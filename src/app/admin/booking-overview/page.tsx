@@ -1,0 +1,108 @@
+import { requireRole } from "@/lib/require-role";
+import { prisma } from "@/lib/prisma";
+import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
+import { Card, CardBody } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { adminCancelBooking } from "./actions";
+
+const statusTone = {
+  BOOKED: "brand",
+  CANCELLED: "neutral",
+  COMPLETED: "success",
+} as const;
+
+const statusLabel: Record<string, string> = {
+  BOOKED: "Terjadwal",
+  CANCELLED: "Dibatalkan",
+  COMPLETED: "Selesai",
+};
+
+export default async function AdminBookingOverviewPage() {
+  await requireRole("ADMIN");
+
+  const bookings = await prisma.booking.findMany({
+    orderBy: { createdAt: "desc" },
+    include: {
+      member: { select: { name: true, email: true } },
+      availability: { include: { coach: { select: { id: true, name: true } } } },
+    },
+  });
+
+  const byCoach = new Map<string, { coachName: string; bookings: typeof bookings }>();
+  for (const b of bookings) {
+    const key = b.availability.coach.id;
+    if (!byCoach.has(key)) {
+      byCoach.set(key, { coachName: b.availability.coach.name, bookings: [] });
+    }
+    byCoach.get(key)!.bookings.push(b);
+  }
+
+  return (
+    <main className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Semua Booking</h1>
+
+      {bookings.length === 0 ? (
+        <Card>
+          <CardBody className="py-10 text-center">
+            <p className="text-sm text-text-muted">Belum ada booking.</p>
+          </CardBody>
+        </Card>
+      ) : (
+        [...byCoach.entries()].map(([coachId, group]) => (
+          <div key={coachId} className="mb-6">
+            <h2 className="mb-2 text-sm font-semibold text-text-muted">
+              {group.coachName} <span className="text-text-subtle">({group.bookings.length})</span>
+            </h2>
+            <Card>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
+                      <th className="px-4 py-3 font-medium">Member</th>
+                      <th className="px-4 py-3 font-medium">Jadwal</th>
+                      <th className="px-4 py-3 font-medium">Status</th>
+                      <th className="px-4 py-3"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.bookings.map((b) => (
+                      <tr key={b.id} className="border-b border-border last:border-0">
+                        <td className="px-4 py-3 text-text">
+                          {b.member.name}
+                          <span className="block text-xs text-text-subtle">{b.member.email}</span>
+                        </td>
+                        <td className="px-4 py-3 text-text-muted">
+                          {formatDateLabel(b.availability.date)},{" "}
+                          {formatTimeWib(b.availability.startTime)}–
+                          {formatTimeWib(b.availability.endTime)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
+                          {b.status === "CANCELLED" && b.cancelledBy && (
+                            <span className="ml-1.5 text-xs text-text-subtle">
+                              oleh {b.cancelledBy === "ADMIN" ? "admin" : "member"}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {b.status === "BOOKED" && (
+                            <form action={adminCancelBooking.bind(null, b.id)}>
+                              <Button type="submit" variant="danger" size="sm">
+                                Batalkan
+                              </Button>
+                            </form>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          </div>
+        ))
+      )}
+    </main>
+  );
+}

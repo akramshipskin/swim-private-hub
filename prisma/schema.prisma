@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  COACH
+  MEMBER
+}
+
+enum PackageStatus {
+  PENDING_PAYMENT
+  ACTIVE
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  EXPIRED
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  BOOKED
+}
+
+enum BookingStatus {
+  BOOKED
+  CANCELLED
+  COMPLETED
+}
+
+enum CancelledBy {
+  MEMBER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(MEMBER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  coachProfile      CoachProfile?
+  packages          Package[]
+  bookings          Booking[]
+  availabilities    Availability[]     @relation("CoachAvailabilities")
+  pushSubscriptions PushSubscription[]
+}
+
+model CoachProfile {
+  id      String  @id @default(cuid())
+  userId  String  @unique
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio     String?
+  isActive Boolean @default(true)
+}
+
+// Katalog paket (harga/durasi) yang admin kelola, gak nempel ke member
+// manapun. Ini yang dipilih member pas checkout Midtrans, atau jadi
+// starting point admin pas assign paket manual ke member.
+model PackageTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  totalSesi Int
+  price     Int
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  packages Package[]
+}
+
+model Package {
+  id          String        @id @default(cuid())
+  memberId    String
+  member      User          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  templateId  String?
+  template    PackageTemplate? @relation(fields: [templateId], references: [id])
+  name        String
+  totalSesi   Int
+  sisaSesi    Int
+  status      PackageStatus @default(PENDING_PAYMENT)
+  startDate   DateTime?
+  expiredDate DateTime?
+  createdAt   DateTime      @default(now())
+
+  payments Payment[]
+
+  @@index([memberId])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  packageId         String
+  package           Package       @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  midtransOrderId   String        @unique
+  amount            Int
+  status            PaymentStatus @default(PENDING)
+  rawWebhookPayload Json?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([packageId])
+}
+
+model Availability {
+  id             String              @id @default(cuid())
+  coachId        String
+  coach          User                @relation("CoachAvailabilities", fields: [coachId], references: [id], onDelete: Cascade)
+  date           DateTime            @db.Date
+  startTime      DateTime
+  endTime        DateTime
+  kapasitas      Int                 @default(1)
+  status         AvailabilityStatus  @default(AVAILABLE)
+  // Kosong buat MVP (availability per hari, input manual). Kolom ini
+  // yang dipakai kalau fitur recurring/per-minggu ditambah belakangan,
+  // biar gak perlu migrasi skema ulang.
+  recurrenceRule String?
+  createdAt      DateTime            @default(now())
+
+  bookings Booking[]
+
+  @@unique([coachId, date, startTime])
+  @@index([coachId, date])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  memberId       String
+  member         User          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  availabilityId String
+  availability   Availability  @relation(fields: [availabilityId], references: [id], onDelete: Cascade)
+  packageId      String
+  status         BookingStatus @default(BOOKED)
+  cancelledBy    CancelledBy?
+  cancelledAt    DateTime?
+  createdAt      DateTime      @default(now())
+
+  @@index([memberId])
+  @@index([availabilityId])
+}
