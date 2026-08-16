@@ -20,6 +20,9 @@ export default function CreateUserForm() {
           <Field label="Email">
             <Input type="email" name="email" required className="w-52" />
           </Field>
+          <Field label="No HP (opsional)">
+            <Input type="tel" name="phone" placeholder="0812xxxxxxx" className="w-40" />
+          </Field>
           <Field label="Password">
             <Input type="password" name="password" required minLength={8} className="w-40" />
           </Field>

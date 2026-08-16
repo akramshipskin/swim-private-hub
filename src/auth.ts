@@ -3,22 +3,27 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   trustHost: true,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
     Credentials({
       credentials: {
-        email: {},
+        identifier: {},
         password: {},
       },
       authorize: async (credentials) => {
-        const email = credentials?.email as string | undefined;
+        const identifier = (credentials?.identifier as string | undefined)?.trim();
         const password = credentials?.password as string | undefined;
-        if (!email || !password) return null;
+        if (!identifier || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        // Identifier bisa email atau no HP -- coba dua-duanya, gak
+        // asumsi format berdasarkan isi string (nomor HP kadang ada yang
+        // isi pake format aneh).
+        const user = await prisma.user.findFirst({
+          where: { OR: [{ email: identifier }, { phone: identifier }] },
+        });
         if (!user || !user.isActive) return null;
 
         const valid = await bcrypt.compare(password, user.passwordHash);
@@ -29,6 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           email: user.email,
           role: user.role,
+          mustChangePassword: user.mustChangePassword,
         };
       },
     }),
@@ -38,6 +44,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.mustChangePassword = user.mustChangePassword;
         return token;
       }
 
@@ -48,7 +55,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       const dbUser = await prisma.user.findUnique({
         where: { id: token.id as string },
-        select: { isActive: true, role: true },
+        select: { isActive: true, role: true, mustChangePassword: true },
       });
 
       if (!dbUser || !dbUser.isActive) {
@@ -56,12 +63,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       token.role = dbUser.role;
+      token.mustChangePassword = dbUser.mustChangePassword;
       return token;
     },
     session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as "ADMIN" | "COACH" | "MEMBER";
+        session.user.mustChangePassword = token.mustChangePassword as boolean;
       }
       return session;
     },

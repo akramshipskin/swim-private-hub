@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { addAvailability } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Label } from "@/components/ui/input";
+import { TimeSelect } from "@/components/ui/time-select";
 import { Button } from "@/components/ui/button";
 
 export default function AddSlotForm() {
@@ -16,12 +17,8 @@ export default function AddSlotForm() {
           <Field label="Tanggal">
             <Input type="date" name="date" required className="w-auto" />
           </Field>
-          <Field label="Jam mulai">
-            <Input type="time" name="startTime" required className="w-auto" />
-          </Field>
-          <Field label="Jam selesai">
-            <Input type="time" name="endTime" required className="w-auto" />
-          </Field>
+          <TimeSelect name="startTime" label="Jam mulai" defaultValue="08:00" />
+          <TimeSelect name="endTime" label="Jam selesai" defaultValue="16:00" />
           <div className="flex items-center gap-1.5 pb-2">
             <input
               type="checkbox"

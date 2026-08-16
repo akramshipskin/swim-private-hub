@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Card, CardBody } from "@/components/ui/card";
@@ -68,10 +68,19 @@ export default function BookingBoard() {
   const [cancelTarget, setCancelTarget] = useState<Slot | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
 
+  // Ganti tanggal cepat bisa bikin fetch tanggal lama nyampe belakangan
+  // (network jitter/cold start) dan nimpa data tanggal baru yang udah
+  // kepasang duluan. requestIdRef nolak response yang bukan dari fetch
+  // terakhir yang di-trigger.
+  const requestIdRef = useRef(0);
+
   const loadSlots = useCallback(async () => {
+    const myRequestId = ++requestIdRef.current;
     const res = await fetch(`/api/availability?date=${date}`);
+    if (requestIdRef.current !== myRequestId) return;
     if (res.ok) {
       const data = await res.json();
+      if (requestIdRef.current !== myRequestId) return;
       setSlots(data.availabilities);
     }
   }, [date]);

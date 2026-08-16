@@ -14,7 +14,10 @@ export default async function CoachLayout({
         brand="Les Renang Cianjur"
         userName={session.user.name ?? ""}
         userRole="Coach"
-        links={[{ href: "/coach/jadwal", label: "Jadwal" }]}
+        links={[
+          { href: "/coach/jadwal", label: "Jadwal" },
+          { href: "/coach/riwayat-sesi", label: "Riwayat Sesi" },
+        ]}
       />
       {children}
     </div>

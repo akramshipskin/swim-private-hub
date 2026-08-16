@@ -1,5 +1,17 @@
 const ADMIN_WHATSAPP_NUMBER = "6281573400086";
 
+function normalizePhoneForWa(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("0")) return "62" + digits.slice(1);
+  return digits;
+}
+
+export function buildContactWaLink(phone: string, name: string) {
+  const number = normalizePhoneForWa(phone);
+  const message = `Halo ${name}, ini dari Admin Les Renang Cianjur.`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
+
 export function buildAdminCancelWaLink({
   memberName,
   coachName,

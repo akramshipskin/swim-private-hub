@@ -38,6 +38,18 @@ export default async function MemberRiwayatPage() {
     include: { availability: { include: { coach: true } } },
   });
 
+  function dateKey(d: Date) {
+    return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+  }
+
+  const byDate = new Map<string, typeof bookings>();
+  for (const b of bookings) {
+    const key = dateKey(b.availability.date);
+    if (!byDate.has(key)) byDate.set(key, []);
+    byDate.get(key)!.push(b);
+  }
+  const sortedDateKeys = [...byDate.keys()].sort().reverse();
+
   // Hitung sisa jatah pembatalan mandiri per paket (dipake buat info di UI).
   const packageIds = [...new Set(bookings.map((b) => b.packageId))];
   const selfCancelCounts = await prisma.booking.groupBy({
@@ -74,14 +86,21 @@ export default async function MemberRiwayatPage() {
           </CardBody>
         </Card>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {bookings.map((b) => {
-            const used = selfCancelByPackage.get(b.packageId) ?? 0;
-            const remaining = Math.max(0, CANCEL_QUOTA_PER_PACKAGE - used);
-            const eligibility = eligibilityByBooking.get(b.id);
+        sortedDateKeys.map((key) => {
+          const rows = byDate.get(key)!;
+          return (
+            <div key={key} className="mb-5">
+              <h2 className="mb-2 text-sm font-semibold text-text-muted">
+                {formatDateLabel(rows[0].availability.date)}
+              </h2>
+              <ul className="flex flex-col gap-2">
+                {rows.map((b) => {
+                  const used = selfCancelByPackage.get(b.packageId) ?? 0;
+                  const remaining = Math.max(0, CANCEL_QUOTA_PER_PACKAGE - used);
+                  const eligibility = eligibilityByBooking.get(b.id);
 
-            return (
-              <Card key={b.id}>
+                  return (
+                    <Card key={b.id}>
                 <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
@@ -92,7 +111,6 @@ export default async function MemberRiwayatPage() {
                         {b.availability.coach.name}
                       </p>
                       <p className="text-sm text-text-muted">
-                        {formatDateLabel(b.availability.date)},{" "}
                         {formatTimeWib(b.availability.startTime)}–
                         {formatTimeWib(b.availability.endTime)}
                       </p>
@@ -142,10 +160,13 @@ export default async function MemberRiwayatPage() {
                     </div>
                   )}
                 </CardBody>
-              </Card>
-            );
-          })}
-        </ul>
+                    </Card>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })
       )}
     </main>
   );

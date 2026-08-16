@@ -45,14 +45,21 @@ enum CancelledBy {
   ADMIN
 }
 
+enum MarkedBy {
+  COACH
+  ADMIN
+}
+
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(MEMBER)
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  id                  String   @id @default(cuid())
+  name                String
+  email               String?  @unique
+  phone               String?  @unique
+  passwordHash        String
+  role                Role     @default(MEMBER)
+  isActive            Boolean  @default(true)
+  mustChangePassword  Boolean  @default(false)
+  createdAt           DateTime @default(now())
 
   coachProfile      CoachProfile?
   packages          Package[]
@@ -159,6 +166,12 @@ model Booking {
   status         BookingStatus @default(BOOKED)
   cancelledBy    CancelledBy?
   cancelledAt    DateTime?
+  // null = belum ditandai, true = member hadir (sesi valid buat coach),
+  // false = member gak hadir (gak dihitung ke sesi valid coach walau
+  // booking-nya tetep BOOKED dan sesi member tetep kepotong).
+  attended       Boolean?
+  attendedBy     MarkedBy?
+  attendedAt     DateTime?
   createdAt      DateTime      @default(now())
 
   @@index([memberId])

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { updatePackage } from "./actions";
 import { Field, Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,17 @@ type Pkg = {
 
 export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
   const [state, formAction, pending] = useActionState(updatePackage, null);
+  const [isEditing, setIsEditing] = useState(false);
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !pending && !state?.error) {
+      setIsEditing(false);
+    }
+    wasPending.current = pending;
+  }, [pending, state]);
+
+  const locked = !isEditing;
 
   return (
     <div>
@@ -27,11 +38,12 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
             defaultValue={pkg.sisaSesi}
             min={0}
             max={pkg.totalSesi}
+            disabled={locked}
             className="w-20"
           />
         </Field>
         <Field label="Status">
-          <Select name="status" defaultValue={pkg.status} className="w-44">
+          <Select name="status" defaultValue={pkg.status} disabled={locked} className="w-44">
             <option value="PENDING_PAYMENT">Menunggu Pembayaran</option>
             <option value="ACTIVE">Aktif</option>
             <option value="EXPIRED">Kedaluwarsa</option>
@@ -42,12 +54,20 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
             type="date"
             name="expiredDate"
             defaultValue={pkg.expiredDateInput}
+            disabled={locked}
             className="w-40"
           />
         </Field>
-        <Button type="submit" variant="secondary" size="sm" loading={pending}>
-          Simpan
-        </Button>
+
+        {locked ? (
+          <Button type="button" variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
+            Edit
+          </Button>
+        ) : (
+          <Button type="submit" variant="secondary" size="sm" loading={pending}>
+            Simpan
+          </Button>
+        )}
       </form>
       {state?.error && (
         <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">

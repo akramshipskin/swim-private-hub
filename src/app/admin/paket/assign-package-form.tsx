@@ -6,7 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-type Member = { id: string; name: string; email: string };
+type Member = { id: string; name: string; email: string | null; phone: string | null };
 type Template = { id: string; name: string };
 
 export default function AssignPackageForm({
@@ -26,7 +26,7 @@ export default function AssignPackageForm({
             <Select name="memberId" required className="w-52">
               {members.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.name} ({m.email})
+                  {m.name} ({m.email ?? m.phone ?? "-"})
                 </option>
               ))}
             </Select>

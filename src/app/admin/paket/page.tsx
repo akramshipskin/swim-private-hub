@@ -41,12 +41,12 @@ export default async function AdminPaketPage() {
     prisma.user.findMany({
       where: { role: "MEMBER" },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, email: true, createdAt: true },
+      select: { id: true, name: true, email: true, phone: true, createdAt: true },
     }),
     prisma.packageTemplate.findMany({ orderBy: { totalSesi: "asc" } }),
     prisma.package.findMany({
       orderBy: { createdAt: "desc" },
-      include: { member: { select: { name: true, email: true, createdAt: true } } },
+      include: { member: { select: { name: true, email: true, phone: true, createdAt: true } } },
     }),
   ]);
 
@@ -88,7 +88,8 @@ export default async function AdminPaketPage() {
             <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-sm font-medium text-text">
-                  {p.member.name} <span className="text-text-subtle">({p.member.email})</span>
+                  {p.member.name}{" "}
+                  <span className="text-text-subtle">({p.member.email ?? p.member.phone ?? "-"})</span>
                 </p>
                 <p className="text-xs text-text-subtle">
                   Member sejak {memberSince(p.member.createdAt)}

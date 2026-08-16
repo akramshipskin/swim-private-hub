@@ -4,6 +4,7 @@ import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AdminCancelButton from "./admin-cancel-button";
+import AttendanceToggle from "@/components/attendance-toggle";
 
 const statusTone = {
   BOOKED: "brand",
@@ -28,13 +29,23 @@ export default async function AdminBookingOverviewPage() {
     },
   });
 
-  const byCoach = new Map<string, { coachName: string; bookings: typeof bookings }>();
+  function dateKey(d: Date) {
+    return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+  }
+
+  const byCoach = new Map<
+    string,
+    { coachName: string; byDate: Map<string, typeof bookings> }
+  >();
   for (const b of bookings) {
-    const key = b.availability.coach.id;
-    if (!byCoach.has(key)) {
-      byCoach.set(key, { coachName: b.availability.coach.name, bookings: [] });
+    const coachKey = b.availability.coach.id;
+    if (!byCoach.has(coachKey)) {
+      byCoach.set(coachKey, { coachName: b.availability.coach.name, byDate: new Map() });
     }
-    byCoach.get(key)!.bookings.push(b);
+    const group = byCoach.get(coachKey)!;
+    const dKey = dateKey(b.availability.date);
+    if (!group.byDate.has(dKey)) group.byDate.set(dKey, []);
+    group.byDate.get(dKey)!.push(b);
   }
 
   return (
@@ -48,53 +59,73 @@ export default async function AdminBookingOverviewPage() {
           </CardBody>
         </Card>
       ) : (
-        [...byCoach.entries()].map(([coachId, group]) => (
-          <div key={coachId} className="mb-6">
-            <h2 className="mb-2 text-sm font-semibold text-text-muted">
-              {group.coachName} <span className="text-text-subtle">({group.bookings.length})</span>
-            </h2>
-            <Card>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
-                      <th className="px-4 py-3 font-medium">Member</th>
-                      <th className="px-4 py-3 font-medium">Jadwal</th>
-                      <th className="px-4 py-3 font-medium">Status</th>
-                      <th className="px-4 py-3"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {group.bookings.map((b) => (
-                      <tr key={b.id} className="border-b border-border last:border-0">
-                        <td className="px-4 py-3 text-text">
-                          {b.member.name}
-                          <span className="block text-xs text-text-subtle">{b.member.email}</span>
-                        </td>
-                        <td className="px-4 py-3 text-text-muted">
-                          {formatDateLabel(b.availability.date)},{" "}
-                          {formatTimeWib(b.availability.startTime)}–
-                          {formatTimeWib(b.availability.endTime)}
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
-                          {b.status === "CANCELLED" && b.cancelledBy && (
-                            <span className="ml-1.5 text-xs text-text-subtle">
-                              oleh {b.cancelledBy === "ADMIN" ? "admin" : "member"}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {b.status === "BOOKED" && <AdminCancelButton bookingId={b.id} />}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          </div>
-        ))
+        [...byCoach.entries()].map(([coachId, group]) => {
+          const totalCount = [...group.byDate.values()].reduce((n, arr) => n + arr.length, 0);
+          const sortedDates = [...group.byDate.keys()].sort();
+
+          return (
+            <div key={coachId} className="mb-6">
+              <h2 className="mb-2 text-sm font-semibold text-text-muted">
+                {group.coachName} <span className="text-text-subtle">({totalCount})</span>
+              </h2>
+
+              {sortedDates.map((dKey) => {
+                const rows = group.byDate.get(dKey)!;
+                return (
+                  <div key={dKey} className="mb-3">
+                    <h3 className="mb-1.5 text-xs font-medium text-text-subtle">
+                      {formatDateLabel(rows[0].availability.date)}
+                    </h3>
+                    <Card>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
+                              <th className="px-4 py-3 font-medium">Member</th>
+                              <th className="px-4 py-3 font-medium">Jam</th>
+                              <th className="px-4 py-3 font-medium">Status</th>
+                              <th className="px-4 py-3"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rows.map((b) => (
+                              <tr key={b.id} className="border-b border-border last:border-0">
+                                <td className="px-4 py-3 text-text">
+                                  {b.member.name}
+                                  <span className="block text-xs text-text-subtle">{b.member.email}</span>
+                                </td>
+                                <td className="px-4 py-3 text-text-muted">
+                                  {formatTimeWib(b.availability.startTime)}–
+                                  {formatTimeWib(b.availability.endTime)}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
+                                  {b.status === "CANCELLED" && b.cancelledBy && (
+                                    <span className="ml-1.5 text-xs text-text-subtle">
+                                      oleh {b.cancelledBy === "ADMIN" ? "admin" : "member"}
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  {b.status === "BOOKED" && b.availability.endTime > new Date() && (
+                                    <AdminCancelButton bookingId={b.id} />
+                                  )}
+                                  {b.status === "BOOKED" && b.availability.endTime <= new Date() && (
+                                    <AttendanceToggle bookingId={b.id} attended={b.attended} />
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })
       )}
     </main>
   );

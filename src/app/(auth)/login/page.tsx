@@ -9,7 +9,7 @@ import { Field, Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ export default function LoginPage() {
     setLoading(true);
 
     const result = await signIn("credentials", {
-      email,
+      identifier,
       password,
       redirect: false,
     });
@@ -28,7 +28,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Email atau password salah");
+      setError("Email/No HP atau password salah");
       return;
     }
 
@@ -48,14 +48,14 @@ export default function LoginPage() {
           <h1 className="mb-5 text-xl font-semibold text-text">Masuk ke akunmu</h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field label="Email">
+            <Field label="Email atau No HP">
               <Input
-                type="email"
-                placeholder="nama@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="nama@email.com atau 0812xxxxxxx"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
-                autoComplete="email"
+                autoComplete="username"
               />
             </Field>
             <Field label="Password">

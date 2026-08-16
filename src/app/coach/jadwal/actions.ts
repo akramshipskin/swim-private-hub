@@ -55,6 +55,8 @@ export async function addAvailability(
 
     const chunks = [];
     for (let h = startH; h < endH; h++) {
+      // Jam istirahat 12.00-13.00 default gak dijadiin slot booking.
+      if (h === 12) continue;
       const pad = (n: number) => String(n).padStart(2, "0");
       chunks.push({
         coachId: session.user.id,

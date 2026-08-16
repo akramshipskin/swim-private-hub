@@ -9,6 +9,10 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
 
+  if (req.auth.user.mustChangePassword && pathname !== "/ganti-password") {
+    return NextResponse.redirect(new URL("/ganti-password", req.nextUrl));
+  }
+
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }

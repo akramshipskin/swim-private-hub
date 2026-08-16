@@ -2,9 +2,11 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { toggleUserActive } from "./actions";
 import CreateUserForm from "./create-user-form";
+import ImportMembersForm from "./import-members-form";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { buildContactWaLink } from "@/lib/whatsapp";
 
 const roleSections: { role: "ADMIN" | "COACH" | "MEMBER"; label: string }[] = [
   { role: "ADMIN", label: "Admin" },
@@ -31,6 +33,7 @@ export default async function AdminUsersPage() {
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola User</h1>
 
       <CreateUserForm />
+      <ImportMembersForm />
 
       {roleSections.map(({ role, label }) => {
         const rows = users.filter((u) => u.role === role);
@@ -48,6 +51,7 @@ export default async function AdminUsersPage() {
                     <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
                       <th className="px-4 py-3 font-medium">Nama</th>
                       <th className="px-4 py-3 font-medium">Email</th>
+                      <th className="px-4 py-3 font-medium">No HP</th>
                       {role === "MEMBER" && (
                         <th className="px-4 py-3 font-medium">Paket</th>
                       )}
@@ -61,7 +65,8 @@ export default async function AdminUsersPage() {
                       return (
                         <tr key={u.id} className="border-b border-border last:border-0">
                           <td className="px-4 py-3 font-medium text-text">{u.name}</td>
-                          <td className="px-4 py-3 text-text-muted">{u.email}</td>
+                          <td className="px-4 py-3 text-text-muted">{u.email ?? "-"}</td>
+                          <td className="px-4 py-3 text-text-muted">{u.phone ?? "-"}</td>
                           {role === "MEMBER" && (
                             <td className="px-4 py-3 text-text-muted">
                               {activePkg ? (
@@ -82,11 +87,23 @@ export default async function AdminUsersPage() {
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <form action={toggleUserActive.bind(null, u.id, !u.isActive)}>
-                              <Button type="submit" variant="ghost" size="sm">
-                                {u.isActive ? "Nonaktifkan" : "Aktifkan"}
-                              </Button>
-                            </form>
+                            <div className="flex items-center justify-end gap-1">
+                              {u.phone && (
+                                <a
+                                  href={buildContactWaLink(u.phone, u.name)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="rounded-md px-2 py-1.5 text-sm font-medium text-[#25D366] hover:bg-[#25D366]/10"
+                                >
+                                  Hubungi
+                                </a>
+                              )}
+                              <form action={toggleUserActive.bind(null, u.id, !u.isActive)}>
+                                <Button type="submit" variant="ghost" size="sm">
+                                  {u.isActive ? "Nonaktifkan" : "Aktifkan"}
+                                </Button>
+                              </form>
+                            </div>
                           </td>
                         </tr>
                       );
