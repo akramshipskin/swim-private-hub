@@ -6,16 +6,18 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Label } from "@/components/ui/input";
 import { TimeSelect } from "@/components/ui/time-select";
 import { Button } from "@/components/ui/button";
+import { todayWibDateString } from "@/lib/datetime";
 
 export default function AddSlotForm() {
   const [state, formAction, pending] = useActionState(addAvailability, null);
+  const today = todayWibDateString();
 
   return (
     <Card className="mb-8 mt-5">
       <CardBody>
         <form action={formAction} className="flex flex-wrap items-end gap-3">
           <Field label="Tanggal">
-            <Input type="date" name="date" required className="w-auto" />
+            <Input type="date" name="date" min={today} defaultValue={today} required className="w-auto" />
           </Field>
           <TimeSelect name="startTime" label="Jam mulai" defaultValue="08:00" />
           <TimeSelect name="endTime" label="Jam selesai" defaultValue="16:00" />

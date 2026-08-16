@@ -30,6 +30,10 @@ export async function addAvailability(
     return { error: "Jam selesai harus setelah jam mulai" };
   }
 
+  if (startDateTime < new Date()) {
+    return { error: "Gak bisa bikin slot di tanggal/jam yang udah lewat." };
+  }
+
   if (!splitHourly) {
     try {
       await prisma.availability.create({

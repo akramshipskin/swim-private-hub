@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
+import { AvailabilityDatePicker } from "@/components/availability-date-picker";
 
 type Slot = {
   id: string;
@@ -185,12 +186,9 @@ export default function BookingBoard() {
       <Card className="mb-4">
         <CardBody className="flex items-center gap-3 py-3">
           <Field label="Tanggal">
-            <Input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="max-w-[10rem]"
-            />
+            <div className="max-w-[16rem]">
+              <AvailabilityDatePicker value={date} onChange={setDate} />
+            </div>
           </Field>
         </CardBody>
       </Card>

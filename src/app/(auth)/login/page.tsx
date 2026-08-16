@@ -28,7 +28,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Email/No HP atau password salah");
+      setError("No HP/Email atau password salah");
       return;
     }
 
@@ -48,10 +48,10 @@ export default function LoginPage() {
           <h1 className="mb-5 text-xl font-semibold text-text">Masuk ke akunmu</h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field label="Email atau No HP">
+            <Field label="No HP atau Email">
               <Input
                 type="text"
-                placeholder="nama@email.com atau 0812xxxxxxx"
+                placeholder="0812xxxxxxx atau nama@email.com"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 required

@@ -16,6 +16,8 @@ type Pkg = {
 export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
   const [state, formAction, pending] = useActionState(updatePackage, null);
   const [isEditing, setIsEditing] = useState(false);
+  const [formKey, setFormKey] = useState(0);
+  const [justEnteredEdit, setJustEnteredEdit] = useState(false);
   const wasPending = useRef(false);
 
   useEffect(() => {
@@ -25,11 +27,22 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
     wasPending.current = pending;
   }, [pending, state]);
 
+  function startEdit() {
+    setIsEditing(true);
+    setJustEnteredEdit(true);
+    setTimeout(() => setJustEnteredEdit(false), 400);
+  }
+
+  function cancel() {
+    setIsEditing(false);
+    setFormKey((k) => k + 1);
+  }
+
   const locked = !isEditing;
 
   return (
     <div>
-      <form action={formAction} className="flex flex-wrap items-end gap-3">
+      <form key={formKey} action={formAction} className="flex flex-wrap items-end gap-3">
         <input type="hidden" name="packageId" value={pkg.id} />
         <Field label="Sisa Sesi">
           <Input
@@ -60,13 +73,24 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
         </Field>
 
         {locked ? (
-          <Button type="button" variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
+          <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
             Edit
           </Button>
         ) : (
-          <Button type="submit" variant="secondary" size="sm" loading={pending}>
-            Simpan
-          </Button>
+          <>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={pending}
+              disabled={justEnteredEdit}
+            >
+              Simpan
+            </Button>
+            <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
+              Batal
+            </Button>
+          </>
         )}
       </form>
       {state?.error && (

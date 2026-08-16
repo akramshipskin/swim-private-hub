@@ -3,15 +3,16 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, email, password } = body as {
+  const { name, phone, email, password } = body as {
     name?: string;
+    phone?: string;
     email?: string;
     password?: string;
   };
 
-  if (!name || !email || !password) {
+  if (!name || !phone || !password) {
     return Response.json(
-      { error: "Nama, email, dan password wajib diisi" },
+      { error: "Nama, No HP, dan password wajib diisi" },
       { status: 400 }
     );
   }
@@ -23,10 +24,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await prisma.user.findFirst({
+    where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
+  });
   if (existing) {
     return Response.json(
-      { error: "Email sudah terdaftar" },
+      { error: "No HP atau email sudah terdaftar" },
       { status: 409 }
     );
   }
@@ -35,20 +38,20 @@ export async function POST(request: Request) {
 
   try {
     const user = await prisma.user.create({
-      data: { name, email, passwordHash, role: "MEMBER" },
-      select: { id: true, name: true, email: true, role: true },
+      data: { name, phone, email: email || null, passwordHash, role: "MEMBER" },
+      select: { id: true, name: true, email: true, phone: true, role: true },
     });
 
     return Response.json({ user }, { status: 201 });
   } catch (err) {
-    // Race jarang: 2 request register email sama nyaris bersamaan, lolos
-    // dari cek findUnique di atas berdua, tapi cuma 1 yang menang di DB.
+    // Race jarang: 2 request register HP/email sama nyaris bersamaan,
+    // lolos dari cek findFirst di atas berdua, tapi cuma 1 yang menang di DB.
     if (
       err instanceof Error &&
       "code" in err &&
       (err as { code?: string }).code === "P2002"
     ) {
-      return Response.json({ error: "Email sudah terdaftar" }, { status: 409 });
+      return Response.json({ error: "No HP atau email sudah terdaftar" }, { status: 409 });
     }
     throw err;
   }

@@ -15,23 +15,23 @@ export async function createUser(
   await requireRole("ADMIN");
 
   const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const phone = (formData.get("phone") as string) || null;
+  const phone = formData.get("phone") as string;
+  const email = (formData.get("email") as string) || null;
   const password = formData.get("password") as string;
   const role = formData.get("role") as "ADMIN" | "COACH" | "MEMBER";
 
-  if (!name || !email || !password || !role) {
-    return { error: "Semua field wajib diisi" };
+  if (!name || !phone || !password || !role) {
+    return { error: "Nama, No HP, password, dan role wajib diisi" };
   }
   if (password.length < 8) {
     return { error: "Password minimal 8 karakter" };
   }
 
   const existing = await prisma.user.findFirst({
-    where: { OR: [{ email }, ...(phone ? [{ phone }] : [])] },
+    where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
   });
   if (existing) {
-    return { error: "Email atau No HP sudah terdaftar" };
+    return { error: "No HP atau email sudah terdaftar" };
   }
 
   const passwordHash = await bcrypt.hash(password, 12);

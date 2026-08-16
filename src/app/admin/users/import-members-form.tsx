@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { importMembersXlsx } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function ImportMembersForm() {
   const [state, formAction, pending] = useActionState(importMembersXlsx, null);
+  const [hasFile, setHasFile] = useState(false);
 
   return (
     <Card className="mb-6">
@@ -22,9 +23,10 @@ export default function ImportMembersForm() {
             name="file"
             accept=".xlsx,.xls"
             required
+            onChange={(e) => setHasFile((e.target.files?.length ?? 0) > 0)}
             className="text-sm text-text file:mr-3 file:rounded-lg file:border-0 file:bg-brand-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-brand-700"
           />
-          <Button type="submit" loading={pending}>
+          <Button type="submit" disabled={!hasFile} loading={pending}>
             Import
           </Button>
         </form>

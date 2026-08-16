@@ -10,6 +10,7 @@ import { Field, Input } from "@/components/ui/input";
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +24,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, phone, email: email || undefined, password }),
     });
 
     if (!res.ok) {
@@ -34,7 +35,7 @@ export default function RegisterPage() {
     }
 
     const signInResult = await signIn("credentials", {
-      identifier: email,
+      identifier: phone,
       password,
       redirect: false,
     });
@@ -71,13 +72,22 @@ export default function RegisterPage() {
                 autoComplete="name"
               />
             </Field>
-            <Field label="Email">
+            <Field label="No HP">
+              <Input
+                type="tel"
+                placeholder="0812xxxxxxx"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+                autoComplete="tel"
+              />
+            </Field>
+            <Field label="Email (opsional)">
               <Input
                 type="email"
                 placeholder="nama@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 autoComplete="email"
               />
             </Field>
