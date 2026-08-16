@@ -1,0 +1,33 @@
+"use client";
+
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardBody } from "@/components/ui/card";
+
+export default function Error({
+  error,
+  retry,
+}: {
+  error: Error & { digest?: string };
+  retry: () => void;
+}) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center">
+      <Card className="w-full max-w-sm">
+        <CardBody className="flex flex-col items-center gap-3 py-8">
+          <h1 className="text-lg font-semibold text-text">Ada yang error</h1>
+          <p className="text-sm text-text-muted">
+            Terjadi kesalahan gak terduga. Coba lagi, atau balik ke halaman sebelumnya.
+          </p>
+          <Button onClick={() => retry()} className="mt-2 w-full">
+            Coba Lagi
+          </Button>
+        </CardBody>
+      </Card>
+    </main>
+  );
+}

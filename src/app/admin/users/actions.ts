@@ -5,7 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 
-export async function createUser(formData: FormData) {
+export type ActionState = { error?: string } | null;
+
+export async function createUser(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   await requireRole("ADMIN");
 
   const name = formData.get("name") as string;
@@ -14,15 +19,15 @@ export async function createUser(formData: FormData) {
   const role = formData.get("role") as "ADMIN" | "COACH" | "MEMBER";
 
   if (!name || !email || !password || !role) {
-    throw new Error("Semua field wajib diisi");
+    return { error: "Semua field wajib diisi" };
   }
   if (password.length < 8) {
-    throw new Error("Password minimal 8 karakter");
+    return { error: "Password minimal 8 karakter" };
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    throw new Error("Email sudah terdaftar");
+    return { error: "Email sudah terdaftar" };
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -38,6 +43,7 @@ export async function createUser(formData: FormData) {
   });
 
   revalidatePath("/admin/users");
+  return null;
 }
 
 export async function toggleUserActive(userId: string, nextActive: boolean) {

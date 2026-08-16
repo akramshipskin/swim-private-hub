@@ -3,8 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { adminCancelBooking } from "./actions";
+import AdminCancelButton from "./admin-cancel-button";
 
 const statusTone = {
   BOOKED: "brand",
@@ -86,13 +85,7 @@ export default async function AdminBookingOverviewPage() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          {b.status === "BOOKED" && (
-                            <form action={adminCancelBooking.bind(null, b.id)}>
-                              <Button type="submit" variant="danger" size="sm">
-                                Batalkan
-                              </Button>
-                            </form>
-                          )}
+                          {b.status === "BOOKED" && <AdminCancelButton bookingId={b.id} />}
                         </td>
                       </tr>
                     ))}

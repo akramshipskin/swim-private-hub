@@ -1,8 +1,8 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
-import { createUser, toggleUserActive } from "./actions";
-import { Card, CardBody } from "@/components/ui/card";
-import { Field, Input, Select } from "@/components/ui/input";
+import { toggleUserActive } from "./actions";
+import CreateUserForm from "./create-user-form";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -30,30 +30,7 @@ export default async function AdminUsersPage() {
     <main className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola User</h1>
 
-      <Card className="mb-6">
-        <CardBody>
-          <h2 className="mb-4 text-sm font-semibold text-text">Tambah User Baru</h2>
-          <form action={createUser} className="flex flex-wrap items-end gap-3">
-            <Field label="Nama">
-              <Input name="name" required className="w-40" />
-            </Field>
-            <Field label="Email">
-              <Input type="email" name="email" required className="w-52" />
-            </Field>
-            <Field label="Password">
-              <Input type="password" name="password" required minLength={8} className="w-40" />
-            </Field>
-            <Field label="Role">
-              <Select name="role" required defaultValue="MEMBER" className="w-32">
-                <option value="MEMBER">Member</option>
-                <option value="COACH">Coach</option>
-                <option value="ADMIN">Admin</option>
-              </Select>
-            </Field>
-            <Button type="submit">Tambah</Button>
-          </form>
-        </CardBody>
-      </Card>
+      <CreateUserForm />
 
       {roleSections.map(({ role, label }) => {
         const rows = users.filter((u) => u.role === role);

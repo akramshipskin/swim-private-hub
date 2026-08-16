@@ -6,7 +6,12 @@ import { revalidatePath } from "next/cache";
 import { wibDateTime, dateLabel } from "@/lib/datetime";
 import { emitBookingChanged } from "@/lib/booking-events";
 
-export async function addAvailability(formData: FormData) {
+export type ActionState = { error?: string } | null;
+
+export async function addAvailability(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const session = await requireRole("COACH");
 
   const date = formData.get("date") as string;
@@ -15,33 +20,37 @@ export async function addAvailability(formData: FormData) {
   const splitHourly = formData.get("splitHourly") === "on";
 
   if (!date || !startTime || !endTime) {
-    throw new Error("Tanggal, jam mulai, dan jam selesai wajib diisi");
+    return { error: "Tanggal, jam mulai, dan jam selesai wajib diisi" };
   }
 
   const startDateTime = wibDateTime(date, startTime);
   const endDateTime = wibDateTime(date, endTime);
 
   if (endDateTime <= startDateTime) {
-    throw new Error("Jam selesai harus setelah jam mulai");
+    return { error: "Jam selesai harus setelah jam mulai" };
   }
 
   if (!splitHourly) {
-    await prisma.availability.create({
-      data: {
-        coachId: session.user.id,
-        date: dateLabel(date),
-        startTime: startDateTime,
-        endTime: endDateTime,
-      },
-    });
+    try {
+      await prisma.availability.create({
+        data: {
+          coachId: session.user.id,
+          date: dateLabel(date),
+          startTime: startDateTime,
+          endTime: endDateTime,
+        },
+      });
+    } catch {
+      return { error: "Slot di jam ini udah ada sebelumnya." };
+    }
   } else {
     const [startH, startM] = startTime.split(":").map(Number);
     const [endH, endM] = endTime.split(":").map(Number);
 
     if (startM !== 0 || endM !== 0) {
-      throw new Error(
-        "Pecah per jam cuma bisa buat jam bulat (misal 08:00, bukan 08:30)."
-      );
+      return {
+        error: "Pecah per jam cuma bisa buat jam bulat (misal 08:00, bukan 08:30).",
+      };
     }
 
     const chunks = [];
@@ -60,6 +69,7 @@ export async function addAvailability(formData: FormData) {
 
   emitBookingChanged();
   revalidatePath("/coach/jadwal");
+  return null;
 }
 
 export async function deleteAvailability(availabilityId: string) {

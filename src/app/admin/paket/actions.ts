@@ -4,9 +4,14 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+export type ActionState = { error?: string } | null;
+
 // --- Katalog paket (PackageTemplate) -- gak nempel ke member manapun ---
 
-export async function createTemplate(formData: FormData) {
+export async function createTemplate(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   await requireRole("ADMIN");
 
   const name = formData.get("name")?.toString().trim() ?? "";
@@ -14,7 +19,7 @@ export async function createTemplate(formData: FormData) {
   const price = Number(formData.get("price"));
 
   if (!name || !Number.isInteger(totalSesi) || totalSesi < 1 || !Number.isFinite(price) || price < 0) {
-    throw new Error("Nama wajib diisi, total sesi minimal 1, harga gak boleh negatif");
+    return { error: "Nama wajib diisi, total sesi minimal 1, harga gak boleh negatif" };
   }
 
   await prisma.packageTemplate.create({
@@ -22,9 +27,13 @@ export async function createTemplate(formData: FormData) {
   });
 
   revalidatePath("/admin/paket");
+  return null;
 }
 
-export async function updateTemplate(formData: FormData) {
+export async function updateTemplate(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   await requireRole("ADMIN");
 
   const templateId = formData.get("templateId") as string;
@@ -34,7 +43,7 @@ export async function updateTemplate(formData: FormData) {
   const isActive = formData.get("isActive") === "on";
 
   if (!name || !Number.isInteger(totalSesi) || totalSesi < 1 || !Number.isFinite(price) || price < 0) {
-    throw new Error("Nama wajib diisi, total sesi minimal 1, harga gak boleh negatif");
+    return { error: "Nama wajib diisi, total sesi minimal 1, harga gak boleh negatif" };
   }
 
   await prisma.packageTemplate.update({
@@ -43,11 +52,15 @@ export async function updateTemplate(formData: FormData) {
   });
 
   revalidatePath("/admin/paket");
+  return null;
 }
 
 // --- Assign paket ke member (custom, boleh dari katalog atau bebas) ---
 
-export async function assignPackageToMember(formData: FormData) {
+export async function assignPackageToMember(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   await requireRole("ADMIN");
 
   const memberId = formData.get("memberId") as string;
@@ -57,7 +70,7 @@ export async function assignPackageToMember(formData: FormData) {
   const expiredDateRaw = formData.get("expiredDate") as string;
 
   if (!memberId || !name || !Number.isInteger(totalSesi) || totalSesi < 1) {
-    throw new Error("Member, nama paket wajib diisi, total sesi minimal 1");
+    return { error: "Member, nama paket wajib diisi, total sesi minimal 1" };
   }
 
   await prisma.package.create({
@@ -74,11 +87,15 @@ export async function assignPackageToMember(formData: FormData) {
   });
 
   revalidatePath("/admin/paket");
+  return null;
 }
 
 // --- Edit paket milik member (sisa sesi, status, masa berlaku) ---
 
-export async function updatePackage(formData: FormData) {
+export async function updatePackage(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   await requireRole("ADMIN");
 
   const packageId = formData.get("packageId") as string;
@@ -87,10 +104,13 @@ export async function updatePackage(formData: FormData) {
   const expiredDateRaw = formData.get("expiredDate") as string;
 
   if (!packageId || !Number.isInteger(sisaSesiRaw) || sisaSesiRaw < 0) {
-    throw new Error("Sisa sesi gak boleh negatif");
+    return { error: "Sisa sesi gak boleh negatif" };
   }
 
-  const pkg = await prisma.package.findUniqueOrThrow({ where: { id: packageId } });
+  const pkg = await prisma.package.findUnique({ where: { id: packageId } });
+  if (!pkg) {
+    return { error: "Paket gak ketemu, mungkin udah dihapus." };
+  }
   // Clamp biar sisa sesi gak bisa ngelewatin total sesi paketnya sendiri.
   const sisaSesi = Math.min(sisaSesiRaw, pkg.totalSesi);
 
@@ -104,4 +124,5 @@ export async function updatePackage(formData: FormData) {
   });
 
   revalidatePath("/admin/paket");
+  return null;
 }

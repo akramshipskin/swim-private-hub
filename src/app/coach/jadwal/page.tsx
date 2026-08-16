@@ -1,11 +1,11 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
-import { addAvailability, deleteAvailability } from "./actions";
+import { deleteAvailability } from "./actions";
+import AddSlotForm from "./add-slot-form";
 import { formatDateLabel, formatTimeWib, dateLabel, todayWibDateString } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Field, Input, Label } from "@/components/ui/input";
 
 export default async function CoachJadwalPage() {
   const session = await requireRole("COACH");
@@ -40,39 +40,7 @@ export default async function CoachJadwalPage() {
         Tambah slot per tanggal. Member bakal lihat & booking slot ini secara real-time.
       </p>
 
-      <Card className="mb-8 mt-5">
-        <CardBody>
-          <form action={addAvailability} className="flex flex-wrap items-end gap-3">
-            <Field label="Tanggal">
-              <Input type="date" name="date" required className="w-auto" />
-            </Field>
-            <Field label="Jam mulai">
-              <Input type="time" name="startTime" required className="w-auto" />
-            </Field>
-            <Field label="Jam selesai">
-              <Input type="time" name="endTime" required className="w-auto" />
-            </Field>
-            <div className="flex items-center gap-1.5 pb-2">
-              <input
-                type="checkbox"
-                name="splitHourly"
-                id="splitHourly"
-                defaultChecked
-                className="h-4 w-4 rounded border-border"
-              />
-              <Label htmlFor="splitHourly" className="text-sm text-text">
-                Pecah per jam (1 sesi = 1 member per jam)
-              </Label>
-            </div>
-            <Button type="submit">Tambah Slot</Button>
-          </form>
-          <p className="mt-2 text-xs text-text-subtle">
-            Contoh: 08.00–10.00 + &ldquo;pecah per jam&rdquo; = 2 slot terpisah (08–09, 09–10),
-            bisa dibooking 2 member beda. Kalau di-uncheck, jadi 1 slot utuh 08.00–10.00 buat 1
-            member aja.
-          </p>
-        </CardBody>
-      </Card>
+      <AddSlotForm />
 
       {availabilities.length === 0 ? (
         <Card>

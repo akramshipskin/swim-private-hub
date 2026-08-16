@@ -1,14 +1,10 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
-import {
-  createTemplate,
-  updateTemplate,
-  assignPackageToMember,
-  updatePackage,
-} from "./actions";
+import CreateTemplateForm from "./create-template-form";
+import TemplateEditForm from "./template-edit-form";
+import AssignPackageForm from "./assign-package-form";
+import PackageEditForm from "./package-edit-form";
 import { Card, CardBody } from "@/components/ui/card";
-import { Field, Input, Select, Label } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDateLabel } from "@/lib/datetime";
 
@@ -23,14 +19,6 @@ const statusLabel: Record<string, string> = {
   ACTIVE: "Aktif",
   EXPIRED: "Kedaluwarsa",
 };
-
-function formatRupiah(n: number) {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
 
 function toInputDate(d: Date | null) {
   if (!d) return "";
@@ -73,56 +61,13 @@ export default async function AdminPaketPage() {
         &ldquo;Beli Paket&rdquo; member.
       </p>
 
-      <Card className="mb-4">
-        <CardBody>
-          <form action={createTemplate} className="flex flex-wrap items-end gap-3">
-            <Field label="Nama Paket">
-              <Input name="name" required className="w-44" />
-            </Field>
-            <Field label="Total Sesi">
-              <Input type="number" name="totalSesi" required min={1} className="w-24" />
-            </Field>
-            <Field label="Harga (Rp)">
-              <Input type="number" name="price" required min={0} className="w-32" />
-            </Field>
-            <Button type="submit">Tambah Katalog</Button>
-          </form>
-        </CardBody>
-      </Card>
+      <CreateTemplateForm />
 
       <ul className="mb-8 flex flex-col gap-2">
         {templates.map((t) => (
-          <Card key={t.id}>
-            <CardBody>
-              <form action={updateTemplate} className="flex flex-wrap items-end gap-3">
-                <input type="hidden" name="templateId" value={t.id} />
-                <Field label="Nama">
-                  <Input name="name" defaultValue={t.name} className="w-40" />
-                </Field>
-                <Field label="Total Sesi">
-                  <Input type="number" name="totalSesi" defaultValue={t.totalSesi} min={1} className="w-20" />
-                </Field>
-                <Field label="Harga (Rp)">
-                  <Input type="number" name="price" defaultValue={t.price} min={0} className="w-32" />
-                </Field>
-                <div className="flex items-center gap-1.5 pb-2">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    id={`active-${t.id}`}
-                    defaultChecked={t.isActive}
-                    className="h-4 w-4 rounded border-border"
-                  />
-                  <Label htmlFor={`active-${t.id}`} className="text-sm text-text">
-                    Aktif
-                  </Label>
-                </div>
-                <Button type="submit" variant="secondary" size="sm">
-                  Simpan
-                </Button>
-              </form>
-            </CardBody>
-          </Card>
+          <li key={t.id}>
+            <TemplateEditForm template={t} />
+          </li>
         ))}
       </ul>
 
@@ -133,41 +78,7 @@ export default async function AdminPaketPage() {
         alur beli-online).
       </p>
 
-      <Card className="mb-8">
-        <CardBody>
-          <form action={assignPackageToMember} className="flex flex-wrap items-end gap-3">
-            <Field label="Member">
-              <Select name="memberId" required className="w-52">
-                {members.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} ({m.email})
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Dari Katalog (opsional)">
-              <Select name="templateId" className="w-44" defaultValue="">
-                <option value="">-- custom --</option>
-                {templates.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Nama Paket">
-              <Input name="name" required className="w-40" />
-            </Field>
-            <Field label="Total Sesi">
-              <Input type="number" name="totalSesi" required min={1} className="w-20" />
-            </Field>
-            <Field label="Berlaku Sampai (opsional)">
-              <Input type="date" name="expiredDate" className="w-40" />
-            </Field>
-            <Button type="submit">Assign (langsung Aktif)</Button>
-          </form>
-        </CardBody>
-      </Card>
+      <AssignPackageForm members={members} templates={templates} />
 
       {/* --- List member + paket, advanced --- */}
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>
@@ -184,37 +95,15 @@ export default async function AdminPaketPage() {
                 </p>
                 <p className="mb-3 mt-1 text-sm text-text-muted">{p.name}</p>
 
-                <form action={updatePackage} className="flex flex-wrap items-end gap-3">
-                  <input type="hidden" name="packageId" value={p.id} />
-                  <Field label="Sisa Sesi">
-                    <Input
-                      type="number"
-                      name="sisaSesi"
-                      defaultValue={p.sisaSesi}
-                      min={0}
-                      max={p.totalSesi}
-                      className="w-20"
-                    />
-                  </Field>
-                  <Field label="Status">
-                    <Select name="status" defaultValue={p.status} className="w-44">
-                      <option value="PENDING_PAYMENT">Menunggu Pembayaran</option>
-                      <option value="ACTIVE">Aktif</option>
-                      <option value="EXPIRED">Kedaluwarsa</option>
-                    </Select>
-                  </Field>
-                  <Field label="Berlaku Sampai">
-                    <Input
-                      type="date"
-                      name="expiredDate"
-                      defaultValue={toInputDate(p.expiredDate)}
-                      className="w-40"
-                    />
-                  </Field>
-                  <Button type="submit" variant="secondary" size="sm">
-                    Simpan
-                  </Button>
-                </form>
+                <PackageEditForm
+                  pkg={{
+                    id: p.id,
+                    sisaSesi: p.sisaSesi,
+                    totalSesi: p.totalSesi,
+                    status: p.status,
+                    expiredDateInput: toInputDate(p.expiredDate),
+                  }}
+                />
               </div>
 
               <div className="shrink-0 rounded-lg bg-surface-muted px-4 py-3 sm:text-right">
