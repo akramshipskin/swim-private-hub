@@ -38,36 +38,53 @@ export async function GET(request: Request) {
     },
   });
 
+  const now = new Date();
+
   const result = await Promise.all(
-    availabilities.map(async (a) => {
-      const activeBooking = a.bookings[0];
-      const bookedByMe = activeBooking?.memberId === session.user.id;
+    availabilities
+      // Slot kosong (belum ada yang book) yang jamnya udah lewat gak
+      // relevan lagi buat member -- hide total. Slot yang UDAH dibooking
+      // tetep ditampilin (biar member masih liat booking-nya sendiri).
+      .filter((a) => a.bookings.length > 0 || a.startTime > now)
+      .map(async (a) => {
+        const activeBooking = a.bookings[0];
+        const bookedByMe = activeBooking?.memberId === session.user.id;
 
-      let canCancel = false;
-      let cancelReason: string | undefined;
+        let canCancel = false;
+        let cancelReason: string | undefined;
+        let hasCancelRequest = false;
 
-      if (bookedByMe && activeBooking) {
-        const eligibility = await checkCancelEligibility({
-          memberId: activeBooking.memberId,
-          packageId: activeBooking.packageId,
+        if (bookedByMe && activeBooking) {
+          const eligibility = await checkCancelEligibility({
+            memberId: activeBooking.memberId,
+            packageId: activeBooking.packageId,
+            startTime: a.startTime,
+          });
+          canCancel = eligibility.canCancel;
+          cancelReason = eligibility.reason;
+
+          if (!canCancel) {
+            const cr = await prisma.cancelRequest.findUnique({
+              where: { bookingId: activeBooking.id },
+              select: { status: true },
+            });
+            hasCancelRequest = cr?.status === "PENDING";
+          }
+        }
+
+        return {
+          id: a.id,
           startTime: a.startTime,
-        });
-        canCancel = eligibility.canCancel;
-        cancelReason = eligibility.reason;
-      }
-
-      return {
-        id: a.id,
-        startTime: a.startTime,
-        endTime: a.endTime,
-        status: a.status,
-        coach: a.coach,
-        bookedByMe,
-        bookingId: bookedByMe ? activeBooking!.id : null,
-        canCancel,
-        cancelReason,
-      };
-    })
+          endTime: a.endTime,
+          status: a.status,
+          coach: a.coach,
+          bookedByMe,
+          bookingId: bookedByMe ? activeBooking!.id : null,
+          canCancel,
+          cancelReason,
+          hasCancelRequest,
+        };
+      })
   );
 
   return Response.json({ availabilities: result });

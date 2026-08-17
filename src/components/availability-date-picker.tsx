@@ -152,25 +152,31 @@ export function AvailabilityDatePicker({
               const hasSlot = availableDates.has(key);
               const isSelected = key === value;
               const isToday = key === todayKey;
+              const isPast = key < todayKey;
 
               return (
                 <button
                   key={key}
                   type="button"
+                  disabled={isPast}
+                  aria-disabled={isPast}
                   onClick={() => {
+                    if (isPast) return;
                     onChange(key);
                     setOpen(false);
                   }}
                   className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs ${
-                    isSelected
-                      ? "bg-brand-600 font-semibold text-white"
-                      : isToday
-                        ? "font-semibold text-brand-700"
-                        : "text-text hover:bg-surface-muted"
+                    isPast
+                      ? "cursor-not-allowed text-text-subtle/40"
+                      : isSelected
+                        ? "bg-brand-600 font-semibold text-white"
+                        : isToday
+                          ? "font-semibold text-brand-700"
+                          : "text-text hover:bg-surface-muted"
                   }`}
                 >
                   {day}
-                  {hasSlot && !isSelected && (
+                  {hasSlot && !isSelected && !isPast && (
                     <span className="absolute bottom-0.5 h-1 w-1 rounded-full bg-brand-500" />
                   )}
                 </button>

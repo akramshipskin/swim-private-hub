@@ -13,27 +13,29 @@ export default function CreateUserForm() {
     <Card className="mb-6">
       <CardBody>
         <h2 className="mb-4 text-sm font-semibold text-text">Tambah User Baru</h2>
-        <form action={formAction} className="flex flex-wrap items-end gap-3">
-          <Field label="Nama">
-            <Input name="name" required className="w-40" />
-          </Field>
-          <Field label="No HP">
-            <Input type="tel" name="phone" placeholder="0812xxxxxxx" required className="w-40" />
-          </Field>
-          <Field label="Email (opsional)">
-            <Input type="email" name="email" className="w-52" />
-          </Field>
-          <Field label="Password">
-            <Input type="password" name="password" required minLength={8} className="w-40" />
-          </Field>
-          <Field label="Role">
-            <Select name="role" required defaultValue="MEMBER" className="w-32">
-              <option value="MEMBER">Member</option>
-              <option value="COACH">Coach</option>
-              <option value="ADMIN">Admin</option>
-            </Select>
-          </Field>
-          <Button type="submit" loading={pending}>
+        <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          <div className="grid grid-cols-1 gap-3 sm:contents">
+            <Field label="Nama">
+              <Input name="name" required className="w-full sm:w-40" />
+            </Field>
+            <Field label="No HP">
+              <Input type="tel" name="phone" placeholder="0812xxxxxxx" required className="w-full sm:w-40" />
+            </Field>
+            <Field label="Email (opsional)">
+              <Input type="email" name="email" className="w-full sm:w-52" />
+            </Field>
+            <Field label="Password">
+              <Input type="password" name="password" required minLength={8} className="w-full sm:w-40" />
+            </Field>
+            <Field label="Role">
+              <Select name="role" required defaultValue="MEMBER" className="w-full sm:w-32">
+                <option value="MEMBER">Member</option>
+                <option value="COACH">Coach</option>
+                <option value="ADMIN">Admin</option>
+              </Select>
+            </Field>
+          </div>
+          <Button type="submit" loading={pending} className="w-full sm:w-auto">
             Tambah
           </Button>
         </form>

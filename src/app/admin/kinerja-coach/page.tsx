@@ -34,26 +34,26 @@ export default async function KinerjaCoachPage({
     include: { availability: { include: { coach: { select: { id: true, name: true } } } } },
   });
 
-  const validByCoach = new Map<string, { name: string; count: number }>();
-  let unmarkedCount = 0;
-  let notHadirCount = 0;
+  const byCoach = new Map<
+    string,
+    { name: string; valid: number; notHadir: number; unmarked: number }
+  >();
 
-  for (const b of bookings) {
-    if (b.attended === true) {
-      const coach = b.availability.coach;
-      if (!validByCoach.has(coach.id)) {
-        validByCoach.set(coach.id, { name: coach.name, count: 0 });
-      }
-      validByCoach.get(coach.id)!.count++;
-    } else if (b.attended === false) {
-      notHadirCount++;
-    } else {
-      unmarkedCount++;
-    }
+  function bucket(coachId: string, name: string) {
+    if (!byCoach.has(coachId)) byCoach.set(coachId, { name, valid: 0, notHadir: 0, unmarked: 0 });
+    return byCoach.get(coachId)!;
   }
 
-  const rows = [...validByCoach.values()].sort((a, b) => b.count - a.count);
-  const totalValid = rows.reduce((n, r) => n + r.count, 0);
+  for (const b of bookings) {
+    const coach = b.availability.coach;
+    const entry = bucket(coach.id, coach.name);
+    if (b.attended === true) entry.valid++;
+    else if (b.attended === false) entry.notHadir++;
+    else entry.unmarked++;
+  }
+
+  const rows = [...byCoach.values()].sort((a, b) => b.valid - a.valid);
+  const totalValid = rows.reduce((n, r) => n + r.valid, 0);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
@@ -65,7 +65,7 @@ export default async function KinerjaCoachPage({
 
       <Card className="mb-6">
         <CardBody>
-          <form className="flex flex-wrap items-end gap-3" method="get">
+          <form className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end" method="get">
             <Field label="Dari">
               <Input type="date" name="from" defaultValue={from} className="w-full sm:w-40" />
             </Field>
@@ -80,12 +80,10 @@ export default async function KinerjaCoachPage({
         </CardBody>
       </Card>
 
-      {rows.length === 0 ? (
+      {bookings.length === 0 ? (
         <Card>
           <CardBody className="py-10 text-center">
-            <p className="text-sm text-text-muted">
-              Belum ada sesi valid (attended) di rentang tanggal ini.
-            </p>
+            <p className="text-sm text-text-muted">Belum ada booking di rentang tanggal ini.</p>
           </CardBody>
         </Card>
       ) : (
@@ -101,8 +99,17 @@ export default async function KinerjaCoachPage({
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.name} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3 font-medium text-text">{r.name}</td>
-                    <td className="px-4 py-3 text-right font-mono text-text">{r.count}</td>
+                    <td className="px-4 py-3">
+                      <p className="font-medium text-text">{r.name}</p>
+                      {(r.unmarked > 0 || r.notHadir > 0) && (
+                        <p className="mt-0.5 text-xs text-text-subtle">
+                          {r.unmarked > 0 && <>{r.unmarked} belum ditandai</>}
+                          {r.unmarked > 0 && r.notHadir > 0 && " · "}
+                          {r.notHadir > 0 && <>{r.notHadir} gak hadir</>}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-text">{r.valid}</td>
                   </tr>
                 ))}
               </tbody>
@@ -119,18 +126,10 @@ export default async function KinerjaCoachPage({
         </Card>
       )}
 
-      {(unmarkedCount > 0 || notHadirCount > 0) && (
-        <p className="mt-4 text-xs text-text-subtle">
-          {unmarkedCount > 0 && (
-            <>
-              {unmarkedCount} booking di rentang ini belum ditandai hadir/gak hadir -- gak ikut
-              kehitung sampai ditandai (cek di Booking &amp; Riwayat Sesi coach).
-              <br />
-            </>
-          )}
-          {notHadirCount > 0 && <>{notHadirCount} booking ditandai gak hadir, gak dihitung.</>}
-        </p>
-      )}
+      <p className="mt-4 text-xs text-text-subtle">
+        Booking yang belum ditandai atau ditandai gak hadir gak ikut kehitung sesi valid -- cek
+        di Booking &amp; Riwayat Sesi coach.
+      </p>
     </main>
   );
 }

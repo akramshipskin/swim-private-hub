@@ -43,6 +43,16 @@ export default async function MemberBookingPage() {
         </div>
       )}
 
+      <div className="mb-6 rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted">
+        <p className="mb-1 font-medium text-text">Kebijakan pembatalan</p>
+        <p>
+          Booking bisa dibatalkan sendiri sesuai jatah paket kamu. Kalau jatah udah abis,
+          kamu masih bisa ajukan pembatalan ke admin (bisa di-approve atau ditolak). Kalau
+          udah booking tapi gak hadir tanpa dibatalin/di-approve, sisa sesi tetap kepotong
+          dan gak ada refund.
+        </p>
+      </div>
+
       <BookingBoard />
     </main>
   );

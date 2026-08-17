@@ -9,14 +9,20 @@ const MINUTES = ["00", "30"];
 // Native <input type="time"> ikut format jam locale browser (bisa AM/PM),
 // dan step-nya default per menit -- susah buat dipaksa 24h + kelipatan 30
 // menit lintas browser. Dropdown custom ini guarantee dua-duanya.
+//
+// hourOnly: coach jadwal cuma butuh presisi per jam (slot selalu dipecah
+// per jam genap) -- skip pilihan menit sepenuhnya biar 1 baris lebih
+// ringkes, menit dikunci "00".
 export function TimeSelect({
   name,
   label,
   defaultValue = "08:00",
+  hourOnly = false,
 }: {
   name: string;
   label: string;
   defaultValue?: string;
+  hourOnly?: boolean;
 }) {
   const [h, m] = defaultValue.split(":");
   const [hour, setHour] = useState(h ?? "08");
@@ -27,7 +33,7 @@ export function TimeSelect({
       <Label>{label}</Label>
       <div className="flex items-center gap-1">
         <Select
-          aria-label={`${label} - jam`}
+          aria-label={hourOnly ? label : `${label} - jam`}
           value={hour}
           onChange={(e) => setHour(e.target.value)}
           className="w-[4.5rem]"
@@ -38,21 +44,25 @@ export function TimeSelect({
             </option>
           ))}
         </Select>
-        <span className="text-text-muted">:</span>
-        <Select
-          aria-label={`${label} - menit`}
-          value={minute}
-          onChange={(e) => setMinute(e.target.value)}
-          className="w-[4.5rem]"
-        >
-          {MINUTES.map((mm) => (
-            <option key={mm} value={mm}>
-              {mm}
-            </option>
-          ))}
-        </Select>
+        {!hourOnly && (
+          <>
+            <span className="text-text-muted">:</span>
+            <Select
+              aria-label={`${label} - menit`}
+              value={minute}
+              onChange={(e) => setMinute(e.target.value)}
+              className="w-[4.5rem]"
+            >
+              {MINUTES.map((mm) => (
+                <option key={mm} value={mm}>
+                  {mm}
+                </option>
+              ))}
+            </Select>
+          </>
+        )}
       </div>
-      <input type="hidden" name={name} value={`${hour}:${minute}`} />
+      <input type="hidden" name={name} value={`${hour}:${hourOnly ? "00" : minute}`} />
     </div>
   );
 }

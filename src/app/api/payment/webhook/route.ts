@@ -35,6 +35,7 @@ export async function POST(request: Request) {
 
   const payment = await prisma.payment.findUnique({
     where: { midtransOrderId: orderId },
+    include: { package: { include: { template: true } } },
   });
 
   if (!payment) {
@@ -57,6 +58,11 @@ export async function POST(request: Request) {
     paymentStatus = "PENDING";
   }
 
+  const durationDays = payment.package.template?.durationDays ?? 60;
+  const now = new Date();
+  const expiredDate = new Date(now);
+  expiredDate.setDate(expiredDate.getDate() + durationDays);
+
   await prisma.$transaction([
     prisma.payment.update({
       where: { id: payment.id },
@@ -68,7 +74,7 @@ export async function POST(request: Request) {
             where: { id: payment.packageId },
             data: {
               status: packageStatus,
-              ...(packageStatus === "ACTIVE" ? { startDate: new Date() } : {}),
+              ...(packageStatus === "ACTIVE" ? { startDate: now, expiredDate } : {}),
             },
           }),
         ]

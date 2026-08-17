@@ -28,8 +28,10 @@ export default function AddSlotForm() {
             </div>
             <input type="hidden" name="date" value={date} />
           </Field>
-          <TimeSelect name="startTime" label="Jam mulai" defaultValue="08:00" />
-          <TimeSelect name="endTime" label="Jam selesai" defaultValue="16:00" />
+          <div className="flex items-end gap-3">
+            <TimeSelect name="startTime" label="Jam mulai" defaultValue="08:00" hourOnly />
+            <TimeSelect name="endTime" label="Jam selesai" defaultValue="16:00" hourOnly />
+          </div>
           <div className="flex items-center gap-1.5 pb-2">
             <input
               type="checkbox"

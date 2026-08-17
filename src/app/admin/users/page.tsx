@@ -7,6 +7,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { buildContactWaLink } from "@/lib/whatsapp";
+import { formatDateLabel } from "@/lib/datetime";
 
 function UserActions({
   user,
@@ -101,6 +102,9 @@ export default async function AdminUsersPage() {
                                   {activePkg.name}
                                   <span className="block text-xs text-text-subtle">
                                     sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi
+                                    {activePkg.expiredDate && (
+                                      <> · s.d. {formatDateLabel(activePkg.expiredDate)}</>
+                                    )}
                                   </span>
                                 </>
                               ) : (
@@ -148,6 +152,9 @@ export default async function AdminUsersPage() {
                           {activePkg ? (
                             <>
                               {activePkg.name} -- sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi
+                              {activePkg.expiredDate && (
+                                <> · s.d. {formatDateLabel(activePkg.expiredDate)}</>
+                              )}
                             </>
                           ) : (
                             <span className="text-text-subtle">Belum ada paket aktif</span>

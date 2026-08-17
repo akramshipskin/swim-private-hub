@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Field } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
@@ -20,6 +21,7 @@ type Slot = {
   bookingId: string | null;
   canCancel: boolean;
   cancelReason?: string;
+  hasCancelRequest: boolean;
 };
 
 function formatTime(iso: string) {
@@ -68,6 +70,7 @@ export default function BookingBoard() {
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [cancelTarget, setCancelTarget] = useState<Slot | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
+  const [requestingId, setRequestingId] = useState<string | null>(null);
 
   // Ganti tanggal cepat bisa bikin fetch tanggal lama nyampe belakangan
   // (network jitter/cold start) dan nimpa data tanggal baru yang udah
@@ -181,6 +184,23 @@ export default function BookingBoard() {
     router.refresh();
   }
 
+  async function handleRequestCancel(bookingId: string) {
+    setRequestingId(bookingId);
+    setMessage(null);
+
+    const res = await fetch(`/api/booking/${bookingId}/cancel-request`, { method: "POST" });
+    const data = await res.json();
+    setRequestingId(null);
+
+    if (!res.ok) {
+      setMessage({ text: data.error, ok: false });
+      return;
+    }
+
+    setMessage({ text: "Pengajuan pembatalan terkirim, tunggu admin proses.", ok: true });
+    loadSlots();
+  }
+
   return (
     <div>
       <Card className="mb-4">
@@ -247,6 +267,18 @@ export default function BookingBoard() {
                           <div className="flex max-w-[220px] flex-col items-end gap-1.5 text-right">
                             <p className="text-xs font-medium text-text">Booking kamu</p>
                             <p className="text-xs text-text-subtle">{s.cancelReason}</p>
+                            {s.hasCancelRequest ? (
+                              <Badge tone="warning">Pengajuan nunggu admin</Badge>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                loading={requestingId === s.bookingId}
+                                onClick={() => handleRequestCancel(s.bookingId!)}
+                              >
+                                Ajukan Pembatalan ke Admin
+                              </Button>
+                            )}
                             <a
                               href={buildAdminCancelWaLink({
                                 memberName: session?.user?.name ?? "Member",

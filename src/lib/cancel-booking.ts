@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { CANCEL_QUOTA_PER_PACKAGE, CANCEL_WINDOW_HOURS } from "@/lib/policy";
+import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
 
 export class CancelError extends Error {
   status: number;
@@ -48,7 +48,9 @@ export async function cancelBooking({
   try {
     await prisma.$transaction(
       async (tx) => {
-        await tx.$queryRaw`SELECT id FROM "Package" WHERE id = ${booking.packageId} FOR UPDATE`;
+        const [pkg] = await tx.$queryRaw<
+          { jatahCancel: number }[]
+        >`SELECT "jatahCancel" FROM "Package" WHERE id = ${booking.packageId} FOR UPDATE`;
 
         if (actor.role === "MEMBER") {
           const hoursUntilStart =
@@ -70,9 +72,10 @@ export async function cancelBooking({
             },
           });
 
-          if (selfCancelCount >= CANCEL_QUOTA_PER_PACKAGE) {
+          const quota = pkg?.jatahCancel ?? 0;
+          if (selfCancelCount >= quota) {
             throw new CancelError(
-              `Jatah pembatalan mandiri (${CANCEL_QUOTA_PER_PACKAGE}x per paket) udah abis. Hubungi admin buat kasus khusus.`,
+              `Jatah pembatalan mandiri (${quota}x per paket ini) udah abis. Ajukan ke admin buat kasus khusus.`,
               409
             );
           }

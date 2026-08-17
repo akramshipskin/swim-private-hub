@@ -4,6 +4,7 @@ import CheckoutButton from "./checkout-button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDateLabel } from "@/lib/datetime";
+import { formatRupiah } from "@/lib/format";
 
 const statusTone = {
   PENDING_PAYMENT: "warning",
@@ -17,14 +18,6 @@ const statusLabel: Record<string, string> = {
   EXPIRED: "Kedaluwarsa",
 };
 
-function formatRupiah(n: number) {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
-
 function toDateLabelFromDate(d: Date) {
   return d.toLocaleDateString("id-ID", {
     day: "numeric",
@@ -37,11 +30,7 @@ function toDateLabelFromDate(d: Date) {
 export default async function MemberPaketPage() {
   const session = await requireRole("MEMBER");
 
-  const [me, packages, templates] = await Promise.all([
-    prisma.user.findUniqueOrThrow({
-      where: { id: session.user.id },
-      select: { createdAt: true },
-    }),
+  const [packages, templates] = await Promise.all([
     prisma.package.findMany({
       where: { memberId: session.user.id },
       orderBy: { createdAt: "desc" },
@@ -52,11 +41,31 @@ export default async function MemberPaketPage() {
     }),
   ]);
 
+  // "Member" cuma valid begitu paket pernah aktif (beli/diassign) --
+  // sebelum itu dia masih pengunjung biasa, jangan diklaim member.
+  const everActivated = packages.filter((p) => p.startDate);
+  const activePkg = packages.find((p) => p.status === "ACTIVE");
+  const earliestStart = everActivated.length
+    ? everActivated.reduce((min, p) => (p.startDate! < min ? p.startDate! : min), everActivated[0].startDate!)
+    : null;
+  const expiredWithDate = packages.filter((p) => p.status === "EXPIRED" && p.expiredDate);
+  const latestExpired = expiredWithDate.length
+    ? expiredWithDate.reduce((max, p) => (p.expiredDate! > max ? p.expiredDate! : max), expiredWithDate[0].expiredDate!)
+    : null;
+
+  const membershipBadge = activePkg && earliestStart ? (
+    <Badge tone="success">Member sejak {toDateLabelFromDate(earliestStart)}</Badge>
+  ) : latestExpired ? (
+    <Badge tone="neutral">Paket abis sejak {toDateLabelFromDate(latestExpired)}</Badge>
+  ) : (
+    <Badge tone="neutral">Belum jadi member</Badge>
+  );
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-text">Paket Saya</h1>
-        <Badge tone="neutral">Member sejak {toDateLabelFromDate(me.createdAt)}</Badge>
+        {membershipBadge}
       </div>
 
       {packages.length === 0 ? (

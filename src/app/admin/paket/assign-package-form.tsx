@@ -21,9 +21,9 @@ export default function AssignPackageForm({
   return (
     <Card className="mb-8">
       <CardBody>
-        <form action={formAction} className="flex flex-wrap items-end gap-3">
+        <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
           <Field label="Member">
-            <Select name="memberId" required className="w-52">
+            <Select name="memberId" required className="w-full sm:w-52">
               {members.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name} ({m.email ?? m.phone ?? "-"})
@@ -32,7 +32,7 @@ export default function AssignPackageForm({
             </Select>
           </Field>
           <Field label="Dari Katalog (opsional)">
-            <Select name="templateId" className="w-44" defaultValue="">
+            <Select name="templateId" className="w-full sm:w-44" defaultValue="">
               <option value="">-- custom --</option>
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -42,15 +42,20 @@ export default function AssignPackageForm({
             </Select>
           </Field>
           <Field label="Nama Paket">
-            <Input name="name" required className="w-40" />
+            <Input name="name" required className="w-full sm:w-40" />
           </Field>
-          <Field label="Total Sesi">
-            <Input type="number" name="totalSesi" required min={1} className="w-20" />
-          </Field>
+          <div className="grid grid-cols-2 gap-3 sm:contents">
+            <Field label="Total Sesi">
+              <Input type="number" name="totalSesi" required min={1} className="w-full sm:w-20" />
+            </Field>
+            <Field label="Jatah Cancel">
+              <Input type="number" name="jatahCancel" min={0} defaultValue={2} className="w-full sm:w-24" />
+            </Field>
+          </div>
           <Field label="Berlaku Sampai (opsional)">
-            <Input type="date" name="expiredDate" className="w-40" />
+            <Input type="date" name="expiredDate" className="w-full sm:w-40" />
           </Field>
-          <Button type="submit" loading={pending}>
+          <Button type="submit" loading={pending} className="w-full sm:w-auto">
             Assign (langsung Aktif)
           </Button>
         </form>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import AdminCancelButton from "./admin-cancel-button";
 import AttendanceToggle from "@/components/attendance-toggle";
 import CoachFilter from "./coach-filter";
+import CancelRequestItem from "./cancel-request-item";
 
 export default async function AdminBookingOverviewPage({
   searchParams,
@@ -35,6 +36,15 @@ export default async function AdminBookingOverviewPage({
     where: { role: "COACH" },
     orderBy: { name: "asc" },
     select: { id: true, name: true },
+  });
+
+  const pendingCancelRequests = await prisma.cancelRequest.findMany({
+    where: { status: "PENDING" },
+    orderBy: { createdAt: "asc" },
+    include: {
+      member: { select: { name: true } },
+      booking: { include: { availability: { include: { coach: { select: { name: true } } } } } },
+    },
   });
 
   function dateKey(d: Date) {
@@ -70,6 +80,37 @@ export default async function AdminBookingOverviewPage({
         <CoachFilter coaches={allCoaches} selected={coachFilter ?? "all"} />
       </div>
 
+      {pendingCancelRequests.length > 0 && (
+        <div className="mb-6">
+          <h2 className="mb-2 text-lg font-semibold text-text">
+            Pengajuan Pembatalan{" "}
+            <span className="text-sm font-normal text-text-subtle">
+              ({pendingCancelRequests.length} nunggu diproses)
+            </span>
+          </h2>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {pendingCancelRequests.map((cr) => (
+              <Card key={cr.id} className="border-amber-300">
+                <CardBody className="flex items-start justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-text">{cr.member.name}</p>
+                    <p className="text-xs text-text-muted">
+                      {cr.booking.availability.coach.name} &middot;{" "}
+                      {formatDateLabel(cr.booking.availability.date)}{" "}
+                      {formatTimeWib(cr.booking.availability.startTime)}
+                    </p>
+                    {cr.reason && (
+                      <p className="mt-1 text-xs italic text-text-subtle">&ldquo;{cr.reason}&rdquo;</p>
+                    )}
+                  </div>
+                  <CancelRequestItem requestId={cr.id} />
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       {availabilities.length === 0 ? (
         <Card>
           <CardBody className="py-10 text-center">
@@ -103,9 +144,12 @@ export default async function AdminBookingOverviewPage({
                         href={buildKabarinWaLink(group.coachName, formatDateLabel(rows[0].date))}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[#25D366] hover:bg-[#25D366]/10"
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-[#25D366] px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90"
                       >
-                        Kabarin WA
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+                          <path d="M12.04 2c-5.52 0-10 4.48-10 10 0 1.77.46 3.45 1.28 4.9L2 22l5.25-1.38a9.96 9.96 0 004.79 1.22h.01c5.52 0 10-4.48 10-10s-4.48-9.84-10.01-9.84zm5.87 14.1c-.25.7-1.45 1.33-2 1.42-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.69-.62-2.97-1.28-4.9-4.28-5.05-4.48-.15-.2-1.22-1.62-1.22-3.09s.77-2.19 1.05-2.49c.27-.3.6-.37.8-.37h.57c.18 0 .43-.07.67.51.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.5-.15.18-.32.4-.45.53-.15.15-.3.32-.13.62.17.3.77 1.27 1.65 2.06 1.14 1.02 2.1 1.33 2.4 1.48.3.15.47.13.65-.08.17-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.73.82 2.03.97.3.15.5.22.57.35.08.12.08.72-.17 1.42z" />
+                        </svg>
+                        Kabarin Grup WhatsApp
                       </a>
                     </div>
 

@@ -17,13 +17,21 @@ export async function createTemplate(
   const name = formData.get("name")?.toString().trim() ?? "";
   const totalSesi = Number(formData.get("totalSesi"));
   const price = Number(formData.get("price"));
+  const durationDays = Number(formData.get("durationDays"));
+  const jatahCancel = Number(formData.get("jatahCancel"));
 
-  if (!name || !Number.isInteger(totalSesi) || totalSesi < 1 || !Number.isFinite(price) || price < 0) {
-    return { error: "Nama wajib diisi, total sesi minimal 1, harga gak boleh negatif" };
+  if (
+    !name ||
+    !Number.isInteger(totalSesi) || totalSesi < 1 ||
+    !Number.isFinite(price) || price < 0 ||
+    !Number.isInteger(durationDays) || durationDays < 1 ||
+    !Number.isInteger(jatahCancel) || jatahCancel < 0
+  ) {
+    return { error: "Nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel gak boleh negatif" };
   }
 
   await prisma.packageTemplate.create({
-    data: { name, totalSesi, price },
+    data: { name, totalSesi, price, durationDays, jatahCancel },
   });
 
   revalidatePath("/admin/paket");
@@ -40,15 +48,23 @@ export async function updateTemplate(
   const name = formData.get("name")?.toString().trim() ?? "";
   const totalSesi = Number(formData.get("totalSesi"));
   const price = Number(formData.get("price"));
+  const durationDays = Number(formData.get("durationDays"));
+  const jatahCancel = Number(formData.get("jatahCancel"));
   const isActive = formData.get("isActive") === "on";
 
-  if (!name || !Number.isInteger(totalSesi) || totalSesi < 1 || !Number.isFinite(price) || price < 0) {
-    return { error: "Nama wajib diisi, total sesi minimal 1, harga gak boleh negatif" };
+  if (
+    !name ||
+    !Number.isInteger(totalSesi) || totalSesi < 1 ||
+    !Number.isFinite(price) || price < 0 ||
+    !Number.isInteger(durationDays) || durationDays < 1 ||
+    !Number.isInteger(jatahCancel) || jatahCancel < 0
+  ) {
+    return { error: "Nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel gak boleh negatif" };
   }
 
   await prisma.packageTemplate.update({
     where: { id: templateId },
-    data: { name, totalSesi, price, isActive },
+    data: { name, totalSesi, price, durationDays, jatahCancel, isActive },
   });
 
   revalidatePath("/admin/paket");
@@ -67,10 +83,16 @@ export async function assignPackageToMember(
   const templateId = formData.get("templateId") as string | null;
   const name = formData.get("name")?.toString().trim() ?? "";
   const totalSesi = Number(formData.get("totalSesi"));
+  const jatahCancelRaw = formData.get("jatahCancel");
+  const jatahCancel = jatahCancelRaw ? Number(jatahCancelRaw) : 2;
   const expiredDateRaw = formData.get("expiredDate") as string;
 
-  if (!memberId || !name || !Number.isInteger(totalSesi) || totalSesi < 1) {
-    return { error: "Member, nama paket wajib diisi, total sesi minimal 1" };
+  if (
+    !memberId || !name ||
+    !Number.isInteger(totalSesi) || totalSesi < 1 ||
+    !Number.isInteger(jatahCancel) || jatahCancel < 0
+  ) {
+    return { error: "Member, nama paket wajib diisi, total sesi minimal 1, jatah cancel gak boleh negatif" };
   }
 
   await prisma.package.create({
@@ -80,6 +102,7 @@ export async function assignPackageToMember(
       name,
       totalSesi,
       sisaSesi: totalSesi,
+      jatahCancel,
       status: "ACTIVE",
       startDate: new Date(),
       expiredDate: expiredDateRaw ? new Date(`${expiredDateRaw}T23:59:59+07:00`) : null,

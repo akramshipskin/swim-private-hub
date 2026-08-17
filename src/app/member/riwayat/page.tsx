@@ -1,10 +1,10 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
-import { CANCEL_QUOTA_PER_PACKAGE } from "@/lib/policy";
 import { checkCancelEligibility } from "@/lib/cancel-eligibility";
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import CancelButton from "./cancel-button";
+import RequestCancelButton from "./request-cancel-button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -50,18 +50,10 @@ export default async function MemberRiwayatPage() {
   }
   const sortedDateKeys = [...byDate.keys()].sort().reverse();
 
-  // Hitung sisa jatah pembatalan mandiri per paket (dipake buat info di UI).
-  const packageIds = [...new Set(bookings.map((b) => b.packageId))];
-  const selfCancelCounts = await prisma.booking.groupBy({
-    by: ["packageId"],
-    where: { packageId: { in: packageIds }, status: "CANCELLED", cancelledBy: "MEMBER" },
-    _count: true,
-  });
-  const selfCancelByPackage = new Map(
-    selfCancelCounts.map((c) => [c.packageId, c._count])
-  );
-
-  const eligibilityByBooking = new Map<string, { canCancel: boolean; reason?: string }>();
+  const eligibilityByBooking = new Map<
+    string,
+    { canCancel: boolean; reason?: string; used: number; quota: number }
+  >();
   for (const b of bookings) {
     if (b.status !== "BOOKED") continue;
     const eligibility = await checkCancelEligibility({
@@ -71,6 +63,15 @@ export default async function MemberRiwayatPage() {
     });
     eligibilityByBooking.set(b.id, eligibility);
   }
+
+  const pendingRequestBookingIds = new Set(
+    (
+      await prisma.cancelRequest.findMany({
+        where: { memberId: session.user.id, status: "PENDING" },
+        select: { bookingId: true },
+      })
+    ).map((r) => r.bookingId)
+  );
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
@@ -95,9 +96,9 @@ export default async function MemberRiwayatPage() {
               </h2>
               <ul className="flex flex-col gap-2">
                 {rows.map((b) => {
-                  const used = selfCancelByPackage.get(b.packageId) ?? 0;
-                  const remaining = Math.max(0, CANCEL_QUOTA_PER_PACKAGE - used);
                   const eligibility = eligibilityByBooking.get(b.id);
+                  const remaining = eligibility ? Math.max(0, eligibility.quota - eligibility.used) : 0;
+                  const hasCancelRequest = pendingRequestBookingIds.has(b.id);
 
                   return (
                     <Card key={b.id}>
@@ -121,6 +122,12 @@ export default async function MemberRiwayatPage() {
                             oleh {b.cancelledBy === "ADMIN" ? "Admin" : "kamu"}
                           </span>
                         )}
+                        {b.status === "BOOKED" && b.attended === true && (
+                          <Badge tone="success">Hadir</Badge>
+                        )}
+                        {b.status === "BOOKED" && b.attended === false && (
+                          <Badge tone="danger">Gak Hadir</Badge>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -134,7 +141,7 @@ export default async function MemberRiwayatPage() {
                             label={`${b.availability.coach.name}, ${formatDateLabel(b.availability.date)} ${formatTimeWib(b.availability.startTime)}`}
                           />
                           <Badge tone={remaining <= 1 ? "warning" : "neutral"}>
-                            Jatah batal: {remaining}/{CANCEL_QUOTA_PER_PACKAGE}
+                            Jatah batal: {remaining}/{eligibility?.quota ?? 0}
                           </Badge>
                         </>
                       ) : (
@@ -142,6 +149,11 @@ export default async function MemberRiwayatPage() {
                           <p className="max-w-[220px] text-right text-xs text-text-subtle">
                             {eligibility?.reason}
                           </p>
+                          {hasCancelRequest ? (
+                            <Badge tone="warning">Pengajuan nunggu admin</Badge>
+                          ) : (
+                            <RequestCancelButton bookingId={b.id} />
+                          )}
                           <a
                             href={buildAdminCancelWaLink({
                               memberName: session.user.name ?? "Member",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
 import { MobileBottomNav, type BottomNavLink } from "@/components/mobile-bottom-nav";
+import { DesktopTabNav } from "@/components/desktop-tab-nav";
 
 export function NavBar({
   brand,
@@ -44,19 +45,7 @@ export function NavBar({
           </div>
 
           {/* Desktop: tab nav di header. Mobile pakai bottom nav (di bawah). */}
-          {links.length > 0 && (
-            <nav className="hidden flex-wrap items-center justify-center gap-1 sm:flex">
-              {links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium text-text-muted transition-colors hover:bg-surface-muted hover:text-text"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          )}
+          {links.length > 0 && <DesktopTabNav links={links} />}
         </div>
       </header>
 

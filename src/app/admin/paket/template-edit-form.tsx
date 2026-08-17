@@ -11,6 +11,8 @@ type Template = {
   name: string;
   totalSesi: number;
   price: number;
+  durationDays: number;
+  jatahCancel: number;
   isActive: boolean;
 };
 
@@ -60,26 +62,48 @@ export default function TemplateEditForm({ template }: { template: Template }) {
           <Field label="Nama">
             <Input name="name" defaultValue={template.name} disabled={locked} className="w-full sm:w-40" />
           </Field>
-          <Field label="Total Sesi">
-            <Input
-              type="number"
-              name="totalSesi"
-              defaultValue={template.totalSesi}
-              min={1}
-              disabled={locked}
-              className="w-full sm:w-20"
-            />
-          </Field>
-          <Field label="Harga (Rp)">
-            <Input
-              type="number"
-              name="price"
-              defaultValue={template.price}
-              min={0}
-              disabled={locked}
-              className="w-full sm:w-32"
-            />
-          </Field>
+          <div className="grid grid-cols-2 gap-3 sm:contents">
+            <Field label="Total Sesi">
+              <Input
+                type="number"
+                name="totalSesi"
+                defaultValue={template.totalSesi}
+                min={1}
+                disabled={locked}
+                className="w-full sm:w-20"
+              />
+            </Field>
+            <Field label="Harga (Rp)">
+              <Input
+                type="number"
+                name="price"
+                defaultValue={template.price}
+                min={0}
+                disabled={locked}
+                className="w-full sm:w-32"
+              />
+            </Field>
+            <Field label="Berlaku (hari)">
+              <Input
+                type="number"
+                name="durationDays"
+                defaultValue={template.durationDays}
+                min={1}
+                disabled={locked}
+                className="w-full sm:w-24"
+              />
+            </Field>
+            <Field label="Jatah Cancel">
+              <Input
+                type="number"
+                name="jatahCancel"
+                defaultValue={template.jatahCancel}
+                min={0}
+                disabled={locked}
+                className="w-full sm:w-24"
+              />
+            </Field>
+          </div>
           <div className="flex items-center gap-1.5 sm:pb-2">
             <input
               type="checkbox"

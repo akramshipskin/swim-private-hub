@@ -27,6 +27,7 @@ export async function POST(request: Request) {
       name: template.name,
       totalSesi: template.totalSesi,
       sisaSesi: template.totalSesi,
+      jatahCancel: template.jatahCancel,
       status: "PENDING_PAYMENT",
     },
   });

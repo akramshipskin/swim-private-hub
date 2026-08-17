@@ -81,18 +81,18 @@ export async function addAvailability(
 export async function deleteAvailability(availabilityId: string) {
   const session = await requireRole("COACH");
 
-  // Cuma boleh hard-delete slot yang BENERAN belum pernah kesentuh
-  // booking (bahkan yang udah dibatalin). Availability->Booking pake
-  // onDelete: Cascade -- kalau slot yang PERNAH dibooking-lalu-dibatalin
-  // dihapus, riwayat cancel-nya ikut lenyap, padahal riwayat itu yang
-  // dipakai ngitung jatah pembatalan mandiri member. Ngapus riwayat itu
-  // diam-diam nge-reset jatah cancel member.
+  // Slot boleh dihapus asal LAGI gak ada booking aktif (status
+  // AVAILABLE) -- gak peduli riwayat booking/cancel sebelumnya (member
+  // batal mandiri ataupun admin). Catatan: ini ngapus juga riwayat
+  // Booking yang nempel di slot ini (Availability->Booking cascade),
+  // jadi hitungan jatah cancel mandiri buat paket terkait bisa
+  // kepengaruh sedikit -- trade-off yang disengaja biar coach bisa
+  // beres-beres jadwal tanpa keganjel slot lama.
   await prisma.availability.deleteMany({
     where: {
       id: availabilityId,
       coachId: session.user.id,
       status: "AVAILABLE",
-      bookings: { none: {} },
     },
   });
 

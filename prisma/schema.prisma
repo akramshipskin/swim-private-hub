@@ -50,29 +50,36 @@ enum MarkedBy {
   ADMIN
 }
 
+enum CancelRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
-  id                  String   @id @default(cuid())
-  name                String
-  email               String?  @unique
-  phone               String?  @unique
-  passwordHash        String
-  role                Role     @default(MEMBER)
-  isActive            Boolean  @default(true)
-  mustChangePassword  Boolean  @default(false)
-  createdAt           DateTime @default(now())
+  id                 String   @id @default(cuid())
+  name               String
+  email              String?  @unique
+  phone              String?  @unique
+  passwordHash       String
+  role               Role     @default(MEMBER)
+  isActive           Boolean  @default(true)
+  mustChangePassword Boolean  @default(false)
+  createdAt          DateTime @default(now())
 
   coachProfile      CoachProfile?
   packages          Package[]
   bookings          Booking[]
   availabilities    Availability[]     @relation("CoachAvailabilities")
   pushSubscriptions PushSubscription[]
+  cancelRequests    CancelRequest[]
 }
 
 model CoachProfile {
-  id      String  @id @default(cuid())
-  userId  String  @unique
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bio     String?
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio      String?
   isActive Boolean @default(true)
 }
 
@@ -80,31 +87,44 @@ model CoachProfile {
 // manapun. Ini yang dipilih member pas checkout Midtrans, atau jadi
 // starting point admin pas assign paket manual ke member.
 model PackageTemplate {
-  id        String   @id @default(cuid())
-  name      String
-  totalSesi Int
-  price     Int
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  name         String
+  totalSesi    Int
+  price        Int
+  // Masa berlaku paket dalam hari, dihitung dari startDate (aktivasi).
+  durationDays Int      @default(60)
+  // Jatah pembatalan mandiri (tanpa approval admin) yang dibawa tiap
+  // paket yang dibuat dari template ini -- dicopy ke Package.jatahCancel
+  // pas paket dibuat, BUKAN dibaca ulang dari template tiap kali cek
+  // kuota (biar paket lama gak ikut berubah kalau template diedit).
+  jatahCancel  Int      @default(2)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
 
   packages Package[]
 }
 
 model Package {
-  id          String        @id @default(cuid())
+  id          String           @id @default(cuid())
   memberId    String
-  member      User          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member      User             @relation(fields: [memberId], references: [id], onDelete: Cascade)
   templateId  String?
-  template    PackageTemplate? @relation(fields: [templateId], references: [id])
+  template    PackageTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
   name        String
   totalSesi   Int
   sisaSesi    Int
-  status      PackageStatus @default(PENDING_PAYMENT)
+  // Dicopy dari PackageTemplate.jatahCancel pas paket dibuat (atau
+  // diisi manual kalau paket custom/assign langsung). Ini yang dipakai
+  // buat cek kuota self-cancel, bukan konstanta global -- tiap paket
+  // bisa punya jatah beda.
+  jatahCancel Int              @default(2)
+  status      PackageStatus    @default(PENDING_PAYMENT)
   startDate   DateTime?
   expiredDate DateTime?
-  createdAt   DateTime      @default(now())
+  createdAt   DateTime         @default(now())
 
-  payments Payment[]
+  payments       Payment[]
+  cancelRequests CancelRequest[]
 
   @@index([memberId])
 }
@@ -124,19 +144,19 @@ model Payment {
 }
 
 model Availability {
-  id             String              @id @default(cuid())
+  id             String             @id @default(cuid())
   coachId        String
-  coach          User                @relation("CoachAvailabilities", fields: [coachId], references: [id], onDelete: Cascade)
-  date           DateTime            @db.Date
+  coach          User               @relation("CoachAvailabilities", fields: [coachId], references: [id], onDelete: Cascade)
+  date           DateTime           @db.Date
   startTime      DateTime
   endTime        DateTime
-  kapasitas      Int                 @default(1)
-  status         AvailabilityStatus  @default(AVAILABLE)
+  kapasitas      Int                @default(1)
+  status         AvailabilityStatus @default(AVAILABLE)
   // Kosong buat MVP (availability per hari, input manual). Kolom ini
   // yang dipakai kalau fitur recurring/per-minggu ditambah belakangan,
   // biar gak perlu migrasi skema ulang.
   recurrenceRule String?
-  createdAt      DateTime            @default(now())
+  createdAt      DateTime           @default(now())
 
   bookings Booking[]
 
@@ -174,6 +194,29 @@ model Booking {
   attendedAt     DateTime?
   createdAt      DateTime      @default(now())
 
+  cancelRequest CancelRequest?
+
   @@index([memberId])
   @@index([availabilityId])
+}
+
+// Pengajuan pembatalan ke admin, dipakai member kalau jatah cancel
+// mandiri paketnya udah abis. Admin bisa approve (booking dibatalin +
+// sesi balik, sama kayak cancel biasa tapi cancelledBy=ADMIN) atau
+// reject (booking tetep BOOKED, sesi tetep kepotong).
+model CancelRequest {
+  id        String              @id @default(cuid())
+  bookingId String              @unique
+  booking   Booking             @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  memberId  String
+  member    User                @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  packageId String
+  package   Package             @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  status    CancelRequestStatus @default(PENDING)
+  reason    String?
+  createdAt DateTime            @default(now())
+  decidedAt DateTime?
+
+  @@index([memberId])
+  @@index([status])
 }

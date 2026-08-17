@@ -1,19 +1,18 @@
 import { prisma } from "@/lib/prisma";
-import { CANCEL_QUOTA_PER_PACKAGE, CANCEL_WINDOW_HOURS } from "@/lib/policy";
+import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
 
 export async function checkCancelEligibility(booking: {
   memberId: string;
   packageId: string;
   startTime: Date;
-}): Promise<{ canCancel: boolean; reason?: string }> {
-  const hoursUntilStart = (booking.startTime.getTime() - Date.now()) / (1000 * 60 * 60);
+}): Promise<{ canCancel: boolean; reason?: string; used: number; quota: number }> {
+  const pkg = await prisma.package.findUnique({
+    where: { id: booking.packageId },
+    select: { jatahCancel: true },
+  });
+  const quota = pkg?.jatahCancel ?? 0;
 
-  if (hoursUntilStart < CANCEL_WINDOW_HOURS) {
-    return {
-      canCancel: false,
-      reason: `Pembatalan hanya bisa dilakukan minimal ${CANCEL_WINDOW_HOURS} jam sebelum jadwal.`,
-    };
-  }
+  const hoursUntilStart = (booking.startTime.getTime() - Date.now()) / (1000 * 60 * 60);
 
   const selfCancelCount = await prisma.booking.count({
     where: {
@@ -24,12 +23,23 @@ export async function checkCancelEligibility(booking: {
     },
   });
 
-  if (selfCancelCount >= CANCEL_QUOTA_PER_PACKAGE) {
+  if (hoursUntilStart < CANCEL_WINDOW_HOURS) {
     return {
       canCancel: false,
-      reason: `Jatah pembatalan mandiri (${CANCEL_QUOTA_PER_PACKAGE}x per paket) udah abis. Hubungi admin buat kasus khusus.`,
+      reason: `Pembatalan hanya bisa dilakukan minimal ${CANCEL_WINDOW_HOURS} jam sebelum jadwal.`,
+      used: selfCancelCount,
+      quota,
     };
   }
 
-  return { canCancel: true };
+  if (selfCancelCount >= quota) {
+    return {
+      canCancel: false,
+      reason: `Jatah pembatalan mandiri (${quota}x per paket ini) udah abis. Ajukan ke admin buat kasus khusus.`,
+      used: selfCancelCount,
+      quota,
+    };
+  }
+
+  return { canCancel: true, used: selfCancelCount, quota };
 }

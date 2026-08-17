@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
-// Tanggal mana yang coach ini UDAH punya slot (kebooking atau belum, gak
-// peduli) -- dipake date picker di halaman "Tambah Slot" biar coach gak
-// lupa apa yang udah pernah dia buka pas milih tanggal buat slot baru.
+// Tanggal mana yang UDAH ada slot dibuka -- coach manapun, bukan cuma
+// yang lagi login (biar keliatan juga kalau coach lain udah isi jadwal
+// di tanggal itu). Dipake date picker di halaman "Tambah Slot".
 export async function GET(request: Request) {
   const session = await auth();
   if (!session || session.user.role !== "COACH") {
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   const to = new Date(Date.UTC(year, month, 1));
 
   const rows = await prisma.availability.findMany({
-    where: { coachId: session.user.id, date: { gte: from, lt: to } },
+    where: { date: { gte: from, lt: to } },
     select: { date: true },
     distinct: ["date"],
   });
