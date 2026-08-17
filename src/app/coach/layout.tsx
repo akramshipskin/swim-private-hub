@@ -15,11 +15,11 @@ export default async function CoachLayout({
         userName={session.user.name ?? ""}
         userRole="Coach"
         links={[
-          { href: "/coach/jadwal", label: "Jadwal" },
-          { href: "/coach/riwayat-sesi", label: "Riwayat Sesi" },
+          { href: "/coach/jadwal", label: "Jadwal", icon: "calendar" },
+          { href: "/coach/riwayat-sesi", label: "Riwayat Sesi", icon: "clipboard-check" },
         ]}
       />
-      {children}
+      <div className="pb-16 sm:pb-0">{children}</div>
     </div>
   );
 }

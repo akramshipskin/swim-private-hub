@@ -12,7 +12,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-700 disabled:bg-slate-300",
+    "bg-brand-600 text-white shadow-sm hover:bg-brand-700 hover:-translate-y-px active:translate-y-0 disabled:bg-slate-300 disabled:shadow-none disabled:translate-y-0",
   secondary:
     "bg-white text-slate-700 border border-border hover:bg-surface-muted active:bg-slate-100 disabled:text-slate-400",
   danger:
@@ -22,8 +22,8 @@ const variantClasses: Record<Variant, string> = {
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-sm rounded-md",
-  md: "px-4 py-2.5 text-sm rounded-lg",
+  sm: "px-3 py-1.5 text-sm rounded-lg",
+  md: "px-4 py-2.5 text-sm rounded-xl",
 };
 
 export function Button({
@@ -39,7 +39,7 @@ export function Button({
     <button
       disabled={disabled || loading}
       className={cn(
-        "inline-flex items-center justify-center gap-2 font-medium transition-colors duration-150 disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center gap-2 font-medium transition-all duration-150 disabled:cursor-not-allowed",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
         variantClasses[variant],
         sizeClasses[size],

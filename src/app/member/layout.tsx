@@ -15,12 +15,12 @@ export default async function MemberLayout({
         userName={session.user.name ?? ""}
         userRole="Member"
         links={[
-          { href: "/member/booking", label: "Booking" },
-          { href: "/member/riwayat", label: "Riwayat" },
-          { href: "/member/paket", label: "Paket" },
+          { href: "/member/booking", label: "Booking", icon: "calendar" },
+          { href: "/member/riwayat", label: "Riwayat", icon: "clock" },
+          { href: "/member/paket", label: "Paket", icon: "package" },
         ]}
       />
-      {children}
+      <div className="pb-16 sm:pb-0">{children}</div>
     </div>
   );
 }

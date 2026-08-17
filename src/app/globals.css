@@ -1,18 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
+  --background: #f4faf9;
   --foreground: #0f172a;
 
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-700: #1d4ed8;
+  /* Biru-teal kayak air kolam -- warna utama, tombol/link/CTA */
+  --color-brand-50: #ecfeff;
+  --color-brand-100: #cffafe;
+  --color-brand-500: #06b6d4;
+  --color-brand-600: #0891b2;
+  --color-brand-700: #0e7490;
+
+  /* Coral/oranye hangat -- aksen buat badge "Populer", highlight, gradient */
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-500: #fb923c;
+  --color-accent-600: #f97316;
 
   --color-surface: #ffffff;
-  --color-surface-muted: #f1f5f9;
-  --color-border: #e2e8f0;
+  --color-surface-muted: #f0f9f8;
+  --color-border: #dceae8;
 
   --color-text: #0f172a;
   --color-text-muted: #64748b;
@@ -37,6 +44,11 @@
   --color-brand-500: var(--color-brand-500);
   --color-brand-600: var(--color-brand-600);
   --color-brand-700: var(--color-brand-700);
+
+  --color-accent-50: var(--color-accent-50);
+  --color-accent-100: var(--color-accent-100);
+  --color-accent-500: var(--color-accent-500);
+  --color-accent-600: var(--color-accent-600);
 
   --color-surface: var(--color-surface);
   --color-surface-muted: var(--color-surface-muted);

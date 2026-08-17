@@ -15,13 +15,13 @@ export default async function AdminLayout({
         userName={session.user.name ?? ""}
         userRole="Admin"
         links={[
-          { href: "/admin/users", label: "Users" },
-          { href: "/admin/paket", label: "Paket" },
-          { href: "/admin/pembayaran", label: "Pembayaran" },
-          { href: "/admin/booking-overview", label: "Booking" },
+          { href: "/admin/users", label: "Users", icon: "users" },
+          { href: "/admin/paket", label: "Paket", icon: "package" },
+          { href: "/admin/pembayaran", label: "Pembayaran", icon: "credit-card" },
+          { href: "/admin/booking-overview", label: "Booking", icon: "calendar" },
         ]}
       />
-      {children}
+      <div className="pb-16 sm:pb-0">{children}</div>
     </div>
   );
 }

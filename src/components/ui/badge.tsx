@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 
-type Tone = "success" | "warning" | "danger" | "neutral" | "brand";
+type Tone = "success" | "warning" | "danger" | "neutral" | "brand" | "accent";
 
 const toneClasses: Record<Tone, string> = {
   success: "bg-success-bg text-success-text",
@@ -8,6 +8,7 @@ const toneClasses: Record<Tone, string> = {
   danger: "bg-danger-bg text-danger-text",
   neutral: "bg-surface-muted text-text-muted",
   brand: "bg-brand-50 text-brand-700",
+  accent: "bg-accent-50 text-accent-600",
 };
 
 export function Badge({

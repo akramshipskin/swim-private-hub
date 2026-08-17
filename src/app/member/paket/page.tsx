@@ -99,7 +99,7 @@ export default async function MemberPaketPage() {
               <CardBody className="flex flex-col gap-3">
                 <div>
                   {i === 1 && (
-                    <span className="mb-1 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">
+                    <span className="mb-1 inline-block rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">
                       Populer
                     </span>
                   )}
