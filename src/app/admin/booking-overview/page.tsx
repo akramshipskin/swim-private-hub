@@ -76,7 +76,8 @@ export default async function AdminBookingOverviewPage() {
                     <h3 className="mb-1.5 text-xs font-medium text-text-subtle">
                       {formatDateLabel(rows[0].availability.date)}
                     </h3>
-                    <Card>
+                    {/* Desktop: tabel */}
+                    <Card className="hidden sm:block">
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
@@ -120,6 +121,41 @@ export default async function AdminBookingOverviewPage() {
                         </table>
                       </div>
                     </Card>
+
+                    {/* Mobile: card */}
+                    <ul className="flex flex-col gap-2 sm:hidden">
+                      {rows.map((b) => (
+                        <Card key={b.id}>
+                          <CardBody className="flex flex-col gap-2 py-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <p className="font-medium text-text">{b.member.name}</p>
+                                <p className="text-xs text-text-subtle">{b.member.email}</p>
+                                <p className="text-sm text-text-muted">
+                                  {formatTimeWib(b.availability.startTime)}–
+                                  {formatTimeWib(b.availability.endTime)}
+                                </p>
+                              </div>
+                              <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
+                            </div>
+                            {b.status === "CANCELLED" && b.cancelledBy && (
+                              <p className="text-xs text-text-subtle">
+                                Dibatalkan oleh {b.cancelledBy === "ADMIN" ? "admin" : "member"}
+                              </p>
+                            )}
+                            {b.status === "BOOKED" && (
+                              <div className="flex items-center justify-end border-t border-border pt-2">
+                                {b.availability.endTime > new Date() ? (
+                                  <AdminCancelButton bookingId={b.id} />
+                                ) : (
+                                  <AttendanceToggle bookingId={b.id} attended={b.attended} />
+                                )}
+                              </div>
+                            )}
+                          </CardBody>
+                        </Card>
+                      ))}
+                    </ul>
                   </div>
                 );
               })}

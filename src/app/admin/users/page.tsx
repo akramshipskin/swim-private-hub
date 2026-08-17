@@ -3,10 +3,36 @@ import { prisma } from "@/lib/prisma";
 import { toggleUserActive } from "./actions";
 import CreateUserForm from "./create-user-form";
 import ImportMembersForm from "./import-members-form";
-import { Card } from "@/components/ui/card";
+import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { buildContactWaLink } from "@/lib/whatsapp";
+
+function UserActions({
+  user,
+}: {
+  user: { id: string; name: string; phone: string | null; isActive: boolean };
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      {user.phone && (
+        <a
+          href={buildContactWaLink(user.phone, user.name)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-md px-2 py-1.5 text-sm font-medium text-[#25D366] hover:bg-[#25D366]/10"
+        >
+          Hubungi
+        </a>
+      )}
+      <form action={toggleUserActive.bind(null, user.id, !user.isActive)}>
+        <Button type="submit" variant="ghost" size="sm">
+          {user.isActive ? "Nonaktifkan" : "Aktifkan"}
+        </Button>
+      </form>
+    </div>
+  );
+}
 
 const roleSections: { role: "ADMIN" | "COACH" | "MEMBER"; label: string }[] = [
   { role: "ADMIN", label: "Admin" },
@@ -44,7 +70,8 @@ export default async function AdminUsersPage() {
             <h2 className="mb-2 text-sm font-semibold text-text-muted">
               {label} <span className="text-text-subtle">({rows.length})</span>
             </h2>
-            <Card>
+            {/* Desktop: tabel */}
+            <Card className="hidden sm:block">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -87,22 +114,8 @@ export default async function AdminUsersPage() {
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              {u.phone && (
-                                <a
-                                  href={buildContactWaLink(u.phone, u.name)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="rounded-md px-2 py-1.5 text-sm font-medium text-[#25D366] hover:bg-[#25D366]/10"
-                                >
-                                  Hubungi
-                                </a>
-                              )}
-                              <form action={toggleUserActive.bind(null, u.id, !u.isActive)}>
-                                <Button type="submit" variant="ghost" size="sm">
-                                  {u.isActive ? "Nonaktifkan" : "Aktifkan"}
-                                </Button>
-                              </form>
+                            <div className="flex items-center justify-end">
+                              <UserActions user={u} />
                             </div>
                           </td>
                         </tr>
@@ -112,6 +125,43 @@ export default async function AdminUsersPage() {
                 </table>
               </div>
             </Card>
+
+            {/* Mobile: card, biar gak perlu geser horizontal */}
+            <ul className="flex flex-col gap-2 sm:hidden">
+              {rows.map((u) => {
+                const activePkg = u.packages[0];
+                return (
+                  <Card key={u.id}>
+                    <CardBody className="flex flex-col gap-2 py-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-medium text-text">{u.name}</p>
+                          <p className="text-xs text-text-subtle">{u.email ?? "-"}</p>
+                          <p className="text-xs text-text-subtle">{u.phone ?? "-"}</p>
+                        </div>
+                        <Badge tone={u.isActive ? "success" : "neutral"}>
+                          {u.isActive ? "Aktif" : "Nonaktif"}
+                        </Badge>
+                      </div>
+                      {role === "MEMBER" && (
+                        <p className="text-xs text-text-muted">
+                          {activePkg ? (
+                            <>
+                              {activePkg.name} -- sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi
+                            </>
+                          ) : (
+                            <span className="text-text-subtle">Belum ada paket aktif</span>
+                          )}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-end border-t border-border pt-2">
+                        <UserActions user={u} />
+                      </div>
+                    </CardBody>
+                  </Card>
+                );
+              })}
+            </ul>
           </div>
         );
       })}
