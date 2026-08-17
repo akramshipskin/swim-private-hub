@@ -19,14 +19,14 @@ export default function CreateTemplateForm() {
           <Field label="Total Sesi">
             <Input type="number" name="totalSesi" required min={1} className="w-full sm:w-24" />
           </Field>
+          <Field label="Harga (Rp)">
+            <Input type="number" name="price" required min={0} className="w-full sm:w-32" />
+          </Field>
           <Field label="Berlaku (hari)">
             <Input type="number" name="durationDays" required min={1} defaultValue={60} className="w-full sm:w-24" />
           </Field>
           <Field label="Jatah Cancel">
             <Input type="number" name="jatahCancel" required min={0} defaultValue={2} className="w-full sm:w-24" />
-          </Field>
-          <Field label="Harga (Rp)">
-            <Input type="number" name="price" required min={0} className="w-full sm:w-32" />
           </Field>
           <Button type="submit" loading={pending}>
             Tambah Katalog

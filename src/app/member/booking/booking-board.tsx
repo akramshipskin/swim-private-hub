@@ -263,6 +263,8 @@ export default function BookingBoard() {
                           <Button size="sm" variant="danger" onClick={() => setCancelTarget(s)}>
                             Batalkan
                           </Button>
+                        ) : new Date(s.startTime) <= new Date() ? (
+                          <p className="text-xs font-medium text-text-subtle">Sesi udah lewat</p>
                         ) : (
                           <div className="flex max-w-[220px] flex-col items-end gap-1.5 text-right">
                             <p className="text-xs font-medium text-text">Booking kamu</p>

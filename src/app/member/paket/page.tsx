@@ -99,11 +99,11 @@ export default async function MemberPaketPage() {
       {templates.length === 0 ? (
         <p className="text-sm text-text-muted">Belum ada katalog paket tersedia.</p>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-3">
+        <ul className="flex flex-wrap gap-3">
           {templates.map((t, i) => (
             <Card
               key={t.id}
-              className={i === 1 ? "border-brand-500 ring-1 ring-brand-500" : undefined}
+              className={`w-full sm:w-72 ${i === 1 ? "border-brand-500 ring-1 ring-brand-500" : ""}`}
             >
               <CardBody className="flex flex-col gap-3">
                 <div>

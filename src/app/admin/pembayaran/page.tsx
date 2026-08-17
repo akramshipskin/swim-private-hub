@@ -14,6 +14,13 @@ const statusTone = {
   EXPIRED: "neutral",
 } as const;
 
+const statusLabel: Record<string, string> = {
+  PENDING: "Menunggu",
+  SUCCESS: "Berhasil",
+  FAILED: "Gagal",
+  EXPIRED: "Kedaluwarsa",
+};
+
 function daysAgoWib(n: number): string {
   const today = new Date(`${todayWibDateString()}T00:00:00+07:00`);
   today.setDate(today.getDate() - n);
@@ -127,7 +134,7 @@ export default async function AdminPembayaranPage({
                           </td>
                           <td className="px-4 py-3 text-text">{formatRupiah(p.amount)}</td>
                           <td className="px-4 py-3">
-                            <Badge tone={statusTone[p.status]}>{p.status}</Badge>
+                            <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
                           </td>
                         </tr>
                       ))}
@@ -146,7 +153,7 @@ export default async function AdminPembayaranPage({
                           <p className="font-medium text-text">{p.package.member.name}</p>
                           <p className="text-xs text-text-subtle">{p.package.member.email}</p>
                         </div>
-                        <Badge tone={statusTone[p.status]}>{p.status}</Badge>
+                        <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
                       </div>
                       <p className="text-sm text-text-muted">{p.package.name}</p>
                       <p className="font-mono text-xs text-text-subtle">{p.midtransOrderId}</p>

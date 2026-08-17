@@ -64,6 +64,8 @@ export default async function MemberRiwayatPage() {
     eligibilityByBooking.set(b.id, eligibility);
   }
 
+  const now = new Date();
+
   const pendingRequestBookingIds = new Set(
     (
       await prisma.cancelRequest.findMany({
@@ -132,7 +134,7 @@ export default async function MemberRiwayatPage() {
                     </div>
                   </div>
 
-                  {b.status === "BOOKED" && (
+                  {b.status === "BOOKED" && b.availability.startTime > now && (
                     <div className="flex shrink-0 flex-col items-end gap-2">
                       {eligibility?.canCancel ? (
                         <>
