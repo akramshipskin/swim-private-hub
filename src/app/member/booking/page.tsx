@@ -23,7 +23,7 @@ export default async function MemberBookingPage() {
             Pilih coach dan jam. Slot yang udah diambil otomatis kekunci.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           {activePackage ? (
             <Badge tone="brand">Sisa sesi: {activePackage.sisaSesi}</Badge>
           ) : (

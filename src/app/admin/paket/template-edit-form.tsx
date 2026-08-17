@@ -51,10 +51,14 @@ export default function TemplateEditForm({ template }: { template: Template }) {
   return (
     <Card>
       <CardBody>
-        <form key={formKey} action={formAction} className="flex flex-wrap items-end gap-3">
+        <form
+          key={formKey}
+          action={formAction}
+          className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
+        >
           <input type="hidden" name="templateId" value={template.id} />
           <Field label="Nama">
-            <Input name="name" defaultValue={template.name} disabled={locked} className="w-40" />
+            <Input name="name" defaultValue={template.name} disabled={locked} className="w-full sm:w-40" />
           </Field>
           <Field label="Total Sesi">
             <Input
@@ -63,7 +67,7 @@ export default function TemplateEditForm({ template }: { template: Template }) {
               defaultValue={template.totalSesi}
               min={1}
               disabled={locked}
-              className="w-20"
+              className="w-full sm:w-20"
             />
           </Field>
           <Field label="Harga (Rp)">
@@ -73,10 +77,10 @@ export default function TemplateEditForm({ template }: { template: Template }) {
               defaultValue={template.price}
               min={0}
               disabled={locked}
-              className="w-32"
+              className="w-full sm:w-32"
             />
           </Field>
-          <div className="flex items-center gap-1.5 pb-2">
+          <div className="flex items-center gap-1.5 sm:pb-2">
             <input
               type="checkbox"
               name="isActive"
@@ -90,26 +94,28 @@ export default function TemplateEditForm({ template }: { template: Template }) {
             </Label>
           </div>
 
-          {locked ? (
-            <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
-              Edit
-            </Button>
-          ) : (
-            <>
-              <Button
-                type="submit"
-                variant="primary"
-                size="sm"
-                loading={pending}
-                disabled={justEnteredEdit}
-              >
-                Simpan
+          <div className="flex items-center gap-2">
+            {locked ? (
+              <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
+                Edit
               </Button>
-              <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
-                Batal
-              </Button>
-            </>
-          )}
+            ) : (
+              <>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  loading={pending}
+                  disabled={justEnteredEdit}
+                >
+                  Simpan
+                </Button>
+                <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
+                  Batal
+                </Button>
+              </>
+            )}
+          </div>
         </form>
         {state?.error && (
           <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">

@@ -42,7 +42,11 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
 
   return (
     <div>
-      <form key={formKey} action={formAction} className="flex flex-wrap items-end gap-3">
+      <form
+        key={formKey}
+        action={formAction}
+        className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
+      >
         <input type="hidden" name="packageId" value={pkg.id} />
         <Field label="Sisa Sesi">
           <Input
@@ -52,11 +56,11 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
             min={0}
             max={pkg.totalSesi}
             disabled={locked}
-            className="w-20"
+            className="w-full sm:w-20"
           />
         </Field>
         <Field label="Status">
-          <Select name="status" defaultValue={pkg.status} disabled={locked} className="w-44">
+          <Select name="status" defaultValue={pkg.status} disabled={locked} className="w-full sm:w-44">
             <option value="PENDING_PAYMENT">Menunggu Pembayaran</option>
             <option value="ACTIVE">Aktif</option>
             <option value="EXPIRED">Kedaluwarsa</option>
@@ -68,30 +72,32 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
             name="expiredDate"
             defaultValue={pkg.expiredDateInput}
             disabled={locked}
-            className="w-40"
+            className="w-full sm:w-40"
           />
         </Field>
 
-        {locked ? (
-          <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
-            Edit
-          </Button>
-        ) : (
-          <>
-            <Button
-              type="submit"
-              variant="primary"
-              size="sm"
-              loading={pending}
-              disabled={justEnteredEdit}
-            >
-              Simpan
+        <div className="flex items-center gap-2">
+          {locked ? (
+            <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
+              Edit
             </Button>
-            <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
-              Batal
-            </Button>
-          </>
-        )}
+          ) : (
+            <>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                loading={pending}
+                disabled={justEnteredEdit}
+              >
+                Simpan
+              </Button>
+              <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
+                Batal
+              </Button>
+            </>
+          )}
+        </div>
       </form>
       {state?.error && (
         <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">

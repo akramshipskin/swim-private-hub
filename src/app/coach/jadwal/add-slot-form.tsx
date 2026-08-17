@@ -16,7 +16,7 @@ export default function AddSlotForm() {
   return (
     <Card className="mb-8 mt-5">
       <CardBody>
-        <form action={formAction} className="flex flex-wrap items-end gap-3">
+        <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
           <Field label="Tanggal">
             <div className="w-56">
               <AvailabilityDatePicker
