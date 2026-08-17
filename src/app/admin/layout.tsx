@@ -19,6 +19,7 @@ export default async function AdminLayout({
           { href: "/admin/paket", label: "Paket", icon: "package" },
           { href: "/admin/pembayaran", label: "Pembayaran", icon: "credit-card" },
           { href: "/admin/booking-overview", label: "Booking", icon: "calendar" },
+          { href: "/admin/kinerja-coach", label: "Kinerja", icon: "bar-chart" },
         ]}
       />
       <div className="pb-16 sm:pb-0">{children}</div>

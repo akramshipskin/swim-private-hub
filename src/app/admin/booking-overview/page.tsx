@@ -5,14 +5,21 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AdminCancelButton from "./admin-cancel-button";
 import AttendanceToggle from "@/components/attendance-toggle";
+import CoachFilter from "./coach-filter";
 
-export default async function AdminBookingOverviewPage() {
+export default async function AdminBookingOverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ coach?: string }>;
+}) {
   await requireRole("ADMIN");
+  const { coach: coachFilter } = await searchParams;
 
   // Root di Availability (bukan Booking) biar slot yang UDAH dibuka coach
   // tapi BELUM ada member yang ambil juga keliatan -- admin bisa langsung
   // tau coach mana yang jamnya masih kosong.
   const availabilities = await prisma.availability.findMany({
+    where: coachFilter ? { coachId: coachFilter } : undefined,
     orderBy: [{ date: "asc" }, { startTime: "asc" }],
     include: {
       coach: { select: { id: true, name: true } },
@@ -22,6 +29,12 @@ export default async function AdminBookingOverviewPage() {
         take: 1,
       },
     },
+  });
+
+  const allCoaches = await prisma.user.findMany({
+    where: { role: "COACH" },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
   });
 
   function dateKey(d: Date) {
@@ -45,9 +58,17 @@ export default async function AdminBookingOverviewPage() {
 
   const now = new Date();
 
+  function buildKabarinWaLink(coachName: string, dateLabel: string) {
+    const message = `Halo semua! Coach ${coachName} baru aja buka jadwal baru tanggal ${dateLabel}. Buruan booking sebelum kehabisan slot ya! 🏊`;
+    return `https://wa.me/?text=${encodeURIComponent(message)}`;
+  }
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Semua Booking</h1>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight text-text">Semua Booking</h1>
+        <CoachFilter coaches={allCoaches} selected={coachFilter ?? "all"} />
+      </div>
 
       {availabilities.length === 0 ? (
         <Card>
@@ -63,9 +84,9 @@ export default async function AdminBookingOverviewPage() {
 
           return (
             <div key={coachId} className="mb-6">
-              <h2 className="mb-2 text-sm font-semibold text-text-muted">
+              <h2 className="mb-2 text-lg font-semibold text-text">
                 {group.coachName}{" "}
-                <span className="text-text-subtle">
+                <span className="text-sm font-normal text-text-subtle">
                   ({filledCount}/{allSlots.length} terisi)
                 </span>
               </h2>
@@ -74,9 +95,19 @@ export default async function AdminBookingOverviewPage() {
                 const rows = group.byDate.get(dKey)!;
                 return (
                   <div key={dKey} className="mb-3">
-                    <h3 className="mb-1.5 text-xs font-medium text-text-subtle">
-                      {formatDateLabel(rows[0].date)}
-                    </h3>
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                      <h3 className="text-xs font-medium text-text-subtle">
+                        {formatDateLabel(rows[0].date)}
+                      </h3>
+                      <a
+                        href={buildKabarinWaLink(group.coachName, formatDateLabel(rows[0].date))}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-[#25D366] hover:bg-[#25D366]/10"
+                      >
+                        Kabarin WA
+                      </a>
+                    </div>
 
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                       {rows.map((a) => {

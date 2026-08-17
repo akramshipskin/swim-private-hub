@@ -56,6 +56,15 @@ export function ClipboardCheckIcon({ className }: IconProps) {
   );
 }
 
+export function BarChartIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 20V10M12 20V4M20 20v-7" />
+      <path strokeLinecap="round" d="M2.5 20h19" />
+    </svg>
+  );
+}
+
 export const ICONS = {
   users: UsersIcon,
   package: PackageIcon,
@@ -63,6 +72,7 @@ export const ICONS = {
   calendar: CalendarIcon,
   clock: ClockIcon,
   "clipboard-check": ClipboardCheckIcon,
+  "bar-chart": BarChartIcon,
 } as const;
 
 export type IconName = keyof typeof ICONS;
