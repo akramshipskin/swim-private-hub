@@ -45,58 +45,80 @@ export async function cancelBooking({
     throw new CancelError("Booking ini sudah dibatalkan/selesai", 409);
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.$queryRaw`SELECT id FROM "Package" WHERE id = ${booking.packageId} FOR UPDATE`;
+  try {
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.$queryRaw`SELECT id FROM "Package" WHERE id = ${booking.packageId} FOR UPDATE`;
 
-    if (actor.role === "MEMBER") {
-      const hoursUntilStart =
-        (booking.availability.startTime.getTime() - Date.now()) / (1000 * 60 * 60);
+        if (actor.role === "MEMBER") {
+          const hoursUntilStart =
+            (booking.availability.startTime.getTime() - Date.now()) / (1000 * 60 * 60);
 
-      if (hoursUntilStart < CANCEL_WINDOW_HOURS) {
-        throw new CancelError(
-          `Pembatalan hanya bisa dilakukan minimal ${CANCEL_WINDOW_HOURS} jam sebelum jadwal.`,
-          409
-        );
-      }
+          if (hoursUntilStart < CANCEL_WINDOW_HOURS) {
+            throw new CancelError(
+              `Pembatalan hanya bisa dilakukan minimal ${CANCEL_WINDOW_HOURS} jam sebelum jadwal.`,
+              409
+            );
+          }
 
-      const selfCancelCount = await tx.booking.count({
-        where: {
-          memberId: booking.memberId,
-          packageId: booking.packageId,
-          status: "CANCELLED",
-          cancelledBy: "MEMBER",
-        },
-      });
+          const selfCancelCount = await tx.booking.count({
+            where: {
+              memberId: booking.memberId,
+              packageId: booking.packageId,
+              status: "CANCELLED",
+              cancelledBy: "MEMBER",
+            },
+          });
 
-      if (selfCancelCount >= CANCEL_QUOTA_PER_PACKAGE) {
-        throw new CancelError(
-          `Jatah pembatalan mandiri (${CANCEL_QUOTA_PER_PACKAGE}x per paket) udah abis. Hubungi admin buat kasus khusus.`,
-          409
-        );
-      }
-    }
+          if (selfCancelCount >= CANCEL_QUOTA_PER_PACKAGE) {
+            throw new CancelError(
+              `Jatah pembatalan mandiri (${CANCEL_QUOTA_PER_PACKAGE}x per paket) udah abis. Hubungi admin buat kasus khusus.`,
+              409
+            );
+          }
+        }
 
-    const claim = await tx.booking.updateMany({
-      where: { id: bookingId, status: "BOOKED" },
-      data: {
-        status: "CANCELLED",
-        cancelledBy: actor.role,
-        cancelledAt: new Date(),
+        const claim = await tx.booking.updateMany({
+          where: { id: bookingId, status: "BOOKED" },
+          data: {
+            status: "CANCELLED",
+            cancelledBy: actor.role,
+            cancelledAt: new Date(),
+          },
+        });
+
+        if (claim.count === 0) {
+          throw new CancelError("Booking ini sudah dibatalkan/selesai", 409);
+        }
+
+        await tx.availability.update({
+          where: { id: booking.availabilityId },
+          data: { status: "AVAILABLE" },
+        });
+
+        await tx.package.update({
+          where: { id: booking.packageId },
+          data: { sisaSesi: { increment: 1 } },
+        });
       },
-    });
-
-    if (claim.count === 0) {
-      throw new CancelError("Booking ini sudah dibatalkan/selesai", 409);
+      { timeout: 10000, maxWait: 8000 }
+    );
+  } catch (err) {
+    if (err instanceof CancelError) throw err;
+    // P2028 = transaksi gak kebagian giliran/expired nunggu row lock
+    // Package (banyak cancel bareng buat paket yang sama). Ini kalah
+    // antre, bukan bug -- kasih pesan yang sama kayak race lainnya,
+    // jangan biarin bocor jadi 500 mentah ke user.
+    if (
+      err instanceof Error &&
+      "code" in err &&
+      (err as { code?: string }).code === "P2028"
+    ) {
+      throw new CancelError(
+        "Lagi banyak yang proses pembatalan bareng, coba lagi sebentar.",
+        409
+      );
     }
-
-    await tx.availability.update({
-      where: { id: booking.availabilityId },
-      data: { status: "AVAILABLE" },
-    });
-
-    await tx.package.update({
-      where: { id: booking.packageId },
-      data: { sisaSesi: { increment: 1 } },
-    });
-  });
+    throw err;
+  }
 }
