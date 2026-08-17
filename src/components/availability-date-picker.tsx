@@ -28,9 +28,15 @@ function parseKey(key: string) {
 export function AvailabilityDatePicker({
   value,
   onChange,
+  fetchUrl = "/api/availability/available-dates",
+  legendLabel = "ada slot ready",
 }: {
   value: string;
   onChange: (date: string) => void;
+  /** Endpoint yang dipanggil per bulan, harus balikin { dates: string[] } (YYYY-MM-DD). */
+  fetchUrl?: string;
+  /** Teks di bawah kalender buat jelasin arti titik penanda. */
+  legendLabel?: string;
 }) {
   const selected = parseKey(value);
   const [open, setOpen] = useState(false);
@@ -41,7 +47,8 @@ export function AvailabilityDatePicker({
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`/api/availability/available-dates?year=${viewY}&month=${viewM + 1}`)
+    const sep = fetchUrl.includes("?") ? "&" : "?";
+    fetch(`${fetchUrl}${sep}year=${viewY}&month=${viewM + 1}`)
       .then((r) => r.json())
       .then((data) => {
         if (!cancelled) setAvailableDates(new Set(data.dates ?? []));
@@ -49,7 +56,7 @@ export function AvailabilityDatePicker({
     return () => {
       cancelled = true;
     };
-  }, [viewY, viewM]);
+  }, [viewY, viewM, fetchUrl]);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -172,7 +179,7 @@ export function AvailabilityDatePicker({
           </div>
 
           <p className="mt-2 flex items-center gap-1.5 text-[11px] text-text-subtle">
-            <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot ready
+            <span className="h-1 w-1 rounded-full bg-brand-500" /> {legendLabel}
           </p>
         </div>
       )}

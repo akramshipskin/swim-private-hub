@@ -1,23 +1,32 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { addAvailability } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
-import { Field, Input, Label } from "@/components/ui/input";
+import { Field, Label } from "@/components/ui/input";
 import { TimeSelect } from "@/components/ui/time-select";
+import { AvailabilityDatePicker } from "@/components/availability-date-picker";
 import { Button } from "@/components/ui/button";
 import { todayWibDateString } from "@/lib/datetime";
 
 export default function AddSlotForm() {
   const [state, formAction, pending] = useActionState(addAvailability, null);
-  const today = todayWibDateString();
+  const [date, setDate] = useState(todayWibDateString());
 
   return (
     <Card className="mb-8 mt-5">
       <CardBody>
         <form action={formAction} className="flex flex-wrap items-end gap-3">
           <Field label="Tanggal">
-            <Input type="date" name="date" min={today} defaultValue={today} required className="w-auto" />
+            <div className="w-56">
+              <AvailabilityDatePicker
+                value={date}
+                onChange={setDate}
+                fetchUrl="/api/coach/schedule-dates"
+                legendLabel="udah ada slot"
+              />
+            </div>
+            <input type="hidden" name="date" value={date} />
           </Field>
           <TimeSelect name="startTime" label="Jam mulai" defaultValue="08:00" />
           <TimeSelect name="endTime" label="Jam selesai" defaultValue="16:00" />
