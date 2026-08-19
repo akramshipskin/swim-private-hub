@@ -50,6 +50,16 @@ export default async function AdminPaketPage() {
     }),
   ]);
 
+  const cancelUsedByPackage = new Map(
+    (
+      await prisma.booking.groupBy({
+        by: ["packageId"],
+        where: { packageId: { in: packages.map((p) => p.id) }, status: "CANCELLED", cancelledBy: "MEMBER" },
+        _count: true,
+      })
+    ).map((r) => [r.packageId, r._count])
+  );
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola Paket</h1>
@@ -83,44 +93,52 @@ export default async function AdminPaketPage() {
       {/* --- List member + paket, advanced --- */}
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>
       <ul className="flex flex-col gap-3">
-        {packages.map((p) => (
-          <Card key={p.id}>
-            <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="text-sm font-medium text-text">
-                  {p.member.name}{" "}
-                  <span className="text-text-subtle">({p.member.email ?? p.member.phone ?? "-"})</span>
-                </p>
-                <p className="text-xs text-text-subtle">
-                  Member sejak {memberSince(p.member.createdAt)}
-                </p>
-                <p className="mb-3 mt-1 text-sm text-text-muted">{p.name}</p>
+        {packages.map((p) => {
+          const cancelUsed = cancelUsedByPackage.get(p.id) ?? 0;
+          const cancelRemaining = Math.max(0, p.jatahCancel - cancelUsed);
 
-                <PackageEditForm
-                  pkg={{
-                    id: p.id,
-                    sisaSesi: p.sisaSesi,
-                    totalSesi: p.totalSesi,
-                    status: p.status,
-                    expiredDateInput: toInputDate(p.expiredDate),
-                  }}
-                />
-              </div>
+          return (
+            <Card key={p.id}>
+              <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-text">
+                    {p.member.name}{" "}
+                    <span className="text-text-subtle">({p.member.email ?? p.member.phone ?? "-"})</span>
+                  </p>
+                  <p className="text-xs text-text-subtle">
+                    Member sejak {memberSince(p.member.createdAt)}
+                  </p>
+                  <p className="mb-3 mt-1 text-sm text-text-muted">{p.name}</p>
 
-              <div className="shrink-0 rounded-lg bg-surface-muted px-4 py-3 sm:text-right">
-                <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
-                <p className="mt-2 text-sm font-semibold text-text">
-                  {p.sisaSesi}/{p.totalSesi} sesi
-                </p>
-                <p className="text-xs text-text-subtle">
-                  {p.expiredDate
-                    ? `Berlaku s.d. ${formatDateLabel(p.expiredDate)}`
-                    : "Gak ada batas waktu"}
-                </p>
-              </div>
-            </CardBody>
-          </Card>
-        ))}
+                  <PackageEditForm
+                    pkg={{
+                      id: p.id,
+                      sisaSesi: p.sisaSesi,
+                      totalSesi: p.totalSesi,
+                      status: p.status,
+                      expiredDateInput: toInputDate(p.expiredDate),
+                    }}
+                  />
+                </div>
+
+                <div className="shrink-0 rounded-lg bg-surface-muted px-4 py-3 sm:text-right">
+                  <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
+                  <p className="mt-2 text-sm font-semibold text-text">
+                    {p.sisaSesi}/{p.totalSesi} sesi
+                  </p>
+                  <p className="text-xs text-text-subtle">
+                    {p.expiredDate
+                      ? `Berlaku s.d. ${formatDateLabel(p.expiredDate)}`
+                      : "Gak ada batas waktu"}
+                  </p>
+                  <p className="mt-1 text-xs text-text-subtle">
+                    Jatah batal: {cancelRemaining}/{p.jatahCancel}
+                  </p>
+                </div>
+              </CardBody>
+            </Card>
+          );
+        })}
       </ul>
     </main>
   );

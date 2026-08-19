@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -55,16 +56,11 @@ export default function EnablePushButton() {
   }
 
   if (status === "unsupported") {
-    return (
-      <p className="text-xs text-gray-400">
-        Browser ini belum dukung notifikasi push. Di iPhone, tambahkan dulu ke
-        Home Screen lalu buka dari sana.
-      </p>
-    );
+    return <Badge tone="neutral">Notifikasi gak didukung browser ini</Badge>;
   }
 
   if (status === "subscribed") {
-    return <p className="text-xs text-green-600">Notifikasi aktif ✓</p>;
+    return <Badge tone="success">Notifikasi aktif</Badge>;
   }
 
   return (
@@ -72,14 +68,13 @@ export default function EnablePushButton() {
       <button
         onClick={handleEnable}
         disabled={status === "loading"}
-        className="text-xs text-blue-600 underline disabled:opacity-50"
+        className="inline-flex items-center rounded-full border border-brand-700/15 bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 hover:bg-brand-100 disabled:opacity-50"
       >
         {status === "loading" ? "Mengaktifkan..." : "Aktifkan Notifikasi"}
       </button>
       {status === "error" && (
-        <p className="text-xs text-red-600">
-          Izin notifikasi ditolak/gagal. Cek pengaturan notifikasi browser
-          buat situs ini.
+        <p className="text-xs text-danger-text">
+          Izin notifikasi ditolak/gagal. Cek pengaturan notifikasi browser buat situs ini.
         </p>
       )}
     </div>

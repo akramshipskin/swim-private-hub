@@ -16,21 +16,25 @@ export default function CreateTemplateForm() {
           <Field label="Nama Paket">
             <Input name="name" required className="w-full sm:w-44" />
           </Field>
-          <Field label="Total Sesi">
-            <Input type="number" name="totalSesi" required min={1} className="w-full sm:w-24" />
-          </Field>
           <Field label="Harga (Rp)">
             <Input type="number" name="price" required min={0} className="w-full sm:w-32" />
           </Field>
-          <Field label="Berlaku (hari)">
-            <Input type="number" name="durationDays" required min={1} defaultValue={60} className="w-full sm:w-24" />
-          </Field>
-          <Field label="Jatah Cancel">
-            <Input type="number" name="jatahCancel" required min={0} defaultValue={2} className="w-full sm:w-24" />
-          </Field>
-          <Button type="submit" loading={pending}>
-            Tambah Katalog
-          </Button>
+          <div className="grid grid-cols-2 gap-3 sm:contents">
+            <Field label="Total Sesi">
+              <Input type="number" name="totalSesi" required min={1} className="w-full sm:w-24" />
+            </Field>
+            <Field label="Jatah Cancel">
+              <Input type="number" name="jatahCancel" required min={0} defaultValue={2} className="w-full sm:w-24" />
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 items-end gap-3 sm:contents">
+            <Field label="Berlaku (hari)">
+              <Input type="number" name="durationDays" required min={1} defaultValue={60} className="w-full sm:w-24" />
+            </Field>
+            <Button type="submit" loading={pending} className="w-full sm:w-auto">
+              Tambah Katalog
+            </Button>
+          </div>
         </form>
         {state?.error && (
           <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">

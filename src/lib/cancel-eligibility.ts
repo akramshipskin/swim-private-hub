@@ -35,7 +35,7 @@ export async function checkCancelEligibility(booking: {
   if (selfCancelCount >= quota) {
     return {
       canCancel: false,
-      reason: `Jatah pembatalan mandiri (${quota}x per paket ini) udah abis. Ajukan ke admin buat kasus khusus.`,
+      reason: "Jatah pembatalan mandiri udah abis. Ajukan ke admin buat kasus khusus.",
       used: selfCancelCount,
       quota,
     };

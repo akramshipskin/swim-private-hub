@@ -50,12 +50,6 @@ enum MarkedBy {
   ADMIN
 }
 
-enum CancelRequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
 model User {
   id                 String   @id @default(cuid())
   name               String
@@ -72,7 +66,6 @@ model User {
   bookings          Booking[]
   availabilities    Availability[]     @relation("CoachAvailabilities")
   pushSubscriptions PushSubscription[]
-  cancelRequests    CancelRequest[]
 }
 
 model CoachProfile {
@@ -123,8 +116,7 @@ model Package {
   expiredDate DateTime?
   createdAt   DateTime         @default(now())
 
-  payments       Payment[]
-  cancelRequests CancelRequest[]
+  payments Payment[]
 
   @@index([memberId])
 }
@@ -194,29 +186,6 @@ model Booking {
   attendedAt     DateTime?
   createdAt      DateTime      @default(now())
 
-  cancelRequest CancelRequest?
-
   @@index([memberId])
   @@index([availabilityId])
-}
-
-// Pengajuan pembatalan ke admin, dipakai member kalau jatah cancel
-// mandiri paketnya udah abis. Admin bisa approve (booking dibatalin +
-// sesi balik, sama kayak cancel biasa tapi cancelledBy=ADMIN) atau
-// reject (booking tetep BOOKED, sesi tetep kepotong).
-model CancelRequest {
-  id        String              @id @default(cuid())
-  bookingId String              @unique
-  booking   Booking             @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  memberId  String
-  member    User                @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  packageId String
-  package   Package             @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  status    CancelRequestStatus @default(PENDING)
-  reason    String?
-  createdAt DateTime            @default(now())
-  decidedAt DateTime?
-
-  @@index([memberId])
-  @@index([status])
 }

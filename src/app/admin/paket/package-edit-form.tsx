@@ -48,24 +48,26 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
         className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
       >
         <input type="hidden" name="packageId" value={pkg.id} />
-        <Field label="Sisa Sesi">
-          <Input
-            type="number"
-            name="sisaSesi"
-            defaultValue={pkg.sisaSesi}
-            min={0}
-            max={pkg.totalSesi}
-            disabled={locked}
-            className="w-full sm:w-20"
-          />
-        </Field>
-        <Field label="Status">
-          <Select name="status" defaultValue={pkg.status} disabled={locked} className="w-full sm:w-44">
-            <option value="PENDING_PAYMENT">Menunggu Pembayaran</option>
-            <option value="ACTIVE">Aktif</option>
-            <option value="EXPIRED">Kedaluwarsa</option>
-          </Select>
-        </Field>
+        <div className="grid grid-cols-2 gap-3 sm:contents">
+          <Field label="Sisa Sesi">
+            <Input
+              type="number"
+              name="sisaSesi"
+              defaultValue={pkg.sisaSesi}
+              min={0}
+              max={pkg.totalSesi}
+              disabled={locked}
+              className="w-full sm:w-20"
+            />
+          </Field>
+          <Field label="Status">
+            <Select name="status" defaultValue={pkg.status} disabled={locked} className="w-full sm:w-44">
+              <option value="PENDING_PAYMENT">Menunggu Pembayaran</option>
+              <option value="ACTIVE">Aktif</option>
+              <option value="EXPIRED">Kedaluwarsa</option>
+            </Select>
+          </Field>
+        </div>
         <Field label="Berlaku Sampai">
           <Input
             type="date"

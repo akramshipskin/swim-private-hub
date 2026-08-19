@@ -114,6 +114,9 @@ export default async function MemberPaketPage() {
                   )}
                   <p className="font-medium text-text">{t.name}</p>
                   <p className="text-lg font-semibold text-text">{formatRupiah(t.price)}</p>
+                  <p className="mt-1 text-sm text-text-muted">
+                    {t.totalSesi} sesi · berlaku {t.durationDays} hari · jatah batal {t.jatahCancel}x
+                  </p>
                 </div>
                 <CheckoutButton templateId={t.id} />
               </CardBody>

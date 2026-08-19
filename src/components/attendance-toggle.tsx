@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useRef } from "react";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
-import { Button } from "@/components/ui/button";
 
-// Begitu attended udah ditandai (bukan null), tombol kekunci -- coach/admin
-// harus klik "Edit" dulu buat ganti. Sebelumnya kedua tombol Hadir/Gak
-// Hadir selalu aktif jadi gampang ke-klik gak sengaja abis nandain.
+// Dropdown compact -- cuma nunjukin status yang lagi kepilih, bukan 2
+// tombol Hadir/Gak Hadir + tombol Edit sekaligus. Ganti pilihan langsung
+// submit (gak butuh tombol Simpan terpisah), jadi kartu booking gak
+// makan tempat horizontal cuma buat nandain kehadiran.
 export default function AttendanceToggle({
   bookingId,
   attended,
@@ -15,54 +15,35 @@ export default function AttendanceToggle({
   attended: boolean | null;
 }) {
   const [state, formAction, pending] = useActionState(markAttendance, null);
-  const [isEditing, setIsEditing] = useState(attended === null);
-  const wasPending = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  useEffect(() => {
-    if (wasPending.current && !pending && !state?.error) {
-      setIsEditing(false);
-    }
-    wasPending.current = pending;
-  }, [pending, state]);
-
-  const locked = attended !== null && !isEditing;
+  const toneClass =
+    attended === true
+      ? "border-success-text/25 bg-success-bg text-success-text"
+      : attended === false
+        ? "border-danger-text/25 bg-danger-bg text-danger-text"
+        : "border-border bg-white text-text-muted";
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <div className="flex gap-1.5">
-        <form action={formAction}>
-          <input type="hidden" name="bookingId" value={bookingId} />
-          <input type="hidden" name="attended" value="true" />
-          <Button
-            type="submit"
-            size="sm"
-            variant={attended === true ? "primary" : "secondary"}
-            loading={pending}
-            disabled={locked}
-          >
-            Hadir
-          </Button>
-        </form>
-        <form action={formAction}>
-          <input type="hidden" name="bookingId" value={bookingId} />
-          <input type="hidden" name="attended" value="false" />
-          <Button
-            type="submit"
-            size="sm"
-            variant={attended === false ? "danger" : "secondary"}
-            loading={pending}
-            disabled={locked}
-          >
-            Gak Hadir
-          </Button>
-        </form>
-        {locked && (
-          <Button type="button" variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
-            Edit
-          </Button>
-        )}
-      </div>
-      {state?.error && <p className="text-xs text-danger-text">{state.error}</p>}
-    </div>
+    <form ref={formRef} action={formAction} className="flex flex-col items-end gap-1">
+      <input type="hidden" name="bookingId" value={bookingId} />
+      <select
+        name="attended"
+        defaultValue={attended === null ? "" : String(attended)}
+        disabled={pending}
+        onChange={(e) => {
+          if (e.target.value) formRef.current?.requestSubmit();
+        }}
+        aria-label="Status kehadiran"
+        className={`rounded-lg border px-2 py-1 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 ${toneClass}`}
+      >
+        <option value="" disabled>
+          Belum ditandai
+        </option>
+        <option value="true">Hadir</option>
+        <option value="false">Gak Hadir</option>
+      </select>
+      {state?.error && <p className="max-w-[140px] text-right text-xs text-danger-text">{state.error}</p>}
+    </form>
   );
 }

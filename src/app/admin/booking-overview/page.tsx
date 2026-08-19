@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import AdminCancelButton from "./admin-cancel-button";
 import AttendanceToggle from "@/components/attendance-toggle";
 import CoachFilter from "./coach-filter";
-import CancelRequestItem from "./cancel-request-item";
 
 export default async function AdminBookingOverviewPage({
   searchParams,
@@ -36,15 +35,6 @@ export default async function AdminBookingOverviewPage({
     where: { role: "COACH" },
     orderBy: { name: "asc" },
     select: { id: true, name: true },
-  });
-
-  const pendingCancelRequests = await prisma.cancelRequest.findMany({
-    where: { status: "PENDING" },
-    orderBy: { createdAt: "asc" },
-    include: {
-      member: { select: { name: true } },
-      booking: { include: { availability: { include: { coach: { select: { name: true } } } } } },
-    },
   });
 
   function dateKey(d: Date) {
@@ -79,37 +69,6 @@ export default async function AdminBookingOverviewPage({
         <h1 className="text-2xl font-semibold tracking-tight text-text">Semua Booking</h1>
         <CoachFilter coaches={allCoaches} selected={coachFilter ?? "all"} />
       </div>
-
-      {pendingCancelRequests.length > 0 && (
-        <div className="mb-6">
-          <h2 className="mb-2 text-lg font-semibold text-text">
-            Pengajuan Pembatalan{" "}
-            <span className="text-sm font-normal text-text-subtle">
-              ({pendingCancelRequests.length} nunggu diproses)
-            </span>
-          </h2>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {pendingCancelRequests.map((cr) => (
-              <Card key={cr.id} className="border-amber-300">
-                <CardBody className="flex items-start justify-between gap-3 py-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-text">{cr.member.name}</p>
-                    <p className="text-xs text-text-muted">
-                      {cr.booking.availability.coach.name} &middot;{" "}
-                      {formatDateLabel(cr.booking.availability.date)}{" "}
-                      {formatTimeWib(cr.booking.availability.startTime)}
-                    </p>
-                    {cr.reason && (
-                      <p className="mt-1 text-xs italic text-text-subtle">&ldquo;{cr.reason}&rdquo;</p>
-                    )}
-                  </div>
-                  <CancelRequestItem requestId={cr.id} />
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
 
       {availabilities.length === 0 ? (
         <Card>

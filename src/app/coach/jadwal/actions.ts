@@ -17,7 +17,6 @@ export async function addAvailability(
   const date = formData.get("date") as string;
   const startTime = formData.get("startTime") as string;
   const endTime = formData.get("endTime") as string;
-  const splitHourly = formData.get("splitHourly") === "on";
 
   if (!date || !startTime || !endTime) {
     return { error: "Tanggal, jam mulai, dan jam selesai wajib diisi" };
@@ -34,44 +33,25 @@ export async function addAvailability(
     return { error: "Gak bisa bikin slot di tanggal/jam yang udah lewat." };
   }
 
-  if (!splitHourly) {
-    try {
-      await prisma.availability.create({
-        data: {
-          coachId: session.user.id,
-          date: dateLabel(date),
-          startTime: startDateTime,
-          endTime: endDateTime,
-        },
-      });
-    } catch {
-      return { error: "Slot di jam ini udah ada sebelumnya." };
-    }
-  } else {
-    const [startH, startM] = startTime.split(":").map(Number);
-    const [endH, endM] = endTime.split(":").map(Number);
+  // Slot selalu dipecah per jam bulat -- TimeSelect (hourOnly) udah
+  // ngunci menit ke "00", jadi startH/endH pasti bilangan bulat.
+  const [startH] = startTime.split(":").map(Number);
+  const [endH] = endTime.split(":").map(Number);
 
-    if (startM !== 0 || endM !== 0) {
-      return {
-        error: "Pecah per jam cuma bisa buat jam bulat (misal 08:00, bukan 08:30).",
-      };
-    }
-
-    const chunks = [];
-    for (let h = startH; h < endH; h++) {
-      // Jam istirahat 12.00-13.00 default gak dijadiin slot booking.
-      if (h === 12) continue;
-      const pad = (n: number) => String(n).padStart(2, "0");
-      chunks.push({
-        coachId: session.user.id,
-        date: dateLabel(date),
-        startTime: wibDateTime(date, `${pad(h)}:00`),
-        endTime: wibDateTime(date, `${pad(h + 1)}:00`),
-      });
-    }
-
-    await prisma.availability.createMany({ data: chunks, skipDuplicates: true });
+  const chunks = [];
+  for (let h = startH; h < endH; h++) {
+    // Jam istirahat 12.00-13.00 default gak dijadiin slot booking.
+    if (h === 12) continue;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    chunks.push({
+      coachId: session.user.id,
+      date: dateLabel(date),
+      startTime: wibDateTime(date, `${pad(h)}:00`),
+      endTime: wibDateTime(date, `${pad(h + 1)}:00`),
+    });
   }
+
+  await prisma.availability.createMany({ data: chunks, skipDuplicates: true });
 
   emitBookingChanged();
   revalidatePath("/coach/jadwal");

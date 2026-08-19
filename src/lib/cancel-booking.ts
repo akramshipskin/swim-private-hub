@@ -75,7 +75,7 @@ export async function cancelBooking({
           const quota = pkg?.jatahCancel ?? 0;
           if (selfCancelCount >= quota) {
             throw new CancelError(
-              `Jatah pembatalan mandiri (${quota}x per paket ini) udah abis. Ajukan ke admin buat kasus khusus.`,
+              "Jatah pembatalan mandiri udah abis. Ajukan ke admin buat kasus khusus.",
               409
             );
           }

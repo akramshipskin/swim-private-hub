@@ -22,7 +22,6 @@ export default async function CoachJadwalPage() {
         include: { member: { select: { name: true } } },
         take: 1,
       },
-      _count: { select: { bookings: true } },
     },
   });
 
@@ -102,16 +101,11 @@ export default async function CoachJadwalPage() {
                       {a.status === "BOOKED" ? (
                         <Badge tone="brand">Terisi</Badge>
                       ) : (
-                        <div className="flex items-center gap-2">
-                          {a._count.bookings > 0 && (
-                            <span className="text-xs text-text-subtle">Pernah dibooking</span>
-                          )}
-                          <form action={deleteAvailability.bind(null, a.id)}>
-                            <Button type="submit" variant="danger" size="sm">
-                              Hapus
-                            </Button>
-                          </form>
-                        </div>
+                        <form action={deleteAvailability.bind(null, a.id)}>
+                          <Button type="submit" variant="danger" size="sm">
+                            Hapus
+                          </Button>
+                        </form>
                       )}
                     </CardBody>
                   </Card>

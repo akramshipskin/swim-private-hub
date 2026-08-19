@@ -52,7 +52,6 @@ export async function GET(request: Request) {
 
         let canCancel = false;
         let cancelReason: string | undefined;
-        let hasCancelRequest = false;
 
         if (bookedByMe && activeBooking) {
           const eligibility = await checkCancelEligibility({
@@ -62,14 +61,6 @@ export async function GET(request: Request) {
           });
           canCancel = eligibility.canCancel;
           cancelReason = eligibility.reason;
-
-          if (!canCancel) {
-            const cr = await prisma.cancelRequest.findUnique({
-              where: { bookingId: activeBooking.id },
-              select: { status: true },
-            });
-            hasCancelRequest = cr?.status === "PENDING";
-          }
         }
 
         return {
@@ -82,7 +73,6 @@ export async function GET(request: Request) {
           bookingId: bookedByMe ? activeBooking!.id : null,
           canCancel,
           cancelReason,
-          hasCancelRequest,
         };
       })
   );

@@ -2,7 +2,6 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import AttendanceToggle from "@/components/attendance-toggle";
 
 export default async function CoachRiwayatSesiPage() {
@@ -57,24 +56,17 @@ export default async function CoachRiwayatSesiPage() {
               <ul className="flex flex-col gap-2">
                 {rows.map((b) => (
                   <Card key={b.id}>
-                    <CardBody className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
+                    <CardBody className="flex items-start justify-between gap-3 py-3">
+                      <div className="min-w-0">
                         <p className="text-sm font-medium text-text">{b.member.name}</p>
                         <p className="text-sm text-text-muted">
                           {formatTimeWib(b.availability.startTime)}–
                           {formatTimeWib(b.availability.endTime)}
                         </p>
-                        {b.attended !== null && (
-                          <div className="mt-1">
-                            <Badge tone={b.attended ? "success" : "neutral"}>
-                              {b.attended ? "Hadir" : "Gak Hadir"}
-                              {b.attendedBy && (
-                                <span className="ml-1 opacity-70">
-                                  (ditandain {b.attendedBy === "COACH" ? "coach" : "admin"})
-                                </span>
-                              )}
-                            </Badge>
-                          </div>
+                        {b.attended !== null && b.attendedBy && (
+                          <p className="mt-0.5 text-xs text-text-subtle">
+                            ditandain {b.attendedBy === "COACH" ? "coach" : "admin"}
+                          </p>
                         )}
                       </div>
                       <AttendanceToggle bookingId={b.id} attended={b.attended} />

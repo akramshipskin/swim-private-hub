@@ -130,39 +130,47 @@ export default async function AdminUsersPage() {
               </div>
             </Card>
 
-            {/* Mobile: card, biar gak perlu geser horizontal */}
-            <ul className="flex flex-col gap-2 sm:hidden">
+            {/* Mobile: card compact, biar gak perlu geser/scroll jauh
+                (member bisa 350+ baris) */}
+            <ul className="flex flex-col gap-1.5 sm:hidden">
               {rows.map((u) => {
                 const activePkg = u.packages[0];
                 return (
                   <Card key={u.id}>
-                    <CardBody className="flex flex-col gap-2 py-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="font-medium text-text">{u.name}</p>
-                          <p className="text-xs text-text-subtle">{u.email ?? "-"}</p>
-                          <p className="text-xs text-text-subtle">{u.phone ?? "-"}</p>
-                        </div>
+                    <CardBody className="flex flex-col gap-1 px-3 py-2.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="truncate text-sm font-medium text-text">{u.name}</p>
                         <Badge tone={u.isActive ? "success" : "neutral"}>
                           {u.isActive ? "Aktif" : "Nonaktif"}
                         </Badge>
                       </div>
-                      {role === "MEMBER" && (
-                        <p className="text-xs text-text-muted">
-                          {activePkg ? (
-                            <>
-                              {activePkg.name} -- sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi
-                              {activePkg.expiredDate && (
-                                <> · s.d. {formatDateLabel(activePkg.expiredDate)}</>
-                              )}
-                            </>
-                          ) : (
-                            <span className="text-text-subtle">Belum ada paket aktif</span>
-                          )}
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="min-w-0 truncate text-xs text-text-subtle">
+                          {u.email ?? u.phone ?? "-"}
+                          {role === "MEMBER" &&
+                            (activePkg ? (
+                              <> · sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi</>
+                            ) : (
+                              <> · belum ada paket</>
+                            ))}
                         </p>
-                      )}
-                      <div className="flex items-center justify-end border-t border-border pt-2">
-                        <UserActions user={u} />
+                        <div className="flex shrink-0 items-center gap-2 text-xs font-medium">
+                          {u.phone && (
+                            <a
+                              href={buildContactWaLink(u.phone, u.name)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#25D366]"
+                            >
+                              WA
+                            </a>
+                          )}
+                          <form action={toggleUserActive.bind(null, u.id, !u.isActive)}>
+                            <button type="submit" className="text-text-muted underline-offset-2 hover:underline">
+                              {u.isActive ? "Nonaktifkan" : "Aktifkan"}
+                            </button>
+                          </form>
+                        </div>
                       </div>
                     </CardBody>
                   </Card>

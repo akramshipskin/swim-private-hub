@@ -65,6 +65,33 @@ export function BarChartIcon({ className }: IconProps) {
   );
 }
 
+export function MenuIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
+      <path strokeLinecap="round" d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17" />
+    </svg>
+  );
+}
+
+export function UserEditIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
+      <circle cx="9" cy="8" r="3.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 19v-1a4 4 0 0 1 4-4h3" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m19.3 12.7-5.1 5.1-2.4.7.7-2.4 5.1-5.1a1.5 1.5 0 0 1 2.1 0l.3.3a1.5 1.5 0 0 1-.7 1.4Z" />
+    </svg>
+  );
+}
+
+export function LogoutIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.5 8.5V6a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2.5" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12H10m11 0-3.2-3.2M21 12l-3.2 3.2" />
+    </svg>
+  );
+}
+
 export const ICONS = {
   users: UsersIcon,
   package: PackageIcon,

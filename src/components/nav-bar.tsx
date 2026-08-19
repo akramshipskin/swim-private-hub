@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { signOut } from "@/auth";
 import { MobileBottomNav, type BottomNavLink } from "@/components/mobile-bottom-nav";
 import { DesktopTabNav } from "@/components/desktop-tab-nav";
+import { UserMenu } from "@/components/user-menu";
 
 export function NavBar({
   brand,
@@ -23,25 +23,7 @@ export function NavBar({
               {brand}
             </Link>
 
-            <div className="flex items-center gap-2.5">
-              <div className="text-right leading-tight">
-                <p className="text-sm font-medium text-text">{userName}</p>
-                <p className="text-xs text-text-subtle">{userRole}</p>
-              </div>
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut();
-                }}
-              >
-                <button
-                  type="submit"
-                  className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-muted hover:bg-surface-muted"
-                >
-                  Logout
-                </button>
-              </form>
-            </div>
+            <UserMenu userName={userName} userRole={userRole} />
           </div>
 
           {/* Desktop: tab nav di header. Mobile pakai bottom nav (di bawah). */}
