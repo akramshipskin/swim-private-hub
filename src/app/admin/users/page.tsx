@@ -15,7 +15,7 @@ function UserActions({
   user: { id: string; name: string; phone: string | null; isActive: boolean };
 }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-2">
       {user.phone && (
         <a
           href={buildContactWaLink(user.phone, user.name)}
@@ -160,13 +160,16 @@ export default async function AdminUsersPage() {
                               href={buildContactWaLink(u.phone, u.name)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[#25D366]"
+                              className="rounded-md px-2 py-1.5 text-[#25D366] hover:bg-[#25D366]/10"
                             >
                               WA
                             </a>
                           )}
                           <form action={toggleUserActive.bind(null, u.id, !u.isActive)}>
-                            <button type="submit" className="text-text-muted underline-offset-2 hover:underline">
+                            <button
+                              type="submit"
+                              className="rounded-md px-2 py-1.5 text-text-muted hover:bg-surface-muted"
+                            >
                               {u.isActive ? "Nonaktifkan" : "Aktifkan"}
                             </button>
                           </form>

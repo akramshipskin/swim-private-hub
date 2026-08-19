@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { NavBar } from "@/components/nav-bar";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 
 export default async function MemberLayout({
   children,
@@ -20,7 +21,9 @@ export default async function MemberLayout({
           { href: "/member/paket", label: "Paket", icon: "package" },
         ]}
       />
-      <div className="pb-16 sm:pb-0">{children}</div>
+      <PullToRefresh>
+        <div className="pb-16 sm:pb-0">{children}</div>
+      </PullToRefresh>
     </div>
   );
 }

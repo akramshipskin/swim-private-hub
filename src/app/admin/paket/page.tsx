@@ -6,7 +6,6 @@ import AssignPackageForm from "./assign-package-form";
 import PackageEditForm from "./package-edit-form";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDateLabel } from "@/lib/datetime";
 
 const statusTone = {
   PENDING_PAYMENT: "warning",
@@ -26,6 +25,18 @@ function toInputDate(d: Date | null) {
 }
 
 function memberSince(d: Date) {
+  return d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  });
+}
+
+// Format singkat (16 Sep 2026) buat ringkasan paket -- formatDateLabel
+// (weekday + nama bulan penuh) kepanjangan buat kotak ringkas ini,
+// bikin nabrak sama baris "Jatah batal" di bawahnya pas mobile.
+function shortDate(d: Date) {
   return d.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "short",
@@ -121,15 +132,13 @@ export default async function AdminPaketPage() {
                   />
                 </div>
 
-                <div className="shrink-0 rounded-lg bg-surface-muted px-4 py-3 sm:text-right">
+                <div className="w-full rounded-lg bg-surface-muted px-4 py-3 sm:w-auto sm:shrink-0 sm:text-right">
                   <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
                   <p className="mt-2 text-sm font-semibold text-text">
                     {p.sisaSesi}/{p.totalSesi} sesi
                   </p>
                   <p className="text-xs text-text-subtle">
-                    {p.expiredDate
-                      ? `Berlaku s.d. ${formatDateLabel(p.expiredDate)}`
-                      : "Gak ada batas waktu"}
+                    {p.expiredDate ? `Berlaku s.d. ${shortDate(p.expiredDate)}` : "Gak ada batas waktu"}
                   </p>
                   <p className="mt-1 text-xs text-text-subtle">
                     Jatah batal: {cancelRemaining}/{p.jatahCancel}

@@ -99,13 +99,13 @@ export default async function MemberPaketPage() {
       {templates.length === 0 ? (
         <p className="text-sm text-text-muted">Belum ada katalog paket tersedia.</p>
       ) : (
-        <ul className="flex flex-wrap gap-3">
+        <ul className="flex flex-wrap justify-center gap-3">
           {templates.map((t, i) => (
             <Card
               key={t.id}
               className={`w-full sm:w-72 ${i === 1 ? "border-brand-500 ring-1 ring-brand-500" : ""}`}
             >
-              <CardBody className="flex flex-col gap-3">
+              <CardBody className="flex flex-col items-center gap-3 text-center">
                 <div>
                   {i === 1 && (
                     <span className="mb-1 inline-block rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">
@@ -115,7 +115,7 @@ export default async function MemberPaketPage() {
                   <p className="font-medium text-text">{t.name}</p>
                   <p className="text-lg font-semibold text-text">{formatRupiah(t.price)}</p>
                   <p className="mt-1 text-sm text-text-muted">
-                    {t.totalSesi} sesi · berlaku {t.durationDays} hari · jatah batal {t.jatahCancel}x
+                    {t.totalSesi} Sesi · Berlaku {t.durationDays} Hari · Jatah Batal Booking {t.jatahCancel}x
                   </p>
                 </div>
                 <CheckoutButton templateId={t.id} />

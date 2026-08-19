@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { NavBar } from "@/components/nav-bar";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 
 export default async function AdminLayout({
   children,
@@ -22,7 +23,9 @@ export default async function AdminLayout({
           { href: "/admin/kinerja-coach", label: "Kinerja", icon: "bar-chart" },
         ]}
       />
-      <div className="pb-16 sm:pb-0">{children}</div>
+      <PullToRefresh>
+        <div className="pb-16 sm:pb-0">{children}</div>
+      </PullToRefresh>
     </div>
   );
 }

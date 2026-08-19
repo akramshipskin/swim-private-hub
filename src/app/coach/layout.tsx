@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { NavBar } from "@/components/nav-bar";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 
 export default async function CoachLayout({
   children,
@@ -19,7 +20,9 @@ export default async function CoachLayout({
           { href: "/coach/riwayat-sesi", label: "Riwayat Sesi", icon: "clipboard-check" },
         ]}
       />
-      <div className="pb-16 sm:pb-0">{children}</div>
+      <PullToRefresh>
+        <div className="pb-16 sm:pb-0">{children}</div>
+      </PullToRefresh>
     </div>
   );
 }

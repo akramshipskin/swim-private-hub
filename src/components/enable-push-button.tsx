@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { BellIcon } from "@/components/icons";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -68,8 +69,9 @@ export default function EnablePushButton() {
       <button
         onClick={handleEnable}
         disabled={status === "loading"}
-        className="inline-flex items-center rounded-full border border-brand-700/15 bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 hover:bg-brand-100 disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-50"
       >
+        <BellIcon className="h-3.5 w-3.5" />
         {status === "loading" ? "Mengaktifkan..." : "Aktifkan Notifikasi"}
       </button>
       {status === "error" && (
