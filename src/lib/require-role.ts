@@ -7,7 +7,9 @@ import { redirect } from "next/navigation";
 // Kalau headernya gak ada (rute di luar cakupan middleware), redirect ke
 // login sama seperti dulu waktu session-nya null.
 export async function requireRole(role: "ADMIN" | "COACH" | "MEMBER") {
+  const __t0 = Date.now();
   const h = await headers();
+  console.log(`[TIMING2] requireRole (header read, no auth() call) took ${Date.now() - __t0}ms`);
   const id = h.get("x-session-user-id");
   const userRole = h.get("x-session-user-role") as "ADMIN" | "COACH" | "MEMBER" | null;
 
