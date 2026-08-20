@@ -10,20 +10,36 @@ import { Button } from "@/components/ui/button";
 export default async function CoachJadwalPage() {
   const session = await requireRole("COACH");
 
-  const availabilities = await prisma.availability.findMany({
-    where: {
-      coachId: session.user.id,
-      date: { gte: dateLabel(todayWibDateString()) },
-    },
-    orderBy: [{ date: "asc" }, { startTime: "asc" }],
-    include: {
-      bookings: {
-        where: { status: "BOOKED" },
-        include: { member: { select: { name: true } } },
-        take: 1,
+  // Jadwal coach lain di tanggal yang sama -- biar coach ini tau siapa
+  // aja yang udah buka jadwal di hari itu, gak cuma keliatan lewat titik
+  // di kalender doang. Dua query ini independen, dijalankan paralel.
+  const [availabilities, otherAvailabilities] = await Promise.all([
+    prisma.availability.findMany({
+      where: {
+        coachId: session.user.id,
+        date: { gte: dateLabel(todayWibDateString()) },
       },
-    },
-  });
+      orderBy: [{ date: "asc" }, { startTime: "asc" }],
+      include: {
+        bookings: {
+          where: { status: "BOOKED" },
+          include: { member: { select: { name: true } } },
+          take: 1,
+        },
+      },
+    }),
+    prisma.availability.findMany({
+      where: {
+        coachId: { not: session.user.id },
+        date: { gte: dateLabel(todayWibDateString()) },
+      },
+      orderBy: [{ date: "asc" }, { startTime: "asc" }],
+      include: {
+        coach: { select: { name: true } },
+        bookings: { where: { status: "BOOKED" }, take: 1 },
+      },
+    }),
+  ]);
 
   const byDate = new Map<string, typeof availabilities>();
   for (const a of availabilities) {
@@ -31,21 +47,6 @@ export default async function CoachJadwalPage() {
     if (!byDate.has(key)) byDate.set(key, []);
     byDate.get(key)!.push(a);
   }
-
-  // Jadwal coach lain di tanggal yang sama -- biar coach ini tau siapa
-  // aja yang udah buka jadwal di hari itu, gak cuma keliatan lewat titik
-  // di kalender doang.
-  const otherAvailabilities = await prisma.availability.findMany({
-    where: {
-      coachId: { not: session.user.id },
-      date: { gte: dateLabel(todayWibDateString()) },
-    },
-    orderBy: [{ date: "asc" }, { startTime: "asc" }],
-    include: {
-      coach: { select: { name: true } },
-      bookings: { where: { status: "BOOKED" }, take: 1 },
-    },
-  });
 
   const otherByDate = new Map<string, typeof otherAvailabilities>();
   for (const a of otherAvailabilities) {
