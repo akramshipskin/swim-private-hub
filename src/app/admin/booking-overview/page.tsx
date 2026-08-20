@@ -12,14 +12,12 @@ export default async function AdminBookingOverviewPage({
 }: {
   searchParams: Promise<{ coach?: string }>;
 }) {
-  const __tPageStart = Date.now();
   await requireRole("ADMIN");
   const { coach: coachFilter } = await searchParams;
 
   // Root di Availability (bukan Booking) biar slot yang UDAH dibuka coach
   // tapi BELUM ada member yang ambil juga keliatan -- admin bisa langsung
   // tau coach mana yang jamnya masih kosong.
-  const __tQueryStart = Date.now();
   const [availabilities, allCoaches] = await Promise.all([
     prisma.availability.findMany({
       where: coachFilter ? { coachId: coachFilter } : undefined,
@@ -39,7 +37,6 @@ export default async function AdminBookingOverviewPage({
       select: { id: true, name: true },
     }),
   ]);
-  console.log(`[TIMING] queries took ${Date.now() - __tQueryStart}ms, total page so far ${Date.now() - __tPageStart}ms`);
 
   function dateKey(d: Date) {
     return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
