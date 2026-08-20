@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Les Renang Cianjur
 
-## Getting Started
+Aplikasi booking les renang dengan tiga peran (Admin, Coach, Member), mencakup manajemen jadwal dan paket, pembayaran via Midtrans, hingga laporan kinerja coach untuk perhitungan honor.
 
-First, run the development server:
+**Live:** [les-renang-cianjur.vercel.app](https://les-renang-cianjur.vercel.app)
+
+## Stack
+
+- **Framework:** Next.js 16 (App Router, Turbopack) + React 19
+- **Database:** PostgreSQL via Supabase
+- **ORM:** Prisma 7 (driver adapter `@prisma/adapter-pg`)
+- **Auth:** NextAuth v5 (Credentials + JWT)
+- **Styling:** Tailwind CSS v4, custom design tokens
+- **Pembayaran:** Midtrans (Snap)
+- **PWA:** manifest + service worker, web push notification
+
+## Menjalankan Secara Lokal
 
 ```bash
+npm install
+npx prisma generate
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Buat file `.env` di root project (lihat `.env.example` untuk daftar lengkap):
 
-## Learn More
+| Variable | Keterangan |
+|---|---|
+| `DATABASE_URL` | Connection string PostgreSQL (Supabase). Untuk migrasi, pakai session pooler (port 5432) -- transaction pooler (port 6543) tidak mendukung advisory lock yang dibutuhkan `prisma migrate`. |
+| `AUTH_SECRET` | Secret untuk NextAuth (generate dengan `npx auth secret`). |
+| `MIDTRANS_SERVER_KEY` / `MIDTRANS_CLIENT_KEY` | Kredensial Midtrans (masih sandbox). |
+| `MIDTRANS_IS_PRODUCTION` | `true`/`false`. |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | Kredensial web push (generate dengan `npx web-push generate-vapid-keys`). |
+| `NEXT_PUBLIC_APP_URL` | Base URL aplikasi. |
 
-To learn more about Next.js, take a look at the following resources:
+### Migrasi Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx prisma migrate dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Kalau `DATABASE_URL` di `.env` memakai transaction pooler (port 6543), migrasi akan hang -- override sementara ke session pooler (port 5432) saat migrasi:
 
-## Deploy on Vercel
+```bash
+DATABASE_URL="<session-pooler-url>" npx prisma migrate dev --name <nama_migrasi>
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Struktur Penting
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/proxy.ts` -- middleware untuk guard peran (ADMIN/COACH/MEMBER) dan redirect ganti-password wajib. Di Next.js 16, file middleware ini bernama `proxy.ts`, bukan `middleware.ts`.
+- `src/lib/cancel-booking.ts` -- logika pembatalan booking dengan row-level lock (`SELECT ... FOR UPDATE`) untuk mencegah race condition saat banyak pembatalan konkuren pada paket yang sama.
+- `src/app/api/availability/route.ts` -- endpoint utama pengecekan slot, termasuk perhitungan kelayakan pembatalan mandiri per booking.
+- `prisma/schema.prisma` -- delapan model utama: `User`, `PackageTemplate`, `Package`, `Payment`, `Availability`, `Booking`, `PushSubscription`, `CoachProfile`.
+
+## Peran & Fitur Utama
+
+**Admin** -- kelola user (termasuk impor massal via xlsx), katalog paket, riwayat pembayaran, overview booking semua coach, dan laporan kinerja coach per rentang tanggal.
+
+**Coach** -- membuka slot jadwal (otomatis terbagi per jam), melihat jadwal coach lain, dan menandai kehadiran member di sesi yang sudah lewat.
+
+**Member** -- booking slot, pembatalan mandiri (jatah per paket), riwayat booking, dan pembelian paket via Midtrans.
+
+## Deploy
+
+Di-deploy otomatis ke Vercel setiap push ke `main`. Environment variables diatur lewat Vercel dashboard, bukan dari `.env` lokal.
