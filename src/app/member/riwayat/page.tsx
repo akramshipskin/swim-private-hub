@@ -49,19 +49,26 @@ export default async function MemberRiwayatPage() {
   }
   const sortedDateKeys = [...byDate.keys()].sort().reverse();
 
+  // Tiap checkCancelEligibility nge-query DB sendiri -- dulu dipanggil
+  // satu-satu berurutan di loop, sekarang paralel karena tiap booking
+  // independen (gak saling bergantung).
+  const bookedBookings = bookings.filter((b) => b.status === "BOOKED");
+  const eligibilityResults = await Promise.all(
+    bookedBookings.map((b) =>
+      checkCancelEligibility({
+        memberId: b.memberId,
+        packageId: b.packageId,
+        startTime: b.availability.startTime,
+      }),
+    ),
+  );
   const eligibilityByBooking = new Map<
     string,
     { canCancel: boolean; reason?: string; used: number; quota: number }
   >();
-  for (const b of bookings) {
-    if (b.status !== "BOOKED") continue;
-    const eligibility = await checkCancelEligibility({
-      memberId: b.memberId,
-      packageId: b.packageId,
-      startTime: b.availability.startTime,
-    });
-    eligibilityByBooking.set(b.id, eligibility);
-  }
+  bookedBookings.forEach((b, i) => {
+    eligibilityByBooking.set(b.id, eligibilityResults[i]);
+  });
 
   const now = new Date();
 
