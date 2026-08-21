@@ -1,7 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
-import { checkCancelEligibility } from "@/lib/cancel-eligibility";
+import { getCancelQuotaUsage, evaluateCancelEligibility } from "@/lib/cancel-eligibility";
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import CancelButton from "./cancel-button";
 import { Card, CardBody } from "@/components/ui/card";
@@ -49,25 +49,29 @@ export default async function MemberRiwayatPage() {
   }
   const sortedDateKeys = [...byDate.keys()].sort().reverse();
 
-  // Tiap checkCancelEligibility nge-query DB sendiri -- dulu dipanggil
-  // satu-satu berurutan di loop, sekarang paralel karena tiap booking
-  // independen (gak saling bergantung).
+  // quota/used cancel cuma bergantung ke (memberId, packageId), bukan per
+  // booking -- fetch sekali per packageId unik (biasanya 1, member pake
+  // paket yang sama buat banyak booking), bukan sekali per booking.
   const bookedBookings = bookings.filter((b) => b.status === "BOOKED");
-  const eligibilityResults = await Promise.all(
-    bookedBookings.map((b) =>
-      checkCancelEligibility({
-        memberId: b.memberId,
-        packageId: b.packageId,
-        startTime: b.availability.startTime,
-      }),
+  const distinctPackageIds = [...new Set(bookedBookings.map((b) => b.packageId))];
+  const quotaUsageByPackage = new Map(
+    await Promise.all(
+      distinctPackageIds.map(
+        async (packageId) =>
+          [packageId, await getCancelQuotaUsage(session.user.id, packageId)] as const,
+      ),
     ),
   );
   const eligibilityByBooking = new Map<
     string,
     { canCancel: boolean; reason?: string; used: number; quota: number }
   >();
-  bookedBookings.forEach((b, i) => {
-    eligibilityByBooking.set(b.id, eligibilityResults[i]);
+  bookedBookings.forEach((b) => {
+    const usage = quotaUsageByPackage.get(b.packageId)!;
+    eligibilityByBooking.set(
+      b.id,
+      evaluateCancelEligibility({ ...usage, startTime: b.availability.startTime }),
+    );
   });
 
   const now = new Date();
