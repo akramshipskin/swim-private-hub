@@ -3,21 +3,7 @@ import { prisma } from "@/lib/prisma";
 import CreateTemplateForm from "./create-template-form";
 import TemplateEditForm from "./template-edit-form";
 import AssignPackageForm from "./assign-package-form";
-import PackageEditForm from "./package-edit-form";
-import { Card, CardBody } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-
-const statusTone = {
-  PENDING_PAYMENT: "warning",
-  ACTIVE: "success",
-  EXPIRED: "neutral",
-} as const;
-
-const statusLabel: Record<string, string> = {
-  PENDING_PAYMENT: "Menunggu Pembayaran",
-  ACTIVE: "Aktif",
-  EXPIRED: "Kedaluwarsa",
-};
+import PackageMemberCard from "./package-member-card";
 
 function toInputDate(d: Date | null) {
   if (!d) return "";
@@ -25,18 +11,6 @@ function toInputDate(d: Date | null) {
 }
 
 function memberSince(d: Date) {
-  return d.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    timeZone: "Asia/Jakarta",
-  });
-}
-
-// Format singkat (16 Sep 2026) buat ringkasan paket -- formatDateLabel
-// (weekday + nama bulan penuh) kepanjangan buat kotak ringkas ini,
-// bikin nabrak sama baris "Jatah batal" di bawahnya pas mobile.
-function shortDate(d: Date) {
   return d.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "short",
@@ -109,44 +83,23 @@ export default async function AdminPaketPage() {
           const cancelRemaining = Math.max(0, p.jatahCancel - cancelUsed);
 
           return (
-            <Card key={p.id}>
-              <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-sm font-medium text-text">
-                    {p.member.name}{" "}
-                    <span className="text-text-subtle">({p.member.email ?? p.member.phone ?? "-"})</span>
-                  </p>
-                  <p className="text-xs text-text-subtle">
-                    Member sejak {memberSince(p.member.createdAt)}
-                  </p>
-                  <p className="mb-3 mt-1 text-sm text-text-muted">{p.name}</p>
-
-                  <PackageEditForm
-                    pkg={{
-                      id: p.id,
-                      sisaSesi: p.sisaSesi,
-                      totalSesi: p.totalSesi,
-                      jatahCancel: p.jatahCancel,
-                      status: p.status,
-                      expiredDateInput: toInputDate(p.expiredDate),
-                    }}
-                  />
-                </div>
-
-                <div className="w-full rounded-lg bg-surface-muted px-4 py-3 sm:w-auto sm:shrink-0 sm:text-right">
-                  <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
-                  <p className="mt-2 text-sm font-semibold text-text">
-                    {p.sisaSesi}/{p.totalSesi} sesi
-                  </p>
-                  <p className="text-xs text-text-subtle">
-                    {p.expiredDate ? `Berlaku s.d. ${shortDate(p.expiredDate)}` : "Gak ada batas waktu"}
-                  </p>
-                  <p className="mt-1 text-xs text-text-subtle">
-                    Jatah batal: {cancelRemaining}/{p.jatahCancel}
-                  </p>
-                </div>
-              </CardBody>
-            </Card>
+            <PackageMemberCard
+              key={p.id}
+              memberName={p.member.name}
+              memberContact={p.member.email ?? p.member.phone ?? "-"}
+              memberSinceLabel={memberSince(p.member.createdAt)}
+              cancelRemaining={cancelRemaining}
+              pkg={{
+                id: p.id,
+                name: p.name,
+                sisaSesi: p.sisaSesi,
+                totalSesi: p.totalSesi,
+                jatahCancel: p.jatahCancel,
+                status: p.status,
+                expiredDate: p.expiredDate,
+                expiredDateInput: toInputDate(p.expiredDate),
+              }}
+            />
           );
         })}
       </ul>
