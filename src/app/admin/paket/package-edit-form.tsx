@@ -40,6 +40,14 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
 
   const locked = !isEditing;
 
+  if (locked) {
+    return (
+      <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
+        Edit
+      </Button>
+    );
+  }
+
   return (
     <div>
       <form
@@ -56,12 +64,11 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
               defaultValue={pkg.sisaSesi}
               min={0}
               max={pkg.totalSesi}
-              disabled={locked}
               className="w-full sm:w-20"
             />
           </Field>
           <Field label="Status">
-            <Select name="status" defaultValue={pkg.status} disabled={locked} className="w-full sm:w-44">
+            <Select name="status" defaultValue={pkg.status} className="w-full sm:w-44">
               <option value="PENDING_PAYMENT">Menunggu Pembayaran</option>
               <option value="ACTIVE">Aktif</option>
               <option value="EXPIRED">Kedaluwarsa</option>
@@ -73,32 +80,23 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
             type="date"
             name="expiredDate"
             defaultValue={pkg.expiredDateInput}
-            disabled={locked}
             className="w-full sm:w-40"
           />
         </Field>
 
         <div className="flex items-center gap-2">
-          {locked ? (
-            <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
-              Edit
-            </Button>
-          ) : (
-            <>
-              <Button
-                type="submit"
-                variant="primary"
-                size="sm"
-                loading={pending}
-                disabled={justEnteredEdit}
-              >
-                Simpan
-              </Button>
-              <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
-                Batal
-              </Button>
-            </>
-          )}
+          <Button
+            type="submit"
+            variant="primary"
+            size="sm"
+            loading={pending}
+            disabled={justEnteredEdit}
+          >
+            Simpan
+          </Button>
+          <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
+            Batal
+          </Button>
         </div>
       </form>
       {state?.error && (

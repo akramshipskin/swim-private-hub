@@ -7,7 +7,14 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { buildContactWaLink } from "@/lib/whatsapp";
-import { formatDateLabel } from "@/lib/datetime";
+function shortDate(d: Date) {
+  return d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "2-digit",
+    timeZone: "Asia/Jakarta",
+  });
+}
 
 function UserActions({
   user,
@@ -81,7 +88,7 @@ export default async function AdminUsersPage() {
                       <th className="px-4 py-3 font-medium">Email</th>
                       <th className="px-4 py-3 font-medium">No HP</th>
                       {role === "MEMBER" && (
-                        <th className="px-4 py-3 font-medium">Paket</th>
+                        <th className="w-48 px-4 py-3 font-medium">Paket</th>
                       )}
                       <th className="px-4 py-3 font-medium">Status</th>
                       <th className="px-4 py-3"></th>
@@ -96,14 +103,14 @@ export default async function AdminUsersPage() {
                           <td className="px-4 py-3 text-text-muted">{u.email ?? "-"}</td>
                           <td className="px-4 py-3 text-text-muted">{u.phone ?? "-"}</td>
                           {role === "MEMBER" && (
-                            <td className="px-4 py-3 text-text-muted">
+                            <td className="w-48 px-4 py-3 text-text-muted">
                               {activePkg ? (
                                 <>
                                   {activePkg.name}
                                   <span className="block text-xs text-text-subtle">
                                     sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi
                                     {activePkg.expiredDate && (
-                                      <> · s.d. {formatDateLabel(activePkg.expiredDate)}</>
+                                      <> · s.d. {shortDate(activePkg.expiredDate)}</>
                                     )}
                                   </span>
                                 </>

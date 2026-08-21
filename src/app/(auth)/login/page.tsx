@@ -91,7 +91,10 @@ export default function LoginPage() {
 
           <p className="mt-5 text-center text-sm text-text-muted">
             Belum punya akun?{" "}
-            <a href="/register" className="font-medium text-brand-600 hover:underline">
+            <a
+              href="/register"
+              className="inline-block -my-3 py-3 font-medium text-brand-600 hover:underline"
+            >
               Daftar
             </a>
           </p>
