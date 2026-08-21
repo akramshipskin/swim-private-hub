@@ -126,6 +126,7 @@ export default async function AdminPaketPage() {
                       id: p.id,
                       sisaSesi: p.sisaSesi,
                       totalSesi: p.totalSesi,
+                      jatahCancel: p.jatahCancel,
                       status: p.status,
                       expiredDateInput: toInputDate(p.expiredDate),
                     }}

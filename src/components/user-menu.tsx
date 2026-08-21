@@ -34,8 +34,10 @@ export function UserMenu({
         aria-expanded={open}
         className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-text-muted hover:bg-surface-muted"
       >
-        <div className="hidden text-right leading-tight sm:block">
-          <p className="text-sm font-medium text-text">{userName}</p>
+        <div className="text-right leading-tight">
+          <p className="max-w-[110px] truncate text-sm font-medium text-text sm:max-w-none">
+            {userName}
+          </p>
           <p className="text-xs text-text-subtle">{userRole}</p>
         </div>
         <MenuIcon className="h-5 w-5 shrink-0" />

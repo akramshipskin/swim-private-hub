@@ -9,6 +9,7 @@ type Pkg = {
   id: string;
   sisaSesi: number;
   totalSesi: number;
+  jatahCancel: number;
   status: "PENDING_PAYMENT" | "ACTIVE" | "EXPIRED";
   expiredDateInput: string;
 };
@@ -73,6 +74,15 @@ export default function PackageEditForm({ pkg }: { pkg: Pkg }) {
               <option value="ACTIVE">Aktif</option>
               <option value="EXPIRED">Kedaluwarsa</option>
             </Select>
+          </Field>
+          <Field label="Jatah Cancel">
+            <Input
+              type="number"
+              name="jatahCancel"
+              defaultValue={pkg.jatahCancel}
+              min={0}
+              className="w-full sm:w-20"
+            />
           </Field>
         </div>
         <Field label="Berlaku Sampai">

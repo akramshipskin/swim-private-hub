@@ -60,7 +60,7 @@ export default function LoginPage() {
             <Field label="No HP atau Email">
               <Input
                 type="text"
-                placeholder="0812xxxxxxx atau nama@email.com"
+                placeholder="0812xxxxxxx atau email"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 required

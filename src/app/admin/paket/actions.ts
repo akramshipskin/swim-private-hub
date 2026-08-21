@@ -123,11 +123,15 @@ export async function updatePackage(
 
   const packageId = formData.get("packageId") as string;
   const sisaSesiRaw = Number(formData.get("sisaSesi"));
+  const jatahCancelRaw = Number(formData.get("jatahCancel"));
   const status = formData.get("status") as "PENDING_PAYMENT" | "ACTIVE" | "EXPIRED";
   const expiredDateRaw = formData.get("expiredDate") as string;
 
   if (!packageId || !Number.isInteger(sisaSesiRaw) || sisaSesiRaw < 0) {
     return { error: "Sisa sesi gak boleh negatif" };
+  }
+  if (!Number.isInteger(jatahCancelRaw) || jatahCancelRaw < 0) {
+    return { error: "Jatah cancel gak boleh negatif" };
   }
 
   const pkg = await prisma.package.findUnique({ where: { id: packageId } });
@@ -141,6 +145,7 @@ export async function updatePackage(
     where: { id: packageId },
     data: {
       sisaSesi,
+      jatahCancel: jatahCancelRaw,
       status,
       expiredDate: expiredDateRaw ? new Date(`${expiredDateRaw}T23:59:59+07:00`) : null,
     },
