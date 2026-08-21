@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/push";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
-import { emitBookingChanged } from "@/lib/booking-events";
 import { activePackageWhere } from "@/lib/active-package";
 
 class BookingError extends Error {
@@ -76,8 +75,6 @@ export async function POST(request: Request) {
         include: { availability: { include: { coach: true } } },
       });
     });
-
-    emitBookingChanged();
 
     // Push notif best-effort -- gagal kirim gak boleh gagalin booking
     // yang udah sukses tersimpan di DB.

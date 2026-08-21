@@ -3,7 +3,6 @@
 import { requireRole } from "@/lib/require-role";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 import { revalidatePath } from "next/cache";
-import { emitBookingChanged } from "@/lib/booking-events";
 
 export type ActionState = { error?: string } | null;
 
@@ -24,7 +23,6 @@ export async function adminCancelBooking(
     return { error: "Gagal membatalkan booking, coba lagi." };
   }
 
-  emitBookingChanged();
   revalidatePath("/admin/booking-overview");
   return null;
 }

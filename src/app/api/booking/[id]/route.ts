@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
-import { emitBookingChanged } from "@/lib/booking-events";
 
 export async function DELETE(
   request: Request,
@@ -18,7 +17,6 @@ export async function DELETE(
       bookingId: id,
       actor: { role: "MEMBER", memberId: session.user.id },
     });
-    emitBookingChanged();
     return Response.json({ ok: true });
   } catch (err) {
     if (err instanceof CancelError) {

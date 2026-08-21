@@ -4,7 +4,6 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { wibDateTime, dateLabel } from "@/lib/datetime";
-import { emitBookingChanged } from "@/lib/booking-events";
 
 export type ActionState = { error?: string } | null;
 
@@ -53,7 +52,6 @@ export async function addAvailability(
 
   await prisma.availability.createMany({ data: chunks, skipDuplicates: true });
 
-  emitBookingChanged();
   revalidatePath("/coach/jadwal");
   return null;
 }
@@ -76,6 +74,5 @@ export async function deleteAvailability(availabilityId: string) {
     },
   });
 
-  emitBookingChanged();
   revalidatePath("/coach/jadwal");
 }

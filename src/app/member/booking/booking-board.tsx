@@ -44,9 +44,10 @@ function todayWib() {
   return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
 }
 
-// SSE nangkep perubahan real-time; polling ini cuma jaring pengaman kalau
-// koneksi SSE putus (network flaky, dst).
-const POLL_FALLBACK_MS = 15000;
+// Polling murni -- SSE dicabut, gak cocok jalan di Vercel serverless
+// (function di-kill paksa tiap 300 detik). 5 detik cukup deket real-time
+// tanpa nahan koneksi kebuka terus.
+const POLL_INTERVAL_MS = 5000;
 
 function initials(name: string) {
   return name
@@ -89,7 +90,7 @@ export default function BookingBoard() {
   useEffect(() => {
     setSlots(null);
     loadSlots();
-    const interval = setInterval(loadSlots, POLL_FALLBACK_MS);
+    const interval = setInterval(loadSlots, POLL_INTERVAL_MS);
 
     // Refetch pas user balik ke tab ini -- biar gak ada jendela stale
     // yang kelamaan pas dia sempet pindah tab terus balik lagi.
@@ -99,21 +100,10 @@ export default function BookingBoard() {
     document.addEventListener("visibilitychange", onVisible);
     window.addEventListener("focus", loadSlots);
 
-    // Real-time: begitu ada booking/cancel di mana pun (coach manapun,
-    // member manapun), server push event ini -- refetch langsung, gak
-    // nunggu interval polling.
-    const eventSource = new EventSource("/api/availability/stream");
-    eventSource.onmessage = () => loadSlots();
-    // Kalau koneksi SSE putus (server restart, jaringan flaky) terus
-    // nyambung ulang, browser auto-reconnect tapi event yang kelewat pas
-    // putus itu gak ke-replay -- refetch begitu konek lagi biar sinkron.
-    eventSource.onopen = () => loadSlots();
-
     return () => {
       clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", loadSlots);
-      eventSource.close();
     };
   }, [loadSlots]);
 
