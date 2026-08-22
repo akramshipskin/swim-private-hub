@@ -79,20 +79,21 @@ export default async function AdminUsersPage() {
             <h2 className="mb-2 text-sm font-semibold text-text-muted">
               {label} <span className="text-text-subtle">({rows.length})</span>
             </h2>
-            {/* Desktop: tabel */}
+            {/* Desktop: tabel -- Nama & Email digabung 1 kolom (email di
+                bawah nama) biar kolom gak sesek, kolom sisanya dapet napas
+                lebih (padding naik dikit). */}
             <Card className="hidden sm:block">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
-                      <th className="px-4 py-3 font-medium">Nama</th>
-                      <th className="px-4 py-3 font-medium">Email</th>
-                      <th className="px-4 py-3 font-medium">No HP</th>
+                      <th className="px-5 py-3.5 font-medium">Nama</th>
+                      <th className="px-5 py-3.5 font-medium">No HP</th>
                       {role === "MEMBER" && (
-                        <th className="w-48 px-4 py-3 font-medium">Paket</th>
+                        <th className="w-52 px-5 py-3.5 font-medium">Paket</th>
                       )}
-                      <th className="px-4 py-3 font-medium">Status</th>
-                      <th className="px-4 py-3"></th>
+                      <th className="px-5 py-3.5 font-medium">Status</th>
+                      <th className="px-5 py-3.5"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -100,11 +101,15 @@ export default async function AdminUsersPage() {
                       const activePkg = u.packages[0];
                       return (
                         <tr key={u.id} className="border-b border-border last:border-0">
-                          <td className="px-4 py-3 font-medium text-text">{u.name}</td>
-                          <td className="px-4 py-3 text-text-muted">{u.email ?? "-"}</td>
-                          <td className="px-4 py-3 text-text-muted">{u.phone ?? "-"}</td>
+                          <td className="px-5 py-4">
+                            <p className="font-medium text-text">{u.name}</p>
+                            {u.email && (
+                              <p className="text-xs text-text-subtle">{u.email}</p>
+                            )}
+                          </td>
+                          <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
                           {role === "MEMBER" && (
-                            <td className="w-48 px-4 py-3 text-text-muted">
+                            <td className="w-52 px-5 py-4 text-text-muted">
                               {activePkg ? (
                                 <>
                                   {activePkg.name}
@@ -120,12 +125,12 @@ export default async function AdminUsersPage() {
                               )}
                             </td>
                           )}
-                          <td className="px-4 py-3">
+                          <td className="px-5 py-4">
                             <Badge tone={u.isActive ? "success" : "neutral"}>
                               {u.isActive ? "Aktif" : "Nonaktif"}
                             </Badge>
                           </td>
-                          <td className="px-4 py-3 text-right">
+                          <td className="px-5 py-4 text-right">
                             <div className="flex items-center justify-end">
                               <UserActions user={u} />
                             </div>
@@ -138,22 +143,36 @@ export default async function AdminUsersPage() {
               </div>
             </Card>
 
-            {/* Mobile: card compact, biar gak perlu geser/scroll jauh
-                (member bisa 350+ baris) */}
+            {/* Mobile: <details> native -- ringkas (nama + status doang)
+                sampe di-tap, baru buka detail (email/HP/paket + aksi).
+                Gak perlu client component buat ini. */}
             <ul className="flex flex-col gap-1.5 sm:hidden">
               {rows.map((u) => {
                 const activePkg = u.packages[0];
                 return (
-                  <Card key={u.id}>
-                    <CardBody className="flex flex-col gap-1 px-3 py-2.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-sm font-medium text-text">{u.name}</p>
-                        <Badge tone={u.isActive ? "success" : "neutral"}>
-                          {u.isActive ? "Aktif" : "Nonaktif"}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="min-w-0 truncate text-xs text-text-subtle">
+                  <Card key={u.id} className="overflow-hidden p-0">
+                    <details className="group">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 [&::-webkit-details-marker]:hidden">
+                        <p className="min-w-0 truncate text-sm font-medium text-text">{u.name}</p>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <Badge tone={u.isActive ? "success" : "neutral"}>
+                            {u.isActive ? "Aktif" : "Nonaktif"}
+                          </Badge>
+                          <svg
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            className="h-4 w-4 text-text-subtle transition-transform group-open:rotate-180"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                      </summary>
+                      <CardBody className="flex flex-col gap-2 border-t border-border px-3 py-2.5 pt-2.5">
+                        <p className="text-xs text-text-subtle">
                           {u.email ?? u.phone ?? "-"}
                           {role === "MEMBER" &&
                             (activePkg ? (
@@ -162,7 +181,7 @@ export default async function AdminUsersPage() {
                               <> · belum ada paket</>
                             ))}
                         </p>
-                        <div className="flex shrink-0 items-center gap-2 text-xs font-medium">
+                        <div className="flex items-center gap-2 text-xs font-medium">
                           {u.phone && (
                             <a
                               href={buildContactWaLink(u.phone, u.name)}
@@ -182,8 +201,8 @@ export default async function AdminUsersPage() {
                             </button>
                           </form>
                         </div>
-                      </div>
-                    </CardBody>
+                      </CardBody>
+                    </details>
                   </Card>
                 );
               })}

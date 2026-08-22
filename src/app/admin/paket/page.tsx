@@ -75,11 +75,13 @@ export default async function AdminPaketPage() {
         ))}
       </ul>
 
-      {/* --- Tambah anak buat member (dibutuhin sebelum bisa assign paket) --- */}
-      <h2 className="mb-3 text-lg font-semibold text-text">Tambah Anak</h2>
+      {/* --- Tambah peserta (anak atau diri sendiri) buat member -- dibutuhin
+          sebelum bisa assign paket --- */}
+      <h2 className="mb-3 text-lg font-semibold text-text">Tambah Peserta</h2>
       <p className="mb-3 text-sm text-text-muted">
-        1 paket = 1 anak. Member baru yang belum pernah login belum punya anak
-        sama sekali -- tambahin di sini dulu kalau mau langsung assign paket.
+        1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang
+        belum pernah login belum punya peserta terdaftar -- tambahin di sini
+        dulu kalau mau langsung assign paket.
       </p>
 
       <AddChildForm members={members} />

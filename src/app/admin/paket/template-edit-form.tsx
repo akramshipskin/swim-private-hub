@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { updateTemplate } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Label } from "@/components/ui/input";
+import { PriceInput } from "@/components/ui/price-input";
 import { Button } from "@/components/ui/button";
 
 type Template = {
@@ -63,11 +64,9 @@ export default function TemplateEditForm({ template }: { template: Template }) {
             <Input name="name" defaultValue={template.name} disabled={locked} className="w-full sm:w-40" />
           </Field>
           <Field label="Harga (Rp)">
-            <Input
-              type="number"
+            <PriceInput
               name="price"
               defaultValue={template.price}
-              min={0}
               disabled={locked}
               className="w-full sm:w-32"
             />

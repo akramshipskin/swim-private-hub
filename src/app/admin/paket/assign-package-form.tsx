@@ -42,17 +42,16 @@ export default function AssignPackageForm({
               ))}
             </Select>
           </Field>
-          <Field label="Anak">
+          <Field label="Peserta">
             {childrenOfMember.length === 0 ? (
               <p className="text-xs text-danger-text">
-                Member ini belum punya anak, tambahin dulu di atas.
+                Member ini belum punya peserta terdaftar, tambahin dulu di atas.
               </p>
             ) : (
               <Select name="dependentId" required className="w-full sm:w-40">
                 {childrenOfMember.map((d) => (
                   <option key={d.id} value={d.id}>
-                    {d.name}
-                    {d.isSelf ? " (diri sendiri)" : ""}
+                    {d.isSelf ? `${d.name} (diri sendiri)` : d.name}
                   </option>
                 ))}
               </Select>

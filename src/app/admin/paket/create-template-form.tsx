@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { createTemplate } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/input";
+import { PriceInput } from "@/components/ui/price-input";
 import { Button } from "@/components/ui/button";
 
 export default function CreateTemplateForm() {
@@ -17,7 +18,7 @@ export default function CreateTemplateForm() {
             <Input name="name" required className="w-full sm:w-44" />
           </Field>
           <Field label="Harga (Rp)">
-            <Input type="number" name="price" required min={0} className="w-full sm:w-32" />
+            <PriceInput name="price" required className="w-full sm:w-32" />
           </Field>
           <div className="grid grid-cols-2 gap-3 sm:contents">
             <Field label="Total Sesi">
