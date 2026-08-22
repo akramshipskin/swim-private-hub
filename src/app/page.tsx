@@ -9,7 +9,7 @@ export default async function Home() {
 
   if (!session) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 text-center">
+      <main className="flex min-h-screen flex-col items-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 pt-[18vh] text-center">
         <Image
           src="/logo.png"
           alt="Les Renang Cianjur"
