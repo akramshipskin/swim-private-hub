@@ -133,7 +133,14 @@ export default function RegisterPage() {
               <p className="text-xs text-text-subtle">
                 Bisa diri sendiri, bisa anak, bisa keduanya. Bisa ditambah lagi nanti.
               </p>
-              {participants.map((p, i) => (
+              {participants.map((p, i) => {
+                // "Diri sendiri" cuma boleh dipilih di 1 baris -- 1 akun cuma
+                // punya 1 "diri sendiri", pilih di baris lain bikin keliatan
+                // kayak beberapa orang padahal yang ke-create cuma 1.
+                const selfTakenElsewhere = participants.some(
+                  (other, idx) => idx !== i && other.type === "self"
+                );
+                return (
                 <div key={i} className="flex gap-2">
                   <Select
                     value={p.type}
@@ -142,7 +149,7 @@ export default function RegisterPage() {
                     }
                     className="w-32 shrink-0"
                   >
-                    <option value="self">Diri sendiri</option>
+                    {!selfTakenElsewhere && <option value="self">Diri sendiri</option>}
                     <option value="child">Anak</option>
                   </Select>
                   {p.type === "self" ? (
@@ -159,7 +166,8 @@ export default function RegisterPage() {
                     />
                   )}
                 </div>
-              ))}
+                );
+              })}
               <button
                 type="button"
                 onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "" }])}
