@@ -63,7 +63,7 @@ export default async function MemberPaketPage() {
   ) : latestExpired ? (
     <Badge tone="neutral">Paket abis sejak {toDateLabelFromDate(latestExpired)}</Badge>
   ) : (
-    <Badge tone="neutral">Belum jadi member</Badge>
+    <Badge tone="neutral">Belum ada paket</Badge>
   );
 
   return (
