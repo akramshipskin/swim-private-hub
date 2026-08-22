@@ -45,12 +45,14 @@ type Pkg = {
 export default function PackageMemberCard({
   pkg,
   memberName,
+  childName,
   memberContact,
   memberSinceLabel,
   cancelRemaining,
 }: {
   pkg: Pkg;
   memberName: string;
+  childName: string | null;
   memberContact: string;
   memberSinceLabel: string;
   cancelRemaining: number;
@@ -85,10 +87,21 @@ export default function PackageMemberCard({
     <Card>
       <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-text">
-            {memberName} <span className="text-text-subtle">({memberContact})</span>
-          </p>
-          <p className="text-xs text-text-subtle">Member sejak {memberSinceLabel}</p>
+          {childName ? (
+            <>
+              <p className="text-sm font-medium text-text">{childName}</p>
+              <p className="text-xs text-text-subtle">
+                ortu: {memberName} ({memberContact}) · member sejak {memberSinceLabel}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-medium text-text">
+                {memberName} <span className="text-text-subtle">({memberContact})</span>
+              </p>
+              <p className="text-xs text-text-subtle">Member sejak {memberSinceLabel}</p>
+            </>
+          )}
           <p className="mb-3 mt-1 text-sm text-text-muted">{pkg.name}</p>
 
           {locked ? (

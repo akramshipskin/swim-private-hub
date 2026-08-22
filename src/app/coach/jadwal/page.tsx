@@ -23,7 +23,9 @@ export default async function CoachJadwalPage() {
       include: {
         bookings: {
           where: { status: "BOOKED" },
-          include: { member: { select: { name: true } } },
+          include: {
+            package: { select: { dependent: { select: { name: true } } } },
+          },
           take: 1,
         },
       },
@@ -88,9 +90,9 @@ export default async function CoachJadwalPage() {
                         </p>
                         {a.status === "BOOKED" && a.bookings[0] ? (
                           <p className="mt-1 text-sm text-text-muted">
-                            Dibooking oleh{" "}
+                            Dibooking buat{" "}
                             <span className="font-medium text-text">
-                              {a.bookings[0].member.name}
+                              {a.bookings[0].package.dependent.name}
                             </span>
                           </p>
                         ) : (

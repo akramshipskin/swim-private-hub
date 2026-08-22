@@ -26,7 +26,10 @@ export default async function AdminBookingOverviewPage({
         coach: { select: { id: true, name: true } },
         bookings: {
           where: { status: "BOOKED" },
-          include: { member: { select: { name: true, email: true } } },
+          include: {
+            member: { select: { name: true, email: true } },
+            package: { select: { dependent: { select: { name: true, isSelf: true } } } },
+          },
           take: 1,
         },
       },
@@ -127,7 +130,9 @@ export default async function AdminBookingOverviewPage({
                                 </p>
                                 {booking ? (
                                   <p className="truncate text-xs text-text-muted">
-                                    {booking.member.name}
+                                    {booking.package.dependent.isSelf
+                                      ? booking.member.name
+                                      : `${booking.package.dependent.name} (${booking.member.name})`}
                                   </p>
                                 ) : (
                                   <p className="text-xs text-text-subtle">Belum ada yang book</p>

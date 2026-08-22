@@ -32,7 +32,10 @@ export default async function AdminPaketPage() {
     prisma.packageTemplate.findMany({ orderBy: { totalSesi: "asc" } }),
     prisma.package.findMany({
       orderBy: { createdAt: "desc" },
-      include: { member: { select: { name: true, email: true, phone: true, createdAt: true } } },
+      include: {
+        member: { select: { name: true, email: true, phone: true, createdAt: true } },
+        dependent: { select: { name: true, isSelf: true } },
+      },
     }),
     prisma.dependent.findMany({
       where: { isActive: true },
@@ -101,6 +104,7 @@ export default async function AdminPaketPage() {
             <PackageMemberCard
               key={p.id}
               memberName={p.member.name}
+              childName={p.dependent.isSelf ? null : p.dependent.name}
               memberContact={p.member.email ?? p.member.phone ?? "-"}
               memberSinceLabel={memberSince(p.member.createdAt)}
               cancelRemaining={cancelRemaining}

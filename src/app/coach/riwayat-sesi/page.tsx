@@ -13,7 +13,10 @@ export default async function CoachRiwayatSesiPage() {
       availability: { coachId: session.user.id, endTime: { lte: new Date() } },
     },
     orderBy: { availability: { startTime: "desc" } },
-    include: { member: { select: { name: true } }, availability: true },
+    include: {
+      package: { select: { dependent: { select: { name: true } } } },
+      availability: true,
+    },
   });
 
   const validSessionCount = bookings.filter((b) => b.attended === true).length;
@@ -58,7 +61,7 @@ export default async function CoachRiwayatSesiPage() {
                   <Card key={b.id}>
                     <CardBody className="flex items-start justify-between gap-3 py-3">
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-text">{b.member.name}</p>
+                        <p className="text-sm font-medium text-text">{b.package.dependent.name}</p>
                         <p className="text-sm text-text-muted">
                           {formatTimeWib(b.availability.startTime)}–
                           {formatTimeWib(b.availability.endTime)}

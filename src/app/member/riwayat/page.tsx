@@ -34,7 +34,10 @@ export default async function MemberRiwayatPage() {
   const bookings = await prisma.booking.findMany({
     where: { memberId: session.user.id },
     orderBy: { createdAt: "desc" },
-    include: { availability: { include: { coach: true } } },
+    include: {
+      availability: { include: { coach: true } },
+      package: { include: { dependent: { select: { name: true, isSelf: true } } } },
+    },
   });
 
   function dateKey(d: Date) {
@@ -118,6 +121,12 @@ export default async function MemberRiwayatPage() {
                               {formatTimeWib(b.availability.startTime)}–
                               {formatTimeWib(b.availability.endTime)}
                             </p>
+                            <p className="text-xs text-text-subtle">
+                              buat{" "}
+                              {b.package.dependent.isSelf
+                                ? "kamu sendiri"
+                                : b.package.dependent.name}
+                            </p>
                             <div className="mt-1 flex flex-wrap items-center gap-1.5">
                               <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
                               {b.status === "CANCELLED" && b.cancelledBy && (
@@ -155,6 +164,9 @@ export default async function MemberRiwayatPage() {
                                 <a
                                   href={buildAdminCancelWaLink({
                                     memberName: session.user.name ?? "Member",
+                                    childName: b.package.dependent.isSelf
+                                      ? undefined
+                                      : b.package.dependent.name,
                                     coachName: b.availability.coach.name,
                                     dateLabel: formatDateLabel(b.availability.date),
                                     timeRange: `${formatTimeWib(b.availability.startTime)}-${formatTimeWib(b.availability.endTime)}`,

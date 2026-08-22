@@ -14,18 +14,21 @@ export function buildContactWaLink(phone: string, name: string) {
 
 export function buildAdminCancelWaLink({
   memberName,
+  childName,
   coachName,
   dateLabel,
   timeRange,
 }: {
   memberName: string;
+  childName?: string;
   coachName: string;
   dateLabel: string;
   timeRange: string;
 }) {
+  const forLine = childName ? `\nBuat: ${childName}` : "";
   const message = `Halo Admin Les Renang Cianjur, saya mau minta bantuan batalkan booking:
 
-Nama: ${memberName}
+Nama: ${memberName}${forLine}
 Coach: ${coachName}
 Jadwal: ${dateLabel}, ${timeRange}
 

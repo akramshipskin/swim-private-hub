@@ -29,6 +29,7 @@ type Slot = {
   coach: { id: string; name: string };
   bookedByMe: boolean;
   bookingId: string | null;
+  bookedForChildName: string | null;
   canCancel: boolean;
   cancelReason?: string;
 };
@@ -269,18 +270,29 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
 
                       {s.bookedByMe ? (
                         s.canCancel ? (
-                          <Button size="sm" variant="danger" onClick={() => setCancelTarget(s)}>
-                            Batalkan
-                          </Button>
+                          <div className="flex flex-col items-end gap-1">
+                            {s.bookedForChildName && (
+                              <p className="text-xs text-text-subtle">buat {s.bookedForChildName}</p>
+                            )}
+                            <Button size="sm" variant="danger" onClick={() => setCancelTarget(s)}>
+                              Batalkan
+                            </Button>
+                          </div>
                         ) : new Date(s.startTime) <= new Date() ? (
                           <p className="text-xs font-medium text-text-subtle">Sesi udah lewat</p>
                         ) : (
                           <div className="flex max-w-[220px] flex-col items-end gap-1.5 text-right">
-                            <p className="text-xs font-medium text-text">Booking kamu</p>
+                            <p className="text-xs font-medium text-text">
+                              Booking kamu{s.bookedForChildName && ` — buat ${s.bookedForChildName}`}
+                            </p>
                             <p className="text-xs text-text-subtle">{s.cancelReason}</p>
                             <a
                               href={buildAdminCancelWaLink({
                                 memberName: session?.user?.name ?? "Member",
+                                childName:
+                                  s.bookedForChildName === "kamu sendiri"
+                                    ? undefined
+                                    : (s.bookedForChildName ?? undefined),
                                 coachName: s.coach.name,
                                 dateLabel: formatFullDate(s.startTime),
                                 timeRange: `${formatTime(s.startTime)}-${formatTime(s.endTime)}`,

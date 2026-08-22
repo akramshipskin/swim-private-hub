@@ -32,6 +32,7 @@ export async function GET(request: Request) {
           memberId: true,
           packageId: true,
           status: true,
+          package: { select: { dependent: { select: { name: true, isSelf: true } } } },
         },
         take: 1,
       },
@@ -71,6 +72,12 @@ export async function GET(request: Request) {
           coach: a.coach,
           bookedByMe,
           bookingId: bookedByMe ? activeBooking!.id : null,
+          bookedForChildName:
+            bookedByMe && activeBooking
+              ? activeBooking.package.dependent.isSelf
+                ? "kamu sendiri"
+                : activeBooking.package.dependent.name
+              : null,
           canCancel,
           cancelReason,
         };
