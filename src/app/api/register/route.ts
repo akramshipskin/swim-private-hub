@@ -1,18 +1,29 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { createSelfDependent } from "@/lib/dependents";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { name, phone, email, password } = body as {
+  const { name, phone, email, password, childNames, wantsSelf } = body as {
     name?: string;
     phone?: string;
     email?: string;
     password?: string;
+    childNames?: string[];
+    wantsSelf?: boolean;
   };
 
   if (!name || !phone || !password) {
     return Response.json(
       { error: "Nama, No HP, dan password wajib diisi" },
+      { status: 400 }
+    );
+  }
+
+  const cleanChildNames = (childNames ?? []).map((n) => n.trim()).filter(Boolean);
+  if (cleanChildNames.length === 0 && !wantsSelf) {
+    return Response.json(
+      { error: "Isi minimal 1 peserta (diri sendiri atau anak)" },
       { status: 400 }
     );
   }
@@ -37,9 +48,20 @@ export async function POST(request: Request) {
   const passwordHash = await bcrypt.hash(password, 12);
 
   try {
-    const user = await prisma.user.create({
-      data: { name, phone, email: email || null, passwordHash, role: "MEMBER" },
-      select: { id: true, name: true, email: true, phone: true, role: true },
+    const user = await prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: { name, phone, email: email || null, passwordHash, role: "MEMBER" },
+        select: { id: true, name: true, email: true, phone: true, role: true },
+      });
+      if (cleanChildNames.length > 0) {
+        await tx.dependent.createMany({
+          data: cleanChildNames.map((childName) => ({ memberId: created.id, name: childName })),
+        });
+      }
+      if (wantsSelf) {
+        await createSelfDependent(created.id, tx);
+      }
+      return created;
     });
 
     return Response.json({ user }, { status: 201 });

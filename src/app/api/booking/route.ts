@@ -18,29 +18,33 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { availabilityId } = (await request.json()) as {
+  const { availabilityId, packageId } = (await request.json()) as {
     availabilityId?: string;
+    packageId?: string;
   };
 
-  if (!availabilityId) {
+  if (!availabilityId || !packageId) {
     return Response.json(
-      { error: "availabilityId wajib diisi" },
+      { error: "availabilityId dan packageId wajib diisi" },
       { status: 400 }
     );
   }
 
   try {
     const booking = await prisma.$transaction(async (tx) => {
-      // Package dengan sisa sesi paling lama dulu dipakai (FIFO), harus
-      // ACTIVE, punya sisa sesi, dan belum lewat masa berlaku (kalau ada).
+      // Paket dipilih eksplisit sama member (1 paket = 1 anak, gak ada
+      // FIFO lintas-anak lagi). Filter `id: packageId` DIGABUNG sama
+      // activePackageWhere(session.user.id) -- ini sekaligus jadi IDOR
+      // guard (kalau packageId itu bukan punya session.user.id, query gak
+      // bakal nemuin apa-apa) DAN validasi eligibility (ACTIVE, ada sisa
+      // sesi, belum kedaluwarsa) dalam 1 query atomic.
       const pkg = await tx.package.findFirst({
-        where: activePackageWhere(session.user.id),
-        orderBy: { createdAt: "asc" },
+        where: { ...activePackageWhere(session.user.id), id: packageId },
       });
 
       if (!pkg) {
         throw new BookingError(
-          "Kuota sesi habis, paket belum aktif, atau udah kedaluwarsa. Beli/perpanjang paket dulu.",
+          "Paket gak ditemukan, kuota sesi habis, belum aktif, atau udah kedaluwarsa.",
           409
         );
       }

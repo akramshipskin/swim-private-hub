@@ -11,3 +11,13 @@ export function activePackageWhere(memberId: string): Prisma.PackageWhereInput {
     OR: [{ expiredDate: null }, { expiredDate: { gte: new Date() } }],
   };
 }
+
+// Sama kayak activePackageWhere, tapi discope ke 1 anak spesifik --
+// 1 paket = 1 anak, jadi gak ada FIFO lintas-anak lagi, tiap anak punya
+// "paket aktif"-nya sendiri.
+export function activePackageWhereForDependent(
+  memberId: string,
+  dependentId: string
+): Prisma.PackageWhereInput {
+  return { ...activePackageWhere(memberId), dependentId };
+}

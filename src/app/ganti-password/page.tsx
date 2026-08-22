@@ -28,7 +28,10 @@ export default async function GantiPasswordPage() {
       <Card className="w-full max-w-sm">
         <CardBody>
           <h1 className="mb-5 text-xl font-semibold text-text">Ganti Password</h1>
-          <ChangePasswordForm />
+          <ChangePasswordForm
+            isMember={session.user.role === "MEMBER"}
+            memberName={session.user.name ?? ""}
+          />
         </CardBody>
       </Card>
     </main>

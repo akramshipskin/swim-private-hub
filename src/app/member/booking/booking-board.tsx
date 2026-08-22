@@ -5,10 +5,21 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/input";
+import { Field, Select } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import { AvailabilityDatePicker } from "@/components/availability-date-picker";
+
+type ChildOption = {
+  dependentId: string;
+  dependentName: string;
+  packageId: string;
+  packageName: string;
+  sisaSesi: number;
+  jatahCancel: number;
+  cancelRemaining: number;
+};
 
 type Slot = {
   id: string;
@@ -58,10 +69,12 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export default function BookingBoard() {
+export default function BookingBoard({ childOptions }: { childOptions: ChildOption[] }) {
   const router = useRouter();
   const { data: session } = useSession();
   const [date, setDate] = useState(todayWib());
+  const [packageId, setPackageId] = useState(childOptions[0]?.packageId ?? "");
+  const selectedChild = childOptions.find((c) => c.packageId === packageId) ?? null;
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(
     null
@@ -125,13 +138,17 @@ export default function BookingBoard() {
   }, [slots]);
 
   async function handleBook(availabilityId: string) {
+    if (!packageId) {
+      setMessage({ text: "Pilih anak dulu sebelum booking", ok: false });
+      return;
+    }
     setPendingId(availabilityId);
     setMessage(null);
 
     const res = await fetch("/api/booking", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ availabilityId }),
+      body: JSON.stringify({ availabilityId, packageId }),
     });
 
     const data = await res.json();
@@ -174,12 +191,34 @@ export default function BookingBoard() {
   return (
     <div>
       <Card className="mb-4">
-        <CardBody className="flex items-center gap-3 py-3">
+        <CardBody className="flex flex-col gap-3 py-3 sm:flex-row sm:items-end sm:flex-wrap">
+          <Field label="Buat anak">
+            <Select
+              value={packageId}
+              onChange={(e) => setPackageId(e.target.value)}
+              className="w-full sm:w-56"
+            >
+              {childOptions.length === 0 && <option value="">-- belum ada paket aktif --</option>}
+              {childOptions.map((c) => (
+                <option key={c.packageId} value={c.packageId}>
+                  {c.dependentName} — {c.packageName}, sisa {c.sisaSesi} sesi
+                </option>
+              ))}
+            </Select>
+          </Field>
           <Field label="Tanggal">
             <div className="max-w-[16rem]">
               <AvailabilityDatePicker value={date} onChange={setDate} />
             </div>
           </Field>
+          {selectedChild && (
+            <div className="flex items-center gap-2 sm:mb-2.5">
+              <Badge tone="brand">Sisa sesi: {selectedChild.sisaSesi}</Badge>
+              <Badge tone={selectedChild.cancelRemaining <= 1 ? "warning" : "neutral"}>
+                Jatah batal: {selectedChild.cancelRemaining}/{selectedChild.jatahCancel}
+              </Badge>
+            </div>
+          )}
         </CardBody>
       </Card>
 
@@ -258,7 +297,7 @@ export default function BookingBoard() {
                         <Button
                           size="sm"
                           variant={s.status === "BOOKED" ? "secondary" : "primary"}
-                          disabled={s.status === "BOOKED" || pendingId === s.id}
+                          disabled={s.status === "BOOKED" || pendingId === s.id || !packageId}
                           loading={pendingId === s.id}
                           onClick={() => handleBook(s.id)}
                         >

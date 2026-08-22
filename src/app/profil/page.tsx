@@ -2,8 +2,10 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { NavBar } from "@/components/nav-bar";
 import { Card, CardBody } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma";
 import EditNameForm from "./edit-name-form";
 import EditPasswordForm from "./edit-password-form";
+import ManageChildrenForm from "./manage-children-form";
 
 const roleLabel: Record<string, string> = {
   ADMIN: "Admin",
@@ -15,6 +17,15 @@ export default async function ProfilPage() {
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.mustChangePassword) redirect("/ganti-password");
+
+  const children =
+    session.user.role === "MEMBER"
+      ? await prisma.dependent.findMany({
+          where: { memberId: session.user.id },
+          orderBy: { createdAt: "asc" },
+          select: { id: true, name: true, isActive: true, isSelf: true },
+        })
+      : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -35,12 +46,21 @@ export default async function ProfilPage() {
           </CardBody>
         </Card>
 
-        <Card>
+        <Card className={children ? "mb-4" : undefined}>
           <CardBody>
             <h2 className="mb-3 text-lg font-semibold text-text">Ganti Password</h2>
             <EditPasswordForm />
           </CardBody>
         </Card>
+
+        {children && (
+          <Card>
+            <CardBody>
+              <h2 className="mb-3 text-lg font-semibold text-text">Anak</h2>
+              <ManageChildrenForm children={children} />
+            </CardBody>
+          </Card>
+        )}
       </main>
     </div>
   );

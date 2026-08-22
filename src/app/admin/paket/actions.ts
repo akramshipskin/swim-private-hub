@@ -2,6 +2,7 @@
 
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
+import { createDependent, createSelfDependent } from "@/lib/dependents";
 import { revalidatePath } from "next/cache";
 
 export type ActionState = { error?: string } | null;
@@ -71,6 +72,39 @@ export async function updateTemplate(
   return null;
 }
 
+// --- Tambah anak buat member (admin) -- nutup gap: admin bikin member
+// baru terus mau langsung assign paket di sesi yang sama, padahal anak
+// cuma bisa dibikin pas member login pertama. Reuse createDependent
+// yang sama kayak member self-service. ---
+
+export async function addChildForMember(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireRole("ADMIN");
+
+  const memberId = formData.get("memberId") as string;
+  const type = formData.get("type")?.toString();
+  const name = formData.get("name")?.toString() ?? "";
+
+  if (!memberId) {
+    return { error: "Pilih member dulu" };
+  }
+
+  try {
+    if (type === "self") {
+      await createSelfDependent(memberId);
+    } else {
+      await createDependent(memberId, name);
+    }
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Gagal nambah peserta" };
+  }
+
+  revalidatePath("/admin/paket");
+  return null;
+}
+
 // --- Assign paket ke member (custom, boleh dari katalog atau bebas) ---
 
 export async function assignPackageToMember(
@@ -80,6 +114,7 @@ export async function assignPackageToMember(
   await requireRole("ADMIN");
 
   const memberId = formData.get("memberId") as string;
+  const dependentId = formData.get("dependentId") as string;
   const templateId = formData.get("templateId") as string | null;
   const name = formData.get("name")?.toString().trim() ?? "";
   const totalSesi = Number(formData.get("totalSesi"));
@@ -88,16 +123,28 @@ export async function assignPackageToMember(
   const expiredDateRaw = formData.get("expiredDate") as string;
 
   if (
-    !memberId || !name ||
+    !memberId || !dependentId || !name ||
     !Number.isInteger(totalSesi) || totalSesi < 1 ||
     !Number.isInteger(jatahCancel) || jatahCancel < 0
   ) {
-    return { error: "Member, nama paket wajib diisi, total sesi minimal 1, jatah cancel gak boleh negatif" };
+    return { error: "Member, anak, nama paket wajib diisi, total sesi minimal 1, jatah cancel gak boleh negatif" };
+  }
+
+  // Anak yang dipilih harus emang punya member ini -- dropdown di form
+  // udah discope per-member, tapi tetep divalidasi ulang di server (IDOR
+  // guard, jangan percaya begitu aja apa yang dikirim client).
+  const dependent = await prisma.dependent.findUnique({
+    where: { id: dependentId },
+    select: { memberId: true },
+  });
+  if (!dependent || dependent.memberId !== memberId) {
+    return { error: "Anak gak ditemukan atau bukan punya member ini" };
   }
 
   await prisma.package.create({
     data: {
       memberId,
+      dependentId,
       templateId: templateId || null,
       name,
       totalSesi,

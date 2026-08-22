@@ -62,6 +62,7 @@ model User {
   createdAt          DateTime @default(now())
 
   coachProfile      CoachProfile?
+  dependents        Dependent[]
   packages          Package[]
   bookings          Booking[]
   availabilities    Availability[]     @relation("CoachAvailabilities")
@@ -74,6 +75,29 @@ model CoachProfile {
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   bio      String?
   isActive Boolean @default(true)
+}
+
+// Profil anak nempel ke 1 akun ortu (User role MEMBER) -- 1 akun bisa
+// punya banyak anak, tapi tetep 1 login/1 session buat semuanya. Bukan
+// akun terpisah. isActive = soft delete: anak yang "dihapus" ortu cuma
+// disembunyiin dari pilihan baru, riwayat Package/Booking lama tetap
+// utuh (dibutuhin buat laporan honor coach).
+model Dependent {
+  id        String   @id @default(cuid())
+  memberId  String
+  member    User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  name      String
+  // Peserta bisa akun itu sendiri (dewasa yang les sendiri), bukan cuma
+  // anak -- isSelf nandain entry mana yang "diri sendiri" (nama-nya
+  // dicopy dari User.name pas dibuat). Paling banyak 1 entry isSelf per
+  // member, dicek di action layer (bukan constraint DB).
+  isSelf    Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  packages Package[]
+
+  @@index([memberId])
 }
 
 // Katalog paket (harga/durasi) yang admin kelola, gak nempel ke member
@@ -101,6 +125,14 @@ model Package {
   id          String           @id @default(cuid())
   memberId    String
   member      User             @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  // Wajib -- 1 paket = 1 anak, gak pooled/gak bisa dipake gantian antar
+  // anak. Ditulis sekali pas paket dibuat; kalau paket ini udah punya
+  // >=1 Booking, dependentId GAK BOLEH diedit lagi (dicek di action
+  // layer, bukan constraint DB) -- soalnya Booking gak nyimpen anak
+  // sendiri, "anak"-nya booking diturunin dari sini. Edit dependentId
+  // setelah ada booking = nge-rewrite riwayat anak booking lama diam-diam.
+  dependentId String
+  dependent   Dependent        @relation(fields: [dependentId], references: [id])
   templateId  String?
   template    PackageTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
   name        String
@@ -117,8 +149,10 @@ model Package {
   createdAt   DateTime         @default(now())
 
   payments Payment[]
+  bookings Booking[]
 
   @@index([memberId])
+  @@index([dependentId])
 }
 
 model Payment {
@@ -174,7 +208,13 @@ model Booking {
   member         User          @relation(fields: [memberId], references: [id], onDelete: Cascade)
   availabilityId String
   availability   Availability  @relation(fields: [availabilityId], references: [id], onDelete: Cascade)
+  // "Anak" buat booking ini diturunin transitif lewat packageId ->
+  // Package.dependentId -- sengaja gak nyimpen field anak sendiri di
+  // sini, biar cuma ada 1 sumber kebenaran (bukan 2 field yang bisa
+  // nyimpang). Relasi Package ditambah sekalian (sebelumnya packageId
+  // cuma string lepas, gak ada FK constraint di DB sama sekali).
   packageId      String
+  package        Package       @relation(fields: [packageId], references: [id])
   status         BookingStatus @default(BOOKED)
   cancelledBy    CancelledBy?
   cancelledAt    DateTime?
@@ -188,4 +228,5 @@ model Booking {
 
   @@index([memberId])
   @@index([availabilityId])
+  @@index([packageId])
 }

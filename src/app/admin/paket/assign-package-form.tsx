@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { assignPackageToMember } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
@@ -8,28 +8,54 @@ import { Button } from "@/components/ui/button";
 
 type Member = { id: string; name: string; email: string | null; phone: string | null };
 type Template = { id: string; name: string };
+type Dependent = { id: string; name: string; memberId: string };
 
 export default function AssignPackageForm({
   members,
   templates,
+  dependents,
 }: {
   members: Member[];
   templates: Template[];
+  dependents: Dependent[];
 }) {
   const [state, formAction, pending] = useActionState(assignPackageToMember, null);
+  const [memberId, setMemberId] = useState(members[0]?.id ?? "");
+  const childrenOfMember = dependents.filter((d) => d.memberId === memberId);
 
   return (
     <Card className="mb-8">
       <CardBody>
         <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
           <Field label="Member">
-            <Select name="memberId" required className="w-full sm:w-52">
+            <Select
+              name="memberId"
+              required
+              className="w-full sm:w-52"
+              value={memberId}
+              onChange={(e) => setMemberId(e.target.value)}
+            >
               {members.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name} ({m.email ?? m.phone ?? "-"})
                 </option>
               ))}
             </Select>
+          </Field>
+          <Field label="Anak">
+            {childrenOfMember.length === 0 ? (
+              <p className="text-xs text-danger-text">
+                Member ini belum punya anak, tambahin dulu di atas.
+              </p>
+            ) : (
+              <Select name="dependentId" required className="w-full sm:w-40">
+                {childrenOfMember.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </Select>
+            )}
           </Field>
           <Field label="Dari Katalog (opsional)">
             <Select name="templateId" className="w-full sm:w-44" defaultValue="">

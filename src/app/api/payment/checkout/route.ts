@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { snap } from "@/lib/midtrans";
+import { assertDependentOwnedByMember } from "@/lib/dependents";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -8,7 +9,22 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { templateId } = (await request.json()) as { templateId?: string };
+  const { templateId, dependentId } = (await request.json()) as {
+    templateId?: string;
+    dependentId?: string;
+  };
+
+  if (!dependentId) {
+    return Response.json({ error: "Pilih anak dulu" }, { status: 400 });
+  }
+  try {
+    await assertDependentOwnedByMember(dependentId, session.user.id);
+  } catch (err) {
+    return Response.json(
+      { error: err instanceof Error ? err.message : "Anak gak valid" },
+      { status: 403 }
+    );
+  }
 
   const template = templateId
     ? await prisma.packageTemplate.findFirst({
@@ -23,6 +39,7 @@ export async function POST(request: Request) {
   const pkg = await prisma.package.create({
     data: {
       memberId: session.user.id,
+      dependentId,
       templateId: template.id,
       name: template.name,
       totalSesi: template.totalSesi,

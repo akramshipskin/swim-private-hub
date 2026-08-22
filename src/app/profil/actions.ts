@@ -2,6 +2,7 @@
 
 import { auth, unstable_update } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { createDependent, createSelfDependent, assertDependentOwnedByMember } from "@/lib/dependents";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 
@@ -54,4 +55,38 @@ export async function updatePasswordProfil(
   });
 
   return { success: true };
+}
+
+export async function addChild(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session) return { error: "Sesi habis, login ulang." };
+  if (session.user.role !== "MEMBER") return { error: "Cuma member yang bisa nambah anak." };
+
+  const type = formData.get("type")?.toString();
+  const name = formData.get("name")?.toString() ?? "";
+
+  try {
+    if (type === "self") {
+      await createSelfDependent(session.user.id);
+    } else {
+      await createDependent(session.user.id, name);
+    }
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Gagal nambah peserta" };
+  }
+
+  revalidatePath("/profil");
+  return { success: true };
+}
+
+export async function toggleChildActive(dependentId: string, isActive: boolean) {
+  const session = await auth();
+  if (!session) throw new Error("Sesi habis, login ulang.");
+
+  await assertDependentOwnedByMember(dependentId, session.user.id);
+  await prisma.dependent.update({ where: { id: dependentId }, data: { isActive } });
+  revalidatePath("/profil");
 }

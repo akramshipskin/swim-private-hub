@@ -30,7 +30,7 @@ function toDateLabelFromDate(d: Date) {
 export default async function MemberPaketPage() {
   const session = await requireRole("MEMBER");
 
-  const [packages, templates] = await Promise.all([
+  const [packages, templates, children] = await Promise.all([
     prisma.package.findMany({
       where: { memberId: session.user.id },
       orderBy: { createdAt: "desc" },
@@ -38,6 +38,11 @@ export default async function MemberPaketPage() {
     prisma.packageTemplate.findMany({
       where: { isActive: true },
       orderBy: { totalSesi: "asc" },
+    }),
+    prisma.dependent.findMany({
+      where: { memberId: session.user.id, isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
     }),
   ]);
 
@@ -96,7 +101,15 @@ export default async function MemberPaketPage() {
       )}
 
       <h2 className="mb-3 text-lg font-semibold text-text">Beli Paket Baru</h2>
-      {templates.length === 0 ? (
+      {children.length === 0 ? (
+        <p className="text-sm text-text-muted">
+          Belum ada anak terdaftar. Tambah anak dulu di halaman{" "}
+          <a href="/profil" className="font-medium text-brand-600 underline">
+            Profil
+          </a>{" "}
+          sebelum beli paket.
+        </p>
+      ) : templates.length === 0 ? (
         <p className="text-sm text-text-muted">Belum ada katalog paket tersedia.</p>
       ) : (
         <ul className="flex flex-wrap justify-center gap-3">
@@ -118,7 +131,7 @@ export default async function MemberPaketPage() {
                     {t.totalSesi} Sesi · Berlaku {t.durationDays} Hari · Jatah Batal Booking {t.jatahCancel}x
                   </p>
                 </div>
-                <CheckoutButton templateId={t.id} />
+                <CheckoutButton templateId={t.id} dependents={children} />
               </CardBody>
             </Card>
           ))}

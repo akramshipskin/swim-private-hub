@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import CreateTemplateForm from "./create-template-form";
 import TemplateEditForm from "./template-edit-form";
 import AssignPackageForm from "./assign-package-form";
+import AddChildForm from "./add-child-form";
 import PackageMemberCard from "./package-member-card";
 
 function toInputDate(d: Date | null) {
@@ -22,7 +23,7 @@ function memberSince(d: Date) {
 export default async function AdminPaketPage() {
   await requireRole("ADMIN");
 
-  const [members, templates, packages] = await Promise.all([
+  const [members, templates, packages, dependents] = await Promise.all([
     prisma.user.findMany({
       where: { role: "MEMBER" },
       orderBy: { name: "asc" },
@@ -32,6 +33,11 @@ export default async function AdminPaketPage() {
     prisma.package.findMany({
       orderBy: { createdAt: "desc" },
       include: { member: { select: { name: true, email: true, phone: true, createdAt: true } } },
+    }),
+    prisma.dependent.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, memberId: true },
     }),
   ]);
 
@@ -66,14 +72,23 @@ export default async function AdminPaketPage() {
         ))}
       </ul>
 
-      {/* --- Assign paket khusus ke member --- */}
-      <h2 className="mb-3 text-lg font-semibold text-text">Assign Paket ke Member</h2>
+      {/* --- Tambah anak buat member (dibutuhin sebelum bisa assign paket) --- */}
+      <h2 className="mb-3 text-lg font-semibold text-text">Tambah Anak</h2>
       <p className="mb-3 text-sm text-text-muted">
-        Buat paket khusus buat 1 member tertentu (koreksi, promo, atau kasus di luar
+        1 paket = 1 anak. Member baru yang belum pernah login belum punya anak
+        sama sekali -- tambahin di sini dulu kalau mau langsung assign paket.
+      </p>
+
+      <AddChildForm members={members} />
+
+      {/* --- Assign paket khusus ke member --- */}
+      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Assign Paket ke Member</h2>
+      <p className="mb-3 text-sm text-text-muted">
+        Buat paket khusus buat 1 anak tertentu (koreksi, promo, atau kasus di luar
         alur beli-online).
       </p>
 
-      <AssignPackageForm members={members} templates={templates} />
+      <AssignPackageForm members={members} templates={templates} dependents={dependents} />
 
       {/* --- List member + paket, advanced --- */}
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>
