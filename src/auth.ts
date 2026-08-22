@@ -55,7 +55,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
 
       const dbUser = await prisma.user.findUnique({
         where: { id: token.id as string },
-        select: { isActive: true, role: true, mustChangePassword: true },
+        select: { isActive: true, role: true, mustChangePassword: true, name: true },
       });
 
       if (!dbUser || !dbUser.isActive) {
@@ -64,6 +64,10 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
 
       token.role = dbUser.role;
       token.mustChangePassword = dbUser.mustChangePassword;
+      // Nama juga disinkron ulang tiap request (bukan cuma pas sign-in) --
+      // tanpa ini, ganti nama di /profil kesimpen bener di DB tapi
+      // session.user.name kebawa stale sampe logout-login ulang.
+      token.name = dbUser.name;
       return token;
     },
     session({ session, token }) {

@@ -21,7 +21,11 @@ export default function EditNameForm({ currentName }: { currentName: string }) {
     <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:items-end">
       <div className="flex-1">
         <Field label="Nama">
-          <Input name="name" defaultValue={currentName} required className="w-full" />
+          {/* key={currentName} biar input remount tiap currentName berubah dari
+              server (abis revalidatePath) -- defaultValue cuma dibaca sekali
+              pas mount, gak reaktif ke prop baru, jadi field kelihatan "gak
+              kesimpen" walau di DB udah bener kalau gak di-remount. */}
+          <Input key={currentName} name="name" defaultValue={currentName} required className="w-full" />
         </Field>
       </div>
       <Button type="submit" loading={pending} className="w-full sm:w-auto">
