@@ -22,6 +22,8 @@ export function MobileBottomNav({ links }: { links: BottomNavLink[] }) {
             <Link
               key={link.href}
               href={link.href}
+              // Sama kayak DesktopTabNav -- tab aktif gak perlu di-prefetch.
+              prefetch={active ? false : undefined}
               className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 text-[11px] font-semibold transition-colors ${
                 active ? "bg-brand-600 text-white" : "text-text-muted hover:bg-surface-muted hover:text-text"
               }`}

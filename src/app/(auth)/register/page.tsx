@@ -146,7 +146,7 @@ export default function RegisterPage() {
                     <option value="child">Anak</option>
                   </Select>
                   {p.type === "self" ? (
-                    <p className="flex min-h-[44px] flex-1 items-center rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
+                    <p className="flex min-h-[44px] min-w-0 flex-1 items-center truncate rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
                       {name || "(isi nama lengkap dulu)"}
                     </p>
                   ) : (
@@ -155,7 +155,7 @@ export default function RegisterPage() {
                       onChange={(e) => updateParticipant(i, { name: e.target.value })}
                       placeholder="Nama anak"
                       required
-                      className="flex-1"
+                      className="min-w-0 flex-1"
                     />
                   )}
                 </div>

@@ -60,8 +60,8 @@ export default function ManageChildrenForm({ children }: { children: Child[] }) 
         </ul>
       )}
 
-      <form action={formAction} className="flex items-end gap-2">
-        <div className="w-32 shrink-0">
+      <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+        <div className="w-full sm:w-32 sm:shrink-0">
           <Field label="Tipe">
             <Select
               name="type"
@@ -76,13 +76,13 @@ export default function ManageChildrenForm({ children }: { children: Child[] }) 
           </Field>
         </div>
         {type === "child" && (
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <Field label="Nama anak">
               <Input name="name" placeholder="Nama anak" required />
             </Field>
           </div>
         )}
-        <Button type="submit" variant="secondary" size="sm" loading={pending}>
+        <Button type="submit" variant="secondary" size="sm" loading={pending} className="w-full sm:w-auto">
           Tambah
         </Button>
       </form>

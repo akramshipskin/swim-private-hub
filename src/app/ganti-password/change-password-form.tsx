@@ -63,7 +63,7 @@ export default function ChangePasswordForm({
               </Select>
               {p.type === "self" ? (
                 <>
-                  <p className="flex min-h-[44px] flex-1 items-center rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
+                  <p className="flex min-h-[44px] min-w-0 flex-1 items-center truncate rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
                     {memberName}
                   </p>
                   <input type="hidden" name="participantName" value="" />
@@ -75,7 +75,7 @@ export default function ChangePasswordForm({
                   onChange={(e) => updateParticipant(i, { name: e.target.value })}
                   placeholder="Nama anak"
                   required
-                  className="flex-1"
+                  className="min-w-0 flex-1"
                 />
               )}
             </div>

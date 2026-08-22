@@ -15,6 +15,13 @@ export function DesktopTabNav({ links }: { links: BottomNavLink[] }) {
           <Link
             key={link.href}
             href={link.href}
+            // Tab aktif gak di-prefetch -- kita udah DI halaman itu, prefetch
+            // ke diri sendiri percuma. Di halaman yang sering ganti state
+            // client-side (misal kalender coach/jadwal), prefetch berulang ke
+            // link aktif malah numpuk & ke-abort duluan sebelum kepake,
+            // munculin "unknown error occurred when fetching the script" di
+            // console (noise doang, gak ngerusak apa-apa, tapi gak perlu).
+            prefetch={active ? false : undefined}
             className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               active
                 ? "bg-brand-600 text-white"
