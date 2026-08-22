@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 type Member = { id: string; name: string; email: string | null; phone: string | null };
 type Template = { id: string; name: string };
-type Dependent = { id: string; name: string; memberId: string };
+type Dependent = { id: string; name: string; memberId: string; isSelf: boolean };
 
 export default function AssignPackageForm({
   members,
@@ -52,6 +52,7 @@ export default function AssignPackageForm({
                 {childrenOfMember.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
+                    {d.isSelf ? " (diri sendiri)" : ""}
                   </option>
                 ))}
               </Select>

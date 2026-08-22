@@ -40,7 +40,7 @@ export default async function AdminPaketPage() {
     prisma.dependent.findMany({
       where: { isActive: true },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, memberId: true },
+      select: { id: true, name: true, memberId: true, isSelf: true },
     }),
   ]);
 
