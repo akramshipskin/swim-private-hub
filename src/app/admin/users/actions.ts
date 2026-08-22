@@ -43,6 +43,10 @@ export async function createUser(
       phone,
       passwordHash,
       role,
+      // MEMBER wajib ganti password + isi peserta (diri sendiri/anak) pas
+      // login pertama -- samain kayak jalur import xlsx, biar gak ada
+      // celah member yang login langsung tanpa pernah diminta isi anak.
+      ...(role === "MEMBER" ? { mustChangePassword: true } : {}),
       ...(role === "COACH" ? { coachProfile: { create: {} } } : {}),
     },
   });

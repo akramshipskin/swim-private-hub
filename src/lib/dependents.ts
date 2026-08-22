@@ -14,20 +14,33 @@ export async function createDependent(memberId: string, name: string, db: Db = p
 
 // Peserta = "diri sendiri" (akun MEMBER-nya sendiri yang les, bukan anak).
 // Nama-nya dicopy dari User.name pas dibuat. Paling banyak 1 per member --
-// dicek di sini, bukan constraint DB (gak ada @@unique yang bisa nangkep
-// "1 row true per memberId" secara native di Prisma/Postgres tanpa partial
-// index manual).
-export async function createSelfDependent(memberId: string, db: Db = prisma) {
-  const existing = await db.dependent.findFirst({ where: { memberId, isSelf: true } });
+// gak ada @@unique yang bisa nangkep "1 row true per memberId" native di
+// Prisma/Postgres tanpa partial index manual, jadi dijamin lewat row lock
+// (FOR UPDATE) di User biar check-then-create-nya atomic -- 2 submit
+// bersamaan (misal double-klik) antre satu-satu, gak dobel-create.
+async function createSelfDependentLocked(memberId: string, tx: Db) {
+  await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${memberId} FOR UPDATE`;
+
+  const existing = await tx.dependent.findFirst({ where: { memberId, isSelf: true } });
   if (existing) return existing;
 
-  const member = await db.user.findUniqueOrThrow({
+  const member = await tx.user.findUniqueOrThrow({
     where: { id: memberId },
     select: { name: true },
   });
-  return db.dependent.create({
+  return tx.dependent.create({
     data: { memberId, name: member.name, isSelf: true },
   });
+}
+
+export async function createSelfDependent(memberId: string, db: Db = prisma) {
+  // `FOR UPDATE` cuma efektif kalau lock-nya ditahan sepanjang
+  // check-then-create -- kalau `db` itu prisma polos (bukan tx caller),
+  // bungkus transaksi sendiri di sini. Kalau caller udah dalem transaksi
+  // (`db` = tx), jalanin langsung di situ biar tetep 1 transaksi yang sama.
+  return db === prisma
+    ? prisma.$transaction((tx) => createSelfDependentLocked(memberId, tx))
+    : createSelfDependentLocked(memberId, db);
 }
 
 // IDOR guard -- dipake tiap kali packageId dateng dari client (booking,

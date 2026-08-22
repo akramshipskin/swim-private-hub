@@ -33,16 +33,20 @@ export async function POST(request: Request) {
   try {
     const booking = await prisma.$transaction(async (tx) => {
       // Paket dipilih eksplisit sama member (1 paket = 1 anak, gak ada
-      // FIFO lintas-anak lagi). Filter `id: packageId` DIGABUNG sama
-      // activePackageWhere(session.user.id) -- ini sekaligus jadi IDOR
-      // guard (kalau packageId itu bukan punya session.user.id, query gak
-      // bakal nemuin apa-apa) DAN validasi eligibility (ACTIVE, ada sisa
-      // sesi, belum kedaluwarsa) dalam 1 query atomic.
-      const pkg = await tx.package.findFirst({
+      // FIFO lintas-anak lagi). Klaim atomic pake conditional updateMany
+      // (compare-and-swap), BUKAN findFirst+update terpisah -- 2 request
+      // booking bersamaan buat paket yang sama (2 slot beda) bisa
+      // lolos dua-duanya kalau cuma baca sisaSesi dulu baru decrement
+      // belakangan (sisaSesi bisa jadi negatif). WHERE di updateMany ini
+      // sekaligus jadi IDOR guard (packageId bukan punya session.user.id
+      // = gak ke-update), validasi eligibility (ACTIVE, ada sisa sesi,
+      // belum kedaluwarsa), DAN klaim sesi, semuanya 1 query atomic.
+      const claimPkg = await tx.package.updateMany({
         where: { ...activePackageWhere(session.user.id), id: packageId },
+        data: { sisaSesi: { decrement: 1 } },
       });
 
-      if (!pkg) {
+      if (claimPkg.count === 0) {
         throw new BookingError(
           "Paket gak ditemukan, kuota sesi habis, belum aktif, atau udah kedaluwarsa.",
           409
@@ -64,16 +68,11 @@ export async function POST(request: Request) {
         );
       }
 
-      await tx.package.update({
-        where: { id: pkg.id },
-        data: { sisaSesi: { decrement: 1 } },
-      });
-
       return tx.booking.create({
         data: {
           memberId: session.user.id,
           availabilityId,
-          packageId: pkg.id,
+          packageId,
           status: "BOOKED",
         },
         include: { availability: { include: { coach: true } } },
