@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
+import { usablePackageConditions } from "@/lib/active-package";
 import { toggleUserActive } from "./actions";
 import CreateUserForm from "./create-user-form";
 import ImportMembersForm from "./import-members-form";
@@ -55,7 +56,7 @@ export default async function AdminUsersPage() {
     orderBy: { createdAt: "desc" },
     include: {
       packages: {
-        where: { status: "ACTIVE" },
+        where: usablePackageConditions,
         orderBy: { createdAt: "desc" },
         take: 1,
       },
