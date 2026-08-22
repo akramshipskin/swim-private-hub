@@ -50,7 +50,14 @@ export default function ChangePasswordForm({
           <p className="text-xs text-text-subtle">
             Bisa diri sendiri, bisa anak, bisa keduanya. Bisa ditambah lagi nanti.
           </p>
-          {participants.map((p, i) => (
+          {participants.map((p, i) => {
+            // "Diri sendiri" cuma boleh dipilih di 1 baris -- sama kayak
+            // register/page.tsx, biar gak keliatan bikin beberapa "diri
+            // sendiri" padahal cuma 1 yang beneran ke-create.
+            const selfTakenElsewhere = participants.some(
+              (other, idx) => idx !== i && other.type === "self"
+            );
+            return (
             <div key={i} className="flex gap-2">
               <Select
                 name="participantType"
@@ -58,7 +65,7 @@ export default function ChangePasswordForm({
                 onChange={(e) => updateParticipant(i, { type: e.target.value as Participant["type"] })}
                 className="w-32 shrink-0"
               >
-                <option value="self">Diri sendiri</option>
+                {!selfTakenElsewhere && <option value="self">Diri sendiri</option>}
                 <option value="child">Anak</option>
               </Select>
               {p.type === "self" ? (
@@ -79,7 +86,8 @@ export default function ChangePasswordForm({
                 />
               )}
             </div>
-          ))}
+            );
+          })}
           <button
             type="button"
             onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "" }])}
