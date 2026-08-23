@@ -21,6 +21,7 @@ export default function AssignPackageForm({
 }) {
   const [state, formAction, pending] = useActionState(assignPackageToMember, null);
   const [memberId, setMemberId] = useState(members[0]?.id ?? "");
+  const [name, setName] = useState("");
   const childrenOfMember = dependents.filter((d) => d.memberId === memberId);
 
   return (
@@ -58,7 +59,15 @@ export default function AssignPackageForm({
             )}
           </Field>
           <Field label="Dari Katalog (opsional)">
-            <Select name="templateId" className="w-full sm:w-44" defaultValue="">
+            <Select
+              name="templateId"
+              className="w-full sm:w-44"
+              defaultValue=""
+              onChange={(e) => {
+                const t = templates.find((t) => t.id === e.target.value);
+                setName(t ? t.name : "");
+              }}
+            >
               <option value="">-- custom --</option>
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -68,7 +77,13 @@ export default function AssignPackageForm({
             </Select>
           </Field>
           <Field label="Nama Paket">
-            <Input name="name" required className="w-full sm:w-40" />
+            <Input
+              name="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full sm:w-40"
+            />
           </Field>
           <div className="grid grid-cols-2 gap-3 sm:contents">
             <Field label="Total Sesi">
