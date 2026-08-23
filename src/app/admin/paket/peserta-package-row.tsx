@@ -88,12 +88,15 @@ export default function PesertaPackageRow({
                   </Select>
                 </Field>
               </div>
-              {/* grid-cols-2 sama kayak baris Sisa Sesi/Status di atas biar
-                  ujung kanan barisnya sejajar. Date input pake max-w-full
-                  (bukan w-full) -- di WebKit iOS dia gak respect width:100%,
-                  render-nya di ukuran aslinya sendiri, tapi max-width tetep
-                  jadi batas atas jadi gak bisa nembus keluar kolom. */}
-              <div className="grid grid-cols-2 gap-3 sm:contents">
+              {/* Kolom gak dibagi rata (grid-cols-2) kayak baris Sisa
+                  Sesi/Status -- Jatah Cancel tetep sempit (5rem), Berlaku
+                  Sampai kebagian sisanya (1fr). Grid container-nya tetep
+                  selebar baris di atas, jadi ujung kanannya otomatis
+                  sejajar tanpa perlu bagi rata. Date input pake max-w-full
+                  (bukan w-full) -- di WebKit iOS dia gak respect
+                  width:100%, tapi max-width tetep jadi batas atas biar
+                  gak nembus keluar kolom. */}
+              <div className="grid grid-cols-[5rem_1fr] gap-3 sm:contents">
                 <Field label="Jatah Cancel">
                   <Input
                     type="number"
