@@ -10,13 +10,21 @@ export default function ImportMembersForm() {
   const [hasFile, setHasFile] = useState(false);
 
   return (
-    <Card className="mb-6">
+    <Card>
       <CardBody>
-        <h2 className="mb-1 text-sm font-semibold text-text">Import Member dari xlsx</h2>
-        <p className="mb-4 text-xs text-text-subtle">
-          Kolom: Nama, No HP. Member baru login pakai No HP + password default yang
-          sama, wajib ganti password pas login pertama.
+        <h2 className="mb-1 text-sm font-semibold text-text">Import Users dari xlsx</h2>
+        <p className="mb-2 text-xs text-text-subtle">
+          Kolom: Nama Member, No HP, Email (opsional), Nama Peserta/Anak, Paket Aktif,
+          Sisa Sesi. 1 baris = 1 peserta -- member dengan &gt;1 anak, ulang No HP yang
+          sama di baris berikutnya. Member baru login pakai No HP + password default
+          yang sama, wajib ganti pas login pertama.
         </p>
+        <a
+          href="/api/admin/import-template"
+          className="mb-4 inline-block text-xs font-medium text-brand-600 hover:underline"
+        >
+          Download Template
+        </a>
         <form action={formAction} className="flex flex-wrap items-end gap-3">
           <input
             type="file"

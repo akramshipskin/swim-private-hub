@@ -21,7 +21,7 @@ export default function CreateUserForm() {
   }
 
   return (
-    <Card className="mb-6">
+    <Card>
       <CardBody>
         <h2 className="mb-4 text-sm font-semibold text-text">Tambah User Baru</h2>
         <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">

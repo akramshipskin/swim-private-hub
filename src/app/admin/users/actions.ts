@@ -4,7 +4,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { toProperCase } from "@/lib/format";
-import { createSelfDependent } from "@/lib/dependents";
+import { createSelfDependent, createDependent } from "@/lib/dependents";
 import bcrypt from "bcryptjs";
 import * as XLSX from "xlsx";
 
@@ -82,8 +82,31 @@ export async function createUser(
 }
 
 const IMPORT_DEFAULT_PASSWORD = "renang2026";
+const IMPORT_DEFAULT_JATAH_CANCEL = 2;
+const IMPORT_DEFAULT_DURATION_DAYS = 60;
 
 export type ImportState = { error?: string; result?: string } | null;
+
+type ImportRow = {
+  name: string | null;
+  phone: string | null;
+  email: string | null;
+  pesertaName: string | null;
+  paketName: string | null;
+  sisaSesi: string | null;
+};
+
+// Header fleksibel: "Nama Member"/"nama"/"NAMA", "No HP"/"HP"/"Nomor HP", dst.
+function pick(row: Record<string, unknown>, candidates: string[]) {
+  const keys = Object.keys(row);
+  for (const c of candidates) {
+    const key = keys.find((k) => k.trim().toLowerCase() === c);
+    if (key && row[key] != null && String(row[key]).trim() !== "") {
+      return String(row[key]).trim();
+    }
+  }
+  return null;
+}
 
 export async function importMembersXlsx(
   _prevState: ImportState,
@@ -97,74 +120,140 @@ export async function importMembersXlsx(
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  let rows: Record<string, unknown>[];
+  let rawRows: Record<string, unknown>[];
   try {
     const workbook = XLSX.read(buffer, { type: "buffer" });
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    rows = XLSX.utils.sheet_to_json(firstSheet);
+    rawRows = XLSX.utils.sheet_to_json(firstSheet);
   } catch {
     return { error: "Gagal baca file. Pastikan format xlsx valid." };
   }
 
-  if (rows.length === 0) {
+  if (rawRows.length === 0) {
     return { error: "File kosong atau gak ada data di sheet pertama." };
   }
 
-  // Header fleksibel: "Nama"/"nama"/"NAMA", "No HP"/"no hp"/"HP"/"Nomor HP", dst.
-  function pick(row: Record<string, unknown>, candidates: string[]) {
-    const keys = Object.keys(row);
-    for (const c of candidates) {
-      const key = keys.find((k) => k.trim().toLowerCase() === c);
-      if (key && row[key] != null && String(row[key]).trim() !== "") {
-        return String(row[key]).trim();
-      }
-    }
-    return null;
-  }
+  const rows: ImportRow[] = rawRows.map((row) => ({
+    name: pick(row, ["nama member", "nama", "name"]),
+    phone: pick(row, ["no hp", "nomor hp", "hp", "phone", "no. hp", "no telepon"]),
+    email: pick(row, ["email (opsional)", "email"]),
+    pesertaName: pick(row, ["nama peserta/anak", "nama peserta", "peserta", "anak", "nama anak"]),
+    paketName: pick(row, ["paket aktif", "paket", "nama paket"]),
+    sisaSesi: pick(row, ["sisa sesi", "sesi", "sisa sesi aktif"]),
+  }));
 
-  const passwordHash = await bcrypt.hash(IMPORT_DEFAULT_PASSWORD, 12);
-
-  let created = 0;
+  // Grup per No HP -- 1 member bisa punya beberapa baris (1 baris = 1
+  // peserta). Baris pertama tiap grup yang nentuin nama/email member.
+  const groups = new Map<string, ImportRow[]>();
   const skipped: string[] = [];
 
   for (const row of rows) {
-    const rawName = pick(row, ["nama", "name"]);
-    const name = rawName ? toProperCase(rawName) : null;
-    const rawPhone = pick(row, ["no hp", "nomor hp", "hp", "phone", "no. hp", "no telepon"]);
-
-    if (!name || !rawPhone) {
-      skipped.push(`Baris tanpa nama/HP lengkap dilewati`);
+    if (!row.phone) {
+      skipped.push(row.name ? `${row.name} -- No HP kosong` : "Baris tanpa No HP dilewati");
       continue;
     }
+    const phone = row.phone.replace(/[^\d+]/g, "");
+    const existingGroup = groups.get(phone);
+    if (existingGroup) {
+      existingGroup.push(row);
+    } else {
+      groups.set(phone, [row]);
+    }
+  }
 
-    const phone = rawPhone.replace(/[^\d+]/g, "");
+  const templates = await prisma.packageTemplate.findMany();
+  const passwordHash = await bcrypt.hash(IMPORT_DEFAULT_PASSWORD, 12);
 
-    const existing = await prisma.user.findUnique({ where: { phone } });
-    if (existing) {
-      skipped.push(`${name} (${phone}) -- HP udah terdaftar`);
+  let membersCreated = 0;
+  let pesertaCreated = 0;
+  let paketCreated = 0;
+
+  for (const [phone, groupRows] of groups) {
+    const first = groupRows[0];
+    const rawName = first.name;
+    if (!rawName) {
+      skipped.push(`${phone} -- baris pertama gak ada Nama Member`);
       continue;
     }
+    const name = toProperCase(rawName);
+    const email = groupRows.find((r) => r.email)?.email ?? null;
 
-    await prisma.user.create({
-      data: {
-        name,
-        phone,
-        email: null,
-        passwordHash,
-        role: "MEMBER",
-        mustChangePassword: true,
-      },
+    const existing = await prisma.user.findFirst({
+      where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
     });
-    created++;
+    if (existing) {
+      skipped.push(`${name} (${phone}) -- HP atau email udah terdaftar`);
+      continue;
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const member = await tx.user.create({
+        data: {
+          name,
+          phone,
+          email,
+          passwordHash,
+          role: "MEMBER",
+          mustChangePassword: true,
+        },
+      });
+      membersCreated++;
+
+      for (const row of groupRows) {
+        // Baris tanpa peserta DAN tanpa paket = member polos, belum ada
+        // peserta terdaftar -- biarin dia isi sendiri pas login pertama.
+        if (!row.pesertaName && !row.paketName) continue;
+
+        const dependent = row.pesertaName
+          ? await createDependent(member.id, row.pesertaName, tx)
+          : await createSelfDependent(member.id, tx);
+        pesertaCreated++;
+
+        if (!row.paketName) continue;
+
+        const sisaSesiNum = row.sisaSesi ? Number(row.sisaSesi) : NaN;
+        if (!Number.isInteger(sisaSesiNum) || sisaSesiNum < 0) {
+          skipped.push(`${name} -- peserta "${dependent.name}": Sisa Sesi gak valid, paket dilewati`);
+          continue;
+        }
+
+        const paketName = toProperCase(row.paketName);
+        const template = templates.find((t) => t.name.trim().toLowerCase() === paketName.toLowerCase());
+        const totalSesi = template?.totalSesi ?? sisaSesiNum;
+        const jatahCancel = template?.jatahCancel ?? IMPORT_DEFAULT_JATAH_CANCEL;
+        const durationDays = template?.durationDays ?? IMPORT_DEFAULT_DURATION_DAYS;
+        const sisaSesi = Math.min(sisaSesiNum, totalSesi);
+
+        await tx.package.create({
+          data: {
+            memberId: member.id,
+            dependentId: dependent.id,
+            templateId: template?.id ?? null,
+            name: paketName,
+            totalSesi,
+            sisaSesi,
+            jatahCancel,
+            status: "ACTIVE",
+            startDate: new Date(),
+            expiredDate: new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000),
+          },
+        });
+        paketCreated++;
+      }
+    });
   }
 
   revalidatePath("/admin/users");
 
-  const parts = [`${created} member berhasil diimport.`];
+  const parts = [
+    `${membersCreated} member, ${pesertaCreated} peserta, ${paketCreated} paket berhasil diimport.`,
+  ];
   if (skipped.length > 0) {
     parts.push(`${skipped.length} dilewati: ${skipped.slice(0, 5).join("; ")}${skipped.length > 5 ? "..." : ""}`);
   }
-  parts.push(`Password default semua: "${IMPORT_DEFAULT_PASSWORD}" -- kasih tau member, mereka wajib ganti pas login pertama.`);
+  if (membersCreated > 0) {
+    parts.push(`Password default member baru: "${IMPORT_DEFAULT_PASSWORD}" -- kasih tau mereka, wajib ganti pas login pertama.`);
+  }
 
   return { result: parts.join(" ") };
 }
