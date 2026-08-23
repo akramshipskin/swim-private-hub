@@ -21,22 +21,51 @@ function memberSince(d: Date) {
 export default async function AdminPaketPage() {
   await requireRole("ADMIN");
 
-  const [templates, packages] = await Promise.all([
+  const [templates, members] = await Promise.all([
     prisma.packageTemplate.findMany({ orderBy: { totalSesi: "asc" } }),
-    prisma.package.findMany({
+    // Grup per member (bukan per paket) -- 1 member bisa punya >1 peserta,
+    // masing-masing punya paketnya sendiri. Cuma member yang punya
+    // >=1 paket yang muncul di sini (member polos tanpa paket sama sekali
+    // udah kepegang di tab Users).
+    prisma.user.findMany({
+      where: { role: "MEMBER", packages: { some: {} } },
       orderBy: { createdAt: "desc" },
-      include: {
-        member: { select: { name: true, email: true, phone: true, createdAt: true } },
-        dependent: { select: { name: true, isSelf: true } },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        createdAt: true,
+        dependents: {
+          where: { isActive: true },
+          orderBy: { name: "asc" },
+          select: { id: true, name: true, isSelf: true },
+        },
+        // Diurut terbaru duluan -- kalau 1 peserta somehow punya >1 paket
+        // (renewal lama), yang kepake buat kartu ini cuma yang terbaru.
+        packages: {
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            name: true,
+            sisaSesi: true,
+            totalSesi: true,
+            jatahCancel: true,
+            status: true,
+            expiredDate: true,
+            dependentId: true,
+          },
+        },
       },
     }),
   ]);
 
+  const allPackageIds = members.flatMap((m) => m.packages.map((p) => p.id));
   const cancelUsedByPackage = new Map(
     (
       await prisma.booking.groupBy({
         by: ["packageId"],
-        where: { packageId: { in: packages.map((p) => p.id) }, status: "CANCELLED", cancelledBy: "MEMBER" },
+        where: { packageId: { in: allPackageIds }, status: "CANCELLED", cancelledBy: "MEMBER" },
         _count: true,
       })
     ).map((r) => [r.packageId, r._count])
@@ -70,29 +99,32 @@ export default async function AdminPaketPage() {
       </p>
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>
       <PaketPerMemberList
-        rows={packages.map((p) => {
-          const cancelUsed = cancelUsedByPackage.get(p.id) ?? 0;
-          const cancelRemaining = Math.max(0, p.jatahCancel - cancelUsed);
-
-          return {
-            id: p.id,
-            memberName: p.member.name,
-            childName: p.dependent.isSelf ? null : p.dependent.name,
-            memberContact: p.member.email ?? p.member.phone ?? "-",
-            memberSinceLabel: memberSince(p.member.createdAt),
-            cancelRemaining,
-            pkg: {
-              id: p.id,
-              name: p.name,
-              sisaSesi: p.sisaSesi,
-              totalSesi: p.totalSesi,
-              jatahCancel: p.jatahCancel,
-              status: p.status,
-              expiredDate: p.expiredDate,
-              expiredDateInput: toInputDate(p.expiredDate),
-            },
-          };
-        })}
+        rows={members.map((m) => ({
+          memberId: m.id,
+          memberName: m.name,
+          memberContact: m.email ?? m.phone ?? "-",
+          memberSinceLabel: memberSince(m.createdAt),
+          peserta: m.dependents.map((d) => {
+            const pkg = m.packages.find((p) => p.dependentId === d.id) ?? null;
+            return {
+              dependentId: d.id,
+              label: d.isSelf ? "Diri sendiri" : d.name,
+              pkg: pkg
+                ? {
+                    id: pkg.id,
+                    name: pkg.name,
+                    sisaSesi: pkg.sisaSesi,
+                    totalSesi: pkg.totalSesi,
+                    jatahCancel: pkg.jatahCancel,
+                    status: pkg.status,
+                    expiredDate: pkg.expiredDate,
+                    expiredDateInput: toInputDate(pkg.expiredDate),
+                    cancelRemaining: Math.max(0, pkg.jatahCancel - (cancelUsedByPackage.get(pkg.id) ?? 0)),
+                  }
+                : null,
+            };
+          }),
+        }))}
       />
     </main>
   );
