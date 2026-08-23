@@ -32,7 +32,11 @@ export default function ManageChildrenForm({ children }: { children: Child[] }) 
               </span>
               <button
                 type="button"
-                onClick={() => toggleChildActive(c.id, false)}
+                onClick={() => {
+                  if (confirm(`Nonaktifkan ${c.name}? Paket & booking dia gak bisa diakses lagi sampai diaktifkan ulang.`)) {
+                    toggleChildActive(c.id, false);
+                  }
+                }}
                 className="text-xs font-medium text-danger-text hover:underline"
               >
                 Nonaktifkan

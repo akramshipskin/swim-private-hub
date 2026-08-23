@@ -9,7 +9,14 @@ export default function AdminCancelButton({ bookingId }: { bookingId: string }) 
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <form action={formAction}>
+      <form
+        action={formAction}
+        onSubmit={(e) => {
+          if (!confirm("Batalkan booking ini? Sisa sesi member bakal balik, jatah pembatalan mandiri dia berkurang.")) {
+            e.preventDefault();
+          }
+        }}
+      >
         <input type="hidden" name="bookingId" value={bookingId} />
         <Button type="submit" variant="danger" size="sm" loading={pending}>
           Batalkan
