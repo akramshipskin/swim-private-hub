@@ -108,20 +108,20 @@ export default async function MemberRiwayatPage() {
 
                   return (
                     <Card key={b.id}>
-                      <CardBody className="flex flex-col gap-3 py-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="flex items-center gap-3">
+                      <CardBody className="flex items-start justify-between gap-3 py-3">
+                        <div className="flex min-w-0 items-center gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
                             {initials(b.availability.coach.name)}
                           </div>
-                          <div>
-                            <p className="text-sm font-medium text-text">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-text">
                               {b.availability.coach.name}
                             </p>
                             <p className="text-sm text-text-muted">
                               {formatTimeWib(b.availability.startTime)}–
                               {formatTimeWib(b.availability.endTime)}
                             </p>
-                            <p className="text-xs text-text-subtle">
+                            <p className="truncate text-xs text-text-subtle">
                               buat{" "}
                               {b.package.dependent.isSelf
                                 ? "kamu sendiri"
@@ -145,22 +145,17 @@ export default async function MemberRiwayatPage() {
                         </div>
 
                         {showActions && (
-                          <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+                          <div className="flex w-28 shrink-0 flex-col items-end gap-1.5 text-right sm:w-auto">
                             {eligibility?.canCancel ? (
                               <>
                                 <CancelButton
                                   bookingId={b.id}
                                   label={`${b.availability.coach.name}, ${formatDateLabel(b.availability.date)} ${formatTimeWib(b.availability.startTime)}`}
                                 />
-                                <Badge tone={remaining <= 1 ? "warning" : "neutral"}>
-                                  Sisa jatah batal: {remaining}
-                                </Badge>
+                                <p className="text-xs text-text-subtle">Sisa jatah batal: {remaining}</p>
                               </>
                             ) : (
                               <>
-                                <p className="max-w-[220px] text-xs text-text-subtle sm:text-right">
-                                  {eligibility?.reason}
-                                </p>
                                 <a
                                   href={buildAdminCancelWaLink({
                                     memberName: session.user.name ?? "Member",
@@ -175,8 +170,9 @@ export default async function MemberRiwayatPage() {
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
                                 >
-                                  Hubungi Admin (WA)
+                                  Hubungi Admin
                                 </a>
+                                <p className="text-xs text-text-subtle">{eligibility?.reason}</p>
                               </>
                             )}
                           </div>

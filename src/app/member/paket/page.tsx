@@ -34,6 +34,7 @@ export default async function MemberPaketPage() {
     prisma.package.findMany({
       where: { memberId: session.user.id },
       orderBy: { createdAt: "desc" },
+      include: { dependent: { select: { name: true, isSelf: true } } },
     }),
     prisma.packageTemplate.findMany({
       where: { isActive: true },
@@ -86,6 +87,9 @@ export default async function MemberPaketPage() {
               <CardBody className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-sm font-medium text-text">{p.name}</p>
+                  <p className="text-xs text-text-subtle">
+                    buat {p.dependent.isSelf ? "kamu sendiri" : p.dependent.name}
+                  </p>
                   <p className="text-sm text-text-muted">
                     Sisa sesi {p.sisaSesi}/{p.totalSesi}
                     {p.expiredDate && (
