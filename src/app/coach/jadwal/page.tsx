@@ -77,7 +77,7 @@ export default async function CoachJadwalPage() {
         <div className="flex flex-col gap-8">
           {[...byDate.entries()].map(([dateKey, dayAvailabilities]) => (
             <div key={dateKey}>
-              <h2 className="mb-3 text-sm font-semibold text-text-muted">
+              <h2 className="mb-2 text-sm font-semibold text-text-muted">
                 {formatDateLabel(dayAvailabilities[0].date)}
               </h2>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">

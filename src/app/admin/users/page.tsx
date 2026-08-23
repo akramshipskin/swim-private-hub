@@ -100,7 +100,7 @@ export default async function AdminUsersPage() {
       </p>
       <AssignPackageForm members={members} templates={templates} dependents={dependents} />
 
-      <h2 className="mb-4 mt-8 text-lg font-semibold text-text">Semua User</h2>
+      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua User</h2>
 
       {roleSections.map(({ role, label }) => {
         const rows = users.filter((u) => u.role === role);
@@ -223,26 +223,7 @@ export default async function AdminUsersPage() {
                             )}
                           </p>
                         )}
-                        <div className="flex items-center gap-2 text-xs font-medium">
-                          {u.phone && (
-                            <a
-                              href={buildContactWaLink(u.phone, u.name)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="rounded-md px-2 py-1.5 text-[#25D366] hover:bg-[#25D366]/10"
-                            >
-                              WA
-                            </a>
-                          )}
-                          <form action={toggleUserActive.bind(null, u.id, !u.isActive)}>
-                            <button
-                              type="submit"
-                              className="rounded-md px-2 py-1.5 text-text-muted hover:bg-surface-muted"
-                            >
-                              {u.isActive ? "Nonaktifkan" : "Aktifkan"}
-                            </button>
-                          </form>
-                        </div>
+                        <UserActions user={u} />
                       </CardBody>
                     </details>
                   </Card>

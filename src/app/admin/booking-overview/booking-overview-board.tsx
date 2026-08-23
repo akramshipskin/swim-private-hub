@@ -94,7 +94,7 @@ export default function BookingOverviewBoard({
 
           return (
             <div key={coachId} className="mb-6">
-              <h2 className="mb-2 text-lg font-semibold text-text">
+              <h2 className="mb-3 text-lg font-semibold text-text">
                 {group.coachName}{" "}
                 <span className="text-sm font-normal text-text-subtle">
                   ({filledCount}/{allSlots.length} terisi)

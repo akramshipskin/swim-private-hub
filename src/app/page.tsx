@@ -18,7 +18,7 @@ export default async function Home() {
           className="mb-2 h-14 w-14 rounded-2xl object-contain shadow-lg shadow-brand-500/20"
           priority
         />
-        <h1 className="mt-4 text-2xl font-semibold text-text">Les Renang Cianjur</h1>
+        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-text">Les Renang Cianjur</h1>
         <p className="mt-1 max-w-xs text-sm text-text-muted">
           Booking jadwal renang dengan coach favoritmu, kapan aja lewat HP.
         </p>
