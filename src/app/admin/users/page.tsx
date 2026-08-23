@@ -241,9 +241,8 @@ export default async function AdminUsersPage() {
               </div>
             </Card>
 
-            {/* Mobile: <details> native -- ringkas (nama + status doang)
-                sampe di-tap, baru buka detail (email/HP/paket + aksi).
-                Gak perlu client component buat ini. */}
+            {/* Mobile: card compact biasa -- semua info langsung keliatan,
+                gak perlu di-tap buat expand. */}
             <ul className="flex flex-col gap-1.5 sm:hidden">
               {rows.map((u) => {
                 const peserta: PesertaRow[] = u.dependents.map((d) => ({
@@ -252,38 +251,23 @@ export default async function AdminUsersPage() {
                   pkg: u.packages.find((p) => p.dependentId === d.id) ?? null,
                 }));
                 return (
-                  <Card key={u.id} className="overflow-hidden p-0">
-                    <details className="group">
-                      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 [&::-webkit-details-marker]:hidden">
+                  <Card key={u.id}>
+                    <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">
+                      <div className="flex items-center justify-between gap-2">
                         <p className="min-w-0 truncate text-sm font-medium text-text">{u.name}</p>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <Badge tone={u.isActive ? "success" : "neutral"}>
-                            {u.isActive ? "Aktif" : "Nonaktif"}
-                          </Badge>
-                          <svg
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            className="h-4 w-4 text-text-subtle transition-transform group-open:rotate-180"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                        <Badge tone={u.isActive ? "success" : "neutral"}>
+                          {u.isActive ? "Aktif" : "Nonaktif"}
+                        </Badge>
+                      </div>
+                      {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
+                      <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
+                      {role === "MEMBER" && (
+                        <div className="text-xs text-text-muted">
+                          <PesertaList items={peserta} />
                         </div>
-                      </summary>
-                      <CardBody className="flex flex-col gap-2 border-t border-border px-3 py-2.5 pt-2.5">
-                        {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
-                        <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
-                        {role === "MEMBER" && (
-                          <div className="text-xs text-text-muted">
-                            <PesertaList items={peserta} />
-                          </div>
-                        )}
-                        <UserActions user={u} />
-                      </CardBody>
-                    </details>
+                      )}
+                      <UserActions user={u} />
+                    </CardBody>
                   </Card>
                 );
               })}
