@@ -19,6 +19,73 @@ function shortDate(d: Date) {
   });
 }
 
+type PesertaRow = {
+  id: string;
+  label: string;
+  pkg: { name: string; sisaSesi: number; totalSesi: number; expiredDate: Date | null } | null;
+};
+
+function PesertaLine({ p }: { p: PesertaRow }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span
+        className={`h-1.5 w-1.5 shrink-0 rounded-full ${p.pkg ? "bg-success-text" : "bg-border"}`}
+      />
+      <span className="min-w-0 truncate">
+        {p.label}
+        {p.pkg ? (
+          <span className="text-text-subtle">
+            {" "}
+            · sisa {p.pkg.sisaSesi}/{p.pkg.totalSesi} sesi
+            {p.pkg.expiredDate && <> · s.d. {shortDate(p.pkg.expiredDate)}</>}
+          </span>
+        ) : (
+          <span className="text-text-subtle"> · belum ada paket aktif</span>
+        )}
+      </span>
+    </div>
+  );
+}
+
+// >1 peserta dibungkus <details> biar baris tabel gak makin tinggi tiap
+// member nambah anak -- summary ringkas (jumlah + berapa yang aktif),
+// baru buka detail per-peserta pas di-klik. 1 peserta (atau 0) langsung
+// tampil, gak perlu collapse.
+function PesertaList({ items }: { items: PesertaRow[] }) {
+  if (items.length === 0) {
+    return <span className="text-text-subtle">Belum ada peserta</span>;
+  }
+  if (items.length === 1) {
+    return <PesertaLine p={items[0]} />;
+  }
+  const activeCount = items.filter((p) => p.pkg).length;
+  return (
+    <details>
+      <summary className="cursor-pointer list-none text-text marker:content-none [&::-webkit-details-marker]:hidden">
+        <span className="inline-flex items-center gap-1">
+          {items.length} peserta · {activeCount} aktif
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-3.5 w-3.5 text-text-subtle transition-transform [details[open]_&]:rotate-180"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </span>
+      </summary>
+      <div className="mt-1.5 flex flex-col gap-1">
+        {items.map((p) => (
+          <PesertaLine key={p.id} p={p} />
+        ))}
+      </div>
+    </details>
+  );
+}
+
 function UserActions({
   user,
 }: {
@@ -58,10 +125,17 @@ export default async function AdminUsersPage() {
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       include: {
+        // Semua paket aktif (bukan cuma 1) -- 1 peserta bisa punya paket
+        // sendiri-sendiri, tabel ini butuh nunjukin status per peserta,
+        // bukan cuma 1 ringkasan buat seluruh member.
         packages: {
           where: usablePackageConditions,
           orderBy: { createdAt: "desc" },
-          take: 1,
+        },
+        dependents: {
+          where: { isActive: true },
+          orderBy: { name: "asc" },
+          select: { id: true, name: true, isSelf: true },
         },
       },
     }),
@@ -130,7 +204,11 @@ export default async function AdminUsersPage() {
                   </thead>
                   <tbody>
                     {rows.map((u) => {
-                      const activePkg = u.packages[0];
+                      const peserta: PesertaRow[] = u.dependents.map((d) => ({
+                        id: d.id,
+                        label: d.isSelf ? "Diri sendiri" : d.name,
+                        pkg: u.packages.find((p) => p.dependentId === d.id) ?? null,
+                      }));
                       return (
                         <tr key={u.id} className="border-b border-border last:border-0">
                           <td className="px-5 py-4">
@@ -141,20 +219,8 @@ export default async function AdminUsersPage() {
                           </td>
                           <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
                           {role === "MEMBER" && (
-                            <td className="w-52 px-5 py-4 text-text-muted">
-                              {activePkg ? (
-                                <>
-                                  {activePkg.name}
-                                  <span className="block text-xs text-text-subtle">
-                                    sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi
-                                    {activePkg.expiredDate && (
-                                      <> · s.d. {shortDate(activePkg.expiredDate)}</>
-                                    )}
-                                  </span>
-                                </>
-                              ) : (
-                                <span className="text-text-subtle">Belum ada paket aktif</span>
-                              )}
+                            <td className="w-52 px-5 py-4 text-xs text-text-muted">
+                              <PesertaList items={peserta} />
                             </td>
                           )}
                           <td className="px-5 py-4">
@@ -180,7 +246,11 @@ export default async function AdminUsersPage() {
                 Gak perlu client component buat ini. */}
             <ul className="flex flex-col gap-1.5 sm:hidden">
               {rows.map((u) => {
-                const activePkg = u.packages[0];
+                const peserta: PesertaRow[] = u.dependents.map((d) => ({
+                  id: d.id,
+                  label: d.isSelf ? "Diri sendiri" : d.name,
+                  pkg: u.packages.find((p) => p.dependentId === d.id) ?? null,
+                }));
                 return (
                   <Card key={u.id} className="overflow-hidden p-0">
                     <details className="group">
@@ -207,21 +277,9 @@ export default async function AdminUsersPage() {
                         {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
                         <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
                         {role === "MEMBER" && (
-                          <p className="text-xs text-text-muted">
-                            {activePkg ? (
-                              <>
-                                {activePkg.name}
-                                <span className="block text-text-subtle">
-                                  sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi
-                                  {activePkg.expiredDate && (
-                                    <> · s.d. {shortDate(activePkg.expiredDate)}</>
-                                  )}
-                                </span>
-                              </>
-                            ) : (
-                              <span className="text-text-subtle">Belum ada paket aktif</span>
-                            )}
-                          </p>
+                          <div className="text-xs text-text-muted">
+                            <PesertaList items={peserta} />
+                          </div>
                         )}
                         <UserActions user={u} />
                       </CardBody>
