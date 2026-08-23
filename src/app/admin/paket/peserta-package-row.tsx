@@ -88,14 +88,13 @@ export default function PesertaPackageRow({
                   </Select>
                 </Field>
               </div>
-              {/* input type=date di WebKit iOS gak respect width:100% --
-                  render-nya tetep di lebar aslinya sendiri walau dikasih
-                  w-full (kebukti dari screenshot: flex-1 bikin kotak
-                  kosong nganggur, bukan ke-stretch). Solusinya: jangan
-                  paksa lebar dia sama sekali (shrink-to-fit natural),
-                  cuma dibatesin max-w-full biar gak bisa nembus keluar. */}
-              <div className="flex flex-wrap gap-3 sm:contents">
-                <Field label="Jatah Cancel" className="w-20 shrink-0">
+              {/* grid-cols-2 sama kayak baris Sisa Sesi/Status di atas biar
+                  ujung kanan barisnya sejajar. Date input pake max-w-full
+                  (bukan w-full) -- di WebKit iOS dia gak respect width:100%,
+                  render-nya di ukuran aslinya sendiri, tapi max-width tetep
+                  jadi batas atas jadi gak bisa nembus keluar kolom. */}
+              <div className="grid grid-cols-2 gap-3 sm:contents">
+                <Field label="Jatah Cancel">
                   <Input
                     type="number"
                     name="jatahCancel"
@@ -104,7 +103,7 @@ export default function PesertaPackageRow({
                     className="w-full sm:w-20"
                   />
                 </Field>
-                <Field label="Berlaku Sampai" className="min-w-0 max-w-full">
+                <Field label="Berlaku Sampai">
                   <Input
                     type="date"
                     name="expiredDate"
