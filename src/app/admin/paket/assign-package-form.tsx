@@ -113,7 +113,9 @@ export default function AssignPackageForm({
             </Field>
           </div>
           <Field label="Berlaku Sampai (opsional)">
-            <Input type="date" name="expiredDate" className="max-w-full sm:w-40" />
+            <div className="w-full overflow-hidden">
+              <Input type="date" name="expiredDate" className="max-w-full sm:w-40" />
+            </div>
           </Field>
           <Button type="submit" loading={pending} className="w-full sm:w-auto">
             Assign (langsung Aktif)

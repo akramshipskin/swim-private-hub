@@ -107,12 +107,19 @@ export default function PesertaPackageRow({
                   />
                 </Field>
                 <Field label="Berlaku Sampai">
-                  <Input
-                    type="date"
-                    name="expiredDate"
-                    defaultValue={pkg.expiredDateInput}
-                    className="max-w-full sm:w-40"
-                  />
+                  {/* width/max-width di elemen date input-nya sendiri
+                      kebukti gak diakuin di WebKit iOS (udah dicoba
+                      dua-duanya, tetep nabrak). Wrapper overflow-hidden
+                      ini clip paksa dari luar -- gak peduli input-nya
+                      mau render selebar apa, gak bisa nembus box ini. */}
+                  <div className="w-full overflow-hidden">
+                    <Input
+                      type="date"
+                      name="expiredDate"
+                      defaultValue={pkg.expiredDateInput}
+                      className="max-w-full sm:w-40"
+                    />
+                  </div>
                 </Field>
               </div>
               <Button type="submit" variant="primary" size="sm" loading={pending}>
