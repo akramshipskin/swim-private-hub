@@ -88,8 +88,12 @@ export default function PesertaPackageRow({
                   </Select>
                 </Field>
               </div>
-              <div className="grid grid-cols-1 gap-3 sm:contents">
-                <Field label="Jatah Cancel">
+              {/* Jatah Cancel dikecilin (shrink-0, lebar tetap) biar Berlaku
+                  Sampai kebagian ruang sebanyak mungkin -- type=date di iOS
+                  Safari nolak nyusut di bawah lebar minimumnya sendiri
+                  (WebKit quirk), jadi harus flex-1 bukan grid-cols-2 rata. */}
+              <div className="flex gap-3 sm:contents">
+                <Field label="Jatah Cancel" className="w-16 shrink-0">
                   <Input
                     type="number"
                     name="jatahCancel"
@@ -98,11 +102,7 @@ export default function PesertaPackageRow({
                     className="w-full sm:w-20"
                   />
                 </Field>
-                {/* Berlaku Sampai gak dipasangin grid-cols-2 kayak sebelah --
-                    input type=date di iOS Safari nolak nyusut di bawah lebar
-                    minimumnya sendiri (WebKit quirk, gak keatasi cuma pake
-                    min-w-0), jadi dikasih baris sendiri biar gak nabrak. */}
-                <Field label="Berlaku Sampai">
+                <Field label="Berlaku Sampai" className="min-w-0 flex-1">
                   <Input
                     type="date"
                     name="expiredDate"
