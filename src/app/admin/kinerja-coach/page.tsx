@@ -56,7 +56,7 @@ export default async function KinerjaCoachPage({
   const totalValid = rows.reduce((n, r) => n + r.valid, 0);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Kinerja Coach</h1>
       <p className="mb-6 text-sm text-text-muted">
         Jumlah sesi valid (member beneran hadir) per coach di rentang tanggal -- dasar hitung

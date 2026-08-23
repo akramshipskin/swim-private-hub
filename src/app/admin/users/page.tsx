@@ -150,7 +150,7 @@ export default async function AdminUsersPage() {
   const members = users.filter((u) => u.role === "MEMBER");
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola User</h1>
 
       <CreateUserForm />
@@ -196,7 +196,7 @@ export default async function AdminUsersPage() {
                       <th className="px-5 py-3.5 font-medium">Nama</th>
                       <th className="px-5 py-3.5 font-medium">No HP</th>
                       {role === "MEMBER" && (
-                        <th className="w-52 px-5 py-3.5 font-medium">Paket</th>
+                        <th className="w-72 px-5 py-3.5 font-medium">Paket</th>
                       )}
                       <th className="px-5 py-3.5 font-medium">Status</th>
                       <th className="px-5 py-3.5"></th>
@@ -219,7 +219,7 @@ export default async function AdminUsersPage() {
                           </td>
                           <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
                           {role === "MEMBER" && (
-                            <td className="w-52 px-5 py-4 text-xs text-text-muted">
+                            <td className="w-72 px-5 py-4 text-xs text-text-muted">
                               <PesertaList items={peserta} />
                             </td>
                           )}
