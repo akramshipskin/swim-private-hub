@@ -93,7 +93,7 @@ export default function PesertaPackageRow({
                   Safari nolak nyusut di bawah lebar minimumnya sendiri
                   (WebKit quirk), jadi harus flex-1 bukan grid-cols-2 rata. */}
               <div className="flex gap-3 sm:contents">
-                <Field label="Jatah Cancel" className="w-16 shrink-0">
+                <Field label="Jatah Cancel" className="w-20 shrink-0">
                   <Input
                     type="number"
                     name="jatahCancel"
