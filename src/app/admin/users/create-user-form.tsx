@@ -24,46 +24,46 @@ export default function CreateUserForm() {
     <Card>
       <CardBody>
         <h2 className="mb-4 text-sm font-semibold text-text">Tambah User Baru</h2>
-        <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-          <div className="grid grid-cols-1 gap-3 sm:contents">
-            <Field label="Nama">
-              <Input
-                name="name"
-                required
-                className="w-full sm:w-40"
-                value={newUserName}
-                onChange={(e) => setNewUserName(e.target.value)}
-              />
-            </Field>
-            <Field label="No HP">
-              <Input type="tel" name="phone" placeholder="0812xxxxxxx" required className="w-full sm:w-40" />
-            </Field>
-            <Field label="Email (opsional)">
-              <Input type="email" name="email" className="w-full sm:w-52" />
-            </Field>
-            <Field label="Password">
-              <PasswordInput name="password" required minLength={8} className="w-full sm:w-40" />
-            </Field>
-            <Field label="Role">
-              <Select
-                name="role"
-                required
-                value={role}
-                onChange={(e) => setRole(e.target.value as Role)}
-                className="w-full sm:w-32"
-              >
-                <option value="MEMBER">Member</option>
-                <option value="COACH">Coach</option>
-                <option value="ADMIN">Admin</option>
-              </Select>
-            </Field>
+        <form action={formAction} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Field label="Nama">
+            <Input
+              name="name"
+              required
+              className="w-full"
+              value={newUserName}
+              onChange={(e) => setNewUserName(e.target.value)}
+            />
+          </Field>
+          <Field label="No HP">
+            <Input type="tel" name="phone" placeholder="0812xxxxxxx" required className="w-full" />
+          </Field>
+          <Field label="Email (opsional)">
+            <Input type="email" name="email" className="w-full" />
+          </Field>
+          <Field label="Password">
+            <PasswordInput name="password" required minLength={8} className="w-full" />
+          </Field>
+          <Field label="Role">
+            <Select
+              name="role"
+              required
+              value={role}
+              onChange={(e) => setRole(e.target.value as Role)}
+              className="w-full"
+            >
+              <option value="MEMBER">Member</option>
+              <option value="COACH">Coach</option>
+              <option value="ADMIN">Admin</option>
+            </Select>
+          </Field>
+          <div className="flex items-end">
+            <Button type="submit" loading={pending} className="w-full">
+              Tambah
+            </Button>
           </div>
-          <Button type="submit" loading={pending} className="w-full sm:w-auto">
-            Tambah
-          </Button>
 
           {role === "MEMBER" && (
-            <div className="flex w-full flex-col gap-2">
+            <div className="col-span-1 flex flex-col gap-2 sm:col-span-2">
               <p className="text-sm font-medium text-text">Siapa yang mau les?</p>
               <p className="text-xs text-text-subtle">
                 Bisa diri sendiri, bisa anak, bisa keduanya. Bisa ditambah lagi nanti.
