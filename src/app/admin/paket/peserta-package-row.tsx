@@ -88,11 +88,13 @@ export default function PesertaPackageRow({
                   </Select>
                 </Field>
               </div>
-              {/* Jatah Cancel dikecilin (shrink-0, lebar tetap) biar Berlaku
-                  Sampai kebagian ruang sebanyak mungkin -- type=date di iOS
-                  Safari nolak nyusut di bawah lebar minimumnya sendiri
-                  (WebKit quirk), jadi harus flex-1 bukan grid-cols-2 rata. */}
-              <div className="flex gap-3 sm:contents">
+              {/* input type=date di WebKit iOS gak respect width:100% --
+                  render-nya tetep di lebar aslinya sendiri walau dikasih
+                  w-full (kebukti dari screenshot: flex-1 bikin kotak
+                  kosong nganggur, bukan ke-stretch). Solusinya: jangan
+                  paksa lebar dia sama sekali (shrink-to-fit natural),
+                  cuma dibatesin max-w-full biar gak bisa nembus keluar. */}
+              <div className="flex flex-wrap gap-3 sm:contents">
                 <Field label="Jatah Cancel" className="w-20 shrink-0">
                   <Input
                     type="number"
@@ -102,12 +104,12 @@ export default function PesertaPackageRow({
                     className="w-full sm:w-20"
                   />
                 </Field>
-                <Field label="Berlaku Sampai" className="min-w-0 flex-1">
+                <Field label="Berlaku Sampai" className="min-w-0 max-w-full">
                   <Input
                     type="date"
                     name="expiredDate"
                     defaultValue={pkg.expiredDateInput}
-                    className="w-full sm:w-40"
+                    className="max-w-full sm:w-40"
                   />
                 </Field>
               </div>
