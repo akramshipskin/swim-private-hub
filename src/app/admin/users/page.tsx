@@ -1,13 +1,12 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { usablePackageConditions } from "@/lib/active-package";
-import { toggleUserActive } from "./actions";
+import ToggleActiveButton from "./toggle-active-button";
 import CreateUserForm from "./create-user-form";
 import ImportMembersForm from "./import-members-form";
 import AddChildForm from "../paket/add-child-form";
 import AssignPackageForm from "../paket/assign-package-form";
 import { Card, CardBody } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { buildContactWaLink } from "@/lib/whatsapp";
 function shortDate(d: Date) {
@@ -103,11 +102,7 @@ function UserActions({
           Hubungi
         </a>
       )}
-      <form action={toggleUserActive.bind(null, user.id, !user.isActive)}>
-        <Button type="submit" variant="ghost" size="sm">
-          {user.isActive ? "Nonaktifkan" : "Aktifkan"}
-        </Button>
-      </form>
+      <ToggleActiveButton userId={user.id} userName={user.name} isActive={user.isActive} />
     </div>
   );
 }

@@ -88,7 +88,7 @@ export default function PesertaPackageRow({
                   </Select>
                 </Field>
               </div>
-              <div className="grid grid-cols-2 gap-3 sm:contents">
+              <div className="grid grid-cols-1 gap-3 sm:contents">
                 <Field label="Jatah Cancel">
                   <Input
                     type="number"
@@ -98,6 +98,10 @@ export default function PesertaPackageRow({
                     className="w-full sm:w-20"
                   />
                 </Field>
+                {/* Berlaku Sampai gak dipasangin grid-cols-2 kayak sebelah --
+                    input type=date di iOS Safari nolak nyusut di bawah lebar
+                    minimumnya sendiri (WebKit quirk, gak keatasi cuma pake
+                    min-w-0), jadi dikasih baris sendiri biar gak nabrak. */}
                 <Field label="Berlaku Sampai">
                   <Input
                     type="date"

@@ -1,11 +1,10 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
-import { deleteAvailability } from "./actions";
 import AddSlotForm from "./add-slot-form";
+import DeleteSlotButton from "./delete-slot-button";
 import { formatDateLabel, formatTimeWib, dateLabel, todayWibDateString } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 export default async function CoachJadwalPage() {
   const session = await requireRole("COACH");
@@ -104,11 +103,10 @@ export default async function CoachJadwalPage() {
                       {a.status === "BOOKED" ? (
                         <Badge tone="brand">Terisi</Badge>
                       ) : (
-                        <form action={deleteAvailability.bind(null, a.id)}>
-                          <Button type="submit" variant="danger" size="sm">
-                            Hapus
-                          </Button>
-                        </form>
+                        <DeleteSlotButton
+                          availabilityId={a.id}
+                          label={`${formatTimeWib(a.startTime)}–${formatTimeWib(a.endTime)}`}
+                        />
                       )}
                     </CardBody>
                   </Card>
