@@ -169,6 +169,7 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
   async function handleConfirmCancel() {
     if (!cancelTarget?.bookingId) return;
     setCancelLoading(true);
+    const targetId = cancelTarget.id;
 
     const res = await fetch(`/api/booking/${cancelTarget.bookingId}`, {
       method: "DELETE",
@@ -184,6 +185,19 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
       return;
     }
 
+    // Update slot ini instan di state lokal -- loadSlots()+router.refresh()
+    // masih jalan buat sinkron beneran, tapi feedback visual gak nunggu
+    // round-trip RSC lagi di atas DELETE yang barusan (kerasa lambat kalau
+    // latency ke DB tinggi).
+    setSlots((prev) =>
+      prev
+        ? prev.map((s) =>
+            s.id === targetId
+              ? { ...s, status: "AVAILABLE", bookedByMe: false, bookingId: null, bookedForChildName: null, canCancel: false }
+              : s
+          )
+        : prev
+    );
     setMessage({ text: "Booking dibatalkan, kuota sesi kamu balik.", ok: true });
     loadSlots();
     router.refresh();
@@ -216,7 +230,7 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
             <div className="flex items-center gap-2 sm:mb-2.5">
               <Badge tone="brand">Sisa sesi: {selectedChild.sisaSesi}</Badge>
               <Badge tone={selectedChild.cancelRemaining <= 1 ? "warning" : "neutral"}>
-                Jatah batal: {selectedChild.cancelRemaining}/{selectedChild.jatahCancel}
+                Sisa jatah batal: {selectedChild.cancelRemaining}
               </Badge>
             </div>
           )}
@@ -264,20 +278,22 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
                 {group.slots.map((s) => (
                   <Card key={s.id}>
                     <CardBody className="flex items-center justify-between gap-3 py-3">
-                      <p className="text-sm font-medium text-text">
-                        {formatTime(s.startTime)}–{formatTime(s.endTime)}
-                      </p>
+                      <div>
+                        <p className="text-sm font-medium text-text">
+                          {formatTime(s.startTime)}–{formatTime(s.endTime)}
+                        </p>
+                        {s.bookedByMe && s.canCancel && s.bookedForChildName && (
+                          <p className="text-center text-sm font-medium text-text">
+                            buat {s.bookedForChildName}
+                          </p>
+                        )}
+                      </div>
 
                       {s.bookedByMe ? (
                         s.canCancel ? (
-                          <div className="flex flex-col items-end gap-1">
-                            {s.bookedForChildName && (
-                              <p className="text-xs text-text-subtle">buat {s.bookedForChildName}</p>
-                            )}
-                            <Button size="sm" variant="danger" onClick={() => setCancelTarget(s)}>
-                              Batalkan
-                            </Button>
-                          </div>
+                          <Button size="sm" variant="danger" onClick={() => setCancelTarget(s)}>
+                            Batalkan
+                          </Button>
                         ) : new Date(s.startTime) <= new Date() ? (
                           <p className="text-xs font-medium text-text-subtle">Sesi udah lewat</p>
                         ) : (

@@ -153,7 +153,7 @@ export default async function MemberRiwayatPage() {
                                   label={`${b.availability.coach.name}, ${formatDateLabel(b.availability.date)} ${formatTimeWib(b.availability.startTime)}`}
                                 />
                                 <Badge tone={remaining <= 1 ? "warning" : "neutral"}>
-                                  Jatah batal: {remaining}/{eligibility?.quota ?? 0}
+                                  Sisa jatah batal: {remaining}
                                 </Badge>
                               </>
                             ) : (

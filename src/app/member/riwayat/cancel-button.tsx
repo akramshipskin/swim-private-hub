@@ -16,6 +16,12 @@ export default function CancelButton({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Update tampilan instan begitu DELETE sukses -- router.refresh() nunggu
+  // round-trip RSC penuh lagi (dobel network round-trip di atas DELETE-nya
+  // sendiri), kerasa lambat kalau latency ke DB lagi tinggi. Flag lokal ini
+  // ngasih feedback langsung, router.refresh() tetep jalan di belakang buat
+  // nyinkronin sisa halaman (badge kuota, dst).
+  const [cancelled, setCancelled] = useState(false);
 
   async function handleCancel() {
     setLoading(true);
@@ -33,7 +39,12 @@ export default function CancelButton({
     }
 
     setOpen(false);
+    setCancelled(true);
     router.refresh();
+  }
+
+  if (cancelled) {
+    return <p className="text-xs font-medium text-text-subtle">Dibatalkan ✓</p>;
   }
 
   return (
