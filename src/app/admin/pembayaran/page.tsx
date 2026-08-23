@@ -2,7 +2,8 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Field, Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { formatRupiah } from "@/lib/format";
 import { todayWibDateString, wibDateTime } from "@/lib/datetime";
@@ -81,14 +82,10 @@ export default async function AdminPembayaranPage({
         <CardBody>
           <form className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end" method="get">
             <Field label="Dari">
-              <div className="w-full overflow-hidden">
-                <Input type="date" name="from" defaultValue={from} className="max-w-full sm:w-40" />
-              </div>
+              <DatePicker name="from" defaultValue={from} className="sm:w-40" />
             </Field>
             <Field label="Sampai">
-              <div className="w-full overflow-hidden">
-                <Input type="date" name="to" defaultValue={to} className="max-w-full sm:w-40" />
-              </div>
+              <DatePicker name="to" defaultValue={to} className="sm:w-40" />
             </Field>
             <Button type="submit">Terapkan</Button>
           </form>

@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { assignPackageToMember } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 
 type Member = { id: string; name: string; email: string | null; phone: string | null };
@@ -113,9 +114,7 @@ export default function AssignPackageForm({
             </Field>
           </div>
           <Field label="Berlaku Sampai (opsional)">
-            <div className="w-full overflow-hidden">
-              <Input type="date" name="expiredDate" className="max-w-full sm:w-40" />
-            </div>
+            <DatePicker name="expiredDate" className="sm:w-40" clearable />
           </Field>
           <Button type="submit" loading={pending} className="w-full sm:w-auto">
             Assign (langsung Aktif)

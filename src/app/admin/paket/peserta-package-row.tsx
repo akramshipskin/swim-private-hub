@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { updatePackage } from "./actions";
 import { Field, Input, Select } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -92,10 +93,7 @@ export default function PesertaPackageRow({
                   Sesi/Status -- Jatah Cancel tetep sempit (5rem), Berlaku
                   Sampai kebagian sisanya (1fr). Grid container-nya tetep
                   selebar baris di atas, jadi ujung kanannya otomatis
-                  sejajar tanpa perlu bagi rata. Date input pake max-w-full
-                  (bukan w-full) -- di WebKit iOS dia gak respect
-                  width:100%, tapi max-width tetep jadi batas atas biar
-                  gak nembus keluar kolom. */}
+                  sejajar tanpa perlu bagi rata. */}
               <div className="grid grid-cols-[5rem_1fr] gap-3 sm:contents">
                 <Field label="Jatah Cancel">
                   <Input
@@ -107,19 +105,7 @@ export default function PesertaPackageRow({
                   />
                 </Field>
                 <Field label="Berlaku Sampai">
-                  {/* width/max-width di elemen date input-nya sendiri
-                      kebukti gak diakuin di WebKit iOS (udah dicoba
-                      dua-duanya, tetep nabrak). Wrapper overflow-hidden
-                      ini clip paksa dari luar -- gak peduli input-nya
-                      mau render selebar apa, gak bisa nembus box ini. */}
-                  <div className="w-full overflow-hidden">
-                    <Input
-                      type="date"
-                      name="expiredDate"
-                      defaultValue={pkg.expiredDateInput}
-                      className="max-w-full sm:w-40"
-                    />
-                  </div>
+                  <DatePicker name="expiredDate" defaultValue={pkg.expiredDateInput} className="sm:w-40" clearable />
                 </Field>
               </div>
               <Button type="submit" variant="primary" size="sm" loading={pending}>
