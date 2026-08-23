@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { NavBar } from "@/components/nav-bar";
 import { PullToRefresh } from "@/components/pull-to-refresh";
+import { roleNavLinks } from "@/lib/nav-links";
 
 export default async function CoachLayout({
   children,
@@ -15,10 +16,7 @@ export default async function CoachLayout({
         brand="Les Renang Cianjur"
         userName={session.user.name ?? ""}
         userRole="Coach"
-        links={[
-          { href: "/coach/jadwal", label: "Jadwal", icon: "calendar" },
-          { href: "/coach/riwayat-sesi", label: "Riwayat Sesi", icon: "clipboard-check" },
-        ]}
+        links={roleNavLinks.COACH}
       />
       <PullToRefresh>
         <div className="pb-16 sm:pb-0">{children}</div>

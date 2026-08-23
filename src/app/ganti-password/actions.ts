@@ -3,6 +3,7 @@
 import { auth, unstable_update } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { createSelfDependent } from "@/lib/dependents";
+import { toProperCase } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
@@ -33,7 +34,8 @@ export async function changePassword(
   const names = formData.getAll("participantName").map(String);
   const childNames = types
     .map((t, i) => (t === "child" ? names[i]?.trim() : null))
-    .filter((n): n is string => !!n);
+    .filter((n): n is string => !!n)
+    .map((n) => toProperCase(n));
   const wantsSelf = types.includes("self");
 
   if (session.user.role === "MEMBER" && childNames.length === 0 && !wantsSelf) {

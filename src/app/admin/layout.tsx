@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { NavBar } from "@/components/nav-bar";
 import { PullToRefresh } from "@/components/pull-to-refresh";
+import { roleNavLinks } from "@/lib/nav-links";
 
 export default async function AdminLayout({
   children,
@@ -15,13 +16,7 @@ export default async function AdminLayout({
         brand="Les Renang Cianjur"
         userName={session.user.name ?? ""}
         userRole="Admin"
-        links={[
-          { href: "/admin/users", label: "Users", icon: "users" },
-          { href: "/admin/paket", label: "Paket", icon: "package" },
-          { href: "/admin/pembayaran", label: "Pembayaran", icon: "credit-card" },
-          { href: "/admin/booking-overview", label: "Booking", icon: "calendar" },
-          { href: "/admin/kinerja-coach", label: "Kinerja", icon: "bar-chart" },
-        ]}
+        links={roleNavLinks.ADMIN}
       />
       <PullToRefresh>
         <div className="pb-16 sm:pb-0">{children}</div>

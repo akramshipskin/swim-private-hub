@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { changePassword } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 type Participant = { type: "self" | "child"; name: string };
 
@@ -26,22 +27,10 @@ export default function ChangePasswordForm({
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <Field label="Password Baru">
-        <Input
-          type="password"
-          name="newPassword"
-          placeholder="••••••••"
-          required
-          autoComplete="new-password"
-        />
+        <PasswordInput name="newPassword" placeholder="••••••••" required autoComplete="new-password" />
       </Field>
       <Field label="Konfirmasi Password Baru">
-        <Input
-          type="password"
-          name="confirmPassword"
-          placeholder="••••••••"
-          required
-          autoComplete="new-password"
-        />
+        <PasswordInput name="confirmPassword" placeholder="••••••••" required autoComplete="new-password" />
       </Field>
 
       {isMember && (

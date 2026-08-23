@@ -3,6 +3,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { toProperCase } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import * as XLSX from "xlsx";
 
@@ -14,15 +15,16 @@ export async function createUser(
 ): Promise<ActionState> {
   await requireRole("ADMIN");
 
-  const name = formData.get("name") as string;
+  const rawName = formData.get("name") as string;
   const phone = formData.get("phone") as string;
   const email = (formData.get("email") as string) || null;
   const password = formData.get("password") as string;
   const role = formData.get("role") as "ADMIN" | "COACH" | "MEMBER";
 
-  if (!name || !phone || !password || !role) {
+  if (!rawName || !phone || !password || !role) {
     return { error: "Nama, No HP, password, dan role wajib diisi" };
   }
+  const name = toProperCase(rawName.trim());
   if (password.length < 8) {
     return { error: "Password minimal 8 karakter" };
   }
@@ -102,7 +104,8 @@ export async function importMembersXlsx(
   const skipped: string[] = [];
 
   for (const row of rows) {
-    const name = pick(row, ["nama", "name"]);
+    const rawName = pick(row, ["nama", "name"]);
+    const name = rawName ? toProperCase(rawName) : null;
     const rawPhone = pick(row, ["no hp", "nomor hp", "hp", "phone", "no. hp", "no telepon"]);
 
     if (!name || !rawPhone) {

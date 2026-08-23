@@ -3,6 +3,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { createDependent, createSelfDependent } from "@/lib/dependents";
+import { toProperCase } from "@/lib/format";
 import { revalidatePath } from "next/cache";
 
 export type ActionState = { error?: string } | null;
@@ -15,7 +16,7 @@ export async function createTemplate(
 ): Promise<ActionState> {
   await requireRole("ADMIN");
 
-  const name = formData.get("name")?.toString().trim() ?? "";
+  const name = toProperCase(formData.get("name")?.toString().trim() ?? "");
   const totalSesi = Number(formData.get("totalSesi"));
   const price = Number(formData.get("price"));
   const durationDays = Number(formData.get("durationDays"));
@@ -46,7 +47,7 @@ export async function updateTemplate(
   await requireRole("ADMIN");
 
   const templateId = formData.get("templateId") as string;
-  const name = formData.get("name")?.toString().trim() ?? "";
+  const name = toProperCase(formData.get("name")?.toString().trim() ?? "");
   const totalSesi = Number(formData.get("totalSesi"));
   const price = Number(formData.get("price"));
   const durationDays = Number(formData.get("durationDays"));
@@ -116,18 +117,31 @@ export async function assignPackageToMember(
   const memberId = formData.get("memberId") as string;
   const dependentId = formData.get("dependentId") as string;
   const templateId = formData.get("templateId") as string | null;
-  const name = formData.get("name")?.toString().trim() ?? "";
+  const name = toProperCase(formData.get("name")?.toString().trim() ?? "");
   const totalSesi = Number(formData.get("totalSesi"));
   const jatahCancelRaw = formData.get("jatahCancel");
   const jatahCancel = jatahCancelRaw ? Number(jatahCancelRaw) : 2;
   const expiredDateRaw = formData.get("expiredDate") as string;
 
-  if (
-    !memberId || !dependentId || !name ||
-    !Number.isInteger(totalSesi) || totalSesi < 1 ||
-    !Number.isInteger(jatahCancel) || jatahCancel < 0
-  ) {
-    return { error: "Member, anak, nama paket wajib diisi, total sesi minimal 1, jatah cancel gak boleh negatif" };
+  // Pesan spesifik per kondisi -- sebelumnya 1 pesan gabungan bikin bingung
+  // (misal semua kolom keisi bener tapi tetep muncul "wajib diisi" karena
+  // dependentId kosong -- member belum punya peserta terdaftar sama sekali).
+  if (!memberId) {
+    return { error: "Pilih member dulu" };
+  }
+  if (!dependentId) {
+    return {
+      error: "Member ini belum punya peserta terdaftar -- tambahin dulu di section \"Tambah Peserta\" sebelum assign paket.",
+    };
+  }
+  if (!name) {
+    return { error: "Nama paket wajib diisi" };
+  }
+  if (!Number.isInteger(totalSesi) || totalSesi < 1) {
+    return { error: "Total sesi minimal 1" };
+  }
+  if (!Number.isInteger(jatahCancel) || jatahCancel < 0) {
+    return { error: "Jatah cancel gak boleh negatif" };
   }
 
   // Anak yang dipilih harus emang punya member ini -- dropdown di form

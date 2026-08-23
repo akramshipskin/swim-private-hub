@@ -3,7 +3,8 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { updatePasswordProfil } from "./actions";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function EditPasswordForm() {
   const [state, formAction, pending] = useActionState(updatePasswordProfil, null);
@@ -20,22 +21,10 @@ export default function EditPasswordForm() {
   return (
     <form key={formKey} action={formAction} className="flex flex-col gap-4">
       <Field label="Password Baru">
-        <Input
-          type="password"
-          name="newPassword"
-          placeholder="••••••••"
-          required
-          autoComplete="new-password"
-        />
+        <PasswordInput name="newPassword" placeholder="••••••••" required autoComplete="new-password" />
       </Field>
       <Field label="Konfirmasi Password Baru">
-        <Input
-          type="password"
-          name="confirmPassword"
-          placeholder="••••••••"
-          required
-          autoComplete="new-password"
-        />
+        <PasswordInput name="confirmPassword" placeholder="••••••••" required autoComplete="new-password" />
       </Field>
 
       {state?.error && (

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { NavBar } from "@/components/nav-bar";
 import { Card, CardBody } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+import { roleNavLinks } from "@/lib/nav-links";
 import EditNameForm from "./edit-name-form";
 import EditPasswordForm from "./edit-password-form";
 import ManageChildrenForm from "./manage-children-form";
@@ -33,10 +34,10 @@ export default async function ProfilPage() {
         brand="Les Renang Cianjur"
         userName={session.user.name ?? ""}
         userRole={roleLabel[session.user.role] ?? session.user.role}
-        links={[]}
+        links={roleNavLinks[session.user.role]}
       />
 
-      <main className="mx-auto max-w-xl px-4 py-6 sm:py-8">
+      <main className="mx-auto max-w-xl px-4 pb-16 py-6 sm:pb-8 sm:py-8">
         <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Edit Profil</h1>
 
         <Card className="mb-4">

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { toProperCase } from "@/lib/format";
 import type { Prisma } from "@/generated/prisma/client";
 
 // `db` opsional -- pass Prisma transaction client (`tx`) kalau manggil dari
@@ -7,7 +8,7 @@ import type { Prisma } from "@/generated/prisma/client";
 type Db = typeof prisma | Prisma.TransactionClient;
 
 export async function createDependent(memberId: string, name: string, db: Db = prisma) {
-  const trimmed = name.trim();
+  const trimmed = toProperCase(name.trim());
   if (!trimmed) throw new Error("Nama anak gak boleh kosong");
   return db.dependent.create({ data: { memberId, name: trimmed } });
 }

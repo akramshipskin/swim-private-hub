@@ -3,6 +3,7 @@
 import { auth, unstable_update } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { createDependent, createSelfDependent, assertDependentOwnedByMember } from "@/lib/dependents";
+import { toProperCase } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 
@@ -15,10 +16,11 @@ export async function updateName(
   const session = await auth();
   if (!session) return { error: "Sesi habis, login ulang." };
 
-  const name = formData.get("name")?.toString().trim() ?? "";
-  if (!name) {
+  const rawName = formData.get("name")?.toString().trim() ?? "";
+  if (!rawName) {
     return { error: "Nama gak boleh kosong" };
   }
+  const name = toProperCase(rawName);
 
   await prisma.user.update({
     where: { id: session.user.id },

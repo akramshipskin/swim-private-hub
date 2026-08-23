@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { createSelfDependent } from "@/lib/dependents";
+import { toProperCase } from "@/lib/format";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -20,7 +21,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const cleanChildNames = (childNames ?? []).map((n) => n.trim()).filter(Boolean);
+  const properName = toProperCase(name.trim());
+  const cleanChildNames = (childNames ?? []).map((n) => toProperCase(n.trim())).filter(Boolean);
   if (cleanChildNames.length === 0 && !wantsSelf) {
     return Response.json(
       { error: "Isi minimal 1 peserta (diri sendiri atau anak)" },
@@ -50,7 +52,7 @@ export async function POST(request: Request) {
   try {
     const user = await prisma.$transaction(async (tx) => {
       const created = await tx.user.create({
-        data: { name, phone, email: email || null, passwordHash, role: "MEMBER" },
+        data: { name: properName, phone, email: email || null, passwordHash, role: "MEMBER" },
         select: { id: true, name: true, email: true, phone: true, role: true },
       });
       if (cleanChildNames.length > 0) {
