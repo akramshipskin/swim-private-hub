@@ -105,7 +105,13 @@ export default function PesertaPackageRow({
                   />
                 </Field>
                 <Field label="Berlaku Sampai">
-                  <DatePicker name="expiredDate" defaultValue={pkg.expiredDateInput} className="sm:w-40" clearable />
+                  <DatePicker
+                    name="expiredDate"
+                    defaultValue={pkg.expiredDateInput}
+                    className="sm:w-40"
+                    clearable
+                    popupAlign="right"
+                  />
                 </Field>
               </div>
               <Button type="submit" variant="primary" size="sm" loading={pending}>

@@ -36,12 +36,16 @@ export function DatePicker({
   placeholder = "Pilih tanggal",
   className,
   clearable = false,
+  popupAlign = "left",
 }: {
   name: string;
   defaultValue?: string;
   placeholder?: string;
   className?: string;
   clearable?: boolean;
+  /** "right" buat trigger yang nempel di ujung kanan card -- popup w-72
+   *  yang nempel kiri bisa nembus keluar & bikin halaman geser. */
+  popupAlign?: "left" | "right";
 }) {
   const [value, setValue] = useState(defaultValue ?? "");
   const [open, setOpen] = useState(false);
@@ -117,7 +121,12 @@ export function DatePicker({
       </button>
 
       {open && (
-        <div className="absolute z-20 mt-1 w-72 rounded-xl border border-border bg-white p-3 shadow-lg">
+        <div
+          className={cn(
+            "absolute z-20 mt-1 w-72 rounded-xl border border-border bg-white p-3 shadow-lg",
+            popupAlign === "right" ? "right-0" : "left-0"
+          )}
+        >
           <div className="mb-2 flex items-center justify-between">
             <button
               type="button"
