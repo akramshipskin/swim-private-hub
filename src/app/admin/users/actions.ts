@@ -186,61 +186,82 @@ export async function importMembersXlsx(
       continue;
     }
 
-    await prisma.$transaction(async (tx) => {
-      const member = await tx.user.create({
-        data: {
-          name,
-          phone,
-          email,
-          passwordHash,
-          role: "MEMBER",
-          mustChangePassword: true,
-        },
-      });
-      membersCreated++;
+    // Coba per grup, jangan biarin 1 grup gagal (misal error DB gak
+    // terduga) nge-crash seluruh action -- grup lain yang udah keproses
+    // sebelumnya harus tetep kehitung di ringkasan hasil, bukan ilang
+    // gara-gara 1 baris rusak di tengah file besar. Counter lokal biar
+    // gak nambahin ke total kalau transaksinya sendiri di-rollback.
+    let groupMembersCreated = 0;
+    let groupPesertaCreated = 0;
+    let groupPaketCreated = 0;
+    const groupSkipped: string[] = [];
 
-      for (const row of groupRows) {
-        // Baris tanpa peserta DAN tanpa paket = member polos, belum ada
-        // peserta terdaftar -- biarin dia isi sendiri pas login pertama.
-        if (!row.pesertaName && !row.paketName) continue;
-
-        const dependent = row.pesertaName
-          ? await createDependent(member.id, row.pesertaName, tx)
-          : await createSelfDependent(member.id, tx);
-        pesertaCreated++;
-
-        if (!row.paketName) continue;
-
-        const sisaSesiNum = row.sisaSesi ? Number(row.sisaSesi) : NaN;
-        if (!Number.isInteger(sisaSesiNum) || sisaSesiNum < 0) {
-          skipped.push(`${name} -- peserta "${dependent.name}": Sisa Sesi gak valid, paket dilewati`);
-          continue;
-        }
-
-        const paketName = toProperCase(row.paketName);
-        const template = templates.find((t) => t.name.trim().toLowerCase() === paketName.toLowerCase());
-        const totalSesi = template?.totalSesi ?? sisaSesiNum;
-        const jatahCancel = template?.jatahCancel ?? IMPORT_DEFAULT_JATAH_CANCEL;
-        const durationDays = template?.durationDays ?? IMPORT_DEFAULT_DURATION_DAYS;
-        const sisaSesi = Math.min(sisaSesiNum, totalSesi);
-
-        await tx.package.create({
+    try {
+      await prisma.$transaction(async (tx) => {
+        const member = await tx.user.create({
           data: {
-            memberId: member.id,
-            dependentId: dependent.id,
-            templateId: template?.id ?? null,
-            name: paketName,
-            totalSesi,
-            sisaSesi,
-            jatahCancel,
-            status: "ACTIVE",
-            startDate: new Date(),
-            expiredDate: new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000),
+            name,
+            phone,
+            email,
+            passwordHash,
+            role: "MEMBER",
+            mustChangePassword: true,
           },
         });
-        paketCreated++;
-      }
-    });
+        groupMembersCreated++;
+
+        for (const row of groupRows) {
+          // Baris tanpa peserta DAN tanpa paket = member polos, belum ada
+          // peserta terdaftar -- biarin dia isi sendiri pas login pertama.
+          if (!row.pesertaName && !row.paketName) continue;
+
+          const dependent = row.pesertaName
+            ? await createDependent(member.id, row.pesertaName, tx)
+            : await createSelfDependent(member.id, tx);
+          groupPesertaCreated++;
+
+          if (!row.paketName) continue;
+
+          const sisaSesiNum = row.sisaSesi ? Number(row.sisaSesi) : NaN;
+          if (!Number.isInteger(sisaSesiNum) || sisaSesiNum < 0) {
+            groupSkipped.push(`${name} -- peserta "${dependent.name}": Sisa Sesi gak valid, paket dilewati`);
+            continue;
+          }
+
+          const paketName = toProperCase(row.paketName);
+          const template = templates.find((t) => t.name.trim().toLowerCase() === paketName.toLowerCase());
+          const totalSesi = template?.totalSesi ?? sisaSesiNum;
+          const jatahCancel = template?.jatahCancel ?? IMPORT_DEFAULT_JATAH_CANCEL;
+          const durationDays = template?.durationDays ?? IMPORT_DEFAULT_DURATION_DAYS;
+          const sisaSesi = Math.min(sisaSesiNum, totalSesi);
+
+          await tx.package.create({
+            data: {
+              memberId: member.id,
+              dependentId: dependent.id,
+              templateId: template?.id ?? null,
+              name: paketName,
+              totalSesi,
+              sisaSesi,
+              jatahCancel,
+              status: "ACTIVE",
+              startDate: new Date(),
+              expiredDate: new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000),
+            },
+          });
+          groupPaketCreated++;
+        }
+      });
+
+      membersCreated += groupMembersCreated;
+      pesertaCreated += groupPesertaCreated;
+      paketCreated += groupPaketCreated;
+      skipped.push(...groupSkipped);
+    } catch (err) {
+      skipped.push(
+        `${name} (${phone}) -- gagal diimport: ${err instanceof Error ? err.message : "error gak dikenal"}`
+      );
+    }
   }
 
   revalidatePath("/admin/users");

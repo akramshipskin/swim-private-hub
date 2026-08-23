@@ -7,7 +7,7 @@ import { Field, Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 type Member = { id: string; name: string; email: string | null; phone: string | null };
-type Template = { id: string; name: string };
+type Template = { id: string; name: string; totalSesi: number; jatahCancel: number };
 type Dependent = { id: string; name: string; memberId: string; isSelf: boolean };
 
 export default function AssignPackageForm({
@@ -22,6 +22,8 @@ export default function AssignPackageForm({
   const [state, formAction, pending] = useActionState(assignPackageToMember, null);
   const [memberId, setMemberId] = useState(members[0]?.id ?? "");
   const [name, setName] = useState("");
+  const [totalSesi, setTotalSesi] = useState("");
+  const [jatahCancel, setJatahCancel] = useState("2");
   const childrenOfMember = dependents.filter((d) => d.memberId === memberId);
 
   return (
@@ -66,6 +68,8 @@ export default function AssignPackageForm({
               onChange={(e) => {
                 const t = templates.find((t) => t.id === e.target.value);
                 setName(t ? t.name : "");
+                setTotalSesi(t ? String(t.totalSesi) : "");
+                setJatahCancel(t ? String(t.jatahCancel) : "2");
               }}
             >
               <option value="">-- custom --</option>
@@ -87,10 +91,25 @@ export default function AssignPackageForm({
           </Field>
           <div className="grid grid-cols-2 gap-3 sm:contents">
             <Field label="Total Sesi">
-              <Input type="number" name="totalSesi" required min={1} className="w-full sm:w-20" />
+              <Input
+                type="number"
+                name="totalSesi"
+                required
+                min={1}
+                value={totalSesi}
+                onChange={(e) => setTotalSesi(e.target.value)}
+                className="w-full sm:w-20"
+              />
             </Field>
             <Field label="Jatah Cancel">
-              <Input type="number" name="jatahCancel" min={0} defaultValue={2} className="w-full sm:w-24" />
+              <Input
+                type="number"
+                name="jatahCancel"
+                min={0}
+                value={jatahCancel}
+                onChange={(e) => setJatahCancel(e.target.value)}
+                className="w-full sm:w-24"
+              />
             </Field>
           </div>
           <Field label="Berlaku Sampai (opsional)">
