@@ -61,7 +61,7 @@ export default function TemplateEditForm({ template }: { template: Template }) {
         >
           <input type="hidden" name="templateId" value={template.id} />
           <Field label="Nama">
-            <Input name="name" defaultValue={template.name} disabled={locked} className="w-full sm:w-40" />
+            <Input name="name" defaultValue={template.name} disabled={locked} className="w-full sm:w-44" />
           </Field>
           <Field label="Harga (Rp)">
             <PriceInput
@@ -79,7 +79,7 @@ export default function TemplateEditForm({ template }: { template: Template }) {
                 defaultValue={template.totalSesi}
                 min={1}
                 disabled={locked}
-                className="w-full sm:w-20"
+                className="w-full sm:w-24"
               />
             </Field>
             <Field label="Jatah Cancel">
