@@ -221,10 +221,8 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
               ))}
             </Select>
           </Field>
-          <Field label="Tanggal">
-            <div className="max-w-[16rem]">
-              <AvailabilityDatePicker value={date} onChange={setDate} />
-            </div>
+          <Field label="Tanggal" className="w-full sm:w-56">
+            <AvailabilityDatePicker value={date} onChange={setDate} />
           </Field>
           {selectedChild && (
             <div className="flex items-center gap-2 sm:mb-2.5">

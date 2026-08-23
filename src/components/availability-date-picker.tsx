@@ -103,7 +103,7 @@ export function AvailabilityDatePicker({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-white px-3 py-2 text-sm text-text hover:bg-surface-muted"
+        className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl border border-border bg-white px-3 py-2 text-sm text-text hover:bg-surface-muted"
       >
         {label}
         <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 text-text-subtle">
