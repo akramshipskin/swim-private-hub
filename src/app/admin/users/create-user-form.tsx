@@ -1,13 +1,24 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createUser } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
+
+type Role = "ADMIN" | "COACH" | "MEMBER";
+type Participant = { type: "self" | "child"; name: string };
 
 export default function CreateUserForm() {
   const [state, formAction, pending] = useActionState(createUser, null);
+  const [role, setRole] = useState<Role>("MEMBER");
+  const [participants, setParticipants] = useState<Participant[]>([{ type: "self", name: "" }]);
+  const [newUserName, setNewUserName] = useState("");
+
+  function updateParticipant(i: number, patch: Partial<Participant>) {
+    setParticipants((prev) => prev.map((p, idx) => (idx === i ? { ...p, ...patch } : p)));
+  }
 
   return (
     <Card className="mb-6">
@@ -16,7 +27,13 @@ export default function CreateUserForm() {
         <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
           <div className="grid grid-cols-1 gap-3 sm:contents">
             <Field label="Nama">
-              <Input name="name" required className="w-full sm:w-40" />
+              <Input
+                name="name"
+                required
+                className="w-full sm:w-40"
+                value={newUserName}
+                onChange={(e) => setNewUserName(e.target.value)}
+              />
             </Field>
             <Field label="No HP">
               <Input type="tel" name="phone" placeholder="0812xxxxxxx" required className="w-full sm:w-40" />
@@ -25,10 +42,16 @@ export default function CreateUserForm() {
               <Input type="email" name="email" className="w-full sm:w-52" />
             </Field>
             <Field label="Password">
-              <Input type="password" name="password" required minLength={8} className="w-full sm:w-40" />
+              <PasswordInput name="password" required minLength={8} className="w-full sm:w-40" />
             </Field>
             <Field label="Role">
-              <Select name="role" required defaultValue="MEMBER" className="w-full sm:w-32">
+              <Select
+                name="role"
+                required
+                value={role}
+                onChange={(e) => setRole(e.target.value as Role)}
+                className="w-full sm:w-32"
+              >
                 <option value="MEMBER">Member</option>
                 <option value="COACH">Coach</option>
                 <option value="ADMIN">Admin</option>
@@ -38,6 +61,57 @@ export default function CreateUserForm() {
           <Button type="submit" loading={pending} className="w-full sm:w-auto">
             Tambah
           </Button>
+
+          {role === "MEMBER" && (
+            <div className="flex w-full flex-col gap-2">
+              <p className="text-sm font-medium text-text">Siapa yang mau les?</p>
+              <p className="text-xs text-text-subtle">
+                Bisa diri sendiri, bisa anak, bisa keduanya. Bisa ditambah lagi nanti.
+              </p>
+              {participants.map((p, i) => {
+                const selfTakenElsewhere = participants.some(
+                  (other, idx) => idx !== i && other.type === "self"
+                );
+                return (
+                  <div key={i} className="flex gap-2">
+                    <Select
+                      name="participantType"
+                      value={p.type}
+                      onChange={(e) => updateParticipant(i, { type: e.target.value as Participant["type"] })}
+                      className="w-32 shrink-0"
+                    >
+                      {!selfTakenElsewhere && <option value="self">Diri sendiri</option>}
+                      <option value="child">Anak</option>
+                    </Select>
+                    {p.type === "self" ? (
+                      <>
+                        <p className="flex min-h-[44px] min-w-0 flex-1 items-center truncate rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
+                          {newUserName || "(isi nama lengkap dulu)"}
+                        </p>
+                        <input type="hidden" name="participantName" value="" />
+                      </>
+                    ) : (
+                      <Input
+                        name="participantName"
+                        value={p.name}
+                        onChange={(e) => updateParticipant(i, { name: e.target.value })}
+                        placeholder="Nama anak"
+                        required
+                        className="min-w-0 flex-1"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "" }])}
+                className="self-start text-sm font-medium text-brand-600 hover:underline"
+              >
+                + Tambah peserta lain
+              </button>
+            </div>
+          )}
         </form>
         {state?.error && (
           <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">

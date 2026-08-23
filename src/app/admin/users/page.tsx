@@ -4,6 +4,8 @@ import { usablePackageConditions } from "@/lib/active-package";
 import { toggleUserActive } from "./actions";
 import CreateUserForm from "./create-user-form";
 import ImportMembersForm from "./import-members-form";
+import AddChildForm from "../paket/add-child-form";
+import AssignPackageForm from "../paket/assign-package-form";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,16 +54,26 @@ const roleSections: { role: "ADMIN" | "COACH" | "MEMBER"; label: string }[] = [
 export default async function AdminUsersPage() {
   await requireRole("ADMIN");
 
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      packages: {
-        where: usablePackageConditions,
-        orderBy: { createdAt: "desc" },
-        take: 1,
+  const [users, templates, dependents] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        packages: {
+          where: usablePackageConditions,
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
       },
-    },
-  });
+    }),
+    prisma.packageTemplate.findMany({ orderBy: { totalSesi: "asc" } }),
+    prisma.dependent.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, memberId: true, isSelf: true },
+    }),
+  ]);
+
+  const members = users.filter((u) => u.role === "MEMBER");
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
@@ -69,6 +81,26 @@ export default async function AdminUsersPage() {
 
       <CreateUserForm />
       <ImportMembersForm />
+
+      {/* --- Tambah peserta (anak atau diri sendiri) buat member -- dibutuhin
+          sebelum bisa assign paket --- */}
+      <h2 className="mb-3 text-lg font-semibold text-text">Tambah Peserta</h2>
+      <p className="mb-3 text-sm text-text-muted">
+        1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang
+        belum pernah login belum punya peserta terdaftar -- tambahin di sini
+        dulu kalau mau langsung assign paket.
+      </p>
+      <AddChildForm members={members} />
+
+      {/* --- Assign paket khusus ke member --- */}
+      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Assign Paket ke Member</h2>
+      <p className="mb-3 text-sm text-text-muted">
+        Buat paket khusus buat 1 anak tertentu (koreksi, promo, atau kasus di luar
+        alur beli-online).
+      </p>
+      <AssignPackageForm members={members} templates={templates} dependents={dependents} />
+
+      <h2 className="mb-4 mt-8 text-lg font-semibold text-text">Semua User</h2>
 
       {roleSections.map(({ role, label }) => {
         const rows = users.filter((u) => u.role === role);
@@ -172,15 +204,25 @@ export default async function AdminUsersPage() {
                         </div>
                       </summary>
                       <CardBody className="flex flex-col gap-2 border-t border-border px-3 py-2.5 pt-2.5">
-                        <p className="text-xs text-text-subtle">
-                          {u.email ?? u.phone ?? "-"}
-                          {role === "MEMBER" &&
-                            (activePkg ? (
-                              <> · sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi</>
+                        {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
+                        <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
+                        {role === "MEMBER" && (
+                          <p className="text-xs text-text-muted">
+                            {activePkg ? (
+                              <>
+                                {activePkg.name}
+                                <span className="block text-text-subtle">
+                                  sisa {activePkg.sisaSesi}/{activePkg.totalSesi} sesi
+                                  {activePkg.expiredDate && (
+                                    <> · s.d. {shortDate(activePkg.expiredDate)}</>
+                                  )}
+                                </span>
+                              </>
                             ) : (
-                              <> · belum ada paket</>
-                            ))}
-                        </p>
+                              <span className="text-text-subtle">Belum ada paket aktif</span>
+                            )}
+                          </p>
+                        )}
                         <div className="flex items-center gap-2 text-xs font-medium">
                           {u.phone && (
                             <a

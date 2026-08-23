@@ -2,9 +2,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import CreateTemplateForm from "./create-template-form";
 import TemplateEditForm from "./template-edit-form";
-import AssignPackageForm from "./assign-package-form";
-import AddChildForm from "./add-child-form";
-import PackageMemberCard from "./package-member-card";
+import PaketPerMemberList from "./paket-per-member-list";
 
 function toInputDate(d: Date | null) {
   if (!d) return "";
@@ -23,12 +21,7 @@ function memberSince(d: Date) {
 export default async function AdminPaketPage() {
   await requireRole("ADMIN");
 
-  const [members, templates, packages, dependents] = await Promise.all([
-    prisma.user.findMany({
-      where: { role: "MEMBER" },
-      orderBy: { name: "asc" },
-      select: { id: true, name: true, email: true, phone: true, createdAt: true },
-    }),
+  const [templates, packages] = await Promise.all([
     prisma.packageTemplate.findMany({ orderBy: { totalSesi: "asc" } }),
     prisma.package.findMany({
       orderBy: { createdAt: "desc" },
@@ -36,11 +29,6 @@ export default async function AdminPaketPage() {
         member: { select: { name: true, email: true, phone: true, createdAt: true } },
         dependent: { select: { name: true, isSelf: true } },
       },
-    }),
-    prisma.dependent.findMany({
-      where: { isActive: true },
-      orderBy: { name: "asc" },
-      select: { id: true, name: true, memberId: true, isSelf: true },
     }),
   ]);
 
@@ -75,55 +63,37 @@ export default async function AdminPaketPage() {
         ))}
       </ul>
 
-      {/* --- Tambah peserta (anak atau diri sendiri) buat member -- dibutuhin
-          sebelum bisa assign paket --- */}
-      <h2 className="mb-3 text-lg font-semibold text-text">Tambah Peserta</h2>
-      <p className="mb-3 text-sm text-text-muted">
-        1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang
-        belum pernah login belum punya peserta terdaftar -- tambahin di sini
-        dulu kalau mau langsung assign paket.
-      </p>
-
-      <AddChildForm members={members} />
-
-      {/* --- Assign paket khusus ke member --- */}
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Assign Paket ke Member</h2>
-      <p className="mb-3 text-sm text-text-muted">
-        Buat paket khusus buat 1 anak tertentu (koreksi, promo, atau kasus di luar
-        alur beli-online).
-      </p>
-
-      <AssignPackageForm members={members} templates={templates} dependents={dependents} />
-
       {/* --- List member + paket, advanced --- */}
+      <p className="mb-3 text-xs text-text-subtle">
+        Mau tambah peserta atau assign paket khusus ke member? Sekarang ada di
+        tab <span className="font-medium text-text-muted">Users</span>.
+      </p>
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>
-      <ul className="flex flex-col gap-3">
-        {packages.map((p) => {
+      <PaketPerMemberList
+        rows={packages.map((p) => {
           const cancelUsed = cancelUsedByPackage.get(p.id) ?? 0;
           const cancelRemaining = Math.max(0, p.jatahCancel - cancelUsed);
 
-          return (
-            <PackageMemberCard
-              key={p.id}
-              memberName={p.member.name}
-              childName={p.dependent.isSelf ? null : p.dependent.name}
-              memberContact={p.member.email ?? p.member.phone ?? "-"}
-              memberSinceLabel={memberSince(p.member.createdAt)}
-              cancelRemaining={cancelRemaining}
-              pkg={{
-                id: p.id,
-                name: p.name,
-                sisaSesi: p.sisaSesi,
-                totalSesi: p.totalSesi,
-                jatahCancel: p.jatahCancel,
-                status: p.status,
-                expiredDate: p.expiredDate,
-                expiredDateInput: toInputDate(p.expiredDate),
-              }}
-            />
-          );
+          return {
+            id: p.id,
+            memberName: p.member.name,
+            childName: p.dependent.isSelf ? null : p.dependent.name,
+            memberContact: p.member.email ?? p.member.phone ?? "-",
+            memberSinceLabel: memberSince(p.member.createdAt),
+            cancelRemaining,
+            pkg: {
+              id: p.id,
+              name: p.name,
+              sisaSesi: p.sisaSesi,
+              totalSesi: p.totalSesi,
+              jatahCancel: p.jatahCancel,
+              status: p.status,
+              expiredDate: p.expiredDate,
+              expiredDateInput: toInputDate(p.expiredDate),
+            },
+          };
         })}
-      </ul>
+      />
     </main>
   );
 }

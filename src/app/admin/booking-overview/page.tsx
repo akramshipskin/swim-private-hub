@@ -1,26 +1,20 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
-import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
-import { Card, CardBody } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import AdminCancelButton from "./admin-cancel-button";
-import AttendanceToggle from "@/components/attendance-toggle";
-import CoachFilter from "./coach-filter";
+import BookingOverviewBoard from "./booking-overview-board";
 
-export default async function AdminBookingOverviewPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ coach?: string }>;
-}) {
+export default async function AdminBookingOverviewPage() {
   await requireRole("ADMIN");
-  const { coach: coachFilter } = await searchParams;
 
   // Root di Availability (bukan Booking) biar slot yang UDAH dibuka coach
   // tapi BELUM ada member yang ambil juga keliatan -- admin bisa langsung
   // tau coach mana yang jamnya masih kosong.
+  //
+  // Semua coach diambil sekaligus (gak difilter server-side per coachId
+  // lagi) -- filter coach sekarang murni di client (BookingOverviewBoard),
+  // biar ganti pilihan coach di dropdown instant tanpa round-trip ke
+  // server/DB.
   const [availabilities, allCoaches] = await Promise.all([
     prisma.availability.findMany({
-      where: coachFilter ? { coachId: coachFilter } : undefined,
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
       include: {
         coach: { select: { id: true, name: true } },
@@ -41,130 +35,9 @@ export default async function AdminBookingOverviewPage({
     }),
   ]);
 
-  function dateKey(d: Date) {
-    return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
-  }
-
-  const byCoach = new Map<
-    string,
-    { coachName: string; byDate: Map<string, typeof availabilities> }
-  >();
-  for (const a of availabilities) {
-    const coachKey = a.coach.id;
-    if (!byCoach.has(coachKey)) {
-      byCoach.set(coachKey, { coachName: a.coach.name, byDate: new Map() });
-    }
-    const group = byCoach.get(coachKey)!;
-    const dKey = dateKey(a.date);
-    if (!group.byDate.has(dKey)) group.byDate.set(dKey, []);
-    group.byDate.get(dKey)!.push(a);
-  }
-
-  const now = new Date();
-
-  function buildKabarinWaLink(coachName: string, dateLabel: string) {
-    const message = `Halo semua! Coach ${coachName} baru aja buka jadwal baru tanggal ${dateLabel}. Buruan booking sebelum kehabisan slot ya! 🏊`;
-    return `https://wa.me/?text=${encodeURIComponent(message)}`;
-  }
-
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-text">Semua Booking</h1>
-        <CoachFilter coaches={allCoaches} selected={coachFilter ?? "all"} />
-      </div>
-
-      {availabilities.length === 0 ? (
-        <Card>
-          <CardBody className="py-10 text-center">
-            <p className="text-sm text-text-muted">Belum ada slot dibuka coach manapun.</p>
-          </CardBody>
-        </Card>
-      ) : (
-        [...byCoach.entries()].map(([coachId, group]) => {
-          const allSlots = [...group.byDate.values()].flat();
-          const filledCount = allSlots.filter((a) => a.bookings.length > 0).length;
-          const sortedDates = [...group.byDate.keys()].sort();
-
-          return (
-            <div key={coachId} className="mb-6">
-              <h2 className="mb-2 text-lg font-semibold text-text">
-                {group.coachName}{" "}
-                <span className="text-sm font-normal text-text-subtle">
-                  ({filledCount}/{allSlots.length} terisi)
-                </span>
-              </h2>
-
-              {sortedDates.map((dKey) => {
-                const rows = group.byDate.get(dKey)!;
-                return (
-                  <div key={dKey} className="mb-3">
-                    <div className="mb-1.5 flex items-center justify-between gap-2">
-                      <h3 className="text-xs font-medium text-text-subtle">
-                        {formatDateLabel(rows[0].date)}
-                      </h3>
-                      <a
-                        href={buildKabarinWaLink(group.coachName, formatDateLabel(rows[0].date))}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-[#25D366] px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90"
-                      >
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
-                          <path d="M12.04 2c-5.52 0-10 4.48-10 10 0 1.77.46 3.45 1.28 4.9L2 22l5.25-1.38a9.96 9.96 0 004.79 1.22h.01c5.52 0 10-4.48 10-10s-4.48-9.84-10.01-9.84zm5.87 14.1c-.25.7-1.45 1.33-2 1.42-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.69-.62-2.97-1.28-4.9-4.28-5.05-4.48-.15-.2-1.22-1.62-1.22-3.09s.77-2.19 1.05-2.49c.27-.3.6-.37.8-.37h.57c.18 0 .43-.07.67.51.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.5-.15.18-.32.4-.45.53-.15.15-.3.32-.13.62.17.3.77 1.27 1.65 2.06 1.14 1.02 2.1 1.33 2.4 1.48.3.15.47.13.65-.08.17-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.73.82 2.03.97.3.15.5.22.57.35.08.12.08.72-.17 1.42z" />
-                        </svg>
-                        Kabarin Grup WhatsApp
-                      </a>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                      {rows.map((a) => {
-                        const booking = a.bookings[0];
-                        const isPast = a.endTime <= now;
-
-                        return (
-                          <Card key={a.id}>
-                            <CardBody className="flex items-center justify-between gap-3 py-2.5">
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium text-text">
-                                  {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
-                                </p>
-                                {booking ? (
-                                  <p className="truncate text-xs text-text-muted">
-                                    {booking.package.dependent.isSelf
-                                      ? booking.member.name
-                                      : `${booking.package.dependent.name} (${booking.member.name})`}
-                                  </p>
-                                ) : (
-                                  <p className="text-xs text-text-subtle">Belum ada yang book</p>
-                                )}
-                              </div>
-
-                              <div className="flex shrink-0 items-center gap-2">
-                                {booking ? (
-                                  <>
-                                    <Badge tone="brand">Terisi</Badge>
-                                    {isPast ? (
-                                      <AttendanceToggle bookingId={booking.id} attended={booking.attended} />
-                                    ) : (
-                                      <AdminCancelButton bookingId={booking.id} />
-                                    )}
-                                  </>
-                                ) : (
-                                  <Badge tone="neutral">Kosong</Badge>
-                                )}
-                              </div>
-                            </CardBody>
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })
-      )}
+      <BookingOverviewBoard availabilities={availabilities} coaches={allCoaches} />
     </main>
   );
 }

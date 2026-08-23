@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { toProperCase } from "@/lib/format";
+import { createSelfDependent } from "@/lib/dependents";
 import bcrypt from "bcryptjs";
 import * as XLSX from "xlsx";
 
@@ -29,6 +30,20 @@ export async function createUser(
     return { error: "Password minimal 8 karakter" };
   }
 
+  // Samain kayak halaman daftar member sendiri -- kalau bikin akun Member,
+  // wajib pilih minimal 1 peserta (diri sendiri/anak) dari sini juga.
+  const types = formData.getAll("participantType").map(String);
+  const names = formData.getAll("participantName").map(String);
+  const childNames = types
+    .map((t, i) => (t === "child" ? names[i]?.trim() : null))
+    .filter((n): n is string => !!n)
+    .map((n) => toProperCase(n));
+  const wantsSelf = types.includes("self");
+
+  if (role === "MEMBER" && childNames.length === 0 && !wantsSelf) {
+    return { error: "Pilih minimal 1 peserta (diri sendiri atau anak)" };
+  }
+
   const existing = await prisma.user.findFirst({
     where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
   });
@@ -38,19 +53,28 @@ export async function createUser(
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  await prisma.user.create({
-    data: {
-      name,
-      email,
-      phone,
-      passwordHash,
-      role,
-      // MEMBER wajib ganti password + isi peserta (diri sendiri/anak) pas
-      // login pertama -- samain kayak jalur import xlsx, biar gak ada
-      // celah member yang login langsung tanpa pernah diminta isi anak.
-      ...(role === "MEMBER" ? { mustChangePassword: true } : {}),
-      ...(role === "COACH" ? { coachProfile: { create: {} } } : {}),
-    },
+  await prisma.$transaction(async (tx) => {
+    const created = await tx.user.create({
+      data: {
+        name,
+        email,
+        phone,
+        passwordHash,
+        role,
+        // MEMBER wajib ganti password pas login pertama -- samain kayak
+        // jalur import xlsx.
+        ...(role === "MEMBER" ? { mustChangePassword: true } : {}),
+        ...(role === "COACH" ? { coachProfile: { create: {} } } : {}),
+      },
+    });
+    if (childNames.length > 0) {
+      await tx.dependent.createMany({
+        data: childNames.map((childName) => ({ memberId: created.id, name: childName })),
+      });
+    }
+    if (wantsSelf) {
+      await createSelfDependent(created.id, tx);
+    }
   });
 
   revalidatePath("/admin/users");

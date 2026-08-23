@@ -103,6 +103,7 @@ export async function addChildForMember(
   }
 
   revalidatePath("/admin/paket");
+  revalidatePath("/admin/users");
   return null;
 }
 
@@ -171,6 +172,7 @@ export async function assignPackageToMember(
   });
 
   revalidatePath("/admin/paket");
+  revalidatePath("/admin/users");
   return null;
 }
 
