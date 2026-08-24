@@ -87,7 +87,7 @@ export default function RegisterPage() {
           <h1 className="mb-5 text-xl font-semibold text-text">Daftar Member</h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field label="Nama lengkap">
+            <Field label="Nama/Orang Tua">
               <Input
                 type="text"
                 placeholder="Nama kamu"
