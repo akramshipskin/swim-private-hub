@@ -75,7 +75,10 @@ export async function POST(request: Request) {
           packageId,
           status: "BOOKED",
         },
-        include: { availability: { include: { coach: true } } },
+        include: {
+          availability: { include: { coach: true } },
+          package: { include: { dependent: true } },
+        },
       });
     });
 
@@ -85,6 +88,12 @@ export async function POST(request: Request) {
       title: "Booking berhasil",
       body: `${booking.availability.coach.name}, ${formatDateLabel(booking.availability.date)} ${formatTimeWib(booking.availability.startTime)}`,
       url: "/member/riwayat",
+    }).catch(() => {});
+
+    sendPushToUser(booking.availability.coachId, {
+      title: "Slot kamu dibooking",
+      body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.date)} ${formatTimeWib(booking.availability.startTime)}`,
+      url: "/coach/jadwal",
     }).catch(() => {});
 
     return Response.json({ booking }, { status: 201 });

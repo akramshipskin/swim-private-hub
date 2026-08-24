@@ -5,6 +5,7 @@ import DeleteSlotButton from "./delete-slot-button";
 import { formatDateLabel, formatTimeWib, dateLabel, todayWibDateString } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import EnablePushButton from "@/components/enable-push-button";
 
 export default async function CoachJadwalPage() {
   const session = await requireRole("COACH");
@@ -58,10 +59,15 @@ export default async function CoachJadwalPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-text">Jadwal Saya</h1>
-      <p className="mt-1 text-sm text-text-muted">
-        Tambah slot per tanggal. Member bakal lihat & booking slot ini secara real-time.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-text">Jadwal Saya</h1>
+          <p className="mt-1 text-sm text-text-muted">
+            Tambah slot per tanggal. Member bakal lihat & booking slot ini secara real-time.
+          </p>
+        </div>
+        <EnablePushButton />
+      </div>
 
       <AddSlotForm />
 
