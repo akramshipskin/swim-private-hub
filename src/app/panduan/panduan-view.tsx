@@ -429,7 +429,7 @@ const PANDUAN_BODY = `
         <p>Tinggal bagikan link login ke member dan coach — gak perlu training panjang, semua alurnya udah familiar kayak booking online pada umumnya.</p>
       </div>
 
-      <footer class="credit">Les Renang Cianjur &mdash; sistem booking &amp; manajemen les renang.<br>Halaman ini bisa diakses lagi kapan aja lewat link <b>"Lihat Panduan Penggunaan"</b> di halaman utama.</footer>
+      <footer class="credit">Les Renang Cianjur &mdash; sistem booking &amp; manajemen les renang.</footer>
     </section>
 
     <!-- ============ CARA INSTALL ============ -->

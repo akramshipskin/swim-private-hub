@@ -30,9 +30,6 @@ export default async function Home() {
             <Button variant="secondary">Daftar</Button>
           </Link>
         </div>
-        <Link href="/panduan" className="mt-5 text-sm font-medium text-brand-600 hover:underline">
-          Lihat Panduan Penggunaan
-        </Link>
       </main>
     );
   }
