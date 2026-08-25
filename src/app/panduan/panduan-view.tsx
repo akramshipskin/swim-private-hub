@@ -359,6 +359,7 @@ const PANDUAN_BODY = `
             <li>Lihat siapa yang booking</li>
             <li>Tandai Hadir / Gak Hadir</li>
             <li>Pantau jadwal coach lain di hari sama</li>
+            <li>Dapet notifikasi tiap ada booking baru</li>
           </ul>
           <button class="go-btn" data-goto="coach">Lihat panduan Coach →</button>
         </div>
@@ -393,7 +394,7 @@ const PANDUAN_BODY = `
         <p>Tinggal bagikan link login ke member dan coach — gak perlu training panjang, semua alurnya udah familiar kayak booking online pada umumnya.</p>
       </div>
 
-      <footer class="credit">Les Renang Cianjur &mdash; sistem booking &amp; manajemen les renang.</footer>
+      <footer class="credit">Les Renang Cianjur &mdash; sistem booking &amp; manajemen les renang.<br>Halaman ini bisa diakses lagi kapan aja lewat link <b>"Lihat Panduan Penggunaan"</b> di halaman utama.</footer>
     </section>
 
     <!-- ============ CARA INSTALL ============ -->
@@ -627,6 +628,7 @@ const PANDUAN_BODY = `
         <a href="#c-lain">3. Jadwal Coach Lain</a>
         <a href="#c-hadir">4. Tandai Kehadiran</a>
         <a href="#c-honor">5. Soal Honor</a>
+        <a href="#c-notif">6. Notifikasi</a>
       </div>
 
       <div class="guide">
@@ -660,6 +662,11 @@ const PANDUAN_BODY = `
         <div class="guide-head" id="c-honor"><span class="gi">5</span><h3>Soal Honor: "Total Sesi Valid"</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Cuma sesi "Hadir" yang kehitung</h4><p>Angka "Total sesi valid" di atas halaman Riwayat Sesi cuma ngitung booking yang udah kamu tandain <b>Hadir</b>. Yang "Gak Hadir" atau belum ditandai sama sekali gak ikut kehitung.</p></div></div>
         <div class="note tip"><span>💡</span><p>Admin pakai angka ini buat hitung honor lewat laporan Kinerja Coach — jadi penting buat selalu update status kehadiran setelah tiap sesi selesai.</p></div>
+      </div>
+
+      <div class="guide">
+        <div class="guide-head" id="c-notif"><span class="gi">6</span><h3>Aktifkan Notifikasi</h3></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Klik "Aktifkan Notifikasi" di halaman Jadwal</h4><p>Browser bakal minta izin — pilih Izinkan. Sekali aktif, kamu dapet notifikasi tiap ada member yang booking slot kamu, walau aplikasi lagi gak dibuka.</p></div></div>
       </div>
     </section>
 
