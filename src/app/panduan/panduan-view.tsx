@@ -424,6 +424,25 @@ const PANDUAN_BODY = `
         <div class="feature-row"><span class="num">5</span><div><h4>Admin pantau semuanya</h4><p>Dari satu dashboard: siapa booking apa, siapa yang belum bayar, berapa sesi valid tiap coach bulan ini.</p></div></div>
       </div>
 
+      <div class="section-head">
+        <span class="kicker">Coba sendiri</span>
+        <h2>Akun test buat login langsung</h2>
+        <p>Semua password sama: <b>TestDeploy2026!</b> &mdash; tinggal login pake email &amp; password di bawah buat coba tiap peran.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="mini-table">
+          <tr><th>Nama</th><th>Role</th><th>Login (Email)</th><th>Password</th></tr>
+          <tr><td>Admin Cianjur</td><td>Admin</td><td>admin@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Coach Ayu</td><td>Coach</td><td>coach1@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Coach Zahra</td><td>Coach</td><td>coach2@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Coach Iwenk</td><td>Coach</td><td>coach3@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Coach Isal</td><td>Coach</td><td>coach4@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Coach Rima</td><td>Coach</td><td>coach5@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Test Member</td><td>Member</td><td>testmember@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Test Member 2</td><td>Member</td><td>testmember2@example.com</td><td>TestDeploy2026!</td></tr>
+        </table>
+      </div>
+
       <div class="cta-band">
         <h2>Siap dipakai hari ini</h2>
         <p>Tinggal bagikan link login ke member dan coach — gak perlu training panjang, semua alurnya udah familiar kayak booking online pada umumnya.</p>
