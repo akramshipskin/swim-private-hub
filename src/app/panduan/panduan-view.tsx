@@ -285,7 +285,7 @@ const PANDUAN_BODY = `
         <div class="hero-actions">
           <span class="pill-stat">📱 <b>Web-based</b> — buka dari HP, gak perlu install apa-apa</span>
           <span class="pill-stat">⚡ <b>Real-time</b> — slot kekunci begitu diambil</span>
-          <span class="pill-stat">🔔 <b>Notifikasi otomatis</b> tiap booking berhasil</span>
+          <span class="pill-stat">🔔 <b>Notifikasi dua arah</b> — member &amp; coach saling kekabarin otomatis</span>
         </div>
       </div>
 
@@ -330,6 +330,11 @@ const PANDUAN_BODY = `
           <h3>Riwayat pembayaran tercatat</h3>
           <p>Setiap transaksi paket tercatat lengkap — status berhasil, menunggu, atau gagal — bisa difilter per rentang tanggal kapan aja.</p>
         </div>
+        <div class="card">
+          <div class="icon" style="background:var(--brand-light);">🔔</div>
+          <h3>Notifikasi dua arah, gak perlu buka app terus</h3>
+          <p>Member booking → coach dapet notif. Coach buka slot baru → semua member aktif dapet notif. Keduanya cukup aktifin sekali, notif nyampe walau aplikasi lagi ketutup.</p>
+        </div>
       </div>
 
       <div class="section-head">
@@ -347,6 +352,7 @@ const PANDUAN_BODY = `
             <li>Lihat sisa sesi &amp; jatah batal per anak</li>
             <li>Batalkan booking sendiri (dengan syarat)</li>
             <li>Riwayat lengkap semua sesi</li>
+            <li>Dapet notifikasi tiap coach buka slot baru</li>
           </ul>
           <button class="go-btn" data-goto="member">Lihat panduan Member →</button>
         </div>
