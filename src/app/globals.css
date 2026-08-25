@@ -153,7 +153,22 @@
 }
 
 body {
-  background: var(--background);
+  /* Gradient asalnya cuma di landing page (bg-[radial-gradient(...)] di
+     page.tsx) -- dipindah ke sini biar 1 sumber kepake di semua halaman/role,
+     bukan copy-paste. color-mix nge-dilute brand-100 ke 30% biar gak
+     ganggu baca di halaman padet (list booking, tabel admin, dst).
+     Falloff-nya pake `vh` (relatif viewport), BUKAN `%` (relatif tinggi
+     body) -- radial-gradient tanpa size keyword defaultnya farthest-corner,
+     yang keitung dari total scrollHeight, jadi di halaman panjang (misal
+     admin/users) tintnya baru bener-bener transparan ribuan px ke bawah,
+     jauh dari yang keliatan pas landing page. `vh` ngunci falloff ke
+     ukuran viewport doang, konsisten di halaman pendek maupun panjang. */
+  background: radial-gradient(
+      circle at top,
+      color-mix(in srgb, var(--color-brand-100) 30%, transparent) 0%,
+      transparent 50vh
+    ),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   color-scheme: light dark;
