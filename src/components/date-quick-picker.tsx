@@ -75,7 +75,7 @@ export function DateQuickPicker({
             className={`relative flex h-16 w-14 shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-xs transition-colors ${
               isSelected
                 ? "border-brand-600 bg-brand-600 text-white"
-                : "border-border bg-white text-text hover:bg-surface-muted"
+                : "border-border bg-surface text-text hover:bg-surface-muted"
             }`}
           >
             <span className={isSelected ? "text-white/80" : "text-text-subtle"}>{o.dow}</span>

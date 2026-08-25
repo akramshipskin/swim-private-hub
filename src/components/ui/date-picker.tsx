@@ -105,7 +105,7 @@ export function DatePicker({
         type="button"
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl border border-border bg-white px-3 py-2 text-sm hover:bg-surface-muted",
+          "flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm hover:bg-surface-muted",
           "focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20",
           value ? "text-text" : "text-text-subtle"
         )}
@@ -123,7 +123,7 @@ export function DatePicker({
       {open && (
         <div
           className={cn(
-            "absolute z-20 mt-1 w-72 rounded-xl border border-border bg-white p-3 shadow-lg",
+            "absolute z-20 mt-1 w-72 rounded-xl border border-border bg-surface p-3 shadow-lg",
             popupAlign === "right" ? "right-0" : "left-0"
           )}
         >

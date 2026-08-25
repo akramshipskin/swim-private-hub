@@ -31,6 +31,89 @@
   --color-warning-text: #b45309;
   --color-danger-bg: #fef2f2;
   --color-danger-text: #b91c1c;
+
+  --color-disabled-bg: #cbd5e1;
+  --color-disabled-text: #94a3b8;
+}
+
+/* Dark mode: ikut OS by default (media query), atau override manual lewat
+   toggle (data-theme attribute di <html>, di-set oleh ThemeToggle + baca
+   ulang di layout lewat inline script biar gak FOUC). Guard
+   :not([data-theme="light"]) supaya pilihan manual "light" menang walau
+   OS lagi dark. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0b1418;
+    --foreground: #e6f1ef;
+
+    --color-brand-50: #0e2b30;
+    --color-brand-100: #123840;
+    --color-brand-500: #22d3ee;
+    --color-brand-600: #0891b2;
+    --color-brand-700: #67e8f9;
+
+    --color-accent-50: #2b1608;
+    --color-accent-100: #3d200c;
+    --color-accent-500: #fb923c;
+    --color-accent-600: #fdba74;
+
+    --color-surface: #101c22;
+    --color-surface-muted: #16242b;
+    --color-border: #23343b;
+
+    --color-text: #e6f1ef;
+    --color-text-muted: #9fb4b0;
+    --color-text-subtle: #74898a;
+
+    --color-success-bg: #0d2e22;
+    --color-success-text: #34d399;
+    --color-warning-bg: #2e2109;
+    --color-warning-text: #fbbf24;
+    --color-danger-bg: #2e1215;
+    --color-danger-text: #f87171;
+
+    --color-disabled-bg: #334155;
+    --color-disabled-text: #64748b;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0b1418;
+  --foreground: #e6f1ef;
+
+  --color-brand-50: #0e2b30;
+  --color-brand-100: #123840;
+  --color-brand-500: #22d3ee;
+  --color-brand-600: #0891b2;
+  --color-brand-700: #67e8f9;
+
+  --color-accent-50: #2b1608;
+  --color-accent-100: #3d200c;
+  --color-accent-500: #fb923c;
+  --color-accent-600: #fdba74;
+
+  --color-surface: #101c22;
+  --color-surface-muted: #16242b;
+  --color-border: #23343b;
+
+  --color-text: #e6f1ef;
+  --color-text-muted: #9fb4b0;
+  --color-text-subtle: #74898a;
+
+  --color-success-bg: #0d2e22;
+  --color-success-text: #34d399;
+  --color-warning-bg: #2e2109;
+  --color-warning-text: #fbbf24;
+  --color-danger-bg: #2e1215;
+  --color-danger-text: #f87171;
+
+  --color-disabled-bg: #334155;
+  --color-disabled-text: #64748b;
 }
 
 @theme inline {
@@ -64,10 +147,14 @@
   --color-warning-text: var(--color-warning-text);
   --color-danger-bg: var(--color-danger-bg);
   --color-danger-text: var(--color-danger-text);
+
+  --color-disabled-bg: var(--color-disabled-bg);
+  --color-disabled-text: var(--color-disabled-text);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  color-scheme: light dark;
 }

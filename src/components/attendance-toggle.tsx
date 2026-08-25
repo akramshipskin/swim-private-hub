@@ -49,7 +49,7 @@ export default function AttendanceToggle({
       ? "border-success-text/25 bg-success-bg text-success-text"
       : localAttended === false
         ? "border-danger-text/25 bg-danger-bg text-danger-text"
-        : "border-border bg-white text-text-muted";
+        : "border-border bg-surface text-text-muted";
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col items-end gap-1">

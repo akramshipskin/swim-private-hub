@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { signOutAction } from "@/lib/auth-actions";
 import { MenuIcon, UserEditIcon, LogoutIcon } from "@/components/icons";
+import { ThemeMenu } from "@/components/theme-toggle";
 
 export function UserMenu({
   userName,
@@ -48,6 +49,10 @@ export function UserMenu({
           <div className="border-b border-border px-3.5 py-3 sm:hidden">
             <p className="text-sm font-medium text-text">{userName}</p>
             <p className="text-xs text-text-subtle">{userRole}</p>
+          </div>
+          <div className="border-b border-border px-3.5 py-3">
+            <p className="mb-2 text-xs font-medium text-text-muted">Tampilan</p>
+            <ThemeMenu />
           </div>
           <Link
             href="/profil"

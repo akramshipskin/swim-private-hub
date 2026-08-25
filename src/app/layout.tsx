@@ -26,11 +26,24 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // data-theme di-set manual lewat inline script di bawah (baca
+    // localStorage sebelum hydrate) -- server gak pernah tau nilainya,
+    // jadi mismatch attribute ini expected, bukan bug beneran.
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        {/* Baca localStorage sebelum paint pertama, biar gak ada FOUC
+            (kedip putih sebelum ganti gelap) pas user udah pernah pilih
+            manual. Gak ada pilihan tersimpan = biarin CSS prefers-color-scheme
+            yang handle, jangan set attribute sama sekali. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;}}catch(e){}`,
+          }}
+        />
         <ServiceWorkerRegister />
         <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>

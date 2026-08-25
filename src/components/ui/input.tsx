@@ -14,7 +14,7 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
   return (
     <input
       className={cn(
-        "w-full min-h-[44px] rounded-xl border border-border bg-white px-3 py-2 text-sm text-text placeholder:text-text-subtle",
+        "w-full min-h-[44px] rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle",
         "focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20",
         "disabled:bg-surface-muted disabled:text-text-subtle",
         className
@@ -33,7 +33,7 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
     // panah dropdown native-nya, jadi digambar ulang manual di sini.
     <div className={cn("relative", className)}>
       <select
-        className="min-h-[44px] w-full appearance-none rounded-xl border border-border bg-white px-3 py-2 pr-8 text-sm text-text focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:bg-surface-muted disabled:text-text-subtle"
+        className="min-h-[44px] w-full appearance-none rounded-xl border border-border bg-surface px-3 py-2 pr-8 text-sm text-text focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:bg-surface-muted disabled:text-text-subtle"
         {...props}
       />
       <svg
