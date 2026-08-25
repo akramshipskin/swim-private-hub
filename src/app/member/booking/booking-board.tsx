@@ -229,12 +229,25 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
                 udah ada -- lebih pas buat lompat jauh ke depan, dan pill
                 8-lebar bakal ganggu alignment sejajar sama field lain. */}
             <div className="sm:hidden">
-              <DateQuickPicker value={date} onChange={setDate} days={8} />
+              <div className="mb-1.5 flex items-center justify-between text-[11px] text-text-subtle">
+                <span className="flex items-center gap-1">
+                  <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot ready
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowFullCalendar((v) => !v)}
+                  className="font-medium text-brand-700 underline underline-offset-2"
+                >
+                  {showFullCalendar ? "Tutup kalender" : "Pilih tanggal lain"}
+                </button>
+              </div>
               {/* Fallback buat booking di luar window 8 hari pill --
                   defaultOpen biar langsung nongol popup-nya begitu toggle,
-                  gak perlu 2x tap (toggle, lalu tap trigger internal). */}
-              {showFullCalendar ? (
-                <div className="mt-2">
+                  gak perlu 2x tap (toggle, lalu tap trigger internal).
+                  Dirender DI ATAS pill row biar popup-nya (yang buka ke
+                  bawah dari trigger-nya) numpuk visual di atas pill. */}
+              {showFullCalendar && (
+                <div className="mb-2">
                   <AvailabilityDatePicker
                     value={date}
                     onChange={(d) => {
@@ -244,15 +257,8 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
                     defaultOpen
                   />
                 </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowFullCalendar(true)}
-                  className="mt-1.5 text-xs font-medium text-brand-700 underline underline-offset-2"
-                >
-                  Pilih tanggal lain
-                </button>
               )}
+              <DateQuickPicker value={date} onChange={setDate} days={8} />
             </div>
             <div className="hidden sm:block">
               <AvailabilityDatePicker value={date} onChange={setDate} />
