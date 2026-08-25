@@ -30,6 +30,7 @@ export function AvailabilityDatePicker({
   onChange,
   fetchUrl = "/api/availability/available-dates",
   legendLabel = "ada slot ready",
+  defaultOpen = false,
 }: {
   value: string;
   onChange: (date: string) => void;
@@ -37,9 +38,13 @@ export function AvailabilityDatePicker({
   fetchUrl?: string;
   /** Teks di bawah kalender buat jelasin arti titik penanda. */
   legendLabel?: string;
+  /** Popup langsung kebuka pas mount -- dipake pas komponen ini dirender
+   *  on-demand (misal fallback "kalender lain" di DateQuickPicker mobile),
+   *  biar gak perlu 2x klik (klik buat munculin, klik lagi buat buka). */
+  defaultOpen?: boolean;
 }) {
   const selected = parseKey(value);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [viewY, setViewY] = useState(selected.y);
   const [viewM, setViewM] = useState(selected.m);
   const [availableDates, setAvailableDates] = useState<Set<string>>(new Set());

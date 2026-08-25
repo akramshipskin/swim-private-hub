@@ -75,6 +75,7 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
   const router = useRouter();
   const { data: session } = useSession();
   const [date, setDate] = useState(todayWib());
+  const [showFullCalendar, setShowFullCalendar] = useState(false);
   const [packageId, setPackageId] = useState(childOptions[0]?.packageId ?? "");
   const selectedChild = childOptions.find((c) => c.packageId === packageId) ?? null;
   const [slots, setSlots] = useState<Slot[] | null>(null);
@@ -229,6 +230,29 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
                 8-lebar bakal ganggu alignment sejajar sama field lain. */}
             <div className="sm:hidden">
               <DateQuickPicker value={date} onChange={setDate} days={8} />
+              {/* Fallback buat booking di luar window 8 hari pill --
+                  defaultOpen biar langsung nongol popup-nya begitu toggle,
+                  gak perlu 2x tap (toggle, lalu tap trigger internal). */}
+              {showFullCalendar ? (
+                <div className="mt-2">
+                  <AvailabilityDatePicker
+                    value={date}
+                    onChange={(d) => {
+                      setDate(d);
+                      setShowFullCalendar(false);
+                    }}
+                    defaultOpen
+                  />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowFullCalendar(true)}
+                  className="mt-1.5 text-xs font-medium text-brand-700 underline underline-offset-2"
+                >
+                  Pilih tanggal lain
+                </button>
+              )}
             </div>
             <div className="hidden sm:block">
               <AvailabilityDatePicker value={date} onChange={setDate} />

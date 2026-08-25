@@ -4,6 +4,7 @@ import BookingBoard from "./booking-board";
 import Link from "next/link";
 import EnablePushButton from "@/components/enable-push-button";
 import { activePackageWhereForDependent } from "@/lib/active-package";
+import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
 
 export default async function MemberBookingPage() {
   const session = await requireRole("MEMBER");
@@ -77,7 +78,7 @@ export default async function MemberBookingPage() {
           Desktop: tetep full text, ruang gak jadi masalah di layar lebar. */}
       <details className="mb-6 rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:hidden">
         <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-text marker:content-none [&::-webkit-details-marker]:hidden">
-          Kebijakan pembatalan
+          KEBIJAKAN PEMBATALAN
           <svg
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -91,20 +92,18 @@ export default async function MemberBookingPage() {
           </svg>
         </summary>
         <p className="mt-2">
-          Booking bisa dibatalkan sendiri sesuai jatah paket anak yang bersangkutan. Kalau
-          jatah udah abis, hubungi admin langsung lewat WhatsApp buat kasus khusus. Kalau
-          udah booking tapi gak hadir tanpa dibatalin, sisa sesi tetap kepotong dan gak ada
-          refund.
+          Batalkan sendiri min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
+          batal paket anak (lihat di bawah). Gak hadir tanpa batal = sesi tetap kepotong, no
+          refund. Jatah abis? Hubungi admin via WhatsApp.
         </p>
       </details>
 
       <div className="mb-6 hidden rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:block">
-        <p className="mb-1 font-medium text-text">Kebijakan pembatalan</p>
+        <p className="mb-1 font-medium text-text">KEBIJAKAN PEMBATALAN</p>
         <p>
-          Booking bisa dibatalkan sendiri sesuai jatah paket anak yang bersangkutan. Kalau
-          jatah udah abis, hubungi admin langsung lewat WhatsApp buat kasus khusus. Kalau
-          udah booking tapi gak hadir tanpa dibatalin, sisa sesi tetap kepotong dan gak ada
-          refund.
+          Batalkan sendiri min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
+          batal paket anak (lihat di bawah). Gak hadir tanpa batal = sesi tetap kepotong, no
+          refund. Jatah abis? Hubungi admin via WhatsApp.
         </p>
       </div>
 
