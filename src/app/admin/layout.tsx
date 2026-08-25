@@ -11,7 +11,7 @@ export default async function AdminLayout({
   const session = await requireRole("ADMIN");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <NavBar
         brand="Les Renang Cianjur"
         userName={session.user.name ?? ""}
