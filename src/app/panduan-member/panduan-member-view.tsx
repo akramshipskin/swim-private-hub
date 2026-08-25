@@ -233,9 +233,36 @@ export default function PanduanMemberView() {
         </div>
       </Step>
 
-      <Step n={8} title="Pilih tanggal" desc="Kalender custom -- tanggal yang ada slot kosong ditandain titik.">
-        <div className="flex min-h-[44px] items-center justify-between rounded-xl border border-border bg-white px-3 text-sm text-text">
-          Sel, 25 Agustus 2026 <span className="text-text-subtle">&#8964;</span>
+      <Step
+        n={8}
+        title="Pilih tanggal"
+        desc="8 pilihan tanggal terdekat -- titik nandain ada slot ready. Butuh tanggal lebih jauh? Tap &ldquo;Pilih tanggal lain&rdquo; buat buka kalender penuh."
+      >
+        <div className="flex items-center justify-between text-[11px] text-text-subtle">
+          <span className="flex items-center gap-1">
+            <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot ready
+          </span>
+          <span className="font-medium text-brand-700 underline underline-offset-2">Pilih tanggal lain</span>
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {[
+            { dow: "Sel", num: 25, active: true, dot: false },
+            { dow: "Rab", num: 26, active: false, dot: true },
+            { dow: "Kam", num: 27, active: false, dot: true },
+            { dow: "Jum", num: 28, active: false, dot: true },
+            { dow: "Sab", num: 29, active: false, dot: true },
+          ].map((d) => (
+            <div
+              key={d.num}
+              className={`relative flex h-14 w-12 shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-xs ${
+                d.active ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-text"
+              }`}
+            >
+              <span className={d.active ? "text-white/80" : "text-text-subtle"}>{d.dow}</span>
+              <span className="text-sm font-semibold">{d.num}</span>
+              {d.dot && <span className="absolute bottom-1 h-1 w-1 rounded-full bg-brand-500" />}
+            </div>
+          ))}
         </div>
       </Step>
 
