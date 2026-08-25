@@ -1,116 +1,18 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { usablePackageConditions } from "@/lib/active-package";
-import ToggleActiveButton from "./toggle-active-button";
 import CreateUserForm from "./create-user-form";
 import ImportMembersForm from "./import-members-form";
 import AddChildForm from "../paket/add-child-form";
 import AssignPackageForm from "../paket/assign-package-form";
+import UsersMemberSection from "./users-member-section";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buildContactWaLink } from "@/lib/whatsapp";
-function shortDate(d: Date) {
-  return d.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "2-digit",
-    timeZone: "Asia/Jakarta",
-  });
-}
+import { UserActions } from "./user-display";
 
-type PesertaRow = {
-  id: string;
-  label: string;
-  pkg: { name: string; sisaSesi: number; totalSesi: number; expiredDate: Date | null } | null;
-};
-
-function PesertaLine({ p }: { p: PesertaRow }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span
-        className={`h-1.5 w-1.5 shrink-0 rounded-full ${p.pkg ? "bg-success-text" : "bg-border"}`}
-      />
-      <span className="min-w-0 truncate">
-        {p.label}
-        {p.pkg ? (
-          <span className="text-text-subtle">
-            {" "}
-            · sisa {p.pkg.sisaSesi}/{p.pkg.totalSesi} sesi
-            {p.pkg.expiredDate && <> · s.d. {shortDate(p.pkg.expiredDate)}</>}
-          </span>
-        ) : (
-          <span className="text-text-subtle"> · belum ada paket aktif</span>
-        )}
-      </span>
-    </div>
-  );
-}
-
-// >1 peserta dibungkus <details> biar baris tabel gak makin tinggi tiap
-// member nambah anak -- summary ringkas (jumlah + berapa yang aktif),
-// baru buka detail per-peserta pas di-klik. 1 peserta (atau 0) langsung
-// tampil, gak perlu collapse.
-function PesertaList({ items }: { items: PesertaRow[] }) {
-  if (items.length === 0) {
-    return <span className="text-text-subtle">Belum ada peserta</span>;
-  }
-  if (items.length === 1) {
-    return <PesertaLine p={items[0]} />;
-  }
-  const activeCount = items.filter((p) => p.pkg).length;
-  return (
-    <details>
-      <summary className="cursor-pointer list-none text-text marker:content-none [&::-webkit-details-marker]:hidden">
-        <span className="inline-flex items-center gap-1">
-          {items.length} peserta · {activeCount} aktif
-          <svg
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-3.5 w-3.5 text-text-subtle transition-transform [details[open]_&]:rotate-180"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </span>
-      </summary>
-      <div className="mt-1.5 flex flex-col gap-1">
-        {items.map((p) => (
-          <PesertaLine key={p.id} p={p} />
-        ))}
-      </div>
-    </details>
-  );
-}
-
-function UserActions({
-  user,
-}: {
-  user: { id: string; name: string; phone: string | null; isActive: boolean };
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      {user.phone && (
-        <a
-          href={buildContactWaLink(user.phone, user.name)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-md px-2 py-1.5 text-sm font-medium text-[#25D366] hover:bg-[#25D366]/10"
-        >
-          Hubungi
-        </a>
-      )}
-      <ToggleActiveButton userId={user.id} userName={user.name} isActive={user.isActive} />
-    </div>
-  );
-}
-
-const roleSections: { role: "ADMIN" | "COACH" | "MEMBER"; label: string }[] = [
+const roleSections: { role: "ADMIN" | "COACH"; label: string }[] = [
   { role: "ADMIN", label: "Admin" },
   { role: "COACH", label: "Coach" },
-  { role: "MEMBER", label: "Member" },
 ];
 
 export default async function AdminUsersPage() {
@@ -192,47 +94,32 @@ export default async function AdminUsersPage() {
                     <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
                       <th className="px-5 py-3.5 font-medium">Nama</th>
                       <th className="px-5 py-3.5 font-medium">No HP</th>
-                      {role === "MEMBER" && (
-                        <th className="w-72 px-5 py-3.5 font-medium">Paket</th>
-                      )}
                       <th className="px-5 py-3.5 font-medium">Status</th>
                       <th className="px-5 py-3.5"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((u) => {
-                      const peserta: PesertaRow[] = u.dependents.map((d) => ({
-                        id: d.id,
-                        label: d.isSelf ? "Diri sendiri" : d.name,
-                        pkg: u.packages.find((p) => p.dependentId === d.id) ?? null,
-                      }));
-                      return (
-                        <tr key={u.id} className="border-b border-border last:border-0">
-                          <td className="px-5 py-4">
-                            <p className="font-medium text-text">{u.name}</p>
-                            {u.email && (
-                              <p className="text-xs text-text-subtle">{u.email}</p>
-                            )}
-                          </td>
-                          <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
-                          {role === "MEMBER" && (
-                            <td className="w-72 px-5 py-4 text-xs text-text-muted">
-                              <PesertaList items={peserta} />
-                            </td>
+                    {rows.map((u) => (
+                      <tr key={u.id} className="border-b border-border last:border-0">
+                        <td className="px-5 py-4">
+                          <p className="font-medium text-text">{u.name}</p>
+                          {u.email && (
+                            <p className="text-xs text-text-subtle">{u.email}</p>
                           )}
-                          <td className="px-5 py-4">
-                            <Badge tone={u.isActive ? "success" : "neutral"}>
-                              {u.isActive ? "Aktif" : "Nonaktif"}
-                            </Badge>
-                          </td>
-                          <td className="px-5 py-4 text-right">
-                            <div className="flex items-center justify-end">
-                              <UserActions user={u} />
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                        </td>
+                        <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
+                        <td className="px-5 py-4">
+                          <Badge tone={u.isActive ? "success" : "neutral"}>
+                            {u.isActive ? "Aktif" : "Nonaktif"}
+                          </Badge>
+                        </td>
+                        <td className="px-5 py-4 text-right">
+                          <div className="flex items-center justify-end">
+                            <UserActions user={u} />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -241,37 +128,40 @@ export default async function AdminUsersPage() {
             {/* Mobile: card compact biasa -- semua info langsung keliatan,
                 gak perlu di-tap buat expand. */}
             <ul className="flex flex-col gap-1.5 sm:hidden">
-              {rows.map((u) => {
-                const peserta: PesertaRow[] = u.dependents.map((d) => ({
-                  id: d.id,
-                  label: d.isSelf ? "Diri sendiri" : d.name,
-                  pkg: u.packages.find((p) => p.dependentId === d.id) ?? null,
-                }));
-                return (
-                  <Card key={u.id}>
-                    <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="min-w-0 truncate text-sm font-medium text-text">{u.name}</p>
-                        <Badge tone={u.isActive ? "success" : "neutral"}>
-                          {u.isActive ? "Aktif" : "Nonaktif"}
-                        </Badge>
-                      </div>
-                      {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
-                      <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
-                      {role === "MEMBER" && (
-                        <div className="text-xs text-text-muted">
-                          <PesertaList items={peserta} />
-                        </div>
-                      )}
-                      <UserActions user={u} />
-                    </CardBody>
-                  </Card>
-                );
-              })}
+              {rows.map((u) => (
+                <Card key={u.id}>
+                  <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="min-w-0 truncate text-sm font-medium text-text">{u.name}</p>
+                      <Badge tone={u.isActive ? "success" : "neutral"}>
+                        {u.isActive ? "Aktif" : "Nonaktif"}
+                      </Badge>
+                    </div>
+                    {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
+                    <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
+                    <UserActions user={u} />
+                  </CardBody>
+                </Card>
+              ))}
             </ul>
           </div>
         );
       })}
+
+      <UsersMemberSection
+        rows={members.map((u) => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone,
+          isActive: u.isActive,
+          peserta: u.dependents.map((d) => ({
+            id: d.id,
+            label: d.isSelf ? "Diri sendiri" : d.name,
+            pkg: u.packages.find((p) => p.dependentId === d.id) ?? null,
+          })),
+        }))}
+      />
     </main>
   );
 }
