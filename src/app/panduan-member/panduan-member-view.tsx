@@ -46,7 +46,7 @@ function Step({
         </div>
         {note && <p className="mt-2 ml-10 text-[11px] text-text-subtle sm:ml-0 sm:mt-3">{note}</p>}
       </div>
-      <div className="w-full max-w-[375px] overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+      <div className="w-full max-w-[375px] overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
         <div className="flex flex-col gap-3 p-4">{children}</div>
       </div>
     </section>
@@ -60,7 +60,7 @@ function FakeField({ label, value, muted }: { label: string; value: string; mute
       <div
         className={
           "flex min-h-[44px] w-full items-center rounded-xl border border-border px-3 text-sm " +
-          (muted ? "bg-surface-muted text-text-muted" : "bg-white text-text")
+          (muted ? "bg-surface-muted text-text-muted" : "bg-surface text-text")
         }
       >
         {value}
@@ -149,10 +149,10 @@ export default function PanduanMemberView() {
         <div>
           <p className="mb-1 text-xs font-medium text-text-muted">Siapa yang mau les?</p>
           <div className="flex gap-2">
-            <div className="flex h-[44px] w-24 shrink-0 items-center justify-center rounded-xl border border-border bg-white text-xs text-text">
+            <div className="flex h-[44px] w-24 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-xs text-text">
               Anak
             </div>
-            <div className="flex h-[44px] flex-1 items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
+            <div className="flex h-[44px] flex-1 items-center rounded-xl border border-border bg-surface px-3 text-sm text-text">
               Kirana
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function PanduanMemberView() {
         <div>
           <p className="mb-1 text-xs font-medium text-text-muted">Siapa yang mau les?</p>
           <div className="flex gap-2">
-            <div className="flex h-[44px] w-24 shrink-0 items-center justify-center rounded-xl border border-border bg-white text-xs text-text">
+            <div className="flex h-[44px] w-24 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-xs text-text">
               Diri sendiri
             </div>
             <div className="flex h-[44px] flex-1 items-center truncate rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
@@ -228,7 +228,7 @@ export default function PanduanMemberView() {
       <Part label="Booking Sesi (Lengkap)" />
 
       <Step n={7} title="Pilih anak" desc="Dropdown &ldquo;Buat anak&rdquo; -- nunjukin paket &amp; sisa sesi tiap peserta.">
-        <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
+        <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-surface px-3 text-sm text-text">
           Anak Satu &mdash; 8x Renang, sisa 8
         </div>
       </Step>
@@ -255,7 +255,7 @@ export default function PanduanMemberView() {
             <div
               key={d.num}
               className={`relative flex h-14 w-12 shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-xs ${
-                d.active ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-white text-text"
+                d.active ? "border-brand-600 bg-brand-600 text-white" : "border-border bg-surface text-text"
               }`}
             >
               <span className={d.active ? "text-white/80" : "text-text-subtle"}>{d.dow}</span>
@@ -291,7 +291,7 @@ export default function PanduanMemberView() {
         <div className="rounded-xl bg-success-bg px-3 py-2 text-xs font-medium text-success-text">
           Booking berhasil! Cek di halaman Riwayat.
         </div>
-        <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
+        <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-surface px-3 text-sm text-text">
           Anak Satu &mdash; 8x Renang, sisa 7
         </div>
       </Step>
@@ -320,7 +320,7 @@ export default function PanduanMemberView() {
         title="Batalkan (kalau masih &ge; 2 jam sebelum jadwal)"
         note="Sisa sesi otomatis balik, tapi jatah pembatalan mandiri berkurang 1."
       >
-        <div className="flex items-center justify-between rounded-xl border border-border bg-white p-3">
+        <div className="flex items-center justify-between rounded-xl border border-border bg-surface p-3">
           <p className="text-xs text-text-muted">Jatah batal: 2/2 tersisa</p>
           <Button variant="danger" size="sm">
             Batalkan
@@ -334,7 +334,7 @@ export default function PanduanMemberView() {
         title="Kalau udah &lt; 2 jam atau jatah abis"
         note="Ini beneran kejadian pas didemo -- booking dites live, kurang dari 2 jam sebelum jadwal."
       >
-        <div className="flex items-center justify-between rounded-xl border border-border bg-white p-3">
+        <div className="flex items-center justify-between rounded-xl border border-border bg-surface p-3">
           <p className="text-xs text-text-muted">Pembatalan hanya bisa minimal 2 jam sebelum jadwal.</p>
           <Button className="shrink-0 bg-success-text hover:bg-success-text/90" size="sm">
             Hubungi Admin
@@ -355,7 +355,7 @@ export default function PanduanMemberView() {
           <CardBody>
             <p className="text-sm font-semibold text-text">Private | 8x Renang</p>
             <p className="mt-1 text-lg font-bold text-text">Rp750.000</p>
-            <div className="mt-3 flex min-h-[40px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
+            <div className="mt-3 flex min-h-[40px] items-center rounded-xl border border-border bg-surface px-3 text-sm text-text">
               Buat Anak Satu
             </div>
             <Button className="mt-3 w-full" size="sm">
