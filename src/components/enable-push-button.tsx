@@ -23,7 +23,20 @@ export default function EnablePushButton() {
     }
     navigator.serviceWorker.ready.then(async (reg) => {
       const existing = await reg.pushManager.getSubscription();
-      if (existing) setStatus("subscribed");
+      if (existing) {
+        // Subscription browser ini punya 1 endpoint yang sama walau
+        // akunnya diganti (misal member logout, coach login di HP yang
+        // sama) -- endpoint lama masih "subscribed" di sisi browser,
+        // tapi baris PushSubscription di server masih ke-tag userId
+        // lama. Re-sync diem-diem tiap mount biar kepemilikannya selalu
+        // ngikut siapa yang lagi login sekarang, gak nyasar ke akun lain.
+        fetch("/api/push/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(existing.toJSON()),
+        }).catch(() => {});
+        setStatus("subscribed");
+      }
     });
   }, []);
 
