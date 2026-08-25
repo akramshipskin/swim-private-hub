@@ -51,7 +51,32 @@ export async function addAvailability(
     });
   }
 
-  await prisma.availability.createMany({ data: chunks, skipDuplicates: true });
+  // Cek dulu jam-jam yang udah pernah dibuka -- kalau createMany langsung
+  // dipanggil pakai skipDuplicates, request ini "berhasil" tanpa error
+  // walau semua/sebagian jamnya kena skip diem-diem (unique constraint
+  // [coachId, date, startTime]). Coach gak dapet feedback apa-apa dan
+  // ngirain slotnya beneran ke-tambah. Blokir total kalau ada bentrok,
+  // biar jelas mana yang perlu diganti jamnya.
+  const conflicts = await prisma.availability.findMany({
+    where: {
+      coachId: session.user.id,
+      date: dateLabel(date),
+      startTime: { in: chunks.map((c) => c.startTime) },
+    },
+    select: { startTime: true, endTime: true },
+    orderBy: { startTime: "asc" },
+  });
+
+  if (conflicts.length > 0) {
+    const times = conflicts
+      .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
+      .join(", ");
+    return {
+      error: `Slot jam ${times} di tanggal ini udah pernah dibuka sebelumnya. Pilih jam lain atau hapus slot lamanya dulu.`,
+    };
+  }
+
+  await prisma.availability.createMany({ data: chunks });
 
   if (chunks.length > 0) {
     // Broadcast 1 notif per aksi "Tambah Slot" (bukan per slot per jam)
