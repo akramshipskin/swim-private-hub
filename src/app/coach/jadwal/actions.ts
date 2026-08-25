@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { wibDateTime, dateLabel, formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { sendPushToUser } from "@/lib/push";
 
-export type ActionState = { error?: string } | null;
+export type ActionState = { error?: string; warning?: string } | null;
 
 export async function addAvailability(
   _prevState: ActionState,
@@ -55,8 +55,7 @@ export async function addAvailability(
   // dipanggil pakai skipDuplicates, request ini "berhasil" tanpa error
   // walau semua/sebagian jamnya kena skip diem-diem (unique constraint
   // [coachId, date, startTime]). Coach gak dapet feedback apa-apa dan
-  // ngirain slotnya beneran ke-tambah. Blokir total kalau ada bentrok,
-  // biar jelas mana yang perlu diganti jamnya.
+  // ngirain slotnya beneran ke-tambah.
   const conflicts = await prisma.availability.findMany({
     where: {
       coachId: session.user.id,
@@ -67,7 +66,15 @@ export async function addAvailability(
     orderBy: { startTime: "asc" },
   });
 
-  if (conflicts.length > 0) {
+  // Jam yang beneran bebas -- cuma ini yang boleh dibuat. Sebelumnya kalau
+  // ADA satu jam aja yang bentrok, seluruh request diblokir total (termasuk
+  // jam yang sebenernya bebas), jadi coach yang buka ulang rentang lebar
+  // abis hapus 1-2 jam di tengahnya, kehilangan jam-jam yang harusnya
+  // aman -- bug nyata yang ketauan pas dipake.
+  const conflictTimes = new Set(conflicts.map((c) => c.startTime.getTime()));
+  const freeChunks = chunks.filter((c) => !conflictTimes.has(c.startTime.getTime()));
+
+  if (conflicts.length > 0 && freeChunks.length === 0) {
     const times = conflicts
       .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
       .join(", ");
@@ -76,17 +83,17 @@ export async function addAvailability(
     };
   }
 
-  await prisma.availability.createMany({ data: chunks });
+  if (freeChunks.length > 0) {
+    await prisma.availability.createMany({ data: freeChunks });
 
-  if (chunks.length > 0) {
     // Broadcast 1 notif per aksi "Tambah Slot" (bukan per slot per jam)
     // biar member gak kebanjiran notif kalau coach buka rentang jam
     // panjang sekaligus. Best-effort, gak boleh gagalin slot yang udah
     // sukses tersimpan.
-    const first = chunks[0];
-    const last = chunks[chunks.length - 1];
+    const first = freeChunks[0];
+    const last = freeChunks[freeChunks.length - 1];
     const rangeLabel =
-      chunks.length === 1
+      freeChunks.length === 1
         ? `${formatTimeWib(first.startTime)}–${formatTimeWib(first.endTime)}`
         : `${formatTimeWib(first.startTime)}–${formatTimeWib(last.endTime)}`;
 
@@ -107,6 +114,16 @@ export async function addAvailability(
   }
 
   revalidatePath("/coach/jadwal");
+
+  if (conflicts.length > 0) {
+    const times = conflicts
+      .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
+      .join(", ");
+    return {
+      warning: `Jam ${times} udah pernah dibuka sebelumnya, dilewatin. Jam lainnya berhasil ditambahin.`,
+    };
+  }
+
   return null;
 }
 

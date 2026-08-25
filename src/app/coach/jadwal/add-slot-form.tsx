@@ -41,6 +41,11 @@ export default function AddSlotForm() {
             {state.error}
           </p>
         )}
+        {state?.warning && (
+          <p role="alert" className="mt-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+            {state.warning}
+          </p>
+        )}
         <p className="mt-2 text-xs text-text-subtle">
           Slot otomatis dipecah per jam -- misal 08.00–10.00 jadi 2 slot terpisah (08–09,
           09–10), masing-masing bisa dibooking member beda.

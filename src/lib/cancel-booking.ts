@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
+import { sendPushToUser } from "@/lib/push";
+import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 
 export class CancelError extends Error {
   status: number;
@@ -30,7 +32,10 @@ export async function cancelBooking({
 }) {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { availability: true },
+    include: {
+      availability: true,
+      package: { include: { dependent: true } },
+    },
   });
 
   if (!booking) {
@@ -106,6 +111,14 @@ export async function cancelBooking({
       },
       { timeout: 10000, maxWait: 8000 }
     );
+
+    // Best-effort -- coach perlu tau slotnya kebuka lagi, tapi gagal
+    // ngirim gak boleh gagalin pembatalan yang udah sukses tersimpan.
+    sendPushToUser(booking.availability.coachId, {
+      title: "Booking dibatalkan",
+      body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} udah kosong lagi`,
+      url: "/coach/jadwal",
+    }).catch(() => {});
   } catch (err) {
     if (err instanceof CancelError) throw err;
     // P2028 = transaksi gak kebagian giliran/expired nunggu row lock

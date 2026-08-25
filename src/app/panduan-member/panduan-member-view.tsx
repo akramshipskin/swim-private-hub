@@ -2,50 +2,68 @@ import Image from "next/image";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/input";
+import { Field, Input, Select } from "@/components/ui/input";
 
-// Data di bawah ini BUKAN mockup/karangan -- diambil langsung dari akun
-// demo yang beneran ada & aktif di database (Demo Diri Sendiri, Demo Satu
-// Anak, Demo Dua Anak, Test Member 2), per 25 Agustus 2026. Tujuannya
-// nunjukin ke klien kondisi asli, bukan contoh hipotetis.
+// Tutorial lengkap POV member, versi mobile aja (sesuai request -- gak
+// ada frame desktop di sini). Urutan & copy di tiap step diverifikasi
+// langsung dari kode aslinya (register/page.tsx, ganti-password/*,
+// member/booking/page.tsx, dst) atau dari data akun demo yang beneran
+// aktif di database -- bukan dikira-kira.
 
-function DeviceFrame({
-  label,
-  maxWidth,
-  children,
-}: {
-  label: string;
-  maxWidth: number;
-  children: React.ReactNode;
-}) {
+function Part({ label }: { label: string }) {
   return (
-    <div className="flex w-full flex-col gap-2" style={{ maxWidth }}>
-      <p className="text-xs font-semibold uppercase tracking-wide text-text-subtle">{label}</p>
-      <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
-        <div className="flex flex-col gap-3 p-4">{children}</div>
-      </div>
+    <div className="mt-12 mb-2 flex items-center gap-3">
+      <p className="shrink-0 text-xs font-bold uppercase tracking-wide text-brand-600">{label}</p>
+      <div className="h-px flex-1 bg-border" />
     </div>
   );
 }
 
-function ScenarioBlock({
-  eyebrow,
+function Step({
+  n,
   title,
   desc,
+  note,
   children,
 }: {
-  eyebrow: string;
+  n: number;
   title: string;
-  desc: string;
+  desc?: string;
+  note?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-t border-border pt-10">
-      <p className="text-xs font-bold uppercase tracking-wide text-brand-600">{eyebrow}</p>
-      <h2 className="mt-1 text-xl font-semibold text-text">{title}</h2>
-      <p className="mt-1 max-w-2xl text-sm text-text-muted">{desc}</p>
-      <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-start">{children}</div>
+    <section className="mt-6">
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
+          {n}
+        </span>
+        <div>
+          <h3 className="text-sm font-semibold text-text">{title}</h3>
+          {desc && <p className="mt-0.5 text-xs text-text-muted">{desc}</p>}
+        </div>
+      </div>
+      <div className="ml-10 mt-3 overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+        <div className="flex flex-col gap-3 p-4">{children}</div>
+      </div>
+      {note && <p className="ml-10 mt-2 text-[11px] text-text-subtle">{note}</p>}
     </section>
+  );
+}
+
+function FakeField({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
+  return (
+    <div>
+      <p className="mb-1 text-xs font-medium text-text-muted">{label}</p>
+      <div
+        className={
+          "flex min-h-[44px] w-full items-center rounded-xl border border-border px-3 text-sm " +
+          (muted ? "bg-surface-muted text-text-muted" : "bg-white text-text")
+        }
+      >
+        {value}
+      </div>
+    </div>
   );
 }
 
@@ -78,221 +96,277 @@ function PaketCard({
   );
 }
 
-function RiwayatCard({
-  coach,
-  time,
-  forWhom,
-  date,
-  status,
-}: {
-  coach: string;
-  time: string;
-  forWhom: string;
-  date: string;
-  status: "Terjadwal" | "Hadir";
-}) {
-  return (
-    <Card>
-      <CardBody className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
-            {coach
-              .split(" ")
-              .map((w) => w[0])
-              .join("")
-              .toUpperCase()}
-          </div>
-          <div>
-            <p className="text-sm font-medium text-text">{coach}</p>
-            <p className="text-xs text-text-muted">
-              {time} &middot; buat {forWhom}
-            </p>
-            <div className="mt-1">
-              <Badge tone={status === "Hadir" ? "success" : "brand"}>{status}</Badge>
-            </div>
-          </div>
-        </div>
-        <p className="text-right text-[11px] text-text-subtle">{date}</p>
-      </CardBody>
-    </Card>
-  );
-}
-
 export default function PanduanMemberView() {
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10 sm:py-14">
+    <main className="mx-auto max-w-[420px] px-4 py-10 sm:py-14">
       <div className="flex flex-col items-start gap-3">
         <Image
           src="/logo.png"
           alt="Les Renang Cianjur"
-          width={48}
-          height={48}
-          className="h-12 w-12 rounded-2xl object-contain shadow-sm"
+          width={44}
+          height={44}
+          className="h-11 w-11 rounded-2xl object-contain shadow-sm"
         />
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-brand-600">Real Case &middot; Bukan Mockup</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
-            Panduan Member &mdash; Contoh dari Akun Aktif
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-600">Real Case &middot; Versi Mobile</p>
+          <h1 className="mt-1 text-xl font-semibold tracking-tight text-text">
+            Panduan Member Lengkap &mdash; Dari Awal Sampai Booking
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-text-muted">
-            Semua data di halaman ini diambil dari akun demo yang beneran ada di sistem (bukan karangan) --
-            biar kebayang persis apa yang bakal dilihat orang tua/member pas mereka pakai aplikasinya, di HP
-            maupun di laptop.
+          <p className="mt-2 text-sm text-text-muted">
+            Urutan step + isi tiap layar di bawah diambil dari kode aplikasi &amp; data akun demo yang
+            beneran aktif -- bukan dikira-kira. Ada 2 jalur masuk (Daftar Sendiri vs Login dari akun yang
+            dibikinin admin), lanjut sampai booking, riwayat, paket, dan profil.
           </p>
         </div>
       </div>
 
-      <ScenarioBlock
-        eyebrow="Skenario 1"
-        title="Member dengan peserta &ldquo;Diri Sendiri&rdquo;"
-        desc="Akun demo.dirisendiri@example.com -- orang tua yang ikut les sendiri, bukan buat anak."
-      >
-        <DeviceFrame label="Mobile" maxWidth={375}>
-          <p className="text-xs text-text-subtle">Halaman Paket Saya</p>
-          <PaketCard
-            name="8x Renang"
-            forWhom="Demo Diri Sendiri (kamu)"
-            sisa={8}
-            total={8}
-            berlaku="Rabu, 21 Oktober 2026"
-          />
-          <p className="mt-2 text-xs text-text-subtle">Dropdown di halaman Booking</p>
-          <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
-            Demo Diri Sendiri &mdash; 8x Renang, sisa 8
-          </div>
-        </DeviceFrame>
-        <DeviceFrame label="Desktop" maxWidth={620}>
-          <p className="text-xs text-text-subtle">Halaman Paket Saya</p>
-          <div className="flex items-center justify-between">
-            <PaketCard
-              name="8x Renang"
-              forWhom="Demo Diri Sendiri (kamu)"
-              sisa={8}
-              total={8}
-              berlaku="Rabu, 21 Oktober 2026"
-            />
-            <span className="ml-3 shrink-0 text-[11px] text-text-subtle">Member sejak 22 Agustus 2026</span>
-          </div>
-        </DeviceFrame>
-      </ScenarioBlock>
+      <Part label="Jalur A &mdash; Daftar Akun Sendiri" />
 
-      <ScenarioBlock
-        eyebrow="Skenario 2"
-        title="Member dengan 1 anak"
-        desc="Akun demo.satuanak@example.com -- “Anak Satu”. Contoh ini nunjukin before/after: sebelum dan sesudah beneran booking 1 sesi."
-      >
-        <DeviceFrame label="Mobile &mdash; sebelum booking" maxWidth={375}>
-          <PaketCard name="8x Renang" forWhom="Anak Satu" sisa={8} total={8} berlaku="Rabu, 21 Oktober 2026" />
-          <p className="text-xs text-text-subtle">Riwayat Booking</p>
-          <div className="rounded-xl border border-dashed border-border p-4 text-center text-xs text-text-subtle">
-            Belum ada riwayat booking.
-          </div>
-        </DeviceFrame>
-        <DeviceFrame label="Desktop &mdash; setelah booking (Sisa jatah batal: 2)" maxWidth={620}>
-          <PaketCard name="8x Renang" forWhom="Anak Satu" sisa={7} total={8} berlaku="Rabu, 21 Oktober 2026" />
-          <p className="text-xs text-text-subtle">Riwayat Booking</p>
-          <RiwayatCard
-            coach="Coach Ayu"
-            time="11.00&ndash;12.00"
-            forWhom="Anak Satu"
-            date="Selasa, 25 Agustus 2026"
-            status="Terjadwal"
-          />
-          <p className="text-[11px] text-text-subtle">
-            Karena udah kurang dari 2 jam sebelum jadwal, tombol yang tampil &ldquo;Hubungi Admin&rdquo;, bukan
-            &ldquo;Batalkan&rdquo; -- ini beneran kejadian pas booking dites live, bukan disengaja.
+      <Step n={1} title="Buka aplikasi pertama kali" desc="Belum login sama sekali.">
+        <div className="flex flex-col items-center gap-2 py-3 text-center">
+          <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-xl object-contain" />
+          <p className="text-sm font-semibold text-text">Les Renang Cianjur</p>
+          <p className="max-w-[220px] text-xs text-text-muted">
+            Booking jadwal renang dengan coach favoritmu, kapan aja lewat HP.
           </p>
-        </DeviceFrame>
-      </ScenarioBlock>
-
-      <ScenarioBlock
-        eyebrow="Skenario 3"
-        title="Member dengan 2 anak"
-        desc="Akun demo.duaanak@example.com -- “Anak Pertama” dan “Anak Kedua”, masing-masing punya paket & sisa sesi sendiri, gak ketuker."
-      >
-        <DeviceFrame label="Mobile" maxWidth={375}>
-          <p className="text-xs text-text-subtle">Halaman Paket Saya</p>
-          <PaketCard name="8x Renang" forWhom="Anak Pertama" sisa={8} total={8} berlaku="Rabu, 21 Oktober 2026" />
-          <PaketCard name="8x Renang" forWhom="Anak Kedua" sisa={8} total={8} berlaku="Rabu, 21 Oktober 2026" />
-        </DeviceFrame>
-        <DeviceFrame label="Desktop &mdash; dropdown pilih anak di Booking" maxWidth={620}>
-          <p className="text-xs text-text-subtle">Field &ldquo;Buat anak&rdquo; di halaman Booking</p>
-          <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
-            Anak Kedua &mdash; 8x Renang, sisa 8
-          </div>
-          <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
-            Anak Pertama &mdash; 8x Renang, sisa 8
-          </div>
-          <p className="text-[11px] text-text-subtle">
-            Satu akun, dua anak, dua paket terpisah -- booking buat Anak Pertama gak pernah motong sesi Anak
-            Kedua.
-          </p>
-        </DeviceFrame>
-      </ScenarioBlock>
-
-      <ScenarioBlock
-        eyebrow="Skenario 4"
-        title="Alur beli paket dari awal (langsung di dalam app)"
-        desc="Akun testmember2@example.com -- akun baru yang belum punya paket sama sekali, sampai proses beli."
-      >
-        <DeviceFrame label="Mobile &mdash; sebelum beli" maxWidth={375}>
-          <div className="rounded-xl border border-amber-200 bg-warning-bg px-3 py-2 text-xs text-warning-text">
-            Belum ada anak yang punya paket aktif dengan sisa sesi.{" "}
-            <span className="font-medium underline">Beli paket dulu.</span>
-          </div>
-          <p className="text-xs text-text-subtle">Halaman Paket &mdash; Beli Paket Baru</p>
-          <Card>
-            <CardBody>
-              <p className="text-sm font-semibold text-text">Private | 8x Renang</p>
-              <p className="mt-1 text-lg font-bold text-text">Rp750.000</p>
-              <p className="mt-1 text-xs text-text-muted">8 Sesi &middot; Berlaku 60 Hari &middot; Jatah Batal Booking 2x</p>
-              <div className="mt-3 flex min-h-[40px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
-                Buat Test Member 2
-              </div>
-              <Button className="mt-3 w-full">Beli</Button>
-            </CardBody>
-          </Card>
-        </DeviceFrame>
-        <DeviceFrame label="Desktop &mdash; sesudah beli (contoh hasil akhir)" maxWidth={620}>
-          <p className="text-xs text-text-subtle">Setelah pembayaran Midtrans berhasil</p>
-          <PaketCard name="Private | 8x Renang" forWhom="Test Member 2" sisa={8} total={8} berlaku="+60 hari dari tanggal aktif" />
-          <p className="text-[11px] text-text-subtle">
-            Paket langsung aktif otomatis begitu Midtrans konfirmasi pembayaran sukses -- gak perlu approval
-            manual dari admin.
-          </p>
-        </DeviceFrame>
-      </ScenarioBlock>
-
-      <ScenarioBlock
-        eyebrow="Skenario 5"
-        title="Kelola Profil"
-        desc="Halaman /profil -- ganti nama, ganti password, tambah/nonaktifkan anak. Contoh dari akun Demo Diri Sendiri."
-      >
-        <DeviceFrame label="Mobile" maxWidth={375}>
-          <Field label="Nama/Orang Tua">
-            <Input defaultValue="Demo Diri Sendiri" readOnly className="bg-surface-muted" />
-          </Field>
-          <Button variant="secondary" size="sm" className="w-fit">
-            Simpan Nama
-          </Button>
-        </DeviceFrame>
-        <DeviceFrame label="Desktop" maxWidth={620}>
-          <div className="flex items-end gap-3">
-            <div className="flex-1">
-              <Field label="Nama/Orang Tua">
-                <Input defaultValue="Demo Diri Sendiri" readOnly className="bg-surface-muted" />
-              </Field>
-            </div>
+          <div className="mt-1 flex gap-2">
+            <Button size="sm">Login</Button>
             <Button variant="secondary" size="sm">
-              Simpan Nama
+              Daftar
             </Button>
           </div>
-        </DeviceFrame>
-      </ScenarioBlock>
+        </div>
+      </Step>
+
+      <Step n={2} title="Tap &ldquo;Daftar&rdquo;, isi form" desc="Halaman /register.">
+        <FakeField label="Nama/Orang Tua" value="Bunda Sarah" />
+        <FakeField label="No HP" value="0812xxxxxxx" />
+        <FakeField label="Email (opsional)" value="" muted />
+        <FakeField label="Password" value="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+        <div>
+          <p className="mb-1 text-xs font-medium text-text-muted">Siapa yang mau les?</p>
+          <div className="flex gap-2">
+            <div className="flex h-[44px] w-24 shrink-0 items-center justify-center rounded-xl border border-border bg-white text-xs text-text">
+              Anak
+            </div>
+            <div className="flex h-[44px] flex-1 items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
+              Kirana
+            </div>
+          </div>
+          <p className="mt-1 text-[11px] text-brand-600">+ Tambah peserta lain</p>
+        </div>
+        <Button className="w-full">Daftar</Button>
+      </Step>
+
+      <Step
+        n={3}
+        title="Otomatis login, diarahkan ke halaman Paket"
+        note="Bukan ke Booking -- karena akun baru belum punya paket aktif, sistem ngarahin ke Paket dulu biar beli."
+      >
+        <div className="rounded-xl border border-amber-200 bg-warning-bg px-3 py-2 text-xs text-warning-text">
+          Belum ada paket. Pilih salah satu di bawah.
+        </div>
+        <p className="text-xs text-text-subtle">Beli Paket Baru</p>
+        <Card>
+          <CardBody>
+            <p className="text-sm font-semibold text-text">Private | 8x Renang</p>
+            <p className="mt-1 text-lg font-bold text-text">Rp750.000</p>
+            <p className="mt-1 text-xs text-text-muted">8 Sesi &middot; Berlaku 60 Hari &middot; Jatah Batal Booking 2x</p>
+            <Button className="mt-3 w-full" size="sm">
+              Beli
+            </Button>
+          </CardBody>
+        </Card>
+      </Step>
+
+      <Part label="Jalur B &mdash; Akun Dibikinin Admin (lebih umum)" />
+
+      <Step
+        n={4}
+        title="Login pake No HP + password default"
+        desc="Admin udah input data member (termasuk anak &amp; paket) lewat import xlsx atau input manual."
+      >
+        <FakeField label="No HP atau Email" value="0812xxxxxxx" />
+        <FakeField label="Password" value="renang2026" />
+        <Button className="w-full">Login</Button>
+        <p className="text-[11px] text-text-subtle">Password default sama buat semua member baru: renang2026</p>
+      </Step>
+
+      <Step
+        n={5}
+        title="Wajib ganti password dulu"
+        desc="Otomatis diarahkan ke /ganti-password, gak bisa dilewatin sebelum ganti."
+        note="Field &ldquo;Siapa yang mau les?&rdquo; tetap muncul di sini walau anaknya udah diinput admin -- itu emang alur baku form ini."
+      >
+        <p className="text-xs text-text-muted">Ini login pertama kamu -- ganti password bawaan dulu ya.</p>
+        <FakeField label="Password Baru" value="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+        <FakeField label="Konfirmasi Password Baru" value="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+        <div>
+          <p className="mb-1 text-xs font-medium text-text-muted">Siapa yang mau les?</p>
+          <div className="flex gap-2">
+            <div className="flex h-[44px] w-24 shrink-0 items-center justify-center rounded-xl border border-border bg-white text-xs text-text">
+              Diri sendiri
+            </div>
+            <div className="flex h-[44px] flex-1 items-center truncate rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
+              (nama kamu)
+            </div>
+          </div>
+        </div>
+        <Button className="w-full">Simpan &amp; Lanjut</Button>
+      </Step>
+
+      <Step n={6} title="Diarahkan ke halaman Booking" note="Sekarang baru masuk ke tab default member: Booking Coach.">
+        <div className="flex items-center gap-2 text-brand-700">
+          <span className="text-lg">&darr;</span>
+          <p className="text-xs font-medium">Landing page member = Booking, bukan Paket</p>
+        </div>
+      </Step>
+
+      <Part label="Booking Sesi (Lengkap)" />
+
+      <Step n={7} title="Pilih anak" desc="Dropdown &ldquo;Buat anak&rdquo; -- nunjukin paket &amp; sisa sesi tiap peserta.">
+        <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
+          Anak Satu &mdash; 8x Renang, sisa 8
+        </div>
+      </Step>
+
+      <Step n={8} title="Pilih tanggal" desc="Kalender custom -- tanggal yang ada slot kosong ditandain titik.">
+        <div className="flex min-h-[44px] items-center justify-between rounded-xl border border-border bg-white px-3 text-sm text-text">
+          Sel, 25 Agustus 2026 <span className="text-text-subtle">&#8964;</span>
+        </div>
+      </Step>
+
+      <Step n={9} title="Pilih coach &amp; jam, tap Booking">
+        <Card>
+          <CardBody className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-brand-700">Coach Ayu</p>
+              <p className="text-sm text-text">11.00&ndash;12.00</p>
+            </div>
+            <Button size="sm">Booking</Button>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody className="flex items-center justify-between opacity-60">
+            <div>
+              <p className="text-xs font-semibold text-brand-700">Coach Ayu</p>
+              <p className="text-sm text-text">08.00&ndash;09.00</p>
+            </div>
+            <Badge tone="neutral">Sudah dibooking</Badge>
+          </CardBody>
+        </Card>
+      </Step>
+
+      <Step n={10} title="Booking berhasil" note="Sisa sesi kepotong 1, dan coach dapet notif kalau notifikasinya udah aktif.">
+        <div className="rounded-xl bg-success-bg px-3 py-2 text-xs font-medium text-success-text">
+          Booking berhasil! Cek di halaman Riwayat.
+        </div>
+        <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
+          Anak Satu &mdash; 8x Renang, sisa 7
+        </div>
+      </Step>
+
+      <Part label="Riwayat &amp; Pembatalan" />
+
+      <Step n={11} title="Cek Riwayat Booking">
+        <Card>
+          <CardBody className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
+                CA
+              </div>
+              <div>
+                <p className="text-sm font-medium text-text">Coach Ayu</p>
+                <p className="text-xs text-text-muted">11.00&ndash;12.00 &middot; buat Anak Satu</p>
+                <Badge tone="brand">Terjadwal</Badge>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </Step>
+
+      <Step
+        n={12}
+        title="Batalkan (kalau masih &ge; 2 jam sebelum jadwal)"
+        note="Sisa sesi otomatis balik, tapi jatah pembatalan mandiri berkurang 1."
+      >
+        <div className="flex items-center justify-between rounded-xl border border-border bg-white p-3">
+          <p className="text-xs text-text-muted">Jatah batal: 2/2 tersisa</p>
+          <Button variant="danger" size="sm">
+            Batalkan
+          </Button>
+        </div>
+        <p className="text-xs text-text-subtle">Muncul konfirmasi: &ldquo;Batalkan booking ini?&rdquo; &rarr; Ya, batalkan</p>
+      </Step>
+
+      <Step
+        n={13}
+        title="Kalau udah &lt; 2 jam atau jatah abis"
+        note="Ini beneran kejadian pas didemo -- booking dites live, kurang dari 2 jam sebelum jadwal."
+      >
+        <div className="flex items-center justify-between rounded-xl border border-border bg-white p-3">
+          <p className="text-xs text-text-muted">Pembatalan hanya bisa minimal 2 jam sebelum jadwal.</p>
+          <Button className="shrink-0 bg-success-text hover:bg-success-text/90" size="sm">
+            Hubungi Admin
+          </Button>
+        </div>
+        <p className="text-xs text-text-subtle">Klik langsung buka WhatsApp, pesannya udah keisi otomatis.</p>
+      </Step>
+
+      <Part label="Paket" />
+
+      <Step n={14} title="Paket Saya">
+        <p className="text-[11px] text-text-subtle">Member sejak 22 Agustus 2026</p>
+        <PaketCard name="8x Renang" forWhom="Anak Satu" sisa={7} total={8} berlaku="Rabu, 21 Oktober 2026" />
+      </Step>
+
+      <Step n={15} title="Beli paket tambahan" desc="Kalau sesi udah mau habis, bisa beli lagi kapan aja.">
+        <Card>
+          <CardBody>
+            <p className="text-sm font-semibold text-text">Private | 8x Renang</p>
+            <p className="mt-1 text-lg font-bold text-text">Rp750.000</p>
+            <div className="mt-3 flex min-h-[40px] items-center rounded-xl border border-border bg-white px-3 text-sm text-text">
+              Buat Anak Satu
+            </div>
+            <Button className="mt-3 w-full" size="sm">
+              Beli
+            </Button>
+          </CardBody>
+        </Card>
+      </Step>
+
+      <Part label="Kelola Profil" />
+
+      <Step n={16} title="Ganti nama / password" desc="Halaman /profil.">
+        <Field label="Nama/Orang Tua">
+          <Input defaultValue="Demo Satu Anak" readOnly className="bg-surface-muted" />
+        </Field>
+        <Button variant="secondary" size="sm" className="w-fit">
+          Simpan Nama
+        </Button>
+      </Step>
+
+      <Step n={17} title="Tambah anak baru">
+        <div className="flex gap-2">
+          <Select disabled className="w-24 shrink-0">
+            <option>Anak</option>
+          </Select>
+          <Input placeholder="Nama anak" className="flex-1" readOnly />
+        </div>
+        <Button variant="secondary" size="sm" className="w-fit">
+          Tambah
+        </Button>
+      </Step>
+
+      <Step n={18} title="Aktifkan notifikasi" note="Sekali aktif, dapet notif tiap booking berhasil dan tiap coach buka slot baru.">
+        <button className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
+          Aktifkan Notifikasi
+        </button>
+      </Step>
 
       <footer className="mt-14 border-t border-border pt-6 text-xs text-text-subtle">
-        Les Renang Cianjur &mdash; dokumentasi internal, dibuat dari data akun demo yang beneran aktif di
-        sistem (bukan mockup). Data per 25 Agustus 2026, bisa berubah kalau akun demo-nya dipakai lagi.
+        Les Renang Cianjur &mdash; dokumentasi internal. Copy &amp; urutan tiap step diverifikasi dari kode
+        aplikasi &amp; akun demo aktif per 25 Agustus 2026, bukan mockup karangan.
       </footer>
     </main>
   );
