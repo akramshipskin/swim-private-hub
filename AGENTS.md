@@ -18,3 +18,27 @@ Run `npm test` (Vitest). See [TESTING.md](./TESTING.md) for framework details an
 - When adding error handling, write a test that triggers the error.
 - When adding a conditional (if/else, switch), write tests for BOTH paths.
 - Never commit code that makes existing tests fail.
+
+## Working style
+
+### Think before coding
+
+Don't silently assume an interpretation when a request is ambiguous — state
+the assumption or ask. If a request implies a design/scope decision (which
+file, what data source, whether to touch prod), surface it and the tradeoff
+instead of picking one and running. Stop and name what's unclear rather than
+guessing past it.
+
+### Goal-driven execution
+
+For non-trivial tasks, define what "done" looks like before starting, and
+verify against it before reporting success:
+
+- Bug fix → reproduce it first (or state exactly how you confirmed it), fix,
+  then re-verify the original repro is gone.
+- New feature/logic change → `npx tsc --noEmit`, `npx vitest run`, and
+  `npm run build` must all pass before it's considered shippable.
+- UI change → verify in the browser (not just "should work").
+
+Trivial changes (typo, one-liner, copy tweak) don't need the full ritual —
+use judgment.
