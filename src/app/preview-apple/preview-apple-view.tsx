@@ -40,10 +40,9 @@ const CSS = `
 
 .aui-toolbar {
   position: sticky; top: 0; z-index: 10;
-  background: color-mix(in srgb, var(--aui-bg) 72%, transparent);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 0.5px solid var(--aui-border);
+  background: color-mix(in srgb, var(--aui-bg) 65%, transparent);
+  backdrop-filter: blur(26px) saturate(220%);
+  -webkit-backdrop-filter: blur(26px) saturate(220%);
   padding: 12px 20px calc(12px + env(safe-area-inset-top, 0px));
 }
 .aui-toolbar-title {
@@ -53,23 +52,27 @@ const CSS = `
   margin-top: 2px; font-size: 15px; color: var(--aui-text-secondary); letter-spacing: -0.01em;
 }
 
+/* Segmented control: pill/kaca, bukan kotak flat -- ciri Liquid Glass
+   (semua control jadi bentuk kapsul, permukaan punya highlight tipis
+   di atas kayak beneran kaca). */
 .aui-segmented {
-  margin: 14px 20px 0; display: flex; background: var(--aui-fill);
-  border-radius: 9px; padding: 2px; gap: 2px;
+  margin: 16px 0 0; display: flex; background: var(--aui-fill);
+  backdrop-filter: blur(10px);
+  border-radius: 999px; padding: 3px; gap: 2px;
 }
 .aui-segmented button {
-  flex: 1; padding: 6px 0; border: none; background: transparent;
-  border-radius: 7px; font-size: 13px; font-weight: 600; letter-spacing: -0.01em;
+  flex: 1; padding: 7px 0; border: none; background: transparent;
+  border-radius: 999px; font-size: 13px; font-weight: 600; letter-spacing: -0.01em;
   color: var(--aui-text-secondary); cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 .aui-segmented button.active {
   background: var(--aui-surface); color: var(--aui-text);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 1px rgba(0,0,0,0.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.14), 0 1px 1px rgba(0,0,0,0.08);
 }
 .aui-segmented button:active { transform: scale(0.97); }
 
-.aui-content { padding: 20px 20px 60px; max-width: 480px; margin: 0 auto; }
+.aui-content { padding: 20px 20px 110px; max-width: 480px; margin: 0 auto; }
 
 .aui-group-label {
   font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em;
@@ -78,8 +81,8 @@ const CSS = `
 .aui-group-label:first-child { margin-top: 0; }
 
 .aui-list {
-  background: var(--aui-surface); border-radius: 14px; overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  background: var(--aui-surface); border-radius: 20px; overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04);
 }
 .aui-row {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -96,9 +99,10 @@ const CSS = `
 .aui-datescroll { display: flex; gap: 8px; overflow-x: auto; padding: 2px 4px 6px; scrollbar-width: none; }
 .aui-datescroll::-webkit-scrollbar { display: none; }
 .aui-datepill {
-  flex-shrink: 0; width: 56px; padding: 10px 0; border-radius: 16px;
+  flex-shrink: 0; width: 56px; padding: 10px 0; border-radius: 20px;
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   background: var(--aui-surface); cursor: pointer; transition: background 0.15s, color 0.15s;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
 }
 .aui-datepill .dow { font-size: 11px; font-weight: 600; color: var(--aui-text-tertiary); text-transform: uppercase; }
 .aui-datepill .num { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
@@ -107,9 +111,9 @@ const CSS = `
 .aui-datepill:active { transform: scale(0.94); }
 
 .aui-slotcard {
-  background: var(--aui-surface); border-radius: 14px; padding: 14px 16px;
+  background: var(--aui-surface); border-radius: 20px; padding: 14px 16px;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04);
 }
 .aui-slotcard + .aui-slotcard { margin-top: 10px; }
 .aui-coach-avatar {
@@ -126,7 +130,10 @@ const CSS = `
   letter-spacing: -0.01em; cursor: pointer; transition: transform 0.1s ease, opacity 0.1s ease;
 }
 .aui-btn:active { transform: scale(0.95); opacity: 0.85; }
-.aui-btn-fill { background: var(--aui-blue); color: white; }
+.aui-btn-fill {
+  background: var(--aui-blue); color: white;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 2px 8px -2px color-mix(in srgb, var(--aui-blue) 60%, transparent);
+}
 .aui-btn-tint { background: color-mix(in srgb, var(--aui-blue) 15%, transparent); color: var(--aui-blue); }
 .aui-btn-disabled { background: var(--aui-fill); color: var(--aui-text-tertiary); cursor: default; }
 .aui-btn-disabled:active { transform: none; }
@@ -143,19 +150,31 @@ const CSS = `
   font-size: 13px; line-height: 1.5;
 }
 
+/* Tab bar Liquid Glass: melayang di atas konten (fixed + margin di
+   semua sisi), bukan flush nempel ke tepi layar kayak iOS lama.
+   Corner besar & elevated shadow biar keliatan "ngambang". */
 .aui-tabbar {
-  position: sticky; bottom: 0; display: flex;
-  background: color-mix(in srgb, var(--aui-bg) 78%, transparent);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-top: 0.5px solid var(--aui-border);
-  padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+  position: fixed; left: 14px; right: 14px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 20; display: flex;
+  background: color-mix(in srgb, var(--aui-bg) 55%, transparent);
+  backdrop-filter: blur(28px) saturate(220%);
+  -webkit-backdrop-filter: blur(28px) saturate(220%);
+  border-radius: 28px;
+  border: 0.5px solid rgba(255,255,255,0.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 12px 32px -8px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.08);
+  padding: 8px 4px;
+  max-width: 480px; margin: 0 auto;
+}
+@media (prefers-color-scheme: dark) {
+  .aui-tabbar { border-color: rgba(255,255,255,0.08); }
 }
 .aui-tabbar button {
   flex: 1; border: none; background: transparent; display: flex; flex-direction: column;
   align-items: center; gap: 3px; padding: 4px 0; cursor: pointer; color: var(--aui-text-tertiary);
+  border-radius: 18px; transition: background 0.15s ease, color 0.15s ease;
 }
-.aui-tabbar button.active { color: var(--aui-blue); }
+.aui-tabbar button.active { color: var(--aui-blue); background: color-mix(in srgb, var(--aui-blue) 12%, transparent); }
 .aui-tabbar .icon { width: 24px; height: 24px; }
 .aui-tabbar .label { font-size: 10px; font-weight: 600; letter-spacing: -0.01em; }
 
@@ -178,8 +197,10 @@ const CSS = `
 @media (min-width: 1024px) {
   .aui-sidebar {
     display: flex; flex-direction: column; width: 240px; flex-shrink: 0;
+    margin: 14px 0 14px 14px; border-radius: 22px;
     background: color-mix(in srgb, var(--aui-bg) 55%, var(--aui-surface));
-    border-right: 0.5px solid var(--aui-border);
+    backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 3px rgba(0,0,0,0.05);
     padding: 18px 10px;
   }
   .aui-sidebar-brand {
@@ -192,7 +213,7 @@ const CSS = `
   }
   .aui-sidebar-item {
     display: flex; align-items: center; gap: 10px; padding: 7px 10px;
-    border-radius: 7px; font-size: 13.5px; font-weight: 500; color: var(--aui-text);
+    border-radius: 10px; font-size: 13.5px; font-weight: 500; color: var(--aui-text);
     cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
   .aui-sidebar-item svg { width: 16px; height: 16px; color: var(--aui-text-secondary); flex-shrink: 0; }
