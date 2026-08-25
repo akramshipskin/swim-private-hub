@@ -165,7 +165,7 @@ body {
      ukuran viewport doang, konsisten di halaman pendek maupun panjang. */
   background: radial-gradient(
       circle at top,
-      color-mix(in srgb, var(--color-brand-100) 30%, transparent) 0%,
+      color-mix(in srgb, var(--color-brand-100) 50%, transparent) 0%,
       transparent 50vh
     ),
     var(--background);
