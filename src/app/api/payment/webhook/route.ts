@@ -42,6 +42,23 @@ export async function POST(request: Request) {
     return Response.json({ error: "Payment tidak ditemukan" }, { status: 404 });
   }
 
+  // Midtrans bisa ngirim ulang notifikasi yang sama (retry kalau endpoint
+  // kita gak balikin 200 tepat waktu, atau emang kadang dobel dari sisi
+  // mereka) -- kalau payment ini UDAH SUCCESS sebelumnya dan notifikasi
+  // yang dateng juga capture/settlement (bukan status baru), ini notif
+  // duplikat: gak boleh reset startDate/expiredDate paket lagi, ntar
+  // masa berlaku member ke-extend diem-diem tiap kali Midtrans retry.
+  if (
+    payment.status === "SUCCESS" &&
+    (transactionStatus === "capture" || transactionStatus === "settlement")
+  ) {
+    await prisma.payment.update({
+      where: { id: payment.id },
+      data: { rawWebhookPayload: body },
+    });
+    return Response.json({ ok: true });
+  }
+
   let paymentStatus: "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED" = "PENDING";
   let packageStatus: "PENDING_PAYMENT" | "ACTIVE" | "EXPIRED" | null = null;
 
