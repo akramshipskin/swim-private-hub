@@ -609,7 +609,7 @@ const PANDUAN_BODY = `
 
       <div class="guide">
         <div class="guide-head" id="m-notif"><span class="gi">7</span><h3>Aktifkan Notifikasi</h3></div>
-        <div class="step"><span class="sn">1</span><div class="st"><h4>Klik "Aktifkan Notifikasi" di halaman Booking</h4><p>Browser bakal minta izin — pilih Izinkan. Sekali aktif, kamu dapet notifikasi tiap booking berhasil, walau aplikasi lagi gak dibuka.</p></div></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Klik "Aktifkan Notifikasi" di halaman Booking</h4><p>Browser bakal minta izin — pilih Izinkan. Sekali aktif, kamu dapet notifikasi tiap booking berhasil, dan tiap ada coach yang buka slot jadwal baru — walau aplikasi lagi gak dibuka.</p></div></div>
       </div>
     </section>
 
@@ -636,7 +636,7 @@ const PANDUAN_BODY = `
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Jadwal</h4></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih Tanggal</h4></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih Jam mulai dan Jam selesai</h4><p>Sistem otomatis mecah rentang jam itu jadi slot per jam. Misalnya 08.00–10.00 jadi 2 slot terpisah: 08–09 dan 09–10, dan masing-masing bisa dibooking member yang beda.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Klik Tambah Slot</h4><p>Slot baru langsung muncul dan bisa dibooking member secara real-time.</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Klik Tambah Slot</h4><p>Slot baru langsung muncul dan bisa dibooking member secara real-time. Semua member aktif yang udah nyalain notifikasi otomatis dapet notif "Slot jadwal baru".</p></div></div>
       </div>
 
       <div class="guide">

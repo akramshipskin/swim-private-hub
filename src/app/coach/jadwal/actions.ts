@@ -3,7 +3,8 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { wibDateTime, dateLabel } from "@/lib/datetime";
+import { wibDateTime, dateLabel, formatDateLabel, formatTimeWib } from "@/lib/datetime";
+import { sendPushToUser } from "@/lib/push";
 
 export type ActionState = { error?: string } | null;
 
@@ -51,6 +52,34 @@ export async function addAvailability(
   }
 
   await prisma.availability.createMany({ data: chunks, skipDuplicates: true });
+
+  if (chunks.length > 0) {
+    // Broadcast 1 notif per aksi "Tambah Slot" (bukan per slot per jam)
+    // biar member gak kebanjiran notif kalau coach buka rentang jam
+    // panjang sekaligus. Best-effort, gak boleh gagalin slot yang udah
+    // sukses tersimpan.
+    const first = chunks[0];
+    const last = chunks[chunks.length - 1];
+    const rangeLabel =
+      chunks.length === 1
+        ? `${formatTimeWib(first.startTime)}–${formatTimeWib(first.endTime)}`
+        : `${formatTimeWib(first.startTime)}–${formatTimeWib(last.endTime)}`;
+
+    prisma.user
+      .findMany({ where: { role: "MEMBER", isActive: true }, select: { id: true } })
+      .then((members) =>
+        Promise.allSettled(
+          members.map((m) =>
+            sendPushToUser(m.id, {
+              title: "Slot jadwal baru",
+              body: `${session.user.name}, ${formatDateLabel(first.startTime)} ${rangeLabel}`,
+              url: "/member/booking",
+            })
+          )
+        )
+      )
+      .catch(() => {});
+  }
 
   revalidatePath("/coach/jadwal");
   return null;
