@@ -167,6 +167,45 @@ const CSS = `
 @media (prefers-color-scheme: dark) {
   .aui-banner { color: #ffb340; }
 }
+
+/* --- Desktop/iPad: bottom tab bar + segmented control diganti sidebar,
+   sama kayak macOS/iPadOS Catalyst app (Notes, Mail) -- bukan cuma
+   di-stretch. Di bawah 1024px tetep layout mobile murni. --- */
+.aui-shell { display: flex; min-height: 100vh; }
+.aui-sidebar { display: none; }
+.aui-main { flex: 1; min-width: 0; }
+
+@media (min-width: 1024px) {
+  .aui-sidebar {
+    display: flex; flex-direction: column; width: 240px; flex-shrink: 0;
+    background: color-mix(in srgb, var(--aui-bg) 55%, var(--aui-surface));
+    border-right: 0.5px solid var(--aui-border);
+    padding: 18px 10px;
+  }
+  .aui-sidebar-brand {
+    display: flex; align-items: center; gap: 8px; padding: 4px 10px 20px;
+    font-size: 15px; font-weight: 700; letter-spacing: -0.01em;
+  }
+  .aui-sidebar-brand .dot {
+    width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+    background: linear-gradient(135deg, #64d2ff, #007aff);
+  }
+  .aui-sidebar-item {
+    display: flex; align-items: center; gap: 10px; padding: 7px 10px;
+    border-radius: 7px; font-size: 13.5px; font-weight: 500; color: var(--aui-text);
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .aui-sidebar-item svg { width: 16px; height: 16px; color: var(--aui-text-secondary); flex-shrink: 0; }
+  .aui-sidebar-item.active { background: color-mix(in srgb, var(--aui-blue) 14%, transparent); color: var(--aui-blue); }
+  .aui-sidebar-item.active svg { color: var(--aui-blue); }
+  .aui-sidebar-item:hover:not(.active) { background: var(--aui-fill); }
+
+  .aui-segmented, .aui-tabbar { display: none; }
+  .aui-toolbar { padding-left: 32px; padding-right: 32px; }
+  .aui-banner { margin-left: 32px; margin-right: 32px; }
+  .aui-content { max-width: 640px; margin: 0; padding-left: 32px; padding-right: 32px; }
+  .aui-slotcard { max-width: 480px; }
+}
 `;
 
 const DATES = [
@@ -194,28 +233,58 @@ export default function PreviewAppleView() {
     <div className="aui-root">
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
 
-      <div className="aui-toolbar">
-        <div className="aui-toolbar-title">Booking</div>
-        <div className="aui-toolbar-sub">Pilih anak, coach, dan jam.</div>
-        <div className="aui-segmented">
-          <button className={tab === "booking" ? "active" : ""} onClick={() => setTab("booking")}>
+      <div className="aui-shell">
+        <aside className="aui-sidebar">
+          <div className="aui-sidebar-brand">
+            <span className="dot" />
+            Les Renang Cianjur
+          </div>
+          <div className={`aui-sidebar-item ${tab === "booking" ? "active" : ""}`} onClick={() => setTab("booking")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <rect x="3.5" y="5" width="17" height="15.5" rx="2.2" />
+              <path strokeLinecap="round" d="M3.5 9.5h17M8 3v3.4M16 3v3.4" />
+            </svg>
             Booking
-          </button>
-          <button className={tab === "riwayat" ? "active" : ""} onClick={() => setTab("riwayat")}>
+          </div>
+          <div className={`aui-sidebar-item ${tab === "riwayat" ? "active" : ""}`} onClick={() => setTab("riwayat")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="12" cy="12" r="8.5" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5V12l3 2" />
+            </svg>
             Riwayat
-          </button>
-          <button className={tab === "paket" ? "active" : ""} onClick={() => setTab("paket")}>
+          </div>
+          <div className={`aui-sidebar-item ${tab === "paket" ? "active" : ""}`} onClick={() => setTab("paket")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20 7.5 12 3 4 7.5v9L12 21l8-4.5v-9Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 7.5 12 12l8-4.5M12 12v9" />
+            </svg>
             Paket
-          </button>
-        </div>
-      </div>
+          </div>
+        </aside>
 
-      <div className="aui-banner">
-        <span>⚠️</span>
-        <span>Ini preview visual doang -- gak nyambung ke data/booking beneran.</span>
-      </div>
+        <div className="aui-main">
+          <div className="aui-toolbar">
+            <div className="aui-toolbar-title">Booking</div>
+            <div className="aui-toolbar-sub">Pilih anak, coach, dan jam.</div>
+            <div className="aui-segmented">
+              <button className={tab === "booking" ? "active" : ""} onClick={() => setTab("booking")}>
+                Booking
+              </button>
+              <button className={tab === "riwayat" ? "active" : ""} onClick={() => setTab("riwayat")}>
+                Riwayat
+              </button>
+              <button className={tab === "paket" ? "active" : ""} onClick={() => setTab("paket")}>
+                Paket
+              </button>
+            </div>
+          </div>
 
-      <div className="aui-content">
+          <div className="aui-banner">
+            <span>⚠️</span>
+            <span>Ini preview visual doang -- gak nyambung ke data/booking beneran.</span>
+          </div>
+
+          <div className="aui-content">
         <div className="aui-group-label">Peserta</div>
         <div className="aui-list">
           <div className="aui-row">
@@ -263,30 +332,32 @@ export default function PreviewAppleView() {
         <div className="aui-note">
           Pembatalan bisa dilakukan sendiri minimal 2 jam sebelum jadwal, sesuai jatah paket. Lewat itu, hubungi admin lewat WhatsApp.
         </div>
-      </div>
+          </div>
 
-      <div className="aui-tabbar">
-        <button className="active">
-          <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <rect x="3.5" y="5" width="17" height="15.5" rx="2.2" />
-            <path strokeLinecap="round" d="M3.5 9.5h17M8 3v3.4M16 3v3.4" />
-          </svg>
-          <span className="label">Booking</span>
-        </button>
-        <button>
-          <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <circle cx="12" cy="12" r="8.5" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5V12l3 2" />
-          </svg>
-          <span className="label">Riwayat</span>
-        </button>
-        <button>
-          <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20 7.5 12 3 4 7.5v9L12 21l8-4.5v-9Z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 7.5 12 12l8-4.5M12 12v9" />
-          </svg>
-          <span className="label">Paket</span>
-        </button>
+          <div className="aui-tabbar">
+            <button className="active">
+              <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <rect x="3.5" y="5" width="17" height="15.5" rx="2.2" />
+                <path strokeLinecap="round" d="M3.5 9.5h17M8 3v3.4M16 3v3.4" />
+              </svg>
+              <span className="label">Booking</span>
+            </button>
+            <button>
+              <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <circle cx="12" cy="12" r="8.5" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5V12l3 2" />
+              </svg>
+              <span className="label">Riwayat</span>
+            </button>
+            <button>
+              <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20 7.5 12 3 4 7.5v9L12 21l8-4.5v-9Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7.5 12 12l8-4.5M12 12v9" />
+              </svg>
+              <span className="label">Paket</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
