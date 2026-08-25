@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import { AvailabilityDatePicker } from "@/components/availability-date-picker";
+import { DateQuickPicker } from "@/components/date-quick-picker";
 
 type ChildOption = {
   dependentId: string;
@@ -222,7 +223,16 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
             </Select>
           </Field>
           <Field label="Tanggal" className="w-full sm:w-56">
-            <AvailabilityDatePicker value={date} onChange={setDate} />
+            {/* Mobile: pill 8 hari terdekat, lebih cepet buat kasus umum
+                (booking minggu ini/depan). Desktop: kalender popup yang
+                udah ada -- lebih pas buat lompat jauh ke depan, dan pill
+                8-lebar bakal ganggu alignment sejajar sama field lain. */}
+            <div className="sm:hidden">
+              <DateQuickPicker value={date} onChange={setDate} days={8} />
+            </div>
+            <div className="hidden sm:block">
+              <AvailabilityDatePicker value={date} onChange={setDate} />
+            </div>
           </Field>
           {selectedChild && (
             <div className="flex items-center gap-2 sm:mb-2.5">

@@ -71,7 +71,34 @@ export default async function MemberBookingPage() {
         </div>
       )}
 
-      <div className="mb-6 rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted">
+      {/* Mobile: collapse -- biar ada ruang buat elemen lain di atas
+          BookingBoard (misal date picker), teks kebijakan lengkap gak
+          wajib kebaca tiap buka halaman, tinggal tap kalau perlu.
+          Desktop: tetep full text, ruang gak jadi masalah di layar lebar. */}
+      <details className="mb-6 rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:hidden">
+        <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-text marker:content-none [&::-webkit-details-marker]:hidden">
+          Kebijakan pembatalan
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-3.5 w-3.5 shrink-0 text-text-subtle transition-transform [details[open]_&]:rotate-180"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </summary>
+        <p className="mt-2">
+          Booking bisa dibatalkan sendiri sesuai jatah paket anak yang bersangkutan. Kalau
+          jatah udah abis, hubungi admin langsung lewat WhatsApp buat kasus khusus. Kalau
+          udah booking tapi gak hadir tanpa dibatalin, sisa sesi tetap kepotong dan gak ada
+          refund.
+        </p>
+      </details>
+
+      <div className="mb-6 hidden rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:block">
         <p className="mb-1 font-medium text-text">Kebijakan pembatalan</p>
         <p>
           Booking bisa dibatalkan sendiri sesuai jatah paket anak yang bersangkutan. Kalau
