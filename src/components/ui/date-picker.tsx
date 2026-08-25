@@ -111,7 +111,7 @@ export function DatePicker({
         )}
       >
         <span className="truncate">{label}</span>
-        <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 shrink-0 text-text-subtle">
+        <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4 shrink-0 text-text-subtle">
           <path
             fillRule="evenodd"
             d="M5.23 7.21a.75.75 0 011.06.02L10 11.19l3.71-3.96a.75.75 0 111.1 1.02l-4.25 4.5a.75.75 0 01-1.1 0l-4.25-4.5a.75.75 0 01.02-1.06z"

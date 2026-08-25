@@ -5,15 +5,26 @@ import { addChild, toggleChildActive } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type Child = { id: string; name: string; isActive: boolean; isSelf: boolean };
 
 export default function ManageChildrenForm({ children }: { children: Child[] }) {
   const [state, formAction, pending] = useActionState(addChild, null);
   const [type, setType] = useState<"self" | "child">("child");
+  const [confirming, setConfirming] = useState<Child | null>(null);
+  const [deactivating, setDeactivating] = useState(false);
   const active = children.filter((c) => c.isActive);
   const inactive = children.filter((c) => !c.isActive);
   const hasSelf = children.some((c) => c.isSelf);
+
+  async function handleDeactivate() {
+    if (!confirming) return;
+    setDeactivating(true);
+    await toggleChildActive(confirming.id, false);
+    setDeactivating(false);
+    setConfirming(null);
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -32,11 +43,7 @@ export default function ManageChildrenForm({ children }: { children: Child[] }) 
               </span>
               <button
                 type="button"
-                onClick={() => {
-                  if (confirm(`Nonaktifkan ${c.name}? Paket & booking dia gak bisa diakses lagi sampai diaktifkan ulang.`)) {
-                    toggleChildActive(c.id, false);
-                  }
-                }}
+                onClick={() => setConfirming(c)}
                 className="text-xs font-medium text-danger-text hover:underline"
               >
                 Nonaktifkan
@@ -96,6 +103,16 @@ export default function ManageChildrenForm({ children }: { children: Child[] }) 
           {state.error}
         </p>
       )}
+
+      <ConfirmDialog
+        open={confirming !== null}
+        title={`Nonaktifkan ${confirming?.name}?`}
+        description="Paket & booking dia gak bisa diakses lagi sampai diaktifkan ulang."
+        confirmLabel="Ya, nonaktifkan"
+        loading={deactivating}
+        onConfirm={handleDeactivate}
+        onCancel={() => setConfirming(null)}
+      />
     </div>
   );
 }

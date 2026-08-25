@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { toggleUserActive } from "./actions";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export default function ToggleActiveButton({
   userId,
@@ -12,18 +14,38 @@ export default function ToggleActiveButton({
   userName: string;
   isActive: boolean;
 }) {
-  return (
-    <form
-      action={toggleUserActive.bind(null, userId, !isActive)}
-      onSubmit={(e) => {
-        if (isActive && !confirm(`Nonaktifkan ${userName}? Dia gak bisa login lagi sampai diaktifkan ulang.`)) {
-          e.preventDefault();
-        }
-      }}
-    >
-      <Button type="submit" variant="ghost" size="sm">
-        {isActive ? "Nonaktifkan" : "Aktifkan"}
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleToggle() {
+    setLoading(true);
+    await toggleUserActive(userId, !isActive);
+    setLoading(false);
+    setOpen(false);
+  }
+
+  if (!isActive) {
+    return (
+      <Button variant="ghost" size="sm" onClick={handleToggle} loading={loading}>
+        Aktifkan
       </Button>
-    </form>
+    );
+  }
+
+  return (
+    <>
+      <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
+        Nonaktifkan
+      </Button>
+      <ConfirmDialog
+        open={open}
+        title={`Nonaktifkan ${userName}?`}
+        description="Dia gak bisa login lagi sampai diaktifkan ulang."
+        confirmLabel="Ya, nonaktifkan"
+        loading={loading}
+        onConfirm={handleToggle}
+        onCancel={() => setOpen(false)}
+      />
+    </>
   );
 }

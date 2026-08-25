@@ -154,6 +154,7 @@ const PANDUAN_CSS = `
   .hero p.lead { max-width: 560px; margin: 18px auto 0; color: var(--text-muted); font-size: 16.5px; }
   .hero-actions { display: flex; gap: 10px; justify-content: center; margin-top: 26px; flex-wrap: wrap; }
   .pill-stat { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--text-muted); box-shadow: var(--shadow); }
+  .pill-stat svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--brand); }
   .pill-stat b { color: var(--text); font-family: var(--font-display); }
 
   .section-head { margin: 64px 0 22px; }
@@ -172,9 +173,10 @@ const PANDUAN_CSS = `
   .card h3 { font-size: 16px; margin-bottom: 8px; }
   .card p { color: var(--text-muted); font-size: 14px; }
   .card .icon { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 19px; margin-bottom: 14px; }
+  .card .icon svg { width: 20px; height: 20px; }
 
   .role-card { border-top: 3px solid var(--role); }
-  .role-card .icon { background: var(--role-bg); }
+  .role-card .icon { background: var(--role-bg); color: var(--role); }
   .role-card ul { margin: 12px 0 0; padding-left: 18px; color: var(--text-muted); font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
   .role-card .go-btn { display: inline-flex; align-items: center; gap: 5px; margin-top: 16px; font-size: 13px; font-weight: 700; color: var(--role); background: none; border: none; cursor: pointer; padding: 0; font-family: var(--font-body); }
   .role-card .go-btn:hover { text-decoration: underline; }
@@ -202,6 +204,7 @@ const PANDUAN_CSS = `
   /* --- tutorial panels --- */
   .role-hero { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
   .role-hero .badge-lg { width: 52px; height: 52px; border-radius: 14px; background: var(--role-bg); color: var(--role); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+  .role-hero .badge-lg svg { width: 26px; height: 26px; }
   .role-hero h1 { font-size: 26px; }
   .role-hero p { color: var(--text-muted); font-size: 14px; margin-top: 3px; }
 
@@ -240,6 +243,8 @@ const PANDUAN_CSS = `
   .note.tip { background: var(--brand-light); color: var(--brand-dark); }
   .note.warn { background: var(--warn-bg); color: var(--warn); }
   .note b { font-weight: 700; }
+  .note > span { flex-shrink: 0; }
+  .note > span svg { width: 18px; height: 18px; }
 
   .mini-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 4px; }
   .mini-table th, .mini-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
@@ -260,6 +265,30 @@ const PANDUAN_CSS = `
   }
 
 `;
+
+// Icon set buat panggantiin emoji sebagai icon struktural (role badge, feature
+// card, note indicator) -- emoji font-dependent & gak konsisten antar
+// platform/OS, SVG garis (viewBox 24x24, stroke 1.8) samain gaya sama
+// src/components/icons.tsx yang udah dipake di rest of app. Emoji yang
+// nyisa di teks instruksi (☰ / ⋮ buat ngasih tau "cari icon ini di Safari/
+// Chrome") sengaja dibiarin -- itu ngerujuk icon aplikasi lain, bukan icon
+// kita sendiri.
+const ICON = {
+  phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="2.5" width="10" height="19" rx="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 18.2h2" stroke-linecap="round"/></svg>`,
+  bolt: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9.5a6 6 0 1 1 12 0c0 4 1.2 5.2 1.7 5.9.3.4 0 1-.5 1H4.8c-.5 0-.8-.6-.5-1 .5-.7 1.7-1.9 1.7-5.9Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 18a2.5 2.5 0 0 0 5 0"/></svg>`,
+  family: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1"/><circle cx="8" cy="8" r="3.2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 4.2a3.2 3.2 0 0 1 0 6.2M20 19v-1a4 4 0 0 0-2.6-3.75"/></svg>`,
+  lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>`,
+  checkCircle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16.5 9"/></svg>`,
+  barChart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 20V10M12 20V4M20 20v-7"/><path stroke-linecap="round" d="M2.5 20h19"/></svg>`,
+  inboxDownload: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 13h4l2 2.5h5l2-2.5h4"/><path d="M3.5 13 5 6a1.5 1.5 0 0 1 1.5-1.2h11A1.5 1.5 0 0 1 19 6l1.5 7"/><path d="M3.5 13v5.5A1.5 1.5 0 0 0 5 20h14a1.5 1.5 0 0 0 1.5-1.5V13"/></svg>`,
+  creditCard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path stroke-linecap="round" d="M3 9.5h18M6 15h4"/></svg>`,
+  swimmer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.8"/><path d="M12 9.5v6"/><path d="M3.5 18q2-2 4 0t4 0t4 0t4 0" stroke-width="1.6"/></svg>`,
+  clipboardCheck: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4.5" width="14" height="16" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5V3.8A1.3 1.3 0 0 1 10.3 2.5h3.4A1.3 1.3 0 0 1 15 3.8v.7"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 13 2 2 4-4.5"/></svg>`,
+  wrench: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 6.5a4 4 0 0 1-5.4 5.4L4 17l3 3 5.1-5.1a4 4 0 0 1 5.4-5.4l-2.6 2.6-2-2 2.6-2.6Z"/></svg>`,
+  bulb: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.45 1 1.15 1 1.9V16h5v-.2c0-.75.4-1.45 1-1.9A6 6 0 0 0 12 3Z"/></svg>`,
+  warningTriangle: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.5 20h19L12 4Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.3" r="0.9" fill="currentColor" stroke="none"/></svg>`,
+};
 
 const PANDUAN_BODY = `
 <div class="app">
@@ -283,9 +312,9 @@ const PANDUAN_BODY = `
         <h1>Satu aplikasi buat <span class="accent-word">booking</span>, <span class="accent-word">jadwal</span>, dan <span class="accent-word">paket</span> les renang</h1>
         <p class="lead">Gak ada lagi bolak-balik chat WhatsApp buat atur jadwal, itung sisa sesi manual, atau lupa siapa yang udah bayar. Member booking sendiri, coach kelola jadwal sendiri, admin pantau semuanya dari satu tempat.</p>
         <div class="hero-actions">
-          <span class="pill-stat">📱 <b>Web-based</b> — buka dari HP, gak perlu install apa-apa</span>
-          <span class="pill-stat">⚡ <b>Real-time</b> — slot kekunci begitu diambil</span>
-          <span class="pill-stat">🔔 <b>Notifikasi dua arah</b> — member &amp; coach saling kekabarin otomatis</span>
+          <span class="pill-stat">${ICON.phone} <b>Web-based</b> — buka dari HP, gak perlu install apa-apa</span>
+          <span class="pill-stat">${ICON.bolt} <b>Real-time</b> — slot kekunci begitu diambil</span>
+          <span class="pill-stat">${ICON.bell} <b>Notifikasi dua arah</b> — member &amp; coach saling kekabarin otomatis</span>
         </div>
       </div>
 
@@ -301,37 +330,37 @@ const PANDUAN_BODY = `
       </div>
       <div class="grid3">
         <div class="card">
-          <div class="icon" style="background:var(--brand-light);">👨‍👩‍👧‍👦</div>
+          <div class="icon" style="background:var(--brand-light);color:var(--brand);">${ICON.family}</div>
           <h3>1 akun, banyak anak</h3>
           <p>Satu orang tua daftar sekali, bisa tambah beberapa anak sekaligus. Tiap anak punya paket dan sisa sesi sendiri-sendiri, gak ketuker.</p>
         </div>
         <div class="card">
-          <div class="icon" style="background:var(--accent-light);">🔒</div>
+          <div class="icon" style="background:var(--accent-light);color:var(--accent);">${ICON.lock}</div>
           <h3>Slot terkunci otomatis</h3>
           <p>Begitu 1 member ambil jam tertentu sama coach tertentu, slot itu langsung kekunci buat member lain. Gak ada lagi bentrok jadwal.</p>
         </div>
         <div class="card">
-          <div class="icon" style="background:var(--success-bg);">✅</div>
+          <div class="icon" style="background:var(--success-bg);color:var(--success);">${ICON.checkCircle}</div>
           <h3>Pembatalan yang adil</h3>
           <p>Member bisa batalin sendiri minimal 2 jam sebelum jadwal, sesuai jatah per paket. Lewat itu, tetep bisa minta bantuan admin lewat WhatsApp.</p>
         </div>
         <div class="card">
-          <div class="icon" style="background:var(--member-bg);">📊</div>
+          <div class="icon" style="background:var(--member-bg);color:var(--member);">${ICON.barChart}</div>
           <h3>Honor coach otomatis kehitung</h3>
           <p>Cuma sesi yang beneran ditandain "Hadir" yang kehitung valid. Admin tinggal buka laporan Kinerja Coach per rentang tanggal, gak perlu rekap manual.</p>
         </div>
         <div class="card">
-          <div class="icon" style="background:var(--coach-bg);">📥</div>
+          <div class="icon" style="background:var(--coach-bg);color:var(--coach);">${ICON.inboxDownload}</div>
           <h3>Import data massal</h3>
           <p>Migrasi dari data lama (Excel/chat) bisa lewat template import — isi nama, kontak, paket, sisa sesi, sistem yang bikinin akun dan paketnya sekaligus.</p>
         </div>
         <div class="card">
-          <div class="icon" style="background:var(--admin-bg);">💳</div>
+          <div class="icon" style="background:var(--admin-bg);color:var(--admin);">${ICON.creditCard}</div>
           <h3>Riwayat pembayaran tercatat</h3>
           <p>Setiap transaksi paket tercatat lengkap — status berhasil, menunggu, atau gagal — bisa difilter per rentang tanggal kapan aja.</p>
         </div>
         <div class="card">
-          <div class="icon" style="background:var(--brand-light);">🔔</div>
+          <div class="icon" style="background:var(--brand-light);color:var(--brand);">${ICON.bell}</div>
           <h3>Notifikasi dua arah, gak perlu buka app terus</h3>
           <p>Member booking → coach dapet notif. Coach buka slot baru → semua member aktif dapet notif. Keduanya cukup aktifin sekali, notif nyampe walau aplikasi lagi ketutup.</p>
         </div>
@@ -344,7 +373,7 @@ const PANDUAN_BODY = `
       </div>
       <div class="grid3">
         <div class="card role-card" style="--role:var(--member);--role-bg:var(--member-bg);">
-          <div class="icon">🏊‍♀️</div>
+          <div class="icon">${ICON.swimmer}</div>
           <h3>Member (orang tua)</h3>
           <p>Daftar, beli paket, booking jadwal, pantau sisa sesi.</p>
           <ul>
@@ -357,7 +386,7 @@ const PANDUAN_BODY = `
           <button class="go-btn" data-goto="member">Lihat panduan Member →</button>
         </div>
         <div class="card role-card" style="--role:var(--coach);--role-bg:var(--coach-bg);">
-          <div class="icon">🧑‍🏫</div>
+          <div class="icon">${ICON.clipboardCheck}</div>
           <h3>Coach</h3>
           <p>Buka jadwal sendiri, tandai kehadiran member.</p>
           <ul>
@@ -370,7 +399,7 @@ const PANDUAN_BODY = `
           <button class="go-btn" data-goto="coach">Lihat panduan Coach →</button>
         </div>
         <div class="card role-card" style="--role:var(--admin);--role-bg:var(--admin-bg);">
-          <div class="icon">🛠️</div>
+          <div class="icon">${ICON.wrench}</div>
           <h3>Admin</h3>
           <p>Kendali penuh — user, paket, booking, laporan.</p>
           <ul>
@@ -406,18 +435,18 @@ const PANDUAN_BODY = `
     <!-- ============ CARA INSTALL ============ -->
     <section class="panel" id="install">
       <div class="role-hero">
-        <div class="badge-lg" style="background:var(--brand-light);color:var(--brand);">📲</div>
+        <div class="badge-lg" style="background:var(--brand-light);color:var(--brand);">${ICON.phone}</div>
         <div>
           <h1>Cara Install ke HP</h1>
           <p>Gak perlu Play Store atau App Store — tinggal tambahkan dari browser, ikonnya muncul di layar utama kayak aplikasi biasa.</p>
         </div>
       </div>
 
-      <div class="note tip" style="margin:20px 0 8px;"><span>💡</span><p>Ini <b>bukan</b> aplikasi terpisah yang perlu di-download — tetap website yang sama, cuma "dipasangkan" ikonnya ke HP biar gampang dibuka lagi tanpa harus ketik alamat website tiap kali.</p></div>
+      <div class="note tip" style="margin:20px 0 8px;"><span>${ICON.bulb}</span><p>Ini <b>bukan</b> aplikasi terpisah yang perlu di-download — tetap website yang sama, cuma "dipasangkan" ikonnya ke HP biar gampang dibuka lagi tanpa harus ketik alamat website tiap kali.</p></div>
 
       <div class="grid3" style="margin-top:24px;">
         <div class="card" style="border-top:3px solid #3ddc84;">
-          <div class="icon" style="background:#e8f9ef;">🤖</div>
+          <div class="icon" style="background:#e8f9ef;color:#1a7a43;">${ICON.phone}</div>
           <h3>Android — Google Chrome</h3>
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
             <div class="step">
@@ -448,7 +477,7 @@ const PANDUAN_BODY = `
         </div>
 
         <div class="card" style="border-top:3px solid #4285f4;">
-          <div class="icon" style="background:#e8f0fe;">🌐</div>
+          <div class="icon" style="background:#e8f0fe;color:#4285f4;">${ICON.phone}</div>
           <h3>iOS (iPhone) — Chrome</h3>
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
             <div class="step">
@@ -479,7 +508,7 @@ const PANDUAN_BODY = `
         </div>
 
         <div class="card" style="border-top:3px solid #1c1c1e;">
-          <div class="icon" style="background:#f2f2f7;">🍎</div>
+          <div class="icon" style="background:#f2f2f7;color:#1c1c1e;">${ICON.phone}</div>
           <h3>iOS (iPhone) — Safari</h3>
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
             <div class="step">
@@ -518,7 +547,7 @@ const PANDUAN_BODY = `
     <!-- ============ MEMBER ============ -->
     <section class="panel" id="member" data-role="member">
       <div class="role-hero">
-        <div class="badge-lg">🏊‍♀️</div>
+        <div class="badge-lg">${ICON.swimmer}</div>
         <div>
           <h1>Panduan Member</h1>
           <p>Buat orang tua/peserta — daftar, beli paket, booking, dan kelola jadwal les renang.</p>
@@ -564,13 +593,13 @@ const PANDUAN_BODY = `
             <p>Akun langsung aktif dan kamu otomatis masuk (login).</p>
           </div>
         </div>
-        <div class="note tip"><span>💡</span><p><b>Tips:</b> peserta (anak/diri sendiri) masih bisa ditambah lagi belakangan lewat menu Profil, gak harus lengkap dari awal.</p></div>
+        <div class="note tip"><span>${ICON.bulb}</span><p><b>Tips:</b> peserta (anak/diri sendiri) masih bisa ditambah lagi belakangan lewat menu Profil, gak harus lengkap dari awal.</p></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="m-login"><span class="gi">2</span><h3>Login</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Masukkan No HP atau Email, dan Password</h4><p>Lalu klik <b>Login</b>.</p></div></div>
-        <div class="note warn"><span>⚠️</span><p><b>Lupa password?</b> Belum ada fitur reset password mandiri — hubungi admin lewat WhatsApp buat dibantu.</p></div>
+        <div class="note warn"><span>${ICON.warningTriangle}</span><p><b>Lupa password?</b> Belum ada fitur reset password mandiri — hubungi admin lewat WhatsApp buat dibantu.</p></div>
       </div>
 
       <div class="guide">
@@ -588,7 +617,7 @@ const PANDUAN_BODY = `
         <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih Tanggal</h4><p>Kalender nunjukin titik penanda di tanggal yang masih ada slot kosong. Tanggal yang udah lewat otomatis gak bisa dipilih.</p></div></div>
         <div class="step"><span class="sn">4</span><div class="st"><h4>Pilih coach &amp; jam</h4><p>Slot yang masih kosong ada tombol <b>Booking</b>. Slot yang udah diambil member lain otomatis kekunci ("Sudah dibooking").</p></div></div>
         <div class="step"><span class="sn">5</span><div class="st"><h4>Klik Booking</h4><p>Sisa sesi berkurang 1 otomatis, dan kamu dapet notifikasi konfirmasi (kalau notifikasi udah diaktifkan).</p></div></div>
-        <div class="note tip"><span>💡</span><p>Kebijakan pembatalan selalu ditampilin di halaman ini: kalau jatah pembatalan mandiri udah abis, kamu masih bisa minta bantuan admin langsung lewat tombol WhatsApp.</p></div>
+        <div class="note tip"><span>${ICON.bulb}</span><p>Kebijakan pembatalan selalu ditampilin di halaman ini: kalau jatah pembatalan mandiri udah abis, kamu masih bisa minta bantuan admin langsung lewat tombol WhatsApp.</p></div>
       </div>
 
       <div class="guide">
@@ -622,7 +651,7 @@ const PANDUAN_BODY = `
     <!-- ============ COACH ============ -->
     <section class="panel" id="coach" data-role="coach">
       <div class="role-hero">
-        <div class="badge-lg">🧑‍🏫</div>
+        <div class="badge-lg">${ICON.clipboardCheck}</div>
         <div>
           <h1>Panduan Coach</h1>
           <p>Buat pelatih — buka jadwal sendiri dan tandai kehadiran member.</p>
@@ -661,13 +690,13 @@ const PANDUAN_BODY = `
         <div class="guide-head" id="c-hadir"><span class="gi">4</span><h3>Tandai Kehadiran</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Riwayat Sesi</h4><p>Semua sesi yang pernah kamu ajar tercatat di sini, dikelompokin per tanggal.</p></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih status di dropdown tiap booking</h4><p>Pilih <b>Hadir</b> kalau member beneran datang, atau <b>Gak Hadir</b> kalau enggak. Langsung tersimpan otomatis begitu dipilih, gak perlu tombol Simpan.</p></div></div>
-        <div class="note warn"><span>⚠️</span><p><b>Perhatian:</b> status yang udah dipilih (Hadir/Gak Hadir) gak bisa dibalikin lagi ke "Belum ditandai" — pastiin pilihannya bener sebelum diklik.</p></div>
+        <div class="note warn"><span>${ICON.warningTriangle}</span><p><b>Perhatian:</b> status yang udah dipilih (Hadir/Gak Hadir) gak bisa dibalikin lagi ke "Belum ditandai" — pastiin pilihannya bener sebelum diklik.</p></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="c-honor"><span class="gi">5</span><h3>Soal Honor: "Total Sesi Valid"</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Cuma sesi "Hadir" yang kehitung</h4><p>Angka "Total sesi valid" di atas halaman Riwayat Sesi cuma ngitung booking yang udah kamu tandain <b>Hadir</b>. Yang "Gak Hadir" atau belum ditandai sama sekali gak ikut kehitung.</p></div></div>
-        <div class="note tip"><span>💡</span><p>Admin pakai angka ini buat hitung honor lewat laporan Kinerja Coach — jadi penting buat selalu update status kehadiran setelah tiap sesi selesai.</p></div>
+        <div class="note tip"><span>${ICON.bulb}</span><p>Admin pakai angka ini buat hitung honor lewat laporan Kinerja Coach — jadi penting buat selalu update status kehadiran setelah tiap sesi selesai.</p></div>
       </div>
 
       <div class="guide">
@@ -679,7 +708,7 @@ const PANDUAN_BODY = `
     <!-- ============ ADMIN ============ -->
     <section class="panel" id="admin" data-role="admin">
       <div class="role-hero">
-        <div class="badge-lg">🛠️</div>
+        <div class="badge-lg">${ICON.wrench}</div>
         <div>
           <h1>Panduan Admin</h1>
           <p>Kendali penuh atas user, paket, booking, pembayaran, dan laporan kinerja coach.</p>
@@ -760,7 +789,7 @@ const PANDUAN_BODY = `
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Kinerja</h4></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Filter tanggal Dari–Sampai, klik Terapkan</h4></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Baca "Sesi Valid" per coach</h4><p>Cuma booking yang ditandain <b>Hadir</b> yang kehitung. Booking yang belum ditandai atau ditandai Gak Hadir gak ikut kehitung — kalau angkanya kelihatan kurang, cek dulu ke tab Booking apa masih ada yang belum ditandai.</p></div></div>
-        <div class="note tip"><span>💡</span><p>Ini angka mentah (jumlah sesi), bukan nominal rupiah — tarif per sesi dihitung manual di luar sistem sesuai kesepakatan tiap coach.</p></div>
+        <div class="note tip"><span>${ICON.bulb}</span><p>Ini angka mentah (jumlah sesi), bukan nominal rupiah — tarif per sesi dihitung manual di luar sistem sesuai kesepakatan tiap coach.</p></div>
       </div>
     </section>
   </main>

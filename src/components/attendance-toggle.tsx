@@ -77,6 +77,7 @@ export default function AttendanceToggle({
           <option value="false">Gak Hadir</option>
         </select>
         <svg
+          aria-hidden="true"
           viewBox="0 0 20 20"
           fill="currentColor"
           className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2"
