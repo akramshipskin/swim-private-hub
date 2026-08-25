@@ -92,7 +92,7 @@ export default async function MemberBookingPage() {
           </svg>
         </summary>
         <p className="mt-2">
-          Batalkan sendiri min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
+          Pembatalan booking min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
           batal paket (lihat di bawah). Gak hadir tanpa pembatalan = sesi tetap kepotong, no
           refund. Jatah abis? Hubungi admin via WhatsApp.
         </p>
@@ -101,7 +101,7 @@ export default async function MemberBookingPage() {
       <div className="mb-6 hidden rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:block">
         <p className="mb-1 font-medium text-text">KEBIJAKAN PEMBATALAN</p>
         <p>
-          Batalkan sendiri min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
+          Pembatalan booking min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
           batal paket (lihat di bawah). Gak hadir tanpa pembatalan = sesi tetap kepotong, no
           refund. Jatah abis? Hubungi admin via WhatsApp.
         </p>
