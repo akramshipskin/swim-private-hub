@@ -33,20 +33,22 @@ function Step({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-6">
-      <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
-          {n}
-        </span>
-        <div>
-          <h3 className="text-sm font-semibold text-text">{title}</h3>
-          {desc && <p className="mt-0.5 text-xs text-text-muted">{desc}</p>}
+    <section className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-start">
+      <div className="sm:w-64 sm:shrink-0">
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
+            {n}
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold text-text">{title}</h3>
+            {desc && <p className="mt-0.5 text-xs text-text-muted">{desc}</p>}
+          </div>
         </div>
+        {note && <p className="mt-2 ml-10 text-[11px] text-text-subtle sm:ml-0 sm:mt-3">{note}</p>}
       </div>
-      <div className="ml-10 mt-3 overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+      <div className="w-full max-w-[375px] overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
         <div className="flex flex-col gap-3 p-4">{children}</div>
       </div>
-      {note && <p className="ml-10 mt-2 text-[11px] text-text-subtle">{note}</p>}
     </section>
   );
 }
@@ -98,7 +100,7 @@ function PaketCard({
 
 export default function PanduanMemberView() {
   return (
-    <main className="mx-auto max-w-[420px] px-4 py-10 sm:py-14">
+    <main className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
       <div className="flex flex-col items-start gap-3">
         <Image
           src="/logo.png"
@@ -112,10 +114,11 @@ export default function PanduanMemberView() {
           <h1 className="mt-1 text-xl font-semibold tracking-tight text-text">
             Panduan Member Lengkap &mdash; Dari Awal Sampai Booking
           </h1>
-          <p className="mt-2 text-sm text-text-muted">
+          <p className="mt-2 max-w-xl text-sm text-text-muted">
             Urutan step + isi tiap layar di bawah diambil dari kode aplikasi &amp; data akun demo yang
             beneran aktif -- bukan dikira-kira. Ada 2 jalur masuk (Daftar Sendiri vs Login dari akun yang
-            dibikinin admin), lanjut sampai booking, riwayat, paket, dan profil.
+            dibikinin admin), lanjut sampai booking, riwayat, paket, dan profil. Mockup di bawah sengaja
+            dibikin tampilan mobile -- di dunia nyata member akses aplikasinya lewat HP.
           </p>
         </div>
       </div>
