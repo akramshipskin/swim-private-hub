@@ -155,20 +155,23 @@
 body {
   /* Gradient asalnya cuma di landing page (bg-[radial-gradient(...)] di
      page.tsx) -- dipindah ke sini biar 1 sumber kepake di semua halaman/role,
-     bukan copy-paste. color-mix nge-dilute brand-100 ke 30% biar gak
+     bukan copy-paste. color-mix nge-dilute brand-100 ke 50% biar gak
      ganggu baca di halaman padet (list booking, tabel admin, dst).
-     Falloff-nya pake `vh` (relatif viewport), BUKAN `%` (relatif tinggi
-     body) -- radial-gradient tanpa size keyword defaultnya farthest-corner,
-     yang keitung dari total scrollHeight, jadi di halaman panjang (misal
-     admin/users) tintnya baru bener-bener transparan ribuan px ke bawah,
-     jauh dari yang keliatan pas landing page. `vh` ngunci falloff ke
-     ukuran viewport doang, konsisten di halaman pendek maupun panjang. */
+     Falloff-nya pake `px` TETAP, BUKAN `vh` -- awalnya pake vh biar
+     konsisten di halaman pendek/panjang, tapi vh goyang di mobile Safari
+     (address bar collapse/expand pas scroll bikin 100vh kereculate
+     terus-terusan), gradient jadi keliatan "loncat"/pulsing pas discroll
+     di HP. px gak kena efek itu sama sekali. background-repeat: no-repeat
+     eksplisit juga -- default-nya emang udah gak keliatan ke-tile karena
+     gradient auto-size ngisi 1 box penuh, tapi dieksplisitin biar gak
+     gantung ke behavior implisit renderer. */
   background: radial-gradient(
       circle at top,
       color-mix(in srgb, var(--color-brand-100) 50%, transparent) 0%,
-      transparent 50vh
+      transparent 400px
     ),
     var(--background);
+  background-repeat: no-repeat;
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   color-scheme: light dark;
