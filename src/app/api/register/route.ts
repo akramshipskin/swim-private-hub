@@ -5,6 +5,9 @@ import { toProperCase } from "@/lib/format";
 
 export async function POST(request: Request) {
   const body = await request.json();
+  const registeredReferer = request.headers.get("referer");
+  const registeredIp =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
   const { name, phone, email, password, childNames, wantsSelf } = body as {
     name?: string;
     phone?: string;
@@ -52,7 +55,15 @@ export async function POST(request: Request) {
   try {
     const user = await prisma.$transaction(async (tx) => {
       const created = await tx.user.create({
-        data: { name: properName, phone, email: email || null, passwordHash, role: "MEMBER" },
+        data: {
+          name: properName,
+          phone,
+          email: email || null,
+          passwordHash,
+          role: "MEMBER",
+          registeredReferer,
+          registeredIp,
+        },
         select: { id: true, name: true, email: true, phone: true, role: true },
       });
       if (cleanChildNames.length > 0) {

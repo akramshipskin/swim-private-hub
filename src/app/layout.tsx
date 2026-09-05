@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import AuthSessionProvider from "@/components/session-provider";
 import ServiceWorkerRegister from "@/components/service-worker-register";
 import "./globals.css";
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <ServiceWorkerRegister />
         <AuthSessionProvider>{children}</AuthSessionProvider>
+        <Analytics />
       </body>
     </html>
   );
