@@ -5,17 +5,24 @@ import { toProperCase } from "@/lib/format";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const registeredReferer = request.headers.get("referer");
   const registeredIp =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  const { name, phone, email, password, childNames, wantsSelf } = body as {
+  const { name, phone, email, password, childNames, wantsSelf, entryReferrer } = body as {
     name?: string;
     phone?: string;
     email?: string;
     password?: string;
     childNames?: string[];
     wantsSelf?: boolean;
+    entryReferrer?: string | null;
   };
+  // entryReferrer dikirim client (document.referrer pas landing pertama,
+  // disimpen di sessionStorage) -- itu sumber ASLI (WA/IG/Google/dll).
+  // request.headers.get("referer") gak dipake lagi karena selalu isi
+  // halaman register itu sendiri (fetch dari halaman yang sama), bukan
+  // sumber sebelumnya. String kosong "" berarti direct/no-referrer valid,
+  // bukan "gak ada data" -- cuma null/undefined yang jadi null.
+  const registeredReferer = entryReferrer ?? null;
 
   if (!name || !phone || !password) {
     return Response.json(

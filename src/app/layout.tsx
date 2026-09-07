@@ -45,6 +45,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: `try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t;}}catch(e){}`,
           }}
         />
+        {/* Simpen referrer ASLI (dari luar situs) sekali pas pertama kali
+            landing di sesi browser ini -- kalau nunggu sampe halaman
+            register, document.referrer udah keganti jadi halaman internal
+            (misal landing page sendiri), sumber luarnya ilang. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(!sessionStorage.getItem("entryReferrer")){sessionStorage.setItem("entryReferrer",document.referrer||"");}}catch(e){}`,
+          }}
+        />
         <ServiceWorkerRegister />
         <AuthSessionProvider>{children}</AuthSessionProvider>
         <Analytics />

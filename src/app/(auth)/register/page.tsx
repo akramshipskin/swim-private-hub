@@ -31,6 +31,14 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
 
+    let entryReferrer: string | null = null;
+    try {
+      entryReferrer = sessionStorage.getItem("entryReferrer") || null;
+    } catch {
+      // sessionStorage bisa gak available (private mode dll) -- gak fatal,
+      // registrasi tetep lanjut tanpa data sumber.
+    }
+
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -41,6 +49,7 @@ export default function RegisterPage() {
         password,
         childNames: participants.filter((p) => p.type === "child").map((p) => p.name),
         wantsSelf: participants.some((p) => p.type === "self"),
+        entryReferrer,
       }),
     });
 
