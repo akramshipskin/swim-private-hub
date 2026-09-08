@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@/generated/prisma/client";
 
 function verifySignature(
   orderId: string,
@@ -16,21 +17,41 @@ function verifySignature(
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  // Midtrans WAJIB dapet HTTP 200 apapun hasilnya (ketauan lewat tombol
+  // "Test notification URL" di dashboard yang gagal terus pas endpoint ini
+  // masih balikin 400/403/404/500) -- kalau kita balikin status lain,
+  // Midtrans nganggep notifikasi gagal terkirim dan retry terus / nge-flag
+  // integrasi ini bermasalah, walau di sisi kita errornya emang valid
+  // (payload gak lengkap, dsb). Jadi semua error path di bawah tetep
+  // return 200, detail error taruh di body doang buat debugging kita
+  // sendiri (bukan buat Midtrans baca).
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return Response.json({ ok: true, error: "Body bukan JSON valid" });
+  }
+
   const {
     order_id: orderId,
     status_code: statusCode,
     gross_amount: grossAmount,
     signature_key: signatureKey,
     transaction_status: transactionStatus,
-  } = body;
+  } = body as {
+    order_id?: string;
+    status_code?: string;
+    gross_amount?: string;
+    signature_key?: string;
+    transaction_status?: string;
+  };
 
   if (!orderId || !signatureKey) {
-    return Response.json({ error: "Payload tidak lengkap" }, { status: 400 });
+    return Response.json({ ok: true, error: "Payload tidak lengkap" });
   }
 
-  if (!verifySignature(orderId, statusCode, grossAmount, signatureKey)) {
-    return Response.json({ error: "Signature tidak valid" }, { status: 403 });
+  if (!verifySignature(orderId, statusCode ?? "", grossAmount ?? "", signatureKey)) {
+    return Response.json({ ok: true, error: "Signature tidak valid" });
   }
 
   const payment = await prisma.payment.findUnique({
@@ -39,7 +60,7 @@ export async function POST(request: Request) {
   });
 
   if (!payment) {
-    return Response.json({ error: "Payment tidak ditemukan" }, { status: 404 });
+    return Response.json({ ok: true, error: "Payment tidak ditemukan" });
   }
 
   // Midtrans bisa ngirim ulang notifikasi yang sama (retry kalau endpoint
@@ -54,7 +75,7 @@ export async function POST(request: Request) {
   ) {
     await prisma.payment.update({
       where: { id: payment.id },
-      data: { rawWebhookPayload: body },
+      data: { rawWebhookPayload: body as Prisma.InputJsonValue },
     });
     return Response.json({ ok: true });
   }
@@ -83,7 +104,7 @@ export async function POST(request: Request) {
   await prisma.$transaction([
     prisma.payment.update({
       where: { id: payment.id },
-      data: { status: paymentStatus, rawWebhookPayload: body },
+      data: { status: paymentStatus, rawWebhookPayload: body as Prisma.InputJsonValue },
     }),
     ...(packageStatus
       ? [
