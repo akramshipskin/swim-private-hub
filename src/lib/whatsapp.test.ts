@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildAdminCancelWaLink, buildContactWaLink } from "./whatsapp";
+import { buildAdminCancelWaLink, buildContactWaLink, buildOwnerInquiryWaLink } from "./whatsapp";
 
 describe("buildContactWaLink", () => {
   it("rewrites a leading 0 to the 62 country code", () => {
@@ -31,5 +31,12 @@ describe("buildAdminCancelWaLink", () => {
     const link = buildAdminCancelWaLink(base);
     const message = decodeURIComponent(link.split("?text=")[1]);
     expect(message).not.toContain("Buat:");
+  });
+});
+
+describe("buildOwnerInquiryWaLink", () => {
+  it("points to the admin WhatsApp number", () => {
+    const link = buildOwnerInquiryWaLink();
+    expect(link).toContain("https://wa.me/6281573400086");
   });
 });

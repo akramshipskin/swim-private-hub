@@ -36,3 +36,9 @@ Jatah pembatalan mandiri saya udah habis / di luar waktu yang diizinkan. Mohon d
 
   return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
+
+export function buildOwnerInquiryWaLink() {
+  const message =
+    "Halo, saya tertarik pake sistem Les Renang Cianjur buat kelola tempat les renang saya. Boleh minta info lebih lanjut?";
+  return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
