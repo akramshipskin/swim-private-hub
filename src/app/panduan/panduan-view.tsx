@@ -109,7 +109,11 @@ const PANDUAN_CSS = `
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); color: var(--text); text-wrap: balance; margin: 0; }
+  /* font-weight WAJIB di-set eksplisit -- Tailwind preflight (globals.css)
+     ke-load site-wide dan reset heading font-weight jadi "inherit" (~400),
+     beda sama landing yang pake font-semibold (600) di semua heading-nya.
+     Tanpa ini, font KELIATAN beda walau font-family-nya sama persis. */
+  h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; color: var(--text); text-wrap: balance; margin: 0; }
   p { margin: 0; }
   a { color: var(--brand); }
   ::selection { background: var(--brand-light); }
