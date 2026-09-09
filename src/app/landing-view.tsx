@@ -119,6 +119,33 @@ const ICONS = {
       />
     </IconWrap>
   ),
+  checkCircle: (
+    <IconWrap>
+      <circle cx="12" cy="12" r="9" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m8 12.5 2.5 2.5L16.5 9" />
+    </IconWrap>
+  ),
+  phone: (
+    <IconWrap>
+      <rect x="7" y="2.5" width="10" height="19" rx="2.2" />
+      <path strokeLinecap="round" d="M11 18.2h2" />
+    </IconWrap>
+  ),
+  bolt: (
+    <IconWrap>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
+    </IconWrap>
+  ),
+  cross: (
+    <IconWrap>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+    </IconWrap>
+  ),
+  quote: (
+    <IconWrap>
+      <path d="M9.5 8c-2.5 0-4.5 2-4.5 4.5S7 17 9.5 17c.3 0 .5-.2.5-.5v-1c0-.3-.2-.5-.5-.5-1.4 0-2.5-1.1-2.5-2.5S8.1 10 9.5 10c.3 0 .5-.2.5-.5v-1c0-.3-.2-.5-.5-.5Zm9 0c-2.5 0-4.5 2-4.5 4.5S16 17 18.5 17c.3 0 .5-.2.5-.5v-1c0-.3-.2-.5-.5-.5-1.4 0-2.5-1.1-2.5-2.5S17.1 10 18.5 10c.3 0 .5-.2.5-.5v-1c0-.3-.2-.5-.5-.5Z" />
+    </IconWrap>
+  ),
 };
 
 type IconName = keyof typeof ICONS;
@@ -166,12 +193,82 @@ const OWNER_FEATURES: { icon: IconName; tone: keyof typeof roleToneClasses; titl
   },
 ];
 
+const TRUST_PILLS: { icon: IconName; label: string }[] = [
+  { icon: "phone", label: "Web-based — gak perlu install apa-apa" },
+  { icon: "bolt", label: "Real-time — slot kekunci begitu diambil" },
+  { icon: "bell", label: "Notifikasi dua arah otomatis" },
+];
+
+const PAIN_POINTS = [
+  "Sisa sesi dihitung manual dari scroll chat WhatsApp berhari-hari ke belakang.",
+  "Dua orang tua booking jam yang sama ke coach yang sama — ketauannya pas udah di lokasi.",
+  "Lupa siapa yang udah bayar, siapa yang belum, jadi harus nagih satu-satu.",
+  "Rekap honor coach di akhir bulan makan waktu berjam-jam, ngitung manual dari catatan kehadiran.",
+  "Data pelanggan lama nyebar di Excel, chat, dan buku catatan — gak ada satu sumber yang bisa dipercaya.",
+  "Member nanya jadwal kosong, admin harus cek manual satu-satu ke tiap coach.",
+];
+
 const roleToneClasses = {
   brand: { bg: "bg-brand-50", text: "text-brand-700" },
   accent: { bg: "bg-accent-50", text: "text-accent-600" },
   admin: { bg: "bg-brand-100", text: "text-brand-700" },
   coach: { bg: "bg-success-bg", text: "text-success-text" },
 };
+
+const COMPARISON_ROWS: { manual: string; sistem: string }[] = [
+  { manual: "Sisa sesi dihitung manual dari chat WhatsApp", sistem: "Kehitung otomatis per anak, real-time" },
+  { manual: "Jadwal bisa bentrok tanpa ketauan", sistem: "Slot terkunci otomatis begitu dibooking" },
+  { manual: "Konfirmasi pembayaran manual satu-satu", sistem: "Paket aktif otomatis begitu bayar berhasil" },
+  { manual: "Rekap honor coach manual tiap akhir bulan", sistem: "Laporan kinerja coach sekali klik, per rentang tanggal" },
+  { manual: "Data pelanggan nyebar di Excel/chat/buku", sistem: "Satu database, satu sumber kebenaran" },
+  { manual: "Member harus tanya admin buat cek jadwal kosong", sistem: "Member lihat & booking slot kosong sendiri" },
+];
+
+const HOW_IT_WORKS = [
+  {
+    title: "Member daftar & beli paket",
+    desc: "Orang tua isi data diri, tentuin siapa aja yang mau les (diri sendiri dan/atau anak), lalu beli paket sesuai kebutuhan.",
+  },
+  {
+    title: "Bayar online, paket auto-aktif",
+    desc: "Pembayaran lewat halaman resmi (VA, QRIS, e-wallet, kartu). Begitu berhasil, paket langsung aktif tanpa perlu konfirmasi manual.",
+  },
+  {
+    title: "Booking jadwal sendiri",
+    desc: "Member pilih anak, coach, tanggal, dan jam yang masih kosong. Slot langsung terkunci setelah dibooking.",
+  },
+  {
+    title: "Coach kelola jadwal & kehadiran",
+    desc: "Coach nentuin sendiri jam berapa aja dia available. Abis sesi, coach tandai Hadir/Gak Hadir — ini yang jadi dasar hitung honor.",
+  },
+  {
+    title: "Admin pantau semuanya",
+    desc: "Dari satu dashboard: siapa booking apa, siapa yang belum bayar, berapa sesi valid tiap coach bulan ini.",
+  },
+];
+
+const FAQ_ITEMS = [
+  {
+    q: "Perlu install aplikasi khusus gak?",
+    a: "Gak perlu. Ini web-based, tinggal buka lewat browser HP atau komputer. Bisa juga \"dipasang\" ke layar utama HP biar kebuka kayak aplikasi biasa, tanpa lewat Play Store/App Store.",
+  },
+  {
+    q: "Data pelanggan lama saya (Excel/chat) bisa dipindahin?",
+    a: "Bisa, lewat template import — isi nama, kontak, paket, dan sisa sesi, sistem yang bikinin akun dan paketnya sekaligus. Gak perlu input satu-satu manual.",
+  },
+  {
+    q: "Gimana kalau member mau batalin booking mendadak?",
+    a: "Ada jatah pembatalan mandiri per paket (bisa diatur), dengan syarat minimal beberapa jam sebelum jadwal. Kalau di luar itu atau jatah udah abis, member tetap bisa minta bantuan admin langsung lewat WhatsApp yang pesannya udah keisi otomatis.",
+  },
+  {
+    q: "Pembayarannya lewat mana?",
+    a: "Terintegrasi payment gateway resmi — mendukung transfer virtual account bank, QRIS, e-wallet (GoPay, OVO, Dana, ShopeePay), dan kartu kredit/debit.",
+  },
+  {
+    q: "Berapa lama proses setup-nya?",
+    a: "Gak butuh training panjang — alurnya udah familiar kayak booking online pada umumnya. Hubungi kami buat bahas kebutuhan spesifik tempat les Anda (jumlah coach, jenis paket, dll).",
+  },
+];
 
 const OWNER_WA_LINK = buildOwnerInquiryWaLink();
 
@@ -227,6 +324,41 @@ export default function LandingView() {
             <Button variant="secondary">Lihat Demo &amp; Fitur Lengkap</Button>
           </a>
         </div>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+          {TRUST_PILLS.map((p) => (
+            <span
+              key={p.label}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-text-muted shadow-sm"
+            >
+              <Icon name={p.icon} className="h-3.5 w-3.5 text-brand-600" />
+              {p.label}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* Problem -- agitate dulu sebelum kasih solusi, pola sales page klasik. */}
+      <section className="mx-auto w-full max-w-4xl px-4 py-10">
+        <div className="mb-8 text-center">
+          <span className="text-xs font-bold uppercase tracking-wide text-accent-600">Kedengeran familiar?</span>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+            Ngurus les renang manual, capeknya di mana-mana
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {PAIN_POINTS.map((p) => (
+            <div key={p} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-danger-bg text-danger-text">
+                <Icon name="cross" className="h-3.5 w-3.5" />
+              </span>
+              <p className="text-sm text-text-muted">{p}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mx-auto mt-6 max-w-lg text-center text-sm font-medium text-text">
+          Semua itu kejadian bukan karena Anda kurang teliti — tapi karena ngatur ini semua pake chat &amp; Excel
+          emang gak dirancang buat scale.
+        </p>
       </section>
 
       {/* Features -- framing buat pemilik/pengelola. */}
@@ -254,6 +386,44 @@ export default function LandingView() {
               </CardBody>
             </Card>
           ))}
+        </div>
+      </section>
+
+      {/* Sebelum vs sesudah -- perbandingan langsung, gampang di-scan. */}
+      <section className="mx-auto w-full max-w-4xl px-4 py-10">
+        <div className="mb-8 text-center">
+          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Perbandingan</span>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+            Manual vs pakai sistem ini
+          </h2>
+        </div>
+        <div className="overflow-x-auto rounded-2xl border border-border">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="border-b border-border bg-surface-muted">
+                <th className="px-4 py-3 text-left font-semibold text-text-subtle">Cara manual</th>
+                <th className="px-4 py-3 text-left font-semibold text-brand-700">Pakai Les Renang Cianjur</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARISON_ROWS.map((r) => (
+                <tr key={r.manual} className="border-b border-border last:border-0">
+                  <td className="px-4 py-3 align-top text-text-muted">
+                    <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-danger-bg text-danger-text align-middle">
+                      <Icon name="cross" className="h-3 w-3" />
+                    </span>
+                    {r.manual}
+                  </td>
+                  <td className="px-4 py-3 align-top font-medium text-text">
+                    <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-success-bg text-success-text align-middle">
+                      <Icon name="checkCircle" className="h-3 w-3" />
+                    </span>
+                    {r.sistem}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -305,6 +475,68 @@ export default function LandingView() {
               </ul>
             </CardBody>
           </Card>
+        </div>
+      </section>
+
+      {/* Cara kerja -- alur singkat 5 langkah, dari daftar sampai admin pantau. */}
+      <section className="mx-auto w-full max-w-3xl px-4 py-10">
+        <div className="mb-8 text-center">
+          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Alur singkat</span>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+            Dari daftar sampai selesai les, 5 langkah
+          </h2>
+        </div>
+        <Card>
+          <CardBody className="flex flex-col gap-0">
+            {HOW_IT_WORKS.map((step, i) => (
+              <div
+                key={step.title}
+                className={`flex gap-4 py-4 ${i < HOW_IT_WORKS.length - 1 ? "border-b border-border" : ""}`}
+              >
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-sm font-bold text-brand-700">
+                  {i + 1}
+                </span>
+                <div>
+                  <h4 className="text-sm font-semibold text-text">{step.title}</h4>
+                  <p className="mt-0.5 text-sm text-text-muted">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </CardBody>
+        </Card>
+      </section>
+
+      {/* Testimoni -- quote sama persis kayak yang udah ada & disetujui di
+          halaman /panduan, bukan testimoni baru yang dikarang. */}
+      <section className="mx-auto w-full max-w-3xl px-4 py-6">
+        <div className="flex gap-4 rounded-2xl bg-brand-50 p-6 sm:p-8">
+          <Icon name="quote" className="h-8 w-8 shrink-0 text-brand-600" />
+          <p className="text-sm font-medium text-brand-700 sm:text-base">
+            Sebelumnya: itung sisa sesi manual dari chat WA, sering ketuker antar anak, admin harus konfirmasi
+            jadwal satu-satu. Sekarang: member booking sendiri, sisa sesi dan jatah pembatalan kehitung otomatis
+            per anak, admin tinggal pantau.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ -- native <details>/<summary>, zero JS/dependency. */}
+      <section className="mx-auto w-full max-w-3xl px-4 py-10">
+        <div className="mb-8 text-center">
+          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Pertanyaan umum</span>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">Masih ragu?</h2>
+        </div>
+        <div className="flex flex-col gap-3">
+          {FAQ_ITEMS.map((item) => (
+            <details key={item.q} className="group rounded-xl border border-border bg-surface p-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-text marker:content-none">
+                {item.q}
+                <span className="shrink-0 text-lg leading-none text-text-subtle transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="mt-2.5 text-sm text-text-muted">{item.a}</p>
+            </details>
+          ))}
         </div>
       </section>
 
