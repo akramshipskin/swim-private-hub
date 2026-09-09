@@ -9,92 +9,101 @@ import { useEffect } from "react";
 // satu kesatuan visual, sama persis kayak yang udah direview & disetujui.
 const PANDUAN_CSS = `
 
+  /* Token-token ini SENGAJA disamain persis (hex-nya, bukan cuma
+     kira-kira mirip) sama --color-* di globals.css, biar /panduan gak
+     keliatan kayak produk beda pas dibuka dari link "Lihat Demo" di
+     landing page. Role->warna juga disamain sama 3 kartu peran di
+     landing (member=brand teal, coach=success hijau, admin=accent
+     oranye) -- sebelumnya /panduan pake biru/ungu sendiri buat itu. */
   :root {
-    --bg: #f4f7f8;
+    --bg: #f4faf9;
     --surface: #ffffff;
-    --surface-muted: #eef3f4;
-    --border: #dbe4e6;
-    --text: #10242a;
-    --text-muted: #4a6169;
-    --text-subtle: #7c9198;
-    --brand: #0d7a8a;
-    --brand-dark: #095c68;
-    --brand-light: #e3f2f4;
-    --accent: #f0793c;
-    --accent-light: #fdece0;
-    --member: #2f5fd6;
-    --member-bg: #eaf0fd;
-    --coach: #0f8f7a;
-    --coach-bg: #e5f6f2;
-    --admin: #7c4fd6;
-    --admin-bg: #f1eafd;
-    --success: #16803d;
-    --success-bg: #e9f7ef;
-    --warn: #a15c07;
-    --warn-bg: #fdf3e1;
+    --surface-muted: #f0f9f8;
+    --border: #dceae8;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #64748b;
+    --brand: #077a94;
+    --brand-dark: #0e7490;
+    --brand-light: #cffafe;
+    --accent: #f97316;
+    --accent-light: #fff7ed;
+    --member: #077a94;
+    --member-bg: #ecfeff;
+    --coach: #047857;
+    --coach-bg: #ecfdf5;
+    --admin: #f97316;
+    --admin-bg: #fff7ed;
+    --success: #047857;
+    --success-bg: #ecfdf5;
+    --warn: #b45309;
+    --warn-bg: #fffbeb;
     --shadow: 0 1px 2px rgba(16,36,42,0.04), 0 8px 24px -12px rgba(16,36,42,0.18);
     --radius: 16px;
-    --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
-    --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0d1416;
-      --surface: #131d20;
-      --surface-muted: #182427;
-      --border: #23343a;
-      --text: #eef5f6;
-      --text-muted: #a9c0c6;
-      --text-subtle: #6f8990;
-      --brand: #37b3c2;
-      --brand-dark: #2a94a1;
-      --brand-light: #14343a;
-      --accent: #ff9a5e;
-      --accent-light: #3a281c;
-      --member: #7fa4ff;
-      --member-bg: #1a2440;
-      --coach: #4fd3b8;
-      --coach-bg: #123832;
-      --admin: #b79bff;
-      --admin-bg: #2a2148;
-      --success: #4ade80;
-      --success-bg: #123320;
-      --warn: #f2b84b;
-      --warn-bg: #362a0f;
+      --bg: #0b1418;
+      --surface: #101c22;
+      --surface-muted: #16242b;
+      --border: #23343b;
+      --text: #e6f1ef;
+      --text-muted: #9fb4b0;
+      --text-subtle: #74898a;
+      --brand: #077a94;
+      --brand-dark: #67e8f9;
+      --brand-light: #123840;
+      --accent: #fdba74;
+      --accent-light: #3d200c;
+      --member: #077a94;
+      --member-bg: #0e2b30;
+      --coach: #34d399;
+      --coach-bg: #0d2e22;
+      --admin: #fdba74;
+      --admin-bg: #2b1608;
+      --success: #34d399;
+      --success-bg: #0d2e22;
+      --warn: #fbbf24;
+      --warn-bg: #2e2109;
       --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0d1416;
-    --surface: #131d20;
-    --surface-muted: #182427;
-    --border: #23343a;
-    --text: #eef5f6;
-    --text-muted: #a9c0c6;
-    --text-subtle: #6f8990;
-    --brand: #37b3c2;
-    --brand-dark: #2a94a1;
-    --brand-light: #14343a;
-    --accent: #ff9a5e;
-    --accent-light: #3a281c;
-    --member: #7fa4ff;
-    --member-bg: #1a2440;
-    --coach: #4fd3b8;
-    --coach-bg: #123832;
-    --admin: #b79bff;
-    --admin-bg: #2a2148;
-    --success: #4ade80;
-    --success-bg: #123320;
-    --warn: #f2b84b;
-    --warn-bg: #362a0f;
+    --bg: #0b1418;
+    --surface: #101c22;
+    --surface-muted: #16242b;
+    --border: #23343b;
+    --text: #e6f1ef;
+    --text-muted: #9fb4b0;
+    --text-subtle: #74898a;
+    --brand: #077a94;
+    --brand-dark: #67e8f9;
+    --brand-light: #123840;
+    --accent: #fdba74;
+    --accent-light: #3d200c;
+    --member: #077a94;
+    --member-bg: #0e2b30;
+    --coach: #34d399;
+    --coach-bg: #0d2e22;
+    --admin: #fdba74;
+    --admin-bg: #2b1608;
+    --success: #34d399;
+    --success-bg: #0d2e22;
+    --warn: #fbbf24;
+    --warn-bg: #2e2109;
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
   }
 
   * { box-sizing: border-box; }
   body {
+    /* background sengaja gak di-declare di sini -- body global di
+       globals.css udah pasang gradient brand-100 site-wide (dipakai di
+       semua halaman lain), declare ulang di sini bakal nimpa gradient
+       itu jadi warna flat. */
     margin: 0;
-    background: var(--bg);
     color: var(--text);
     font-family: var(--font-body);
     line-height: 1.6;
