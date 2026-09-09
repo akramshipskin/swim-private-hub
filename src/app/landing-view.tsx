@@ -155,6 +155,32 @@ function Icon({ name, className }: { name: IconName; className?: string }) {
   return cloneElement(ICONS[name], { className });
 }
 
+// Bingkai "browser" buat rekreasi UI beneran di section "Lihat Langsung" --
+// bukan screenshot file, tapi state persis yang udah diverifikasi langsung
+// di app produksi. Pake Card/Badge/Button yang sama kayak UI aslinya biar
+// akurat, bukan didesain ulang biar "lebih bagus".
+function BrowserFrame({
+  title,
+  className,
+  children,
+}: {
+  title: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={`overflow-hidden rounded-2xl border border-border bg-surface shadow-lg ${className ?? ""}`}>
+      <div className="flex items-center gap-1.5 border-b border-border bg-surface-muted px-4 py-2.5">
+        <span className="h-2.5 w-2.5 rounded-full bg-danger-text/30" />
+        <span className="h-2.5 w-2.5 rounded-full bg-warning-text/30" />
+        <span className="h-2.5 w-2.5 rounded-full bg-success-text/30" />
+        <span className="ml-2 truncate text-[11px] text-text-subtle">{title}</span>
+      </div>
+      <div className="p-4">{children}</div>
+    </div>
+  );
+}
+
 const OWNER_FEATURES: { icon: IconName; tone: keyof typeof roleToneClasses; title: string; desc: string }[] = [
   {
     icon: "family",
@@ -212,56 +238,6 @@ const roleToneClasses = {
   coach: { bg: "bg-success-bg", text: "text-success-text" },
 };
 
-const COMPARISON_ROWS: { manual: string; generik: string; sistem: string }[] = [
-  {
-    manual: "Sisa sesi dihitung manual dari chat WhatsApp",
-    generik: "Gak ada konsep 'sisa sesi per anak' sama sekali",
-    sistem: "Kehitung otomatis per anak, real-time",
-  },
-  {
-    manual: "Jadwal bisa bentrok tanpa ketauan",
-    generik: "Slot generik, gak ngerti 1 coach = 1 jam = 1 murid",
-    sistem: "Slot terkunci otomatis begitu dibooking",
-  },
-  {
-    manual: "Konfirmasi pembayaran manual satu-satu",
-    generik: "Payment ada, tapi paket/kuota sesi harus diatur manual terpisah",
-    sistem: "Paket aktif otomatis begitu bayar berhasil",
-  },
-  {
-    manual: "Rekap honor coach manual tiap akhir bulan",
-    generik: "Gak ada konsep 'honor per kehadiran' bawaan",
-    sistem: "Laporan kinerja coach sekali klik, per rentang tanggal",
-  },
-  {
-    manual: "Data pelanggan nyebar di Excel/chat/buku",
-    generik: "Bisa import kontak, tapi gak ngerti struktur 1 akun banyak anak",
-    sistem: "Satu database, satu sumber kebenaran, 1 akun banyak anak",
-  },
-  {
-    manual: "Member harus tanya admin buat cek jadwal kosong",
-    generik: "Kebijakan pembatalan generik, gak ada jatah per paket",
-    sistem: "Member lihat & booking slot kosong sendiri, jatah batal transparan",
-  },
-];
-
-const HOW_IT_WORKS = [
-  {
-    title: "Daftar & bayar",
-    desc: "Orang tua isi data diri, tentuin siapa aja yang mau les (diri sendiri dan/atau anak), beli paket, bayar online (VA/QRIS/e-wallet/kartu). Paket langsung aktif otomatis begitu bayar berhasil.",
-    mockup: { label: "Order #PKG-8x-renang", value: "Rp 750.000", status: "Aktif" },
-  },
-  {
-    title: "Booking real-time",
-    desc: "Member pilih anak, coach, tanggal, dan jam yang masih kosong. Begitu diklik, slot itu langsung terkunci — member lain otomatis lihat status 'Sudah dibooking'.",
-    mockup: { label: "Coach Rima · Sabtu 08.00", value: "1 slot tersisa", status: "Kekunci" },
-  },
-  {
-    title: "Kelola & pantau",
-    desc: "Coach tandai Hadir/Gak Hadir abis sesi selesai — ini dasar hitung honor. Admin pantau semuanya dari satu dashboard: booking, pembayaran, kinerja coach per rentang tanggal.",
-    mockup: { label: "Kinerja Coach · Sep 2026", value: "Rekap otomatis", status: "Siap dilihat" },
-  },
-];
 
 const FAQ_ITEMS = [
   {
@@ -291,19 +267,11 @@ const OWNER_WA_LINK = buildOwnerInquiryWaLink();
 export default function LandingView() {
   return (
     <main className="flex min-h-screen flex-col">
-      {/* Hero band -- gelap, gradient dalem ke terang, terinspirasi gaya
-          graphify.com (dark hero -> fade ke body terang) tapi dipalet ulang
-          pake warna brand sendiri (teal tua -> --background), bukan hijau
-          punya mereka. Header ikut duduk di band gelap ini, makanya
-          teks/tombolnya versi terang, beda dari header biasa di halaman lain. */}
-      <div
-        className="relative overflow-hidden"
-        style={{
-          background:
-            "linear-gradient(180deg, #052229 0%, #0b3a45 32%, #0e5a6e 58%, var(--background) 100%)",
-        }}
-      >
-        <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5">
+      {/* Hero -- kembali ke palet terang standar aplikasi (bg-background +
+          gradient brand-100 yang sama kayak body di globals.css), gaya
+          graphify (dark band) di-cancel per feedback Hadi. */}
+      <div>
+        <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5">
           <div className="flex items-center gap-2.5">
             <Image
               src="/logo.png"
@@ -313,62 +281,51 @@ export default function LandingView() {
               className="h-8 w-8 rounded-lg object-contain"
               priority
             />
-            <span className="font-semibold tracking-tight text-white">Les Renang Cianjur</span>
+            <span className="font-semibold tracking-tight text-text">Les Renang Cianjur</span>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login">
-              <Button variant="ghost" size="sm" className="!text-white/80 hover:!bg-white/10 hover:!text-white">
+              <Button variant="ghost" size="sm">
                 Login
               </Button>
             </Link>
             <Link href="/register">
-              <Button size="sm" className="!bg-white !text-brand-700 hover:!bg-white/90">
-                Daftar
-              </Button>
+              <Button size="sm">Daftar</Button>
             </Link>
           </div>
         </header>
 
-        {/* Hero -- pitch utama ke pemilik kolam/tempat les (audiens B2B),
-            bukan ke orang tua. Section "buat orang tua" ada di bawah,
-            terpisah & lebih ringkas, sesuai request Hadi. */}
-        <section className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-4 pb-16 pt-10 text-center sm:pb-24 sm:pt-16">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
+        {/* Pitch utama ke pemilik kolam/tempat les (audiens B2B), bukan ke
+            orang tua -- fork "Anda yang mana?" ada di bawah. */}
+        <section className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 pb-10 pt-8 text-center sm:pt-14">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-text-muted shadow-sm">
             Sistem booking &amp; manajemen les renang
           </span>
-          <h1 className="mt-6 text-4xl font-bold tracking-tight text-balance text-white sm:text-6xl">
-            Kelola les renang tanpa bolak-balik <span className="text-accent-500">chat WhatsApp</span>
+          <h1 className="mt-5 text-3xl font-semibold tracking-tight text-balance text-text sm:text-5xl">
+            Kelola les renang tanpa <span className="text-brand-600">bolak-balik chat WhatsApp</span>
           </h1>
-          <p className="mt-5 max-w-xl text-base text-white/70 sm:text-lg">
+          <p className="mt-4 max-w-xl text-base text-text-muted sm:text-lg">
             Jadwal bentrok, sisa sesi dihitung manual dari chat, lupa siapa yang udah bayar — sistem ini beresin
             semuanya. Member booking sendiri, coach kelola jadwal sendiri, Anda tinggal pantau dari satu dashboard.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
-              <Button className="!rounded-full !bg-white !text-brand-700 hover:!bg-white/90">
+              <Button>
                 <Icon name="chat" className="h-4 w-4" />
                 Punya Kolam Renang? Hubungi Kami
               </Button>
             </a>
             <a href="/panduan">
-              <Button
-                variant="secondary"
-                className="!rounded-full !border-white/25 !bg-white/5 !text-white hover:!bg-white/10"
-              >
-                Lihat Demo &amp; Fitur Lengkap
-              </Button>
+              <Button variant="secondary">Lihat Demo &amp; Fitur Lengkap</Button>
             </a>
           </div>
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            {TRUST_PILLS.map((p, i) => (
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            {TRUST_PILLS.map((p) => (
               <span
                 key={p.label}
-                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/55"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-text-muted shadow-sm"
               >
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ backgroundColor: i % 2 === 0 ? "#fb923c" : "#22d3ee" }}
-                />
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
                 {p.label}
               </span>
             ))}
@@ -428,84 +385,100 @@ export default function LandingView() {
         </div>
       </section>
 
-      {/* Kenapa ini, bukan WA+Excel ATAU aplikasi booking generik --
-          perbandingan 3 arah, bukan cuma 2. Argumen "kenapa bukan yang
-          generik" ini yang tadinya belum ada di halaman ini. */}
+      {/* Lihat Langsung -- rekreasi UI beneran (bukan screenshot file, tapi
+          state persis yang barusan diverifikasi langsung di app produksi:
+          Coach Ayu buka slot 10 Sep, 1 dibooking 1 masih kebuka) buat 3
+          momen inti. Gantiin tabel perbandingan + kartu skenario teks --
+          "liat produknya" lebih ngena daripada tabel klaim. */}
       <section className="mx-auto w-full max-w-5xl px-4 py-10">
         <div className="mb-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">
-            Kenapa ini, bukan itu
-          </span>
+          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Lihat langsung</span>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
-            Bukan cuma lebih baik dari manual — juga lebih pas dari aplikasi booking generik
+            Bukan mockup, ini tampilan aslinya
           </h2>
-          <p className="mx-auto mt-2 max-w-2xl text-sm text-text-muted">
-            Aplikasi booking umum dirancang buat salon atau klinik — slotnya generik. Sistem ini dari awal
-            dirancang ngerti konsep <strong>1 paket = 1 anak</strong>, <strong>sesi berkurang tiap booking</strong>,
-            dan <strong>honor coach dari kehadiran</strong>.
-          </p>
         </div>
-        <div className="overflow-x-auto rounded-2xl border border-border">
-          <table className="w-full min-w-[640px] border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-border bg-surface-muted">
-                <th className="px-4 py-3 text-left font-semibold text-text-subtle">Cara manual</th>
-                <th className="px-4 py-3 text-left font-semibold text-text-subtle">Aplikasi booking generik</th>
-                <th className="px-4 py-3 text-left font-semibold text-brand-700">Les Renang Cianjur</th>
-              </tr>
-            </thead>
-            <tbody>
-              {COMPARISON_ROWS.map((r) => (
-                <tr key={r.manual} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 align-top text-text-muted">
-                    <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-danger-bg text-danger-text align-middle">
-                      <Icon name="cross" className="h-3 w-3" />
-                    </span>
-                    {r.manual}
-                  </td>
-                  <td className="px-4 py-3 align-top text-text-muted">
-                    <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-warning-bg text-warning-text align-middle">
-                      <Icon name="cross" className="h-3 w-3" />
-                    </span>
-                    {r.generik}
-                  </td>
-                  <td className="px-4 py-3 align-top font-medium text-text">
-                    <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-success-bg text-success-text align-middle">
-                      <Icon name="checkCircle" className="h-3 w-3" />
-                    </span>
-                    {r.sistem}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 01</span>
+              <h3 className="mt-1 text-lg font-semibold text-text">Slot kekunci begitu dibooking</h3>
+              <p className="mt-1.5 text-sm text-text-muted">
+                2 orang tua chat bareng nanya slot yang sama — baik lewat chat personal maupun grup WhatsApp. Yang
+                klik "Booking" duluan langsung ngunci slot itu. Yang lain otomatis lihat slot udah kepake, gak
+                perlu admin turun tangan misahin.
+              </p>
+            </div>
+            <BrowserFrame title="lesrenangcianjur.vercel.app/member/booking">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">
+                  CA
+                </span>
+                <span className="text-sm font-semibold text-text">Coach Ayu</span>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                  <div>
+                    <p className="text-sm font-medium text-text">08.00–09.00</p>
+                    <p className="text-xs text-text-subtle">buat kamu sendiri</p>
+                  </div>
+                  <span className="rounded-lg border border-danger-text/25 px-2.5 py-1 text-xs font-medium text-danger-text">
+                    Batalkan
+                  </span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                  <p className="text-sm font-medium text-text">09.00–10.00</p>
+                  <Button size="sm">Booking</Button>
+                </div>
+              </div>
+              <p className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-xs font-medium text-success-text">
+                Booking berhasil! Cek di halaman Riwayat.
+              </p>
+            </BrowserFrame>
+          </div>
 
-      {/* Payoff -- 1 skenario konkret (ala "the answer is a path, not a
-          vibe"-nya graphify), bukan klaim abstrak. Fakta: slot-lock ini
-          beneran diverifikasi jalan di sesi kerja sebelumnya. */}
-      <section className="mx-auto w-full max-w-3xl px-4 py-6">
-        <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Contoh nyata</span>
-          <h3 className="mt-2 text-lg font-semibold text-text sm:text-xl">
-            Sabtu malam, 3 orang tua chat WA bareng nanya slot Minggu pagi
-          </h3>
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="rounded-xl bg-danger-bg p-4">
-              <p className="text-xs font-bold uppercase tracking-wide text-danger-text">Cara manual</p>
+          <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+            <div className="sm:order-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 02</span>
+              <h3 className="mt-1 text-lg font-semibold text-text">Paket aktif otomatis abis bayar</h3>
               <p className="mt-1.5 text-sm text-text-muted">
-                Admin balesin satu-satu, 2 orang tua sama-sama dijawab "bisa" buat jam 08.00 sama coach yang sama
-                — ketauan bentroknya pas udah di kolam.
+                Gak ada lagi "admin, udah dicek belum bayarannya?". Begitu pembayaran online berhasil, status paket
+                langsung berubah — sisa sesi siap dipakai booking hari itu juga.
               </p>
             </div>
-            <div className="rounded-xl bg-success-bg p-4">
-              <p className="text-xs font-bold uppercase tracking-wide text-success-text">Pakai sistem ini</p>
+            <BrowserFrame title="lesrenangcianjur.vercel.app/member/paket" className="sm:order-1">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-subtle">Paket Saya</p>
+              <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                <div>
+                  <p className="text-sm font-medium text-text">Private | 8x Renang</p>
+                  <p className="text-xs text-text-subtle">buat Ucok · Sisa sesi 8/8</p>
+                </div>
+                <Badge tone="success">Aktif</Badge>
+              </div>
+            </BrowserFrame>
+          </div>
+
+          <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 03</span>
+              <h3 className="mt-1 text-lg font-semibold text-text">Honor coach dari kehadiran, bukan tebakan</h3>
               <p className="mt-1.5 text-sm text-text-muted">
-                Orang tua pertama yang klik "Booking" langsung ngunci slot itu. Orang tua kedua otomatis lihat
-                status "Sudah dibooking" — gak perlu admin turun tangan sama sekali.
+                Coach tandai Hadir/Gak Hadir abis sesi selesai. Cuma sesi Hadir yang kehitung valid — Anda tinggal
+                buka laporan Kinerja Coach per rentang tanggal, gak perlu rekap manual dari catatan.
               </p>
             </div>
+            <BrowserFrame title="lesrenangcianjur.vercel.app/coach/riwayat">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-subtle">Riwayat Sesi</p>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                  <p className="text-sm text-text">Ucok · 08.00–09.00</p>
+                  <Badge tone="success">Hadir</Badge>
+                </div>
+                <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                  <p className="text-sm text-text">Rina · 09.00–10.00</p>
+                  <Badge tone="neutral">Belum ditandai</Badge>
+                </div>
+              </div>
+            </BrowserFrame>
           </div>
         </div>
       </section>
@@ -561,36 +534,6 @@ export default function LandingView() {
         </div>
       </section>
 
-      {/* Cara kerja -- 3 STEP besar, tiap step dikasih "mockup" kecil biar
-          konkret (bukan cuma teks), gaya STEP 01/02/03-nya graphify. */}
-      <section className="mx-auto w-full max-w-4xl px-4 py-10">
-        <div className="mb-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Cara kerja</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">Daftar → booking → beres</h2>
-        </div>
-        <div className="flex flex-col gap-4">
-          {HOW_IT_WORKS.map((step, i) => (
-            <Card key={step.title} className="overflow-hidden">
-              <CardBody className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <div className="flex-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">
-                    Step {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="mt-1 text-lg font-semibold text-text">{step.title}</h3>
-                  <p className="mt-1.5 text-sm text-text-muted">{step.desc}</p>
-                </div>
-                <div className="flex w-full shrink-0 items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted px-4 py-3 font-mono text-xs sm:w-64">
-                  <div>
-                    <p className="text-text-subtle">{step.mockup.label}</p>
-                    <p className="mt-0.5 font-semibold text-text">{step.mockup.value}</p>
-                  </div>
-                  <Badge tone="success">{step.mockup.status}</Badge>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      </section>
 
       {/* Testimoni -- quote sama persis kayak yang udah ada & disetujui di
           halaman /panduan, bukan testimoni baru yang dikarang. */}
