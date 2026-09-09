@@ -611,9 +611,14 @@ export default function LandingView() {
         </div>
       </section>
 
-      {/* CTA band penutup */}
+      {/* CTA band penutup -- gradient & warna teks tombol dipaku pake hex
+          literal (bukan token brand-700), soalnya brand-700 sengaja
+          "dibalik" jadi cyan terang di dark mode (buat teks di atas
+          surface gelap) -- dipake sebagai warna BACKGROUND/teks di sini
+          malah bikin band nyilaukan & tombol putih teksnya nyaris gak
+          kebaca. Band ini sengaja fixed 1 tampilan di kedua tema. */}
       <section className="mx-auto w-full max-w-3xl px-4 pb-16">
-        <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 px-6 py-9 text-center text-white sm:px-10 sm:py-12">
+        <div className="rounded-2xl bg-gradient-to-br from-[#077a94] to-[#0b4a57] px-6 py-9 text-center text-white sm:px-10 sm:py-12">
           <h2 className="text-xl font-semibold sm:text-2xl">Siap dipakai hari ini</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-white/85">
             Gak perlu training panjang — alurnya udah familiar kayak booking online pada umumnya. Coba dulu lewat
@@ -621,7 +626,7 @@ export default function LandingView() {
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary" className="!bg-white !text-brand-700 hover:!bg-white/90">
+              <Button variant="secondary" className="!bg-white !text-[#0e7490] hover:!bg-white/90">
                 Hubungi Kami
               </Button>
             </a>
