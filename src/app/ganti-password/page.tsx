@@ -8,6 +8,20 @@ export default async function GantiPasswordPage() {
   const session = await auth();
   if (!session) redirect("/login");
 
+  // Halaman ini cuma valid buat login pertama (password bawaan wajib
+  // diganti). Tanpa guard ini, siapa aja yang udah lama pake akun bisa
+  // nyasar ke sini (lewat browser back, bookmark lama, dst) dan lihat
+  // pesan "login pertama kamu" yang salah + form setup peserta yang
+  // gak nyambung sama data yang udah ada.
+  if (!session.user.mustChangePassword) {
+    const roleHome: Record<string, string> = {
+      ADMIN: "/admin",
+      COACH: "/coach",
+      MEMBER: "/member/booking",
+    };
+    redirect(roleHome[session.user.role]);
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 py-12">
       <div className="mb-6 flex flex-col items-center text-center">
