@@ -140,6 +140,26 @@ const PANDUAN_CSS = `
   .tab:hover { background: var(--surface-muted); color: var(--text); }
   .tab.active { background: var(--brand); color: white; }
 
+  /* --- tombol -- gaya & ukuran disamain sama komponen Button React di
+     landing page (min-height 44px, rounded-xl, padding sama), biar
+     header/hero /panduan berasa satu produk sama landing, bukan
+     halaman terpisah. --- */
+  .btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 44px; padding: 0 16px; border-radius: 12px;
+    font-family: var(--font-body); font-weight: 500; font-size: 14px;
+    text-decoration: none; white-space: nowrap; cursor: pointer;
+    transition: filter .15s, background .15s;
+  }
+  .btn-primary { background: var(--brand); color: white; }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--surface-muted); }
+  .btn-ghost { background: transparent; color: var(--brand); }
+  .btn-ghost:hover { background: var(--brand-light); }
+  .btn-sm { min-height: 36px; padding: 0 14px; font-size: 13.5px; }
+
   /* --- panels --- */
   .panel { display: none; padding-top: 40px; }
   .panel.active { display: block; animation: fade .25s ease; }
@@ -311,6 +331,10 @@ const PANDUAN_BODY = `
         <button class="tab" data-tab="coach">Panduan Coach</button>
         <button class="tab" data-tab="admin">Panduan Admin</button>
       </nav>
+      <div class="btn-row">
+        <a class="btn btn-ghost btn-sm" href="/login">Login</a>
+        <a class="btn btn-primary btn-sm" href="/register">Daftar</a>
+      </div>
     </div>
   </div>
 
@@ -320,6 +344,10 @@ const PANDUAN_BODY = `
       <div class="hero">
         <h1>Satu aplikasi buat <span class="accent-word">booking</span>, <span class="accent-word">jadwal</span>, dan <span class="accent-word">paket</span> les renang</h1>
         <p class="lead">Gak ada lagi bolak-balik chat WhatsApp buat atur jadwal, itung sisa sesi manual, atau lupa siapa yang udah bayar. Member booking sendiri, coach kelola jadwal sendiri, admin pantau semuanya dari satu tempat.</p>
+        <div class="btn-row" style="justify-content:center;margin-top:22px;">
+          <a class="btn btn-primary" href="https://wa.me/6281573400086?text=${encodeURIComponent("Halo, saya tertarik pake sistem Les Renang Cianjur buat kelola tempat les renang saya. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
+          <a class="btn btn-secondary" href="/register">Daftar Sekarang</a>
+        </div>
         <div class="hero-actions">
           <span class="pill-stat">${ICON.phone} <b>Web-based</b> — buka dari HP, gak perlu install apa-apa</span>
           <span class="pill-stat">${ICON.bolt} <b>Real-time</b> — slot kekunci begitu diambil</span>
