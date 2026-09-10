@@ -50,6 +50,7 @@ export async function POST(request: Request) {
   });
 
   const orderId = `PKG-${pkg.id}-${Date.now()}`;
+  const origin = new URL(request.url).origin;
 
   try {
     const transaction = await snap.createTransaction({
@@ -66,6 +67,13 @@ export async function POST(request: Request) {
           name: template.name,
         },
       ],
+      // Tanpa ini, Snap balikin user ke example.com bawaan Midtrans kalau
+      // popup ditutup/selesai/gagal -- gak profesional buat production.
+      callbacks: {
+        finish: `${origin}/member/paket`,
+        unfinish: `${origin}/member/paket`,
+        error: `${origin}/member/paket`,
+      },
     });
 
     await prisma.payment.create({
