@@ -70,9 +70,9 @@ export async function POST(request: Request) {
       // Tanpa ini, Snap balikin user ke example.com bawaan Midtrans kalau
       // popup ditutup/selesai/gagal -- gak profesional buat production.
       callbacks: {
-        finish: `${origin}/member/paket`,
-        unfinish: `${origin}/member/paket`,
-        error: `${origin}/member/paket`,
+        finish: `${origin}/pembayaran/sukses`,
+        unfinish: `${origin}/pembayaran/gagal`,
+        error: `${origin}/pembayaran/gagal`,
       },
     });
 
