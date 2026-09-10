@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+
+export const metadata: Metadata = {
+  title: "Kebijakan Pengembalian | Les Renang Cianjur",
+  description: "Ketentuan kapan pembayaran paket les bisa dan tidak bisa dikembalikan (refund).",
+};
 
 export default function KebijakanPengembalianPage() {
   return (

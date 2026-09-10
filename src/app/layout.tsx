@@ -17,9 +17,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://les-renang-cianjur.vercel.app"),
   title: "Les Renang Cianjur",
   description: "Booking jadwal renang dengan coach favoritmu.",
   manifest: "/manifest.json",
+  openGraph: {
+    siteName: "Les Renang Cianjur",
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export const viewport: Viewport = {

@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+
+export const metadata: Metadata = {
+  title: "Kebijakan Privasi | Les Renang Cianjur",
+  description: "Data pribadi apa yang dikumpulkan, tujuan penggunaannya, dan hak Anda atas data tersebut.",
+};
 
 export default function KebijakanPrivasiPage() {
   return (

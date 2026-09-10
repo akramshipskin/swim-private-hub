@@ -7,15 +7,29 @@ export async function POST(request: Request) {
   const body = await request.json();
   const registeredIp =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  const { name, phone, email, password, childNames, wantsSelf, entryReferrer } = body as {
-    name?: string;
-    phone?: string;
-    email?: string;
-    password?: string;
-    childNames?: string[];
-    wantsSelf?: boolean;
-    entryReferrer?: string | null;
-  };
+  const { name, phone, email, password, childNames, wantsSelf, entryReferrer, website, formRenderedAt } =
+    body as {
+      name?: string;
+      phone?: string;
+      email?: string;
+      password?: string;
+      childNames?: string[];
+      wantsSelf?: boolean;
+      entryReferrer?: string | null;
+      website?: string;
+      formRenderedAt?: number;
+    };
+
+  // Anti-spam sederhana: "website" itu honeypot (field kosong yang
+  // disembunyikan dari user asli lewat CSS -- bot yang isi semua field
+  // otomatis bakal ke-isi ini juga). formRenderedAt dipake buat nolak
+  // submit yang lebih cepet dari waktu wajar buat isi form manual.
+  if (website) {
+    return Response.json({ error: "Registrasi gagal" }, { status: 400 });
+  }
+  if (typeof formRenderedAt === "number" && Date.now() - formRenderedAt < 1500) {
+    return Response.json({ error: "Registrasi gagal, coba lagi" }, { status: 400 });
+  }
   // entryReferrer dikirim client (document.referrer pas landing pertama,
   // disimpen di sessionStorage) -- itu sumber ASLI (WA/IG/Google/dll).
   // request.headers.get("referer") gak dipake lagi karena selalu isi

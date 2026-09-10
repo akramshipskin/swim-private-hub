@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { NavBar } from "@/components/nav-bar";
@@ -7,6 +8,11 @@ import { roleNavLinks } from "@/lib/nav-links";
 import EditNameForm from "./edit-name-form";
 import EditPasswordForm from "./edit-password-form";
 import ManageChildrenForm from "./manage-children-form";
+
+export const metadata: Metadata = {
+  title: "Profil | Les Renang Cianjur",
+  robots: { index: false, follow: false },
+};
 
 const roleLabel: Record<string, string> = {
   ADMIN: "Admin",

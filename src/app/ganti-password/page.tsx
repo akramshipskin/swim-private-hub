@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import { Card, CardBody } from "@/components/ui/card";
 import ChangePasswordForm from "./change-password-form";
+
+export const metadata: Metadata = {
+  title: "Ganti Password | Les Renang Cianjur",
+  robots: { index: false, follow: false },
+};
 
 export default async function GantiPasswordPage() {
   const session = await auth();

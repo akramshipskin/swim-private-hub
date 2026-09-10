@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+
+export const metadata: Metadata = {
+  title: "Syarat & Ketentuan | Les Renang Cianjur",
+  description: "Ketentuan penggunaan aplikasi pemesanan dan manajemen les renang Les Renang Cianjur.",
+};
 
 export default function SyaratKetentuanPage() {
   return (

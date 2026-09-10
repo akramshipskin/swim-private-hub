@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+
+export const metadata: Metadata = {
+  title: "Kebijakan Cookie | Les Renang Cianjur",
+  description: "Cookie dan penyimpanan lokal apa yang dipakai aplikasi ini, dan buat apa.",
+};
 
 export default function KebijakanCookiePage() {
   return (
