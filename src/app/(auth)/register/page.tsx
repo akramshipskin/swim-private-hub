@@ -19,6 +19,7 @@ export default function RegisterPage() {
   const [participants, setParticipants] = useState<Participant[]>([
     { type: "self", name: "" },
   ]);
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -186,13 +187,34 @@ export default function RegisterPage() {
               </button>
             </div>
 
+            <label className="flex items-start gap-2 text-xs text-text-muted">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                required
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500"
+              />
+              <span>
+                Saya setuju dengan{" "}
+                <a href="/syarat-ketentuan" target="_blank" className="font-medium text-brand-600 hover:underline">
+                  Syarat &amp; Ketentuan
+                </a>{" "}
+                dan{" "}
+                <a href="/kebijakan-privasi" target="_blank" className="font-medium text-brand-600 hover:underline">
+                  Kebijakan Privasi
+                </a>
+                .
+              </span>
+            </label>
+
             {error && (
               <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">
                 {error}
               </p>
             )}
 
-            <Button type="submit" loading={loading} className="mt-1 w-full">
+            <Button type="submit" loading={loading} disabled={!agreed} className="mt-1 w-full">
               Daftar
             </Button>
           </form>

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import AuthSessionProvider from "@/components/session-provider";
 import ServiceWorkerRegister from "@/components/service-worker-register";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <ServiceWorkerRegister />
         <AuthSessionProvider>{children}</AuthSessionProvider>
+        <CookieConsentBanner />
         <Analytics />
       </body>
     </html>

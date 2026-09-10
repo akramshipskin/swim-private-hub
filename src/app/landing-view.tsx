@@ -639,8 +639,40 @@ export default function LandingView() {
         </div>
       </section>
 
-      <footer className="border-t border-border py-6 text-center text-xs text-text-subtle">
-        Les Renang Cianjur — sistem booking &amp; manajemen les renang.
+      <footer className="border-t border-border py-8">
+        <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 text-xs text-text-subtle sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="font-medium text-text-muted">Les Renang Cianjur</p>
+            <p className="mt-1">[ALAMAT]</p>
+            <p className="mt-1">
+              WhatsApp{" "}
+              <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-brand-600 hover:underline">
+                +62 815-7340-0086
+              </a>{" "}
+              · Email{" "}
+              <a href="mailto:[EMAIL]" className="hover:text-brand-600 hover:underline">
+                [EMAIL]
+              </a>
+            </p>
+          </div>
+          <div className="flex flex-col gap-1.5 sm:items-end">
+            <Link href="/kebijakan-privasi" className="hover:text-brand-600 hover:underline">
+              Kebijakan Privasi
+            </Link>
+            <Link href="/syarat-ketentuan" className="hover:text-brand-600 hover:underline">
+              Syarat &amp; Ketentuan
+            </Link>
+            <Link href="/kebijakan-pengembalian" className="hover:text-brand-600 hover:underline">
+              Kebijakan Pengembalian
+            </Link>
+            <Link href="/kebijakan-cookie" className="hover:text-brand-600 hover:underline">
+              Kebijakan Cookie
+            </Link>
+          </div>
+        </div>
+        <p className="mt-6 text-center text-xs text-text-subtle">
+          © 2026 Les Renang Cianjur — sistem booking &amp; manajemen les renang.
+        </p>
       </footer>
     </main>
   );

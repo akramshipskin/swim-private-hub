@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { cloneElement, isValidElement, useId } from "react";
 import type { InputHTMLAttributes, LabelHTMLAttributes, SelectHTMLAttributes } from "react";
 
 export function Label({ className, ...props }: LabelHTMLAttributes<HTMLLabelElement>) {
@@ -61,10 +62,15 @@ export function Field({
   children: React.ReactNode;
   className?: string;
 }) {
+  const generatedId = useId();
+  const element = isValidElement<{ id?: string }>(children) ? children : null;
+  const inputId = element ? (element.props.id ?? generatedId) : undefined;
+  const child = element ? cloneElement(element, { id: inputId }) : children;
+
   return (
     <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
-      <Label>{label}</Label>
-      {children}
+      <Label htmlFor={inputId}>{label}</Label>
+      {child}
     </div>
   );
 }
