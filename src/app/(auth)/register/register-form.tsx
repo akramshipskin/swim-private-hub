@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
+import { isValidIndonesianPhone } from "@/lib/format";
 
 type Participant = { type: "self" | "child"; name: string };
 
@@ -32,6 +33,12 @@ export default function RegisterForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (!isValidIndonesianPhone(phone)) {
+      setError("Format No HP gak valid (contoh: 0812xxxxxxx)");
+      return;
+    }
+
     setLoading(true);
 
     let entryReferrer: string | null = null;

@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { createSelfDependent } from "@/lib/dependents";
-import { toProperCase } from "@/lib/format";
+import { isValidIndonesianPhone, toProperCase } from "@/lib/format";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -41,6 +41,13 @@ export async function POST(request: Request) {
   if (!name || !phone || !password) {
     return Response.json(
       { error: "Nama, No HP, dan password wajib diisi" },
+      { status: 400 }
+    );
+  }
+
+  if (!isValidIndonesianPhone(phone)) {
+    return Response.json(
+      { error: "Format No HP gak valid (contoh: 0812xxxxxxx)" },
       { status: 400 }
     );
   }
