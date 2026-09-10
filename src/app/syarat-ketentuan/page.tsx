@@ -4,37 +4,37 @@ export default function SyaratKetentuanPage() {
   return (
     <LegalPageLayout title="Syarat & Ketentuan" updatedAt="10 September 2026">
       <p>
-        Dengan mendaftar dan menggunakan aplikasi booking &amp; manajemen les renang
-        Les Renang Cianjur ("Aplikasi"), kamu setuju sama syarat &amp; ketentuan di
-        bawah ini.
+        Dengan mendaftar dan menggunakan aplikasi pemesanan dan manajemen les
+        renang Les Renang Cianjur ("Aplikasi"), Pengguna menyatakan setuju
+        terhadap Syarat &amp; Ketentuan berikut ini.
       </p>
 
       <h2>1. Akun</h2>
       <ul>
-        <li>Kamu wajib ngisi data pendaftaran (nama, no HP, password) dengan benar.</li>
-        <li>Satu akun member bisa punya beberapa peserta (diri sendiri dan/atau anak).</li>
-        <li>Kamu bertanggung jawab jaga kerahasiaan password akunmu sendiri.</li>
+        <li>Pengguna wajib mengisi data pendaftaran (nama, nomor telepon, kata sandi) dengan benar dan akurat.</li>
+        <li>Satu akun member dapat memiliki beberapa peserta les (diri sendiri dan/atau anak).</li>
+        <li>Pengguna bertanggung jawab penuh atas kerahasiaan kata sandi akunnya masing-masing.</li>
       </ul>
 
-      <h2>2. Paket &amp; Sesi</h2>
+      <h2>2. Paket dan Sesi</h2>
       <ul>
-        <li>Paket les terdiri dari sejumlah sesi yang berkurang tiap booking yang dihadiri.</li>
-        <li>Paket aktif otomatis setelah pembayaran berhasil dikonfirmasi sistem.</li>
-        <li>Sisa sesi dan jatah pembatalan berlaku per peserta, gak bisa dipindah ke peserta lain kecuali diproses manual oleh admin.</li>
+        <li>Paket les terdiri atas sejumlah sesi yang berkurang setiap kali pemesanan dihadiri.</li>
+        <li>Paket akan aktif secara otomatis setelah pembayaran berhasil dikonfirmasi oleh sistem.</li>
+        <li>Sisa sesi dan jatah pembatalan berlaku per peserta, dan tidak dapat dipindahkan ke peserta lain kecuali melalui proses manual oleh administrator.</li>
       </ul>
 
-      <h2>3. Booking &amp; Pembatalan</h2>
+      <h2>3. Pemesanan dan Pembatalan</h2>
       <ul>
-        <li>Booking jadwal tunduk pada ketersediaan slot coach yang dipilih.</li>
-        <li>Pembatalan booking memotong jatah cancel yang tersedia di paketmu.</li>
-        <li>Kehadiran ditandai oleh coach setelah sesi selesai; cuma sesi dengan status Hadir yang dihitung terpakai.</li>
+        <li>Pemesanan jadwal tunduk pada ketersediaan slot pelatih (coach) yang dipilih.</li>
+        <li>Pembatalan pemesanan akan mengurangi jatah pembatalan yang tersedia pada paket Pengguna.</li>
+        <li>Kehadiran ditandai oleh pelatih setelah sesi selesai; hanya sesi berstatus Hadir yang dihitung sebagai terpakai.</li>
       </ul>
 
       <h2>4. Pembayaran</h2>
       <p>
-        Pembayaran diproses lewat Midtrans sebagai payment gateway resmi (virtual
-        account, QRIS, e-wallet, kartu debit/kredit). Ketentuan pengembalian dana
-        diatur terpisah di{" "}
+        Pembayaran diproses melalui Midtrans selaku penyedia gerbang pembayaran
+        resmi (virtual account, QRIS, dompet digital, serta kartu debit/kredit).
+        Ketentuan mengenai pengembalian dana diatur secara terpisah pada{" "}
         <a href="/kebijakan-pengembalian" className="text-brand-600 hover:underline">
           Kebijakan Pengembalian
         </a>
@@ -43,36 +43,40 @@ export default function SyaratKetentuanPage() {
 
       <h2>5. Kewajiban Pengguna</h2>
       <ul>
-        <li>Gunakan Aplikasi cuma buat keperluan booking les renang yang sah.</li>
-        <li>Gak boleh menyalahgunakan sistem (misal booking ganda dengan itikad gak baik, manipulasi data).</li>
-        <li>Data peserta (nama anak dll) wajib akurat -- kesalahan data jadi tanggung jawab yang mendaftarkan.</li>
+        <li>Menggunakan Aplikasi semata-mata untuk keperluan pemesanan les renang yang sah.</li>
+        <li>Tidak menyalahgunakan sistem, termasuk namun tidak terbatas pada pemesanan ganda dengan itikad tidak baik atau manipulasi data.</li>
+        <li>Data peserta (nama anak, dan sebagainya) wajib akurat; kesalahan data menjadi tanggung jawab Pengguna yang mendaftarkan.</li>
       </ul>
 
       <h2>6. Batasan Tanggung Jawab</h2>
       <p>
-        Aplikasi ini adalah alat bantu administrasi booking &amp; pembayaran. Kualitas
-        pengajaran renang, keselamatan di kolam, dan operasional lapangan sepenuhnya
-        tanggung jawab tempat les/coach terkait, bukan penyedia Aplikasi.
+        Aplikasi ini merupakan sarana bantu administrasi pemesanan dan
+        pembayaran. Kualitas pengajaran renang, keselamatan di area kolam, dan
+        operasional lapangan sepenuhnya menjadi tanggung jawab pihak
+        penyelenggara les/pelatih terkait, dan bukan tanggung jawab penyedia
+        Aplikasi.
       </p>
 
       <h2>7. Perubahan Layanan</h2>
       <p>
-        Fitur, harga paket, dan ketentuan ini bisa berubah sewaktu-waktu. Perubahan
-        harga gak berlaku surut ke paket yang udah dibeli.
+        Fitur, harga paket, dan ketentuan ini dapat berubah sewaktu-waktu.
+        Perubahan harga tidak berlaku surut terhadap paket yang telah dibeli
+        sebelumnya.
       </p>
 
       <h2>8. Hukum yang Berlaku</h2>
-      <p>Syarat &amp; Ketentuan ini tunduk pada hukum Republik Indonesia.</p>
+      <p>Syarat &amp; Ketentuan ini tunduk pada hukum yang berlaku di Republik Indonesia.</p>
 
-      <h2>Kontak</h2>
+      <h2>9. Kontak</h2>
       <p>
-        Pertanyaan soal Syarat &amp; Ketentuan: WhatsApp{" "}
-        <a href="https://wa.me/6281573400086" className="text-brand-600 hover:underline">
-          +62 815-7340-0086
+        Pertanyaan mengenai Syarat &amp; Ketentuan dapat disampaikan melalui
+        WhatsApp{" "}
+        <a href="https://wa.me/6282117173124" className="text-brand-600 hover:underline">
+          +62 821-1717-3124
         </a>{" "}
         atau email{" "}
-        <a href="mailto:[EMAIL]" className="text-brand-600 hover:underline">
-          [EMAIL]
+        <a href="mailto:cianjurmarketers@gmail.com" className="text-brand-600 hover:underline">
+          cianjurmarketers@gmail.com
         </a>
         .
       </p>

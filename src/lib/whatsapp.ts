@@ -1,4 +1,4 @@
-const ADMIN_WHATSAPP_NUMBER = "6281573400086";
+const ADMIN_WHATSAPP_NUMBER = "6282117173124";
 
 function normalizePhoneForWa(phone: string): string {
   const digits = phone.replace(/\D/g, "");

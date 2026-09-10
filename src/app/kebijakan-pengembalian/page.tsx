@@ -4,49 +4,50 @@ export default function KebijakanPengembalianPage() {
   return (
     <LegalPageLayout title="Kebijakan Pengembalian" updatedAt="10 September 2026">
       <p>
-        Halaman ini menjelaskan kapan pembayaran paket les bisa dikembalikan
-        (refund), dan bedanya sama jatah pembatalan booking (yang gak sama dengan
-        pengembalian uang).
+        Halaman ini menjelaskan ketentuan pengembalian dana (refund) atas
+        pembayaran paket les, serta perbedaannya dengan jatah pembatalan
+        pemesanan.
       </p>
 
-      <h2>Jatah Pembatalan vs Refund Uang</h2>
+      <h2>1. Jatah Pembatalan versus Pengembalian Dana</h2>
       <p>
-        Tiap paket punya jatah pembatalan (cancel) yang dipakai kalau kamu batalin
-        booking sebelum jadwal. Ini <strong>bukan</strong> pengembalian uang --
-        sesi tetap ada di paketmu buat dijadwalkan ulang. Refund uang cuma berlaku
-        di kondisi khusus di bawah.
+        Setiap paket memiliki jatah pembatalan (cancel) yang digunakan apabila
+        Pengguna membatalkan pemesanan sebelum jadwal berlangsung. Hal ini{" "}
+        <strong>bukan</strong> merupakan pengembalian dana — sesi tetap tersedia
+        pada paket Pengguna untuk dijadwalkan ulang. Pengembalian dana hanya
+        berlaku pada kondisi khusus sebagaimana dijelaskan di bawah ini.
       </p>
 
-      <h2>Kondisi yang Bisa Direfund</h2>
+      <h2>2. Kondisi yang Dapat Diajukan Pengembalian Dana</h2>
       <ul>
-        <li>Pembayaran ganda/duplikat buat paket yang sama (kesalahan teknis).</li>
-        <li>Sistem mengaktifkan paket yang salah karena kesalahan kami.</li>
-        <li>Dana sudah terpotong tapi status transaksi gagal/error di sisi payment gateway (bukan dibatalkan sendiri oleh pembeli).</li>
+        <li>Pembayaran ganda/duplikat untuk paket yang sama akibat kesalahan teknis.</li>
+        <li>Sistem mengaktifkan paket yang keliru akibat kesalahan pada pihak kami.</li>
+        <li>Dana telah terpotong namun status transaksi gagal/mengalami kesalahan pada sisi gerbang pembayaran (bukan akibat pembatalan oleh pembeli sendiri).</li>
       </ul>
 
-      <h2>Kondisi yang Gak Bisa Direfund</h2>
+      <h2>3. Kondisi yang Tidak Dapat Diajukan Pengembalian Dana</h2>
       <ul>
-        <li>Paket yang sesinya udah mulai dipakai (sebagian atau seluruhnya).</li>
-        <li>Berubah pikiran/gak jadi ikut les setelah paket aktif dan belum ada sesi terpakai lebih dari 7 hari sejak pembayaran (bisa didiskusikan case-by-case lewat kontak di bawah).</li>
-        <li>Kesalahan input data peserta oleh pembeli sendiri (bisa dikoreksi lewat admin, bukan alasan refund).</li>
+        <li>Paket yang sesinya telah digunakan, baik sebagian maupun seluruhnya.</li>
+        <li>Pembatalan keikutsertaan setelah paket aktif tanpa sesi yang terpakai, yang diajukan lebih dari 7 (tujuh) hari sejak tanggal pembayaran (dapat dipertimbangkan secara kasus per kasus melalui kontak di bawah).</li>
+        <li>Kesalahan input data peserta yang dilakukan oleh pembeli sendiri (dapat dikoreksi melalui administrator, dan bukan merupakan dasar pengajuan pengembalian dana).</li>
       </ul>
 
-      <h2>Cara Mengajukan Refund</h2>
+      <h2>4. Tata Cara Pengajuan</h2>
       <ol className="list-decimal pl-5">
-        <li>Hubungi kami lewat WhatsApp/email di bawah, sertakan nomor transaksi atau nama akun.</li>
-        <li>Tim kami verifikasi status transaksi lewat sistem &amp; Midtrans.</li>
-        <li>Kalau disetujui, dana dikembalikan ke metode pembayaran asal maksimal 14 hari kerja.</li>
+        <li>Menghubungi kami melalui WhatsApp/email di bawah dengan menyertakan nomor transaksi atau nama akun.</li>
+        <li>Tim kami akan memverifikasi status transaksi melalui sistem dan Midtrans.</li>
+        <li>Apabila disetujui, dana akan dikembalikan ke metode pembayaran asal paling lambat 14 (empat belas) hari kerja.</li>
       </ol>
 
-      <h2>Kontak Pengajuan Refund</h2>
+      <h2>5. Kontak Pengajuan Pengembalian Dana</h2>
       <p>
         WhatsApp{" "}
-        <a href="https://wa.me/6281573400086" className="text-brand-600 hover:underline">
-          +62 815-7340-0086
+        <a href="https://wa.me/6282117173124" className="text-brand-600 hover:underline">
+          +62 821-1717-3124
         </a>{" "}
         atau email{" "}
-        <a href="mailto:[EMAIL]" className="text-brand-600 hover:underline">
-          [EMAIL]
+        <a href="mailto:cianjurmarketers@gmail.com" className="text-brand-600 hover:underline">
+          cianjurmarketers@gmail.com
         </a>
         .
       </p>

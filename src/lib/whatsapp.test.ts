@@ -37,6 +37,6 @@ describe("buildAdminCancelWaLink", () => {
 describe("buildOwnerInquiryWaLink", () => {
   it("points to the admin WhatsApp number", () => {
     const link = buildOwnerInquiryWaLink();
-    expect(link).toContain("https://wa.me/6281573400086");
+    expect(link).toContain("https://wa.me/6282117173124");
   });
 });

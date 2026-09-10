@@ -647,11 +647,11 @@ export default function LandingView() {
             <p className="mt-1">
               WhatsApp{" "}
               <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-brand-600 hover:underline">
-                +62 815-7340-0086
+                +62 821-1717-3124
               </a>{" "}
               · Email{" "}
-              <a href="mailto:[EMAIL]" className="hover:text-brand-600 hover:underline">
-                [EMAIL]
+              <a href="mailto:cianjurmarketers@gmail.com" className="hover:text-brand-600 hover:underline">
+                cianjurmarketers@gmail.com
               </a>
             </p>
           </div>

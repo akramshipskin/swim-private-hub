@@ -4,95 +4,100 @@ export default function KebijakanPrivasiPage() {
   return (
     <LegalPageLayout title="Kebijakan Privasi" updatedAt="10 September 2026">
       <p>
-        Kebijakan ini menjelaskan data apa aja yang dikumpulkan Les Renang Cianjur
-        lewat aplikasi booking &amp; manajemen les renang ini, buat apa dipakai, dan
-        hak kamu atas data itu. Berlaku buat semua pengguna: orang tua/member, coach,
-        dan admin.
+        Kebijakan Privasi ini menjelaskan jenis data pribadi yang dikumpulkan oleh
+        Les Renang Cianjur ("kami") melalui aplikasi pemesanan dan manajemen les
+        renang ("Aplikasi"), tujuan penggunaannya, serta hak Pengguna atas data
+        tersebut. Kebijakan ini berlaku bagi seluruh Pengguna Aplikasi, yaitu
+        orang tua/member, pelatih (coach), dan administrator.
       </p>
 
-      <h2>Data yang Dikumpulkan</h2>
+      <h2>1. Data yang Dikumpulkan</h2>
       <ul>
-        <li>Nama, nomor HP, dan email (email opsional) saat daftar akun.</li>
+        <li>Nama, nomor telepon, dan alamat email (email bersifat opsional) pada saat pendaftaran akun.</li>
         <li>Nama anak/peserta les yang didaftarkan di bawah akun member.</li>
-        <li>Riwayat booking, kehadiran, dan sisa sesi paket.</li>
+        <li>Riwayat pemesanan jadwal, kehadiran, dan sisa sesi paket.</li>
         <li>
-          Data transaksi pembayaran (nominal, status, metode) -- nomor kartu/rekening
-          gak pernah disimpan di sistem kami, itu ditangani langsung sama Midtrans
-          sebagai payment gateway resmi.
+          Data transaksi pembayaran (nominal, status, dan metode pembayaran). Nomor
+          kartu atau rekening tidak pernah disimpan dalam sistem kami, melainkan
+          diproses langsung oleh Midtrans selaku penyedia gerbang pembayaran resmi.
         </li>
-        <li>Sumber pendaftaran (misal dari link WA/IG) buat keperluan internal, bukan dijual ke pihak ketiga.</li>
+        <li>Sumber rujukan pendaftaran (misalnya tautan WhatsApp/Instagram) untuk kebutuhan internal, dan tidak dibagikan kepada pihak ketiga untuk tujuan komersial.</li>
       </ul>
 
-      <h2>Tujuan Penggunaan Data</h2>
+      <h2>2. Tujuan Penggunaan Data</h2>
       <ul>
-        <li>Ngatur booking, jadwal coach, dan sisa sesi paket kamu.</li>
-        <li>Memproses pembayaran dan mengaktifkan paket otomatis.</li>
-        <li>Mengirim notifikasi terkait booking (kalau diaktifkan).</li>
-        <li>Analitik pemakaian aplikasi secara agregat buat perbaikan produk.</li>
+        <li>Mengelola pemesanan jadwal, penugasan pelatih, dan sisa sesi paket Pengguna.</li>
+        <li>Memproses pembayaran dan mengaktifkan paket secara otomatis.</li>
+        <li>Mengirimkan notifikasi terkait pemesanan (apabila fitur ini diaktifkan oleh Pengguna).</li>
+        <li>Melakukan analisis penggunaan Aplikasi secara agregat untuk kepentingan pengembangan layanan.</li>
       </ul>
 
-      <h2>Berbagi Data ke Pihak Ketiga</h2>
+      <h2>3. Pembagian Data kepada Pihak Ketiga</h2>
       <p>
-        Kami cuma berbagi data seperlunya ke pihak yang bantu jalanin layanan ini:
+        Kami hanya membagikan data sebatas yang diperlukan kepada pihak yang
+        mendukung penyelenggaraan layanan ini:
       </p>
       <ul>
         <li>
-          <strong>Midtrans</strong> -- payment gateway resmi, nerima data transaksi
-          (nominal, order ID, nama, email) buat memproses pembayaran.
+          <strong>Midtrans</strong> — penyedia gerbang pembayaran resmi, menerima
+          data transaksi (nominal, nomor pesanan, nama, dan email) untuk memproses
+          pembayaran.
         </li>
         <li>
-          <strong>Vercel Analytics</strong> -- analitik kunjungan halaman yang
-          <em> cookieless</em> (gak pakai cookie pelacak individual).
+          <strong>Vercel Analytics</strong> — layanan analitik kunjungan halaman
+          yang bersifat <em>cookieless</em> dan tidak melacak individu pengguna.
         </li>
       </ul>
-      <p>Kami gak menjual atau menyewakan data pribadi kamu ke pihak manapun.</p>
+      <p>Kami tidak menjual maupun menyewakan data pribadi Pengguna kepada pihak manapun.</p>
 
-      <h2>Cookie &amp; Penyimpanan Lokal</h2>
+      <h2>4. Cookie dan Penyimpanan Lokal</h2>
       <p>
-        Aplikasi ini pakai sesi login (cookie) dan local/session storage buat fitur
-        tema gelap-terang dan lain-lain. Detail lengkapnya ada di{" "}
+        Aplikasi menggunakan sesi masuk (cookie) serta penyimpanan lokal/sesi
+        peramban untuk mendukung fungsi tertentu, termasuk preferensi tampilan.
+        Penjelasan lebih lanjut tersedia pada{" "}
         <a href="/kebijakan-cookie" className="text-brand-600 hover:underline">
           Kebijakan Cookie
         </a>
         .
       </p>
 
-      <h2>Keamanan Data</h2>
+      <h2>5. Keamanan Data</h2>
       <p>
-        Password disimpan dalam bentuk hash (bukan teks biasa), dan akses ke data
-        dibatasi sesuai peran (member cuma bisa lihat data anaknya sendiri, coach
-        cuma lihat jadwalnya, dst).
+        Kata sandi disimpan dalam bentuk terenkripsi (hash), bukan sebagai teks
+        biasa. Akses terhadap data dibatasi sesuai peran pengguna — member hanya
+        dapat mengakses data anaknya sendiri, pelatih hanya dapat mengakses
+        jadwalnya sendiri, dan seterusnya.
       </p>
 
-      <h2>Hak Kamu Atas Data</h2>
+      <h2>6. Hak Pengguna atas Data Pribadi</h2>
       <p>
-        Sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi, kamu berhak:
+        Sesuai dengan Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data
+        Pribadi, Pengguna berhak untuk:
       </p>
       <ul>
-        <li>Minta salinan data pribadi yang kami simpan.</li>
-        <li>Minta koreksi data yang salah/gak akurat.</li>
-        <li>Minta penghapusan akun &amp; data pribadi (dengan catatan riwayat transaksi yang wajib disimpan sesuai ketentuan hukum tetap ada).</li>
-        <li>Menarik persetujuan penggunaan data untuk keperluan non-esensial (misal notifikasi).</li>
+        <li>Memperoleh salinan data pribadi yang kami simpan.</li>
+        <li>Meminta perbaikan atas data yang tidak akurat.</li>
+        <li>Meminta penghapusan akun dan data pribadi, dengan catatan bahwa riwayat transaksi yang wajib disimpan sesuai ketentuan perundang-undangan tetap dipertahankan.</li>
+        <li>Menarik persetujuan atas penggunaan data untuk tujuan yang bersifat non-esensial (misalnya notifikasi).</li>
       </ul>
+      <p>Untuk menggunakan hak-hak tersebut, Pengguna dapat menghubungi kami melalui kontak di bawah ini.</p>
+
+      <h2>7. Perubahan Kebijakan</h2>
       <p>
-        Buat pakai hak-hak di atas, hubungi kami lewat kontak di bawah.
+        Kebijakan ini dapat diperbarui sewaktu-waktu. Perubahan yang bersifat
+        signifikan akan diinformasikan melalui Aplikasi.
       </p>
 
-      <h2>Perubahan Kebijakan</h2>
+      <h2>8. Kontak</h2>
       <p>
-        Kebijakan ini bisa diperbarui sewaktu-waktu. Perubahan signifikan bakal
-        diinformasikan lewat aplikasi.
-      </p>
-
-      <h2>Kontak</h2>
-      <p>
-        Pertanyaan soal privasi/data pribadi: WhatsApp{" "}
-        <a href="https://wa.me/6281573400086" className="text-brand-600 hover:underline">
-          +62 815-7340-0086
+        Pertanyaan mengenai privasi atau data pribadi dapat disampaikan melalui
+        WhatsApp{" "}
+        <a href="https://wa.me/6282117173124" className="text-brand-600 hover:underline">
+          +62 821-1717-3124
         </a>{" "}
         atau email{" "}
-        <a href="mailto:[EMAIL]" className="text-brand-600 hover:underline">
-          [EMAIL]
+        <a href="mailto:cianjurmarketers@gmail.com" className="text-brand-600 hover:underline">
+          cianjurmarketers@gmail.com
         </a>
         .
       </p>

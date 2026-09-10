@@ -4,53 +4,58 @@ export default function KebijakanCookiePage() {
   return (
     <LegalPageLayout title="Kebijakan Cookie" updatedAt="10 September 2026">
       <p>
-        Aplikasi ini pakai cookie dan penyimpanan lokal browser (local/session
-        storage) seperlunya buat bikin aplikasi jalan dengan bener -- bukan buat
-        iklan atau dijual ke pengiklan pihak ketiga.
+        Aplikasi ini menggunakan cookie dan penyimpanan lokal peramban
+        (local/session storage) sebatas yang diperlukan agar Aplikasi dapat
+        berfungsi dengan semestinya, dan bukan untuk kepentingan periklanan
+        maupun diperjualbelikan kepada pihak ketiga.
       </p>
 
-      <h2>Yang Kami Pakai</h2>
+      <h2>1. Yang Kami Gunakan</h2>
       <ul>
         <li>
-          <strong>Cookie sesi login</strong> -- esensial, dipakai buat ngenalin kamu
-          udah login atau belum. Tanpa ini kamu gak bisa akses fitur yang butuh
-          login.
+          <strong>Cookie sesi masuk (login)</strong> — bersifat esensial,
+          digunakan untuk mengenali status masuk Pengguna. Tanpa cookie ini,
+          Pengguna tidak dapat mengakses fitur yang memerlukan proses masuk.
         </li>
         <li>
-          <strong>Local storage tema</strong> -- nyimpen pilihan tampilan
-          gelap/terang kamu di browser ini aja.
+          <strong>Penyimpanan lokal preferensi tampilan</strong> — menyimpan
+          pilihan tampilan gelap/terang Pengguna pada peramban yang bersangkutan.
         </li>
         <li>
-          <strong>Session storage sumber pendaftaran</strong> -- nyimpen dari mana
-          kamu pertama kali buka aplikasi (misal link WA), dipakai sekali pas
-          pendaftaran buat keperluan internal, otomatis hilang begitu tab
-          ditutup.
+          <strong>Penyimpanan sesi sumber pendaftaran</strong> — menyimpan
+          informasi mengenai sumber rujukan saat Pengguna pertama kali mengakses
+          Aplikasi (misalnya tautan WhatsApp), digunakan satu kali pada saat
+          pendaftaran untuk kebutuhan internal, dan terhapus otomatis ketika tab
+          peramban ditutup.
         </li>
       </ul>
 
-      <h2>Yang Gak Kami Pakai</h2>
+      <h2>2. Yang Tidak Kami Gunakan</h2>
       <p>
-        Gak ada cookie pelacak iklan pihak ketiga (Google Ads, Facebook Pixel, dll).
-        Analitik kunjungan halaman (Vercel Analytics) sifatnya <em>cookieless</em>
-        {" "}dan agregat, gak melacak individu.
+        Kami tidak menggunakan cookie pelacak iklan pihak ketiga (Google Ads,
+        Facebook Pixel, dan sejenisnya). Analitik kunjungan halaman (Vercel
+        Analytics) bersifat <em>cookieless</em> dan agregat, serta tidak
+        melacak pengguna secara individual.
       </p>
 
-      <h2>Cara Menonaktifkan</h2>
+      <h2>3. Cara Menonaktifkan</h2>
       <p>
-        Kamu bisa hapus cookie/local storage lewat pengaturan browser kapan aja.
-        Karena cookie login bersifat esensial, menghapusnya bakal otomatis
-        me-logout kamu dari Aplikasi.
+        Pengguna dapat menghapus cookie/penyimpanan lokal kapan saja melalui
+        pengaturan peramban. Oleh karena cookie sesi masuk bersifat esensial,
+        penghapusannya akan secara otomatis mengeluarkan (logout) Pengguna dari
+        Aplikasi.
       </p>
 
-      <h2>Kontak</h2>
+      <h2>4. Kontak</h2>
       <p>
-        Pertanyaan soal cookie: WhatsApp{" "}
-        <a href="https://wa.me/6281573400086" className="text-brand-600 hover:underline">
-          +62 815-7340-0086
+        Pertanyaan mengenai penggunaan cookie dapat disampaikan melalui
+        WhatsApp{" "}
+        <a href="https://wa.me/6282117173124" className="text-brand-600 hover:underline">
+          +62 821-1717-3124
         </a>{" "}
         atau email{" "}
-        <a href="mailto:[EMAIL]" className="text-brand-600 hover:underline">
-          [EMAIL]
+        <a href="mailto:cianjurmarketers@gmail.com" className="text-brand-600 hover:underline">
+          cianjurmarketers@gmail.com
         </a>
         .
       </p>

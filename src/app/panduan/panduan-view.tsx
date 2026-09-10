@@ -349,7 +349,7 @@ const PANDUAN_BODY = `
         <h1>Satu aplikasi buat <span class="accent-word">booking</span>, <span class="accent-word">jadwal</span>, dan <span class="accent-word">paket</span> les renang</h1>
         <p class="lead">Gak ada lagi bolak-balik chat WhatsApp buat atur jadwal, itung sisa sesi manual, atau lupa siapa yang udah bayar. Member booking sendiri, coach kelola jadwal sendiri, admin pantau semuanya dari satu tempat.</p>
         <div class="btn-row" style="justify-content:center;margin-top:22px;">
-          <a class="btn btn-primary" href="https://wa.me/6281573400086?text=${encodeURIComponent("Halo, saya tertarik pake sistem Les Renang Cianjur buat kelola tempat les renang saya. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
+          <a class="btn btn-primary" href="https://wa.me/6282117173124?text=${encodeURIComponent("Halo, saya tertarik pake sistem Les Renang Cianjur buat kelola tempat les renang saya. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
           <a class="btn btn-secondary" href="/register">Daftar Sekarang</a>
         </div>
         <div class="hero-actions">
