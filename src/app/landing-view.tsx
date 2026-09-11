@@ -285,12 +285,14 @@ export default function LandingView() {
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="min-h-[44px]">
                 Login
               </Button>
             </Link>
             <Link href="/register">
-              <Button size="sm">Daftar</Button>
+              <Button size="sm" className="min-h-[44px]">
+                Daftar
+              </Button>
             </Link>
           </div>
         </header>
