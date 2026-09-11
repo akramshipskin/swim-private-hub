@@ -303,7 +303,7 @@ export default function LandingView() {
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-text-muted shadow-sm">
             Sistem booking &amp; manajemen les renang
           </span>
-          <h1 className="mt-5 text-3xl font-semibold tracking-tight text-balance text-text sm:text-5xl">
+          <h1 className="mt-5 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
             Kelola les renang tanpa <span className="text-brand-600">bolak-balik chat WhatsApp</span>
           </h1>
           <p className="mt-4 max-w-xl text-base text-text-muted sm:text-lg">
