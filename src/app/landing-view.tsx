@@ -370,19 +370,18 @@ export default function LandingView() {
             Bukan sistem booking generik — tiap fitur disesuaikan sama cara kerja les privat.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 divide-y divide-border border-t border-border">
           {OWNER_FEATURES.map((f) => (
-            <Card key={f.title}>
-              <CardBody>
-                <div
-                  className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${roleToneClasses[f.tone].bg} ${roleToneClasses[f.tone].text}`}
-                >
-                  <Icon name={f.icon} className="h-5 w-5" />
-                </div>
+            <div
+              key={f.title}
+              className="grid grid-cols-1 gap-2 py-6 sm:grid-cols-[240px_1fr] sm:gap-8 sm:py-7"
+            >
+              <div className={`flex items-center gap-2.5 ${roleToneClasses[f.tone].text}`}>
+                <Icon name={f.icon} className="h-5 w-5 shrink-0" />
                 <h3 className="text-sm font-semibold text-text">{f.title}</h3>
-                <p className="mt-1.5 text-sm text-text-muted">{f.desc}</p>
-              </CardBody>
-            </Card>
+              </div>
+              <p className="text-sm text-text-muted sm:pt-0.5">{f.desc}</p>
+            </div>
           ))}
         </div>
       </section>
