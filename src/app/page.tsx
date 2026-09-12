@@ -1,12 +1,18 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import LandingView from "./landing-view";
 
 export default async function Home() {
   const session = await auth();
 
   if (!session) {
-    return <LandingView />;
+    const [poolCount, coachCount, memberCount] = await Promise.all([
+      prisma.pool.count({ where: { isActive: true } }),
+      prisma.user.count({ where: { role: "COACH" } }),
+      prisma.user.count({ where: { role: "MEMBER" } }),
+    ]);
+    return <LandingView stats={{ poolCount, coachCount, memberCount }} />;
   }
 
   if (session.user.mustChangePassword) {

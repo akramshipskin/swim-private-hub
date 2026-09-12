@@ -259,9 +259,54 @@ const FAQ_ITEMS = [
 
 const OWNER_WA_LINK = buildOwnerInquiryWaLink();
 
-export default function LandingView() {
+type LandingStats = { poolCount: number; coachCount: number; memberCount: number };
+
+export default function LandingView({ stats }: { stats: LandingStats }) {
+  const STATS = [
+    { value: String(stats.poolCount), label: "Kolam mitra" },
+    { value: String(stats.coachCount), label: "Coach terdaftar" },
+    { value: String(stats.memberCount), label: "Member terdaftar" },
+    { value: "3", label: "Peran dalam 1 sistem" },
+  ];
+
   return (
-    <main className="flex min-h-screen flex-col">
+    // Landing page dipaku ke light theme regardless of OS/system dark mode
+    // (sama pola kayak hero & CTA band di bawah -- "fixed 1 tampilan").
+    // Card/Badge/Button pake token warna (bg-surface, text-text, dst) yang
+    // biasanya ngikutin dark mode; tanpa pin ini, teks jadi nyaris gak
+    // kebaca di atas bg cream pas viewer OS-nya dark mode.
+    <main
+      className="flex min-h-screen flex-col bg-[#f1f0ea] text-[#141313]"
+      style={
+        {
+          "--background": "#f7f7fd",
+          "--foreground": "#1e1b2e",
+          "--color-brand-50": "#eef2ff",
+          "--color-brand-100": "#e0e7ff",
+          "--color-brand-500": "#6366f1",
+          "--color-brand-600": "#4f46e5",
+          "--color-brand-700": "#4338ca",
+          "--color-accent-50": "#fff1f2",
+          "--color-accent-100": "#ffe4e6",
+          "--color-accent-500": "#f43f5e",
+          "--color-accent-600": "#e11d48",
+          "--color-surface": "#ffffff",
+          "--color-surface-muted": "#f3f2fb",
+          "--color-border": "#e3e1f5",
+          "--color-text": "#1e1b2e",
+          "--color-text-muted": "#56526b",
+          "--color-text-subtle": "#77738c",
+          "--color-success-bg": "#ecfdf5",
+          "--color-success-text": "#047857",
+          "--color-warning-bg": "#fffbeb",
+          "--color-warning-text": "#b45309",
+          "--color-danger-bg": "#fef2f2",
+          "--color-danger-text": "#b91c1c",
+          "--color-disabled-bg": "#cbd5e1",
+          "--color-disabled-text": "#94a3b8",
+        } as React.CSSProperties
+      }
+    >
       {/* Hero -- band gelap FIXED (bukan ikut tema light/dark, sama pola
           kayak CTA band di bawah) buat bikin statement kuat di atas fold,
           gaya "dark photo hero" yang direferensiin (karate academy, run
@@ -291,12 +336,12 @@ export default function LandingView() {
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login">
-              <Button variant="ghost" size="sm" className="min-h-[44px] !text-white hover:!bg-white/10">
+              <Button variant="ghost" size="sm" className="min-h-[44px] !rounded-full !text-white hover:!bg-white/10">
                 Login
               </Button>
             </Link>
             <Link href="/register">
-              <Button size="sm" className="min-h-[44px]">
+              <Button size="sm" className="min-h-[44px] !rounded-full">
                 Daftar
               </Button>
             </Link>
@@ -320,13 +365,16 @@ export default function LandingView() {
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/daftar-kolam">
-              <Button>
+              <Button className="!rounded-full">
                 <Icon name="chat" className="h-4 w-4" />
                 Punya Kolam? Gabung Jaringan
               </Button>
             </Link>
             <Link href="/daftar-coach">
-              <Button variant="ghost" className="!border !border-white/20 !text-white hover:!bg-white/10">
+              <Button
+                variant="ghost"
+                className="!rounded-full !border !border-white/20 !text-white hover:!bg-white/10"
+              >
                 <Icon name="swimmer" className="h-4 w-4" />
                 Coach Renang? Daftar di Sini
               </Button>
@@ -344,13 +392,28 @@ export default function LandingView() {
             ))}
           </div>
         </section>
+
+        {/* Stats band -- angka ASLI dari DB (bukan angka rekaan kayak
+            "500+ students" di template referensi), query di page.tsx.
+            Wajar kecil karena masih pre-launch -- jujur lebih penting
+            daripada keliatan "rame". */}
+        <section className="relative border-t border-white/10 px-4 py-10 sm:py-12">
+          <div className="mx-auto grid w-full max-w-4xl grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
+            {STATS.map((s) => (
+              <div key={s.label} className="flex flex-col gap-1">
+                <span className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{s.value}</span>
+                <span className="text-sm text-white/60">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
 
       {/* Problem -- agitate dulu sebelum kasih solusi, pola sales page klasik. */}
-      <section className="mx-auto w-full max-w-4xl px-4 py-10">
+      <section className="mx-auto w-full max-w-4xl px-4 py-14 sm:py-16">
         <div className="mb-8 text-center">
           <span className="text-xs font-bold uppercase tracking-wide text-accent-600">Kedengeran familiar?</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
             Ngurus les renang manual, capeknya di mana-mana
           </h2>
         </div>
@@ -371,10 +434,10 @@ export default function LandingView() {
       </section>
 
       {/* Features -- framing buat pemilik/pengelola. */}
-      <section className="mx-auto w-full max-w-5xl px-4 py-10">
+      <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
         <div className="mb-8 text-center">
           <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Kenapa ini beda</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
             Dibangun buat masalah operasional nyata
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-sm text-text-muted">
@@ -402,10 +465,10 @@ export default function LandingView() {
           Coach Ayu buka slot 10 Sep, 1 dibooking 1 masih kebuka) buat 3
           momen inti. Gantiin tabel perbandingan + kartu skenario teks --
           "liat produknya" lebih ngena daripada tabel klaim. */}
-      <section className="mx-auto w-full max-w-5xl px-4 py-10">
+      <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
         <div className="mb-8 text-center">
           <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Lihat langsung</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
             Bukan mockup, ini tampilan aslinya
           </h2>
         </div>
@@ -519,10 +582,10 @@ export default function LandingView() {
       </section>
 
       {/* 3 peran -- nunjukin sistem lengkap dari 3 sisi. */}
-      <section className="mx-auto w-full max-w-5xl px-4 py-10">
+      <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
         <div className="mb-8 text-center">
           <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Satu sistem, 3 peran</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
             Semua orang cuma lihat yang relevan
           </h2>
         </div>
@@ -571,10 +634,10 @@ export default function LandingView() {
 
 
       {/* FAQ -- native <details>/<summary>, zero JS/dependency. */}
-      <section className="mx-auto w-full max-w-3xl px-4 py-10">
+      <section className="mx-auto w-full max-w-3xl px-4 py-14 sm:py-16">
         <div className="mb-8 text-center">
           <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Pertanyaan umum</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">Masih ragu?</h2>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">Masih ragu?</h2>
         </div>
         <div className="flex flex-col gap-3">
           {FAQ_ITEMS.map((item) => (
@@ -595,10 +658,10 @@ export default function LandingView() {
           bukan 2 kayak versi single-pool sebelumnya -- marketplace ini
           punya 3 sisi, jadi 3 kartu bobot yang sama, bukan salah satu
           dianggap sampingan. */}
-      <section className="mx-auto w-full max-w-5xl px-4 py-10">
+      <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
         <div className="mb-8 text-center">
           <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Pilih jalur Anda</span>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">Anda yang mana?</h2>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">Anda yang mana?</h2>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card className="border-t-4 border-t-brand-500">
@@ -612,7 +675,7 @@ export default function LandingView() {
                 otomatis, tanpa ngurus tech sendiri.
               </p>
               <Link href="/daftar-kolam">
-                <Button>Daftar Kolam</Button>
+                <Button className="!rounded-full">Daftar Kolam</Button>
               </Link>
             </CardBody>
           </Card>
@@ -627,7 +690,7 @@ export default function LandingView() {
                 1 tempat doang.
               </p>
               <Link href="/daftar-coach">
-                <Button variant="secondary">Gabung Jadi Coach</Button>
+                <Button variant="secondary" className="!rounded-full">Gabung Jadi Coach</Button>
               </Link>
             </CardBody>
           </Card>
@@ -642,7 +705,7 @@ export default function LandingView() {
                 lebih dari satu anak sekaligus.
               </p>
               <Link href="/register">
-                <Button variant="secondary">Daftar Sekarang</Button>
+                <Button variant="secondary" className="!rounded-full">Daftar Sekarang</Button>
               </Link>
             </CardBody>
           </Card>
@@ -664,12 +727,12 @@ export default function LandingView() {
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary" className="!bg-white !text-[#4338ca] hover:!bg-white/90">
+              <Button variant="secondary" className="!rounded-full !bg-white !text-[#4338ca] hover:!bg-white/90">
                 Hubungi Kami
               </Button>
             </a>
             <a href="/panduan">
-              <Button variant="ghost" className="!text-white hover:!bg-white/10">
+              <Button variant="ghost" className="!rounded-full !text-white hover:!bg-white/10">
                 Coba Akun Demo →
               </Button>
             </a>
