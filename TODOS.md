@@ -1,34 +1,55 @@
 # TODOS
 
-## Test integrasi DB buat concurrency booking & onboarding script (belum ada, butuh Postgres nyata)
+## Verifikasi beneran integrasi Midtrans Iris (disbursement) -- belum ada akun buat ditest
 
-**What:** Dua path paling kritis dari `/plan-eng-review` 2026-09-12 (marketplace
-pivot) belum punya test otomatis:
+**What:** `src/lib/disbursement.ts` (`disburseViaIris`) nembak endpoint
+`/iris/api/v1/payouts` berdasarkan baca dokumentasi doang -- shape
+request/response-nya BELUM diverifikasi lawan API beneran, karena belum ada
+akun Midtrans Iris. Ditandain eksplisit di kode (comment `ponytail:`-style
+di fungsinya).
+
+**Why belum ada:** Iris itu produk terpisah dari Snap (yang udah dipake buat
+checkout), butuh KYC bisnis sendiri di Midtrans -- bukan sesuatu yang bisa
+didaftarin dari sesi coding ini.
+
+**Fix yang disaranin:** Begitu founder daftar & dapet `MIDTRANS_IRIS_SERVER_KEY`,
+test manual dulu 1 pencairan kecil di sandbox Iris, cocokin response shape
+beneran lawan yang diasumsikan di kode (field `payouts[0].reference_no`
+khususnya), baru percaya penuh sama jalur otomatisnya di `/admin/withdrawals`.
+
+**Depends on / blocked by:** Founder daftar Midtrans Iris (proses bisnis,
+bukan teknis).
+
+## Test integrasi DB buat concurrency booking, onboarding script, & wallet math (belum ada, Postgres sekarang UDAH ADA)
+
+**What:** Beberapa path kritis (uang & concurrency) masih diverifikasi manual
+(browser + script sekali jalan), belum otomatis:
 - `src/app/api/booking/route.ts` -- concurrency test: 2 booking bersamaan buat
-  slot yang sama harus cuma 1 yang lolos (CAS pattern yang udah ada di code,
-  tinggal diverifikasi lewat test beneran, bukan cuma dibaca).
+  slot yang sama harus cuma 1 yang lolos (CAS pattern yang udah ada di code).
 - `scripts/onboard-pools.ts` -- idempotency test: jalanin script 2x, pastiin
-  gak bikin Pool/PoolAffiliation duplikat, dan role downgrade ADMIN->MEMBER
-  cuma kejadian sekali (gak double-apply/gak ada efek samping run kedua).
+  gak bikin Pool/PoolAffiliation duplikat, dan role change cuma kejadian sekali.
+- `src/lib/wallet.ts` (`creditPoolFromPackageSale`, `payoutCoachForSession`,
+  `reverseCoachPayoutForSession`) -- diverifikasi manual sekali (lihat
+  Revision 2026-09-12 di `docs/designs/marketplace-pivot.md`, angkanya cocok
+  persis), tapi belum ada test otomatis buat kasus edge: attendance
+  di-toggle bolak-balik berkali-kali, `coachSharePercent` berubah PAS ADA
+  transaksi di tengah jalan, atau 2 admin mark-attendance bersamaan buat
+  booking yang sama.
 
-**Why belum ada:** Repo ini belum punya Supabase project sendiri (`.env` belum
-disetup, `DATABASE_URL` masih placeholder) -- kedua test ini butuh Postgres
-beneran (transaksi, row lock, unique constraint race), bukan yang bisa
-di-mock. Konvensi test project ini sekarang cuma nutup helper murni di
-`src/lib/*` (format, cn, whatsapp, active-package, pool-credentials) --
-`cancel-booking.ts` yang udah lama ada di codebase pun belum punya test
-karena alasan yang sama.
+**Why belum otomatis:** Supabase project buat swim-private-hub SEKARANG UDAH
+ADA (`.env` udah keisi, migration udah jalan) -- gap-nya sekarang murni
+belum ada test SETUP-nya (schema migrate ke DB test terpisah, seed minimal,
+rollback/truncate antar test), bukan lagi soal gak ada DB sama sekali.
+Konvensi test project ini masih cuma nutup helper murni di `src/lib/*`
+(format, cn, whatsapp, active-package) yang gak butuh DB.
 
-**Fix yang disaranin:** Begitu Supabase project buat swim-private-hub udah
-jalan, tambah test setup yang bisa nyambung ke DB test (schema migrate,
-seed minimal, test lalu rollback/truncate) buat 2 path di atas, baru
-verifikasi actual race-condition behavior-nya lewat test paralel
-(`Promise.all` 2 request bersamaan), bukan cuma baca code dan percaya CAS-nya
-bener.
+**Fix yang disaranin:** Bikin test setup yang connect ke DB test terpisah
+(BUKAN production `DATABASE_URL` yang sekarang -- lihat
+`feedback_les_renang_shared_database` di memory, jangan ulang kesalahan yang
+sama), lalu tulis test paralel (`Promise.all`) buat tiap path di atas.
 
-**Depends on / blocked by:** Setup Supabase project + `DATABASE_URL` asli
-buat swim-private-hub (belum dilakukan -- lihat README, "New Supabase project
-required").
+**Depends on / blocked by:** Provision Supabase project KEDUA khusus buat
+testing (jangan pake yang production -- ini masih perlu dilakukan).
 
 ## Tahap 2 — Visibilitas nama anak per role (deferred dari fitur multi-anak)
 

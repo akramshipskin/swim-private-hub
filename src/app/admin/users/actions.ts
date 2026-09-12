@@ -20,7 +20,7 @@ export async function createUser(
   const phone = formData.get("phone") as string;
   const email = (formData.get("email") as string) || null;
   const password = formData.get("password") as string;
-  const role = formData.get("role") as "ADMIN" | "COACH" | "MEMBER";
+  const role = formData.get("role") as "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
 
   if (!rawName || !phone || !password || !role) {
     return { error: "Nama, No HP, password, dan role wajib diisi" };

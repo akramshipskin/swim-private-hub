@@ -14,6 +14,29 @@ enum Role {
   ADMIN
   COACH
   MEMBER
+  // Pemilik kolam -- akses cuma ke wallet & pengajuan pencairan kolamnya
+  // SENDIRI (lihat requireRole/proxy.ts), gak ada akses admin lintas-kolam.
+  // Ditambah pas fitur wallet (2026-09-12); sebelumnya owner yang
+  // dimigrasi diturunin ke MEMBER (gak ada UI apapun buat mereka) --
+  // sekarang butuh role sendiri karena mereka perlu liat saldo & cairin.
+  POOL_OWNER
+}
+
+enum WalletTransactionType {
+  // Kredit ke Pool pas Payment sukses (harga paket - komisi platform).
+  PACKAGE_SALE
+  // Pool bayar Coach buat 1 sesi yang ditandai Hadir -- dicatat 2 baris
+  // (debit Pool, kredit Coach) yang share sessionPayoutGroupId yang sama.
+  SESSION_PAYOUT
+  // Saldo keluar pas WithdrawalRequest berhasil diproses.
+  WITHDRAWAL
+}
+
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
 }
 
 enum PackageStatus {
@@ -79,6 +102,73 @@ model CoachProfile {
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   bio      String?
   isActive Boolean @default(true)
+  // Saldo coach ini dari bagian per-sesi (Pool.coachSharePercent),
+  // dikredit pas booking ditandai Hadir. Lihat Pool.walletBalance buat
+  // catatan yang sama soal cache-vs-ledger.
+  walletBalance     Int      @default(0)
+  bankName          String?
+  bankAccountNumber String?
+  bankAccountName   String?
+
+  walletTransactions WalletTransaction[]
+  withdrawalRequests WithdrawalRequest[]
+}
+
+// Ledger lengkap tiap pergerakan saldo -- walletBalance di Pool/CoachProfile
+// itu CACHE (baca cepet), baris di sini yang jadi sumber kebenaran buat
+// audit ("kenapa saldo gua segini"). Setiap update walletBalance WAJIB
+// diiringi >=1 baris di sini dalam transaksi DB yang sama.
+model WalletTransaction {
+  id     String                @id @default(cuid())
+  type   WalletTransactionType
+  // Persis 1 dari dua ini yang keisi -- baris punya Pool ATAU CoachProfile,
+  // gak pernah dua-duanya (dicek di action layer, bukan constraint DB,
+  // pola yang sama kayak Pool.ownerUserId).
+  poolId         String?
+  pool           Pool?          @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  coachProfileId String?
+  coachProfile   CoachProfile?  @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
+  // Positif = kredit (saldo nambah), negatif = debit (saldo berkurang).
+  amount         Int
+  // Referensi ke sumber transaksi -- paling banyak 1 yang keisi sesuai
+  // type-nya (PACKAGE_SALE -> paymentId, SESSION_PAYOUT -> bookingId,
+  // WITHDRAWAL -> withdrawalRequestId).
+  paymentId          String?
+  bookingId          String?
+  withdrawalRequestId String?
+  createdAt      DateTime              @default(now())
+
+  @@index([poolId])
+  @@index([coachProfileId])
+}
+
+// Pengajuan pencairan saldo (kolam ATAU coach, sama pola exactly-1
+// kayak WalletTransaction). Phase 1: PENDING dibuat sistem otomatis
+// begitu user klik "Cairkan"; transisi ke PROCESSING/PAID/FAILED butuh
+// Midtrans Iris (disbursement) terpasang -- sebelum itu ada, admin yang
+// proses manual dari /admin/withdrawals (lihat src/lib/disbursement.ts).
+model WithdrawalRequest {
+  id     String           @id @default(cuid())
+  poolId String?
+  pool   Pool?            @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  coachProfileId String?
+  coachProfile   CoachProfile? @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
+  amount Int
+  status WithdrawalStatus @default(PENDING)
+  // Disalin dari Pool/CoachProfile pas request dibuat -- kalau rekening
+  // tujuan diedit belakangan, request yang UDAH ADA gak boleh ikut
+  // berubah diam-diam (riwayat pencairan harus nunjukin kemana duitnya
+  // BENERAN dikirim saat itu).
+  bankName          String
+  bankAccountNumber String
+  bankAccountName   String
+  midtransReferenceId String?
+  failureReason       String?
+  requestedAt DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([poolId])
+  @@index([coachProfileId])
 }
 
 // Profil anak nempel ke 1 akun ortu (User role MEMBER) -- 1 akun bisa
@@ -220,43 +310,51 @@ model Availability {
   @@index([poolId, date])
 }
 
-// Kolam/venue -- 1 pool = 1 lokasi fisik dengan kontak & (kalau udah
-// KYC) akun Midtrans sendiri. Platform CONNECTOR posture (locked
-// /plan-eng-review 2026-09-12): checkout member selalu route ke
-// midtransMerchantId milik pool ini, platform gak pernah pegang dana.
+// Kolam/venue -- 1 pool = 1 lokasi fisik. SERVICE PROVIDER posture
+// (revisi 2026-09-12, gantiin connector): platform pegang 1 akun
+// Midtrans sendiri (QRIS), SEMUA transaksi dari SEMUA kolam masuk ke
+// situ dulu -- makanya gak ada lagi kredensial Midtrans per-pool di
+// sini (lihat src/lib/midtrans.ts, balik ke 1 akun global kayak
+// les-renang-cianjur). Bagian kolam & coach disimpen di wallet
+// (walletBalance) abis komisi platform kepotong, dicairkan manual
+// lewat WithdrawalRequest.
 model Pool {
   id                 String   @id @default(cuid())
   name               String
   address            String?
   contactPhone       String?
-  // User yang jadi kontak/pemilik kolam ini. Nullable karena Phase 1
-  // gak punya UI admin per-pool -- ini murni buat referensi/pelaporan,
-  // BUKAN buat kasih akses admin (role User ybs sengaja diturunin dari
-  // ADMIN pas onboarding, lihat scripts/onboard-pools.ts).
+  // User yang jadi kontak/pemilik kolam ini -- role POOL_OWNER, akses
+  // ke wallet & pencairan kolam ini doang (lihat scripts/onboard-pools.ts).
   ownerUserId        String?
   ownerUser          User?    @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
-  // Kredensial Midtrans MILIK KOLAM INI SENDIRI (bukan platform) --
-  // Midtrans gak punya cara "platform pegang 1 akun, routing ke akun
-  // lain pake ID doang" (koreksi dari asumsi awal /plan-eng-review,
-  // ketemu pas implementasi). Disimpen terenkripsi (lihat
-  // src/lib/pool-credentials.ts), didekripsi cuma pas mau bikin
-  // transaksi. Null di salah satu = pool ini belum selesai setup
-  // Midtrans -- checkout HARUS fallback ke instruksi manual/transfer,
-  // jangan biarin gagal senyap.
-  midtransServerKeyEnc  String?
-  midtransClientKeyEnc  String?
-  midtransIsProduction  Boolean  @default(false)
   // Persentase komisi platform, di-set platform (bukan per-coach),
   // provisional 15% (lihat Open Questions di design doc). Config value,
   // bukan struktural -- boleh diubah tanpa migrasi.
   commissionPercent  Int      @default(15)
+  // Persentase dari HARGA PAKET (bukan dari sisa abis komisi) yang jadi
+  // bagian coach per sesi -- dibayarkan dari walletBalance kolam ke
+  // walletBalance coach pas booking ditandai Hadir (lihat
+  // src/lib/wallet.ts). commissionPercent + coachSharePercent harus
+  // <=100 (sisanya buat kolam), dicek di action layer pas admin edit.
+  coachSharePercent  Int      @default(55)
+  // Saldo kolam ini SETELAH komisi platform, SEBELUM dikurangi bagian
+  // coach per sesi (lihat WalletTransaction buat riwayat lengkap --
+  // field ini cache buat baca cepet, bukan sumber kebenaran tunggal).
+  walletBalance      Int      @default(0)
+  // Tujuan pencairan (WithdrawalRequest). Nullable -- kolam yang belum
+  // isi ini gak bisa ajuin cairin (dicek di action layer).
+  bankName              String?
+  bankAccountNumber     String?
+  bankAccountName       String?
   isActive           Boolean  @default(true)
   createdAt          DateTime @default(now())
 
-  affiliations     PoolAffiliation[]
-  availabilities   Availability[]
-  packageTemplates PackageTemplate[]
-  packages         Package[]
+  affiliations       PoolAffiliation[]
+  availabilities     Availability[]
+  packageTemplates   PackageTemplate[]
+  packages           Package[]
+  walletTransactions WalletTransaction[]
+  withdrawalRequests WithdrawalRequest[]
 }
 
 // Many-to-many Coach <-> Pool. Coach (User role=COACH) tetep entity

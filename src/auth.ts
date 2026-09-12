@@ -73,7 +73,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
     session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as "ADMIN" | "COACH" | "MEMBER";
+        session.user.role = token.role as "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
         session.user.mustChangePassword = token.mustChangePassword as boolean;
       }
       return session;

@@ -35,7 +35,8 @@ Buat file `.env` di root project (lihat `.env.example` untuk daftar lengkap):
 |---|---|
 | `DATABASE_URL` | Connection string PostgreSQL (Supabase project TERPISAH dari les-renang-cianjur -- jangan pernah reuse). Untuk migrasi, pakai session pooler (port 5432) -- transaction pooler (port 6543) tidak mendukung advisory lock yang dibutuhkan `prisma migrate`. |
 | `AUTH_SECRET` | Secret untuk NextAuth (generate dengan `npx auth secret`). |
-| `MIDTRANS_CREDENTIAL_ENCRYPTION_KEY` | Key buat enkripsi/dekripsi kredensial Midtrans MILIK TIAP KOLAM (bukan platform -- connector posture, lihat `src/lib/pool-credentials.ts`). Generate dengan `openssl rand -base64 32`. |
+| `MIDTRANS_SERVER_KEY` / `MIDTRANS_CLIENT_KEY` / `MIDTRANS_IS_PRODUCTION` | Kredensial Midtrans PLATFORM (service provider posture -- 1 akun buat semua kolam, bukan per-kolam). |
+| `MIDTRANS_IRIS_SERVER_KEY` | Opsional -- pencairan otomatis (lihat `src/lib/disbursement.ts`). Kosong = pencairan tetap manual lewat `/admin/withdrawals`. |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | Kredensial web push (generate dengan `npx web-push generate-vapid-keys`). |
 | `NEXT_PUBLIC_APP_URL` | Base URL aplikasi. |
 
@@ -57,19 +58,22 @@ DATABASE_URL="<session-pooler-url>" npx prisma migrate dev --name <nama_migrasi>
 - `src/lib/cancel-booking.ts` -- logika pembatalan booking dengan row-level lock (`SELECT ... FOR UPDATE`) untuk mencegah race condition saat banyak pembatalan konkuren pada paket yang sama.
 - `src/app/api/booking/route.ts` -- klaim slot pake conditional update (CAS) + validasi Package.poolId harus sama sama Availability.poolId (booking cross-kolam ditolak).
 - `src/app/api/availability/route.ts` -- endpoint utama pengecekan slot (pool-first: filter via `?poolId=`), termasuk perhitungan kelayakan pembatalan mandiri per booking.
-- `prisma/schema.prisma` -- model utama: `User`, `Pool`, `PoolAffiliation`, `PackageTemplate`, `Package`, `Payment`, `Availability`, `Booking`, `PushSubscription`, `CoachProfile`. Availability constraint `unique(coachId, date, startTime)` SENGAJA gak include poolId -- 1 coach cuma boleh punya 1 slot terbuka per jam di SELURUH kolam (gak bisa dobel di 2 kolam jam yang sama).
-- `src/lib/pool-credentials.ts` -- enkripsi/dekripsi kredensial Midtrans per-kolam (connector posture: platform gak pernah pegang dana, tiap kolam pake akun Midtrans sendiri).
-- `scripts/onboard-pools.ts` -- seed script onboarding kolam (idempotent), downgrade role ADMIN yang dimigrasi ke MEMBER biar gak jadi superadmin lintas-kolam. Jalanin: `npm run onboard:pools`.
+- `prisma/schema.prisma` -- model utama: `User`, `Pool`, `PoolAffiliation`, `PackageTemplate`, `Package`, `Payment`, `Availability`, `Booking`, `PushSubscription`, `CoachProfile`, `WalletTransaction`, `WithdrawalRequest`. Availability constraint `unique(coachId, date, startTime)` SENGAJA gak include poolId -- 1 coach cuma boleh punya 1 slot terbuka per jam di SELURUH kolam (gak bisa dobel di 2 kolam jam yang sama).
+- `src/lib/wallet.ts` -- kredit saldo kolam pas Payment sukses (harga - komisi platform), kredit saldo coach + debit saldo kolam pas booking ditandai Hadir (harga per-sesi x bagian coach). `WalletTransaction` = ledger sumber kebenaran, `walletBalance` di Pool/CoachProfile cuma cache.
+- `src/lib/withdrawal.ts` + `src/lib/disbursement.ts` -- pengajuan pencairan (saldo kepotong pas request, bukan pas approve) + integrasi Midtrans Iris opsional (belum aktif sampai `MIDTRANS_IRIS_SERVER_KEY` diisi -- fallback manual di `/admin/withdrawals`).
+- `scripts/onboard-pools.ts` -- seed script onboarding kolam (idempotent), ganti role owner yang dimigrasi ke `POOL_OWNER` (akses cuma ke wallet & pencairan kolamnya sendiri). Jalanin: `npm run onboard:pools`.
 - `src/lib/format.ts` -- helper format & validasi (nomor telepon Indonesia, rupiah, proper case nama).
 - `src/components/legal-page-layout.tsx` -- layout bersama buat 4 halaman legal (privasi, S&K, pengembalian, cookie).
 
 ## Peran & Fitur Utama
 
-**Admin (founder, sole superadmin di Phase 1)** -- kelola user (termasuk impor massal via xlsx, per-kolam), katalog paket per-kolam, riwayat pembayaran, overview booking semua coach, laporan kinerja coach, dan laporan komisi per kolam (`/admin/komisi`). Belum ada admin per-pool -- deferred ke Phase 2.
+**Admin (founder, sole superadmin di Phase 1)** -- kelola user (termasuk impor massal via xlsx, per-kolam), katalog paket per-kolam, persentase komisi/bagian coach per kolam (`/admin/kolam`), riwayat pembayaran, overview booking semua coach, laporan kinerja coach, laporan komisi platform (`/admin/komisi`), dan proses pencairan saldo (`/admin/withdrawals`). Belum ada admin per-pool (di luar wallet) -- deferred ke Phase 2.
 
-**Coach** -- membuka slot jadwal per kolam yang dia terafiliasi (`PoolAffiliation`), melihat jadwal coach lain, dan menandai kehadiran member di sesi yang sudah lewat.
+**Pool Owner** -- role baru, akses cuma ke saldo & pencairan kolamnya sendiri (`/pool/saldo`). Owner yang dimigrasi dari kolam lama TIDAK dapet akses admin lintas-kolam.
 
-**Member** -- booking slot di kolam paketnya (pool-first browse), pembatalan mandiri (jatah per paket), riwayat booking, dan pembelian paket via Midtrans (checkout routing ke akun Midtrans kolam yang bersangkutan, fallback manual kalau kolam belum setup Midtrans).
+**Coach** -- membuka slot jadwal per kolam yang dia terafiliasi (`PoolAffiliation`), melihat jadwal coach lain, menandai kehadiran member di sesi yang sudah lewat (memicu payout ke saldonya, `/coach/saldo`), dan mencairkan saldo.
+
+**Member** -- booking slot di kolam paketnya (pool-first browse), pembatalan mandiri (jatah per paket), riwayat booking, dan pembelian paket via Midtrans (1 akun platform, service provider posture -- duit masuk ke platform dulu, baru dibagi ke saldo kolam & coach).
 
 **Coach shortcut (`/pelatih/[coachId]`, publik)** -- halaman statis nunjukin kolam-kolam tempat 1 coach ngajar + link WA, biar parent bisa nemuin coach yang lagi ngajar di kolam lain tanpa perlu fitur search lintas-kolam.
 

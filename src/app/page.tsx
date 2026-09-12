@@ -17,6 +17,7 @@ export default async function Home() {
     ADMIN: "/admin",
     COACH: "/coach",
     MEMBER: "/member/booking",
+    POOL_OWNER: "/pool/saldo",
   };
 
   redirect(roleHome[session.user.role]);

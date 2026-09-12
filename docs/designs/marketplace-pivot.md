@@ -471,10 +471,81 @@ finding above. Run with Claude Code or Codex; checkbox as you ship.
   - Computed from `Payment` status `SUCCESS` (not `manual_pending` — see T4's Payment-timing correction) joined through `Package.poolId`, × `Pool.commissionPercent`.
 
 **Not yet done — needs a provisioned Supabase project (tracked in TODOS.md):**
-Prisma migration has not been applied to a real database (none provisioned
-yet); DB-integration tests for the T2 concurrency guarantee and the T3
-onboarding idempotency guarantee could not be written without one. `npx tsc
---noEmit`, `npx vitest run` (28 passing), and `npx next build` all pass clean.
+~~Prisma migration has not been applied to a real database~~ — DONE 2026-09-12,
+see revision below. DB-integration tests for the T2 concurrency guarantee and
+the T3 onboarding idempotency guarantee still not written (would need a
+dedicated test schema/fixtures, not just DB access).
+
+## Revision (2026-09-12): service provider posture + wallet system
+
+**Reversed decision, explicit founder call — logged per "if you're about to
+reverse a cross-session decision, say so explicitly":** the connector posture
+locked earlier in this same session (Payment section, D1 above) is REPLACED.
+Platform now holds member funds directly (1 Midtrans account, QRIS), then
+splits revenue into per-pool and per-coach wallets that pools/coaches cash
+out on demand. Founder's own framing: "gpp jadi nanti ada sistem saldo di
+setiap akun, mau itu kolam ataupun coach, nantinya bisa dicairkan."
+
+**Why the reversal happened:** founder wanted pools to onboard by just
+signing up (no separate Midtrans KYC per pool), and wanted coaches — not just
+pools — to hold a real cash-out-able balance. Connector posture couldn't
+support either without much more plumbing (a real per-coach payment rail
+independent of pool Midtrans accounts). Service provider posture makes both
+trivial: the platform is already the one place money and splits happen.
+
+**Liability tradeoff, named again per the original D1 brief:** this is the
+posture connector was chosen specifically to avoid — platform is now legally
+the one receiving payment for a service it doesn't itself provide, which is
+real exposure connector sidesteps. Founder explicitly accepted this tradeoff
+("gpp"), same pattern as Premise 3 (Approach B over A) — conviction, not
+denial. Not re-litigated further per "once decided, commit fully."
+
+**What changed, mechanically:**
+- `Pool.midtransServerKeyEnc/midtransClientKeyEnc/midtransIsProduction`
+  REMOVED — no per-pool Midtrans credentials anymore. `src/lib/midtrans.ts`
+  reverted to one global `snap` client (env vars), same shape as
+  les-renang-cianjur's original single-tenant pattern.
+- **Revenue split, locked with founder input:** platform commission 15%
+  (`Pool.commissionPercent`, unchanged), coach share 55% of package price
+  (`Pool.coachSharePercent`, new), pool keeps the remainder (~30%). All
+  editable per-pool at runtime (`/admin/kolam`), not structural.
+- **Coach earnings are tied to attendance, not package purchase** — a
+  package covers N sessions, possibly with different coaches, so there's no
+  single "the coach" at payment time. Pool wallet is credited in full
+  (minus platform commission) when `Payment` succeeds; coach wallet is
+  credited (debiting pool wallet by the same amount) only when a `Booking`
+  is marked Hadir, calculated as `Payment.amount / Package.totalSesi` ×
+  `coachSharePercent`. Un-marking Hadir reverses the specific ledger entry
+  (not a recalculation — protects against `coachSharePercent` changing
+  between credit and reversal). See `src/lib/wallet.ts`.
+- **New models:** `WalletTransaction` (append-only ledger, source of truth;
+  `Pool.walletBalance`/`CoachProfile.walletBalance` are caches updated
+  atomically alongside it) and `WithdrawalRequest` (PENDING → PAID/FAILED;
+  balance is deducted at request time, not at approval, so two concurrent
+  requests can't both spend the same balance).
+- **New role `POOL_OWNER`** — forced by this revision: a wallet that can't
+  be viewed or cashed out isn't a wallet. `scripts/onboard-pools.ts` now
+  migrates existing owners to `POOL_OWNER` (was `MEMBER` under the old
+  no-pool-UI Phase 1 plan) — this is a smaller, wallet-scoped UI
+  (`/pool/saldo`), not the deferred full per-pool admin dashboard.
+- **Withdrawal automation:** founder is fine paying for real disbursement,
+  but wants requests to actually complete without an admin manually wiring
+  money. No such automation is free — `src/lib/disbursement.ts` scaffolds a
+  Midtrans Iris integration (same provider as Snap, separate KYC/product)
+  that activates the moment `MIDTRANS_IRIS_SERVER_KEY` is set; until then,
+  `/admin/withdrawals` requires a manual "Tandai Dibayar" after a real bank
+  transfer. The Iris HTTP call shape is unverified (no test account yet) —
+  flagged with a `ponytail:`-style comment at the call site.
+- `/admin/komisi` reframed from "amount to bill pools" (connector framing,
+  now backwards) to "platform revenue already collected" (informational).
+
+**Verified end-to-end (manual, real Supabase DB, no real Midtrans account
+yet so the actual webhook HTTP path is unverified — the wallet math was
+invoked directly, matching the values by hand):** package-sale credit,
+attendance-triggered coach payout (browser-triggered `markAttendance`,
+confirmed against the same math run via script), withdrawal request
+(balance deducted immediately), admin manual "Tandai Dibayar" and the Iris
+not-configured fallback message, pool-owner `/pool/saldo` view.
 
 ## GSTACK REVIEW REPORT
 

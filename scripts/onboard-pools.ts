@@ -72,13 +72,13 @@ async function onboardPool(seed: PoolSeed) {
 
   // WAJIB, nutup celah data-isolation dari /plan-eng-review 2026-09-12:
   // owner yang di-migrate TIDAK BOLEH tetep ADMIN (unrestricted access
-  // ke SEMUA kolam lain, bukan cuma kolamnya sendiri). Phase 1 gak
-  // punya role "pool owner" tersendiri (deferred ke Phase 2 bareng
-  // admin UI per-pool) -- MEMBER dipilih karena akses paling rendah,
-  // bukan karena owner ini beneran jadi "member" pemesan sesi.
-  if (owner.role === "ADMIN") {
-    await prisma.user.update({ where: { id: owner.id }, data: { role: "MEMBER" } });
-    console.log(`[ROLE DOWNGRADED] ${owner.name} (${owner.phone}): ADMIN -> MEMBER`);
+  // ke SEMUA kolam lain, bukan cuma kolamnya sendiri). POOL_OWNER
+  // (ditambah pas fitur wallet) kasih akses ke wallet & pencairan kolam
+  // ini doang -- lihat src/app/pool/.
+  if (owner.role !== "POOL_OWNER") {
+    const fromRole = owner.role;
+    await prisma.user.update({ where: { id: owner.id }, data: { role: "POOL_OWNER" } });
+    console.log(`[ROLE CHANGED] ${owner.name} (${owner.phone}): ${fromRole} -> POOL_OWNER`);
   }
 
   for (const coachPhone of seed.coachPhones ?? []) {

@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { snapForPool } from "@/lib/midtrans";
+import { snap } from "@/lib/midtrans";
 import { assertDependentOwnedByMember } from "@/lib/dependents";
 
 export async function POST(request: Request) {
@@ -29,27 +29,11 @@ export async function POST(request: Request) {
   const template = templateId
     ? await prisma.packageTemplate.findFirst({
         where: { id: templateId, isActive: true },
-        include: { pool: true },
       })
     : null;
 
   if (!template) {
     return Response.json({ error: "Paket tidak valid" }, { status: 400 });
-  }
-
-  // Kolam ini belum selesai setup Midtrans (belum ngasih Server/Client
-  // Key mereka) -- jangan biarin checkout gagal senyap atau nyoba pake
-  // key kosong. Beri tahu member secara eksplisit, arahkan ke jalur
-  // manual/transfer (ditangani di UI checkout).
-  const snap = snapForPool(template.pool);
-  if (!snap) {
-    return Response.json(
-      {
-        error:
-          "Kolam ini belum bisa menerima pembayaran online. Hubungi admin kolam untuk pembayaran manual/transfer.",
-      },
-      { status: 409 }
-    );
   }
 
   const pkg = await prisma.package.create({
@@ -105,7 +89,7 @@ export async function POST(request: Request) {
     await prisma.package.delete({ where: { id: pkg.id } });
     return Response.json(
       {
-        error: "Gagal membuat transaksi pembayaran. Cek kredensial Midtrans kolam ini.",
+        error: "Gagal membuat transaksi pembayaran. Cek kredensial Midtrans di .env.",
         detail: err instanceof Error ? err.message : String(err),
       },
       { status: 502 }

@@ -25,6 +25,10 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
+  if (pathname.startsWith("/pool") && role !== "POOL_OWNER") {
+    return NextResponse.redirect(new URL("/", req.nextUrl));
+  }
+
   // Sesi udah diverifikasi (termasuk cek isActive terbaru) di atas -- oper
   // hasilnya lewat header biar layout/page gak perlu jalanin auth() ulang
   // (yang query DB lagi) buat ngecek hal yang udah pasti sama.
@@ -42,5 +46,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/member/:path*", "/coach/:path*", "/admin/:path*", "/api/admin/:path*"],
+  matcher: ["/member/:path*", "/coach/:path*", "/admin/:path*", "/pool/:path*", "/api/admin/:path*"],
 };

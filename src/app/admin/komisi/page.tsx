@@ -8,12 +8,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Laporan komisi (cross-model tension #3, /plan-eng-review 2026-09-12):
-// connector posture + settlement manual off-platform artinya gak ada
-// mekanisme yang MAKSA/negingetin kolam bayar komisi platform --
-// laporan ini kasih angka pasti buat ditagih, bukan fitur pembayaran.
-// Read-only, dihitung dari Payment SUCCESS x commissionPercent kolam,
-// bukan query terpisah per pool (jumlah kolam masih kecil di Phase 1).
+// Laporan komisi platform (revisi 2026-09-12, service provider posture):
+// duit udah kepotong OTOMATIS pas checkout (lihat src/lib/wallet.ts,
+// dikredit ke Pool.walletBalance abis commissionPercent-nya kepotong) --
+// halaman ini murni informasional (berapa yang UDAH jadi revenue
+// platform), bukan tagihan kayak versi connector sebelumnya.
 export default async function KomisiPage() {
   await requireRole("ADMIN");
 
@@ -49,19 +48,18 @@ export default async function KomisiPage() {
     .map(([poolId, v]) => ({
       poolId,
       ...v,
-      commissionOwed: Math.round((v.totalRevenue * v.commissionPercent) / 100),
+      platformCommission: Math.round((v.totalRevenue * v.commissionPercent) / 100),
     }))
-    .sort((a, b) => b.commissionOwed - a.commissionOwed);
+    .sort((a, b) => b.platformCommission - a.platformCommission);
 
-  const totalOwed = rows.reduce((sum, r) => sum + r.commissionOwed, 0);
+  const totalCommission = rows.reduce((sum, r) => sum + r.platformCommission, 0);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-text">Komisi per Kolam</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-text">Komisi Platform</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Total komisi yang perlu ditagih ke tiap kolam, dihitung dari pembayaran yang udah
-        berhasil. Penagihan tetap manual (transfer/invoice) -- angka ini cuma biar gak modal
-        ingatan.
+        Komisi yang udah kepotong otomatis dari tiap transaksi (sisanya masuk saldo kolam).
+        Murni laporan -- gak ada yang perlu ditagih, uangnya udah ada di akun platform.
       </p>
 
       {rows.length === 0 ? (
@@ -82,7 +80,7 @@ export default async function KomisiPage() {
                   </p>
                 </div>
                 <p className="text-sm font-semibold text-text">
-                  {formatRupiah(r.commissionOwed)}
+                  {formatRupiah(r.platformCommission)}
                 </p>
               </CardBody>
             </Card>
@@ -90,7 +88,7 @@ export default async function KomisiPage() {
           <Card>
             <CardBody className="flex items-center justify-between gap-3 py-3">
               <p className="text-sm font-semibold text-text">Total semua kolam</p>
-              <p className="text-sm font-semibold text-text">{formatRupiah(totalOwed)}</p>
+              <p className="text-sm font-semibold text-text">{formatRupiah(totalCommission)}</p>
             </CardBody>
           </Card>
         </div>

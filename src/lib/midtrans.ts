@@ -1,32 +1,14 @@
 import midtransClient from "midtrans-client";
-import { decryptPoolCredential } from "@/lib/pool-credentials";
 
-type PoolMidtransCredentials = {
-  midtransServerKeyEnc: string | null;
-  midtransClientKeyEnc: string | null;
-  midtransIsProduction: boolean;
-};
+// Service provider posture (revisi 2026-09-12, gantiin connector): 1 akun
+// Midtrans platform buat SEMUA kolam -- checkout dan verifikasi webhook
+// pake kredensial global ini, bukan per-pool lagi.
+export const snap = new midtransClient.Snap({
+  isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
+  serverKey: process.env.MIDTRANS_SERVER_KEY!,
+  clientKey: process.env.MIDTRANS_CLIENT_KEY!,
+});
 
-// Connector posture (locked /plan-eng-review 2026-09-12): platform gak
-// pernah pegang dana, jadi TIDAK ADA akun Midtrans milik platform di
-// app ini -- tiap transaksi wajib pake Server Key + Client Key milik
-// KOLAM itu sendiri. Null kalau pool belum setup Midtrans -- caller
-// WAJIB fallback ke instruksi manual/transfer, jangan anggap ini selalu
-// berhasil.
-export function snapForPool(pool: PoolMidtransCredentials) {
-  if (!pool.midtransServerKeyEnc || !pool.midtransClientKeyEnc) return null;
-  return new midtransClient.Snap({
-    isProduction: pool.midtransIsProduction,
-    serverKey: decryptPoolCredential(pool.midtransServerKeyEnc),
-    clientKey: decryptPoolCredential(pool.midtransClientKeyEnc),
-  });
-}
-
-// Buat verifikasi signature webhook -- butuh server key kolam yang
-// bersangkutan, bukan snap client penuh.
-export function serverKeyForPool(
-  pool: Pick<PoolMidtransCredentials, "midtransServerKeyEnc">
-): string | null {
-  if (!pool.midtransServerKeyEnc) return null;
-  return decryptPoolCredential(pool.midtransServerKeyEnc);
+export function platformServerKey(): string {
+  return process.env.MIDTRANS_SERVER_KEY!;
 }

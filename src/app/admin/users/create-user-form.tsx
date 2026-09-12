@@ -7,7 +7,7 @@ import { Field, Input, Select } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 
-type Role = "ADMIN" | "COACH" | "MEMBER";
+type Role = "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
 type Participant = { type: "self" | "child"; name: string };
 
 export default function CreateUserForm() {
