@@ -191,3 +191,11 @@ h5,
 h6 {
   font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
 }
+
+/* Smooth anchor/CTA scroll app-wide -- guarded biar gak jalan pas user
+   pilih "reduce motion" di OS. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

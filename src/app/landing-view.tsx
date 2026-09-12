@@ -4,7 +4,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Reveal } from "@/components/ui/reveal";
+import { StatCounter } from "@/components/ui/stat-counter";
 import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
+
+const CARD_HOVER = "transition-all duration-300 hover:-translate-y-1 hover:shadow-lg";
 
 // Icon garis 24x24 stroke 1.8, dicopy persis dari ICON set di
 // src/app/panduan/panduan-view.tsx (dikonversi ke JSX) biar bentuknya
@@ -263,10 +267,10 @@ type LandingStats = { poolCount: number; coachCount: number; memberCount: number
 
 export default function LandingView({ stats }: { stats: LandingStats }) {
   const STATS = [
-    { value: String(stats.poolCount), label: "Kolam mitra" },
-    { value: String(stats.coachCount), label: "Coach terdaftar" },
-    { value: String(stats.memberCount), label: "Member terdaftar" },
-    { value: "3", label: "Peran dalam 1 sistem" },
+    { value: stats.poolCount, label: "Kolam mitra" },
+    { value: stats.coachCount, label: "Coach terdaftar" },
+    { value: stats.memberCount, label: "Member terdaftar" },
+    { value: 3, label: "Peran dalam 1 sistem" },
   ];
 
   return (
@@ -351,59 +355,74 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
         {/* Pitch utama: platform yang nyambungin kolam, coach lintas kolam,
             dan orang tua -- fork 3 jalur ("Anda yang mana?") ada di bawah. */}
         <section className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-4 pb-14 pt-6 text-center sm:pb-20 sm:pt-10">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/70">
-            Marketplace les renang privat
-          </span>
-          <h1 className="mt-5 text-4xl font-bold tracking-tight text-balance text-white sm:text-6xl">
-            Coach mana aja,
-            <br />
-            kolam mana aja.
-          </h1>
-          <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">
-            Coach gak keiket 1 tempat, bisa ngajar di beberapa kolam mitra. Orang tua booking langsung, kolam
-            manapun. Kolam dapet booking &amp; laporan komisi otomatis, tanpa ngurus tech sendiri.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/daftar-kolam">
-              <Button className="!rounded-full">
-                <Icon name="chat" className="h-4 w-4" />
-                Punya Kolam? Gabung Jaringan
-              </Button>
-            </Link>
-            <Link href="/daftar-coach">
-              <Button
-                variant="ghost"
-                className="!rounded-full !border !border-white/20 !text-white hover:!bg-white/10"
-              >
-                <Icon name="swimmer" className="h-4 w-4" />
-                Coach Renang? Daftar di Sini
-              </Button>
-            </Link>
-          </div>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-            {TRUST_PILLS.map((p) => (
-              <span
-                key={p.label}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/70"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
-                {p.label}
-              </span>
-            ))}
-          </div>
+          <Reveal eager>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/70">
+              Marketplace les renang privat
+            </span>
+          </Reveal>
+          <Reveal eager delay={90}>
+            <h1 className="mt-5 text-4xl font-bold tracking-tight text-balance text-white sm:text-6xl">
+              Coach mana aja,
+              <br />
+              kolam mana aja.
+            </h1>
+          </Reveal>
+          <Reveal eager delay={180}>
+            <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">
+              Coach gak keiket 1 tempat, bisa ngajar di beberapa kolam mitra. Orang tua booking langsung, kolam
+              manapun. Kolam dapet booking &amp; laporan komisi otomatis, tanpa ngurus tech sendiri.
+            </p>
+          </Reveal>
+          <Reveal eager delay={270}>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link href="/daftar-kolam">
+                <Button className="!rounded-full transition-transform hover:scale-[1.03] active:scale-[0.98]">
+                  <Icon name="chat" className="h-4 w-4" />
+                  Punya Kolam? Gabung Jaringan
+                </Button>
+              </Link>
+              <Link href="/daftar-coach">
+                <Button
+                  variant="ghost"
+                  className="!rounded-full !border !border-white/20 !text-white transition-transform hover:!bg-white/10 hover:scale-[1.03] active:scale-[0.98]"
+                >
+                  <Icon name="swimmer" className="h-4 w-4" />
+                  Coach Renang? Daftar di Sini
+                </Button>
+              </Link>
+            </div>
+          </Reveal>
+          <Reveal eager delay={360}>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+              {TRUST_PILLS.map((p) => (
+                <span
+                  key={p.label}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/70"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
+                  {p.label}
+                </span>
+              ))}
+            </div>
+          </Reveal>
         </section>
 
         {/* Stats band -- angka ASLI dari DB (bukan angka rekaan kayak
             "500+ students" di template referensi), query di page.tsx.
             Wajar kecil karena masih pre-launch -- jujur lebih penting
-            daripada keliatan "rame". */}
+            daripada keliatan "rame". Angka ngitung naik pas discroll ke
+            sini (StatCounter) -- animasi doang, bukan angkanya dikarang. */}
         <section className="relative border-t border-white/10 px-4 py-10 sm:py-12">
           <div className="mx-auto grid w-full max-w-4xl grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
-            {STATS.map((s) => (
-              <div key={s.label} className="flex flex-col gap-1">
-                <span className="text-4xl font-bold tracking-tight text-white sm:text-5xl">{s.value}</span>
-                <span className="text-sm text-white/60">{s.label}</span>
-              </div>
+            {STATS.map((s, i) => (
+              <Reveal key={s.label} delay={i * 90}>
+                <div className="flex flex-col gap-1">
+                  <span className="text-4xl font-bold tracking-tight tabular-nums text-white sm:text-5xl">
+                    <StatCounter value={s.value} />
+                  </span>
+                  <span className="text-sm text-white/60">{s.label}</span>
+                </div>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -411,51 +430,58 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
 
       {/* Problem -- agitate dulu sebelum kasih solusi, pola sales page klasik. */}
       <section className="mx-auto w-full max-w-4xl px-4 py-14 sm:py-16">
-        <div className="mb-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-wide text-accent-600">Kedengeran familiar?</span>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
-            Ngurus les renang manual, capeknya di mana-mana
-          </h2>
-        </div>
+        <Reveal>
+          <div className="mb-8 text-center">
+            <span className="text-xs font-bold uppercase tracking-wide text-accent-600">Kedengeran familiar?</span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
+              Ngurus les renang manual, capeknya di mana-mana
+            </h2>
+          </div>
+        </Reveal>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {PAIN_POINTS.map((p) => (
-            <div key={p} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
-              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-danger-bg text-danger-text">
-                <Icon name="cross" className="h-3.5 w-3.5" />
-              </span>
-              <p className="text-sm text-text-muted">{p}</p>
-            </div>
+          {PAIN_POINTS.map((p, i) => (
+            <Reveal key={p} delay={(i % 2) * 80}>
+              <div className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-danger-bg text-danger-text">
+                  <Icon name="cross" className="h-3.5 w-3.5" />
+                </span>
+                <p className="text-sm text-text-muted">{p}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
-        <p className="mx-auto mt-6 max-w-lg text-center text-sm font-medium text-text">
-          Semua itu kejadian bukan karena Anda kurang teliti — tapi karena ngatur ini semua pake chat &amp; Excel
-          emang gak dirancang buat scale.
-        </p>
+        <Reveal>
+          <p className="mx-auto mt-6 max-w-lg text-center text-sm font-medium text-text">
+            Semua itu kejadian bukan karena Anda kurang teliti — tapi karena ngatur ini semua pake chat &amp; Excel
+            emang gak dirancang buat scale.
+          </p>
+        </Reveal>
       </section>
 
       {/* Features -- framing buat pemilik/pengelola. */}
       <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
-        <div className="mb-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Kenapa ini beda</span>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
-            Dibangun buat masalah operasional nyata
-          </h2>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-text-muted">
-            Bukan sistem booking generik — tiap fitur disesuaikan sama cara kerja les privat.
-          </p>
-        </div>
+        <Reveal>
+          <div className="mb-8 text-center">
+            <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Kenapa ini beda</span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
+              Dibangun buat masalah operasional nyata
+            </h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-text-muted">
+              Bukan sistem booking generik — tiap fitur disesuaikan sama cara kerja les privat.
+            </p>
+          </div>
+        </Reveal>
         <div className="mt-6 divide-y divide-border border-t border-border">
-          {OWNER_FEATURES.map((f) => (
-            <div
-              key={f.title}
-              className="grid grid-cols-1 gap-2 py-6 sm:grid-cols-[240px_1fr] sm:gap-8 sm:py-7"
-            >
-              <div className={`flex items-center gap-2.5 ${roleToneClasses[f.tone].text}`}>
-                <Icon name={f.icon} className="h-5 w-5 shrink-0" />
-                <h3 className="text-sm font-semibold text-text">{f.title}</h3>
+          {OWNER_FEATURES.map((f, i) => (
+            <Reveal key={f.title} delay={Math.min(i, 4) * 60}>
+              <div className="grid grid-cols-1 gap-2 py-6 sm:grid-cols-[240px_1fr] sm:gap-8 sm:py-7">
+                <div className={`flex items-center gap-2.5 ${roleToneClasses[f.tone].text}`}>
+                  <Icon name={f.icon} className="h-5 w-5 shrink-0" />
+                  <h3 className="text-sm font-semibold text-text">{f.title}</h3>
+                </div>
+                <p className="text-sm text-text-muted sm:pt-0.5">{f.desc}</p>
               </div>
-              <p className="text-sm text-text-muted sm:pt-0.5">{f.desc}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -466,14 +492,16 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
           momen inti. Gantiin tabel perbandingan + kartu skenario teks --
           "liat produknya" lebih ngena daripada tabel klaim. */}
       <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
-        <div className="mb-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Lihat langsung</span>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
-            Bukan mockup, ini tampilan aslinya
-          </h2>
-        </div>
+        <Reveal>
+          <div className="mb-8 text-center">
+            <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Lihat langsung</span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
+              Bukan mockup, ini tampilan aslinya
+            </h2>
+          </div>
+        </Reveal>
         <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+          <Reveal className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 01</span>
               <h3 className="mt-1 text-lg font-semibold text-text">Slot kekunci begitu dibooking</h3>
@@ -509,9 +537,9 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
                 Booking berhasil! Cek di halaman Riwayat.
               </p>
             </BrowserFrame>
-          </div>
+          </Reveal>
 
-          <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+          <Reveal className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
             <div className="sm:order-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 02</span>
               <h3 className="mt-1 text-lg font-semibold text-text">Paket aktif otomatis abis bayar</h3>
@@ -530,9 +558,9 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
                 <Badge tone="success">Aktif</Badge>
               </div>
             </BrowserFrame>
-          </div>
+          </Reveal>
 
-          <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+          <Reveal className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 03</span>
               <h3 className="mt-1 text-lg font-semibold text-text">Honor coach dari kehadiran, bukan tebakan</h3>
@@ -554,9 +582,9 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
                 </div>
               </div>
             </BrowserFrame>
-          </div>
+          </Reveal>
 
-          <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+          <Reveal className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
             <div className="sm:order-2">
               <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 04</span>
               <h3 className="mt-1 text-lg font-semibold text-text">Coach yang sama, kolam beda-beda</h3>
@@ -577,79 +605,93 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
                 </div>
               </div>
             </BrowserFrame>
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* 3 peran -- nunjukin sistem lengkap dari 3 sisi. */}
       <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
-        <div className="mb-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Satu sistem, 3 peran</span>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
-            Semua orang cuma lihat yang relevan
-          </h2>
-        </div>
+        <Reveal>
+          <div className="mb-8 text-center">
+            <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Satu sistem, 3 peran</span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
+              Semua orang cuma lihat yang relevan
+            </h2>
+          </div>
+        </Reveal>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Card className="border-t-4 border-t-brand-500">
-            <CardBody>
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
-                <Icon name="swimmer" className="h-5 w-5" />
-              </div>
-              <h3 className="text-sm font-semibold text-text">Member (orang tua)</h3>
-              <ul className="mt-2 flex flex-col gap-1.5 text-sm text-text-muted">
-                <li>Booking coach &amp; jam sendiri</li>
-                <li>Pantau sisa sesi per anak</li>
-                <li>Batalkan booking sendiri (dengan syarat)</li>
-              </ul>
-            </CardBody>
-          </Card>
-          <Card className="border-t-4 border-t-success-text">
-            <CardBody>
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-success-bg text-success-text">
-                <Icon name="clipboardCheck" className="h-5 w-5" />
-              </div>
-              <h3 className="text-sm font-semibold text-text">Coach</h3>
-              <ul className="mt-2 flex flex-col gap-1.5 text-sm text-text-muted">
-                <li>Terafiliasi ke beberapa kolam sekaligus</li>
-                <li>Buka slot jadwal per kolam</li>
-                <li>Tandai kehadiran member</li>
-              </ul>
-            </CardBody>
-          </Card>
-          <Card className="border-t-4 border-t-accent-500">
-            <CardBody>
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-accent-50 text-accent-600">
-                <Icon name="wrench" className="h-5 w-5" />
-              </div>
-              <h3 className="text-sm font-semibold text-text">Admin (Anda)</h3>
-              <ul className="mt-2 flex flex-col gap-1.5 text-sm text-text-muted">
-                <li>Kelola semua akun &amp; peserta</li>
-                <li>Pantau booking &amp; pembayaran</li>
-                <li>Laporan kinerja coach otomatis</li>
-              </ul>
-            </CardBody>
-          </Card>
+          <Reveal delay={0}>
+            <Card className={`border-t-4 border-t-brand-500 ${CARD_HOVER}`}>
+              <CardBody>
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                  <Icon name="swimmer" className="h-5 w-5" />
+                </div>
+                <h3 className="text-sm font-semibold text-text">Member (orang tua)</h3>
+                <ul className="mt-2 flex flex-col gap-1.5 text-sm text-text-muted">
+                  <li>Booking coach &amp; jam sendiri</li>
+                  <li>Pantau sisa sesi per anak</li>
+                  <li>Batalkan booking sendiri (dengan syarat)</li>
+                </ul>
+              </CardBody>
+            </Card>
+          </Reveal>
+          <Reveal delay={80}>
+            <Card className={`border-t-4 border-t-success-text ${CARD_HOVER}`}>
+              <CardBody>
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-success-bg text-success-text">
+                  <Icon name="clipboardCheck" className="h-5 w-5" />
+                </div>
+                <h3 className="text-sm font-semibold text-text">Coach</h3>
+                <ul className="mt-2 flex flex-col gap-1.5 text-sm text-text-muted">
+                  <li>Terafiliasi ke beberapa kolam sekaligus</li>
+                  <li>Buka slot jadwal per kolam</li>
+                  <li>Tandai kehadiran member</li>
+                </ul>
+              </CardBody>
+            </Card>
+          </Reveal>
+          <Reveal delay={160}>
+            <Card className={`border-t-4 border-t-accent-500 ${CARD_HOVER}`}>
+              <CardBody>
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-accent-50 text-accent-600">
+                  <Icon name="wrench" className="h-5 w-5" />
+                </div>
+                <h3 className="text-sm font-semibold text-text">Admin (Anda)</h3>
+                <ul className="mt-2 flex flex-col gap-1.5 text-sm text-text-muted">
+                  <li>Kelola semua akun &amp; peserta</li>
+                  <li>Pantau booking &amp; pembayaran</li>
+                  <li>Laporan kinerja coach otomatis</li>
+                </ul>
+              </CardBody>
+            </Card>
+          </Reveal>
         </div>
       </section>
 
 
       {/* FAQ -- native <details>/<summary>, zero JS/dependency. */}
       <section className="mx-auto w-full max-w-3xl px-4 py-14 sm:py-16">
-        <div className="mb-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Pertanyaan umum</span>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">Masih ragu?</h2>
-        </div>
+        <Reveal>
+          <div className="mb-8 text-center">
+            <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Pertanyaan umum</span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
+              Masih ragu?
+            </h2>
+          </div>
+        </Reveal>
         <div className="flex flex-col gap-3">
-          {FAQ_ITEMS.map((item) => (
-            <details key={item.q} className="group rounded-xl border border-border bg-surface p-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-text marker:content-none">
-                {item.q}
-                <span className="shrink-0 text-lg leading-none text-text-subtle transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-2.5 text-sm text-text-muted">{item.a}</p>
-            </details>
+          {FAQ_ITEMS.map((item, i) => (
+            <Reveal key={item.q} delay={Math.min(i, 4) * 50}>
+              <details className="group rounded-xl border border-border bg-surface p-4">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-text marker:content-none">
+                  {item.q}
+                  <span className="shrink-0 text-lg leading-none text-text-subtle transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-2.5 text-sm text-text-muted">{item.a}</p>
+              </details>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -659,56 +701,70 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
           punya 3 sisi, jadi 3 kartu bobot yang sama, bukan salah satu
           dianggap sampingan. */}
       <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
-        <div className="mb-8 text-center">
-          <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Pilih jalur Anda</span>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">Anda yang mana?</h2>
-        </div>
+        <Reveal>
+          <div className="mb-8 text-center">
+            <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Pilih jalur Anda</span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
+              Anda yang mana?
+            </h2>
+          </div>
+        </Reveal>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Card className="border-t-4 border-t-brand-500">
-            <CardBody className="flex flex-col items-start gap-3 py-7">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
-                <Icon name="wrench" className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-semibold text-text">Punya kolam / tempat les</h3>
-              <p className="text-sm text-text-muted">
-                Gabung jadi kolam mitra — dapet booking dari jaringan coach yang lebih luas, laporan komisi
-                otomatis, tanpa ngurus tech sendiri.
-              </p>
-              <Link href="/daftar-kolam">
-                <Button className="!rounded-full">Daftar Kolam</Button>
-              </Link>
-            </CardBody>
-          </Card>
-          <Card className="border-t-4 border-t-success-text">
-            <CardBody className="flex flex-col items-start gap-3 py-7">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-bg text-success-text">
-                <Icon name="clipboardCheck" className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-semibold text-text">Coach renang</h3>
-              <p className="text-sm text-text-muted">
-                Ngajar di lebih dari 1 kolam mitra, atur jadwal sendiri per kolam, jangkauan murid lebih luas dari
-                1 tempat doang.
-              </p>
-              <Link href="/daftar-coach">
-                <Button variant="secondary" className="!rounded-full">Gabung Jadi Coach</Button>
-              </Link>
-            </CardBody>
-          </Card>
-          <Card className="border-t-4 border-t-accent-500">
-            <CardBody className="flex flex-col items-start gap-3 py-7">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-50 text-accent-600">
-                <Icon name="swimmer" className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-semibold text-text">Anak mau les renang</h3>
-              <p className="text-sm text-text-muted">
-                Daftar akun, pilih kolam dan coach yang cocok, bayar online — paket langsung aktif. Bisa daftarin
-                lebih dari satu anak sekaligus.
-              </p>
-              <Link href="/register">
-                <Button variant="secondary" className="!rounded-full">Daftar Sekarang</Button>
-              </Link>
-            </CardBody>
-          </Card>
+          <Reveal delay={0}>
+            <Card className={`border-t-4 border-t-brand-500 ${CARD_HOVER}`}>
+              <CardBody className="flex flex-col items-start gap-3 py-7">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
+                  <Icon name="wrench" className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-text">Punya kolam / tempat les</h3>
+                <p className="text-sm text-text-muted">
+                  Gabung jadi kolam mitra — dapet booking dari jaringan coach yang lebih luas, laporan komisi
+                  otomatis, tanpa ngurus tech sendiri.
+                </p>
+                <Link href="/daftar-kolam">
+                  <Button className="!rounded-full">Daftar Kolam</Button>
+                </Link>
+              </CardBody>
+            </Card>
+          </Reveal>
+          <Reveal delay={80}>
+            <Card className={`border-t-4 border-t-success-text ${CARD_HOVER}`}>
+              <CardBody className="flex flex-col items-start gap-3 py-7">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-bg text-success-text">
+                  <Icon name="clipboardCheck" className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-text">Coach renang</h3>
+                <p className="text-sm text-text-muted">
+                  Ngajar di lebih dari 1 kolam mitra, atur jadwal sendiri per kolam, jangkauan murid lebih luas
+                  dari 1 tempat doang.
+                </p>
+                <Link href="/daftar-coach">
+                  <Button variant="secondary" className="!rounded-full">
+                    Gabung Jadi Coach
+                  </Button>
+                </Link>
+              </CardBody>
+            </Card>
+          </Reveal>
+          <Reveal delay={160}>
+            <Card className={`border-t-4 border-t-accent-500 ${CARD_HOVER}`}>
+              <CardBody className="flex flex-col items-start gap-3 py-7">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-50 text-accent-600">
+                  <Icon name="swimmer" className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold text-text">Anak mau les renang</h3>
+                <p className="text-sm text-text-muted">
+                  Daftar akun, pilih kolam dan coach yang cocok, bayar online — paket langsung aktif. Bisa
+                  daftarin lebih dari satu anak sekaligus.
+                </p>
+                <Link href="/register">
+                  <Button variant="secondary" className="!rounded-full">
+                    Daftar Sekarang
+                  </Button>
+                </Link>
+              </CardBody>
+            </Card>
+          </Reveal>
         </div>
       </section>
 
@@ -719,25 +775,33 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
           malah bikin band nyilaukan & tombol putih teksnya nyaris gak
           kebaca. Band ini sengaja fixed 1 tampilan di kedua tema. */}
       <section className="mx-auto w-full max-w-3xl px-4 pb-16">
-        <div className="rounded-2xl bg-gradient-to-br from-[#4f46e5] to-[#1e1b4b] px-6 py-9 text-center text-white sm:px-10 sm:py-12">
-          <h2 className="text-xl font-semibold sm:text-2xl">Siap dipakai hari ini</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-white/85">
-            Gak perlu training panjang — alurnya udah familiar kayak booking online pada umumnya. Coba dulu lewat
-            akun demo, atau langsung ngobrol soal gabung sebagai kolam mitra.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary" className="!rounded-full !bg-white !text-[#4338ca] hover:!bg-white/90">
-                Hubungi Kami
-              </Button>
-            </a>
-            <a href="/panduan">
-              <Button variant="ghost" className="!rounded-full !text-white hover:!bg-white/10">
-                Coba Akun Demo →
-              </Button>
-            </a>
+        <Reveal>
+          <div className="rounded-2xl bg-gradient-to-br from-[#4f46e5] to-[#1e1b4b] px-6 py-9 text-center text-white sm:px-10 sm:py-12">
+            <h2 className="text-xl font-semibold sm:text-2xl">Siap dipakai hari ini</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-white/85">
+              Gak perlu training panjang — alurnya udah familiar kayak booking online pada umumnya. Coba dulu
+              lewat akun demo, atau langsung ngobrol soal gabung sebagai kolam mitra.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
+                <Button
+                  variant="secondary"
+                  className="!rounded-full !bg-white !text-[#4338ca] transition-transform hover:!bg-white/90 hover:scale-[1.03] active:scale-[0.98]"
+                >
+                  Hubungi Kami
+                </Button>
+              </a>
+              <a href="/panduan">
+                <Button
+                  variant="ghost"
+                  className="!rounded-full !text-white transition-transform hover:!bg-white/10 hover:scale-[1.03] active:scale-[0.98]"
+                >
+                  Coba Akun Demo →
+                </Button>
+              </a>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <footer className="border-t border-border py-8">
