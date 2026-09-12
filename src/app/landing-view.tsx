@@ -500,112 +500,151 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
             </h2>
           </div>
         </Reveal>
-        <div className="flex flex-col gap-6">
-          <Reveal className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 01</span>
-              <h3 className="mt-1 text-lg font-semibold text-text">Slot kekunci begitu dibooking</h3>
-              <p className="mt-1.5 text-sm text-text-muted">
-                2 orang tua chat bareng nanya slot yang sama — baik lewat chat personal maupun grup WhatsApp. Yang
-                klik "Booking" duluan langsung ngunci slot itu. Yang lain otomatis lihat slot udah kepake, gak
-                perlu admin turun tangan misahin.
-              </p>
-            </div>
-            <BrowserFrame title="/member/booking">
-              <div className="mb-3 flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">
-                  CA
-                </span>
-                <span className="text-sm font-semibold text-text">Coach Ayu</span>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between rounded-xl border border-border p-3">
-                  <div>
-                    <p className="text-sm font-medium text-text">08.00–09.00</p>
-                    <p className="text-xs text-text-subtle">buat kamu sendiri</p>
-                  </div>
-                  <span className="rounded-lg border border-danger-text/25 px-2.5 py-1 text-xs font-medium text-danger-text">
-                    Batalkan
-                  </span>
-                </div>
-                <div className="flex items-center justify-between rounded-xl border border-border p-3">
-                  <p className="text-sm font-medium text-text">09.00–10.00</p>
-                  <Button size="sm">Booking</Button>
-                </div>
-              </div>
-              <p className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-xs font-medium text-success-text">
-                Booking berhasil! Cek di halaman Riwayat.
-              </p>
-            </BrowserFrame>
-          </Reveal>
-
-          <Reveal className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
-            <div className="sm:order-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 02</span>
-              <h3 className="mt-1 text-lg font-semibold text-text">Paket aktif otomatis abis bayar</h3>
-              <p className="mt-1.5 text-sm text-text-muted">
-                Gak ada lagi "admin, udah dicek belum bayarannya?". Begitu pembayaran online berhasil, status paket
-                langsung berubah — sisa sesi siap dipakai booking hari itu juga.
-              </p>
-            </div>
-            <BrowserFrame title="/member/paket" className="sm:order-1">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-subtle">Paket Saya</p>
-              <div className="flex items-center justify-between rounded-xl border border-border p-3">
+        {/* Sticky stacking cards -- sama persis mekanisme scroll di reference
+            (schedule cards Stride template): tiap kartu `position: sticky`
+            dengan `top` makin gede + z-index makin tinggi, jadi pas discroll
+            kartu berikutnya nutupin kartu sebelumnya, nyisain sliver dikit
+            di atas. CSS murni, nol JS/dependency. */}
+        {/* Tiap kartu sticky butuh "runway" scroll ekstra biar keliatan
+            numpuk (bukan cuma sticky doang tanpa ruang gerak) -- runway-nya
+            WAJIB `margin-bottom` di kartu sticky itu sendiri, BUKAN
+            `padding-bottom` di div wrapper terpisah. Udah diuji langsung:
+            wrapper terpisah dengan padding-bottom bikin sticky-nya gagal
+            nempel sama sekali (containing block-nya keliatan kehitung
+            salah), sedangkan margin di elemen sticky-nya sendiri (sebagai
+            flex child langsung, gak dibungkus div lain) beres. Div
+            `sticky` juga WAJIB di LUAR `<Reveal>`, bukan sebaliknya --
+            `Reveal` nyetel CSS `transform` (translate-y) buat animasi
+            fade-nya, dan `transform` di ANCESTOR bikin containing-block
+            baru buat descendant `position: sticky`. */}
+        <div className="flex flex-col">
+          <div className="sticky top-20 z-10 mb-16 rounded-2xl border border-border bg-surface shadow-xl sm:top-24 sm:mb-24">
+            <Reveal className="p-5 sm:p-8">
+              <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm font-medium text-text">Private | 8x Renang</p>
-                  <p className="text-xs text-text-subtle">buat Ucok · Sisa sesi 8/8</p>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 01</span>
+                  <h3 className="mt-1 text-lg font-semibold text-text">Slot kekunci begitu dibooking</h3>
+                  <p className="mt-1.5 text-sm text-text-muted">
+                    2 orang tua chat bareng nanya slot yang sama — baik lewat chat personal maupun grup WhatsApp.
+                    Yang klik &quot;Booking&quot; duluan langsung ngunci slot itu. Yang lain otomatis lihat slot
+                    udah kepake, gak perlu admin turun tangan misahin.
+                  </p>
                 </div>
-                <Badge tone="success">Aktif</Badge>
+                <BrowserFrame title="/member/booking">
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">
+                      CA
+                    </span>
+                    <span className="text-sm font-semibold text-text">Coach Ayu</span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                      <div>
+                        <p className="text-sm font-medium text-text">08.00–09.00</p>
+                        <p className="text-xs text-text-subtle">buat kamu sendiri</p>
+                      </div>
+                      <span className="rounded-lg border border-danger-text/25 px-2.5 py-1 text-xs font-medium text-danger-text">
+                        Batalkan
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                      <p className="text-sm font-medium text-text">09.00–10.00</p>
+                      <Button size="sm">Booking</Button>
+                    </div>
+                  </div>
+                  <p className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-xs font-medium text-success-text">
+                    Booking berhasil! Cek di halaman Riwayat.
+                  </p>
+                </BrowserFrame>
               </div>
-            </BrowserFrame>
-          </Reveal>
+            </Reveal>
+          </div>
 
-          <Reveal className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 03</span>
-              <h3 className="mt-1 text-lg font-semibold text-text">Honor coach dari kehadiran, bukan tebakan</h3>
-              <p className="mt-1.5 text-sm text-text-muted">
-                Coach tandai Hadir/Gak Hadir abis sesi selesai. Cuma sesi Hadir yang kehitung valid — Anda tinggal
-                buka laporan Kinerja Coach per rentang tanggal, gak perlu rekap manual dari catatan.
-              </p>
-            </div>
-            <BrowserFrame title="/coach/riwayat">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-subtle">Riwayat Sesi</p>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between rounded-xl border border-border p-3">
-                  <p className="text-sm text-text">Ucok · 08.00–09.00</p>
-                  <Badge tone="success">Hadir</Badge>
+          <div className="sticky top-28 z-20 mb-16 rounded-2xl border border-border bg-surface shadow-xl sm:top-32 sm:mb-24">
+            <Reveal className="p-5 sm:p-8">
+              <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+                <div className="sm:order-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 02</span>
+                  <h3 className="mt-1 text-lg font-semibold text-text">Paket aktif otomatis abis bayar</h3>
+                  <p className="mt-1.5 text-sm text-text-muted">
+                    Gak ada lagi &quot;admin, udah dicek belum bayarannya?&quot;. Begitu pembayaran online
+                    berhasil, status paket langsung berubah — sisa sesi siap dipakai booking hari itu juga.
+                  </p>
                 </div>
-                <div className="flex items-center justify-between rounded-xl border border-border p-3">
-                  <p className="text-sm text-text">Rina · 09.00–10.00</p>
-                  <Badge tone="neutral">Belum ditandai</Badge>
-                </div>
+                <BrowserFrame title="/member/paket" className="sm:order-1">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-subtle">Paket Saya</p>
+                  <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                    <div>
+                      <p className="text-sm font-medium text-text">Private | 8x Renang</p>
+                      <p className="text-xs text-text-subtle">buat Ucok · Sisa sesi 8/8</p>
+                    </div>
+                    <Badge tone="success">Aktif</Badge>
+                  </div>
+                </BrowserFrame>
               </div>
-            </BrowserFrame>
-          </Reveal>
+            </Reveal>
+          </div>
 
-          <Reveal className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
-            <div className="sm:order-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 04</span>
-              <h3 className="mt-1 text-lg font-semibold text-text">Coach yang sama, kolam beda-beda</h3>
-              <p className="mt-1.5 text-sm text-text-muted">
-                Kenal 1 coach dari kolam langganan, tapi dia lagi ngajar di kolam lain? Tinggal buka halaman
-                coach-nya, langsung keliatan kolam mana aja yang dia terafiliasi, plus kontak WA langsung.
-              </p>
-            </div>
-            <BrowserFrame title="/pelatih/coach-ayu" className="sm:order-1">
-              <p className="mb-2 text-lg font-semibold text-text">Coach Ayu</p>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-text-subtle">Ngajar di kolam</p>
-              <div className="flex flex-col gap-2">
-                <div className="rounded-xl border border-border p-3">
-                  <p className="text-sm font-medium text-text">Kolam Renang Melati</p>
+          <div className="sticky top-36 z-30 mb-16 rounded-2xl border border-border bg-surface shadow-xl sm:top-40 sm:mb-24">
+            <Reveal className="p-5 sm:p-8">
+              <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 03</span>
+                  <h3 className="mt-1 text-lg font-semibold text-text">
+                    Honor coach dari kehadiran, bukan tebakan
+                  </h3>
+                  <p className="mt-1.5 text-sm text-text-muted">
+                    Coach tandai Hadir/Gak Hadir abis sesi selesai. Cuma sesi Hadir yang kehitung valid — Anda
+                    tinggal buka laporan Kinerja Coach per rentang tanggal, gak perlu rekap manual dari catatan.
+                  </p>
                 </div>
-                <div className="rounded-xl border border-border p-3">
-                  <p className="text-sm font-medium text-text">Kolam Renang Tirta Asri</p>
-                </div>
+                <BrowserFrame title="/coach/riwayat">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-subtle">
+                    Riwayat Sesi
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                      <p className="text-sm text-text">Ucok · 08.00–09.00</p>
+                      <Badge tone="success">Hadir</Badge>
+                    </div>
+                    <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                      <p className="text-sm text-text">Rina · 09.00–10.00</p>
+                      <Badge tone="neutral">Belum ditandai</Badge>
+                    </div>
+                  </div>
+                </BrowserFrame>
               </div>
-            </BrowserFrame>
-          </Reveal>
+            </Reveal>
+          </div>
+
+          <div className="sticky top-44 z-40 rounded-2xl border border-border bg-surface shadow-xl sm:top-48">
+            <Reveal className="p-5 sm:p-8">
+              <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+                <div className="sm:order-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 04</span>
+                  <h3 className="mt-1 text-lg font-semibold text-text">Coach yang sama, kolam beda-beda</h3>
+                  <p className="mt-1.5 text-sm text-text-muted">
+                    Kenal 1 coach dari kolam langganan, tapi dia lagi ngajar di kolam lain? Tinggal buka halaman
+                    coach-nya, langsung keliatan kolam mana aja yang dia terafiliasi, plus kontak WA langsung.
+                  </p>
+                </div>
+                <BrowserFrame title="/pelatih/coach-ayu" className="sm:order-1">
+                  <p className="mb-2 text-lg font-semibold text-text">Coach Ayu</p>
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-text-subtle">
+                    Ngajar di kolam
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <div className="rounded-xl border border-border p-3">
+                      <p className="text-sm font-medium text-text">Kolam Renang Melati</p>
+                    </div>
+                    <div className="rounded-xl border border-border p-3">
+                      <p className="text-sm font-medium text-text">Kolam Renang Tirta Asri</p>
+                    </div>
+                  </div>
+                </BrowserFrame>
+              </div>
+            </Reveal>
+          </div>
         </div>
       </section>
 
