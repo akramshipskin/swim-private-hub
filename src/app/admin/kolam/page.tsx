@@ -3,21 +3,33 @@ import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import { Card, CardBody } from "@/components/ui/card";
 import PoolShareForm from "./pool-share-form";
+import AffiliateCoachForm from "./affiliate-coach-form";
 
 export default async function AdminKolamPage() {
   await requireRole("ADMIN");
 
-  const pools = await prisma.pool.findMany({
-    orderBy: { name: "asc" },
-    select: {
-      id: true,
-      name: true,
-      commissionPercent: true,
-      coachSharePercent: true,
-      walletBalance: true,
-      ownerUser: { select: { name: true, phone: true } },
-    },
-  });
+  const [pools, coaches] = await Promise.all([
+    prisma.pool.findMany({
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        commissionPercent: true,
+        coachSharePercent: true,
+        walletBalance: true,
+        ownerUser: { select: { name: true, phone: true } },
+        affiliations: {
+          select: { id: true, coachId: true, coach: { select: { name: true } } },
+          orderBy: { coach: { name: "asc" } },
+        },
+      },
+    }),
+    prisma.user.findMany({
+      where: { role: "COACH" },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
@@ -53,6 +65,15 @@ export default async function AdminKolamPage() {
                   poolId={p.id}
                   commissionPercent={p.commissionPercent}
                   coachSharePercent={p.coachSharePercent}
+                />
+                <AffiliateCoachForm
+                  poolId={p.id}
+                  allCoaches={coaches}
+                  affiliations={p.affiliations.map((a) => ({
+                    id: a.id,
+                    coachId: a.coachId,
+                    coachName: a.coach.name,
+                  }))}
                 />
               </CardBody>
             </Card>

@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { platformServerKey } from "@/lib/midtrans";
-import { creditPoolFromPackageSale } from "@/lib/wallet";
 import type { Prisma } from "@/generated/prisma/client";
 
 // Signature Midtrans dihitung pake Server Key platform -- service
@@ -121,17 +120,10 @@ export async function POST(request: Request) {
       });
     }
 
-    // Kolam dikredit sekali doang, pas payment BENERAN transisi ke
-    // SUCCESS (bukan tiap notifikasi capture/settlement -- guard duplikat
-    // di atas udah nangkep retry, blok ini cuma jalan pas payment.status
-    // SEBELUMNYA bukan SUCCESS).
-    if (paymentStatus === "SUCCESS") {
-      await creditPoolFromPackageSale(tx, {
-        poolId: payment.package.poolId,
-        paymentId: payment.id,
-        grossAmount: payment.amount,
-      });
-    }
+    // Gak ada kredit wallet di sini -- paket lintas-kolam (revisi
+    // 2026-09-12) artinya kolam mana yang dikredit baru ketauan pas
+    // tiap sesi BENERAN dipake (lihat src/lib/wallet.ts, dipanggil dari
+    // markAttendance). Payment sukses cuma bikin Package aktif.
   });
 
   return Response.json({ ok: true });

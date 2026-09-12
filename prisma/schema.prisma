@@ -23,10 +23,13 @@ enum Role {
 }
 
 enum WalletTransactionType {
-  // Kredit ke Pool pas Payment sukses (harga paket - komisi platform).
-  PACKAGE_SALE
-  // Pool bayar Coach buat 1 sesi yang ditandai Hadir -- dicatat 2 baris
-  // (debit Pool, kredit Coach) yang share sessionPayoutGroupId yang sama.
+  // Kredit ke Pool TEMPAT SESI BENERAN DIAJAR (Booking.availability.poolId),
+  // bukan pool tempat Package dibeli -- paket sekarang lintas-kolam
+  // (revisi 2026-09-12), jadi kredit ditunda sampai tau pasti kolam mana
+  // yang beneran ngasih fasilitas buat sesi itu. Dicatat bareng
+  // SESSION_PAYOUT (coach), share bookingId yang sama.
+  SESSION_REVENUE
+  // Kredit ke Coach buat 1 sesi yang ditandai Hadir.
   SESSION_PAYOUT
   // Saldo keluar pas WithdrawalRequest berhasil diproses.
   WITHDRAWAL
@@ -102,6 +105,16 @@ model CoachProfile {
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   bio      String?
   isActive Boolean @default(true)
+  // Poin-poin keahlian (misal "Gaya bebas", "Anak usia dini", "Terapi
+  // air") -- array pendek, ditampilin di halaman shortcut coach
+  // (/pelatih/[id]) & profil. Bukan free-text panjang, biar konsisten
+  // scan-able buat parent yang milih coach.
+  specialties       String[] @default([])
+  // Badge "plus poin" kalau coach punya sertifikasi renang resmi
+  // (misal sertifikasi pelatih renang/lifeguard). certificationNote
+  // opsional -- nama sertifikat/lembaga, ditampilin di sebelah badge.
+  hasCertification  Boolean  @default(false)
+  certificationNote String?
   // Saldo coach ini dari bagian per-sesi (Pool.coachSharePercent),
   // dikredit pas booking ditandai Hadir. Lihat Pool.walletBalance buat
   // catatan yang sama soal cache-vs-ledger.
@@ -234,11 +247,13 @@ model Package {
   // setelah ada booking = nge-rewrite riwayat anak booking lama diam-diam.
   dependentId String
   dependent   Dependent        @relation(fields: [dependentId], references: [id])
-  // Dicopy dari template.poolId pas Package dibuat (bukan dibaca ulang
-  // dari template tiap kali, sama alasannya kayak name/totalSesi di
-  // bawah). WAJIB -- booking yang pake Package ini cuma boleh ambil
-  // Availability di kolam yang SAMA (dicek di action layer pas booking,
-  // bukan constraint DB, sama pola kayak dependentId di Booking).
+  // Dicopy dari template.poolId pas Package dibuat -- ini kolam TEMPAT
+  // BELI (nentuin harga & katalog yang dipake), BUKAN batasan kolam
+  // tempat pake sesi (revisi 2026-09-12: paket lintas-kolam, sesi bisa
+  // dibooking di kolam MANAPUN, gak lagi dicek harus sama kayak
+  // sebelumnya). Kolam yang beneran dikredit per sesi ditentuin dari
+  // Booking -> Availability.poolId pas sesi ditandai Hadir, lihat
+  // src/lib/wallet.ts.
   poolId      String
   pool        Pool             @relation(fields: [poolId], references: [id])
   templateId  String?
@@ -323,8 +338,17 @@ model Pool {
   name               String
   address            String?
   contactPhone       String?
+  // Jam operasional harian (format "HH:mm", misal "06:00"/"21:00").
+  // Satu jam buka-tutup buat semua hari -- MVP, belum per-hari (Senin
+  // beda jam sama Minggu dst). Ditampilin di profil kolam, BUKAN
+  // constraint yang nge-block coach buka slot di luar jam ini (belum
+  // divalidasi di action layer, murni informasional buat sekarang).
+  openTime           String?
+  closeTime          String?
   // User yang jadi kontak/pemilik kolam ini -- role POOL_OWNER, akses
-  // ke wallet & pencairan kolam ini doang (lihat scripts/onboard-pools.ts).
+  // ke wallet & pencairan kolam ini doang. Dibuat pas kolam daftar
+  // sendiri lewat /daftar-kolam (self-service, revisi 2026-09-12 --
+  // gak ada lagi migrasi dari jaringan lama via script).
   ownerUserId        String?
   ownerUser          User?    @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
   // Persentase komisi platform, di-set platform (bukan per-coach),
@@ -332,14 +356,16 @@ model Pool {
   // bukan struktural -- boleh diubah tanpa migrasi.
   commissionPercent  Int      @default(15)
   // Persentase dari HARGA PAKET (bukan dari sisa abis komisi) yang jadi
-  // bagian coach per sesi -- dibayarkan dari walletBalance kolam ke
-  // walletBalance coach pas booking ditandai Hadir (lihat
-  // src/lib/wallet.ts). commissionPercent + coachSharePercent harus
-  // <=100 (sisanya buat kolam), dicek di action layer pas admin edit.
+  // bagian coach per sesi -- dikredit ke walletBalance coach BARENGAN
+  // sama walletBalance kolam sendiri dikredit, pas booking ditandai
+  // Hadir (lihat src/lib/wallet.ts). commissionPercent + coachSharePercent
+  // harus <=100 (sisanya buat kolam), dicek di action layer pas admin edit.
   coachSharePercent  Int      @default(55)
-  // Saldo kolam ini SETELAH komisi platform, SEBELUM dikurangi bagian
-  // coach per sesi (lihat WalletTransaction buat riwayat lengkap --
-  // field ini cache buat baca cepet, bukan sumber kebenaran tunggal).
+  // Saldo kolam ini dari sesi-sesi yang BENERAN diajar di kolam ini
+  // (dikredit pas Booking ditandai Hadir, bukan pas Package dibeli --
+  // revisi 2026-09-12: paket lintas-kolam, kolam yang kredit itu kolam
+  // TEMPAT SESI, bukan kolam tempat paket dibeli). Cache, lihat
+  // WalletTransaction buat sumber kebenaran.
   walletBalance      Int      @default(0)
   // Tujuan pencairan (WithdrawalRequest). Nullable -- kolam yang belum
   // isi ini gak bisa ajuin cairin (dicek di action layer).

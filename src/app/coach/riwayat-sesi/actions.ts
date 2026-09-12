@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { payoutCoachForSession, reverseCoachPayoutForSession } from "@/lib/wallet";
+import { creditSessionRevenue, reverseSessionRevenue } from "@/lib/wallet";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -55,11 +55,15 @@ export async function markAttendance(
       },
     });
 
-    // Payout cuma jalan kalau paket ini beneran dibeli lewat Midtrans
-    // (ada Payment SUCCESS) -- paket yang di-assign manual/gratis sama
-    // admin gak punya uang beneran buat dibagi, jadi gak ada transaksi
-    // wallet. coachProfile null (coach gak sengaja punya profile, harusnya
-    // gak mungkin tapi dicek jaga-jaga) juga skip.
+    // Kredit wallet cuma jalan kalau paket ini beneran dibeli lewat
+    // Midtrans (ada Payment SUCCESS) -- paket yang di-assign manual/gratis
+    // sama admin gak punya uang beneran buat dibagi. coachProfile null
+    // (harusnya gak mungkin tapi dicek jaga-jaga) juga skip.
+    //
+    // PENTING (revisi 2026-09-12, paket lintas-kolam): kolam yang
+    // dikredit itu Booking.availability.poolId -- kolam TEMPAT SESI INI
+    // BENERAN DIAJAR -- bukan booking.package.poolId (kolam tempat
+    // paket dibeli, bisa beda kolam sekarang).
     const successPayment = booking.package.payments[0];
     const coachProfile = booking.availability.coach.coachProfile;
     if (!successPayment || !coachProfile) return;
@@ -67,14 +71,14 @@ export async function markAttendance(
     const perSessionValue = Math.round(successPayment.amount / booking.package.totalSesi);
 
     if (!wasAttended && attended) {
-      await payoutCoachForSession(tx, {
-        poolId: booking.package.poolId,
+      await creditSessionRevenue(tx, {
+        poolId: booking.availability.poolId,
         coachProfileId: coachProfile.id,
         bookingId,
         perSessionValue,
       });
     } else if (wasAttended && !attended) {
-      await reverseCoachPayoutForSession(tx, { bookingId });
+      await reverseSessionRevenue(tx, { bookingId });
     }
   });
 

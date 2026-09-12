@@ -17,12 +17,13 @@ type ChildOption = {
   dependentName: string;
   packageId: string;
   packageName: string;
-  poolId: string;
-  poolName: string;
+  purchasedFromPoolName: string;
   sisaSesi: number;
   jatahCancel: number;
   cancelRemaining: number;
 };
+
+type PoolOption = { id: string; name: string };
 
 type Slot = {
   id: string;
@@ -73,12 +74,19 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export default function BookingBoard({ childOptions }: { childOptions: ChildOption[] }) {
+export default function BookingBoard({
+  childOptions,
+  pools,
+}: {
+  childOptions: ChildOption[];
+  pools: PoolOption[];
+}) {
   const router = useRouter();
   const { data: session } = useSession();
   const [date, setDate] = useState(todayWib());
   const [showFullCalendar, setShowFullCalendar] = useState(false);
   const [packageId, setPackageId] = useState(childOptions[0]?.packageId ?? "");
+  const [poolId, setPoolId] = useState(pools[0]?.id ?? "");
   const selectedChild = childOptions.find((c) => c.packageId === packageId) ?? null;
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(
@@ -95,22 +103,22 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
   const requestIdRef = useRef(0);
 
   const loadSlots = useCallback(async () => {
-    // Pool-first browse: kolam ditentukan dari paket/anak yang dipilih
-    // (1 paket = 1 kolam sekarang), belum ada anak/paket terpilih =
-    // belum ada kolam buat ditampilin -- jangan fetch semua kolam.
-    if (!selectedChild) {
+    // Kolam dipilih bebas (revisi 2026-09-12, paket lintas-kolam) --
+    // gak lagi diturunin dari paket/anak yang dipilih. Belum ada kolam
+    // dipilih = belum ada yang bisa ditampilin.
+    if (!poolId) {
       setSlots([]);
       return;
     }
     const myRequestId = ++requestIdRef.current;
-    const res = await fetch(`/api/availability?date=${date}&poolId=${selectedChild.poolId}`);
+    const res = await fetch(`/api/availability?date=${date}&poolId=${poolId}`);
     if (requestIdRef.current !== myRequestId) return;
     if (res.ok) {
       const data = await res.json();
       if (requestIdRef.current !== myRequestId) return;
       setSlots(data.availabilities);
     }
-  }, [date, selectedChild]);
+  }, [date, poolId]);
 
   useEffect(() => {
     setSlots(null);
@@ -227,7 +235,21 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
               {childOptions.length === 0 && <option value="">-- belum ada paket aktif --</option>}
               {childOptions.map((c) => (
                 <option key={c.packageId} value={c.packageId}>
-                  {c.dependentName} — {c.poolName}, sisa {c.sisaSesi} sesi
+                  {c.dependentName} — sisa {c.sisaSesi} sesi
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Kolam">
+            <Select
+              value={poolId}
+              onChange={(e) => setPoolId(e.target.value)}
+              className="w-full sm:w-48"
+            >
+              {pools.length === 0 && <option value="">-- belum ada kolam --</option>}
+              {pools.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
                 </option>
               ))}
             </Select>
@@ -274,11 +296,12 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
             </div>
           </Field>
           {selectedChild && (
-            <div className="flex items-center gap-2 sm:mb-2.5">
+            <div className="flex flex-wrap items-center gap-2 sm:mb-2.5">
               <Badge tone="brand">Sisa sesi: {selectedChild.sisaSesi}</Badge>
               <Badge tone={selectedChild.cancelRemaining <= 1 ? "warning" : "neutral"}>
                 Sisa jatah batal: {selectedChild.cancelRemaining}
               </Badge>
+              <Badge tone="neutral">Dibeli dari: {selectedChild.purchasedFromPoolName}</Badge>
             </div>
           )}
         </CardBody>

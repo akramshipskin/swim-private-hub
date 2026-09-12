@@ -547,6 +547,61 @@ confirmed against the same math run via script), withdrawal request
 (balance deducted immediately), admin manual "Tandai Dibayar" and the Iris
 not-configured fallback message, pool-owner `/pool/saldo` view.
 
+## Revision 2 (2026-09-12): multi-pool packages, self-registration, coach profiles
+
+**Reversed decision:** Package no longer locks a member to 1 pool for
+redemption (Booking route's cross-pool guard from the original T2 fix is
+removed). Founder's own framing: still prepaid packages ("tetep harus beli
+paket di muka"), but sessions redeemable at ANY pool — this is what pushed
+the marketplace framing (a member isn't stuck with 1 kolam per purchase)
+closer to what cross-model tension #4 originally asked for.
+
+**Why this forced a wallet redesign:** Pool.walletBalance used to be
+credited in full at `Payment` SUCCESS (100% - commission), assuming the
+purchasing pool would host every session. With cross-pool redemption, that
+assumption is gone — a package's 8 sessions could be spent at 3 different
+pools. Fix: crediting moved from "at purchase" to "at attendance" —
+`creditSessionRevenue` (was `creditPoolFromPackageSale` + the old
+`payoutCoachForSession`, now merged into one function) computes the FULL
+3-way split (platform commission / coach share / pool share) using the
+**pool where the session actually happened** (`Booking.availability.poolId`),
+not the pool where the package was purchased (`Package.poolId`, which now
+only means "which catalog/price applied at checkout"). `Package.poolId`
+stays on the model but its enforcement meaning changed — flagged explicitly
+in the schema comment, not just silently repurposed.
+
+**Named blind spot, not solved in code:** if a member buys a cheap pool's
+package and redeems sessions at a pricier pool, that pricier pool gets paid
+based on the ORIGINAL (possibly lower) purchase price, not their own rate.
+Founder accepted this as a real limitation of the small initial network
+rather than asking for a pricing-normalization mechanism — worth revisiting
+if pools start declining bookings from what they consider underpriced
+outside packages.
+
+**Onboarding, reversed again:** the seed-script approach for the existing
+network (`scripts/onboard-pools.ts`, locked in the original /plan-eng-review)
+is REMOVED per explicit instruction ("onboarding terutama kolam lama
+hilangkan aja... semuanya nanti mulai dari 0 daftarnya"). Pools and coaches
+now self-register (`/daftar-kolam`, `/daftar-coach`) exactly like members do
+at `/register` — same honeypot/timing anti-spam pattern. `PoolAffiliation`
+(coach↔pool linking) has no self-service flow yet since a self-registered
+pool and a self-registered coach have no existing relationship to link
+automatically — admin connects them manually via a small tool added to
+`/admin/kolam`.
+
+**Coach profile additions:** `CoachProfile.specialties` (fixed checklist,
+not free text — `src/lib/coach-specialties.ts`) and
+`hasCertification`/`certificationNote` (a badge, not a verification
+process — nobody checks the claim, matches the "no approval workflow"
+scope call below). Required at self-registration: name, phone, password,
+≥1 specialty. Pool required fields: name, address, `openTime`/`closeTime`
+(single daily hours, not per-day-of-week — MVP), owner name/phone/password.
+
+**Scope call, not asked for but flagged:** self-registered pools and
+coaches get `isActive: true` immediately, no admin approval gate — anyone
+can claim to own a pool. Acceptable at this network size (founder knows
+everyone joining early), revisit if registration opens more broadly.
+
 ## GSTACK REVIEW REPORT
 
 | Review | Trigger | Why | Runs | Status | Findings |

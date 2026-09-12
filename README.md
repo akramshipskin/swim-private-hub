@@ -56,12 +56,13 @@ DATABASE_URL="<session-pooler-url>" npx prisma migrate dev --name <nama_migrasi>
 
 - `src/proxy.ts` -- middleware untuk guard peran (ADMIN/COACH/MEMBER) dan redirect ganti-password wajib. Di Next.js 16, file middleware ini bernama `proxy.ts`, bukan `middleware.ts`.
 - `src/lib/cancel-booking.ts` -- logika pembatalan booking dengan row-level lock (`SELECT ... FOR UPDATE`) untuk mencegah race condition saat banyak pembatalan konkuren pada paket yang sama.
-- `src/app/api/booking/route.ts` -- klaim slot pake conditional update (CAS) + validasi Package.poolId harus sama sama Availability.poolId (booking cross-kolam ditolak).
-- `src/app/api/availability/route.ts` -- endpoint utama pengecekan slot (pool-first: filter via `?poolId=`), termasuk perhitungan kelayakan pembatalan mandiri per booking.
-- `prisma/schema.prisma` -- model utama: `User`, `Pool`, `PoolAffiliation`, `PackageTemplate`, `Package`, `Payment`, `Availability`, `Booking`, `PushSubscription`, `CoachProfile`, `WalletTransaction`, `WithdrawalRequest`. Availability constraint `unique(coachId, date, startTime)` SENGAJA gak include poolId -- 1 coach cuma boleh punya 1 slot terbuka per jam di SELURUH kolam (gak bisa dobel di 2 kolam jam yang sama).
-- `src/lib/wallet.ts` -- kredit saldo kolam pas Payment sukses (harga - komisi platform), kredit saldo coach + debit saldo kolam pas booking ditandai Hadir (harga per-sesi x bagian coach). `WalletTransaction` = ledger sumber kebenaran, `walletBalance` di Pool/CoachProfile cuma cache.
+- `src/app/api/booking/route.ts` -- klaim slot pake conditional update (CAS). Booking LINTAS-KOLAM diperbolehkan (revisi 2026-09-12) -- Package gak lagi dikunci ke 1 kolam buat redeem.
+- `src/app/api/availability/route.ts` -- endpoint pengecekan slot (filter via `?poolId=`, dipilih bebas oleh member gak lagi ikut paket), termasuk perhitungan kelayakan pembatalan mandiri per booking.
+- `prisma/schema.prisma` -- model utama: `User` (role `ADMIN`/`COACH`/`MEMBER`/`POOL_OWNER`), `Pool`, `PoolAffiliation`, `PackageTemplate`, `Package`, `Payment`, `Availability`, `Booking`, `PushSubscription`, `CoachProfile`, `WalletTransaction`, `WithdrawalRequest`. Availability constraint `unique(coachId, date, startTime)` SENGAJA gak include poolId -- 1 coach cuma boleh punya 1 slot terbuka per jam di SELURUH kolam.
+- `src/lib/wallet.ts` -- `creditSessionRevenue`: kredit saldo kolam DAN coach BARENGAN pas booking ditandai Hadir, pake persentase kolam TEMPAT SESI ITU DIAJAR (`Booking.availability.poolId`), bukan kolam tempat paket dibeli (`Package.poolId` cuma nentuin harga/katalog checkout). `WalletTransaction` = ledger sumber kebenaran, `walletBalance` di Pool/CoachProfile cuma cache.
 - `src/lib/withdrawal.ts` + `src/lib/disbursement.ts` -- pengajuan pencairan (saldo kepotong pas request, bukan pas approve) + integrasi Midtrans Iris opsional (belum aktif sampai `MIDTRANS_IRIS_SERVER_KEY` diisi -- fallback manual di `/admin/withdrawals`).
-- `scripts/onboard-pools.ts` -- seed script onboarding kolam (idempotent), ganti role owner yang dimigrasi ke `POOL_OWNER` (akses cuma ke wallet & pencairan kolamnya sendiri). Jalanin: `npm run onboard:pools`.
+- `src/app/daftar-kolam/`, `src/app/daftar-coach/` -- pendaftaran mandiri kolam & coach (pola anti-spam sama kayak `/register`). Gak ada lagi migrasi jaringan lama via script -- semua mulai dari 0.
+- `src/lib/coach-specialties.ts` -- daftar keahlian coach (checklist tetap, bukan free-text), plus `CoachProfile.hasCertification`/`certificationNote` (badge, bukan proses verifikasi).
 - `src/lib/format.ts` -- helper format & validasi (nomor telepon Indonesia, rupiah, proper case nama).
 - `src/components/legal-page-layout.tsx` -- layout bersama buat 4 halaman legal (privasi, S&K, pengembalian, cookie).
 

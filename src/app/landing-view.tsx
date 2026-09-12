@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buildCoachJoinWaLink, buildOwnerInquiryWaLink } from "@/lib/whatsapp";
+import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
 
 // Icon garis 24x24 stroke 1.8, dicopy persis dari ICON set di
 // src/app/panduan/panduan-view.tsx (dikonversi ke JSX) biar bentuknya
@@ -258,16 +258,26 @@ const FAQ_ITEMS = [
 ];
 
 const OWNER_WA_LINK = buildOwnerInquiryWaLink();
-const COACH_WA_LINK = buildCoachJoinWaLink();
 
 export default function LandingView() {
   return (
     <main className="flex min-h-screen flex-col">
-      {/* Hero -- kembali ke palet terang standar aplikasi (bg-background +
-          gradient brand-100 yang sama kayak body di globals.css), gaya
-          graphify (dark band) di-cancel per feedback Hadi. */}
-      <div>
-        <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5">
+      {/* Hero -- band gelap FIXED (bukan ikut tema light/dark, sama pola
+          kayak CTA band di bawah) buat bikin statement kuat di atas fold,
+          gaya "dark photo hero" yang direferensiin (karate academy, run
+          club Framer template) TAPI tanpa foto asli -- gak ada foto
+          kolam/coach beneran, motion-blur gradient dipake sebagai
+          pengganti biar gak keliatan kayak stock photo palsu. */}
+      <div className="relative overflow-hidden bg-[#0d0b1f]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(circle at 15% 20%, rgba(99,102,241,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 75%, rgba(244,63,94,0.25) 0%, transparent 50%)",
+          }}
+        />
+        <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5">
           <div className="flex items-center gap-2.5">
             <Image
               src="/logo.png"
@@ -277,11 +287,11 @@ export default function LandingView() {
               className="h-8 w-8 rounded-lg object-contain"
               priority
             />
-            <span className="font-semibold tracking-tight text-text">Swim Private Hub</span>
+            <span className="font-semibold tracking-tight text-white">Swim Private Hub</span>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login">
-              <Button variant="ghost" size="sm" className="min-h-[44px]">
+              <Button variant="ghost" size="sm" className="min-h-[44px] !text-white hover:!bg-white/10">
                 Login
               </Button>
             </Link>
@@ -295,38 +305,40 @@ export default function LandingView() {
 
         {/* Pitch utama: platform yang nyambungin kolam, coach lintas kolam,
             dan orang tua -- fork 3 jalur ("Anda yang mana?") ada di bawah. */}
-        <section className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 pb-10 pt-8 text-center sm:pt-14">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-text-muted shadow-sm">
+        <section className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-4 pb-14 pt-6 text-center sm:pb-20 sm:pt-10">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/70">
             Marketplace les renang privat
           </span>
-          <h1 className="mt-5 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
-            Coach mana aja, kolam mana aja — <span className="text-brand-600">1 platform buat semua</span>
+          <h1 className="mt-5 text-4xl font-bold tracking-tight text-balance text-white sm:text-6xl">
+            Coach mana aja,
+            <br />
+            kolam mana aja.
           </h1>
-          <p className="mt-4 max-w-xl text-base text-text-muted sm:text-lg">
-            Coach gak keiket 1 tempat, bisa ngajar di beberapa kolam mitra. Orang tua booking langsung dari kolam
-            paketnya. Kolam dapet booking &amp; laporan komisi otomatis, tanpa ngurus tech sendiri.
+          <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">
+            Coach gak keiket 1 tempat, bisa ngajar di beberapa kolam mitra. Orang tua booking langsung, kolam
+            manapun. Kolam dapet booking &amp; laporan komisi otomatis, tanpa ngurus tech sendiri.
           </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/daftar-kolam">
               <Button>
                 <Icon name="chat" className="h-4 w-4" />
                 Punya Kolam? Gabung Jaringan
               </Button>
-            </a>
-            <a href={COACH_WA_LINK} target="_blank" rel="noopener noreferrer">
-              <Button variant="secondary">
+            </Link>
+            <Link href="/daftar-coach">
+              <Button variant="ghost" className="!border !border-white/20 !text-white hover:!bg-white/10">
                 <Icon name="swimmer" className="h-4 w-4" />
                 Coach Renang? Daftar di Sini
               </Button>
-            </a>
+            </Link>
           </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
             {TRUST_PILLS.map((p) => (
               <span
                 key={p.label}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-text-muted shadow-sm"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/70"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+                <span className="h-1.5 w-1.5 rounded-full bg-accent-500" />
                 {p.label}
               </span>
             ))}
@@ -599,9 +611,9 @@ export default function LandingView() {
                 Gabung jadi kolam mitra — dapet booking dari jaringan coach yang lebih luas, laporan komisi
                 otomatis, tanpa ngurus tech sendiri.
               </p>
-              <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
-                <Button>Hubungi Kami</Button>
-              </a>
+              <Link href="/daftar-kolam">
+                <Button>Daftar Kolam</Button>
+              </Link>
             </CardBody>
           </Card>
           <Card className="border-t-4 border-t-success-text">
@@ -614,9 +626,9 @@ export default function LandingView() {
                 Ngajar di lebih dari 1 kolam mitra, atur jadwal sendiri per kolam, jangkauan murid lebih luas dari
                 1 tempat doang.
               </p>
-              <a href={COACH_WA_LINK} target="_blank" rel="noopener noreferrer">
+              <Link href="/daftar-coach">
                 <Button variant="secondary">Gabung Jadi Coach</Button>
-              </a>
+              </Link>
             </CardBody>
           </Card>
           <Card className="border-t-4 border-t-accent-500">

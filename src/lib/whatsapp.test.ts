@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   buildAdminCancelWaLink,
   buildCoachInquiryWaLink,
-  buildCoachJoinWaLink,
   buildContactWaLink,
   buildOwnerInquiryWaLink,
 } from "./whatsapp";
@@ -43,13 +42,6 @@ describe("buildAdminCancelWaLink", () => {
 describe("buildOwnerInquiryWaLink", () => {
   it("points to the admin WhatsApp number", () => {
     const link = buildOwnerInquiryWaLink();
-    expect(link).toContain("https://wa.me/6282117173124");
-  });
-});
-
-describe("buildCoachJoinWaLink", () => {
-  it("points to the admin WhatsApp number", () => {
-    const link = buildCoachJoinWaLink();
     expect(link).toContain("https://wa.me/6282117173124");
   });
 });

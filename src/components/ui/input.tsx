@@ -1,6 +1,11 @@
 import { cn } from "@/lib/cn";
 import { cloneElement, isValidElement, useId } from "react";
-import type { InputHTMLAttributes, LabelHTMLAttributes, SelectHTMLAttributes } from "react";
+import type {
+  InputHTMLAttributes,
+  LabelHTMLAttributes,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+} from "react";
 
 export function Label({ className, ...props }: LabelHTMLAttributes<HTMLLabelElement>) {
   return (
@@ -16,6 +21,20 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
     <input
       className={cn(
         "w-full min-h-[44px] rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle",
+        "focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20",
+        "disabled:bg-surface-muted disabled:text-text-subtle",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <textarea
+      className={cn(
+        "w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-subtle",
         "focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20",
         "disabled:bg-surface-muted disabled:text-text-subtle",
         className

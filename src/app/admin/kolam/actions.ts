@@ -6,6 +6,35 @@ import { revalidatePath } from "next/cache";
 
 export type ActionState = { error?: string } | null;
 
+export async function affiliateCoach(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireRole("ADMIN");
+
+  const poolId = formData.get("poolId") as string;
+  const coachId = formData.get("coachId") as string;
+  if (!poolId || !coachId) {
+    return { error: "Pilih coach dulu." };
+  }
+
+  await prisma.poolAffiliation.upsert({
+    where: { poolId_coachId: { poolId, coachId } },
+    update: {},
+    create: { poolId, coachId },
+  });
+
+  revalidatePath("/admin/kolam");
+  return null;
+}
+
+export async function removeAffiliation(formData: FormData) {
+  await requireRole("ADMIN");
+  const affiliationId = formData.get("affiliationId") as string;
+  await prisma.poolAffiliation.delete({ where: { id: affiliationId } }).catch(() => {});
+  revalidatePath("/admin/kolam");
+}
+
 export async function updatePoolShares(
   _prevState: ActionState,
   formData: FormData

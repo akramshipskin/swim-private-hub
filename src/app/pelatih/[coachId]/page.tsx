@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { buildCoachInquiryWaLink } from "@/lib/whatsapp";
 import { Card, CardBody } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 // Coach shortcut page (pool-first browse + cheap cross-pool discovery,
 // locked /plan-eng-review 2026-09-12, cross-model tension #4): pool-first
@@ -27,7 +28,9 @@ export default async function CoachShortcutPage({
       id: true,
       name: true,
       phone: true,
-      coachProfile: { select: { bio: true } },
+      coachProfile: {
+        select: { bio: true, specialties: true, hasCertification: true, certificationNote: true },
+      },
       poolAffiliations: {
         select: { pool: { select: { id: true, name: true, address: true } } },
         orderBy: { pool: { name: "asc" } },
@@ -39,9 +42,29 @@ export default async function CoachShortcutPage({
 
   return (
     <main className="mx-auto max-w-lg px-4 py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
+        {coach.coachProfile?.hasCertification && (
+          <Badge tone="accent">
+            Bersertifikat{coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
+          </Badge>
+        )}
+      </div>
       {coach.coachProfile?.bio && (
         <p className="mt-2 text-sm text-text-muted">{coach.coachProfile.bio}</p>
+      )}
+
+      {coach.coachProfile && coach.coachProfile.specialties.length > 0 && (
+        <>
+          <h2 className="mt-6 text-sm font-semibold text-text-muted">Keahlian</h2>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {coach.coachProfile.specialties.map((s) => (
+              <Badge key={s} tone="brand">
+                {s}
+              </Badge>
+            ))}
+          </div>
+        </>
       )}
 
       <h2 className="mt-6 text-sm font-semibold text-text-muted">Ngajar di kolam</h2>

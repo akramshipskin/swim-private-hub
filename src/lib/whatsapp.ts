@@ -53,9 +53,3 @@ export function buildOwnerInquiryWaLink() {
     "Halo, saya punya kolam renang dan tertarik gabung jadi mitra Swim Private Hub. Boleh minta info lebih lanjut?";
   return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
-
-export function buildCoachJoinWaLink() {
-  const message =
-    "Halo, saya coach renang dan tertarik gabung ngajar lewat Swim Private Hub. Boleh minta info lebih lanjut?";
-  return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-}

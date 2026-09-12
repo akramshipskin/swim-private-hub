@@ -33,11 +33,10 @@ export default async function MemberBookingPage() {
         dependentName: child.name,
         packageId: pkg.id,
         packageName: pkg.name,
-        // Pool-first browse (locked /plan-eng-review 2026-09-12): paket
-        // sekarang pin ke 1 kolam, jadi kolamnya otomatis "kepilih" pas
-        // ortu pilih anak/paket ini -- gak perlu dropdown kolam terpisah.
-        poolId: pkg.poolId,
-        poolName: pkg.pool.name,
+        // Cuma info "dibeli dari kolam mana" -- BUKAN batasan kolam
+        // booking lagi (revisi 2026-09-12, paket lintas-kolam). Kolam
+        // booking dipilih terpisah lewat dropdown Kolam di bawah.
+        purchasedFromPoolName: pkg.pool.name,
         sisaSesi: pkg.sisaSesi,
         jatahCancel: pkg.jatahCancel,
         cancelRemaining: Math.max(0, pkg.jatahCancel - cancelUsed),
@@ -45,6 +44,12 @@ export default async function MemberBookingPage() {
     })
   );
   const childOptions = packagesByChild.filter((c) => c !== null);
+
+  const pools = await prisma.pool.findMany({
+    where: { isActive: true },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
@@ -113,7 +118,7 @@ export default async function MemberBookingPage() {
         </p>
       </div>
 
-      <BookingBoard childOptions={childOptions} />
+      <BookingBoard childOptions={childOptions} pools={pools} />
     </main>
   );
 }
