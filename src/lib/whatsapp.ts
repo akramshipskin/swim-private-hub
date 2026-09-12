@@ -8,7 +8,7 @@ function normalizePhoneForWa(phone: string): string {
 
 export function buildContactWaLink(phone: string, name: string) {
   const number = normalizePhoneForWa(phone);
-  const message = `Halo ${name}, ini dari Admin Les Renang Cianjur.`;
+  const message = `Halo ${name}, ini dari Admin Swim Private Hub.`;
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
@@ -37,7 +37,7 @@ export function buildAdminCancelWaLink({
   timeRange: string;
 }) {
   const forLine = childName ? `\nBuat: ${childName}` : "";
-  const message = `Halo Admin Les Renang Cianjur, saya mau minta bantuan batalkan booking:
+  const message = `Halo Admin Swim Private Hub, saya mau minta bantuan batalkan booking:
 
 Nama: ${memberName}${forLine}
 Coach: ${coachName}
@@ -50,6 +50,12 @@ Jatah pembatalan mandiri saya udah habis / di luar waktu yang diizinkan. Mohon d
 
 export function buildOwnerInquiryWaLink() {
   const message =
-    "Halo, saya tertarik pake sistem Les Renang Cianjur buat kelola tempat les renang saya. Boleh minta info lebih lanjut?";
+    "Halo, saya punya kolam renang dan tertarik gabung jadi mitra Swim Private Hub. Boleh minta info lebih lanjut?";
+  return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+export function buildCoachJoinWaLink() {
+  const message =
+    "Halo, saya coach renang dan tertarik gabung ngajar lewat Swim Private Hub. Boleh minta info lebih lanjut?";
   return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }

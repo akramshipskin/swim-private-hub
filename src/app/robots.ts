@@ -17,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         "/ganti-password",
       ],
     },
-    sitemap: "https://les-renang-cianjur.vercel.app/sitemap.xml",
+    sitemap: "https://swim-private-hub.vercel.app/sitemap.xml",
   };
 }

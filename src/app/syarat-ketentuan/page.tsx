@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
 
 export const metadata: Metadata = {
-  title: "Syarat & Ketentuan | Les Renang Cianjur",
-  description: "Ketentuan penggunaan aplikasi pemesanan dan manajemen les renang Les Renang Cianjur.",
+  title: "Syarat & Ketentuan | Swim Private Hub",
+  description: "Ketentuan penggunaan aplikasi pemesanan dan manajemen les renang Swim Private Hub.",
 };
 
 export default function SyaratKetentuanPage() {
@@ -11,7 +11,7 @@ export default function SyaratKetentuanPage() {
     <LegalPageLayout title="Syarat & Ketentuan" updatedAt="10 September 2026">
       <p>
         Dengan mendaftar dan menggunakan aplikasi pemesanan dan manajemen les
-        renang Les Renang Cianjur ("Aplikasi"), Pengguna menyatakan setuju
+        renang Swim Private Hub ("Aplikasi"), Pengguna menyatakan setuju
         terhadap Syarat &amp; Ketentuan berikut ini.
       </p>
 

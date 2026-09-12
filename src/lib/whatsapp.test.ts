@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { buildAdminCancelWaLink, buildContactWaLink, buildOwnerInquiryWaLink } from "./whatsapp";
+import {
+  buildAdminCancelWaLink,
+  buildCoachInquiryWaLink,
+  buildCoachJoinWaLink,
+  buildContactWaLink,
+  buildOwnerInquiryWaLink,
+} from "./whatsapp";
 
 describe("buildContactWaLink", () => {
   it("rewrites a leading 0 to the 62 country code", () => {
@@ -38,5 +44,25 @@ describe("buildOwnerInquiryWaLink", () => {
   it("points to the admin WhatsApp number", () => {
     const link = buildOwnerInquiryWaLink();
     expect(link).toContain("https://wa.me/6282117173124");
+  });
+});
+
+describe("buildCoachJoinWaLink", () => {
+  it("points to the admin WhatsApp number", () => {
+    const link = buildCoachJoinWaLink();
+    expect(link).toContain("https://wa.me/6282117173124");
+  });
+});
+
+describe("buildCoachInquiryWaLink", () => {
+  it("rewrites a leading 0 to the 62 country code", () => {
+    const link = buildCoachInquiryWaLink("081234567890", "Ayu");
+    expect(link).toContain("https://wa.me/6281234567890");
+  });
+
+  it("includes the coach's name in the message", () => {
+    const link = buildCoachInquiryWaLink("6281234567890", "Ayu");
+    const message = decodeURIComponent(link.split("?text=")[1]);
+    expect(message).toContain("Coach Ayu");
   });
 });

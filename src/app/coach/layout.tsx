@@ -5,7 +5,7 @@ import { PullToRefresh } from "@/components/pull-to-refresh";
 import { roleNavLinks } from "@/lib/nav-links";
 
 export const metadata: Metadata = {
-  title: "Coach | Les Renang Cianjur",
+  title: "Coach | Swim Private Hub",
   robots: { index: false, follow: false },
 };
 
@@ -19,7 +19,7 @@ export default async function CoachLayout({
   return (
     <div className="min-h-screen">
       <NavBar
-        brand="Les Renang Cianjur"
+        brand="Swim Private Hub"
         userName={session.user.name ?? ""}
         userRole="Coach"
         links={roleNavLinks.COACH}

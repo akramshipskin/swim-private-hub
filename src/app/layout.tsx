@@ -17,12 +17,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://les-renang-cianjur.vercel.app"),
-  title: "Les Renang Cianjur",
+  metadataBase: new URL("https://swim-private-hub.vercel.app"),
+  title: "Swim Private Hub",
   description: "Booking jadwal renang dengan coach favoritmu.",
   manifest: "/manifest.json",
   openGraph: {
-    siteName: "Les Renang Cianjur",
+    siteName: "Swim Private Hub",
     locale: "id_ID",
     type: "website",
   },

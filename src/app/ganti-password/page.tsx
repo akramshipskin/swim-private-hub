@@ -6,7 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import ChangePasswordForm from "./change-password-form";
 
 export const metadata: Metadata = {
-  title: "Ganti Password | Les Renang Cianjur",
+  title: "Ganti Password | Swim Private Hub",
   robots: { index: false, follow: false },
 };
 
@@ -33,13 +33,13 @@ export default async function GantiPasswordPage() {
       <div className="mb-6 flex flex-col items-center text-center">
         <Image
           src="/logo.png"
-          alt="Les Renang Cianjur"
+          alt="Swim Private Hub"
           width={56}
           height={56}
           className="mb-3 h-14 w-14 rounded-2xl object-contain shadow-lg shadow-brand-500/20"
           priority
         />
-        <p className="text-lg font-semibold text-text">Les Renang Cianjur</p>
+        <p className="text-lg font-semibold text-text">Swim Private Hub</p>
         <p className="text-sm text-text-muted">
           Ini login pertama kamu -- ganti password bawaan dulu ya.
         </p>

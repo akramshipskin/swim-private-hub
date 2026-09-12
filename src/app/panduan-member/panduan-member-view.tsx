@@ -104,7 +104,7 @@ export default function PanduanMemberView() {
       <div className="flex flex-col items-start gap-3">
         <Image
           src="/logo.png"
-          alt="Les Renang Cianjur"
+          alt="Swim Private Hub"
           width={44}
           height={44}
           className="h-11 w-11 rounded-2xl object-contain shadow-sm"
@@ -128,7 +128,7 @@ export default function PanduanMemberView() {
       <Step n={1} title="Buka aplikasi pertama kali" desc="Belum login sama sekali.">
         <div className="flex flex-col items-center gap-2 py-3 text-center">
           <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-xl object-contain" />
-          <p className="text-sm font-semibold text-text">Les Renang Cianjur</p>
+          <p className="text-sm font-semibold text-text">Swim Private Hub</p>
           <p className="max-w-[220px] text-xs text-text-muted">
             Booking jadwal renang dengan coach favoritmu, kapan aja lewat HP.
           </p>
@@ -395,7 +395,7 @@ export default function PanduanMemberView() {
       </Step>
 
       <footer className="mt-14 border-t border-border pt-6 text-xs text-text-subtle">
-        Les Renang Cianjur &mdash; dokumentasi internal. Copy &amp; urutan tiap step diverifikasi dari kode
+        Swim Private Hub &mdash; dokumentasi internal. Copy &amp; urutan tiap step diverifikasi dari kode
         aplikasi &amp; akun demo aktif per 25 Agustus 2026, bukan mockup karangan.
       </footer>
     </main>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
 
 export const metadata: Metadata = {
-  title: "Kebijakan Pengembalian | Les Renang Cianjur",
+  title: "Kebijakan Pengembalian | Swim Private Hub",
   description: "Ketentuan kapan pembayaran paket les bisa dan tidak bisa dikembalikan (refund).",
 };
 

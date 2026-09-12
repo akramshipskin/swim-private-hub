@@ -25,12 +25,12 @@ export function LegalPageLayout({
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.png"
-              alt="Les Renang Cianjur"
+              alt="Swim Private Hub"
               width={32}
               height={32}
               className="h-8 w-8 rounded-lg object-contain"
             />
-            <span className="text-sm font-semibold text-text">Les Renang Cianjur</span>
+            <span className="text-sm font-semibold text-text">Swim Private Hub</span>
           </Link>
           <Link href="/" className="text-sm font-medium text-brand-600 hover:underline">
             ← Beranda

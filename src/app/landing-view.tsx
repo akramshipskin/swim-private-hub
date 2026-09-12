@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
+import { buildCoachJoinWaLink, buildOwnerInquiryWaLink } from "@/lib/whatsapp";
 
 // Icon garis 24x24 stroke 1.8, dicopy persis dari ICON set di
 // src/app/panduan/panduan-view.tsx (dikonversi ke JSX) biar bentuknya
@@ -142,11 +142,6 @@ const ICONS = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
     </IconWrap>
   ),
-  quote: (
-    <IconWrap>
-      <path d="M9.5 8c-2.5 0-4.5 2-4.5 4.5S7 17 9.5 17c.3 0 .5-.2.5-.5v-1c0-.3-.2-.5-.5-.5-1.4 0-2.5-1.1-2.5-2.5S8.1 10 9.5 10c.3 0 .5-.2.5-.5v-1c0-.3-.2-.5-.5-.5Zm9 0c-2.5 0-4.5 2-4.5 4.5S16 17 18.5 17c.3 0 .5-.2.5-.5v-1c0-.3-.2-.5-.5-.5-1.4 0-2.5-1.1-2.5-2.5S17.1 10 18.5 10c.3 0 .5-.2.5-.5v-1c0-.3-.2-.5-.5-.5Z" />
-    </IconWrap>
-  ),
 };
 
 type IconName = keyof typeof ICONS;
@@ -183,34 +178,34 @@ function BrowserFrame({
 
 const OWNER_FEATURES: { icon: IconName; tone: keyof typeof roleToneClasses; title: string; desc: string }[] = [
   {
-    icon: "family",
-    tone: "brand",
-    title: "1 akun, banyak anak",
-    desc: "Orang tua daftar sekali, tambah beberapa anak sekaligus. Sisa sesi kehitung per anak, gak ketuker.",
+    icon: "swimmer",
+    tone: "coach",
+    title: "Coach bisa ngajar lintas kolam",
+    desc: "Coach gak keiket 1 tempat — bisa terafiliasi ke beberapa kolam mitra sekaligus, buka jadwal beda-beda di tiap kolam.",
   },
   {
     icon: "lock",
     tone: "accent",
-    title: "Slot terkunci otomatis",
-    desc: "Begitu 1 member ambil jam tertentu, slot langsung kekunci buat member lain. Gak ada lagi jadwal bentrok.",
+    title: "Slot terkunci otomatis, gak bisa dobel",
+    desc: "1 coach cuma bisa punya 1 slot terbuka per jam di SELURUH kolam — sistem yang jaga, bukan diinget-inget manual.",
+  },
+  {
+    icon: "family",
+    tone: "brand",
+    title: "Pilih kolam, baru pilih coach",
+    desc: "Orang tua booking dari kolam paketnya sendiri. Kenal coach yang lagi ngajar di kolam lain? Ada halaman kontak langsungnya.",
   },
   {
     icon: "creditCard",
     tone: "admin",
-    title: "Pembayaran online, paket auto-aktif",
-    desc: "Member bayar lewat halaman pembayaran resmi, paket langsung aktif otomatis begitu bayar berhasil — gak perlu konfirmasi manual.",
+    title: "Pembayaran online per kolam",
+    desc: "Checkout langsung ke akun Midtrans kolam yang bersangkutan — transparan, bukan lewat rekening pihak lain.",
   },
   {
     icon: "barChart",
     tone: "coach",
-    title: "Honor coach kehitung otomatis",
-    desc: "Cuma sesi yang ditandain 'Hadir' yang kehitung valid. Tinggal buka laporan Kinerja Coach per rentang tanggal, gak perlu rekap manual.",
-  },
-  {
-    icon: "inboxDownload",
-    tone: "brand",
-    title: "Import data lama sekali klik",
-    desc: "Migrasi dari catatan Excel/chat WhatsApp bisa lewat template import — sistem yang bikinin akun dan paketnya sekaligus.",
+    title: "Laporan komisi otomatis",
+    desc: "Tiap kolam dapet rincian omzet & komisi yang jelas, bukan hitung-hitungan manual di akhir bulan.",
   },
   {
     icon: "bell",
@@ -225,8 +220,8 @@ const TRUST_PILLS = [{ label: "Web-based" }, { label: "Real-time" }, { label: "N
 const PAIN_POINTS = [
   "Sisa sesi dihitung manual dari scroll chat WhatsApp berhari-hari ke belakang.",
   "Dua orang tua booking jam yang sama ke coach yang sama — ketauannya pas udah di lokasi.",
-  "Lupa siapa yang udah bayar, siapa yang belum, jadi harus nagih satu-satu.",
-  "Rekap honor coach di akhir bulan makan waktu berjam-jam, ngitung manual dari catatan kehadiran.",
+  "Coach bagus cuma bisa diakses lewat 1 kolam — mau ikut kemana coach-nya pindah, susah dilacak.",
+  "Kolam yang lagi butuh coach tambahan gak tau harus cari kemana selain nunggu rekomendasi orang.",
   "Data pelanggan lama nyebar di Excel, chat, dan buku catatan — gak ada satu sumber yang bisa dipercaya.",
   "Member nanya jadwal kosong, admin harus cek manual satu-satu ke tiap coach.",
 ];
@@ -245,24 +240,25 @@ const FAQ_ITEMS = [
     a: "Gak perlu. Ini web-based, tinggal buka lewat browser HP atau komputer. Bisa juga \"dipasang\" ke layar utama HP biar kebuka kayak aplikasi biasa, tanpa lewat Play Store/App Store.",
   },
   {
-    q: "Data pelanggan lama saya (Excel/chat) bisa dipindahin?",
-    a: "Bisa, lewat template import — isi nama, kontak, paket, dan sisa sesi, sistem yang bikinin akun dan paketnya sekaligus. Gak perlu input satu-satu manual.",
+    q: "Kolam saya udah punya harga paket sendiri, bisa tetap pakai?",
+    a: "Bisa. Tiap kolam mitra atur katalog paket & harganya sendiri-sendiri — platform gak maksa 1 harga sama rata buat semua kolam.",
   },
   {
     q: "Gimana kalau member mau batalin booking mendadak?",
     a: "Ada jatah pembatalan mandiri per paket (bisa diatur), dengan syarat minimal beberapa jam sebelum jadwal. Kalau di luar itu atau jatah udah abis, member tetap bisa minta bantuan admin langsung lewat WhatsApp yang pesannya udah keisi otomatis.",
   },
   {
-    q: "Pembayarannya lewat mana?",
-    a: "Terintegrasi payment gateway resmi — mendukung transfer virtual account bank, QRIS, e-wallet (GoPay, OVO, Dana, ShopeePay), dan kartu kredit/debit.",
+    q: "Pembayarannya lewat mana, uangnya ke siapa?",
+    a: "Lewat payment gateway resmi (virtual account bank, QRIS, e-wallet, kartu), tapi duitnya langsung masuk ke akun kolam yang bersangkutan — platform gak pernah pegang atau nahan dana member.",
   },
   {
-    q: "Berapa lama proses setup-nya?",
-    a: "Gak butuh training panjang — alurnya udah familiar kayak booking online pada umumnya. Hubungi kami buat bahas kebutuhan spesifik tempat les Anda (jumlah coach, jenis paket, dll).",
+    q: "Coach bisa ngajar di lebih dari 1 kolam?",
+    a: "Bisa, itu justru inti dari platform ini — coach terafiliasi ke berapa pun kolam mitra, buka jadwal masing-masing sesuai kolamnya, tanpa bisa kebentrok jam.",
   },
 ];
 
 const OWNER_WA_LINK = buildOwnerInquiryWaLink();
+const COACH_WA_LINK = buildCoachJoinWaLink();
 
 export default function LandingView() {
   return (
@@ -275,13 +271,13 @@ export default function LandingView() {
           <div className="flex items-center gap-2.5">
             <Image
               src="/logo.png"
-              alt="Les Renang Cianjur"
+              alt="Swim Private Hub"
               width={32}
               height={32}
               className="h-8 w-8 rounded-lg object-contain"
               priority
             />
-            <span className="font-semibold tracking-tight text-text">Les Renang Cianjur</span>
+            <span className="font-semibold tracking-tight text-text">Swim Private Hub</span>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/login">
@@ -297,28 +293,31 @@ export default function LandingView() {
           </div>
         </header>
 
-        {/* Pitch utama ke pemilik kolam/tempat les (audiens B2B), bukan ke
-            orang tua -- fork "Anda yang mana?" ada di bawah. */}
+        {/* Pitch utama: platform yang nyambungin kolam, coach lintas kolam,
+            dan orang tua -- fork 3 jalur ("Anda yang mana?") ada di bawah. */}
         <section className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 pb-10 pt-8 text-center sm:pt-14">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-text-muted shadow-sm">
-            Sistem booking &amp; manajemen les renang
+            Marketplace les renang privat
           </span>
           <h1 className="mt-5 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
-            Kelola les renang tanpa <span className="text-brand-600">bolak-balik chat WhatsApp</span>
+            Coach mana aja, kolam mana aja — <span className="text-brand-600">1 platform buat semua</span>
           </h1>
           <p className="mt-4 max-w-xl text-base text-text-muted sm:text-lg">
-            Jadwal bentrok, sisa sesi dihitung manual dari chat, lupa siapa yang udah bayar — sistem ini beresin
-            semuanya. Member booking sendiri, coach kelola jadwal sendiri, Anda tinggal pantau dari satu dashboard.
+            Coach gak keiket 1 tempat, bisa ngajar di beberapa kolam mitra. Orang tua booking langsung dari kolam
+            paketnya. Kolam dapet booking &amp; laporan komisi otomatis, tanpa ngurus tech sendiri.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
               <Button>
                 <Icon name="chat" className="h-4 w-4" />
-                Punya Kolam Renang? Hubungi Kami
+                Punya Kolam? Gabung Jaringan
               </Button>
             </a>
-            <a href="/panduan">
-              <Button variant="secondary">Lihat Demo &amp; Fitur Lengkap</Button>
+            <a href={COACH_WA_LINK} target="_blank" rel="noopener noreferrer">
+              <Button variant="secondary">
+                <Icon name="swimmer" className="h-4 w-4" />
+                Coach Renang? Daftar di Sini
+              </Button>
             </a>
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
@@ -409,7 +408,7 @@ export default function LandingView() {
                 perlu admin turun tangan misahin.
               </p>
             </div>
-            <BrowserFrame title="lesrenangcianjur.vercel.app/member/booking">
+            <BrowserFrame title="/member/booking">
               <div className="mb-3 flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-[11px] font-bold text-brand-700">
                   CA
@@ -446,7 +445,7 @@ export default function LandingView() {
                 langsung berubah — sisa sesi siap dipakai booking hari itu juga.
               </p>
             </div>
-            <BrowserFrame title="lesrenangcianjur.vercel.app/member/paket" className="sm:order-1">
+            <BrowserFrame title="/member/paket" className="sm:order-1">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-subtle">Paket Saya</p>
               <div className="flex items-center justify-between rounded-xl border border-border p-3">
                 <div>
@@ -467,7 +466,7 @@ export default function LandingView() {
                 buka laporan Kinerja Coach per rentang tanggal, gak perlu rekap manual dari catatan.
               </p>
             </div>
-            <BrowserFrame title="lesrenangcianjur.vercel.app/coach/riwayat">
+            <BrowserFrame title="/coach/riwayat">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-subtle">Riwayat Sesi</p>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between rounded-xl border border-border p-3">
@@ -477,6 +476,29 @@ export default function LandingView() {
                 <div className="flex items-center justify-between rounded-xl border border-border p-3">
                   <p className="text-sm text-text">Rina · 09.00–10.00</p>
                   <Badge tone="neutral">Belum ditandai</Badge>
+                </div>
+              </div>
+            </BrowserFrame>
+          </div>
+
+          <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
+            <div className="sm:order-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600">Step 04</span>
+              <h3 className="mt-1 text-lg font-semibold text-text">Coach yang sama, kolam beda-beda</h3>
+              <p className="mt-1.5 text-sm text-text-muted">
+                Kenal 1 coach dari kolam langganan, tapi dia lagi ngajar di kolam lain? Tinggal buka halaman
+                coach-nya, langsung keliatan kolam mana aja yang dia terafiliasi, plus kontak WA langsung.
+              </p>
+            </div>
+            <BrowserFrame title="/pelatih/coach-ayu" className="sm:order-1">
+              <p className="mb-2 text-lg font-semibold text-text">Coach Ayu</p>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-text-subtle">Ngajar di kolam</p>
+              <div className="flex flex-col gap-2">
+                <div className="rounded-xl border border-border p-3">
+                  <p className="text-sm font-medium text-text">Kolam Renang Melati</p>
+                </div>
+                <div className="rounded-xl border border-border p-3">
+                  <p className="text-sm font-medium text-text">Kolam Renang Tirta Asri</p>
                 </div>
               </div>
             </BrowserFrame>
@@ -513,9 +535,9 @@ export default function LandingView() {
               </div>
               <h3 className="text-sm font-semibold text-text">Coach</h3>
               <ul className="mt-2 flex flex-col gap-1.5 text-sm text-text-muted">
-                <li>Buka slot jadwal sendiri</li>
+                <li>Terafiliasi ke beberapa kolam sekaligus</li>
+                <li>Buka slot jadwal per kolam</li>
                 <li>Tandai kehadiran member</li>
-                <li>Pantau jadwal coach lain</li>
               </ul>
             </CardBody>
           </Card>
@@ -535,19 +557,6 @@ export default function LandingView() {
         </div>
       </section>
 
-
-      {/* Testimoni -- quote sama persis kayak yang udah ada & disetujui di
-          halaman /panduan, bukan testimoni baru yang dikarang. */}
-      <section className="mx-auto w-full max-w-3xl px-4 py-6">
-        <div className="flex gap-4 rounded-2xl bg-brand-50 p-6 sm:p-8">
-          <Icon name="quote" className="h-8 w-8 shrink-0 text-brand-600" />
-          <p className="text-sm font-medium text-brand-700 sm:text-base">
-            Sebelumnya: itung sisa sesi manual dari chat WA, sering ketuker antar anak, admin harus konfirmasi
-            jadwal satu-satu. Sekarang: member booking sendiri, sisa sesi dan jatah pembatalan kehitung otomatis
-            per anak, admin tinggal pantau.
-          </p>
-        </div>
-      </section>
 
       {/* FAQ -- native <details>/<summary>, zero JS/dependency. */}
       <section className="mx-auto w-full max-w-3xl px-4 py-10">
@@ -570,15 +579,16 @@ export default function LandingView() {
         </div>
       </section>
 
-      {/* Pilih jalur -- fork eksplisit 2 audiens (pemilik vs orang tua),
-          gantiin section "buat orang tua" yang tadinya sendirian & keliatan
-          nyempil -- sekarang dua-duanya dikasih bobot yang sama. */}
-      <section className="mx-auto w-full max-w-4xl px-4 py-10">
+      {/* Pilih jalur -- fork eksplisit 3 audiens (kolam, coach, orang tua),
+          bukan 2 kayak versi single-pool sebelumnya -- marketplace ini
+          punya 3 sisi, jadi 3 kartu bobot yang sama, bukan salah satu
+          dianggap sampingan. */}
+      <section className="mx-auto w-full max-w-5xl px-4 py-10">
         <div className="mb-8 text-center">
           <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Pilih jalur Anda</span>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-text sm:text-3xl">Anda yang mana?</h2>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card className="border-t-4 border-t-brand-500">
             <CardBody className="flex flex-col items-start gap-3 py-7">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-700">
@@ -586,11 +596,26 @@ export default function LandingView() {
               </div>
               <h3 className="text-lg font-semibold text-text">Punya kolam / tempat les</h3>
               <p className="text-sm text-text-muted">
-                Mau kelola booking, jadwal coach, dan pembayaran tanpa ribet WA &amp; Excel? Ngobrol dulu soal
-                kebutuhan tempat les Anda.
+                Gabung jadi kolam mitra — dapet booking dari jaringan coach yang lebih luas, laporan komisi
+                otomatis, tanpa ngurus tech sendiri.
               </p>
               <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
                 <Button>Hubungi Kami</Button>
+              </a>
+            </CardBody>
+          </Card>
+          <Card className="border-t-4 border-t-success-text">
+            <CardBody className="flex flex-col items-start gap-3 py-7">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success-bg text-success-text">
+                <Icon name="clipboardCheck" className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-semibold text-text">Coach renang</h3>
+              <p className="text-sm text-text-muted">
+                Ngajar di lebih dari 1 kolam mitra, atur jadwal sendiri per kolam, jangkauan murid lebih luas dari
+                1 tempat doang.
+              </p>
+              <a href={COACH_WA_LINK} target="_blank" rel="noopener noreferrer">
+                <Button variant="secondary">Gabung Jadi Coach</Button>
               </a>
             </CardBody>
           </Card>
@@ -601,7 +626,7 @@ export default function LandingView() {
               </div>
               <h3 className="text-lg font-semibold text-text">Anak mau les renang</h3>
               <p className="text-sm text-text-muted">
-                Daftar akun, pilih coach dan jam yang cocok, bayar online — paket langsung aktif. Bisa daftarin
+                Daftar akun, pilih kolam dan coach yang cocok, bayar online — paket langsung aktif. Bisa daftarin
                 lebih dari satu anak sekaligus.
               </p>
               <Link href="/register">
@@ -623,7 +648,7 @@ export default function LandingView() {
           <h2 className="text-xl font-semibold sm:text-2xl">Siap dipakai hari ini</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-white/85">
             Gak perlu training panjang — alurnya udah familiar kayak booking online pada umumnya. Coba dulu lewat
-            akun demo, atau langsung ngobrol soal kebutuhan tempat les Anda.
+            akun demo, atau langsung ngobrol soal gabung sebagai kolam mitra.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
@@ -643,7 +668,7 @@ export default function LandingView() {
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 text-xs text-text-subtle sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="font-medium text-text-muted">Les Renang Cianjur</p>
+            <p className="font-medium text-text-muted">Swim Private Hub</p>
             <p className="mt-1">[ALAMAT]</p>
             <p className="mt-1">
               WhatsApp{" "}
@@ -672,7 +697,7 @@ export default function LandingView() {
           </div>
         </div>
         <p className="mt-6 text-center text-xs text-text-subtle">
-          © 2026 Les Renang Cianjur — sistem booking &amp; manajemen les renang.
+          © 2026 Swim Private Hub — marketplace les renang privat.
         </p>
       </footer>
     </main>

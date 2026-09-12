@@ -10,7 +10,7 @@ import EditPasswordForm from "./edit-password-form";
 import ManageChildrenForm from "./manage-children-form";
 
 export const metadata: Metadata = {
-  title: "Profil | Les Renang Cianjur",
+  title: "Profil | Swim Private Hub",
   robots: { index: false, follow: false },
 };
 
@@ -37,7 +37,7 @@ export default async function ProfilPage() {
   return (
     <div className="min-h-screen">
       <NavBar
-        brand="Les Renang Cianjur"
+        brand="Swim Private Hub"
         userName={session.user.name ?? ""}
         userRole={roleLabel[session.user.role] ?? session.user.role}
         links={roleNavLinks[session.user.role]}

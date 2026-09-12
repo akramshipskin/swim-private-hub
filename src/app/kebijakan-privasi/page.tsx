@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
 
 export const metadata: Metadata = {
-  title: "Kebijakan Privasi | Les Renang Cianjur",
+  title: "Kebijakan Privasi | Swim Private Hub",
   description: "Data pribadi apa yang dikumpulkan, tujuan penggunaannya, dan hak Anda atas data tersebut.",
 };
 
@@ -11,7 +11,7 @@ export default function KebijakanPrivasiPage() {
     <LegalPageLayout title="Kebijakan Privasi" updatedAt="10 September 2026">
       <p>
         Kebijakan Privasi ini menjelaskan jenis data pribadi yang dikumpulkan oleh
-        Les Renang Cianjur ("kami") melalui aplikasi pemesanan dan manajemen les
+        Swim Private Hub ("kami") melalui aplikasi pemesanan dan manajemen les
         renang ("Aplikasi"), tujuan penggunaannya, serta hak Pengguna atas data
         tersebut. Kebijakan ini berlaku bagi seluruh Pengguna Aplikasi, yaitu
         orang tua/member, pelatih (coach), dan administrator.

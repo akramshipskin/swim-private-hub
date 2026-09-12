@@ -327,7 +327,7 @@ const PANDUAN_BODY = `
 <div class="app">
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="brand"><span class="brand-mark"><img src="/logo.png" alt="Logo Les Renang Cianjur"></span> Les Renang Cianjur</div>
+      <div class="brand"><span class="brand-mark"><img src="/logo.png" alt="Logo Swim Private Hub"></span> Swim Private Hub</div>
       <nav class="tabs" role="tablist">
         <button class="tab active" data-tab="presentasi">Presentasi</button>
         <button class="tab" data-tab="install">Cara Install ke HP</button>
@@ -349,7 +349,7 @@ const PANDUAN_BODY = `
         <h1>Satu aplikasi buat <span class="accent-word">booking</span>, <span class="accent-word">jadwal</span>, dan <span class="accent-word">paket</span> les renang</h1>
         <p class="lead">Gak ada lagi bolak-balik chat WhatsApp buat atur jadwal, itung sisa sesi manual, atau lupa siapa yang udah bayar. Member booking sendiri, coach kelola jadwal sendiri, admin pantau semuanya dari satu tempat.</p>
         <div class="btn-row" style="justify-content:center;margin-top:22px;">
-          <a class="btn btn-primary" href="https://wa.me/6282117173124?text=${encodeURIComponent("Halo, saya tertarik pake sistem Les Renang Cianjur buat kelola tempat les renang saya. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
+          <a class="btn btn-primary" href="https://wa.me/6282117173124?text=${encodeURIComponent("Halo, saya tertarik pake sistem Swim Private Hub buat kelola tempat les renang saya. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
           <a class="btn btn-secondary" href="/register">Daftar Sekarang</a>
         </div>
         <div class="hero-actions">
@@ -473,7 +473,7 @@ const PANDUAN_BODY = `
       <div class="table-wrap">
         <table class="mini-table">
           <tr><th>Nama</th><th>Role</th><th>Login (Email)</th><th>Password</th></tr>
-          <tr><td>Admin Cianjur</td><td>Admin</td><td>admin@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Admin Swim Private Hub</td><td>Admin</td><td>admin@example.com</td><td>TestDeploy2026!</td></tr>
           <tr><td>Coach Ayu</td><td>Coach</td><td>coach1@example.com</td><td>TestDeploy2026!</td></tr>
           <tr><td>Coach Zahra</td><td>Coach</td><td>coach2@example.com</td><td>TestDeploy2026!</td></tr>
           <tr><td>Coach Iwenk</td><td>Coach</td><td>coach3@example.com</td><td>TestDeploy2026!</td></tr>
@@ -489,7 +489,7 @@ const PANDUAN_BODY = `
         <p>Tinggal bagikan link login ke member dan coach — gak perlu training panjang, semua alurnya udah familiar kayak booking online pada umumnya.</p>
       </div>
 
-      <footer class="credit">Les Renang Cianjur &mdash; sistem booking &amp; manajemen les renang.</footer>
+      <footer class="credit">Swim Private Hub &mdash; sistem booking &amp; manajemen les renang.</footer>
     </section>
 
     <!-- ============ CARA INSTALL ============ -->
@@ -511,7 +511,7 @@ const PANDUAN_BODY = `
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
             <div class="step">
               <span class="sn" style="background:#1a7a43;">1</span>
-              <div class="st"><h4>Buka link Les Renang Cianjur di Chrome</h4></div>
+              <div class="st"><h4>Buka link Swim Private Hub di Chrome</h4></div>
             </div>
             <div class="step">
               <span class="sn" style="background:#1a7a43;">2</span>
@@ -542,7 +542,7 @@ const PANDUAN_BODY = `
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
             <div class="step">
               <span class="sn" style="background:#4285f4;">1</span>
-              <div class="st"><h4>Buka link Les Renang Cianjur di Chrome</h4></div>
+              <div class="st"><h4>Buka link Swim Private Hub di Chrome</h4></div>
             </div>
             <div class="step">
               <span class="sn" style="background:#4285f4;">2</span>
@@ -573,7 +573,7 @@ const PANDUAN_BODY = `
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
             <div class="step">
               <span class="sn" style="background:#1c1c1e;">1</span>
-              <div class="st"><h4>Buka link Les Renang Cianjur di Safari</h4></div>
+              <div class="st"><h4>Buka link Swim Private Hub di Safari</h4></div>
             </div>
             <div class="step">
               <span class="sn" style="background:#1c1c1e;">2</span>

@@ -1,7 +1,9 @@
-// Semua input jam dari coach/member diasumsikan WIB (Asia/Jakarta),
-// klien tunggal di Cianjur. Pakai offset eksplisit +07:00 biar hasil
-// instant-nya benar gak peduli timezone server tempat app di-deploy
-// (Vercel default UTC, bisa beda dari timezone lokal pas development).
+// Semua input jam dari coach/member diasumsikan WIB (Asia/Jakarta) --
+// semua kolam mitra Phase 1 ada di zona WIB. Pakai offset eksplisit
+// +07:00 biar hasil instant-nya benar gak peduli timezone server
+// tempat app di-deploy (Vercel default UTC, bisa beda dari timezone
+// lokal pas development). Kalau nanti ada kolam di zona lain
+// (WITA/WIT), field ini perlu jadi per-Pool, bukan konstanta global.
 
 export function wibDateTime(dateStr: string, timeStr: string): Date {
   return new Date(`${dateStr}T${timeStr}:00+07:00`);
