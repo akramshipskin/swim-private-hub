@@ -13,57 +13,57 @@ const PANDUAN_CSS = `
      kira-kira mirip) sama --color-* di globals.css, biar /panduan gak
      keliatan kayak produk beda pas dibuka dari link "Lihat Demo" di
      landing page. Role->warna juga disamain sama 3 kartu peran di
-     landing (member=brand teal, coach=success hijau, admin=accent
-     oranye) -- sebelumnya /panduan pake biru/ungu sendiri buat itu. */
+     landing (member=brand indigo, coach=success hijau, admin=accent
+     rose) -- ganti bareng pas rebrand jadi Swim Private Hub. */
   :root {
-    --bg: #f4faf9;
+    --bg: #f7f7fd;
     --surface: #ffffff;
-    --surface-muted: #f0f9f8;
-    --border: #dceae8;
-    --text: #0f172a;
-    --text-muted: #475569;
-    --text-subtle: #64748b;
-    --brand: #077a94;
-    --brand-dark: #0e7490;
-    --brand-light: #cffafe;
-    --accent: #f97316;
-    --accent-light: #fff7ed;
-    --member: #077a94;
-    --member-bg: #ecfeff;
+    --surface-muted: #f3f2fb;
+    --border: #e3e1f5;
+    --text: #1e1b2e;
+    --text-muted: #56526b;
+    --text-subtle: #77738c;
+    --brand: #4f46e5;
+    --brand-dark: #4338ca;
+    --brand-light: #e0e7ff;
+    --accent: #e11d48;
+    --accent-light: #fff1f2;
+    --member: #4f46e5;
+    --member-bg: #eef2ff;
     --coach: #047857;
     --coach-bg: #ecfdf5;
-    --admin: #f97316;
-    --admin-bg: #fff7ed;
+    --admin: #e11d48;
+    --admin-bg: #fff1f2;
     --success: #047857;
     --success-bg: #ecfdf5;
     --warn: #b45309;
     --warn-bg: #fffbeb;
-    --shadow: 0 1px 2px rgba(16,36,42,0.04), 0 8px 24px -12px rgba(16,36,42,0.18);
+    --shadow: 0 1px 2px rgba(30,27,46,0.04), 0 8px 24px -12px rgba(30,27,46,0.18);
     --radius: 16px;
-    --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-    --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+    --font-body: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0b1418;
-      --surface: #101c22;
-      --surface-muted: #16242b;
-      --border: #23343b;
-      --text: #e6f1ef;
-      --text-muted: #9fb4b0;
-      --text-subtle: #74898a;
-      --brand: #077a94;
-      --brand-dark: #67e8f9;
-      --brand-light: #123840;
-      --accent: #fdba74;
-      --accent-light: #3d200c;
-      --member: #077a94;
-      --member-bg: #0e2b30;
+      --bg: #100e21;
+      --surface: #16142b;
+      --surface-muted: #1c1a35;
+      --border: #2e2b52;
+      --text: #ece9fb;
+      --text-muted: #a8a3c9;
+      --text-subtle: #78749e;
+      --brand: #818cf8;
+      --brand-dark: #a5b4fc;
+      --brand-light: #2a2555;
+      --accent: #fb7185;
+      --accent-light: #881337;
+      --member: #818cf8;
+      --member-bg: #1e1b3a;
       --coach: #34d399;
       --coach-bg: #0d2e22;
-      --admin: #fdba74;
-      --admin-bg: #2b1608;
+      --admin: #fb7185;
+      --admin-bg: #4c0519;
       --success: #34d399;
       --success-bg: #0d2e22;
       --warn: #fbbf24;
@@ -72,24 +72,24 @@ const PANDUAN_CSS = `
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0b1418;
-    --surface: #101c22;
-    --surface-muted: #16242b;
-    --border: #23343b;
-    --text: #e6f1ef;
-    --text-muted: #9fb4b0;
-    --text-subtle: #74898a;
-    --brand: #077a94;
-    --brand-dark: #67e8f9;
-    --brand-light: #123840;
-    --accent: #fdba74;
-    --accent-light: #3d200c;
-    --member: #077a94;
-    --member-bg: #0e2b30;
+    --bg: #100e21;
+    --surface: #16142b;
+    --surface-muted: #1c1a35;
+    --border: #2e2b52;
+    --text: #ece9fb;
+    --text-muted: #a8a3c9;
+    --text-subtle: #78749e;
+    --brand: #818cf8;
+    --brand-dark: #a5b4fc;
+    --brand-light: #2a2555;
+    --accent: #fb7185;
+    --accent-light: #881337;
+    --member: #818cf8;
+    --member-bg: #1e1b3a;
     --coach: #34d399;
     --coach-bg: #0d2e22;
-    --admin: #fdba74;
-    --admin-bg: #2b1608;
+    --admin: #fb7185;
+    --admin-bg: #4c0519;
     --success: #34d399;
     --success-bg: #0d2e22;
     --warn: #fbbf24;

@@ -30,27 +30,6 @@ bener.
 buat swim-private-hub (belum dilakukan -- lihat README, "New Supabase project
 required").
 
-## Button component: hover state pakai `brand-700` sebagai background, bukan teks
-
-**What:** `src/components/ui/button.tsx` variant `primary` pakai
-`hover:bg-brand-700`. Root cause sama kayak bug CTA band di landing page
-yang udah difix (`bb07074`): `--color-brand-700` didefinisikan beda antara
-light mode (`#0e7490`, teal gelap -- aman dipakai background) dan dark mode
-(`#67e8f9`, cyan terang -- dimaksudkan cuma buat teks/foreground di atas
-permukaan gelap). Dipakai sebagai `hover:bg-*` di sini artinya pas dark mode,
-hover state tombol primary bisa nyala terang gak semestinya (persis gejala
-yang di CTA band sebelum difix).
-
-**Why belum difix:** Ketemu pas `/design-review` (audit landing page), tapi
-di luar scope waktu itu (fokusnya landing page doang) -- di-flag lewat
-`spawn_task`, bukan langsung diubah biar gak ngerembet ke shared component
-yang dipake di semua halaman tanpa QA visual penuh.
-
-**Fix yang disaranin:** Ganti `hover:bg-brand-700` ke hex literal yang
-sengaja sama di kedua tema (pola yang sama dipake buat fix CTA band), atau
-tambah token terpisah khusus buat "background yang gak boleh invert ikut
-tema" biar gak kejadian lagi di komponen lain.
-
 ## Tahap 2 — Visibilitas nama anak per role (deferred dari fitur multi-anak)
 
 **What:** Tampilan nama anak (bukan nama ortu) di halaman-halaman berikut:

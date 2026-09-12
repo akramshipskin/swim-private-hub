@@ -1,29 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4faf9;
-  --foreground: #0f172a;
+  --background: #f7f7fd;
+  --foreground: #1e1b2e;
 
-  /* Biru-teal kayak air kolam -- warna utama, tombol/link/CTA */
-  --color-brand-50: #ecfeff;
-  --color-brand-100: #cffafe;
-  --color-brand-500: #06b6d4;
-  --color-brand-600: #077a94;
-  --color-brand-700: #0e7490;
+  /* Indigo -- identitas marketplace, sengaja beda total dari
+     biru-teal "air kolam" les-renang-cianjur. Warna utama, tombol/link/CTA. */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
 
-  /* Coral/oranye hangat -- aksen buat badge "Populer", highlight, gradient */
-  --color-accent-50: #fff7ed;
-  --color-accent-100: #ffedd5;
-  --color-accent-500: #fb923c;
-  --color-accent-600: #f97316;
+  /* Rose -- aksen buat badge "Populer", highlight, gradient, dan kartu
+     peran Admin. Kontras jelas sama indigo TANPA ijo (biar gak ketuker
+     visual sama warna success/peran Coach) atau oranye/coral kayak
+     brand lama. */
+  --color-accent-50: #fff1f2;
+  --color-accent-100: #ffe4e6;
+  --color-accent-500: #f43f5e;
+  --color-accent-600: #e11d48;
 
   --color-surface: #ffffff;
-  --color-surface-muted: #f0f9f8;
-  --color-border: #dceae8;
+  --color-surface-muted: #f3f2fb;
+  --color-border: #e3e1f5;
 
-  --color-text: #0f172a;
-  --color-text-muted: #475569;
-  --color-text-subtle: #64748b;
+  --color-text: #1e1b2e;
+  --color-text-muted: #56526b;
+  --color-text-subtle: #77738c;
 
   --color-success-bg: #ecfdf5;
   --color-success-text: #047857;
@@ -43,27 +47,27 @@
    OS lagi dark. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #0b1418;
-    --foreground: #e6f1ef;
+    --background: #100e21;
+    --foreground: #ece9fb;
 
-    --color-brand-50: #0e2b30;
-    --color-brand-100: #123840;
-    --color-brand-500: #22d3ee;
-    --color-brand-600: #077a94;
-    --color-brand-700: #67e8f9;
+    --color-brand-50: #1e1b3a;
+    --color-brand-100: #2a2555;
+    --color-brand-500: #818cf8;
+    --color-brand-600: #6366f1;
+    --color-brand-700: #a5b4fc;
 
-    --color-accent-50: #2b1608;
-    --color-accent-100: #3d200c;
-    --color-accent-500: #fb923c;
-    --color-accent-600: #fdba74;
+    --color-accent-50: #4c0519;
+    --color-accent-100: #881337;
+    --color-accent-500: #fb7185;
+    --color-accent-600: #fda4af;
 
-    --color-surface: #101c22;
-    --color-surface-muted: #16242b;
-    --color-border: #23343b;
+    --color-surface: #16142b;
+    --color-surface-muted: #1c1a35;
+    --color-border: #2e2b52;
 
-    --color-text: #e6f1ef;
-    --color-text-muted: #9fb4b0;
-    --color-text-subtle: #74898a;
+    --color-text: #ece9fb;
+    --color-text-muted: #a8a3c9;
+    --color-text-subtle: #78749e;
 
     --color-success-bg: #0d2e22;
     --color-success-text: #34d399;
@@ -83,27 +87,27 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --background: #0b1418;
-  --foreground: #e6f1ef;
+  --background: #100e21;
+  --foreground: #ece9fb;
 
-  --color-brand-50: #0e2b30;
-  --color-brand-100: #123840;
-  --color-brand-500: #22d3ee;
-  --color-brand-600: #077a94;
-  --color-brand-700: #67e8f9;
+  --color-brand-50: #1e1b3a;
+  --color-brand-100: #2a2555;
+  --color-brand-500: #818cf8;
+  --color-brand-600: #6366f1;
+  --color-brand-700: #a5b4fc;
 
-  --color-accent-50: #2b1608;
-  --color-accent-100: #3d200c;
-  --color-accent-500: #fb923c;
-  --color-accent-600: #fdba74;
+  --color-accent-50: #4c0519;
+  --color-accent-100: #881337;
+  --color-accent-500: #fb7185;
+  --color-accent-600: #fda4af;
 
-  --color-surface: #101c22;
-  --color-surface-muted: #16242b;
-  --color-border: #23343b;
+  --color-surface: #16142b;
+  --color-surface-muted: #1c1a35;
+  --color-border: #2e2b52;
 
-  --color-text: #e6f1ef;
-  --color-text-muted: #9fb4b0;
-  --color-text-subtle: #74898a;
+  --color-text: #ece9fb;
+  --color-text-muted: #a8a3c9;
+  --color-text-subtle: #78749e;
 
   --color-success-bg: #0d2e22;
   --color-success-text: #34d399;
@@ -119,8 +123,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta);
+  --font-heading: var(--font-sora);
+  --font-mono: var(--font-jetbrains-mono);
 
   --color-brand-50: var(--color-brand-50);
   --color-brand-100: var(--color-brand-100);
@@ -173,4 +178,16 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   color-scheme: light dark;
+}
+
+/* Heading pake Sora (geometris, karakter beda dari body Jakarta Sans) --
+   sengaja global di sini, bukan class per-komponen, biar konsisten di
+   seluruh app tanpa nyentuh tiap file yang punya <h1>-<h6>. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
 }

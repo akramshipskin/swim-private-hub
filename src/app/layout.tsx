@@ -1,18 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono, Plus_Jakarta_Sans, Sora } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import AuthSessionProvider from "@/components/session-provider";
 import ServiceWorkerRegister from "@/components/service-worker-register";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Identitas visual sengaja beda total dari les-renang-cianjur (Geist) --
+// Jakarta Sans buat body (humanis, gampang dibaca), Sora buat heading
+// (geometris, karakter lebih kuat buat judul/CTA).
+const jakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sora = Sora({
+  variable: "--font-sora",
+  subsets: ["latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
 
@@ -32,7 +40,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#077a94",
+  themeColor: "#4338ca",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -42,7 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // jadi mismatch attribute ini expected, bukan bug beneran.
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${jakartaSans.variable} ${sora.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
