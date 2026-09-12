@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { snap } from "@/lib/midtrans";
+import { snapForPool } from "@/lib/midtrans";
 import { assertDependentOwnedByMember } from "@/lib/dependents";
 
 export async function POST(request: Request) {
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
   const template = templateId
     ? await prisma.packageTemplate.findFirst({
         where: { id: templateId, isActive: true },
+        include: { pool: true },
       })
     : null;
 
@@ -36,10 +37,27 @@ export async function POST(request: Request) {
     return Response.json({ error: "Paket tidak valid" }, { status: 400 });
   }
 
+  // Kolam ini belum selesai setup Midtrans (belum ngasih Server/Client
+  // Key mereka) -- jangan biarin checkout gagal senyap atau nyoba pake
+  // key kosong. Beri tahu member secara eksplisit, arahkan ke jalur
+  // manual/transfer (ditangani di UI checkout).
+  const snap = snapForPool(template.pool);
+  if (!snap) {
+    return Response.json(
+      {
+        error: "MIDTRANS_NOT_CONFIGURED",
+        message:
+          "Kolam ini belum bisa menerima pembayaran online. Hubungi admin kolam untuk pembayaran manual/transfer.",
+      },
+      { status: 409 }
+    );
+  }
+
   const pkg = await prisma.package.create({
     data: {
       memberId: session.user.id,
       dependentId,
+      poolId: template.poolId,
       templateId: template.id,
       name: template.name,
       totalSesi: template.totalSesi,
@@ -67,8 +85,6 @@ export async function POST(request: Request) {
           name: template.name,
         },
       ],
-      // Tanpa ini, Snap balikin user ke example.com bawaan Midtrans kalau
-      // popup ditutup/selesai/gagal -- gak profesional buat production.
       callbacks: {
         finish: `${origin}/pembayaran/sukses`,
         unfinish: `${origin}/pembayaran/gagal`,
@@ -87,13 +103,10 @@ export async function POST(request: Request) {
 
     return Response.json({ redirectUrl: transaction.redirect_url });
   } catch (err) {
-    // Rollback package biar gak nyangkut PENDING_PAYMENT selamanya kalau
-    // Midtrans gagal dipanggil (misal kredensial belum diisi).
     await prisma.package.delete({ where: { id: pkg.id } });
     return Response.json(
       {
-        error:
-          "Gagal membuat transaksi pembayaran. Cek kredensial Midtrans di .env.",
+        error: "Gagal membuat transaksi pembayaran. Cek kredensial Midtrans kolam ini.",
         detail: err instanceof Error ? err.message : String(err),
       },
       { status: 502 }

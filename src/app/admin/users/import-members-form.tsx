@@ -3,9 +3,12 @@
 import { useActionState, useState } from "react";
 import { importMembersXlsx } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
+import { Field, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export default function ImportMembersForm() {
+type PoolOption = { id: string; name: string };
+
+export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
   const [state, formAction, pending] = useActionState(importMembersXlsx, null);
   const [hasFile, setHasFile] = useState(false);
 
@@ -17,7 +20,8 @@ export default function ImportMembersForm() {
           Kolom: Nama Member, No HP, Email (opsional), Nama Peserta/Anak, Paket Aktif,
           Sisa Sesi. 1 baris = 1 peserta -- member dengan &gt;1 anak, ulang No HP yang
           sama di baris berikutnya. Member baru login pakai No HP + password default
-          yang sama, wajib ganti pas login pertama.
+          yang sama, wajib ganti pas login pertama. 1 file = 1 kolam tujuan -- kalau
+          data lu lintas kolam, pisah filenya dan import satu-satu per kolam.
         </p>
         <a
           href="/api/admin/import-template"
@@ -26,6 +30,15 @@ export default function ImportMembersForm() {
           Download Template
         </a>
         <form action={formAction} className="flex flex-wrap items-end gap-3">
+          <Field label="Kolam tujuan">
+            <Select name="poolId" required className="w-40">
+              {pools.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
           <input
             type="file"
             name="file"

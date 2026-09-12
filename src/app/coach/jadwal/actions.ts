@@ -17,9 +17,19 @@ export async function addAvailability(
   const date = formData.get("date") as string;
   const startTime = formData.get("startTime") as string;
   const endTime = formData.get("endTime") as string;
+  const poolId = formData.get("poolId") as string;
 
-  if (!date || !startTime || !endTime) {
-    return { error: "Tanggal, jam mulai, dan jam selesai wajib diisi" };
+  if (!date || !startTime || !endTime || !poolId) {
+    return { error: "Tanggal, jam mulai, jam selesai, dan kolam wajib diisi" };
+  }
+
+  // Coach cuma boleh buka slot di kolam yang dia terafiliasi -- dicek di
+  // sini (bukan cuma dropdown UI) karena formData bisa dipalsu.
+  const affiliated = await prisma.poolAffiliation.findUnique({
+    where: { poolId_coachId: { poolId, coachId: session.user.id } },
+  });
+  if (!affiliated) {
+    return { error: "Kamu gak terafiliasi ke kolam ini." };
   }
 
   const startDateTime = wibDateTime(date, startTime);
@@ -45,6 +55,7 @@ export async function addAvailability(
     const pad = (n: number) => String(n).padStart(2, "0");
     chunks.push({
       coachId: session.user.id,
+      poolId,
       date: dateLabel(date),
       startTime: wibDateTime(date, `${pad(h)}:00`),
       endTime: wibDateTime(date, `${pad(h + 1)}:00`),

@@ -22,6 +22,7 @@ export default async function MemberBookingPage() {
       const pkg = await prisma.package.findFirst({
         where: activePackageWhereForDependent(session.user.id, child.id),
         orderBy: { createdAt: "asc" },
+        include: { pool: { select: { id: true, name: true } } },
       });
       if (!pkg) return null;
       const cancelUsed = await prisma.booking.count({
@@ -32,6 +33,11 @@ export default async function MemberBookingPage() {
         dependentName: child.name,
         packageId: pkg.id,
         packageName: pkg.name,
+        // Pool-first browse (locked /plan-eng-review 2026-09-12): paket
+        // sekarang pin ke 1 kolam, jadi kolamnya otomatis "kepilih" pas
+        // ortu pilih anak/paket ini -- gak perlu dropdown kolam terpisah.
+        poolId: pkg.poolId,
+        poolName: pkg.pool.name,
         sisaSesi: pkg.sisaSesi,
         jatahCancel: pkg.jatahCancel,
         cancelRemaining: Math.max(0, pkg.jatahCancel - cancelUsed),

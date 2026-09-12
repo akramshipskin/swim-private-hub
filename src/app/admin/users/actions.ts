@@ -114,6 +114,15 @@ export async function importMembersXlsx(
 ): Promise<ImportState> {
   await requireRole("ADMIN");
 
+  // 1 file import = 1 kolam -- semua paket yang dibuat dari batch ini
+  // pin ke kolam yang sama (locked /plan-eng-review 2026-09-12). Import
+  // xlsx lintas-kolam sekaligus gak didukung -- jalanin importnya
+  // per-kolam kalau ada beberapa.
+  const poolId = formData.get("poolId") as string;
+  if (!poolId) {
+    return { error: "Pilih kolam tujuan import dulu" };
+  }
+
   const file = formData.get("file") as File | null;
   if (!file || file.size === 0) {
     return { error: "Pilih file xlsx dulu" };
@@ -161,7 +170,7 @@ export async function importMembersXlsx(
     }
   }
 
-  const templates = await prisma.packageTemplate.findMany();
+  const templates = await prisma.packageTemplate.findMany({ where: { poolId } });
   const passwordHash = await bcrypt.hash(IMPORT_DEFAULT_PASSWORD, 12);
 
   let membersCreated = 0;
@@ -239,6 +248,7 @@ export async function importMembersXlsx(
             data: {
               memberId: member.id,
               dependentId: dependent.id,
+              poolId,
               templateId: template?.id ?? null,
               name: paketName,
               totalSesi,

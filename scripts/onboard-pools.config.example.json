@@ -1,0 +1,9 @@
+[
+  {
+    "poolName": "Nama Kolam A",
+    "address": "Alamat kolam A",
+    "contactPhone": "628xxxxxxxxxx",
+    "ownerPhone": "628xxxxxxxxxx",
+    "coachPhones": ["628xxxxxxxxxx"]
+  }
+]

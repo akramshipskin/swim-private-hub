@@ -41,6 +41,20 @@ export async function POST(request: Request) {
       // sekaligus jadi IDOR guard (packageId bukan punya session.user.id
       // = gak ke-update), validasi eligibility (ACTIVE, ada sisa sesi,
       // belum kedaluwarsa), DAN klaim sesi, semuanya 1 query atomic.
+      // poolId paket dibaca sebelum klaim -- immutable sejak Package
+      // dibuat (lihat schema.prisma), jadi baca duluan gak bikin race,
+      // cuma dipakai buat validasi/pesan error yang jelas di bawah.
+      const pkgPool = await tx.package.findUnique({
+        where: { id: packageId },
+        select: { poolId: true },
+      });
+      if (!pkgPool) {
+        throw new BookingError(
+          "Paket gak ditemukan, kuota sesi habis, belum aktif, atau udah kedaluwarsa.",
+          409
+        );
+      }
+
       const claimPkg = await tx.package.updateMany({
         where: { ...activePackageWhere(session.user.id), id: packageId },
         data: { sisaSesi: { decrement: 1 } },
@@ -49,6 +63,24 @@ export async function POST(request: Request) {
       if (claimPkg.count === 0) {
         throw new BookingError(
           "Paket gak ditemukan, kuota sesi habis, belum aktif, atau udah kedaluwarsa.",
+          409
+        );
+      }
+
+      // Booking cross-pool ditolak -- 1 Package cuma boleh dipake buat
+      // Availability di kolam yang sama (locked /plan-eng-review
+      // 2026-09-12). Dicek terpisah dari klaim slot di bawah biar
+      // pesan errornya jelas beda sama "slot udah diambil orang".
+      const targetAvailability = await tx.availability.findUnique({
+        where: { id: availabilityId },
+        select: { poolId: true },
+      });
+      if (!targetAvailability) {
+        throw new BookingError("Slot ini tidak ditemukan.", 404);
+      }
+      if (targetAvailability.poolId !== pkgPool.poolId) {
+        throw new BookingError(
+          "Slot ini ada di kolam yang beda dari paket kamu.",
           409
         );
       }

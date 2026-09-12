@@ -17,6 +17,8 @@ type ChildOption = {
   dependentName: string;
   packageId: string;
   packageName: string;
+  poolId: string;
+  poolName: string;
   sisaSesi: number;
   jatahCancel: number;
   cancelRemaining: number;
@@ -93,15 +95,22 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
   const requestIdRef = useRef(0);
 
   const loadSlots = useCallback(async () => {
+    // Pool-first browse: kolam ditentukan dari paket/anak yang dipilih
+    // (1 paket = 1 kolam sekarang), belum ada anak/paket terpilih =
+    // belum ada kolam buat ditampilin -- jangan fetch semua kolam.
+    if (!selectedChild) {
+      setSlots([]);
+      return;
+    }
     const myRequestId = ++requestIdRef.current;
-    const res = await fetch(`/api/availability?date=${date}`);
+    const res = await fetch(`/api/availability?date=${date}&poolId=${selectedChild.poolId}`);
     if (requestIdRef.current !== myRequestId) return;
     if (res.ok) {
       const data = await res.json();
       if (requestIdRef.current !== myRequestId) return;
       setSlots(data.availabilities);
     }
-  }, [date]);
+  }, [date, selectedChild]);
 
   useEffect(() => {
     setSlots(null);
@@ -218,7 +227,7 @@ export default function BookingBoard({ childOptions }: { childOptions: ChildOpti
               {childOptions.length === 0 && <option value="">-- belum ada paket aktif --</option>}
               {childOptions.map((c) => (
                 <option key={c.packageId} value={c.packageId}>
-                  {c.dependentName} — {c.packageName}, sisa {c.sisaSesi} sesi
+                  {c.dependentName} — {c.poolName}, sisa {c.sisaSesi} sesi
                 </option>
               ))}
             </Select>

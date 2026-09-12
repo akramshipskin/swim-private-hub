@@ -1,5 +1,35 @@
 # TODOS
 
+## Test integrasi DB buat concurrency booking & onboarding script (belum ada, butuh Postgres nyata)
+
+**What:** Dua path paling kritis dari `/plan-eng-review` 2026-09-12 (marketplace
+pivot) belum punya test otomatis:
+- `src/app/api/booking/route.ts` -- concurrency test: 2 booking bersamaan buat
+  slot yang sama harus cuma 1 yang lolos (CAS pattern yang udah ada di code,
+  tinggal diverifikasi lewat test beneran, bukan cuma dibaca).
+- `scripts/onboard-pools.ts` -- idempotency test: jalanin script 2x, pastiin
+  gak bikin Pool/PoolAffiliation duplikat, dan role downgrade ADMIN->MEMBER
+  cuma kejadian sekali (gak double-apply/gak ada efek samping run kedua).
+
+**Why belum ada:** Repo ini belum punya Supabase project sendiri (`.env` belum
+disetup, `DATABASE_URL` masih placeholder) -- kedua test ini butuh Postgres
+beneran (transaksi, row lock, unique constraint race), bukan yang bisa
+di-mock. Konvensi test project ini sekarang cuma nutup helper murni di
+`src/lib/*` (format, cn, whatsapp, active-package, pool-credentials) --
+`cancel-booking.ts` yang udah lama ada di codebase pun belum punya test
+karena alasan yang sama.
+
+**Fix yang disaranin:** Begitu Supabase project buat swim-private-hub udah
+jalan, tambah test setup yang bisa nyambung ke DB test (schema migrate,
+seed minimal, test lalu rollback/truncate) buat 2 path di atas, baru
+verifikasi actual race-condition behavior-nya lewat test paralel
+(`Promise.all` 2 request bersamaan), bukan cuma baca code dan percaya CAS-nya
+bener.
+
+**Depends on / blocked by:** Setup Supabase project + `DATABASE_URL` asli
+buat swim-private-hub (belum dilakukan -- lihat README, "New Supabase project
+required").
+
 ## Button component: hover state pakai `brand-700` sebagai background, bukan teks
 
 **What:** `src/components/ui/button.tsx` variant `primary` pakai

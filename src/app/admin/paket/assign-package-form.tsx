@@ -8,23 +8,31 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 
 type Member = { id: string; name: string; email: string | null; phone: string | null };
-type Template = { id: string; name: string; totalSesi: number; jatahCancel: number };
+type Template = { id: string; name: string; totalSesi: number; jatahCancel: number; poolId: string };
 type Dependent = { id: string; name: string; memberId: string; isSelf: boolean };
+type PoolOption = { id: string; name: string };
 
 export default function AssignPackageForm({
   members,
   templates,
   dependents,
+  pools,
 }: {
   members: Member[];
   templates: Template[];
   dependents: Dependent[];
+  pools: PoolOption[];
 }) {
   const [state, formAction, pending] = useActionState(assignPackageToMember, null);
   const [memberId, setMemberId] = useState(members[0]?.id ?? "");
   const [name, setName] = useState("");
   const [totalSesi, setTotalSesi] = useState("");
   const [jatahCancel, setJatahCancel] = useState("2");
+  // Paket wajib pin ke 1 kolam. Dari katalog -> ikut kolam template
+  // (dikunci di UI, server juga maksa ini walau dikirim beda). Custom
+  // -> admin pilih kolam manual.
+  const [poolId, setPoolId] = useState(pools[0]?.id ?? "");
+  const [templateId, setTemplateId] = useState("");
   const childrenOfMember = dependents.filter((d) => d.memberId === memberId);
 
   return (
@@ -65,18 +73,36 @@ export default function AssignPackageForm({
             <Select
               name="templateId"
               className="w-full sm:w-44"
-              defaultValue=""
+              value={templateId}
               onChange={(e) => {
                 const t = templates.find((t) => t.id === e.target.value);
+                setTemplateId(e.target.value);
                 setName(t ? t.name : "");
                 setTotalSesi(t ? String(t.totalSesi) : "");
                 setJatahCancel(t ? String(t.jatahCancel) : "2");
+                if (t) setPoolId(t.poolId);
               }}
             >
               <option value="">-- custom --</option>
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Kolam">
+            <Select
+              name="poolId"
+              required
+              disabled={!!templateId}
+              value={poolId}
+              onChange={(e) => setPoolId(e.target.value)}
+              className="w-full sm:w-36"
+            >
+              {pools.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
                 </option>
               ))}
             </Select>

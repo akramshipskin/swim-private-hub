@@ -21,8 +21,11 @@ function memberSince(d: Date) {
 export default async function AdminPaketPage() {
   await requireRole("ADMIN");
 
-  const [templates, members] = await Promise.all([
-    prisma.packageTemplate.findMany({ orderBy: { totalSesi: "asc" } }),
+  const [templates, members, pools] = await Promise.all([
+    prisma.packageTemplate.findMany({
+      orderBy: { totalSesi: "asc" },
+      include: { pool: { select: { name: true } } },
+    }),
     // Grup per member (bukan per paket) -- 1 member bisa punya >1 peserta,
     // masing-masing punya paketnya sendiri. Cuma member yang punya
     // >=1 paket yang muncul di sini (member polos tanpa paket sama sekali
@@ -58,6 +61,7 @@ export default async function AdminPaketPage() {
         },
       },
     }),
+    prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
   const allPackageIds = members.flatMap((m) => m.packages.map((p) => p.id));
@@ -82,12 +86,13 @@ export default async function AdminPaketPage() {
         &ldquo;Beli Paket&rdquo; member.
       </p>
 
-      <CreateTemplateForm />
+      <CreateTemplateForm pools={pools} />
 
       <ul className="mb-8 flex flex-col gap-2">
         {templates.map((t) => (
           <li key={t.id}>
             <TemplateEditForm template={t} />
+            <p className="mt-1 pl-1 text-xs text-text-subtle">Kolam: {t.pool.name}</p>
           </li>
         ))}
       </ul>

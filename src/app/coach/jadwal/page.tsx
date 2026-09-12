@@ -12,8 +12,8 @@ export default async function CoachJadwalPage() {
 
   // Jadwal coach lain di tanggal yang sama -- biar coach ini tau siapa
   // aja yang udah buka jadwal di hari itu, gak cuma keliatan lewat titik
-  // di kalender doang. Dua query ini independen, dijalankan paralel.
-  const [availabilities, otherAvailabilities] = await Promise.all([
+  // di kalender doang. Query-query ini independen, dijalankan paralel.
+  const [availabilities, otherAvailabilities, myAffiliations] = await Promise.all([
     prisma.availability.findMany({
       where: {
         coachId: session.user.id,
@@ -21,6 +21,7 @@ export default async function CoachJadwalPage() {
       },
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
       include: {
+        pool: { select: { name: true } },
         bookings: {
           where: { status: "BOOKED" },
           include: {
@@ -41,7 +42,14 @@ export default async function CoachJadwalPage() {
         bookings: { where: { status: "BOOKED" }, take: 1 },
       },
     }),
+    prisma.poolAffiliation.findMany({
+      where: { coachId: session.user.id },
+      include: { pool: { select: { id: true, name: true } } },
+      orderBy: { pool: { name: "asc" } },
+    }),
   ]);
+
+  const myPools = myAffiliations.map((a) => a.pool);
 
   const byDate = new Map<string, typeof availabilities>();
   for (const a of availabilities) {
@@ -69,7 +77,7 @@ export default async function CoachJadwalPage() {
         <EnablePushButton />
       </div>
 
-      <AddSlotForm />
+      <AddSlotForm pools={myPools} />
 
       {availabilities.length === 0 ? (
         <Card>
@@ -93,6 +101,7 @@ export default async function CoachJadwalPage() {
                         <p className="text-sm font-medium text-text">
                           {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
                         </p>
+                        <p className="mt-0.5 text-xs text-text-subtle">{a.pool.name}</p>
                         {a.status === "BOOKED" && a.bookings[0] ? (
                           <p className="mt-1 text-sm text-text-muted">
                             Dibooking buat{" "}

@@ -11,9 +11,16 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date") ?? todayWibDateString();
+  // Pool-first browse (locked /plan-eng-review 2026-09-12): member
+  // selalu tau kolamnya lewat paket/anak yang dipilih. poolId dibiarin
+  // opsional (bukan wajib) di level API supaya endpoint ini tetep aman
+  // dipanggil tanpa filter kalau ada pemanggil lain di masa depan yang
+  // beneran butuh lintas-kolam -- tapi UI member saat ini SELALU
+  // ngirim poolId.
+  const poolId = searchParams.get("poolId") ?? undefined;
 
   const availabilities = await prisma.availability.findMany({
-    where: { date: dateLabel(date) },
+    where: { date: dateLabel(date), ...(poolId ? { poolId } : {}) },
     orderBy: [{ startTime: "asc" }],
     select: {
       id: true,

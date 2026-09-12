@@ -7,6 +7,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER", BottomNavLink[]>
     { href: "/admin/pembayaran", label: "Pembayaran", icon: "credit-card" },
     { href: "/admin/booking-overview", label: "Booking", icon: "calendar" },
     { href: "/admin/kinerja-coach", label: "Kinerja", icon: "bar-chart" },
+    { href: "/admin/komisi", label: "Komisi", icon: "credit-card" },
   ],
   COACH: [
     { href: "/coach/jadwal", label: "Jadwal", icon: "calendar" },

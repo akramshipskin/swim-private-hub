@@ -18,7 +18,7 @@ const roleSections: { role: "ADMIN" | "COACH"; label: string }[] = [
 export default async function AdminUsersPage() {
   await requireRole("ADMIN");
 
-  const [users, templates, dependents] = await Promise.all([
+  const [users, templates, dependents, pools] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       include: {
@@ -42,6 +42,7 @@ export default async function AdminUsersPage() {
       orderBy: { name: "asc" },
       select: { id: true, name: true, memberId: true, isSelf: true },
     }),
+    prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
   const members = users.filter((u) => u.role === "MEMBER");
@@ -52,7 +53,7 @@ export default async function AdminUsersPage() {
 
       <div className="mb-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <CreateUserForm />
-        <ImportMembersForm />
+        <ImportMembersForm pools={pools} />
       </div>
 
       {/* --- Tambah peserta (anak atau diri sendiri) buat member -- dibutuhin
@@ -71,7 +72,7 @@ export default async function AdminUsersPage() {
         Buat paket khusus buat 1 anak tertentu (koreksi, promo, atau kasus di luar
         alur beli-online).
       </p>
-      <AssignPackageForm members={members} templates={templates} dependents={dependents} />
+      <AssignPackageForm members={members} templates={templates} dependents={dependents} pools={pools} />
 
       <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua User</h2>
 

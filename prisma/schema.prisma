@@ -63,12 +63,14 @@ model User {
   registeredReferer  String?
   registeredIp       String?
 
-  coachProfile      CoachProfile?
-  dependents        Dependent[]
-  packages          Package[]
-  bookings          Booking[]
-  availabilities    Availability[]     @relation("CoachAvailabilities")
-  pushSubscriptions PushSubscription[]
+  coachProfile        CoachProfile?
+  dependents          Dependent[]
+  packages            Package[]
+  bookings            Booking[]
+  availabilities      Availability[]     @relation("CoachAvailabilities")
+  pushSubscriptions   PushSubscription[]
+  poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
+  ownedPools          Pool[]
 }
 
 model CoachProfile {
@@ -102,11 +104,16 @@ model Dependent {
   @@index([memberId])
 }
 
-// Katalog paket (harga/durasi) yang admin kelola, gak nempel ke member
-// manapun. Ini yang dipilih member pas checkout Midtrans, atau jadi
-// starting point admin pas assign paket manual ke member.
+// Katalog paket (harga/durasi) per KOLAM (locked /plan-eng-review
+// 2026-09-12) -- tiap kolam pasang harga sendiri (kenyataan: kolam yang
+// udah gabung sebelumnya emang udah punya harga masing-masing lewat
+// Excel/WA, gak dipaksa 1 harga platform). poolId JUGA yang nentuin
+// checkout Midtrans ini routing ke akun kolam mana (connector posture --
+// platform gak pernah pegang dana, lihat Payment/Pool).
 model PackageTemplate {
   id           String   @id @default(cuid())
+  poolId       String
+  pool         Pool     @relation(fields: [poolId], references: [id], onDelete: Cascade)
   name         String
   totalSesi    Int
   price        Int
@@ -121,6 +128,8 @@ model PackageTemplate {
   createdAt    DateTime @default(now())
 
   packages Package[]
+
+  @@index([poolId])
 }
 
 model Package {
@@ -135,6 +144,13 @@ model Package {
   // setelah ada booking = nge-rewrite riwayat anak booking lama diam-diam.
   dependentId String
   dependent   Dependent        @relation(fields: [dependentId], references: [id])
+  // Dicopy dari template.poolId pas Package dibuat (bukan dibaca ulang
+  // dari template tiap kali, sama alasannya kayak name/totalSesi di
+  // bawah). WAJIB -- booking yang pake Package ini cuma boleh ambil
+  // Availability di kolam yang SAMA (dicek di action layer pas booking,
+  // bukan constraint DB, sama pola kayak dependentId di Booking).
+  poolId      String
+  pool        Pool             @relation(fields: [poolId], references: [id])
   templateId  String?
   template    PackageTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
   name        String
@@ -155,6 +171,7 @@ model Package {
 
   @@index([memberId])
   @@index([dependentId])
+  @@index([poolId])
 }
 
 model Payment {
@@ -175,6 +192,11 @@ model Availability {
   id             String             @id @default(cuid())
   coachId        String
   coach          User               @relation("CoachAvailabilities", fields: [coachId], references: [id], onDelete: Cascade)
+  // Kolam tempat slot ini dibuka. Coach independen dari Pool manapun
+  // (PoolAffiliation), tapi tiap slot yang dibuka tetep pin ke SATU
+  // kolam spesifik -- coach gak bisa "buka slot generik" tanpa kolam.
+  poolId         String
+  pool           Pool               @relation(fields: [poolId], references: [id], onDelete: Cascade)
   date           DateTime           @db.Date
   startTime      DateTime
   endTime        DateTime
@@ -188,8 +210,68 @@ model Availability {
 
   bookings Booking[]
 
+  // SENGAJA gak ada poolId di constraint ini -- 1 coach cuma boleh
+  // punya 1 slot terbuka per (date, startTime) di SELURUH kolam, titik.
+  // Coach gak bisa ada di 2 tempat jam yang sama. Constraint dgn poolId
+  // di dalamnya cuma nyegah duplikat slot yang SAMA di kolam yang SAMA,
+  // gak nyegah coach ke-double-book lintas kolam -- itu bug yang
+  // ketemu pas /plan-eng-review 2026-09-12.
   @@unique([coachId, date, startTime])
-  @@index([coachId, date])
+  @@index([poolId, date])
+}
+
+// Kolam/venue -- 1 pool = 1 lokasi fisik dengan kontak & (kalau udah
+// KYC) akun Midtrans sendiri. Platform CONNECTOR posture (locked
+// /plan-eng-review 2026-09-12): checkout member selalu route ke
+// midtransMerchantId milik pool ini, platform gak pernah pegang dana.
+model Pool {
+  id                 String   @id @default(cuid())
+  name               String
+  address            String?
+  contactPhone       String?
+  // User yang jadi kontak/pemilik kolam ini. Nullable karena Phase 1
+  // gak punya UI admin per-pool -- ini murni buat referensi/pelaporan,
+  // BUKAN buat kasih akses admin (role User ybs sengaja diturunin dari
+  // ADMIN pas onboarding, lihat scripts/onboard-pools.ts).
+  ownerUserId        String?
+  ownerUser          User?    @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  // Kredensial Midtrans MILIK KOLAM INI SENDIRI (bukan platform) --
+  // Midtrans gak punya cara "platform pegang 1 akun, routing ke akun
+  // lain pake ID doang" (koreksi dari asumsi awal /plan-eng-review,
+  // ketemu pas implementasi). Disimpen terenkripsi (lihat
+  // src/lib/pool-credentials.ts), didekripsi cuma pas mau bikin
+  // transaksi. Null di salah satu = pool ini belum selesai setup
+  // Midtrans -- checkout HARUS fallback ke instruksi manual/transfer,
+  // jangan biarin gagal senyap.
+  midtransServerKeyEnc  String?
+  midtransClientKeyEnc  String?
+  midtransIsProduction  Boolean  @default(false)
+  // Persentase komisi platform, di-set platform (bukan per-coach),
+  // provisional 15% (lihat Open Questions di design doc). Config value,
+  // bukan struktural -- boleh diubah tanpa migrasi.
+  commissionPercent  Int      @default(15)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+
+  affiliations     PoolAffiliation[]
+  availabilities   Availability[]
+  packageTemplates PackageTemplate[]
+  packages         Package[]
+}
+
+// Many-to-many Coach <-> Pool. Coach (User role=COACH) tetep entity
+// independen -- baris ini cuma nyatet "coach X bisa buka slot di kolam
+// Y", bukan kepemilikan.
+model PoolAffiliation {
+  id        String   @id @default(cuid())
+  poolId    String
+  pool      Pool     @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  coachId   String
+  coach     User     @relation("CoachPoolAffiliations", fields: [coachId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([poolId, coachId])
+  @@index([coachId])
 }
 
 model PushSubscription {

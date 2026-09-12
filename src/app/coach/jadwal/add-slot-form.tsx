@@ -3,20 +3,45 @@
 import { useActionState, useState } from "react";
 import { addAvailability } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
-import { Field } from "@/components/ui/input";
+import { Field, Select } from "@/components/ui/input";
 import { TimeSelect } from "@/components/ui/time-select";
 import { AvailabilityDatePicker } from "@/components/availability-date-picker";
 import { Button } from "@/components/ui/button";
 import { todayWibDateString } from "@/lib/datetime";
 
-export default function AddSlotForm() {
+type PoolOption = { id: string; name: string };
+
+export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
   const [state, formAction, pending] = useActionState(addAvailability, null);
   const [date, setDate] = useState(todayWibDateString());
+
+  if (pools.length === 0) {
+    return (
+      <Card className="mb-8 mt-5">
+        <CardBody className="py-6 text-center text-sm text-text-muted">
+          Kamu belum terafiliasi ke kolam manapun. Hubungi admin biar bisa buka jadwal.
+        </CardBody>
+      </Card>
+    );
+  }
 
   return (
     <Card className="mb-8 mt-5">
       <CardBody>
         <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          {/* 1 coach bisa terafiliasi ke banyak kolam (PoolAffiliation) --
+              slot yang dibuka WAJIB pin ke 1 kolam spesifik, jadi
+              dropdown ini wajib dipilih tiap buka slot, gak ada
+              default "semua kolam". */}
+          <Field label="Kolam">
+            <Select name="poolId" defaultValue={pools[0].id} className="w-full sm:w-48">
+              {pools.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
           <Field label="Tanggal">
             <div className="w-56">
               <AvailabilityDatePicker

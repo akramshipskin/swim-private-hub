@@ -3,17 +3,32 @@
 import { useActionState } from "react";
 import { createTemplate } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
-import { Field, Input } from "@/components/ui/input";
+import { Field, Input, Select } from "@/components/ui/input";
 import { PriceInput } from "@/components/ui/price-input";
 import { Button } from "@/components/ui/button";
 
-export default function CreateTemplateForm() {
+type PoolOption = { id: string; name: string };
+
+export default function CreateTemplateForm({ pools }: { pools: PoolOption[] }) {
   const [state, formAction, pending] = useActionState(createTemplate, null);
 
   return (
     <Card className="mb-4">
       <CardBody>
         <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          {/* Katalog paket sekarang per-kolam (locked /plan-eng-review
+              2026-09-12) -- tiap kolam pasang harga sendiri. Phase 1 gak
+              punya admin per-pool, jadi founder (superadmin) yang pilih
+              kolam mana di sini. */}
+          <Field label="Kolam">
+            <Select name="poolId" required className="w-full sm:w-40">
+              {pools.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
           <Field label="Nama Paket">
             <Input name="name" required className="w-full sm:w-44" />
           </Field>

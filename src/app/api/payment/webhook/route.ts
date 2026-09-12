@@ -1,14 +1,20 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { serverKeyForPool } from "@/lib/midtrans";
 import type { Prisma } from "@/generated/prisma/client";
 
+// Signature Midtrans dihitung pake Server Key si penerima pembayaran --
+// di app ini itu Server Key KOLAM (connector posture, tiap kolam pegang
+// akun Midtrans sendiri), BUKAN 1 key platform global. serverKey null
+// berarti kolam ini gak (lagi) punya kredensial Midtrans tersimpan --
+// signature otomatis gak valid, jangan lempar exception ke Midtrans.
 function verifySignature(
   orderId: string,
   statusCode: string,
   grossAmount: string,
-  signatureKey: string
+  signatureKey: string,
+  serverKey: string
 ) {
-  const serverKey = process.env.MIDTRANS_SERVER_KEY!;
   const expected = crypto
     .createHash("sha512")
     .update(orderId + statusCode + grossAmount + serverKey)
@@ -50,17 +56,25 @@ export async function POST(request: Request) {
     return Response.json({ ok: true, error: "Payload tidak lengkap" });
   }
 
-  if (!verifySignature(orderId, statusCode ?? "", grossAmount ?? "", signatureKey)) {
-    return Response.json({ ok: true, error: "Signature tidak valid" });
-  }
-
+  // Payment dicari duluan (bukan verifySignature duluan) karena kita
+  // butuh tau kolam mana pemilik transaksi ini buat dapetin Server Key
+  // yang bener -- di app single-tenant lama, key-nya global jadi urutan
+  // gak masalah; di sini urutannya wajib dibalik.
   const payment = await prisma.payment.findUnique({
     where: { midtransOrderId: orderId },
-    include: { package: { include: { template: true } } },
+    include: { package: { include: { template: true, pool: true } } },
   });
 
   if (!payment) {
     return Response.json({ ok: true, error: "Payment tidak ditemukan" });
+  }
+
+  const poolServerKey = serverKeyForPool(payment.package.pool);
+  if (
+    !poolServerKey ||
+    !verifySignature(orderId, statusCode ?? "", grossAmount ?? "", signatureKey, poolServerKey)
+  ) {
+    return Response.json({ ok: true, error: "Signature tidak valid" });
   }
 
   // Midtrans bisa ngirim ulang notifikasi yang sama (retry kalau endpoint
