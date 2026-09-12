@@ -445,32 +445,36 @@ script (Lane A's second half) can run anytime after schema, independent of B/C/D
 Synthesized from this review's findings. Each task derives from a specific
 finding above. Run with Claude Code or Codex; checkbox as you ship.
 
-- [ ] **T1 (P1, human: ~30min / CC: ~10min)** — schema — Add `unique(coachId, timeslot)` to Availability, no poolId in the constraint
+- [x] **T1 (P1, human: ~30min / CC: ~10min)** — schema — Add `unique(coachId, date, startTime)` to Availability, no poolId in the constraint
   - Surfaced by: Architecture #1 — coach could otherwise be double-booked across pools
-  - Files: `prisma/schema.prisma`, new migration
-  - Verify: attempt two Availability creates for same coach+timeslot at different pools, second must fail
-- [ ] **T2 (P1, human: ~1h / CC: ~15min)** — booking — Port `cancel-booking.ts` row-lock pattern to Booking creation
-  - Surfaced by: Cross-model tension #1 — uniqueness constraint alone doesn't stop two members racing to book the same open slot
-  - Files: booking-creation route/service, `src/lib/cancel-booking.ts` (reference pattern)
-  - Verify: new P1 concurrency test — two simultaneous booking attempts on same Availability row, exactly one succeeds
-- [ ] **T3 (P1, human: ~1h / CC: ~20min)** — onboarding — Seed script for Pool/PoolAffiliation with role downgrade + idempotency check
+  - Files: `prisma/schema.prisma`
+  - Done: the pre-existing single-pool constraint was already `unique(coachId, date, startTime)` with no pool concept at all — adding `poolId` as a plain column and leaving this constraint untouched was the correct, minimal fix.
+- [x] **T2 (P1, human: ~1h / CC: ~15min)** — booking — ~~Port `cancel-booking.ts` row-lock pattern~~ verified existing CAS pattern + added cross-pool guard
+  - Surfaced by: Cross-model tension #1
+  - Correction found during implementation: `src/app/api/booking/route.ts` already used an atomic conditional `updateMany` (compare-and-swap) on `Availability.status`, not `cancel-booking.ts`'s raw `FOR UPDATE` — a different but equally valid pattern already race-safe. No porting needed. What WAS missing: a check that `Availability.poolId` matches `Package.poolId` (booking across pools) — added.
+  - Files: `src/app/api/booking/route.ts`
+- [x] **T3 (P1, human: ~1h / CC: ~20min)** — onboarding — Seed script for Pool/PoolAffiliation with role downgrade + idempotency check
   - Surfaced by: Architecture #2 (role downgrade) + Failure modes (idempotency gap)
-  - Files: new `scripts/onboard-pools.ts` (or equivalent)
-  - Verify: run script twice, assert no duplicate Pool/PoolAffiliation rows; assert migrated User role is not ADMIN
-  - **Critical gap** per Failure modes — must ship with Phase 1, not deferred
-- [ ] **T4 (P2, human: ~2h / CC: ~30min)** — checkout — Fallback UI for pools with no `midtransMerchantId` yet
+  - Files: `scripts/onboard-pools.ts`, `scripts/onboard-pools.config.example.json`
+  - Idempotency: checks for an existing Pool by `ownerUserId` before creating; `PoolAffiliation` uses `upsert`.
+- [x] **T4 (P2, human: ~2h / CC: ~30min)** — checkout — Fallback for pools without Midtrans configured yet
   - Surfaced by: Failure modes — silent-failure risk on checkout before a pool completes Midtrans KYC
-  - Files: `src/app/api/payment/checkout/route.ts`, checkout UI
-  - Verify: attempt checkout against a Pool with `midtransMerchantId: null`, assert clear cash/manual-transfer prompt, not a crash or silent failure
-  - **Critical gap** per Failure modes — must ship with Phase 1, not deferred
-- [ ] **T5 (P2, human: ~2-3h / CC: ~30min)** — discovery — Pool-first browse UI + static per-coach shortcut page
+  - **Correction found during implementation (real architecture gap, not in original design doc):** Midtrans has no "platform holds one account, routes to another merchant" API — connector posture requires each pool's OWN Server Key + Client Key, not a shared `midtransMerchantId` reference. Schema changed to `midtransServerKeyEnc` / `midtransClientKeyEnc` (AES-256-GCM encrypted, `src/lib/pool-credentials.ts`) / `midtransIsProduction`. Checkout (`snapForPool`) and webhook signature verification (`serverKeyForPool`) both now key off the specific pool's own credentials.
+  - **Second correction found during implementation:** `Payment` is created per package-purchase (checkout), not per-Booking as the design doc's provisional Payment section assumed — a member buys session credits before choosing any specific coach/pool slot. For connector routing to know which pool's Midtrans account to use, `PackageTemplate` and `Package` both had to become pool-scoped (`poolId` added to both). This matches reality better anyway: pools already set their own prices today (Excel/WA), so platform-wide pricing was never accurate.
+  - Files: `prisma/schema.prisma` (Pool, PackageTemplate, Package), `src/lib/pool-credentials.ts`, `src/lib/midtrans.ts`, `src/app/api/payment/checkout/route.ts`, `src/app/api/payment/webhook/route.ts`, `src/app/admin/paket/*`, `src/app/admin/users/actions.ts` + `import-members-form.tsx`
+- [x] **T5 (P2, human: ~2-3h / CC: ~30min)** — discovery — Pool-first browse UI + static per-coach shortcut page
   - Surfaced by: Architecture #3 + Cross-model tension #4
-  - Files: member-facing Availability list route (add pool-selector), new coach profile page
-  - Verify: member can browse a selected pool's open slots; a coach's shortcut page lists their current pool affiliations
-- [ ] **T6 (P2, human: ~1h / CC: ~15min)** — reporting — Commission summary query (GROUP BY poolId over manual_pending Payments × commission %)
+  - Files: `src/app/member/booking/{page,booking-board}.tsx` (poolId now implicit via the selected child's pool-scoped Package — no separate pool-selector dropdown needed), `src/app/api/availability/route.ts` (`?poolId=` filter), `src/app/pelatih/[coachId]/page.tsx` (new, public), `src/lib/whatsapp.ts` (`buildCoachInquiryWaLink`)
+  - Also updated `src/app/coach/jadwal/*` — coach now picks which affiliated pool to open a slot at (`PoolAffiliation`-scoped dropdown), enforced server-side.
+- [x] **T6 (P2, human: ~1h / CC: ~15min)** — reporting — Commission summary (`src/app/admin/komisi/page.tsx`)
   - Surfaced by: Cross-model tension #3
-  - Files: small admin page or CLI script
-  - Verify: seed test Payments across 2 pools, assert report sums correctly per pool
+  - Computed from `Payment` status `SUCCESS` (not `manual_pending` — see T4's Payment-timing correction) joined through `Package.poolId`, × `Pool.commissionPercent`.
+
+**Not yet done — needs a provisioned Supabase project (tracked in TODOS.md):**
+Prisma migration has not been applied to a real database (none provisioned
+yet); DB-integration tests for the T2 concurrency guarantee and the T3
+onboarding idempotency guarantee could not be written without one. `npx tsc
+--noEmit`, `npx vitest run` (28 passing), and `npx next build` all pass clean.
 
 ## GSTACK REVIEW REPORT
 
