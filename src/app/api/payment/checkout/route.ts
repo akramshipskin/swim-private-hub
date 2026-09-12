@@ -45,8 +45,7 @@ export async function POST(request: Request) {
   if (!snap) {
     return Response.json(
       {
-        error: "MIDTRANS_NOT_CONFIGURED",
-        message:
+        error:
           "Kolam ini belum bisa menerima pembayaran online. Hubungi admin kolam untuk pembayaran manual/transfer.",
       },
       { status: 409 }
