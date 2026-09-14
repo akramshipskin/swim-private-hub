@@ -45,42 +45,58 @@ export async function markAttendance(
 
   const wasAttended = booking.attended === true;
 
-  await prisma.$transaction(async (tx) => {
-    await tx.booking.update({
-      where: { id: bookingId },
-      data: {
-        attended,
-        attendedBy: session.user.role as "COACH" | "ADMIN",
-        attendedAt: new Date(),
-      },
-    });
-
-    // Kredit wallet cuma jalan kalau paket ini beneran dibeli lewat
-    // Midtrans (ada Payment SUCCESS) -- paket yang di-assign manual/gratis
-    // sama admin gak punya uang beneran buat dibagi. coachProfile null
-    // (harusnya gak mungkin tapi dicek jaga-jaga) juga skip.
-    //
-    // PENTING (revisi 2026-09-12, paket lintas-kolam): kolam yang
-    // dikredit itu Booking.availability.poolId -- kolam TEMPAT SESI INI
-    // BENERAN DIAJAR -- bukan booking.package.poolId (kolam tempat
-    // paket dibeli, bisa beda kolam sekarang).
-    const successPayment = booking.package.payments[0];
-    const coachProfile = booking.availability.coach.coachProfile;
-    if (!successPayment || !coachProfile) return;
-
-    const perSessionValue = Math.round(successPayment.amount / booking.package.totalSesi);
-
-    if (!wasAttended && attended) {
-      await creditSessionRevenue(tx, {
-        poolId: booking.availability.poolId,
-        coachProfileId: coachProfile.id,
-        bookingId,
-        perSessionValue,
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Conditional update (CAS) -- pola sama kayak cancelBooking (row lock
+      // Package) buat cegah double-klik/double-submit dobel kredit wallet.
+      // Tanpa `where: { attended: booking.attended }` ini, 2 request
+      // bersamaan bisa DUA-DUANYA baca wasAttended=false sebelum salah
+      // satu commit, jadi creditSessionRevenue kepanggil 2x buat booking
+      // yang sama.
+      const claim = await tx.booking.updateMany({
+        where: { id: bookingId, attended: booking.attended },
+        data: {
+          attended,
+          attendedBy: session.user.role as "COACH" | "ADMIN",
+          attendedAt: new Date(),
+        },
       });
-    } else if (wasAttended && !attended) {
-      await reverseSessionRevenue(tx, { bookingId });
+      if (claim.count === 0) {
+        throw new Error("Status kehadiran udah diubah barengan, coba lagi.");
+      }
+
+      // Kredit wallet cuma jalan kalau paket ini beneran dibeli lewat
+      // Midtrans (ada Payment SUCCESS) -- paket yang di-assign manual/gratis
+      // sama admin gak punya uang beneran buat dibagi. coachProfile null
+      // (harusnya gak mungkin tapi dicek jaga-jaga) juga skip.
+      //
+      // PENTING (revisi 2026-09-12, paket lintas-kolam): kolam yang
+      // dikredit itu Booking.availability.poolId -- kolam TEMPAT SESI INI
+      // BENERAN DIAJAR -- bukan booking.package.poolId (kolam tempat
+      // paket dibeli, bisa beda kolam sekarang).
+      const successPayment = booking.package.payments[0];
+      const coachProfile = booking.availability.coach.coachProfile;
+      if (!successPayment || !coachProfile) return;
+
+      const perSessionValue = Math.round(successPayment.amount / booking.package.totalSesi);
+
+      if (!wasAttended && attended) {
+        await creditSessionRevenue(tx, {
+          poolId: booking.availability.poolId,
+          coachProfileId: coachProfile.id,
+          bookingId,
+          perSessionValue,
+        });
+      } else if (wasAttended && !attended) {
+        await reverseSessionRevenue(tx, { bookingId });
+      }
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("diubah barengan")) {
+      return { error: err.message };
     }
-  });
+    throw err;
+  }
 
   revalidatePath("/coach/riwayat-sesi");
   revalidatePath("/coach/saldo");
