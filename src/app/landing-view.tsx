@@ -320,51 +320,62 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
           buat legibility teks + sentuhan warna brand (indigo/rose) biar
           gak lepas dari identitas visual sisa halaman. */}
       <div className="relative overflow-hidden bg-[#0d0b1f]">
-        <Image
-          src="/images/landing/hero-swim.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-[50%_38%]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(8,7,18,0.6) 0%, rgba(8,7,18,0.35) 30%, rgba(8,7,18,0.72) 72%, rgba(8,7,18,0.96) 100%), radial-gradient(circle at 85% 10%, rgba(244,63,94,0.22) 0%, transparent 45%), radial-gradient(circle at 10% 85%, rgba(99,102,241,0.22) 0%, transparent 45%)",
-          }}
-        />
-        <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5">
-          <div className="flex items-center gap-2.5">
-            <Image
-              src="/logo.png"
-              alt="Swim Private Hub"
-              width={32}
-              height={32}
-              className="h-8 w-8 rounded-lg object-contain"
-              priority
-            />
-            <span className="font-semibold tracking-tight text-white">Swim Private Hub</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="/login">
-              <Button variant="ghost" size="sm" className="min-h-[44px] !rounded-full !text-white hover:!bg-white/10">
-                Login
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button size="sm" className="min-h-[44px] !rounded-full">
-                Daftar
-              </Button>
-            </Link>
-          </div>
-        </header>
+        {/* Blok visual hero -- dipaku min-h-screen (1 layar penuh, kayak
+            reference) BUKAN auto-height. Foto di-zoom (scale) dikit biar
+            ngisi frame penuh & kerasa immersive, bukan foto kecil ngambang
+            di tengah ruang gelap kosong. */}
+        <div className="relative flex min-h-screen flex-col">
+          <Image
+            src="/images/landing/hero-swim.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="scale-125 object-cover object-[62%_45%] sm:scale-110"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, rgba(8,7,18,0.55) 0%, rgba(8,7,18,0.3) 30%, rgba(8,7,18,0.75) 72%, rgba(8,7,18,0.97) 100%), radial-gradient(circle at 85% 10%, rgba(244,63,94,0.22) 0%, transparent 45%), radial-gradient(circle at 10% 85%, rgba(99,102,241,0.22) 0%, transparent 45%)",
+            }}
+          />
+          <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5">
+            <div className="flex items-center gap-2.5">
+              <Image
+                src="/logo.png"
+                alt="Swim Private Hub"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-lg object-contain"
+                priority
+              />
+              <span className="font-semibold tracking-tight text-white">Swim Private Hub</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="min-h-[44px] !rounded-full !text-white hover:!bg-white/10"
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button size="sm" className="min-h-[44px] !rounded-full">
+                  Daftar
+                </Button>
+              </Link>
+            </div>
+          </header>
 
-        {/* Pitch utama: platform yang nyambungin kolam, coach lintas kolam,
-            dan orang tua -- fork 3 jalur ("Anda yang mana?") ada di bawah. */}
-        <section className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-4 pb-14 pt-6 text-center sm:pb-20 sm:pt-10">
+          {/* Pitch utama, anchor ke BAWAH blok hero (mt-auto) -- sama kayak
+              reference yang teksnya nempel bawah, ninggalin ruang foto
+              kebuka di atas, bukan ke-center di tengah kotak pendek. Fork
+              3 jalur ("Anda yang mana?") ada di section terpisah bawah. */}
+          <section className="relative mx-auto mt-auto flex w-full max-w-3xl flex-col items-center px-4 pb-14 pt-6 text-center sm:pb-20 sm:pt-10">
           <Reveal eager>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/70">
               Marketplace les renang privat
@@ -415,7 +426,8 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
               ))}
             </div>
           </Reveal>
-        </section>
+          </section>
+        </div>
 
         {/* Stats band -- angka ASLI dari DB (bukan angka rekaan kayak
             "500+ students" di template referensi), query di page.tsx.
