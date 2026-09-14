@@ -8,22 +8,38 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Laporan komisi platform (revisi 2026-09-12, service provider posture):
-// duit udah kepotong OTOMATIS pas checkout (lihat src/lib/wallet.ts,
-// dikredit ke Pool.walletBalance abis commissionPercent-nya kepotong) --
-// halaman ini murni informasional (berapa yang UDAH jadi revenue
-// platform), bukan tagihan kayak versi connector sebelumnya.
+// Laporan komisi platform.
+//
+// BUG (ditemuin & dibenerin 2026-09-14): versi sebelumnya masih pake
+// model LAMA (pre-revisi 2026-09-12) -- komisi dihitung dari
+// Payment.amount (harga PAKET PENUH) x commissionPercent KOLAM TEMPAT
+// PAKET DIBELI, seolah komisi kepotong otomatis pas checkout. Itu udah
+// gak sesuai arsitektur sekarang: wallet baru dikredit PER SESI pas
+// attendance ditandai Hadir (lihat src/lib/wallet.ts), pake persentase
+// KOLAM TEMPAT SESI ITU BENERAN DIAJAR (booking.availability.poolId),
+// bukan kolam pembelian -- paket sekarang bisa dipake lintas-kolam.
+// Versi lama itu bisa nunjukin komisi buat paket yang sesinya BELUM
+// dipakai sama sekali, dan nyalahin ke kolam yang keliru.
+//
+// Versi ini ngitung ulang dari booking yang beneran attended=true,
+// pake rumus PERSIS SAMA kayak creditSessionRevenue (perSessionValue =
+// harga paket / totalSesi), dikelompokin per kolam TEMPAT SESI DIAJAR.
 export default async function KomisiPage() {
   await requireRole("ADMIN");
 
-  const payments = await prisma.payment.findMany({
-    where: { status: "SUCCESS" },
+  const attendedBookings = await prisma.booking.findMany({
+    where: { attended: true },
     select: {
-      amount: true,
-      package: {
+      availability: {
         select: {
           poolId: true,
           pool: { select: { name: true, commissionPercent: true } },
+        },
+      },
+      package: {
+        select: {
+          totalSesi: true,
+          payments: { where: { status: "SUCCESS" }, select: { amount: true }, take: 1 },
         },
       },
     },
@@ -31,41 +47,48 @@ export default async function KomisiPage() {
 
   const byPool = new Map<
     string,
-    { poolName: string; commissionPercent: number; totalRevenue: number }
+    { poolName: string; commissionPercent: number; sessionCount: number; totalCommission: number }
   >();
-  for (const p of payments) {
-    const key = p.package.poolId;
-    const existing = byPool.get(key) ?? {
-      poolName: p.package.pool.name,
-      commissionPercent: p.package.pool.commissionPercent,
-      totalRevenue: 0,
+
+  for (const b of attendedBookings) {
+    const successPayment = b.package.payments[0];
+    if (!successPayment) continue; // paket di-assign manual/gratis, gak ada uang beneran
+
+    const perSessionValue = Math.round(successPayment.amount / b.package.totalSesi);
+    const poolId = b.availability.poolId;
+    const commissionPercent = b.availability.pool.commissionPercent;
+    const platformAmount = Math.round((perSessionValue * commissionPercent) / 100);
+
+    const existing = byPool.get(poolId) ?? {
+      poolName: b.availability.pool.name,
+      commissionPercent,
+      sessionCount: 0,
+      totalCommission: 0,
     };
-    existing.totalRevenue += p.amount;
-    byPool.set(key, existing);
+    existing.sessionCount += 1;
+    existing.totalCommission += platformAmount;
+    byPool.set(poolId, existing);
   }
 
   const rows = [...byPool.entries()]
-    .map(([poolId, v]) => ({
-      poolId,
-      ...v,
-      platformCommission: Math.round((v.totalRevenue * v.commissionPercent) / 100),
-    }))
-    .sort((a, b) => b.platformCommission - a.platformCommission);
+    .map(([poolId, v]) => ({ poolId, ...v }))
+    .sort((a, b) => b.totalCommission - a.totalCommission);
 
-  const totalCommission = rows.reduce((sum, r) => sum + r.platformCommission, 0);
+  const totalCommission = rows.reduce((sum, r) => sum + r.totalCommission, 0);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Komisi Platform</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Komisi yang udah kepotong otomatis dari tiap transaksi (sisanya masuk saldo kolam).
-        Murni laporan -- gak ada yang perlu ditagih, uangnya udah ada di akun platform.
+        Komisi dari sesi yang beneran Hadir (bukan seluruh nilai paket) -- dikelompokin per
+        kolam tempat sesinya diajar, bukan kolam tempat paket dibeli. Sesi yang belum ditandai
+        Hadir belum kehitung di sini, sama kayak wallet kolam/coach.
       </p>
 
       {rows.length === 0 ? (
         <Card className="mt-6">
           <CardBody className="py-10 text-center text-sm text-text-muted">
-            Belum ada pembayaran berhasil.
+            Belum ada sesi yang ditandai Hadir dengan paket berbayar.
           </CardBody>
         </Card>
       ) : (
@@ -76,11 +99,11 @@ export default async function KomisiPage() {
                 <div>
                   <p className="text-sm font-medium text-text">{r.poolName}</p>
                   <p className="text-xs text-text-muted">
-                    Omzet {formatRupiah(r.totalRevenue)} &times; {r.commissionPercent}%
+                    {r.sessionCount} sesi hadir &times; {r.commissionPercent}%
                   </p>
                 </div>
                 <p className="text-sm font-semibold text-text">
-                  {formatRupiah(r.platformCommission)}
+                  {formatRupiah(r.totalCommission)}
                 </p>
               </CardBody>
             </Card>
