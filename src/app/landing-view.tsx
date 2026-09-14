@@ -313,17 +313,27 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
     >
       {/* Hero -- band gelap FIXED (bukan ikut tema light/dark, sama pola
           kayak CTA band di bawah) buat bikin statement kuat di atas fold,
-          gaya "dark photo hero" yang direferensiin (karate academy, run
-          club Framer template) TAPI tanpa foto asli -- gak ada foto
-          kolam/coach beneran, motion-blur gradient dipake sebagai
-          pengganti biar gak keliatan kayak stock photo palsu. */}
+          gaya "dark photo hero" yang direferensiin (run club Framer
+          template). Foto STOCK generik (Pexels, free-to-use license,
+          bukan kolam/coach/member beneran -- lihat Kredit Foto di
+          footer), bukan gradient doang lagi. Overlay gradient di atasnya
+          buat legibility teks + sentuhan warna brand (indigo/rose) biar
+          gak lepas dari identitas visual sisa halaman. */}
       <div className="relative overflow-hidden bg-[#0d0b1f]">
+        <Image
+          src="/images/landing/hero-swim.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[50%_38%]"
+        />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(circle at 15% 20%, rgba(99,102,241,0.35) 0%, transparent 45%), radial-gradient(circle at 85% 75%, rgba(244,63,94,0.25) 0%, transparent 50%)",
+              "linear-gradient(to bottom, rgba(8,7,18,0.6) 0%, rgba(8,7,18,0.35) 30%, rgba(8,7,18,0.72) 72%, rgba(8,7,18,0.96) 100%), radial-gradient(circle at 85% 10%, rgba(244,63,94,0.22) 0%, transparent 45%), radial-gradient(circle at 10% 85%, rgba(99,102,241,0.22) 0%, transparent 45%)",
           }}
         />
         <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5">
@@ -875,7 +885,8 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
           </div>
         </div>
         <p className="mt-6 text-center text-xs text-text-subtle">
-          © 2026 Swim Private Hub — marketplace les renang privat.
+          © 2026 Swim Private Hub — marketplace les renang privat. Foto hero: stok (Pexels, bebas komersial), bukan
+          member/kolam sungguhan.
         </p>
       </footer>
     </main>
