@@ -19,7 +19,7 @@ export default async function Home() {
     redirect("/ganti-password");
   }
 
-  const roleHome: Record<string, string> = {
+  const roleHome: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", string> = {
     ADMIN: "/admin",
     COACH: "/coach",
     MEMBER: "/member/booking",

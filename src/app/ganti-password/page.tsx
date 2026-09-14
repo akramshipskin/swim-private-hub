@@ -20,10 +20,15 @@ export default async function GantiPasswordPage() {
   // pesan "login pertama kamu" yang salah + form setup peserta yang
   // gak nyambung sama data yang udah ada.
   if (!session.user.mustChangePassword) {
-    const roleHome: Record<string, string> = {
+    // Record<Role, string> sengaja (bukan Record<string, string>) --
+    // 3 salinan map ini nyebar di app (sini, page.tsx, ganti-password/
+    // actions.ts) dan POOL_OWNER pernah ketinggalan di 2 dari 3-nya
+    // karena Record<string,...> gak maksa semua role keisi.
+    const roleHome: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", string> = {
       ADMIN: "/admin",
       COACH: "/coach",
       MEMBER: "/member/booking",
+      POOL_OWNER: "/pool/saldo",
     };
     redirect(roleHome[session.user.role]);
   }

@@ -61,10 +61,15 @@ export async function changePassword(
 
   await unstable_update({ user: { mustChangePassword: false } });
 
-  const roleHome: Record<string, string> = {
+  // Record<Role, string> (bukan Record<string, string>) sengaja -- biar
+  // TypeScript maksa tiap role kekasih entry, gak ada yang keskip diem-diem
+  // kalau ada role baru (ini yang bikin POOL_OWNER pernah ketinggalan di
+  // sini padahal udah ada di roleHome-nya src/app/page.tsx).
+  const roleHome: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", string> = {
     ADMIN: "/admin",
     COACH: "/coach",
     MEMBER: "/member/booking",
+    POOL_OWNER: "/pool/saldo",
   };
   redirect(roleHome[session.user.role]);
 }
