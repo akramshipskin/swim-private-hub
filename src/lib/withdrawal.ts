@@ -125,11 +125,22 @@ export async function requestCoachWithdrawal(coachProfileId: string) {
 // Dipanggil admin kalau pencairan GAGAL diproses (Iris nolak, atau admin
 // batalin manual) -- saldo yang udah kepotong pas request dibuat WAJIB
 // balik, jangan biarin ilang gitu aja.
+//
+// Conditional update (CAS) di WHERE status -- tanpa ini, double-klik
+// tombol "Tolak"/gagal Iris dobel bisa manggil ini 2x buat request yang
+// sama, jadi saldo dibalikin DUA KALI. Sama kelas bug kayak
+// cancelBooking/markAttendance, guard di titik yang sama (conditional
+// update), bukan cuma di caller.
 export async function markWithdrawalFailed(withdrawalRequestId: string, reason: string) {
   await prisma.$transaction(async (tx) => {
-    const req = await tx.withdrawalRequest.update({
-      where: { id: withdrawalRequestId },
+    const claim = await tx.withdrawalRequest.updateMany({
+      where: { id: withdrawalRequestId, status: { in: ["PENDING", "PROCESSING"] } },
       data: { status: "FAILED", failureReason: reason, processedAt: new Date() },
+    });
+    if (claim.count === 0) return;
+
+    const req = await tx.withdrawalRequest.findUniqueOrThrow({
+      where: { id: withdrawalRequestId },
     });
 
     if (req.poolId) {
