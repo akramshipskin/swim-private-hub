@@ -15,12 +15,18 @@ export async function requireRole(role: "ADMIN" | "COACH" | "MEMBER" | "POOL_OWN
     redirect("/login");
   }
 
+  // Pasangan encodeURIComponent di proxy.ts (lihat komentar di sana) --
+  // name/email dioper lewat header dalam bentuk encoded, decode balik di
+  // sini biar caller dapet nilai asli.
+  const rawName = h.get("x-session-user-name");
+  const rawEmail = h.get("x-session-user-email");
+
   return {
     user: {
       id,
       role: userRole,
-      name: h.get("x-session-user-name") || null,
-      email: h.get("x-session-user-email") || null,
+      name: rawName ? decodeURIComponent(rawName) : null,
+      email: rawEmail ? decodeURIComponent(rawEmail) : null,
       mustChangePassword: h.get("x-session-must-change-password") === "true",
     },
   };
