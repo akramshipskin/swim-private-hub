@@ -39,14 +39,31 @@ export async function updatePasswordProfil(
   const session = await auth();
   if (!session) return { error: "Sesi habis, login ulang." };
 
+  const currentPassword = formData.get("currentPassword") as string;
   const newPassword = formData.get("newPassword") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
+  if (!currentPassword) {
+    return { error: "Password saat ini wajib diisi" };
+  }
   if (!newPassword || newPassword.length < 8) {
     return { error: "Password baru minimal 8 karakter" };
   }
   if (newPassword !== confirmPassword) {
     return { error: "Konfirmasi password gak sama" };
+  }
+
+  // Ganti password dari sini WAJIB verifikasi password lama dulu -- tanpa
+  // ini, siapapun yang megang session aktif (komputer bersama yang lupa
+  // logout, session ke-curi) bisa diem-diem ganti password dan ngunci
+  // pemilik akun aslinya, tanpa perlu tau password lamanya sama sekali.
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: session.user.id },
+    select: { passwordHash: true },
+  });
+  const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!valid) {
+    return { error: "Password saat ini salah" };
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 12);

@@ -20,6 +20,9 @@ export default function EditPasswordForm() {
 
   return (
     <form key={formKey} action={formAction} className="flex flex-col gap-4">
+      <Field label="Password Saat Ini">
+        <PasswordInput name="currentPassword" placeholder="••••••••" required autoComplete="current-password" />
+      </Field>
       <Field label="Password Baru">
         <PasswordInput name="newPassword" placeholder="••••••••" required autoComplete="new-password" />
       </Field>
