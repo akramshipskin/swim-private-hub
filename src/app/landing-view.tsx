@@ -540,7 +540,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
             fade-nya, dan `transform` di ANCESTOR bikin containing-block
             baru buat descendant `position: sticky`. */}
         <div className="flex flex-col">
-          <div className="sticky top-20 z-10 mb-16 rounded-2xl border border-border bg-surface shadow-xl sm:top-24 sm:mb-24">
+          <div className="sticky top-20 z-10 mb-16 flex flex-col rounded-2xl border border-border bg-surface shadow-xl sm:top-24 sm:mb-24 sm:min-h-[420px] sm:justify-center">
             <Reveal className="p-5 sm:p-8">
               <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
                 <div>
@@ -582,7 +582,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
             </Reveal>
           </div>
 
-          <div className="sticky top-28 z-20 mb-16 rounded-2xl border border-border bg-surface shadow-xl sm:top-32 sm:mb-24">
+          <div className="sticky top-28 z-20 mb-16 flex flex-col rounded-2xl border border-border bg-surface shadow-xl sm:top-32 sm:mb-24 sm:min-h-[420px] sm:justify-center">
             <Reveal className="p-5 sm:p-8">
               <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
                 <div className="sm:order-2">
@@ -607,7 +607,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
             </Reveal>
           </div>
 
-          <div className="sticky top-36 z-30 mb-16 rounded-2xl border border-border bg-surface shadow-xl sm:top-40 sm:mb-24">
+          <div className="sticky top-36 z-30 mb-16 flex flex-col rounded-2xl border border-border bg-surface shadow-xl sm:top-40 sm:mb-24 sm:min-h-[420px] sm:justify-center">
             <Reveal className="p-5 sm:p-8">
               <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
                 <div>
@@ -639,7 +639,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
             </Reveal>
           </div>
 
-          <div className="sticky top-44 z-40 rounded-2xl border border-border bg-surface shadow-xl sm:top-48">
+          <div className="sticky top-44 z-40 flex flex-col rounded-2xl border border-border bg-surface shadow-xl sm:top-48 sm:min-h-[420px] sm:justify-center">
             <Reveal className="p-5 sm:p-8">
               <div className="grid grid-cols-1 items-center gap-6 sm:grid-cols-2">
                 <div className="sm:order-2">
