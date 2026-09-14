@@ -95,7 +95,13 @@ export async function addAvailability(
   }
 
   if (freeChunks.length > 0) {
-    await prisma.availability.createMany({ data: freeChunks });
+    // skipDuplicates cuma jaring pengaman buat double-submit BENERAN
+    // bersamaan (2 request keduanya lolos pre-check di atas sebelum
+    // salah satu commit) -- pesan conflict yang udah ramah di atas
+    // tetep jalan normal buat kasus biasa (submit ulang beberapa detik
+    // kemudian), ini cuma nyegah 500 mentah (unique constraint violation)
+    // buat sliver TOCTOU yang sangat jarang.
+    await prisma.availability.createMany({ data: freeChunks, skipDuplicates: true });
 
     // Broadcast 1 notif per aksi "Tambah Slot" (bukan per slot per jam)
     // biar member gak kebanjiran notif kalau coach buka rentang jam
