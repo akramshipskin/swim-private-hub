@@ -48,6 +48,15 @@ export async function POST(request: Request) {
   if (password.length < 8) {
     return Response.json({ error: "Password minimal 8 karakter" }, { status: 400 });
   }
+  // Form udah validasi closeTime > openTime di client, tapi request API
+  // bisa dipalsu langsung (bukan cuma dropdown UI) -- validasi ulang di
+  // sini, sama pola kayak affiliasi coach di addAvailability.
+  if (!/^\d{2}:\d{2}$/.test(openTime) || !/^\d{2}:\d{2}$/.test(closeTime)) {
+    return Response.json({ error: "Format jam buka/tutup gak valid" }, { status: 400 });
+  }
+  if (closeTime <= openTime) {
+    return Response.json({ error: "Jam tutup harus setelah jam buka" }, { status: 400 });
+  }
 
   const existing = await prisma.user.findFirst({
     where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
