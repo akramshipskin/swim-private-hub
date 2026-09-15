@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Logotype } from "@/components/ui/logotype";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -30,7 +31,7 @@ export function LegalPageLayout({
               height={32}
               className="h-8 w-8 rounded-lg object-contain"
             />
-            <span className="text-sm font-semibold text-text">Swim Private Hub</span>
+            <Logotype className="text-sm" />
           </Link>
           <Link href="/" className="text-sm font-medium text-brand-600 hover:underline">
             ← Beranda

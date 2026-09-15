@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
+import { Logotype } from "@/components/ui/logotype";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Textarea } from "@/components/ui/input";
@@ -96,7 +97,7 @@ export default function RegisterCoachForm() {
           className="mb-3 h-14 w-14 rounded-2xl object-contain shadow-lg shadow-brand-500/20"
           priority
         />
-        <p className="text-lg font-semibold text-text">Swim Private Hub</p>
+        <p className="text-lg text-text"><Logotype /></p>
         <p className="text-sm text-text-muted">Ngajar renang di beberapa kolam mitra</p>
       </div>
 

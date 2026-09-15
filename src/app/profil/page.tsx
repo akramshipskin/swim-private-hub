@@ -41,7 +41,6 @@ export default async function ProfilPage() {
   return (
     <div className="min-h-screen">
       <NavBar
-        brand="Swim Private Hub"
         userName={session.user.name ?? ""}
         userRole={roleLabel[session.user.role] ?? session.user.role}
         links={roleNavLinks[session.user.role]}

@@ -19,7 +19,6 @@ export default async function PoolLayout({
   return (
     <div className="min-h-screen">
       <NavBar
-        brand="Swim Private Hub"
         userName={session.user.name ?? ""}
         userRole="Kolam"
         links={roleNavLinks.POOL_OWNER}

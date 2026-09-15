@@ -19,7 +19,6 @@ export default async function MemberLayout({
   return (
     <div className="min-h-screen">
       <NavBar
-        brand="Swim Private Hub"
         userName={session.user.name ?? ""}
         userRole="Member"
         links={roleNavLinks.MEMBER}

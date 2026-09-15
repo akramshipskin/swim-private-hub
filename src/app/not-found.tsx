@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Logotype } from "@/components/ui/logotype";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ export default function NotFound() {
           className="mb-3 h-14 w-14 rounded-2xl object-contain shadow-lg shadow-brand-500/20"
           priority
         />
-        <p className="text-lg font-semibold text-text">Swim Private Hub</p>
+        <p className="text-lg text-text"><Logotype /></p>
       </div>
 
       <Card className="w-full max-w-sm">

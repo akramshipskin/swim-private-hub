@@ -19,7 +19,6 @@ export default async function CoachLayout({
   return (
     <div className="min-h-screen">
       <NavBar
-        brand="Swim Private Hub"
         userName={session.user.name ?? ""}
         userRole="Coach"
         links={roleNavLinks.COACH}

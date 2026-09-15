@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/ui/reveal";
 import { StatCounter } from "@/components/ui/stat-counter";
+import { Logotype } from "@/components/ui/logotype";
 import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
 
 const CARD_HOVER = "transition-all duration-300 hover:-translate-y-1 hover:shadow-lg";
@@ -351,7 +352,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
                 className="h-8 w-8 rounded-lg object-contain"
                 priority
               />
-              <span className="font-semibold tracking-tight text-white">Swim Private Hub</span>
+              <Logotype className="text-white" />
             </div>
             <div className="flex items-center gap-2">
               <Link href="/login">
@@ -868,7 +869,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 text-xs text-text-subtle sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="font-medium text-text-muted">Swim Private Hub</p>
+            <Logotype className="text-text-muted" />
             <p className="mt-1">[ALAMAT]</p>
             <p className="mt-1">
               WhatsApp{" "}

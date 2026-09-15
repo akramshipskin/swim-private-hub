@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { Logotype } from "@/components/ui/logotype";
 import { Card, CardBody } from "@/components/ui/card";
 import ChangePasswordForm from "./change-password-form";
 
@@ -44,7 +45,7 @@ export default async function GantiPasswordPage() {
           className="mb-3 h-14 w-14 rounded-2xl object-contain shadow-lg shadow-brand-500/20"
           priority
         />
-        <p className="text-lg font-semibold text-text">Swim Private Hub</p>
+        <p className="text-lg text-text"><Logotype /></p>
         <p className="text-sm text-text-muted">
           Ini login pertama kamu -- ganti password bawaan dulu ya.
         </p>

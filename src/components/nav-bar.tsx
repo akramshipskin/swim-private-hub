@@ -3,14 +3,13 @@ import Image from "next/image";
 import { MobileBottomNav, type BottomNavLink } from "@/components/mobile-bottom-nav";
 import { DesktopTabNav } from "@/components/desktop-tab-nav";
 import { UserMenu } from "@/components/user-menu";
+import { Logotype } from "@/components/ui/logotype";
 
 export function NavBar({
-  brand,
   links,
   userName,
   userRole,
 }: {
-  brand: string;
   links: BottomNavLink[];
   userName: string;
   userRole: string;
@@ -33,7 +32,7 @@ export function NavBar({
               className="flex shrink-0 items-center gap-2 text-sm font-semibold text-text"
             >
               <Image src="/logo.png" alt="" width={28} height={28} className="h-7 w-7 rounded-lg object-contain" />
-              {brand}
+              <Logotype className="text-sm" />
             </Link>
 
             <UserMenu userName={userName} userRole={userRole} />

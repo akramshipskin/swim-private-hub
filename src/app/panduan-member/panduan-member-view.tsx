@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Logotype } from "@/components/ui/logotype";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -128,7 +129,7 @@ export default function PanduanMemberView() {
       <Step n={1} title="Buka aplikasi pertama kali" desc="Belum login sama sekali.">
         <div className="flex flex-col items-center gap-2 py-3 text-center">
           <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-xl object-contain" />
-          <p className="text-sm font-semibold text-text">Swim Private Hub</p>
+          <p className="text-sm text-text"><Logotype className="text-sm" /></p>
           <p className="max-w-[220px] text-xs text-text-muted">
             Booking jadwal renang dengan coach favoritmu, kapan aja lewat HP.
           </p>

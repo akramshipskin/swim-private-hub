@@ -26,6 +26,7 @@ const PANDUAN_CSS = `
     --brand: #14140F;
     --brand-dark: #14140F;
     --brand-light: #F1FBDD;
+    --brand-accent: #8FB82B;
     --accent: #e11d48;
     --accent-light: #fff1f2;
     --member: #14140F;
@@ -56,6 +57,7 @@ const PANDUAN_CSS = `
       --brand: #6F8F1E;
       --brand-dark: #C6FF3D;
       --brand-light: #1E210F;
+      --brand-accent: #C6FF3D;
       --accent: #fb7185;
       --accent-light: #881337;
       --member: #6F8F1E;
@@ -82,6 +84,7 @@ const PANDUAN_CSS = `
     --brand: #6F8F1E;
     --brand-dark: #C6FF3D;
     --brand-light: #1E210F;
+    --brand-accent: #C6FF3D;
     --accent: #fb7185;
     --accent-light: #881337;
     --member: #6F8F1E;
@@ -130,7 +133,8 @@ const PANDUAN_CSS = `
     margin: 0 -20px 0;
   }
   .topbar-inner { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 800; font-size: 16px; letter-spacing: -0.01em; white-space: nowrap; }
+  .brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: -0.02em; white-space: nowrap; }
+  .brand .dot { color: var(--brand-accent); }
   .brand-mark { width: 30px; height: 30px; border-radius: 9px; overflow: hidden; flex-shrink: 0; display: flex; }
   .brand-mark img { width: 100%; height: 100%; object-fit: cover; }
   .tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
@@ -327,7 +331,7 @@ const PANDUAN_BODY = `
 <div class="app">
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="brand"><span class="brand-mark"><img src="/logo.png" alt="Logo Swim Private Hub"></span> Swim Private Hub</div>
+      <div class="brand"><span class="brand-mark"><img src="/logo.png" alt="Logo Swim Private Hub"></span><span>swim<span class="dot">.</span>privatehub</span></div>
       <nav class="tabs" role="tablist">
         <button class="tab active" data-tab="presentasi">Presentasi</button>
         <button class="tab" data-tab="install">Cara Install ke HP</button>
