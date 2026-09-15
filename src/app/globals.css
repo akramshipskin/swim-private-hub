@@ -1,33 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f7fd;
-  --foreground: #1e1b2e;
+  --background: #f6f6ee;
+  --foreground: #14140f;
 
-  /* Indigo -- identitas marketplace, sengaja beda total dari
-     biru-teal "air kolam" les-renang-cianjur. Warna utama, tombol/link/CTA. */
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  /* Lime Pulse -- charcoal + lime, brand guideline v1.0. brand-600 dipake
+     buat solid fill (bg-brand-600 text-white) di banyak komponen, jadi
+     HARUS tetep charcoal (gelap) biar teks putih di atasnya kebaca --
+     lime murni gak dipake di scale ini karena bakal bikin teks putih
+     ilang kontras. Lime murni cuma nongol lewat brand-500 (ring/border/
+     dot, gak nanggung kontras teks) dan literal #C6FF3D di tempat yang
+     emang butuh warna lime penuh (landing hero, tombol CTA khusus). */
+  --color-brand-50: #f1fbdd;
+  --color-brand-100: #e3f5b0;
+  --color-brand-500: #9fcc1f;
+  --color-brand-600: #14140f;
+  --color-brand-700: #14140f;
 
-  /* Rose -- aksen buat badge "Populer", highlight, gradient, dan kartu
-     peran Admin. Kontras jelas sama indigo TANPA ijo (biar gak ketuker
-     visual sama warna success/peran Coach) atau oranye/coral kayak
-     brand lama. */
+  /* Rose -- tetep, gak diganti rebrand ini. Cuma dipake buat badge
+     "Populer" & kartu peran Admin, gak nyenggol identitas utama lime/
+     charcoal, dan masih kontras jelas sama keduanya. */
   --color-accent-50: #fff1f2;
   --color-accent-100: #ffe4e6;
   --color-accent-500: #f43f5e;
   --color-accent-600: #e11d48;
 
   --color-surface: #ffffff;
-  --color-surface-muted: #f3f2fb;
-  --color-border: #e3e1f5;
+  --color-surface-muted: #ece9dc;
+  --color-border: #dedaca;
 
-  --color-text: #1e1b2e;
-  --color-text-muted: #56526b;
-  --color-text-subtle: #77738c;
+  --color-text: #14140f;
+  --color-text-muted: #5c5945;
+  --color-text-subtle: #8b8770;
 
   --color-success-bg: #ecfdf5;
   --color-success-text: #047857;
@@ -47,27 +51,32 @@
    OS lagi dark. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #100e21;
-    --foreground: #ece9fb;
+    --background: #14140f;
+    --foreground: #f2efe3;
 
-    --color-brand-50: #1e1b3a;
-    --color-brand-100: #2a2555;
-    --color-brand-500: #818cf8;
-    --color-brand-600: #6366f1;
-    --color-brand-700: #a5b4fc;
+    /* brand-600 di dark mode GAK BISA charcoal (background-nya udah
+       charcoal, tombol jadi invisible) -- lime-dark (olive) dipilih:
+       cukup vivid buat nongol di atas bg gelap, tapi masih cukup gelap
+       biar text-white di atasnya (dipake statis di banyak komponen)
+       tetep kebaca. Sama pola kayak indigo dark-600 dulu. */
+    --color-brand-50: #1e210f;
+    --color-brand-100: #262b14;
+    --color-brand-500: #c6ff3d;
+    --color-brand-600: #6f8f1e;
+    --color-brand-700: #c6ff3d;
 
     --color-accent-50: #4c0519;
     --color-accent-100: #881337;
     --color-accent-500: #fb7185;
     --color-accent-600: #fda4af;
 
-    --color-surface: #16142b;
-    --color-surface-muted: #1c1a35;
-    --color-border: #2e2b52;
+    --color-surface: #1b1a12;
+    --color-surface-muted: #211f15;
+    --color-border: #34311f;
 
-    --color-text: #ece9fb;
-    --color-text-muted: #a8a3c9;
-    --color-text-subtle: #78749e;
+    --color-text: #f2efe3;
+    --color-text-muted: #b4af98;
+    --color-text-subtle: #7d7967;
 
     --color-success-bg: #0d2e22;
     --color-success-text: #34d399;
@@ -87,27 +96,27 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --background: #100e21;
-  --foreground: #ece9fb;
+  --background: #14140f;
+  --foreground: #f2efe3;
 
-  --color-brand-50: #1e1b3a;
-  --color-brand-100: #2a2555;
-  --color-brand-500: #818cf8;
-  --color-brand-600: #6366f1;
-  --color-brand-700: #a5b4fc;
+  --color-brand-50: #1e210f;
+  --color-brand-100: #262b14;
+  --color-brand-500: #c6ff3d;
+  --color-brand-600: #6f8f1e;
+  --color-brand-700: #c6ff3d;
 
   --color-accent-50: #4c0519;
   --color-accent-100: #881337;
   --color-accent-500: #fb7185;
   --color-accent-600: #fda4af;
 
-  --color-surface: #16142b;
-  --color-surface-muted: #1c1a35;
-  --color-border: #2e2b52;
+  --color-surface: #1b1a12;
+  --color-surface-muted: #211f15;
+  --color-border: #34311f;
 
-  --color-text: #ece9fb;
-  --color-text-muted: #a8a3c9;
-  --color-text-subtle: #78749e;
+  --color-text: #f2efe3;
+  --color-text-muted: #b4af98;
+  --color-text-subtle: #7d7967;
 
   --color-success-bg: #0d2e22;
   --color-success-text: #34d399;

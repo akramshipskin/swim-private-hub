@@ -16,20 +16,20 @@ const PANDUAN_CSS = `
      landing (member=brand indigo, coach=success hijau, admin=accent
      rose) -- ganti bareng pas rebrand jadi Swim Private Hub. */
   :root {
-    --bg: #f7f7fd;
+    --bg: #F6F6EE;
     --surface: #ffffff;
-    --surface-muted: #f3f2fb;
-    --border: #e3e1f5;
-    --text: #1e1b2e;
-    --text-muted: #56526b;
-    --text-subtle: #77738c;
-    --brand: #4f46e5;
-    --brand-dark: #4338ca;
-    --brand-light: #e0e7ff;
+    --surface-muted: #ECE9DC;
+    --border: #DEDACA;
+    --text: #14140F;
+    --text-muted: #5C5945;
+    --text-subtle: #8B8770;
+    --brand: #14140F;
+    --brand-dark: #14140F;
+    --brand-light: #F1FBDD;
     --accent: #e11d48;
     --accent-light: #fff1f2;
-    --member: #4f46e5;
-    --member-bg: #eef2ff;
+    --member: #14140F;
+    --member-bg: #F1FBDD;
     --coach: #047857;
     --coach-bg: #ecfdf5;
     --admin: #e11d48;
@@ -38,7 +38,7 @@ const PANDUAN_CSS = `
     --success-bg: #ecfdf5;
     --warn: #b45309;
     --warn-bg: #fffbeb;
-    --shadow: 0 1px 2px rgba(30,27,46,0.04), 0 8px 24px -12px rgba(30,27,46,0.18);
+    --shadow: 0 1px 2px rgba(20,20,15,0.04), 0 8px 24px -12px rgba(20,20,15,0.18);
     --radius: 16px;
     --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
     --font-body: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
@@ -46,20 +46,20 @@ const PANDUAN_CSS = `
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #100e21;
-      --surface: #16142b;
-      --surface-muted: #1c1a35;
-      --border: #2e2b52;
-      --text: #ece9fb;
-      --text-muted: #a8a3c9;
-      --text-subtle: #78749e;
-      --brand: #818cf8;
-      --brand-dark: #a5b4fc;
-      --brand-light: #2a2555;
+      --bg: #14140F;
+      --surface: #1B1A12;
+      --surface-muted: #211F15;
+      --border: #34311F;
+      --text: #F2EFE3;
+      --text-muted: #B4AF98;
+      --text-subtle: #7D7967;
+      --brand: #6F8F1E;
+      --brand-dark: #C6FF3D;
+      --brand-light: #1E210F;
       --accent: #fb7185;
       --accent-light: #881337;
-      --member: #818cf8;
-      --member-bg: #1e1b3a;
+      --member: #6F8F1E;
+      --member-bg: #1E210F;
       --coach: #34d399;
       --coach-bg: #0d2e22;
       --admin: #fb7185;
@@ -72,20 +72,20 @@ const PANDUAN_CSS = `
     }
   }
   :root[data-theme="dark"] {
-    --bg: #100e21;
-    --surface: #16142b;
-    --surface-muted: #1c1a35;
-    --border: #2e2b52;
-    --text: #ece9fb;
-    --text-muted: #a8a3c9;
-    --text-subtle: #78749e;
-    --brand: #818cf8;
-    --brand-dark: #a5b4fc;
-    --brand-light: #2a2555;
+    --bg: #14140F;
+    --surface: #1B1A12;
+    --surface-muted: #211F15;
+    --border: #34311F;
+    --text: #F2EFE3;
+    --text-muted: #B4AF98;
+    --text-subtle: #7D7967;
+    --brand: #6F8F1E;
+    --brand-dark: #C6FF3D;
+    --brand-light: #1E210F;
     --accent: #fb7185;
     --accent-light: #881337;
-    --member: #818cf8;
-    --member-bg: #1e1b3a;
+    --member: #6F8F1E;
+    --member-bg: #1E210F;
     --coach: #34d399;
     --coach-bg: #0d2e22;
     --admin: #fb7185;

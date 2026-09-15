@@ -280,26 +280,26 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
     // biasanya ngikutin dark mode; tanpa pin ini, teks jadi nyaris gak
     // kebaca di atas bg cream pas viewer OS-nya dark mode.
     <main
-      className="flex min-h-screen flex-col bg-[#f1f0ea] text-[#141313]"
+      className="flex min-h-screen flex-col bg-[#F6F6EE] text-[#14140F]"
       style={
         {
-          "--background": "#f7f7fd",
-          "--foreground": "#1e1b2e",
-          "--color-brand-50": "#eef2ff",
-          "--color-brand-100": "#e0e7ff",
-          "--color-brand-500": "#6366f1",
-          "--color-brand-600": "#4f46e5",
-          "--color-brand-700": "#4338ca",
+          "--background": "#F6F6EE",
+          "--foreground": "#14140F",
+          "--color-brand-50": "#F1FBDD",
+          "--color-brand-100": "#E3F5B0",
+          "--color-brand-500": "#9FCC1F",
+          "--color-brand-600": "#14140F",
+          "--color-brand-700": "#14140F",
           "--color-accent-50": "#fff1f2",
           "--color-accent-100": "#ffe4e6",
           "--color-accent-500": "#f43f5e",
           "--color-accent-600": "#e11d48",
           "--color-surface": "#ffffff",
-          "--color-surface-muted": "#f3f2fb",
-          "--color-border": "#e3e1f5",
-          "--color-text": "#1e1b2e",
-          "--color-text-muted": "#56526b",
-          "--color-text-subtle": "#77738c",
+          "--color-surface-muted": "#ECE9DC",
+          "--color-border": "#DEDACA",
+          "--color-text": "#14140F",
+          "--color-text-muted": "#5C5945",
+          "--color-text-subtle": "#8B8770",
           "--color-success-bg": "#ecfdf5",
           "--color-success-text": "#047857",
           "--color-warning-bg": "#fffbeb",
@@ -319,7 +319,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
           footer), bukan gradient doang lagi. Overlay gradient di atasnya
           buat legibility teks + sentuhan warna brand (indigo/rose) biar
           gak lepas dari identitas visual sisa halaman. */}
-      <div className="relative overflow-hidden bg-[#0d0b1f]">
+      <div className="relative overflow-hidden bg-[#14140F]">
         {/* Blok visual hero -- dipaku min-h-screen (1 layar penuh, kayak
             reference) BUKAN auto-height. Foto di-zoom (scale) dikit biar
             ngisi frame penuh & kerasa immersive, bukan foto kecil ngambang
@@ -338,7 +338,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                "linear-gradient(to bottom, rgba(8,7,18,0.55) 0%, rgba(8,7,18,0.3) 30%, rgba(8,7,18,0.75) 72%, rgba(8,7,18,0.97) 100%), radial-gradient(circle at 85% 10%, rgba(244,63,94,0.22) 0%, transparent 45%), radial-gradient(circle at 10% 85%, rgba(99,102,241,0.22) 0%, transparent 45%)",
+                "linear-gradient(to bottom, rgba(20,20,15,0.55) 0%, rgba(20,20,15,0.3) 30%, rgba(20,20,15,0.75) 72%, rgba(20,20,15,0.97) 100%), radial-gradient(circle at 85% 10%, rgba(244,63,94,0.18) 0%, transparent 45%), radial-gradient(circle at 10% 85%, rgba(198,255,61,0.22) 0%, transparent 45%)",
             }}
           />
           <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5">
@@ -831,13 +831,13 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
 
       {/* CTA band penutup -- gradient & warna teks tombol dipaku pake hex
           literal (bukan token brand-700), soalnya brand-700 sengaja
-          "dibalik" jadi lavender terang di dark mode (buat teks di atas
+          "dibalik" jadi lime terang di dark mode (buat teks di atas
           surface gelap) -- dipake sebagai warna BACKGROUND/teks di sini
-          malah bikin band nyilaukan & tombol putih teksnya nyaris gak
+          malah bikin band nyala lime & tombol putih teksnya nyaris gak
           kebaca. Band ini sengaja fixed 1 tampilan di kedua tema. */}
       <section className="mx-auto w-full max-w-3xl px-4 pb-16">
         <Reveal>
-          <div className="rounded-2xl bg-gradient-to-br from-[#4f46e5] to-[#1e1b4b] px-6 py-9 text-center text-white sm:px-10 sm:py-12">
+          <div className="rounded-2xl bg-gradient-to-br from-[#14140F] to-[#0a0a08] px-6 py-9 text-center text-white sm:px-10 sm:py-12">
             <h2 className="text-xl font-semibold sm:text-2xl">Siap dipakai hari ini</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-white/85">
               Gak perlu training panjang — alurnya udah familiar kayak booking online pada umumnya. Coba dulu
@@ -847,7 +847,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
               <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer">
                 <Button
                   variant="secondary"
-                  className="!rounded-full !bg-white !text-[#4338ca] transition-transform hover:!bg-white/90 hover:scale-[1.03] active:scale-[0.98]"
+                  className="!rounded-full !bg-[#C6FF3D] !text-[#14140F] transition-transform hover:!bg-[#D9FF7A] hover:scale-[1.03] active:scale-[0.98]"
                 >
                   Hubungi Kami
                 </Button>

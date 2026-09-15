@@ -15,7 +15,7 @@ export default async function OpengraphImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%)",
+          background: "linear-gradient(135deg, #14140f 0%, #0a0a08 100%)",
           fontFamily: "sans-serif",
         }}
       >
@@ -25,7 +25,7 @@ export default async function OpengraphImage() {
             width: 96,
             height: 96,
             borderRadius: 24,
-            background: "rgba(255,255,255,0.15)",
+            background: "#C6FF3D",
             alignItems: "center",
             justifyContent: "center",
             marginBottom: 32,
