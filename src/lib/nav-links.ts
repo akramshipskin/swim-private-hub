@@ -1,5 +1,15 @@
 import type { BottomNavLink } from "@/components/mobile-bottom-nav";
 
+// Fallback (?? role mentah) di pemakaiannya, jadi kalau ada role baru yang
+// ketinggalan di sini gak sampe nunjukin "undefined" -- tapi tetep nunjukin
+// enum mentah kayak "POOL_OWNER" bukan label rapi kayak role lain.
+export const roleLabel: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", string> = {
+  ADMIN: "Admin",
+  COACH: "Coach",
+  MEMBER: "Member",
+  POOL_OWNER: "Pemilik Kolam",
+};
+
 // group opsional -- 8 link ADMIN dulu 1 baris flat (DesktopTabNav), sekarang
 // dikelompokin jadi kategori objek bisnis (Booking/Kolam/Coach/User/Keuangan)
 // di SidebarNav, bukan tab numpuk. "Pengaturan" (Profil Saya) sengaja

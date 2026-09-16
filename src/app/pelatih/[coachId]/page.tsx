@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { buildCoachInquiryWaLink } from "@/lib/whatsapp";
+import { roleNavLinks, roleLabel } from "@/lib/nav-links";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Logotype } from "@/components/ui/logotype";
+import { NavBar } from "@/components/nav-bar";
 
 // Coach shortcut page (pool-first browse + cheap cross-pool discovery,
 // locked /plan-eng-review 2026-09-12, cross-model tension #4): pool-first
@@ -23,6 +27,7 @@ export default async function CoachShortcutPage({
   params: Promise<{ coachId: string }>;
 }) {
   const { coachId } = await params;
+  const session = await auth();
 
   const coach = await prisma.user.findUnique({
     where: { id: coachId, role: "COACH" },
@@ -42,73 +47,106 @@ export default async function CoachShortcutPage({
 
   if (!coach) notFound();
 
+  const content = (
+    <main className="mx-auto max-w-lg px-4 py-8">
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
+        {coach.coachProfile?.hasCertification && (
+          <Badge tone="accent">
+            Bersertifikat{coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
+          </Badge>
+        )}
+      </div>
+      {coach.coachProfile?.bio && (
+        <p className="mt-2 text-sm text-text-muted">{coach.coachProfile.bio}</p>
+      )}
+
+      {coach.coachProfile && coach.coachProfile.specialties.length > 0 && (
+        <>
+          <h2 className="mt-6 text-sm font-semibold text-text-muted">Keahlian</h2>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {coach.coachProfile.specialties.map((s) => (
+              <Badge key={s} tone="brand">
+                {s}
+              </Badge>
+            ))}
+          </div>
+        </>
+      )}
+
+      <h2 className="mt-6 text-sm font-semibold text-text-muted">Ngajar di kolam</h2>
+      {coach.poolAffiliations.length === 0 ? (
+        <p className="mt-2 text-sm text-text-muted">Belum terafiliasi ke kolam manapun.</p>
+      ) : (
+        <ul className="mt-2 flex flex-col gap-2">
+          {coach.poolAffiliations.map(({ pool }) => (
+            <Card key={pool.id}>
+              <CardBody className="py-3">
+                <p className="text-sm font-medium text-text">{pool.name}</p>
+                {pool.address && <p className="text-xs text-text-muted">{pool.address}</p>}
+              </CardBody>
+            </Card>
+          ))}
+        </ul>
+      )}
+
+      {coach.phone && (
+        <a
+          href={buildCoachInquiryWaLink(coach.phone, coach.name)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+        >
+          Hubungi {coach.name} (WA)
+        </a>
+      )}
+
+      <p className="mt-4 text-xs text-text-subtle">
+        Buat booking beneran, tetep lewat paket kolam yang kamu punya -- halaman ini cuma buat
+        bantu nemuin coach yang lagi ngajar di kolam lain.
+      </p>
+    </main>
+  );
+
+  // Publik = dua alur berbeda: pengunjung yang lagi LOGIN (misal member
+  // yang klik "Lihat profil & kontak" dari Cari Coach) tetep butuh NavBar
+  // lengkap sesuai role-nya biar gak keburu ilang navigasi -- itu bug yang
+  // kejadian sebelum fix ini (cuma nambah logo doang, gak beneran misahin
+  // dua alur). Pengunjung ANONIM (link dishare manual via WA, belum pernah
+  // login) dapet header publik minimal + tombol Login/Daftar, sama kayak
+  // landing page.
+  if (session) {
+    return (
+      <NavBar
+        userName={session.user.name ?? ""}
+        userRole={roleLabel[session.user.role] ?? session.user.role}
+        links={roleNavLinks[session.user.role]}
+      >
+        {content}
+      </NavBar>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
-        <div className="mx-auto max-w-lg px-4 py-3">
+        <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
           <Link href="/" className="inline-block">
             <Logotype className="text-lg" />
           </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/login">
+              <Button variant="ghost" size="sm">
+                Login
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button size="sm">Daftar</Button>
+            </Link>
+          </div>
         </div>
       </header>
-      <main className="mx-auto max-w-lg px-4 py-8">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
-          {coach.coachProfile?.hasCertification && (
-            <Badge tone="accent">
-              Bersertifikat{coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
-            </Badge>
-          )}
-        </div>
-        {coach.coachProfile?.bio && (
-          <p className="mt-2 text-sm text-text-muted">{coach.coachProfile.bio}</p>
-        )}
-
-        {coach.coachProfile && coach.coachProfile.specialties.length > 0 && (
-          <>
-            <h2 className="mt-6 text-sm font-semibold text-text-muted">Keahlian</h2>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {coach.coachProfile.specialties.map((s) => (
-                <Badge key={s} tone="brand">
-                  {s}
-                </Badge>
-              ))}
-            </div>
-          </>
-        )}
-
-        <h2 className="mt-6 text-sm font-semibold text-text-muted">Ngajar di kolam</h2>
-        {coach.poolAffiliations.length === 0 ? (
-          <p className="mt-2 text-sm text-text-muted">Belum terafiliasi ke kolam manapun.</p>
-        ) : (
-          <ul className="mt-2 flex flex-col gap-2">
-            {coach.poolAffiliations.map(({ pool }) => (
-              <Card key={pool.id}>
-                <CardBody className="py-3">
-                  <p className="text-sm font-medium text-text">{pool.name}</p>
-                  {pool.address && <p className="text-xs text-text-muted">{pool.address}</p>}
-                </CardBody>
-              </Card>
-            ))}
-          </ul>
-        )}
-
-        {coach.phone && (
-          <a
-            href={buildCoachInquiryWaLink(coach.phone, coach.name)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-          >
-            Hubungi {coach.name} (WA)
-          </a>
-        )}
-
-        <p className="mt-4 text-xs text-text-subtle">
-          Buat booking beneran, tetep lewat paket kolam yang kamu punya -- halaman ini cuma buat
-          bantu nemuin coach yang lagi ngajar di kolam lain.
-        </p>
-      </main>
+      {content}
     </div>
   );
 }

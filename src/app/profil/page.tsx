@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { NavBar } from "@/components/nav-bar";
 import { Card, CardBody } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
-import { roleNavLinks } from "@/lib/nav-links";
+import { roleNavLinks, roleLabel } from "@/lib/nav-links";
 import EditNameForm from "./edit-name-form";
 import EditPasswordForm from "./edit-password-form";
 import ManageChildrenForm from "./manage-children-form";
@@ -13,16 +13,6 @@ import CopyLinkButton from "./copy-link-button";
 export const metadata: Metadata = {
   title: "Profil | Swim Private Hub",
   robots: { index: false, follow: false },
-};
-
-// Ada fallback (?? session.user.role) di pemakaiannya, jadi POOL_OWNER
-// yang ketinggalan di sini gak sampe nunjukin "undefined" -- tapi tetep
-// nunjukin enum mentah "POOL_OWNER" bukan label rapi kayak role lain.
-const roleLabel: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", string> = {
-  ADMIN: "Admin",
-  COACH: "Coach",
-  MEMBER: "Member",
-  POOL_OWNER: "Pemilik Kolam",
 };
 
 export default async function ProfilPage() {
