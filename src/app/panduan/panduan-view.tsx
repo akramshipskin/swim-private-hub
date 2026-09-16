@@ -472,19 +472,17 @@ const PANDUAN_BODY = `
       <div class="section-head">
         <span class="kicker">Coba sendiri</span>
         <h2>Akun test buat login langsung</h2>
-        <p>Semua password sama: <b>TestDeploy2026!</b> &mdash; tinggal login pake email &amp; password di bawah buat coba tiap peran.</p>
+        <p>Semua password sama: <b>qwertyuiop</b> &mdash; tinggal login pake email &amp; password di bawah buat coba tiap peran. (Akun admin gak dishare di sini demi keamanan &mdash; hubungi kami kalau perlu akses admin buat evaluasi.)</p>
       </div>
       <div class="table-wrap">
         <table class="mini-table">
           <tr><th>Nama</th><th>Role</th><th>Login (Email)</th><th>Password</th></tr>
-          <tr><td>Admin Swim Private Hub</td><td>Admin</td><td>admin@example.com</td><td>TestDeploy2026!</td></tr>
-          <tr><td>Coach Ayu</td><td>Coach</td><td>coach1@example.com</td><td>TestDeploy2026!</td></tr>
-          <tr><td>Coach Zahra</td><td>Coach</td><td>coach2@example.com</td><td>TestDeploy2026!</td></tr>
-          <tr><td>Coach Iwenk</td><td>Coach</td><td>coach3@example.com</td><td>TestDeploy2026!</td></tr>
-          <tr><td>Coach Isal</td><td>Coach</td><td>coach4@example.com</td><td>TestDeploy2026!</td></tr>
-          <tr><td>Coach Rima</td><td>Coach</td><td>coach5@example.com</td><td>TestDeploy2026!</td></tr>
-          <tr><td>Test Member</td><td>Member</td><td>testmember@example.com</td><td>TestDeploy2026!</td></tr>
-          <tr><td>Test Member 2</td><td>Member</td><td>testmember2@example.com</td><td>TestDeploy2026!</td></tr>
+          <tr><td>Ayu Lestari</td><td>Coach</td><td>ayu.coach@example.com</td><td>qwertyuiop</td></tr>
+          <tr><td>Rian Pratama</td><td>Coach</td><td>rian.coach@example.com</td><td>qwertyuiop</td></tr>
+          <tr><td>Dewi Anggraini</td><td>Coach</td><td>dewi.coach@example.com</td><td>qwertyuiop</td></tr>
+          <tr><td>Fajar Nugroho</td><td>Coach</td><td>fajar.coach@example.com</td><td>qwertyuiop</td></tr>
+          <tr><td>Dedi Kurniawan</td><td>Member</td><td>dedi.member@example.com</td><td>qwertyuiop</td></tr>
+          <tr><td>Rina Marlina</td><td>Member</td><td>rina.member@example.com</td><td>qwertyuiop</td></tr>
         </table>
       </div>
 
