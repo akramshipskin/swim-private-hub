@@ -96,7 +96,7 @@ model User {
   availabilities      Availability[]     @relation("CoachAvailabilities")
   pushSubscriptions   PushSubscription[]
   poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
-  ownedPools          Pool[]
+  poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
 }
 
 model CoachProfile {
@@ -345,12 +345,6 @@ model Pool {
   // divalidasi di action layer, murni informasional buat sekarang).
   openTime           String?
   closeTime          String?
-  // User yang jadi kontak/pemilik kolam ini -- role POOL_OWNER, akses
-  // ke wallet & pencairan kolam ini doang. Dibuat pas kolam daftar
-  // sendiri lewat /daftar-kolam (self-service, revisi 2026-09-12 --
-  // gak ada lagi migrasi dari jaringan lama via script).
-  ownerUserId        String?
-  ownerUser          User?    @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
   // Persentase komisi platform, di-set platform (bukan per-coach),
   // provisional 15% (lihat Open Questions di design doc). Config value,
   // bukan struktural -- boleh diubah tanpa migrasi.
@@ -381,6 +375,23 @@ model Pool {
   packages           Package[]
   walletTransactions WalletTransaction[]
   withdrawalRequests WithdrawalRequest[]
+  ownerships         PoolOwnership[]
+}
+
+// Many-to-many User(role=POOL_OWNER) <-> Pool -- gantiin Pool.ownerUserId
+// (1 kolam = 1 owner doang) yang gak ngedukung 1 orang punya beberapa
+// kolam sekaligus. Sama pola persis kayak PoolAffiliation (coach <-> pool),
+// cuma beda arah relasi (owner, bukan orang yang ngajar).
+model PoolOwnership {
+  id        String   @id @default(cuid())
+  poolId    String
+  pool      Pool     @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  ownerId   String
+  owner     User     @relation("PoolOwners", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([poolId, ownerId])
+  @@index([ownerId])
 }
 
 // Many-to-many Coach <-> Pool. Coach (User role=COACH) tetep entity

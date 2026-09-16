@@ -7,13 +7,21 @@ import { revalidatePath } from "next/cache";
 
 export type ActionState = { error?: string; ok?: boolean } | null;
 
-async function getOwnedPool(userId: string) {
-  const pool = await prisma.pool.findFirst({ where: { ownerUserId: userId } });
-  if (!pool) throw new WithdrawalError("Akun ini belum ke-link ke kolam manapun.");
+// poolId dioper dari client (via .bind pas render, lihat page.tsx) --
+// WAJIB diverifikasi di sini kalau poolId itu beneran punya userId ini
+// (bukan cuma percaya form), soalnya 1 user sekarang bisa punya lebih
+// dari 1 kolam dan poolId gak lagi bisa diturunin sendirian dari
+// session kayak dulu (findFirst by ownerUserId).
+async function getOwnedPool(userId: string, poolId: string) {
+  const pool = await prisma.pool.findFirst({
+    where: { id: poolId, ownerships: { some: { ownerId: userId } } },
+  });
+  if (!pool) throw new WithdrawalError("Kolam ini bukan milik akun kamu.");
   return pool;
 }
 
 export async function updateBankInfo(
+  poolId: string,
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
@@ -28,7 +36,7 @@ export async function updateBankInfo(
   }
 
   try {
-    const pool = await getOwnedPool(session.user.id);
+    const pool = await getOwnedPool(session.user.id, poolId);
     await prisma.pool.update({
       where: { id: pool.id },
       data: { bankName, bankAccountNumber, bankAccountName },
@@ -41,11 +49,11 @@ export async function updateBankInfo(
   return { ok: true };
 }
 
-export async function requestWithdrawal(): Promise<ActionState> {
+export async function requestWithdrawal(poolId: string): Promise<ActionState> {
   const session = await requireRole("POOL_OWNER");
 
   try {
-    const pool = await getOwnedPool(session.user.id);
+    const pool = await getOwnedPool(session.user.id, poolId);
     await requestPoolWithdrawal(pool.id);
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Gagal ajuin pencairan" };

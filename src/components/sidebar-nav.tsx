@@ -35,7 +35,11 @@ export function SidebarNav({ links }: { links: BottomNavLink[] }) {
             </p>
           )}
           {items.map((link) => {
-            const active = pathname === link.href || pathname.startsWith(link.href + "/");
+            // Exact match doang -- semua halaman role ini flat (gak ada
+            // nested sub-route), dan "Ringkasan" (/admin) itu prefix dari
+            // SEMUA link admin lain, jadi startsWith bikin dia keliatan
+            // aktif di halaman manapun kalau dipake di sini.
+            const active = pathname === link.href;
             return (
               <Link
                 key={link.href}
@@ -67,7 +71,9 @@ export function MobileNavStrip({ links }: { links: BottomNavLink[] }) {
       aria-label="Navigasi"
     >
       {links.map((link) => {
-        const active = pathname === link.href || pathname.startsWith(link.href + "/");
+        // Exact match doang, sama alesan kayak SidebarNav (Ringkasan/admin
+        // adalah prefix dari semua link admin lain).
+        const active = pathname === link.href;
         return (
           <Link
             key={link.href}

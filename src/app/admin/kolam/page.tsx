@@ -17,7 +17,10 @@ export default async function AdminKolamPage() {
         commissionPercent: true,
         coachSharePercent: true,
         walletBalance: true,
-        ownerUser: { select: { name: true, phone: true } },
+        ownerships: {
+          select: { owner: { select: { name: true, phone: true } } },
+          orderBy: { createdAt: "asc" },
+        },
         affiliations: {
           select: { id: true, coachId: true, coach: { select: { name: true } } },
           orderBy: { coach: { name: "asc" } },
@@ -54,7 +57,9 @@ export default async function AdminKolamPage() {
                   <div>
                     <p className="text-sm font-medium text-text">{p.name}</p>
                     <p className="text-xs text-text-subtle">
-                      {p.ownerUser?.name ?? "-"} · {p.ownerUser?.phone ?? "-"}
+                      {p.ownerships.length === 0
+                        ? "Belum ada owner"
+                        : p.ownerships.map((o) => o.owner.name).join(", ")}
                     </p>
                   </div>
                   <p className="text-sm font-semibold text-text">

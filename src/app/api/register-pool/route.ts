@@ -85,7 +85,7 @@ export async function POST(request: Request) {
           contactPhone: phone,
           openTime,
           closeTime,
-          ownerUserId: user.id,
+          ownerships: { create: { ownerId: user.id } },
         },
       });
       return { user, pool };

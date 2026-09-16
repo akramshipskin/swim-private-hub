@@ -8,7 +8,12 @@ export default defineConfig({
   migrations: {
     path: "prisma/migrations",
   },
+  // CLI (migrate/studio) doang yang baca file ini -- app beneran (Prisma
+  // Client di src/lib/prisma.ts) baca DATABASE_URL langsung dari env,
+  // gak lewat sini. Makanya aman pisah: CLI pake DIRECT_URL (session-mode,
+  // 5432 -- migrate butuh advisory lock yang gak didukung pooler
+  // transaction-mode), app tetep pake DATABASE_URL (pooled, 6543).
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
   },
 });
