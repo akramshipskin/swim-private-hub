@@ -69,6 +69,7 @@ enum BookingStatus {
 enum CancelledBy {
   MEMBER
   ADMIN
+  COACH
 }
 
 enum MarkedBy {

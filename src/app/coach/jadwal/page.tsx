@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import AddSlotForm from "./add-slot-form";
 import DeleteSlotButton from "./delete-slot-button";
+import CancelBookingButton from "./cancel-booking-button";
 import { formatDateLabel, formatTimeWib, dateLabel, todayWibDateString } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +25,8 @@ export default async function CoachJadwalPage() {
         pool: { select: { name: true } },
         bookings: {
           where: { status: "BOOKED" },
-          include: {
+          select: {
+            id: true,
             package: { select: { dependent: { select: { name: true } } } },
           },
           take: 1,
@@ -115,8 +117,11 @@ export default async function CoachJadwalPage() {
                           </div>
                         )}
                       </div>
-                      {a.status === "BOOKED" ? (
-                        <Badge tone="brand">Terisi</Badge>
+                      {a.status === "BOOKED" && a.bookings[0] ? (
+                        <CancelBookingButton
+                          bookingId={a.bookings[0].id}
+                          label={`${formatTimeWib(a.startTime)}–${formatTimeWib(a.endTime)}`}
+                        />
                       ) : (
                         <DeleteSlotButton
                           availabilityId={a.id}

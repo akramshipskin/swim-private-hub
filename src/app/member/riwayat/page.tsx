@@ -131,7 +131,12 @@ export default async function MemberRiwayatPage() {
                               <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
                               {b.status === "CANCELLED" && b.cancelledBy && (
                                 <span className="text-xs text-text-subtle">
-                                  oleh {b.cancelledBy === "ADMIN" ? "Admin" : "kamu"}
+                                  oleh{" "}
+                                  {b.cancelledBy === "ADMIN"
+                                    ? "Admin"
+                                    : b.cancelledBy === "COACH"
+                                      ? "Coach"
+                                      : "kamu"}
                                 </span>
                               )}
                               {b.status === "BOOKED" && b.attended === true && (

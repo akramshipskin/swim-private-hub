@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { wibDateTime, dateLabel, formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { sendPushToUser } from "@/lib/push";
+import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 
 export type ActionState = { error?: string; warning?: string } | null;
 
@@ -163,4 +164,32 @@ export async function deleteAvailability(availabilityId: string) {
   });
 
   revalidatePath("/coach/jadwal");
+}
+
+export type CancelBookingActionState = { error?: string } | null;
+
+// Coach batalin sesi yang UDAH dibooking (sakit/emergency, dll) -- bypass
+// window & jatah kuota mandiri member (lihat komentar cancelBooking),
+// beda dari deleteAvailability yang cuma bisa hapus slot yang MASIH
+// kosong. Sisa sesi member otomatis balik, coach dapet slotnya kembali
+// AVAILABLE, member dapet notif.
+export async function cancelBookingAsCoach(
+  _prevState: CancelBookingActionState,
+  formData: FormData
+): Promise<CancelBookingActionState> {
+  const session = await requireRole("COACH");
+
+  const bookingId = formData.get("bookingId") as string;
+  if (!bookingId) return { error: "Booking gak ditemukan." };
+
+  try {
+    await cancelBooking({ bookingId, actor: { role: "COACH", coachId: session.user.id } });
+  } catch (err) {
+    if (err instanceof CancelError) return { error: err.message };
+    throw err;
+  }
+
+  revalidatePath("/coach/jadwal");
+  revalidatePath("/admin/booking-overview");
+  return null;
 }

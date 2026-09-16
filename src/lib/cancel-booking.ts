@@ -22,13 +22,18 @@ export class CancelError extends Error {
  * 2. Conditional update di Booking (`WHERE status = 'BOOKED'`) --
  *    cegah 2 request cancel yang nembak booking SAMA barengan (misal
  *    admin double-klik) dobel nambahin sisa sesi paket.
+ *
+ * COACH sengaja disamain sama ADMIN (bypass window & jatah kuota member)
+ * -- coach batalin sesi karena sakit/emergency bukan kesalahan dia mau
+ * "ngirit" jatah pembatalan, dan gak fair kalau kepentok window yang
+ * sama kayak member yang emang lagi coba cancel mepet.
  */
 export async function cancelBooking({
   bookingId,
   actor,
 }: {
   bookingId: string;
-  actor: { role: "MEMBER"; memberId: string } | { role: "ADMIN" };
+  actor: { role: "MEMBER"; memberId: string } | { role: "ADMIN" } | { role: "COACH"; coachId: string };
 }) {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
@@ -44,6 +49,10 @@ export async function cancelBooking({
 
   if (actor.role === "MEMBER" && booking.memberId !== actor.memberId) {
     throw new CancelError("Booking tidak ditemukan", 404);
+  }
+
+  if (actor.role === "COACH" && booking.availability.coachId !== actor.coachId) {
+    throw new CancelError("Bukan sesi kamu", 403);
   }
 
   if (booking.status !== "BOOKED") {
@@ -112,13 +121,23 @@ export async function cancelBooking({
       { timeout: 10000, maxWait: 8000 }
     );
 
-    // Best-effort -- coach perlu tau slotnya kebuka lagi, tapi gagal
-    // ngirim gak boleh gagalin pembatalan yang udah sukses tersimpan.
-    sendPushToUser(booking.availability.coachId, {
-      title: "Booking dibatalkan",
-      body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} udah kosong lagi`,
-      url: "/coach/jadwal",
-    }).catch(() => {});
+    // Best-effort -- gagal ngirim gak boleh gagalin pembatalan yang udah
+    // sukses tersimpan. Coach yang cancel sendiri gak perlu dikabarin
+    // soal aksinya sendiri -- yang perlu tau itu MEMBER-nya (sesi mereka
+    // ilang), makanya arah notifnya kebalik dari cancel oleh member/admin.
+    if (actor.role === "COACH") {
+      sendPushToUser(booking.memberId, {
+        title: "Booking dibatalkan coach",
+        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} dibatalin coach. Sisa sesi udah balik.`,
+        url: "/member/riwayat",
+      }).catch(() => {});
+    } else {
+      sendPushToUser(booking.availability.coachId, {
+        title: "Booking dibatalkan",
+        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} udah kosong lagi`,
+        url: "/coach/jadwal",
+      }).catch(() => {});
+    }
   } catch (err) {
     if (err instanceof CancelError) throw err;
     // P2028 = transaksi gak kebagian giliran/expired nunggu row lock
