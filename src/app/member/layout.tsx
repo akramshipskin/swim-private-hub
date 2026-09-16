@@ -17,15 +17,14 @@ export default async function MemberLayout({
   const session = await requireRole("MEMBER");
 
   return (
-    <div className="min-h-screen">
-      <NavBar
-        userName={session.user.name ?? ""}
-        userRole="Member"
-        links={roleNavLinks.MEMBER}
-      />
+    <NavBar
+      userName={session.user.name ?? ""}
+      userRole="Member"
+      links={roleNavLinks.MEMBER}
+    >
       <PullToRefresh>
         <div className="pb-16 sm:pb-0">{children}</div>
       </PullToRefresh>
-    </div>
+    </NavBar>
   );
 }

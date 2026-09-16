@@ -74,6 +74,15 @@ export function BellIcon({ className }: IconProps) {
   );
 }
 
+export function SearchIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path strokeLinecap="round" d="m20 20-4.6-4.6" />
+    </svg>
+  );
+}
+
 export function MenuIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
@@ -129,6 +138,7 @@ export const ICONS = {
   clock: ClockIcon,
   "clipboard-check": ClipboardCheckIcon,
   "bar-chart": BarChartIcon,
+  search: SearchIcon,
 } as const;
 
 export type IconName = keyof typeof ICONS;

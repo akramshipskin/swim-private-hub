@@ -39,13 +39,11 @@ export default async function ProfilPage() {
       : null;
 
   return (
-    <div className="min-h-screen">
-      <NavBar
-        userName={session.user.name ?? ""}
-        userRole={roleLabel[session.user.role] ?? session.user.role}
-        links={roleNavLinks[session.user.role]}
-      />
-
+    <NavBar
+      userName={session.user.name ?? ""}
+      userRole={roleLabel[session.user.role] ?? session.user.role}
+      links={roleNavLinks[session.user.role]}
+    >
       <main className="mx-auto max-w-xl px-4 pb-16 py-6 sm:pb-8 sm:py-8">
         <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Edit Profil</h1>
 
@@ -72,6 +70,6 @@ export default async function ProfilPage() {
           </Card>
         )}
       </main>
-    </div>
+    </NavBar>
   );
 }

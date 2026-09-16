@@ -17,15 +17,14 @@ export default async function CoachLayout({
   const session = await requireRole("COACH");
 
   return (
-    <div className="min-h-screen">
-      <NavBar
-        userName={session.user.name ?? ""}
-        userRole="Coach"
-        links={roleNavLinks.COACH}
-      />
+    <NavBar
+      userName={session.user.name ?? ""}
+      userRole="Coach"
+      links={roleNavLinks.COACH}
+    >
       <PullToRefresh>
         <div className="pb-16 sm:pb-0">{children}</div>
       </PullToRefresh>
-    </div>
+    </NavBar>
   );
 }

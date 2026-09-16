@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ICONS, type IconName } from "@/components/icons";
 
-export type BottomNavLink = { href: string; label: string; icon: IconName };
+// group opsional -- dipake SidebarNav buat ngelompokin link jadi kategori
+// (dashboard modern), diabaikan kalau kosong (render flat, gak ada header
+// kategori). Lihat src/lib/nav-links.ts.
+export type BottomNavLink = { href: string; label: string; icon: IconName; group?: string };
 
 export function MobileBottomNav({ links }: { links: BottomNavLink[] }) {
   const pathname = usePathname();

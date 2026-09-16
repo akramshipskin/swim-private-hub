@@ -17,15 +17,14 @@ export default async function PoolLayout({
   const session = await requireRole("POOL_OWNER");
 
   return (
-    <div className="min-h-screen">
-      <NavBar
-        userName={session.user.name ?? ""}
-        userRole="Kolam"
-        links={roleNavLinks.POOL_OWNER}
-      />
+    <NavBar
+      userName={session.user.name ?? ""}
+      userRole="Kolam"
+      links={roleNavLinks.POOL_OWNER}
+    >
       <PullToRefresh>
         <div className="pb-16 sm:pb-0">{children}</div>
       </PullToRefresh>
-    </div>
+    </NavBar>
   );
 }

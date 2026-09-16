@@ -17,15 +17,14 @@ export default async function AdminLayout({
   const session = await requireRole("ADMIN");
 
   return (
-    <div className="min-h-screen">
-      <NavBar
-        userName={session.user.name ?? ""}
-        userRole="Admin"
-        links={roleNavLinks.ADMIN}
-      />
+    <NavBar
+      userName={session.user.name ?? ""}
+      userRole="Admin"
+      links={roleNavLinks.ADMIN}
+    >
       <PullToRefresh>
         <div className="pb-16 sm:pb-0">{children}</div>
       </PullToRefresh>
-    </div>
+    </NavBar>
   );
 }
