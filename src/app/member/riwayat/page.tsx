@@ -173,7 +173,7 @@ export default async function MemberRiwayatPage() {
                                   })}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+                                  className="inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
                                 >
                                   Hubungi Admin
                                 </a>

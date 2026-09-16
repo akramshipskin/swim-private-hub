@@ -98,7 +98,7 @@ export default async function CoachShortcutPage({
             href={buildCoachInquiryWaLink(coach.phone, coach.name)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-1.5 rounded-md bg-[#25D366] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            className="mt-6 inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-4 py-2 text-sm font-medium text-white hover:opacity-90"
           >
             Hubungi {coach.name} (WA)
           </a>

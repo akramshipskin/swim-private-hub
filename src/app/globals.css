@@ -42,6 +42,8 @@
 
   --color-disabled-bg: #cbd5e1;
   --color-disabled-text: #94a3b8;
+
+  --color-whatsapp: #25d366;
 }
 
 /* Dark mode: ikut OS by default (media query), atau override manual lewat
@@ -87,6 +89,12 @@
 
     --color-disabled-bg: #334155;
     --color-disabled-text: #64748b;
+
+    /* Hijau WA asli (#25D366) kesaturasi terlalu tinggi buat nyala di
+       atas bg gelap -- "pedes di mata" kalau dipake mentah kayak di
+       light mode. Diredupin dikit (deeper + sedikit desaturated),
+       teks putih di atasnya masih kontras jelas. */
+    --color-whatsapp: #1d9e56;
   }
 }
 
@@ -127,6 +135,8 @@
 
   --color-disabled-bg: #334155;
   --color-disabled-text: #64748b;
+
+  --color-whatsapp: #1d9e56;
 }
 
 @theme inline {
@@ -164,6 +174,8 @@
 
   --color-disabled-bg: var(--color-disabled-bg);
   --color-disabled-text: var(--color-disabled-text);
+
+  --color-whatsapp: var(--color-whatsapp);
 }
 
 body {
