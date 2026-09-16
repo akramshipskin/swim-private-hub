@@ -15,7 +15,7 @@ export default async function CoachRiwayatSesiPage() {
     orderBy: { availability: { startTime: "desc" } },
     include: {
       package: { select: { dependent: { select: { name: true } } } },
-      availability: true,
+      availability: { include: { pool: { select: { name: true } } } },
     },
   });
 
@@ -64,7 +64,7 @@ export default async function CoachRiwayatSesiPage() {
                         <p className="text-sm font-medium text-text">{b.package.dependent.name}</p>
                         <p className="text-sm text-text-muted">
                           {formatTimeWib(b.availability.startTime)}–
-                          {formatTimeWib(b.availability.endTime)}
+                          {formatTimeWib(b.availability.endTime)} · {b.availability.pool.name}
                         </p>
                         {b.attended !== null && b.attendedBy && (
                           <p className="mt-0.5 text-xs text-text-subtle">
