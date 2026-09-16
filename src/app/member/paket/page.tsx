@@ -34,11 +34,15 @@ export default async function MemberPaketPage() {
     prisma.package.findMany({
       where: { memberId: session.user.id },
       orderBy: { createdAt: "desc" },
-      include: { dependent: { select: { name: true, isSelf: true } } },
+      include: {
+        dependent: { select: { name: true, isSelf: true } },
+        pool: { select: { name: true } },
+      },
     }),
     prisma.packageTemplate.findMany({
       where: { isActive: true },
       orderBy: { totalSesi: "asc" },
+      include: { pool: { select: { name: true } } },
     }),
     prisma.dependent.findMany({
       where: { memberId: session.user.id, isActive: true },
@@ -88,7 +92,7 @@ export default async function MemberPaketPage() {
                 <div>
                   <p className="text-sm font-medium text-text">{p.name}</p>
                   <p className="text-xs text-text-subtle">
-                    buat {p.dependent.isSelf ? "kamu sendiri" : p.dependent.name}
+                    buat {p.dependent.isSelf ? "kamu sendiri" : p.dependent.name} · {p.pool.name}
                   </p>
                   <p className="text-sm text-text-muted">
                     Sisa sesi {p.sisaSesi}/{p.totalSesi}
@@ -130,6 +134,7 @@ export default async function MemberPaketPage() {
                     </span>
                   )}
                   <p className="font-medium text-text">{t.name}</p>
+                  <p className="text-xs text-text-subtle">{t.pool.name}</p>
                   <p className="text-lg font-semibold text-text">{formatRupiah(t.price)}</p>
                   <p className="mt-1 text-sm text-text-muted">
                     {t.totalSesi} Sesi · Berlaku {t.durationDays} Hari · Jatah Batal Booking {t.jatahCancel}x
