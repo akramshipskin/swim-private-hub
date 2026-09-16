@@ -25,7 +25,7 @@ export function NavBar({
   userRole: string;
   children: React.ReactNode;
 }) {
-  const hasManyLinks = links.length > 4;
+  const hasManyLinks = links.length > 5;
 
   return (
     <div className="min-h-screen">
