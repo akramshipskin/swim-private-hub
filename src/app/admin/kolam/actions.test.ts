@@ -16,7 +16,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-const { updatePoolShares, affiliateCoach, removeAffiliation } = await import("./actions");
+const { updatePoolShares, affiliateCoach, removeAffiliation, togglePoolActive } = await import("./actions");
 
 function formData(entries: Record<string, string>) {
   const fd = new FormData();
@@ -90,6 +90,20 @@ describe("affiliateCoach", () => {
       update: {},
       create: { poolId: "pool-1", coachId: "coach-1" },
     });
+  });
+});
+
+describe("togglePoolActive", () => {
+  // Kolam yang daftar sendiri mulai isActive:false (nunggu approve) --
+  // ini tombol satu-satunya yang bisa nge-flip itu.
+  it("approves a pending pool by setting isActive true", async () => {
+    await togglePoolActive("pool-1", true);
+    expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: true } });
+  });
+
+  it("deactivates an active pool", async () => {
+    await togglePoolActive("pool-1", false);
+    expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: false } });
   });
 });
 

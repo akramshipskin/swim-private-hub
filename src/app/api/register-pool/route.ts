@@ -69,6 +69,12 @@ export async function POST(request: Request) {
 
   try {
     const result = await prisma.$transaction(async (tx) => {
+      // Owner & kolam yang daftar sendiri gak langsung aktif -- nunggu
+      // admin approve dulu (toggle isActive di /admin/users buat owner,
+      // /admin/kolam buat kolamnya). Kolam yang belum aktif otomatis gak
+      // keliatan di dropdown booking member (member/booking/page.tsx
+      // filter isActive:true), jadi gak bisa nerima booking sebelum
+      // di-review.
       const user = await tx.user.create({
         data: {
           name: toProperCase(ownerName.trim()),
@@ -76,6 +82,7 @@ export async function POST(request: Request) {
           email: email || null,
           passwordHash,
           role: "POOL_OWNER",
+          isActive: false,
         },
       });
       const pool = await tx.pool.create({
@@ -85,6 +92,7 @@ export async function POST(request: Request) {
           contactPhone: phone,
           openTime,
           closeTime,
+          isActive: false,
           ownerships: { create: { ownerId: user.id } },
         },
       });

@@ -2,8 +2,10 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import { Card, CardBody } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import PoolShareForm from "./pool-share-form";
 import AffiliateCoachForm from "./affiliate-coach-form";
+import PoolActiveToggle from "./pool-active-toggle";
 
 export default async function AdminKolamPage() {
   await requireRole("ADMIN");
@@ -14,6 +16,7 @@ export default async function AdminKolamPage() {
       select: {
         id: true,
         name: true,
+        isActive: true,
         commissionPercent: true,
         coachSharePercent: true,
         walletBalance: true,
@@ -55,16 +58,24 @@ export default async function AdminKolamPage() {
               <CardBody className="flex flex-col gap-3 py-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-text">{p.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-text">{p.name}</p>
+                      <Badge tone={p.isActive ? "success" : "warning"}>
+                        {p.isActive ? "Aktif" : "Belum di-approve"}
+                      </Badge>
+                    </div>
                     <p className="text-xs text-text-subtle">
                       {p.ownerships.length === 0
                         ? "Belum ada owner"
                         : p.ownerships.map((o) => o.owner.name).join(", ")}
                     </p>
                   </div>
-                  <p className="text-sm font-semibold text-text">
-                    Saldo: {formatRupiah(p.walletBalance)}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm font-semibold text-text">
+                      Saldo: {formatRupiah(p.walletBalance)}
+                    </p>
+                    <PoolActiveToggle poolId={p.id} poolName={p.name} isActive={p.isActive} />
+                  </div>
                 </div>
                 <PoolShareForm
                   poolId={p.id}

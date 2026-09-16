@@ -35,6 +35,21 @@ export async function removeAffiliation(formData: FormData) {
   revalidatePath("/admin/kolam");
 }
 
+// Approve/nonaktifin kolam -- kolam yang isActive:false (baru daftar
+// sendiri, belum di-review) otomatis gak keliatan di dropdown booking
+// member (lihat member/booking/page.tsx), jadi gak bisa nerima booking
+// sebelum admin approve.
+export async function togglePoolActive(poolId: string, nextActive: boolean) {
+  await requireRole("ADMIN");
+
+  await prisma.pool.update({
+    where: { id: poolId },
+    data: { isActive: nextActive },
+  });
+
+  revalidatePath("/admin/kolam");
+}
+
 export async function updatePoolShares(
   _prevState: ActionState,
   formData: FormData

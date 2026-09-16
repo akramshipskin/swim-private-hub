@@ -10,9 +10,10 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserActions } from "./user-display";
 
-const roleSections: { role: "ADMIN" | "COACH"; label: string }[] = [
+const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] = [
   { role: "ADMIN", label: "Admin" },
   { role: "COACH", label: "Coach" },
+  { role: "POOL_OWNER", label: "Pemilik Kolam" },
 ];
 
 export default async function AdminUsersPage() {

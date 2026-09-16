@@ -71,6 +71,11 @@ export async function POST(request: Request) {
         email: email || null,
         passwordHash,
         role: "COACH",
+        // Coach yang daftar sendiri gak langsung bisa login/keliatan --
+        // nunggu admin approve dulu (toggle isActive di /admin/users).
+        // Gak ada vetting kualitas sebelum ini, siapa aja yang isi form
+        // langsung bisa buka slot & diliat member.
+        isActive: false,
         coachProfile: {
           create: {
             bio: bio?.trim() || null,
