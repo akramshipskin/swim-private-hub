@@ -18,6 +18,7 @@ export default async function AdminBookingOverviewPage() {
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
       include: {
         coach: { select: { id: true, name: true } },
+        pool: { select: { name: true } },
         bookings: {
           where: { status: "BOOKED" },
           include: {

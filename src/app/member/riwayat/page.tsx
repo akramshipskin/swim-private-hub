@@ -35,7 +35,7 @@ export default async function MemberRiwayatPage() {
     where: { memberId: session.user.id },
     orderBy: { createdAt: "desc" },
     include: {
-      availability: { include: { coach: true } },
+      availability: { include: { coach: true, pool: { select: { name: true } } } },
       package: { include: { dependent: { select: { name: true, isSelf: true } } } },
     },
   });
@@ -119,7 +119,7 @@ export default async function MemberRiwayatPage() {
                             </p>
                             <p className="text-sm text-text-muted">
                               {formatTimeWib(b.availability.startTime)}–
-                              {formatTimeWib(b.availability.endTime)}
+                              {formatTimeWib(b.availability.endTime)} · {b.availability.pool.name}
                             </p>
                             <p className="truncate text-xs text-text-subtle">
                               buat{" "}

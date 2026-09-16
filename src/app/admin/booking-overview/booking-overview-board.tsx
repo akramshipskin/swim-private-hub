@@ -14,6 +14,7 @@ type Availability = {
   startTime: Date;
   endTime: Date;
   coach: { id: string; name: string };
+  pool: { name: string };
   bookings: {
     id: string;
     attended: boolean | null;
@@ -122,7 +123,11 @@ export default function BookingOverviewBoard({
                       </a>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {/* 2 kolom baru mulai di lg, bukan sm -- di lebar sm
+                        kartu kesempitan sampe nama kolam/member ke-truncate
+                        jadi "Kolam Renang ..." (gak kebaca Melati apa Tirta
+                        Asri, padahal itu inti infonya). */}
+                    <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                       {rows.map((a) => {
                         const booking = a.bookings[0];
                         const isPast = a.endTime <= now;
@@ -134,6 +139,7 @@ export default function BookingOverviewBoard({
                                 <p className="text-sm font-medium text-text">
                                   {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
                                 </p>
+                                <p className="text-xs text-text-subtle">{a.pool.name}</p>
                                 {booking ? (
                                   <p className="truncate text-xs text-text-muted">
                                     {booking.package.dependent.isSelf
