@@ -33,6 +33,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/profil", label: "Profil Saya", icon: "settings", group: "Pengaturan" },
   ],
   POOL_OWNER: [
+    { href: "/pool/laporan", label: "Laporan", icon: "bar-chart" },
     { href: "/pool/saldo", label: "Saldo", icon: "credit-card" },
     { href: "/profil", label: "Profil Saya", icon: "settings", group: "Pengaturan" },
   ],
