@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Logotype } from "@/components/ui/logotype";
 import { NavBar } from "@/components/nav-bar";
+import BackButton from "./back-button";
 
 // Coach shortcut page (pool-first browse + cheap cross-pool discovery,
 // locked /plan-eng-review 2026-09-12, cross-model tension #4): pool-first
@@ -50,13 +51,16 @@ export default async function CoachShortcutPage({
   const content = (
     <main className="mx-auto max-w-lg px-4 py-8">
       <div className="flex items-center gap-2">
+        <BackButton />
         <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
-        {coach.coachProfile?.hasCertification && (
+      </div>
+      {coach.coachProfile?.hasCertification && (
+        <div className="mt-2">
           <Badge tone="accent">
             Bersertifikat{coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
           </Badge>
-        )}
-      </div>
+        </div>
+      )}
       {coach.coachProfile?.bio && (
         <p className="mt-2 text-sm text-text-muted">{coach.coachProfile.bio}</p>
       )}
@@ -121,6 +125,9 @@ export default async function CoachShortcutPage({
         userName={session.user.name ?? ""}
         userRole={roleLabel[session.user.role] ?? session.user.role}
         links={roleNavLinks[session.user.role]}
+        // Cuma Member yang punya menu "Cari Coach" -- role lain gak
+        // punya item yang relevan buat dipaksa nyala, biarin default.
+        activePath={session.user.role === "MEMBER" ? "/member/cari-coach" : undefined}
       >
         {content}
       </NavBar>

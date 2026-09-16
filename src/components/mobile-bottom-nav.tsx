@@ -9,8 +9,15 @@ import { ICONS, type IconName } from "@/components/icons";
 // kategori). Lihat src/lib/nav-links.ts.
 export type BottomNavLink = { href: string; label: string; icon: IconName; group?: string };
 
-export function MobileBottomNav({ links }: { links: BottomNavLink[] }) {
+export function MobileBottomNav({
+  links,
+  activePath,
+}: {
+  links: BottomNavLink[];
+  activePath?: string;
+}) {
   const pathname = usePathname();
+  const currentPath = activePath ?? pathname;
 
   return (
     <nav
@@ -19,7 +26,7 @@ export function MobileBottomNav({ links }: { links: BottomNavLink[] }) {
     >
       <div className="mx-auto flex max-w-3xl gap-1 px-2 py-1.5">
         {links.map((link) => {
-          const active = pathname === link.href || pathname.startsWith(link.href + "/");
+          const active = currentPath === link.href || currentPath.startsWith(link.href + "/");
           const Icon = ICONS[link.icon];
           return (
             <Link

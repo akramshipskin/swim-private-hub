@@ -21,8 +21,19 @@ function groupLinks(links: BottomNavLink[]) {
 // Sidebar kiri, desktop-only -- gantiin DesktopTabNav (baris tab horizontal)
 // yang numpuk gak karuan begitu 1 role punya >4 fitur (Admin: 8). Link tanpa
 // `group` dirender flat (list pendek gak butuh header kategori).
-export function SidebarNav({ links }: { links: BottomNavLink[] }) {
+export function SidebarNav({
+  links,
+  activePath,
+}: {
+  links: BottomNavLink[];
+  // Override buat halaman yang gak ada di `links` sendiri (misal
+  // /pelatih/[coachId], dibuka dari Cari Coach) tapi konsepnya masih
+  // "di dalam" 1 menu tertentu -- biar highlight-nya gak ilang cuma
+  // karena URL-nya beda dari href menu itu persis.
+  activePath?: string;
+}) {
   const pathname = usePathname();
+  const currentPath = activePath ?? pathname;
   const groups = groupLinks(links);
 
   return (
@@ -39,7 +50,7 @@ export function SidebarNav({ links }: { links: BottomNavLink[] }) {
             // nested sub-route), dan "Ringkasan" (/admin) itu prefix dari
             // SEMUA link admin lain, jadi startsWith bikin dia keliatan
             // aktif di halaman manapun kalau dipake di sini.
-            const active = pathname === link.href;
+            const active = currentPath === link.href;
             return (
               <Link
                 key={link.href}
@@ -62,8 +73,9 @@ export function SidebarNav({ links }: { links: BottomNavLink[] }) {
 // Mobile-only, cuma dipake buat role dengan link panjang (Admin) --
 // MobileBottomNav (icon bar 44px) numpuk banget kalau diisi >4 item, strip
 // scroll-horizontal lebih pas buat kategori sebanyak itu di layar sempit.
-export function MobileNavStrip({ links }: { links: BottomNavLink[] }) {
+export function MobileNavStrip({ links, activePath }: { links: BottomNavLink[]; activePath?: string }) {
   const pathname = usePathname();
+  const currentPath = activePath ?? pathname;
 
   return (
     <nav
@@ -73,7 +85,7 @@ export function MobileNavStrip({ links }: { links: BottomNavLink[] }) {
       {links.map((link) => {
         // Exact match doang, sama alesan kayak SidebarNav (Ringkasan/admin
         // adalah prefix dari semua link admin lain).
-        const active = pathname === link.href;
+        const active = currentPath === link.href;
         return (
           <Link
             key={link.href}

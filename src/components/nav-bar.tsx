@@ -18,11 +18,13 @@ export function NavBar({
   links,
   userName,
   userRole,
+  activePath,
   children,
 }: {
   links: BottomNavLink[];
   userName: string;
   userRole: string;
+  activePath?: string;
   children: React.ReactNode;
 }) {
   const hasManyLinks = links.length > 5;
@@ -49,15 +51,15 @@ export function NavBar({
 
           <UserMenu userName={userName} userRole={userRole} />
         </div>
-        {links.length > 0 && hasManyLinks && <MobileNavStrip links={links} />}
+        {links.length > 0 && hasManyLinks && <MobileNavStrip links={links} activePath={activePath} />}
       </header>
 
       <div className="mx-auto flex max-w-6xl gap-6 px-4">
-        {links.length > 0 && <SidebarNav links={links} />}
+        {links.length > 0 && <SidebarNav links={links} activePath={activePath} />}
         <div className="min-w-0 flex-1">{children}</div>
       </div>
 
-      {links.length > 0 && !hasManyLinks && <MobileBottomNav links={links} />}
+      {links.length > 0 && !hasManyLinks && <MobileBottomNav links={links} activePath={activePath} />}
     </div>
   );
 }
