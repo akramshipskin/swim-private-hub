@@ -197,14 +197,14 @@ const OWNER_FEATURES: { icon: IconName; tone: keyof typeof roleToneClasses; titl
   {
     icon: "family",
     tone: "brand",
-    title: "Pilih kolam, baru pilih coach",
-    desc: "Orang tua booking dari kolam paketnya sendiri. Kenal coach yang lagi ngajar di kolam lain? Ada halaman kontak langsungnya.",
+    title: "1 paket, semua kolam mitra",
+    desc: "Paket yang dibeli orang tua berlaku di kolam mitra manapun — tinggal pilih kolam & coach tiap booking. Kenal coach yang ngajar di kolam lain? Ada halaman kontak langsungnya.",
   },
   {
     icon: "creditCard",
     tone: "admin",
-    title: "Pembayaran online per kolam",
-    desc: "Checkout langsung ke akun Midtrans kolam yang bersangkutan — transparan, bukan lewat rekening pihak lain.",
+    title: "Bayar online, bagi hasil otomatis",
+    desc: "Member bayar lewat Midtrans. Bagian kolam & coach masuk ke saldo masing-masing tiap sesi ditandai Hadir — tinggal ajukan pencairan ke rekening sendiri.",
   },
   {
     icon: "barChart",
@@ -254,7 +254,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Pembayarannya lewat mana, uangnya ke siapa?",
-    a: "Lewat payment gateway resmi (virtual account bank, QRIS, e-wallet, kartu), tapi duitnya langsung masuk ke akun kolam yang bersangkutan — platform gak pernah pegang atau nahan dana member.",
+    a: "Lewat payment gateway resmi Midtrans (virtual account bank, QRIS, e-wallet, kartu) ke akun platform. Tiap sesi yang ditandai Hadir, bagian kolam & coach otomatis masuk ke saldo masing-masing (setelah komisi platform), lalu bisa dicairkan ke rekening kolam/coach.",
   },
   {
     q: "Coach bisa ngajar di lebih dari 1 kolam?",
@@ -870,7 +870,6 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
         <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 text-xs text-text-subtle sm:flex-row sm:items-start sm:justify-between">
           <div>
             <Logotype className="text-text-muted" />
-            <p className="mt-1">[ALAMAT]</p>
             <p className="mt-1">
               WhatsApp{" "}
               <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-brand-600 hover:underline">

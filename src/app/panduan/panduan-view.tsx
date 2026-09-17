@@ -483,6 +483,8 @@ const PANDUAN_BODY = `
           <tr><td>Fajar Nugroho</td><td>Coach</td><td>fajar.coach@example.com</td><td>qwertyuiop</td></tr>
           <tr><td>Dedi Kurniawan</td><td>Member</td><td>dedi.member@example.com</td><td>qwertyuiop</td></tr>
           <tr><td>Rina Marlina</td><td>Member</td><td>rina.member@example.com</td><td>qwertyuiop</td></tr>
+          <tr><td>Sari Wulandari</td><td>Pemilik Kolam (Melati)</td><td>sari.melati@example.com</td><td>qwertyuiop</td></tr>
+          <tr><td>Budi Santoso</td><td>Pemilik Kolam (Tirta Asri)</td><td>budi.tirta@example.com</td><td>qwertyuiop</td></tr>
         </table>
       </div>
 

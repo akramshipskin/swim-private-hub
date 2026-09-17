@@ -14,7 +14,7 @@ export default function KebijakanPrivasiPage() {
         Swim Private Hub ("kami") melalui aplikasi pemesanan dan manajemen les
         renang ("Aplikasi"), tujuan penggunaannya, serta hak Pengguna atas data
         tersebut. Kebijakan ini berlaku bagi seluruh Pengguna Aplikasi, yaitu
-        orang tua/member, pelatih (coach), dan administrator.
+        orang tua/member, pelatih (coach), pemilik kolam, dan administrator.
       </p>
 
       <h2>1. Data yang Dikumpulkan</h2>
@@ -24,9 +24,16 @@ export default function KebijakanPrivasiPage() {
         <li>Riwayat pemesanan jadwal, kehadiran, dan sisa sesi paket.</li>
         <li>
           Data transaksi pembayaran (nominal, status, dan metode pembayaran). Nomor
-          kartu atau rekening tidak pernah disimpan dalam sistem kami, melainkan
-          diproses langsung oleh Midtrans selaku penyedia gerbang pembayaran resmi.
+          kartu atau rekening yang dipakai member untuk membayar tidak pernah disimpan
+          dalam sistem kami, melainkan diproses langsung oleh Midtrans selaku penyedia
+          gerbang pembayaran resmi.
         </li>
+        <li>
+          Untuk pelatih dan pemilik kolam: nama bank, nomor rekening, dan nama pemilik
+          rekening yang diisi sendiri sebagai tujuan pencairan saldo, beserta riwayat
+          saldo dan pencairannya.
+        </li>
+        <li>Alamat IP saat pendaftaran akun, untuk keamanan dan pencegahan pendaftaran palsu.</li>
         <li>Sumber rujukan pendaftaran (misalnya tautan WhatsApp/Instagram) untuk kebutuhan internal, dan tidak dibagikan kepada pihak ketiga untuk tujuan komersial.</li>
       </ul>
 
@@ -34,6 +41,7 @@ export default function KebijakanPrivasiPage() {
       <ul>
         <li>Mengelola pemesanan jadwal, penugasan pelatih, dan sisa sesi paket Pengguna.</li>
         <li>Memproses pembayaran dan mengaktifkan paket secara otomatis.</li>
+        <li>Menghitung bagian kolam dan pelatih per sesi serta memproses pencairan saldo ke rekening tujuan.</li>
         <li>Mengirimkan notifikasi terkait pemesanan (apabila fitur ini diaktifkan oleh Pengguna).</li>
         <li>Melakukan analisis penggunaan Aplikasi secara agregat untuk kepentingan pengembangan layanan.</li>
       </ul>
