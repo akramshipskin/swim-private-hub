@@ -6,6 +6,7 @@ import { createDependent, createSelfDependent, assertDependentOwnedByMember } fr
 import { toProperCase } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
+import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties";
 
 export type ActionState = { error?: string; success?: boolean } | null;
 
@@ -108,4 +109,46 @@ export async function toggleChildActive(dependentId: string, isActive: boolean) 
   await assertDependentOwnedByMember(dependentId, session.user.id);
   await prisma.dependent.update({ where: { id: dependentId }, data: { isActive } });
   revalidatePath("/profil");
+}
+
+// Coach edit bio/keahlian/sertifikasi sendiri -- sebelumnya cuma bisa diisi
+// sekali pas daftar, gak ada jalan buat ngubah (padahal ini yang dibaca
+// orang tua di halaman /pelatih/[id]).
+export async function updateCoachProfile(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session) return { error: "Sesi habis, login ulang." };
+  if (session.user.role !== "COACH") return { error: "Cuma buat akun coach." };
+
+  const bio = formData.get("bio")?.toString().trim() ?? "";
+  const specialties = formData
+    .getAll("specialties")
+    .map(String)
+    .filter((s): s is CoachSpecialty => (COACH_SPECIALTIES as readonly string[]).includes(s));
+  const hasCertification = formData.get("hasCertification") === "on";
+  const certificationNote = formData.get("certificationNote")?.toString().trim() ?? "";
+
+  if (specialties.length === 0) {
+    return { error: "Pilih minimal 1 keahlian." };
+  }
+  if (bio.length > 500) {
+    return { error: "Bio maksimal 500 karakter." };
+  }
+
+  const updated = await prisma.coachProfile.updateMany({
+    where: { userId: session.user.id },
+    data: {
+      bio: bio || null,
+      specialties,
+      hasCertification,
+      certificationNote: hasCertification ? certificationNote || null : null,
+    },
+  });
+  if (updated.count === 0) return { error: "Profil coach gak ditemukan. Hubungi admin." };
+
+  revalidatePath("/profil");
+  revalidatePath(`/pelatih/${session.user.id}`);
+  return { success: true };
 }

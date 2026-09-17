@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { toProperCase } from "@/lib/format";
 import { createSelfDependent, createDependent } from "@/lib/dependents";
 import bcrypt from "bcryptjs";
+import { randomInt } from "crypto";
 import * as XLSX from "xlsx";
 
 export type ActionState = { error?: string } | null;
@@ -313,4 +314,36 @@ export async function toggleUserActive(userId: string, nextActive: boolean) {
   });
 
   revalidatePath("/admin/users");
+}
+
+// Alfabet tanpa karakter yang gampang ketuker pas dibaca/diketik ulang
+// dari chat WA (0/O, 1/l/I).
+const TEMP_PASSWORD_ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
+
+// Admin reset password user yang lupa -- gak ada "lupa password" mandiri.
+// Password sementara acak dibalikin ke admin (buat dikirim lewat WA), dan
+// mustChangePassword dipaksa true: user wajib bikin password baru pas login
+// (session yang lagi kebuka juga ikut kepaksa, lihat jwt callback di auth.ts).
+export async function resetUserPassword(
+  userId: string
+): Promise<{ tempPassword?: string; error?: string }> {
+  const session = await requireRole("ADMIN");
+  if (userId === session.user.id) {
+    return { error: "Ganti password akunmu sendiri lewat halaman Profil." };
+  }
+
+  const tempPassword = Array.from(
+    { length: 10 },
+    () => TEMP_PASSWORD_ALPHABET[randomInt(TEMP_PASSWORD_ALPHABET.length)]
+  ).join("");
+  const passwordHash = await bcrypt.hash(tempPassword, 12);
+
+  const updated = await prisma.user.updateMany({
+    where: { id: userId },
+    data: { passwordHash, mustChangePassword: true },
+  });
+  if (updated.count === 0) {
+    return { error: "User gak ditemukan." };
+  }
+  return { tempPassword };
 }

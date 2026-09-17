@@ -197,8 +197,8 @@ const OWNER_FEATURES: { icon: IconName; tone: keyof typeof roleToneClasses; titl
   {
     icon: "family",
     tone: "brand",
-    title: "1 paket, semua kolam mitra",
-    desc: "Paket yang dibeli orang tua berlaku di kolam mitra manapun — tinggal pilih kolam & coach tiap booking. Kenal coach yang ngajar di kolam lain? Ada halaman kontak langsungnya.",
+    title: "Paket per kolam, bisa mampir ke kolam lain",
+    desc: "Paket berlaku di kolam tempat dibeli, dengan harga kolam itu. Mau renang di kolam mitra lain? Member yang masih punya paket aktif bisa beli 1 sesi di sana.",
   },
   {
     icon: "creditCard",
@@ -671,17 +671,17 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
         </div>
       </section>
 
-      {/* 3 peran -- nunjukin sistem lengkap dari 3 sisi. */}
+      {/* 4 peran -- nunjukin sistem lengkap dari semua sisi. */}
       <section className="mx-auto w-full max-w-5xl px-4 py-14 sm:py-16">
         <Reveal>
           <div className="mb-8 text-center">
-            <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Satu sistem, 3 peran</span>
+            <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Satu sistem, 4 peran</span>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance text-text sm:text-5xl">
               Semua orang cuma lihat yang relevan
             </h2>
           </div>
         </Reveal>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Reveal delay={0}>
             <Card className={`border-t-4 border-t-brand-500 ${CARD_HOVER}`}>
               <CardBody>
@@ -723,6 +723,21 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
                   <li>Kelola semua akun &amp; peserta</li>
                   <li>Pantau booking &amp; pembayaran</li>
                   <li>Laporan kinerja coach otomatis</li>
+                </ul>
+              </CardBody>
+            </Card>
+          </Reveal>
+          <Reveal delay={240}>
+            <Card className={`border-t-4 border-t-warning-text ${CARD_HOVER}`}>
+              <CardBody>
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-warning-bg text-warning-text">
+                  <Icon name="creditCard" className="h-5 w-5" />
+                </div>
+                <h3 className="text-sm font-semibold text-text">Pemilik Kolam</h3>
+                <ul className="mt-2 flex flex-col gap-1.5 text-sm text-text-muted">
+                  <li>Saldo kolam dari tiap sesi Hadir</li>
+                  <li>Ajukan pencairan ke rekening</li>
+                  <li>Laporan sesi &amp; pendapatan</li>
                 </ul>
               </CardBody>
             </Card>
@@ -771,7 +786,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
             </h2>
           </div>
         </Reveal>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Reveal delay={0}>
             <Card className={`border-t-4 border-t-brand-500 ${CARD_HOVER}`}>
               <CardBody className="flex flex-col items-start gap-3 py-7">

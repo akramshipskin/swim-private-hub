@@ -11,6 +11,7 @@ const dependentCreateMany = vi.fn().mockResolvedValue({});
 const packageTemplateFindMany = vi.fn().mockResolvedValue([]);
 const packageCreate = vi.fn().mockResolvedValue({});
 const userUpdate = vi.fn().mockResolvedValue({});
+const userUpdateMany = vi.fn().mockResolvedValue({ count: 1 });
 
 function makeTx() {
   return {
@@ -26,6 +27,7 @@ vi.mock("@/lib/prisma", () => ({
     user: {
       findFirst: (...args: unknown[]) => userFindFirst(...args),
       update: (...args: unknown[]) => userUpdate(...args),
+      updateMany: (...args: unknown[]) => userUpdateMany(...args),
     },
     packageTemplate: { findMany: (...args: unknown[]) => packageTemplateFindMany(...args) },
   },
@@ -38,7 +40,7 @@ vi.mock("@/lib/dependents", () => ({
   createDependent: (...args: unknown[]) => createDependent(...args),
 }));
 
-const { createUser, importMembersXlsx, toggleUserActive } = await import("./actions");
+const { createUser, importMembersXlsx, toggleUserActive, resetUserPassword } = await import("./actions");
 
 function formData(entries: Record<string, string | string[]>) {
   const fd = new FormData();
@@ -135,6 +137,30 @@ describe("toggleUserActive", () => {
   it("updates isActive to the given value", async () => {
     await toggleUserActive("user-1", false);
     expect(userUpdate).toHaveBeenCalledWith({ where: { id: "user-1" }, data: { isActive: false } });
+  });
+});
+
+describe("resetUserPassword", () => {
+  it("refuses to reset the admin's own password", async () => {
+    const res = await resetUserPassword("admin-1");
+    expect(res.error).toBeTruthy();
+    expect(userUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("sets a new hash, forces a password change, and returns a readable temp password", async () => {
+    userUpdateMany.mockResolvedValueOnce({ count: 1 });
+    const res = await resetUserPassword("user-1");
+    expect(res.tempPassword).toMatch(/^[a-hjkmnp-z2-9]{10}$/);
+    expect(userUpdateMany).toHaveBeenCalledWith({
+      where: { id: "user-1" },
+      data: { passwordHash: "hashed", mustChangePassword: true },
+    });
+  });
+
+  it("reports a missing user", async () => {
+    userUpdateMany.mockResolvedValueOnce({ count: 0 });
+    const res = await resetUserPassword("gone");
+    expect(res).toEqual({ error: "User gak ditemukan." });
   });
 });
 

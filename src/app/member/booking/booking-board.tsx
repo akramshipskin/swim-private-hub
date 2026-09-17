@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { formatRupiah } from "@/lib/format";
 import { useSession } from "next-auth/react";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,18 +14,18 @@ import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import { AvailabilityDatePicker } from "@/components/availability-date-picker";
 import { DateQuickPicker } from "@/components/date-quick-picker";
 
-type ChildOption = {
-  dependentId: string;
-  dependentName: string;
+type PackageOption = {
   packageId: string;
   packageName: string;
-  purchasedFromPoolName: string;
+  dependentId: string;
+  poolId: string;
   sisaSesi: number;
-  jatahCancel: number;
   cancelRemaining: number;
 };
 
-type PoolOption = { id: string; name: string };
+type DependentOption = { id: string; name: string };
+
+type PoolOption = { id: string; name: string; singleSessionPrice: number | null };
 
 type Slot = {
   id: string;
@@ -75,19 +77,42 @@ function initials(name: string) {
 }
 
 export default function BookingBoard({
-  childOptions,
+  dependents,
+  packageOptions,
   pools,
+  canBuySingleSession,
 }: {
-  childOptions: ChildOption[];
+  dependents: DependentOption[];
+  packageOptions: PackageOption[];
   pools: PoolOption[];
+  canBuySingleSession: boolean;
 }) {
   const router = useRouter();
   const { data: session } = useSession();
   const [date, setDate] = useState(todayWib());
   const [showFullCalendar, setShowFullCalendar] = useState(false);
-  const [packageId, setPackageId] = useState(childOptions[0]?.packageId ?? "");
-  const [poolId, setPoolId] = useState(pools[0]?.id ?? "");
-  const selectedChild = childOptions.find((c) => c.packageId === packageId) ?? null;
+  // Default: anak & kolam dari paket aktif pertama, biar begitu buka
+  // halaman langsung bisa booking tanpa ganti pilihan.
+  const [dependentId, setDependentId] = useState(
+    packageOptions[0]?.dependentId ?? dependents[0]?.id ?? ""
+  );
+  const [poolId, setPoolId] = useState(packageOptions[0]?.poolId ?? pools[0]?.id ?? "");
+  // Paket cuma berlaku di kolam tempat beli -- paket yang dipake = paket
+  // aktif paling lama milik anak ini DI kolam ini. Gak ada = gak bisa
+  // booking di sini (tawarin beli 1 sesi).
+  const selectedPkg =
+    packageOptions.find((p) => p.dependentId === dependentId && p.poolId === poolId) ?? null;
+  const packageId = selectedPkg?.packageId ?? "";
+  const selectedPool = pools.find((p) => p.id === poolId) ?? null;
+  const dependentPoolNames = [
+    ...new Set(
+      packageOptions
+        .filter((p) => p.dependentId === dependentId)
+        .map((p) => pools.find((pool) => pool.id === p.poolId)?.name)
+        .filter(Boolean)
+    ),
+  ];
+  const [buyLoading, setBuyLoading] = useState(false);
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(
     null
@@ -103,9 +128,9 @@ export default function BookingBoard({
   const requestIdRef = useRef(0);
 
   const loadSlots = useCallback(async () => {
-    // Kolam dipilih bebas (revisi 2026-09-12, paket lintas-kolam) --
-    // gak lagi diturunin dari paket/anak yang dipilih. Belum ada kolam
-    // dipilih = belum ada yang bisa ditampilin.
+    // Slot tetep bisa dilihat di kolam manapun; booking-nya yang butuh
+    // paket di kolam itu (lihat selectedPkg). Belum ada kolam dipilih =
+    // belum ada yang bisa ditampilin.
     if (!poolId) {
       setSlots([]);
       return;
@@ -157,9 +182,26 @@ export default function BookingBoard({
       }));
   }, [slots]);
 
+  async function handleBuySingleSession() {
+    setBuyLoading(true);
+    setMessage(null);
+    const res = await fetch("/api/payment/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dependentId, singleSessionPoolId: poolId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setBuyLoading(false);
+      setMessage({ text: data.error ?? "Gagal memulai pembayaran", ok: false });
+      return;
+    }
+    window.location.href = data.redirectUrl;
+  }
+
   async function handleBook(availabilityId: string) {
     if (!packageId) {
-      setMessage({ text: "Pilih peserta dulu sebelum booking", ok: false });
+      setMessage({ text: "Peserta ini belum punya paket di kolam ini", ok: false });
       return;
     }
     setPendingId(availabilityId);
@@ -228,14 +270,14 @@ export default function BookingBoard({
         <CardBody className="flex flex-col gap-3 py-3 sm:flex-row sm:items-end sm:flex-wrap">
           <Field label="Buat peserta">
             <Select
-              value={packageId}
-              onChange={(e) => setPackageId(e.target.value)}
+              value={dependentId}
+              onChange={(e) => setDependentId(e.target.value)}
               className="w-full sm:w-56"
             >
-              {childOptions.length === 0 && <option value="">-- belum ada paket aktif --</option>}
-              {childOptions.map((c) => (
-                <option key={c.packageId} value={c.packageId}>
-                  {c.dependentName} — sisa {c.sisaSesi} sesi
+              {dependents.length === 0 && <option value="">-- belum ada peserta --</option>}
+              {dependents.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
                 </option>
               ))}
             </Select>
@@ -305,17 +347,39 @@ export default function BookingBoard({
               />
             </div>
           </Field>
-          {selectedChild && (
+          {selectedPkg && (
             <div className="flex flex-wrap items-center gap-2 sm:mb-2.5">
-              <Badge tone="brand">Sisa sesi: {selectedChild.sisaSesi}</Badge>
-              <Badge tone={selectedChild.cancelRemaining <= 1 ? "warning" : "neutral"}>
-                Sisa jatah batal: {selectedChild.cancelRemaining}
+              <Badge tone="brand">Sisa sesi: {selectedPkg.sisaSesi}</Badge>
+              <Badge tone={selectedPkg.cancelRemaining <= 1 ? "warning" : "neutral"}>
+                Sisa jatah batal: {selectedPkg.cancelRemaining}
               </Badge>
-              <Badge tone="neutral">Dibeli dari: {selectedChild.purchasedFromPoolName}</Badge>
+              <Badge tone="neutral">{selectedPkg.packageName}</Badge>
             </div>
           )}
         </CardBody>
       </Card>
+
+      {dependentId && poolId && !selectedPkg && (
+        <div className="mb-4 flex flex-col gap-3 rounded-lg border border-amber-200 bg-warning-bg px-4 py-3 text-sm text-warning-text sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            Belum ada paket aktif buat peserta ini di {selectedPool?.name}.
+            {dependentPoolNames.length > 0 && <> Paketnya berlaku di: {dependentPoolNames.join(", ")}.</>}
+            {!canBuySingleSession && " Beli paket dulu buat bisa booking."}
+            {canBuySingleSession &&
+              selectedPool?.singleSessionPrice == null &&
+              " Kolam ini belum jual 1 sesi."}
+          </p>
+          {canBuySingleSession && selectedPool?.singleSessionPrice != null ? (
+            <Button size="sm" loading={buyLoading} onClick={handleBuySingleSession} className="shrink-0">
+              Beli 1 sesi di sini — {formatRupiah(selectedPool.singleSessionPrice)}
+            </Button>
+          ) : (
+            <Link href="/member/paket" className="shrink-0 font-medium underline">
+              Lihat paket
+            </Link>
+          )}
+        </div>
+      )}
 
       {message && (
         <p

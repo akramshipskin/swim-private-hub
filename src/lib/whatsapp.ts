@@ -10,6 +10,10 @@ function normalizePhoneForWa(phone: string): string {
   return digits;
 }
 
+export function buildWaLinkTo(phone: string, message: string) {
+  return `https://wa.me/${normalizePhoneForWa(phone)}?text=${encodeURIComponent(message)}`;
+}
+
 export function buildContactWaLink(phone: string, name: string) {
   const number = normalizePhoneForWa(phone);
   const message = `Halo ${name}, ini dari Admin Swim Private Hub.`;

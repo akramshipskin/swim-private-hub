@@ -38,7 +38,25 @@ export async function affiliateCoach(
 export async function removeAffiliation(formData: FormData) {
   await requireRole("ADMIN");
   const affiliationId = formData.get("affiliationId") as string;
-  await prisma.poolAffiliation.delete({ where: { id: affiliationId } }).catch(() => {});
+  const affiliation = await prisma.poolAffiliation.findUnique({ where: { id: affiliationId } });
+  if (!affiliation) {
+    revalidatePath("/admin/kolam");
+    return;
+  }
+  // Coach yang dicopot dari kolam dulu slot kosongnya ke depan di kolam itu
+  // tetep kebuka & bisa dibooking member. Slot yang udah dibooking
+  // dibiarin -- itu janji ke member, dibatalin manual kalau perlu.
+  await prisma.$transaction([
+    prisma.poolAffiliation.deleteMany({ where: { id: affiliationId } }),
+    prisma.availability.deleteMany({
+      where: {
+        coachId: affiliation.coachId,
+        poolId: affiliation.poolId,
+        status: "AVAILABLE",
+        startTime: { gt: new Date() },
+      },
+    }),
+  ]);
   revalidatePath("/admin/kolam");
 }
 

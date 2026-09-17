@@ -24,7 +24,8 @@ export default function SyaratKetentuanPage() {
 
       <h2>2. Paket dan Sesi</h2>
       <ul>
-        <li>Paket les terdiri atas sejumlah sesi yang berkurang setiap kali pemesanan dihadiri.</li>
+        <li>Paket les terdiri atas sejumlah sesi yang berkurang setiap kali pemesanan dibuat, dan dikembalikan apabila pemesanan dibatalkan sesuai ketentuan pembatalan.</li>
+        <li>Paket hanya dapat digunakan untuk pemesanan di kolam tempat paket tersebut dibeli. Pemesanan di kolam mitra lain dilakukan dengan membeli paket 1 sesi di kolam tersebut, yang hanya tersedia bagi pengguna yang masih memiliki paket aktif.</li>
         <li>Paket akan aktif secara otomatis setelah pembayaran berhasil dikonfirmasi oleh sistem.</li>
         <li>Sisa sesi dan jatah pembatalan berlaku per peserta, dan tidak dapat dipindahkan ke peserta lain kecuali melalui proses manual oleh administrator.</li>
       </ul>

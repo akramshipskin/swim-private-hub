@@ -248,13 +248,11 @@ model Package {
   // setelah ada booking = nge-rewrite riwayat anak booking lama diam-diam.
   dependentId String
   dependent   Dependent        @relation(fields: [dependentId], references: [id])
-  // Dicopy dari template.poolId pas Package dibuat -- ini kolam TEMPAT
-  // BELI (nentuin harga & katalog yang dipake), BUKAN batasan kolam
-  // tempat pake sesi (revisi 2026-09-12: paket lintas-kolam, sesi bisa
-  // dibooking di kolam MANAPUN, gak lagi dicek harus sama kayak
-  // sebelumnya). Kolam yang beneran dikredit per sesi ditentuin dari
-  // Booking -> Availability.poolId pas sesi ditandai Hadir, lihat
-  // src/lib/wallet.ts.
+  // Kolam tempat beli, DAN satu-satunya kolam tempat paket ini bisa
+  // dibooking (revisi 2026-09-17, gantiin paket lintas-kolam 2026-09-12:
+  // beli di kolam murah lalu dipake di kolam mahal bikin kolam mahal
+  // dibayar pake harga kolam murah). Mau renang di kolam lain = beli
+  // paket 1 sesi di kolam itu (isSingleSession), lihat src/lib/drop-in.ts.
   poolId      String
   pool        Pool             @relation(fields: [poolId], references: [id])
   templateId  String?
@@ -267,6 +265,10 @@ model Package {
   // buat cek kuota self-cancel, bukan konstanta global -- tiap paket
   // bisa punya jatah beda.
   jatahCancel Int              @default(2)
+  // Paket eceran 1 sesi buat renang di kolam selain kolam paket utama.
+  // Cuma bisa dibeli member yang masih punya paket biasa (bukan 1 sesi)
+  // yang aktif -- dan paket 1 sesi sendiri gak ngitung sebagai syarat itu.
+  isSingleSession Boolean      @default(false)
   status      PackageStatus    @default(PENDING_PAYMENT)
   startDate   DateTime?
   expiredDate DateTime?

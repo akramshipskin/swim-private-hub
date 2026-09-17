@@ -9,6 +9,7 @@ import EditNameForm from "./edit-name-form";
 import EditPasswordForm from "./edit-password-form";
 import ManageChildrenForm from "./manage-children-form";
 import CopyLinkButton from "./copy-link-button";
+import EditCoachProfileForm from "./edit-coach-profile-form";
 
 export const metadata: Metadata = {
   title: "Profil | Swim Private Hub",
@@ -38,6 +39,13 @@ export default async function ProfilPage() {
     session.user.role === "COACH"
       ? `${process.env.NEXT_PUBLIC_APP_URL}/pelatih/${session.user.id}`
       : null;
+  const coachProfile =
+    session.user.role === "COACH"
+      ? await prisma.coachProfile.findUnique({
+          where: { userId: session.user.id },
+          select: { bio: true, specialties: true, hasCertification: true, certificationNote: true },
+        })
+      : null;
   const hasTrailingSection = children !== null || publicProfileLink !== null;
 
   return (
@@ -58,6 +66,18 @@ export default async function ProfilPage() {
             />
           </CardBody>
         </Card>
+
+        {coachProfile && (
+          <Card className="mb-4">
+            <CardBody>
+              <h2 className="mb-1 text-lg font-semibold text-text">Profil Coach</h2>
+              <p className="mb-3 text-sm text-text-muted">
+                Ditampilin ke orang tua di halaman profil publik kamu.
+              </p>
+              <EditCoachProfileForm profile={coachProfile} />
+            </CardBody>
+          </Card>
+        )}
 
         <Card className={hasTrailingSection ? "mb-4" : undefined}>
           <CardBody>

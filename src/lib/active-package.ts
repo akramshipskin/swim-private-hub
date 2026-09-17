@@ -22,13 +22,3 @@ export function usablePackageConditions(): Prisma.PackageWhereInput {
 export function activePackageWhere(memberId: string): Prisma.PackageWhereInput {
   return { memberId, ...usablePackageConditions() };
 }
-
-// Sama kayak activePackageWhere, tapi discope ke 1 anak spesifik --
-// 1 paket = 1 anak, jadi gak ada FIFO lintas-anak lagi, tiap anak punya
-// "paket aktif"-nya sendiri.
-export function activePackageWhereForDependent(
-  memberId: string,
-  dependentId: string
-): Prisma.PackageWhereInput {
-  return { ...activePackageWhere(memberId), dependentId };
-}

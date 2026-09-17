@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import BookingBoard from "./booking-board";
 import Link from "next/link";
 import EnablePushButton from "@/components/enable-push-button";
-import { activePackageWhereForDependent } from "@/lib/active-package";
+import { activePackageWhere } from "@/lib/active-package";
+import { dropInPrice } from "@/lib/drop-in";
 import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
 
 export default async function MemberBookingPage() {
@@ -14,42 +15,45 @@ export default async function MemberBookingPage() {
     orderBy: { name: "asc" },
   });
 
-  // 1 paket = 1 anak sekarang -- tiap anak bisa punya paket aktif sendiri,
-  // gak ada FIFO lintas-anak lagi. Ortu pilih paket (== pilih anak) di
-  // BookingBoard, bukan sistem yang nebak.
-  const packagesByChild = await Promise.all(
-    children.map(async (child) => {
-      const pkg = await prisma.package.findFirst({
-        where: activePackageWhereForDependent(session.user.id, child.id),
-        orderBy: { createdAt: "asc" },
-        include: { pool: { select: { id: true, name: true } } },
-      });
-      if (!pkg) return null;
-      const cancelUsed = await prisma.booking.count({
-        where: { packageId: pkg.id, status: "CANCELLED", cancelledBy: "MEMBER" },
-      });
-      return {
-        dependentId: child.id,
-        dependentName: child.name,
-        packageId: pkg.id,
-        packageName: pkg.name,
-        // Cuma info "dibeli dari kolam mana" -- BUKAN batasan kolam
-        // booking lagi (revisi 2026-09-12, paket lintas-kolam). Kolam
-        // booking dipilih terpisah lewat dropdown Kolam di bawah.
-        purchasedFromPoolName: pkg.pool.name,
-        sisaSesi: pkg.sisaSesi,
-        jatahCancel: pkg.jatahCancel,
-        cancelRemaining: Math.max(0, pkg.jatahCancel - cancelUsed),
-      };
-    })
-  );
-  const childOptions = packagesByChild.filter((c) => c !== null);
-
-  const pools = await prisma.pool.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-    select: { id: true, name: true },
+  // Semua paket yang masih bisa dipake, per anak & per kolam -- paket cuma
+  // berlaku di kolam tempat beli (revisi 2026-09-17), jadi 1 anak bisa
+  // punya beberapa paket aktif di kolam beda. BookingBoard milih paket
+  // dari kombinasi (anak, kolam) yang dipilih ortu.
+  const usable = await prisma.package.findMany({
+    where: activePackageWhere(session.user.id),
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      name: true,
+      dependentId: true,
+      poolId: true,
+      sisaSesi: true,
+      jatahCancel: true,
+      isSingleSession: true,
+      _count: { select: { bookings: { where: { status: "CANCELLED", cancelledBy: "MEMBER" } } } },
+    },
   });
+  const packageOptions = usable.map((p) => ({
+    packageId: p.id,
+    packageName: p.name,
+    dependentId: p.dependentId,
+    poolId: p.poolId,
+    sisaSesi: p.sisaSesi,
+    cancelRemaining: Math.max(0, p.jatahCancel - p._count.bookings),
+  }));
+  const canBuySingleSession = usable.some((p) => !p.isSingleSession);
+
+  const pools = (
+    await prisma.pool.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        packageTemplates: { where: { isActive: true }, select: { price: true, totalSesi: true } },
+      },
+    })
+  ).map((p) => ({ id: p.id, name: p.name, singleSessionPrice: dropInPrice(p.packageTemplates) }));
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
@@ -73,7 +77,7 @@ export default async function MemberBookingPage() {
         </div>
       )}
 
-      {children.length > 0 && childOptions.length === 0 && (
+      {children.length > 0 && packageOptions.length === 0 && (
         <div className="mb-6 rounded-lg border border-amber-200 bg-warning-bg px-4 py-3 text-sm text-warning-text">
           Belum ada anak yang punya paket aktif dengan sisa sesi.{" "}
           <Link href="/member/paket" className="font-medium underline">
@@ -118,7 +122,12 @@ export default async function MemberBookingPage() {
         </p>
       </div>
 
-      <BookingBoard childOptions={childOptions} pools={pools} />
+      <BookingBoard
+        dependents={children.map((c) => ({ id: c.id, name: c.name }))}
+        packageOptions={packageOptions}
+        pools={pools}
+        canBuySingleSession={canBuySingleSession}
+      />
     </main>
   );
 }

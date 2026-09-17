@@ -44,7 +44,12 @@ export default async function MemberPaketPage() {
       // jualan paket lagi.
       where: { isActive: true, pool: { isActive: true } },
       orderBy: { totalSesi: "asc" },
-      include: { pool: { select: { name: true } } },
+      include: {
+        pool: { select: { name: true } },
+        // Paket yang pernah aktif (startDate keisi = dibayar/diassign) --
+        // dasar badge "Populer", bukan urutan kartu.
+        _count: { select: { packages: { where: { startDate: { not: null } } } } },
+      },
     }),
     prisma.dependent.findMany({
       where: { memberId: session.user.id, isActive: true },
@@ -54,6 +59,8 @@ export default async function MemberPaketPage() {
   ]);
 
   const now = new Date();
+  const maxSold = Math.max(0, ...templates.map((t) => t._count.packages));
+  const popularTemplateId = maxSold > 0 ? templates.find((t) => t._count.packages === maxSold)?.id : undefined;
 
   // "Member" cuma valid begitu paket pernah aktif (beli/diassign) --
   // sebelum itu dia masih pengunjung biasa, jangan diklaim member.
@@ -121,7 +128,10 @@ export default async function MemberPaketPage() {
         </ul>
       )}
 
-      <h2 className="mb-3 text-lg font-semibold text-text">Beli Paket Baru</h2>
+      <h2 className="mb-1 text-lg font-semibold text-text">Beli Paket Baru</h2>
+      <p className="mb-3 text-sm text-text-muted">
+        Paket cuma bisa dipake booking di kolam tempat paket itu dibeli.
+      </p>
       {children.length === 0 ? (
         <p className="text-sm text-text-muted">
           Belum ada anak terdaftar. Tambah anak dulu di halaman{" "}
@@ -134,14 +144,14 @@ export default async function MemberPaketPage() {
         <p className="text-sm text-text-muted">Belum ada katalog paket tersedia.</p>
       ) : (
         <ul className="flex flex-wrap justify-center gap-3">
-          {templates.map((t, i) => (
+          {templates.map((t) => (
             <Card
               key={t.id}
-              className={`w-full sm:w-72 ${i === 1 ? "border-brand-500 ring-1 ring-brand-500" : ""}`}
+              className={`w-full sm:w-72 ${t.id === popularTemplateId ? "border-brand-500 ring-1 ring-brand-500" : ""}`}
             >
               <CardBody className="flex flex-col items-center gap-3 text-center">
                 <div>
-                  {i === 1 && (
+                  {t.id === popularTemplateId && (
                     <span className="mb-1 inline-block rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">
                       Populer
                     </span>

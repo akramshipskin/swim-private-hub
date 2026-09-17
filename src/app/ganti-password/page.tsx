@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import { Card, CardBody } from "@/components/ui/card";
@@ -34,6 +35,12 @@ export default async function GantiPasswordPage() {
     redirect(roleHome[session.user.role]);
   }
 
+  // Member yang udah punya peserta (password direset admin, bukan login
+  // pertama) gak perlu isi form peserta lagi.
+  const needsParticipants =
+    session.user.role === "MEMBER" &&
+    (await prisma.dependent.count({ where: { memberId: session.user.id, isActive: true } })) === 0;
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 py-12">
       <div className="mb-6 flex flex-col items-center text-center">
@@ -47,7 +54,9 @@ export default async function GantiPasswordPage() {
         />
         <p className="text-lg text-text"><Logotype /></p>
         <p className="text-sm text-text-muted">
-          Ini login pertama kamu -- ganti password bawaan dulu ya.
+          {needsParticipants
+            ? "Ini login pertama kamu -- ganti password bawaan dulu ya."
+            : "Ganti password sementara kamu dulu ya sebelum lanjut."}
         </p>
       </div>
 
@@ -55,7 +64,7 @@ export default async function GantiPasswordPage() {
         <CardBody>
           <h1 className="mb-5 text-xl font-semibold text-text">Ganti Password</h1>
           <ChangePasswordForm
-            isMember={session.user.role === "MEMBER"}
+            isMember={needsParticipants}
             memberName={session.user.name ?? ""}
           />
         </CardBody>

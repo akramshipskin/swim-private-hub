@@ -1,4 +1,5 @@
 import ToggleActiveButton from "./toggle-active-button";
+import ResetPasswordButton from "./reset-password-button";
 import { buildContactWaLink } from "@/lib/whatsapp";
 
 export function shortDate(d: Date) {
@@ -81,11 +82,11 @@ export function UserActions({
   user,
   isSelf = false,
 }: {
-  user: { id: string; name: string; phone: string | null; isActive: boolean };
+  user: { id: string; name: string; phone: string | null; email: string | null; isActive: boolean };
   isSelf?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center justify-end gap-1">
       {user.phone && (
         <a
           href={buildContactWaLink(user.phone, user.name)}
@@ -98,6 +99,14 @@ export function UserActions({
       )}
       {/* Admin nonaktifin akunnya sendiri = langsung ke-logout & gak ada
           admin lain buat ngaktifin balik (cuma bisa lewat DB). */}
+      {!isSelf && (
+        <ResetPasswordButton
+          userId={user.id}
+          userName={user.name}
+          phone={user.phone}
+          loginId={user.phone ?? user.email ?? ""}
+        />
+      )}
       {!isSelf && <ToggleActiveButton userId={user.id} userName={user.name} isActive={user.isActive} />}
     </div>
   );

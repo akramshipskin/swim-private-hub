@@ -41,23 +41,28 @@ export async function POST(request: Request) {
       // sekaligus jadi IDOR guard (packageId bukan punya session.user.id
       // = gak ke-update), validasi eligibility (ACTIVE, ada sisa sesi,
       // belum kedaluwarsa), DAN klaim sesi, semuanya 1 query atomic.
+      // Paket cuma berlaku di kolam tempat dibeli (revisi 2026-09-17) --
+      // poolId slot dibaca dulu lalu jadi syarat klaim paket. poolId slot
+      // gak pernah berubah, jadi baca-dulu di sini aman dari race.
+      const slot = await tx.availability.findUnique({
+        where: { id: availabilityId },
+        select: { poolId: true },
+      });
+      if (!slot) {
+        throw new BookingError("Slot gak ditemukan.", 404);
+      }
+
       const claimPkg = await tx.package.updateMany({
-        where: { ...activePackageWhere(session.user.id), id: packageId },
+        where: { ...activePackageWhere(session.user.id), id: packageId, poolId: slot.poolId },
         data: { sisaSesi: { decrement: 1 } },
       });
 
       if (claimPkg.count === 0) {
         throw new BookingError(
-          "Paket gak ditemukan, kuota sesi habis, belum aktif, atau udah kedaluwarsa.",
+          "Paket ini gak bisa dipake buat slot ini: paketnya buat kolam lain, kuota sesi habis, belum aktif, atau udah kedaluwarsa.",
           409
         );
       }
-
-      // Booking lintas-kolam DIPERBOLEHKAN (revisi 2026-09-12) -- paket
-      // gak lagi dikunci ke 1 kolam, member bisa booking coach+slot di
-      // kolam manapun selama sesinya masih ada. Kolam mana yang
-      // akhirnya dikredit ditentuin belakangan pas sesi ditandai Hadir
-      // (lihat src/lib/wallet.ts), bukan di sini.
 
       // Klaim atomic: cuma berhasil kalau slot masih AVAILABLE. Ini yang
       // bikin "war booking" aman -- 2 request bersamaan cuma 1 yang lolos,

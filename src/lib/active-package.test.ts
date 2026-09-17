@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { activePackageWhere, activePackageWhereForDependent, usablePackageConditions } from "./active-package";
+import { activePackageWhere, usablePackageConditions } from "./active-package";
 
 describe("usablePackageConditions", () => {
   // Regression: admin/users session 2026-08-19 — filtering on status:"ACTIVE"
@@ -37,13 +37,5 @@ describe("activePackageWhere", () => {
     const where = activePackageWhere("member-1");
     expect(where.memberId).toBe("member-1");
     expect(where.status).toBe("ACTIVE");
-  });
-});
-
-describe("activePackageWhereForDependent", () => {
-  it("further scopes to one dependent, so each child has its own active package", () => {
-    const where = activePackageWhereForDependent("member-1", "dependent-1");
-    expect(where.memberId).toBe("member-1");
-    expect(where.dependentId).toBe("dependent-1");
   });
 });

@@ -412,11 +412,11 @@ const PANDUAN_BODY = `
       </div>
 
       <div class="section-head">
-        <span class="kicker">3 peran, 3 pengalaman</span>
+        <span class="kicker">4 peran, 4 pengalaman</span>
         <h2>Setiap orang cuma lihat yang relevan buat dia</h2>
         <p>Klik salah satu buat langsung lompat ke panduan lengkapnya.</p>
       </div>
-      <div class="grid3">
+      <div class="grid2">
         <div class="card role-card" style="--role:var(--member);--role-bg:var(--member-bg);">
           <div class="icon">${ICON.swimmer}</div>
           <h3>Member (orang tua)</h3>
@@ -454,6 +454,16 @@ const PANDUAN_BODY = `
             <li>Laporan pembayaran &amp; kinerja coach</li>
           </ul>
           <button class="go-btn" data-goto="admin">Lihat panduan Admin →</button>
+        </div>
+        <div class="card role-card" style="--role:var(--admin);--role-bg:var(--admin-bg);">
+          <div class="icon">${ICON.creditCard}</div>
+          <h3>Pemilik Kolam</h3>
+          <p>Pantau pendapatan kolam, cairkan ke rekening.</p>
+          <ul>
+            <li>Saldo kolam bertambah tiap sesi ditandai Hadir</li>
+            <li>Isi rekening &amp; ajukan pencairan</li>
+            <li>Laporan sesi &amp; pendapatan per tanggal</li>
+          </ul>
         </div>
       </div>
 
@@ -677,7 +687,7 @@ const PANDUAN_BODY = `
       <div class="guide">
         <div class="guide-head" id="m-booking"><span class="gi">4</span><h3>Booking Sesi</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Booking</h4></div></div>
-        <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih "Buat anak"</h4><p>Dropdown ini nunjukin peserta mana aja yang punya paket aktif, sekalian nama paket dan sisa sesinya.</p></div></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih peserta &amp; kolam</h4><p>Paket cuma berlaku di kolam tempat paket itu dibeli. Kalau peserta punya paket di kolam yang dipilih, sisa sesi &amp; jatah batalnya langsung muncul. Kalau belum, dan kamu masih punya paket aktif di kolam lain, ada tombol <b>Beli 1 sesi di sini</b> (harga per sesi kolam itu + 20%).</p></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih Tanggal</h4><p>Kalender nunjukin titik penanda di tanggal yang masih ada slot kosong. Tanggal yang udah lewat otomatis gak bisa dipilih.</p></div></div>
         <div class="step"><span class="sn">4</span><div class="st"><h4>Pilih coach &amp; jam</h4><p>Slot yang masih kosong ada tombol <b>Booking</b>. Slot yang udah diambil member lain otomatis kekunci ("Sudah dibooking").</p></div></div>
         <div class="step"><span class="sn">5</span><div class="st"><h4>Klik Booking</h4><p>Sisa sesi berkurang 1 otomatis, dan kamu dapet notifikasi konfirmasi (kalau notifikasi udah diaktifkan).</p></div></div>

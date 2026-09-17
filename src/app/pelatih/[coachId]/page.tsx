@@ -109,8 +109,8 @@ export default async function CoachShortcutPage({
 
       <p className="mt-4 text-xs text-text-subtle">
         {session?.user.role === "MEMBER"
-          ? "Mau booking coach ini? Pilih kolam & coach-nya di menu Booking -- paketmu berlaku di semua kolam mitra."
-          : "Mau booking coach ini? Daftar/login sebagai member, lalu pilih kolam & coach-nya di menu Booking -- paket berlaku di semua kolam mitra."}
+          ? "Mau booking coach ini? Pilih kolam & coach-nya di menu Booking. Paket berlaku di kolam tempat dibeli; di kolam lain bisa beli 1 sesi."
+          : "Mau booking coach ini? Daftar/login sebagai member, beli paket di kolam tempat coach ini ngajar, lalu booking lewat menu Booking."}
       </p>
     </main>
   );

@@ -38,7 +38,12 @@ export async function changePassword(
     .map((n) => toProperCase(n));
   const wantsSelf = types.includes("self");
 
-  if (session.user.role === "MEMBER" && childNames.length === 0 && !wantsSelf) {
+  // Wajib isi peserta cuma kalau member ini belum punya peserta sama sekali
+  // (login pertama). Member yang password-nya direset admin udah punya.
+  const needsParticipants =
+    session.user.role === "MEMBER" &&
+    (await prisma.dependent.count({ where: { memberId: session.user.id, isActive: true } })) === 0;
+  if (needsParticipants && childNames.length === 0 && !wantsSelf) {
     return { error: "Isi minimal 1 peserta (diri sendiri atau anak)" };
   }
 
