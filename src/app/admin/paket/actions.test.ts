@@ -75,7 +75,7 @@ describe("createTemplate", () => {
     const result = await createTemplate(null, formData(valid));
     expect(result).toBeNull();
     expect(templateCreate).toHaveBeenCalledWith({
-      data: { poolId: "pool-1", name: "Private 8x", totalSesi: 8, price: 750000, durationDays: 60, jatahCancel: 2 },
+      data: expect.objectContaining({ poolId: "pool-1", name: "Private 8x", totalSesi: 8, price: 750000, durationDays: 60, jatahCancel: 2, isActive: true }),
     });
   });
 
@@ -125,7 +125,7 @@ describe("updateTemplate", () => {
     expect(result).toBeNull();
     expect(templateUpdate).toHaveBeenCalledWith({
       where: { id: "tpl-1" },
-      data: { name: "Private 8x", totalSesi: 8, price: 750000, durationDays: 60, jatahCancel: 2, isActive: true },
+      data: expect.objectContaining({ name: "Private 8x", totalSesi: 8, price: 750000, durationDays: 60, jatahCancel: 2, isActive: true }),
     });
   });
 

@@ -13,8 +13,8 @@ vi.mock("@/lib/prisma", () => ({
 const createTemplateRecord = vi.fn().mockResolvedValue(null);
 const updateTemplateRecord = vi.fn().mockResolvedValue(null);
 vi.mock("@/lib/package-template", () => ({
-  createTemplateRecord: (...a: unknown[]) => createTemplateRecord(...a),
-  updateTemplateRecord: (...a: unknown[]) => updateTemplateRecord(...a),
+  proposeNewTemplate: (...a: unknown[]) => createTemplateRecord(...a),
+  proposeTemplateUpdate: (...a: unknown[]) => updateTemplateRecord(...a),
 }));
 
 const { createPoolTemplate, updatePoolTemplate } = await import("./actions");

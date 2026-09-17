@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import CreateTemplateForm from "./create-template-form";
 import TemplateEditForm from "./template-edit-form";
 import PaketPerMemberList from "./paket-per-member-list";
+import PendingTemplateChanges from "./pending-template-changes";
 
 function toInputDate(d: Date | null) {
   if (!d) return "";
@@ -80,6 +81,8 @@ export default async function AdminPaketPage() {
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola Paket</h1>
+
+      <PendingTemplateChanges />
 
       {/* --- Katalog Paket --- */}
       <h2 className="mb-3 text-lg font-semibold text-text">Katalog Paket</h2>

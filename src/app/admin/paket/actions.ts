@@ -3,7 +3,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { withDedupeLock } from "@/lib/dedupe-lock";
-import { createTemplateRecord, updateTemplateRecord } from "@/lib/package-template";
+import { createTemplateRecord, updateTemplateRecord, reviewTemplateChange } from "@/lib/package-template";
 import { createDependent, createSelfDependent } from "@/lib/dependents";
 import { toProperCase } from "@/lib/format";
 import { revalidatePath } from "next/cache";
@@ -22,6 +22,14 @@ export async function createTemplate(
   revalidatePath("/admin/paket");
   revalidatePath("/pool/paket");
   return null;
+}
+
+export async function reviewTemplate(templateId: string, approve: boolean) {
+  await requireRole("ADMIN");
+  await reviewTemplateChange(templateId, approve);
+  revalidatePath("/admin", "layout");
+  revalidatePath("/pool/paket");
+  revalidatePath("/member/paket");
 }
 
 export async function updateTemplate(

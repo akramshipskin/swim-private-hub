@@ -290,6 +290,9 @@ model PackageTemplate {
   // kuota (biar paket lama gak ikut berubah kalau template diedit).
   jatahCancel  Int      @default(2)
   isActive     Boolean  @default(true)
+  // Usulan perubahan dari pemilik kolam yang menunggu persetujuan admin
+  // (lihat src/lib/package-template.ts). Nilai di atas = yang sedang dijual.
+  pendingChanges Json?
   createdAt    DateTime @default(now())
 
   packages Package[]

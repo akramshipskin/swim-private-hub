@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import CreateTemplateForm from "@/app/admin/paket/create-template-form";
 import TemplateEditForm from "@/app/admin/paket/template-edit-form";
 import { createPoolTemplate, updatePoolTemplate } from "./actions";
+import { formatRupiah } from "@/lib/format";
+import type { PendingTemplateChange } from "@/lib/package-template";
 
 export default async function PoolPaketPage() {
   const session = await requireRole("POOL_OWNER");
@@ -20,8 +22,8 @@ export default async function PoolPaketPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Paket &amp; Harga</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
-        Atur katalog paket yang dijual di kolammu. Perubahan harga langsung berlaku untuk pembelian berikutnya; paket yang
-        sudah dibeli member tidak berubah.
+        Usulkan paket baru atau perubahan harga untuk kolammu. Usulan berlaku setelah disetujui admin; paket yang sudah
+        dibeli member tidak ikut berubah.
       </p>
       {pools.length === 0 ? (
         <p className="text-sm text-text-muted">Akun ini belum terhubung ke kolam mana pun. Hubungi admin.</p>
@@ -38,6 +40,14 @@ export default async function PoolPaketPage() {
                   <ul className="grid gap-3 lg:grid-cols-2">
                     {p.packageTemplates.map((t) => (
                       <li key={t.id}>
+                        {t.pendingChanges && (
+                          <p className="mb-2 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+                            {(t.pendingChanges as unknown as PendingTemplateChange).isNew ? "Paket baru" : "Perubahan"} menunggu
+                            persetujuan admin: {(t.pendingChanges as unknown as PendingTemplateChange).name} ·{" "}
+                            {formatRupiah((t.pendingChanges as unknown as PendingTemplateChange).price)}. Yang tampil di bawah adalah
+                            yang sedang berlaku.
+                          </p>
+                        )}
                         <TemplateEditForm template={t} action={updatePoolTemplate} />
                       </li>
                     ))}
