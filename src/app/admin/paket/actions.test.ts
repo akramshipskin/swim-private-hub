@@ -9,7 +9,7 @@ const templateFindUnique = vi.fn();
 const dependentFindUnique = vi.fn();
 const packageCreate = vi.fn().mockResolvedValue({});
 const packageFindUnique = vi.fn();
-const packageUpdate = vi.fn().mockResolvedValue({});
+const packageUpdate = vi.fn().mockResolvedValue({ count: 1 });
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -22,7 +22,7 @@ vi.mock("@/lib/prisma", () => ({
     package: {
       create: (...args: unknown[]) => packageCreate(...args),
       findUnique: (...args: unknown[]) => packageFindUnique(...args),
-      update: (...args: unknown[]) => packageUpdate(...args),
+      updateMany: (...args: unknown[]) => packageUpdate(...args),
     },
   },
 }));
@@ -247,5 +247,19 @@ describe("updatePackage", () => {
       formData({ packageId: "pkg-1", sisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
     );
     expect(packageUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ sisaSesi: 5 }) }));
+  });
+
+  // Regression (tes race lokal 2026-09-17): form edit dibuka pas sisa 5,
+  // member booking 3x, admin simpan "5" -> 3 sesi gratis. Simpan harus
+  // gagal kalau sisa sesi udah beda dari pas form dibuka.
+  it("only updates when sisaSesi still equals the value the form was opened with", async () => {
+    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8 });
+    packageUpdate.mockResolvedValueOnce({ count: 0 });
+    const result = await updatePackage(
+      null,
+      formData({ packageId: "pkg-1", sisaSesi: "5", expectedSisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
+    );
+    expect(packageUpdate).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "pkg-1", sisaSesi: 5 } }));
+    expect(result?.error).toContain("barusan berubah");
   });
 });

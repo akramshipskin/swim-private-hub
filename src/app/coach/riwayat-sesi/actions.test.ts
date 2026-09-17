@@ -174,4 +174,15 @@ describe("markAttendance", () => {
       expect.objectContaining({ data: expect.objectContaining({ attendedBy: "COACH" }) })
     );
   });
+
+  // Regression (tes race lokal 2026-09-17): booking dibatalin di antara baca
+  // & update masih bisa ditandai Hadir dan wallet kekredit. CAS wajib
+  // nyertain status BOOKED.
+  it("includes status BOOKED in the conditional update so a just-cancelled booking can't be credited", async () => {
+    bookingFindUnique.mockResolvedValue(baseBooking({ attended: null }));
+    await markAttendance(null, formData("booking-1", "true"));
+    expect(bookingUpdateMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "booking-1", attended: null, status: "BOOKED" } })
+    );
+  });
 });

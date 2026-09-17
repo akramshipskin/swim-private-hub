@@ -27,7 +27,7 @@ export default async function AdminUsersPage() {
         // sendiri-sendiri, tabel ini butuh nunjukin status per peserta,
         // bukan cuma 1 ringkasan buat seluruh member.
         packages: {
-          where: usablePackageConditions,
+          where: usablePackageConditions(),
           orderBy: { createdAt: "desc" },
         },
         dependents: {

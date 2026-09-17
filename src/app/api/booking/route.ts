@@ -62,14 +62,19 @@ export async function POST(request: Request) {
       // Klaim atomic: cuma berhasil kalau slot masih AVAILABLE. Ini yang
       // bikin "war booking" aman -- 2 request bersamaan cuma 1 yang lolos,
       // dijamin row-level lock Postgres di dalam transaksi ini.
+      //
+      // startTime > sekarang juga dicek di sini -- UI emang nyembunyiin slot
+      // kosong yang udah lewat, tapi halaman yang dibiarin kebuka (atau
+      // request langsung ke API) sebelumnya tetep bisa booking slot yang
+      // jamnya udah lewat, sesi member kepotong buat jadwal yang mustahil.
       const claim = await tx.availability.updateMany({
-        where: { id: availabilityId, status: "AVAILABLE" },
+        where: { id: availabilityId, status: "AVAILABLE", startTime: { gt: new Date() } },
         data: { status: "BOOKED" },
       });
 
       if (claim.count === 0) {
         throw new BookingError(
-          "Slot ini baru aja diambil member lain, coba pilih slot lain.",
+          "Slot ini udah gak bisa dibooking (baru aja diambil member lain, atau jamnya udah lewat). Pilih slot lain.",
           409
         );
       }

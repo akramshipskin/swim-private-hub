@@ -4,18 +4,18 @@ vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 const findUnique = vi.fn();
-const update = vi.fn().mockResolvedValue({});
+const updateMany = vi.fn().mockResolvedValue({ count: 1 });
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     withdrawalRequest: {
       findUnique: (...args: unknown[]) => findUnique(...args),
-      update: (...args: unknown[]) => update(...args),
+      updateMany: (...args: unknown[]) => updateMany(...args),
     },
   },
 }));
 
-const markWithdrawalPaid = vi.fn().mockResolvedValue(undefined);
-const markWithdrawalFailed = vi.fn().mockResolvedValue(undefined);
+const markWithdrawalPaid = vi.fn().mockResolvedValue(true);
+const markWithdrawalFailed = vi.fn().mockResolvedValue(true);
 vi.mock("@/lib/withdrawal", () => ({
   markWithdrawalPaid: (...args: unknown[]) => markWithdrawalPaid(...args),
   markWithdrawalFailed: (...args: unknown[]) => markWithdrawalFailed(...args),
@@ -124,5 +124,32 @@ describe("rejectWithdrawal", () => {
     const result = await rejectWithdrawal(null, formData("wd-1"));
     expect(result?.error).toBeTruthy();
     expect(markWithdrawalFailed).not.toHaveBeenCalled();
+  });
+});
+
+// Regression (tes race lokal 2026-09-17): "Tandai Dibayar" & "Tolak" diklik
+// barengan -- yang kalah klaim CAS harus dapet error, bukan diem-diem sukses.
+describe("lost CAS claim", () => {
+  it("markPaidManually returns an error when the request was resolved in between", async () => {
+    findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
+    markWithdrawalPaid.mockResolvedValueOnce(false);
+    const result = await markPaidManually(null, formData("wd-1"));
+    expect(result?.error).toContain("barusan udah diproses");
+  });
+
+  it("rejectWithdrawal returns an error when the request was resolved in between", async () => {
+    findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
+    markWithdrawalFailed.mockResolvedValueOnce(false);
+    const result = await rejectWithdrawal(null, formData("wd-1"));
+    expect(result?.error).toContain("barusan udah diproses");
+  });
+
+  it("processWithdrawal refuses when another click already moved it out of PENDING", async () => {
+    findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
+    isIrisConfigured.mockReturnValue(true);
+    updateMany.mockResolvedValueOnce({ count: 0 });
+    const result = await processWithdrawal(null, formData("wd-1"));
+    expect(result?.error).toBeTruthy();
+    expect(disburseViaIris).not.toHaveBeenCalled();
   });
 });

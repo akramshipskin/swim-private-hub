@@ -131,13 +131,15 @@ export async function requestCoachWithdrawal(coachProfileId: string) {
 // sama, jadi saldo dibalikin DUA KALI. Sama kelas bug kayak
 // cancelBooking/markAttendance, guard di titik yang sama (conditional
 // update), bukan cuma di caller.
+// Balikin true kalau request ini beneran diklaim (diubah ke FAILED) oleh
+// panggilan ini, false kalau udah keburu diproses duluan (PAID/FAILED).
 export async function markWithdrawalFailed(withdrawalRequestId: string, reason: string) {
-  await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const claim = await tx.withdrawalRequest.updateMany({
       where: { id: withdrawalRequestId, status: { in: ["PENDING", "PROCESSING"] } },
       data: { status: "FAILED", failureReason: reason, processedAt: new Date() },
     });
-    if (claim.count === 0) return;
+    if (claim.count === 0) return false;
 
     const req = await tx.withdrawalRequest.findUniqueOrThrow({
       where: { id: withdrawalRequestId },
@@ -164,12 +166,19 @@ export async function markWithdrawalFailed(withdrawalRequestId: string, reason: 
         withdrawalRequestId: req.id,
       },
     });
+    return true;
   });
 }
 
+// CAS yang sama kayak markWithdrawalFailed -- tanpa ini, admin klik "Tandai
+// Dibayar" dan "Tolak" barengan (2 tab / double-klik) bisa bikin request
+// yang saldonya UDAH dibalikin (FAILED) ketiban jadi PAID: duit ditransfer
+// manual DAN saldo balik ke wallet = keluar 2x. Kebukti di tes race lokal
+// 2026-09-17 (1 dari 10 percobaan).
 export async function markWithdrawalPaid(withdrawalRequestId: string, midtransReferenceId?: string) {
-  await prisma.withdrawalRequest.update({
-    where: { id: withdrawalRequestId },
+  const claim = await prisma.withdrawalRequest.updateMany({
+    where: { id: withdrawalRequestId, status: { in: ["PENDING", "PROCESSING"] } },
     data: { status: "PAID", processedAt: new Date(), midtransReferenceId },
   });
+  return claim.count > 0;
 }

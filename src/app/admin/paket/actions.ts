@@ -226,8 +226,16 @@ export async function updatePackage(
   // Clamp biar sisa sesi gak bisa ngelewatin total sesi paketnya sendiri.
   const sisaSesi = Math.min(sisaSesiRaw, pkg.totalSesi);
 
-  await prisma.package.update({
-    where: { id: packageId },
+  // expectedSisaSesi = nilai sisa sesi pas form edit dibuka. Sisa sesi di
+  // sini ditimpa nilai absolut, jadi kalau di antara buka form & klik
+  // Simpan member sempet booking/batal, simpan tanpa cek ini nge-hapus
+  // perubahan itu diem-diem (tes race lokal 2026-09-17: 3 booking masuk
+  // barengan, sisa sesi balik ke angka lama = 3 sesi gratis).
+  const expectedRaw = formData.get("expectedSisaSesi");
+  const expected = expectedRaw === null || expectedRaw === "" ? null : Number(expectedRaw);
+
+  const result = await prisma.package.updateMany({
+    where: { id: packageId, ...(expected !== null && Number.isInteger(expected) ? { sisaSesi: expected } : {}) },
     data: {
       sisaSesi,
       jatahCancel: jatahCancelRaw,
@@ -235,6 +243,11 @@ export async function updatePackage(
       expiredDate: expiredDateRaw ? new Date(`${expiredDateRaw}T23:59:59+07:00`) : null,
     },
   });
+  if (result.count === 0) {
+    return {
+      error: "Sisa sesi paket ini barusan berubah (ada booking/pembatalan baru). Refresh halaman, cek angkanya, lalu simpan lagi.",
+    };
+  }
 
   revalidatePath("/admin/paket");
   return null;

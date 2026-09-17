@@ -53,8 +53,12 @@ export async function markAttendance(
       // bersamaan bisa DUA-DUANYA baca wasAttended=false sebelum salah
       // satu commit, jadi creditSessionRevenue kepanggil 2x buat booking
       // yang sama.
+      // status: "BOOKED" juga ikut di CAS -- tanpa ini, booking yang
+      // dibatalin di antara baca & update tetep bisa ditandai Hadir dan
+      // wallet kekredit buat sesi yang udah CANCELLED (tes race lokal
+      // 2026-09-17, 8 dari 8 percobaan).
       const claim = await tx.booking.updateMany({
-        where: { id: bookingId, attended: booking.attended },
+        where: { id: bookingId, attended: booking.attended, status: "BOOKED" },
         data: {
           attended,
           attendedBy: session.user.role as "COACH" | "ADMIN",
@@ -62,7 +66,7 @@ export async function markAttendance(
         },
       });
       if (claim.count === 0) {
-        throw new Error("Status kehadiran udah diubah barengan, coba lagi.");
+        throw new Error("Booking ini udah diubah barengan (dibatalin/ditandai di tempat lain), refresh dulu.");
       }
 
       // Kredit wallet cuma jalan kalau paket ini beneran dibeli lewat

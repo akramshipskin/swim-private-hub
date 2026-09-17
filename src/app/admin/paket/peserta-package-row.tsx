@@ -70,6 +70,7 @@ export default function PesertaPackageRow({
           {isEditing && (
             <form action={formAction} className="mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
               <input type="hidden" name="packageId" value={pkg.id} />
+              <input type="hidden" name="expectedSisaSesi" value={pkg.sisaSesi} />
               <div className="grid grid-cols-2 gap-3 sm:contents">
                 <Field label="Sisa Sesi">
                   <Input

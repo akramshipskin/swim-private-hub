@@ -72,10 +72,11 @@ export async function POST(request: Request) {
   // duplikat: gak boleh reset startDate/expiredDate paket ATAU kredit
   // wallet kolam lagi, ntar saldo/masa berlaku ke-double diem-diem tiap
   // kali Midtrans retry.
-  if (
-    payment.status === "SUCCESS" &&
-    (transactionStatus === "capture" || transactionStatus === "settlement")
-  ) {
+  //
+  // Status lain (pending/expire yang telat, refund, dll) buat payment yang
+  // udah SUCCESS juga gak boleh ngubah apa-apa -- refund belum ditangani
+  // otomatis, diproses manual (lihat /kebijakan-pengembalian).
+  if (payment.status === "SUCCESS") {
     await prisma.payment.update({
       where: { id: payment.id },
       data: { rawWebhookPayload: body as Prisma.InputJsonValue },
@@ -105,10 +106,18 @@ export async function POST(request: Request) {
   expiredDate.setDate(expiredDate.getDate() + durationDays);
 
   await prisma.$transaction(async (tx) => {
-    await tx.payment.update({
-      where: { id: payment.id },
+    // Payment yang udah SUCCESS gak boleh turun status lagi -- notif
+    // "pending"/"expire" yang telat nyampe (retry Midtrans, urutan gak
+    // dijamin) sebelumnya nge-balikin payment jadi PENDING & paket yang
+    // udah dibayar jadi EXPIRED; efek lanjutannya markAttendance gak
+    // ngredit wallet (butuh Payment SUCCESS). Dicek atomic di WHERE, bukan
+    // cuma dari `payment.status` yang dibaca di atas, biar 2 notif yang
+    // nyampe barengan juga aman. Kebukti di tes race lokal 2026-09-17.
+    const claim = await tx.payment.updateMany({
+      where: { id: payment.id, status: { not: "SUCCESS" } },
       data: { status: paymentStatus, rawWebhookPayload: body as Prisma.InputJsonValue },
     });
+    if (claim.count === 0) return;
 
     if (packageStatus) {
       await tx.package.update({

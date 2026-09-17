@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { activePackageWhere, activePackageWhereForDependent, usablePackageConditions } from "./active-package";
 
 describe("usablePackageConditions", () => {
@@ -7,15 +7,28 @@ describe("usablePackageConditions", () => {
   // single source of truth every booking-enforcement and display query must
   // share, so pin its shape down explicitly.
   it("requires ACTIVE status and a positive session count", () => {
-    expect(usablePackageConditions.status).toBe("ACTIVE");
-    expect(usablePackageConditions.sisaSesi).toEqual({ gt: 0 });
+    expect(usablePackageConditions().status).toBe("ACTIVE");
+    expect(usablePackageConditions().sisaSesi).toEqual({ gt: 0 });
   });
 
   it("accepts a package with no expiry OR one that hasn't expired yet", () => {
-    expect(usablePackageConditions.OR).toEqual([
+    expect(usablePackageConditions().OR).toEqual([
       { expiredDate: null },
       { expiredDate: { gte: expect.any(Date) } },
     ]);
+  });
+
+  // Regression (sweep 2026-09-17): dulu konstanta level modul, jadi
+  // "sekarang" kebeku di waktu modul di-load -- paket yang expired setelah
+  // server nyala masih lolos filter. Tiap panggilan harus pake jam terbaru.
+  it("evaluates 'now' on every call, not once at module load", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));
+    const first = (usablePackageConditions().OR as { expiredDate: { gte: Date } }[])[1].expiredDate.gte;
+    vi.setSystemTime(new Date("2026-06-01T00:00:00Z"));
+    const later = (usablePackageConditions().OR as { expiredDate: { gte: Date } }[])[1].expiredDate.gte;
+    vi.useRealTimers();
+    expect(later.getTime()).toBeGreaterThan(first.getTime());
   });
 });
 

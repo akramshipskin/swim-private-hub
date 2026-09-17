@@ -32,7 +32,7 @@ vi.mock("@/lib/prisma", () => ({
     $transaction: (fn: (tx: unknown) => unknown) => fn(makeTx()),
     pool: { findUniqueOrThrow: (...args: unknown[]) => poolFindUniqueOrThrow(...args) },
     coachProfile: { findUniqueOrThrow: (...args: unknown[]) => coachFindUniqueOrThrow(...args) },
-    withdrawalRequest: { update: (...args: unknown[]) => withdrawalUpdate(...args) },
+    withdrawalRequest: { updateMany: (...args: unknown[]) => withdrawalUpdate(...args) },
   },
 }));
 
@@ -143,17 +143,26 @@ describe("markWithdrawalFailed", () => {
 
 describe("markWithdrawalPaid", () => {
   it("sets status PAID and records the Midtrans reference when given", async () => {
-    await markWithdrawalPaid("wd-1", "REF-123");
+    withdrawalUpdate.mockResolvedValue({ count: 1 });
+    expect(await markWithdrawalPaid("wd-1", "REF-123")).toBe(true);
     expect(withdrawalUpdate).toHaveBeenCalledWith({
-      where: { id: "wd-1" },
+      where: { id: "wd-1", status: { in: ["PENDING", "PROCESSING"] } },
       data: { status: "PAID", processedAt: expect.any(Date), midtransReferenceId: "REF-123" },
     });
   });
 
   it("works without a reference for manual (non-Iris) payouts", async () => {
+    withdrawalUpdate.mockResolvedValue({ count: 1 });
     await markWithdrawalPaid("wd-1");
     expect(withdrawalUpdate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ midtransReferenceId: undefined }) })
     );
+  });
+
+  // Regression (tes race lokal 2026-09-17): request yang barusan ditolak
+  // (saldo udah dibalikin) gak boleh ketiban PAID.
+  it("returns false and changes nothing when the request is no longer PENDING/PROCESSING", async () => {
+    withdrawalUpdate.mockResolvedValue({ count: 0 });
+    expect(await markWithdrawalPaid("wd-1")).toBe(false);
   });
 });

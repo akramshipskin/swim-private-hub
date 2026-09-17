@@ -59,6 +59,25 @@ export async function cancelBooking({
     throw new CancelError("Booking ini sudah dibatalkan/selesai", 409);
   }
 
+  // Sesi yang udah ditandai Hadir/Gak Hadir gak boleh dibatalin siapapun --
+  // sebelumnya lolos: sisa sesi member balik +1 TAPI kredit wallet
+  // coach/kolam yang udah masuk gak dibalik (duit & sesi kepake dobel).
+  // Kebukti di tes race lokal 2026-09-17. Jalur koreksinya: ubah status
+  // kehadiran (reverseSessionRevenue jalan), lalu koreksi sisa sesi di
+  // menu Paket admin.
+  if (booking.attended !== null) {
+    throw new CancelError(
+      "Sesi ini udah ditandai kehadirannya, gak bisa dibatalin. Kalau salah tandai, ubah status kehadirannya dulu, lalu koreksi sisa sesi di menu Paket.",
+      409
+    );
+  }
+
+  // Coach cuma boleh batalin sesi yang belum mulai -- sesi yang udah
+  // lewat itu urusan absensi (Hadir/Gak Hadir), bukan pembatalan.
+  if (actor.role === "COACH" && booking.availability.startTime <= new Date()) {
+    throw new CancelError("Sesi ini udah mulai/lewat, gak bisa dibatalin. Tandai kehadirannya di Riwayat Sesi.", 409);
+  }
+
   try {
     await prisma.$transaction(
       async (tx) => {
@@ -95,8 +114,10 @@ export async function cancelBooking({
           }
         }
 
+        // attended: null ikut di CAS -- nutup race batal vs tandai Hadir
+        // barengan (pasangannya: markAttendance nge-CAS status BOOKED).
         const claim = await tx.booking.updateMany({
-          where: { id: bookingId, status: "BOOKED" },
+          where: { id: bookingId, status: "BOOKED", attended: null },
           data: {
             status: "CANCELLED",
             cancelledBy: actor.role,

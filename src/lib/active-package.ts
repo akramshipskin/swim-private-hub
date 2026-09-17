@@ -6,14 +6,21 @@ import { Prisma } from "@/generated/prisma/client";
 // Satu sumber kebenaran, dipake di query booking (enforce) DAN di semua
 // tampilan (member, admin) -- biar gak nyimpang: kalau di sini bilang
 // aktif, booking pasti lolos.
-export const usablePackageConditions: Prisma.PackageWhereInput = {
-  status: "ACTIVE",
-  sisaSesi: { gt: 0 },
-  OR: [{ expiredDate: null }, { expiredDate: { gte: new Date() } }],
-};
+//
+// Function, bukan konstanta -- `new Date()` di konstanta level modul cuma
+// kejalan SEKALI pas modul di-load, jadi di instance server yang idup lama
+// (warm Vercel function) "sekarang"-nya kebeku di jam server nyala: paket
+// yang expired setelah itu masih dianggap aktif & masih bisa dibooking.
+export function usablePackageConditions(): Prisma.PackageWhereInput {
+  return {
+    status: "ACTIVE",
+    sisaSesi: { gt: 0 },
+    OR: [{ expiredDate: null }, { expiredDate: { gte: new Date() } }],
+  };
+}
 
 export function activePackageWhere(memberId: string): Prisma.PackageWhereInput {
-  return { memberId, ...usablePackageConditions };
+  return { memberId, ...usablePackageConditions() };
 }
 
 // Sama kayak activePackageWhere, tapi discope ke 1 anak spesifik --

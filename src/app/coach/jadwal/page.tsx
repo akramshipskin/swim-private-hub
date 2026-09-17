@@ -41,6 +41,7 @@ export default async function CoachJadwalPage() {
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
       include: {
         coach: { select: { name: true } },
+        pool: { select: { name: true } },
         bookings: { where: { status: "BOOKED" }, take: 1 },
       },
     }),
@@ -52,6 +53,7 @@ export default async function CoachJadwalPage() {
   ]);
 
   const myPools = myAffiliations.map((a) => a.pool);
+  const now = new Date();
 
   const byDate = new Map<string, typeof availabilities>();
   for (const a of availabilities) {
@@ -117,7 +119,13 @@ export default async function CoachJadwalPage() {
                           </div>
                         )}
                       </div>
-                      {a.status === "BOOKED" && a.bookings[0] ? (
+                      {a.status === "BOOKED" && a.bookings[0] && a.startTime <= now ? (
+                        // Sesi yang udah mulai/lewat bukan urusan batal lagi
+                        // (server juga nolak) -- tandai kehadirannya aja.
+                        <span className="shrink-0 text-right text-xs text-text-subtle">
+                          Udah mulai -- tandai di Riwayat Sesi
+                        </span>
+                      ) : a.status === "BOOKED" && a.bookings[0] ? (
                         <CancelBookingButton
                           bookingId={a.bookings[0].id}
                           label={`${formatTimeWib(a.startTime)}–${formatTimeWib(a.endTime)}`}
@@ -167,8 +175,9 @@ export default async function CoachJadwalPage() {
                               key={a.id}
                               className="flex items-center justify-between gap-2 rounded-lg border border-border bg-surface px-3 py-2"
                             >
-                              <span className="text-sm text-text">
+                              <span className="min-w-0 text-sm text-text">
                                 {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
+                                <span className="block text-xs text-text-subtle">{a.pool.name}</span>
                               </span>
                               <Badge tone={a.bookings.length > 0 ? "brand" : "neutral"}>
                                 {a.bookings.length > 0 ? "Terisi" : "Kosong"}

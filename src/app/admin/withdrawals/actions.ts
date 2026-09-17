@@ -30,10 +30,13 @@ export async function processWithdrawal(
     };
   }
 
-  await prisma.withdrawalRequest.update({
-    where: { id: withdrawalId },
+  const claim = await prisma.withdrawalRequest.updateMany({
+    where: { id: withdrawalId, status: "PENDING" },
     data: { status: "PROCESSING" },
   });
+  if (claim.count === 0) {
+    return { error: "Pengajuan gak ditemukan atau udah diproses." };
+  }
 
   const result = await disburseViaIris({
     amount: request.amount,
@@ -65,8 +68,11 @@ export async function markPaidManually(
     return { error: "Pengajuan gak ditemukan atau udah diproses." };
   }
 
-  await markWithdrawalPaid(withdrawalId);
+  const claimed = await markWithdrawalPaid(withdrawalId);
   revalidatePath("/admin/withdrawals");
+  if (!claimed) {
+    return { error: "Pengajuan ini barusan udah diproses (dibayar/ditolak). Refresh dulu." };
+  }
   return null;
 }
 
@@ -82,7 +88,10 @@ export async function rejectWithdrawal(
     return { error: "Pengajuan gak ditemukan atau udah diproses." };
   }
 
-  await markWithdrawalFailed(withdrawalId, "Ditolak admin");
+  const claimed = await markWithdrawalFailed(withdrawalId, "Ditolak admin");
   revalidatePath("/admin/withdrawals");
+  if (!claimed) {
+    return { error: "Pengajuan ini barusan udah diproses (dibayar/ditolak). Refresh dulu." };
+  }
   return null;
 }
