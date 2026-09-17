@@ -37,7 +37,7 @@ export default function ResetPasswordButton({
 
   return (
     <>
-      <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
+      <Button variant="ghost" size="sm" onClick={() => setOpen(true)} className="whitespace-nowrap">
         Reset password
       </Button>
       <ConfirmDialog

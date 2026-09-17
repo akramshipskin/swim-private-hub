@@ -60,7 +60,9 @@ export default async function MemberPaketPage() {
 
   const now = new Date();
   const maxSold = Math.max(0, ...templates.map((t) => t._count.packages));
-  const popularTemplateId = maxSold > 0 ? templates.find((t) => t._count.packages === maxSold)?.id : undefined;
+  // Seri = gak ada yang beneran paling laku, jangan pilih salah satu asal.
+  const topSellers = templates.filter((t) => t._count.packages === maxSold);
+  const popularTemplateId = maxSold > 0 && topSellers.length === 1 ? topSellers[0].id : undefined;
 
   // "Member" cuma valid begitu paket pernah aktif (beli/diassign) --
   // sebelum itu dia masih pengunjung biasa, jangan diklaim member.

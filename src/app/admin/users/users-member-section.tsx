@@ -56,7 +56,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                   <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
                     <th className="px-5 py-3.5 font-medium">Nama</th>
                     <th className="px-5 py-3.5 font-medium">No HP</th>
-                    <th className="w-72 px-5 py-3.5 font-medium">Paket</th>
+                    <th className="w-56 px-5 py-3.5 font-medium">Paket</th>
                     <th className="px-5 py-3.5 font-medium">Status</th>
                     <th className="px-5 py-3.5"></th>
                   </tr>
@@ -69,7 +69,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                         {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
                       </td>
                       <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
-                      <td className="w-72 px-5 py-4 text-xs text-text-muted">
+                      <td className="w-56 px-5 py-4 text-xs text-text-muted">
                         <PesertaList items={u.peserta} />
                       </td>
                       <td className="px-5 py-4">
