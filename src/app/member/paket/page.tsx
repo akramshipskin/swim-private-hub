@@ -27,12 +27,27 @@ function toDateLabelFromDate(d: Date) {
   });
 }
 
+// Batas waktu bayar Midtrans (24 jam). Dipakai untuk menyembunyikan paket
+// yang menunggu pembayaran tapi sudah tidak bisa dibayar lagi.
+const PAYMENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
 export default async function MemberPaketPage() {
   const session = await requireRole("MEMBER");
+  const now = new Date();
+  const paymentCutoff = new Date(now.getTime() - PAYMENT_WINDOW_MS);
 
   const [packages, templates, children] = await Promise.all([
     prisma.package.findMany({
-      where: { memberId: session.user.id },
+      where: {
+        memberId: session.user.id,
+        // Paket yang menunggu pembayaran tapi sudah lewat batas waktu bayar
+        // (24 jam, sama dengan kedaluwarsa transaksi Midtrans) disembunyikan
+        // dari daftar -- riwayatnya tetap ada di menu Riwayat Bayar.
+        OR: [
+          { status: { not: "PENDING_PAYMENT" } },
+          { status: "PENDING_PAYMENT", createdAt: { gte: paymentCutoff } },
+        ],
+      },
       orderBy: { createdAt: "desc" },
       include: {
         dependent: { select: { name: true, isSelf: true } },
@@ -45,7 +60,7 @@ export default async function MemberPaketPage() {
       where: { isActive: true, pool: { isActive: true } },
       orderBy: { totalSesi: "asc" },
       include: {
-        pool: { select: { id: true, name: true, address: true, facilities: true, openTime: true, closeTime: true } },
+        pool: { select: { id: true, name: true, address: true, description: true, facilities: true, photos: true, openTime: true, closeTime: true } },
         // Paket yang pernah aktif (startDate keisi = dibayar/diassign) --
         // dasar badge "Populer", bukan urutan kartu.
         _count: { select: { packages: { where: { startDate: { not: null } } } } },
@@ -58,7 +73,6 @@ export default async function MemberPaketPage() {
     }),
   ]);
 
-  const now = new Date();
   const maxSold = Math.max(0, ...templates.map((t) => t._count.packages));
   // Seri = gak ada yang beneran paling laku, jangan pilih salah satu asal.
   const topSellers = templates.filter((t) => t._count.packages === maxSold);
@@ -154,12 +168,33 @@ export default async function MemberPaketPage() {
         <div className="flex flex-col gap-8">
           {[...new Map(templates.map((t) => [t.pool.id, t.pool])).values()].map((pool) => (
             <section key={pool.id}>
-              <div className="mb-3 border-b border-border pb-2">
-                <h3 className="text-lg font-semibold text-brand-700">{pool.name}</h3>
-                <p className="text-sm text-text-muted">
-                  {[pool.address, pool.openTime && pool.closeTime && `Buka ${pool.openTime}–${pool.closeTime}`].filter(Boolean).join(" · ") || "Info kolam belum dilengkapi"}
-                </p>
-                {pool.facilities.length > 0 && <p className="text-sm text-text-muted">Fasilitas: {pool.facilities.join(", ")}</p>}
+              <div className="mb-3 flex flex-col gap-3 border-b border-border pb-3 sm:flex-row">
+                {pool.photos.length > 0 && (
+                  <div className="flex gap-2 sm:w-56 sm:shrink-0">
+                    {pool.photos.slice(0, 2).map((url, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={url + i} src={url} alt={`Foto ${pool.name}`} className="h-24 min-w-0 flex-1 rounded-lg object-cover" />
+                    ))}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <h3 className="text-lg font-semibold text-brand-700">{pool.name}</h3>
+                  <p className="text-sm text-text-muted">
+                    {[pool.address, pool.openTime && pool.closeTime && `Buka ${pool.openTime}–${pool.closeTime}`]
+                      .filter(Boolean)
+                      .join(" · ") || "Info kolam belum dilengkapi"}
+                  </p>
+                  {pool.description && <p className="mt-1 text-sm text-text-muted">{pool.description}</p>}
+                  {pool.facilities.length > 0 && (
+                    <ul className="mt-2 flex flex-wrap gap-1.5">
+                      {pool.facilities.map((f) => (
+                        <li key={f} className="rounded-full bg-surface-muted px-2.5 py-1 text-xs text-text-muted">
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
               <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {templates

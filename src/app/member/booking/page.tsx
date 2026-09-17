@@ -53,6 +53,7 @@ export default async function MemberBookingPage() {
         address: true,
         description: true,
         facilities: true,
+        photos: true,
         openTime: true,
         closeTime: true,
         packageTemplates: { where: { isActive: true }, select: { price: true, totalSesi: true } },
@@ -64,6 +65,7 @@ export default async function MemberBookingPage() {
     address: p.address,
     description: p.description,
     facilities: p.facilities,
+    photos: p.photos,
     hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
     singleSessionPrice: dropInPrice(p.packageTemplates),
     // Harga per sesi termahal tanpa markup, buat pembanding di konfirmasi.

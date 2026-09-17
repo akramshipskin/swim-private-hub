@@ -34,6 +34,7 @@ type PoolOption = {
   address: string | null;
   description: string | null;
   facilities: string[];
+  photos: string[];
   hours: string | null;
   singleSessionPrice: number | null;
   packagePerSession: number | null;
@@ -284,18 +285,31 @@ export default function BookingBoard({
   return (
     <div>
       {activePoolSummary.length > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3">
-          <span className="text-sm font-medium text-text">Paket aktifmu berlaku di:</span>
-          {activePoolSummary.map(({ pool, sisa }) => (
-            <button
-              key={pool.id}
-              type="button"
-              onClick={() => setPoolId(pool.id)}
-              className={`rounded-full border px-3 py-1 text-sm font-semibold ${pool.id === poolId ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border text-text hover:bg-surface-muted"}`}
-            >
-              {pool.name} · sisa {sisa} sesi
-            </button>
-          ))}
+        <div className="mb-4 rounded-xl border border-border bg-surface px-4 py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-text">Paket aktifmu berlaku di:</span>
+            {activePoolSummary.map(({ pool, sisa }) => (
+              <button
+                key={pool.id}
+                type="button"
+                onClick={() => setPoolId(pool.id)}
+                className={`rounded-full border px-3 py-1 text-sm font-semibold ${pool.id === poolId ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border text-text hover:bg-surface-muted"}`}
+              >
+                {pool.name} · sisa {sisa} sesi
+              </button>
+            ))}
+          </div>
+          {/* Rincian paket peserta terpilih ikut di baris ini (Hadi 18 Sep),
+              supaya area pilih peserta/kolam/tanggal di bawah tetap bersih. */}
+          {selectedPkg && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-border pt-2">
+              <Badge tone="brand">Sisa sesi: {selectedPkg.sisaSesi}</Badge>
+              <Badge tone={selectedPkg.cancelRemaining <= 1 ? "warning" : "neutral"}>
+                Sisa jatah batal: {selectedPkg.cancelRemaining}
+              </Badge>
+              <Badge tone="neutral">{selectedPkg.packageName}</Badge>
+            </div>
+          )}
         </div>
       )}
       <Card className="mb-4">
@@ -379,15 +393,6 @@ export default function BookingBoard({
               />
             </div>
           </Field>
-          {selectedPkg && (
-            <div className="flex flex-wrap items-center gap-2 sm:mb-2.5">
-              <Badge tone="brand">Sisa sesi: {selectedPkg.sisaSesi}</Badge>
-              <Badge tone={selectedPkg.cancelRemaining <= 1 ? "warning" : "neutral"}>
-                Sisa jatah batal: {selectedPkg.cancelRemaining}
-              </Badge>
-              <Badge tone="neutral">{selectedPkg.packageName}</Badge>
-            </div>
-          )}
         </CardBody>
       </Card>
 
@@ -414,14 +419,39 @@ export default function BookingBoard({
       )}
 
       {selectedPool && (selectedPool.address || selectedPool.hours || selectedPool.facilities.length > 0) && (
-        <div className="mb-4 rounded-xl border border-border bg-surface px-4 py-3">
-          <p className="text-base font-semibold text-text">{selectedPool.name}</p>
-          {selectedPool.address && <p className="text-sm text-text-muted">{selectedPool.address}</p>}
-          <p className="text-sm text-text-muted">
-            {[selectedPool.hours && `Buka ${selectedPool.hours}`, selectedPool.facilities.length > 0 && `Fasilitas: ${selectedPool.facilities.join(", ")}`]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
+        <div className="mb-4 overflow-hidden rounded-xl border border-border bg-surface">
+          <div className="flex flex-col gap-4 p-4 sm:flex-row">
+            {selectedPool.photos.length > 0 && (
+              <div className="flex gap-2 sm:w-64 sm:shrink-0">
+                {selectedPool.photos.slice(0, 2).map((url, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={url + i}
+                    src={url}
+                    alt={`Foto ${selectedPool.name}`}
+                    className="h-24 min-w-0 flex-1 rounded-lg object-cover sm:h-28"
+                  />
+                ))}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-semibold text-text">{selectedPool.name}</p>
+              {selectedPool.address && <p className="text-sm text-text-muted">{selectedPool.address}</p>}
+              {selectedPool.hours && <p className="text-sm text-text-muted">Buka {selectedPool.hours}</p>}
+              {selectedPool.description && (
+                <p className="mt-1 line-clamp-2 text-sm text-text-muted">{selectedPool.description}</p>
+              )}
+              {selectedPool.facilities.length > 0 && (
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {selectedPool.facilities.map((f) => (
+                    <li key={f} className="rounded-full bg-surface-muted px-2.5 py-1 text-xs text-text-muted">
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -450,7 +480,7 @@ export default function BookingBoard({
           </CardBody>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
           {groupedByCoach.map((group) => (
             <div key={group.coachName}>
               <div className="mb-2 flex items-center gap-2">

@@ -97,8 +97,12 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
               </h2>
               {[...new Set(rows.map((r) => r.availability.pool.name))].map((poolName) => (
               <div key={poolName} className="mb-3">
-              <h3 className="mb-2 text-sm font-semibold text-brand-700">{poolName}</h3>
-              <ul className="flex flex-col gap-2">
+              {/* Nama kolam dibikin label kontras + 2 kolom di layar lebar
+                  (Hadi 18 Sep: kolamnya kurang kebaca, banyak ruang kosong). */}
+              <p className="mb-2 inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold tracking-wide text-brand-700 uppercase">
+                {poolName}
+              </p>
+              <ul className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                 {rows.filter((r) => r.availability.pool.name === poolName).map((b) => {
                   const eligibility = eligibilityByBooking.get(b.id);
                   const remaining = eligibility ? Math.max(0, eligibility.quota - eligibility.used) : 0;
@@ -113,9 +117,7 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                             <p className="text-base font-semibold text-text tabular-nums">
                               {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}
                             </p>
-                            <p className="truncate text-sm text-text">
-                              Coach {b.availability.coach.name} · {b.availability.pool.name}
-                            </p>
+                            <p className="truncate text-sm text-text">Coach {b.availability.coach.name}</p>
                             <p className="truncate text-sm text-text-muted">
                               Peserta: {b.package.dependent.isSelf ? "kamu sendiri" : b.package.dependent.name} · {b.package.name}
                             </p>

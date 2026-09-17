@@ -4,13 +4,15 @@ import { activePackageWhere } from "@/lib/active-package";
 import { todayWibDateString, dateLabel, formatDateLabel } from "@/lib/datetime";
 import { BentoCard, Stat, SessionList } from "@/components/dashboard";
 import { Badge } from "@/components/ui/badge";
+import { formatRupiah } from "@/lib/format";
 
 export default async function MemberDashboardPage() {
   const session = await requireRole("MEMBER");
   const today = dateLabel(todayWibDateString());
   const now = new Date();
 
-  const [packages, upcoming, attendedCount] = await Promise.all([
+  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const [packages, upcoming, attendedCount, attendedThisMonth, pesertaCount, spentThisMonth, favCoach] = await Promise.all([
     prisma.package.findMany({
       where: activePackageWhere(session.user.id),
       orderBy: { expiredDate: "asc" },
@@ -38,7 +40,27 @@ export default async function MemberDashboardPage() {
       },
     }),
     prisma.booking.count({ where: { memberId: session.user.id, attended: true } }),
+    prisma.booking.count({
+      where: { memberId: session.user.id, attended: true, availability: { startTime: { gte: startMonth } } },
+    }),
+    prisma.dependent.count({ where: { memberId: session.user.id, isActive: true } }),
+    prisma.payment.aggregate({
+      where: { status: "SUCCESS", createdAt: { gte: startMonth }, package: { memberId: session.user.id } },
+      _sum: { amount: true },
+    }),
+    // Coach yang paling sering mengajar peserta member ini -- info kecil
+    // tapi sering ditanya orang tua ("biasanya sama coach siapa?").
+    prisma.booking.findMany({
+      where: { memberId: session.user.id, attended: true },
+      select: { availability: { select: { coach: { select: { name: true } } } } },
+    }),
   ]);
+
+  const coachCounts = favCoach.reduce<Record<string, number>>((acc, b) => {
+    acc[b.availability.coach.name] = (acc[b.availability.coach.name] ?? 0) + 1;
+    return acc;
+  }, {});
+  const topCoach = Object.entries(coachCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
   const totalSisa = packages.reduce((s, p) => s + p.sisaSesi, 0);
   const expiringSoon = packages.filter((p) => p.expiredDate && p.expiredDate.getTime() - now.getTime() < 7 * 86_400_000);
@@ -51,10 +73,14 @@ export default async function MemberDashboardPage() {
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <BentoCard title="Ringkasan" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
-            <Stat label="Paket aktif" value={packages.length} />
+            <Stat label="Paket aktif" value={packages.length} hint={`${pesertaCount} peserta terdaftar`} />
             <Stat label="Total sisa sesi" value={totalSisa} />
             <Stat label="Sesi terjadwal" value={upcoming.length} />
-            <Stat label="Sesi sudah dihadiri" value={attendedCount} />
+            <Stat label="Sesi dihadiri" value={attendedCount} hint={`${attendedThisMonth} bulan ini`} />
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-border pt-4 xl:grid-cols-4">
+            <Stat label="Belanja paket bulan ini" value={formatRupiah(spentThisMonth._sum.amount ?? 0)} />
+            <Stat label="Paling sering diajar" value={topCoach ?? "-"} />
           </div>
           {expiringSoon.length > 0 && (
             <p className="mt-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">

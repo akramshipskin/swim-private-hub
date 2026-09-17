@@ -43,6 +43,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/member/cari-coach", label: "Cari Coach", icon: "search" },
     { href: "/member/riwayat", label: "Riwayat", icon: "clock" },
     { href: "/member/paket", label: "Paket", icon: "package" },
+    { href: "/member/pembayaran", label: "Riwayat Bayar", icon: "credit-card" },
     { href: "/member/peserta", label: "Peserta", icon: "users" },
     { href: "/profil", label: "Profil Saya", icon: "settings", group: "Pengaturan" },
   ],

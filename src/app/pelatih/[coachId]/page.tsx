@@ -42,7 +42,7 @@ export default async function CoachShortcutPage({
       },
       poolAffiliations: {
         select: {
-          pool: { select: { id: true, name: true, address: true, openTime: true, closeTime: true, facilities: true } },
+          pool: { select: { id: true, name: true, address: true, openTime: true, closeTime: true, facilities: true, photos: true } },
         },
         orderBy: { pool: { name: "asc" } },
       },
@@ -64,11 +64,21 @@ export default async function CoachShortcutPage({
     // pindah dari Cari Coach). Anonim: tengah, sejajar header publik.
     <main className={session ? "w-full px-4 py-6 sm:py-8" : "mx-auto max-w-lg px-4 py-8"}>
       <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
-      <div className="mt-3 flex items-center gap-4">
-        <Avatar src={profile?.photoUrl} alt={`Foto ${coach.name}`} className="h-20 w-20" />
-        <div>
+      <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
+        <Avatar src={profile?.photoUrl} alt={`Foto ${coach.name}`} className="h-24 w-24 sm:h-28 sm:w-28" />
+        <div className="min-w-0 flex-1">
           <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
           <p className="text-sm text-text-muted">{coachBioLine(profile) ?? "Coach renang privat"}</p>
+          {profile?.bio && <p className="mt-2 text-base text-text">{profile.bio}</p>}
+          {profile && profile.specialties.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {profile.specialties.map((sp) => (
+                <Badge key={sp} tone="brand">
+                  {sp}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -82,48 +92,47 @@ export default async function CoachShortcutPage({
               </a>
             )
           ) : (
-            <Link href="/register" className="text-sm font-medium text-brand-700 underline">
-              Lihat sertifikat (daftar dulu)
-            </Link>
+            profile?.certificateUrl && (
+              <Link href="/register" className="text-sm font-medium text-brand-700 underline">
+                Lihat sertifikat (daftar dulu)
+              </Link>
+            )
           )}
         </div>
-      )}
-
-      {profile?.bio && <p className="mt-4 text-base text-text">{profile.bio}</p>}
-
-      {profile && profile.specialties.length > 0 && (
-        <>
-          <h2 className="mt-6 text-base font-semibold text-text">Keahlian</h2>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {profile.specialties.map((sp) => (
-              <Badge key={sp} tone="brand">{sp}</Badge>
-            ))}
-          </div>
-        </>
       )}
 
       <h2 className="mt-6 text-base font-semibold text-text">Mengajar di kolam</h2>
       {coach.poolAffiliations.length === 0 ? (
         <p className="mt-2 text-sm text-text-muted">Belum terdaftar di kolam mana pun.</p>
       ) : (
-        <ul className="mt-2 flex flex-col gap-2">
+        <ul className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
           {coach.poolAffiliations.map(({ pool }) => (
-            <Card key={pool.id}>
-              <CardBody className="py-3">
-                <p className="text-base font-semibold text-text">{pool.name}</p>
-                {pool.address && <p className="text-sm text-text-muted">{pool.address}</p>}
-                {session && (
-                  <>
-                    {pool.openTime && pool.closeTime && (
-                      <p className="mt-1 text-sm text-text-muted">Buka {pool.openTime}–{pool.closeTime}</p>
+            <li key={pool.id}>
+              <Card>
+                <CardBody className="flex gap-3 py-3">
+                  {pool.photos.length > 0 && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={pool.photos[0]} alt={`Foto ${pool.name}`} className="h-20 w-24 shrink-0 rounded-lg object-cover" />
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold text-text">{pool.name}</p>
+                    {pool.address && <p className="text-sm text-text-muted">{pool.address}</p>}
+                    {session && (
+                      <>
+                        {pool.openTime && pool.closeTime && (
+                          <p className="mt-1 text-sm text-text-muted">
+                            Buka {pool.openTime}–{pool.closeTime}
+                          </p>
+                        )}
+                        {pool.facilities.length > 0 && (
+                          <p className="mt-1 line-clamp-2 text-sm text-text-muted">Fasilitas: {pool.facilities.join(", ")}</p>
+                        )}
+                      </>
                     )}
-                    {pool.facilities.length > 0 && (
-                      <p className="mt-1 text-sm text-text-muted">Fasilitas: {pool.facilities.join(", ")}</p>
-                    )}
-                  </>
-                )}
-              </CardBody>
-            </Card>
+                  </div>
+                </CardBody>
+              </Card>
+            </li>
           ))}
         </ul>
       )}
