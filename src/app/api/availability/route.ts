@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       startTime: true,
       endTime: true,
       status: true,
-      coach: { select: { id: true, name: true } },
+      coach: { select: { id: true, name: true, coachProfile: { select: { photoUrl: true } } } },
       // Availability bisa punya banyak Booking historis (pernah
       // dibatalkan lalu dibooking lagi) -- yang relevan buat status
       // slot cuma yang masih BOOKED (paling banyak 1, dijamin partial
@@ -76,7 +76,7 @@ export async function GET(request: Request) {
           startTime: a.startTime,
           endTime: a.endTime,
           status: a.status,
-          coach: a.coach,
+          coach: { id: a.coach.id, name: a.coach.name, photoUrl: a.coach.coachProfile?.photoUrl ?? null },
           bookedByMe,
           bookingId: bookedByMe ? activeBooking!.id : null,
           bookedForChildName:

@@ -6,6 +6,7 @@ import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEditLock } from "@/hooks/use-edit-lock";
+import { TimeSelect } from "@/components/ui/time-select";
 
 export type PoolInfo = {
   id: string;
@@ -36,12 +37,8 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
           <Field label="No. telepon kolam">
             <Input name="contactPhone" defaultValue={pool.contactPhone ?? ""} />
           </Field>
-          <Field label="Jam buka">
-            <Input type="time" name="openTime" defaultValue={pool.openTime ?? ""} />
-          </Field>
-          <Field label="Jam tutup">
-            <Input type="time" name="closeTime" defaultValue={pool.closeTime ?? ""} />
-          </Field>
+          <TimeSelect name="openTime" label="Jam buka" defaultValue={pool.openTime ?? "06:00"} />
+          <TimeSelect name="closeTime" label="Jam tutup" defaultValue={pool.closeTime ?? "21:00"} />
         </div>
         <div className="lg:col-span-2">
           <p className="mb-2 text-sm font-medium text-text">Fasilitas</p>

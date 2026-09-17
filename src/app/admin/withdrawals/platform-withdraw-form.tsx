@@ -5,6 +5,7 @@ import { withdrawPlatform } from "./platform-actions";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { formatRupiah } from "@/lib/format";
+import { PriceInput } from "@/components/ui/price-input";
 
 export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number; tax: number }) {
   const [state, action, pending] = useActionState(withdrawPlatform, null);
@@ -12,7 +13,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
     <form action={action} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label={`Tarik pendapatan (maks. ${formatRupiah(Math.max(0, revenue))})`}>
-          <Input type="number" name="revenueAmount" min={0} max={Math.max(0, revenue)} defaultValue={Math.max(0, revenue)} required />
+          <PriceInput name="revenueAmount" defaultValue={Math.max(0, revenue)} required />
         </Field>
         <Field label="Catatan (opsional)">
           <Input name="note" maxLength={200} placeholder="Misal: transfer ke rekening perusahaan" />

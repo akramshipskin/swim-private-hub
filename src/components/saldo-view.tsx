@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
 import { MIN_WITHDRAWAL } from "@/lib/policy";
 import { useEditLock } from "@/hooks/use-edit-lock";
+import { PriceInput } from "@/components/ui/price-input";
 
 type Withdrawal = {
   id: string;
@@ -95,13 +96,8 @@ export default function SaldoView({
 
           <form action={cairAction} className="flex flex-col gap-2 sm:flex-row sm:items-end">
             <Field label={`Nominal (min. ${formatRupiah(MIN_WITHDRAWAL)})`} className="flex-1">
-              <Input
-                id="withdraw-amount"
-                type="number"
+              <PriceInput
                 name="amount"
-                min={MIN_WITHDRAWAL}
-                max={walletBalance}
-                step={1000}
                 defaultValue={walletBalance >= MIN_WITHDRAWAL ? walletBalance : ""}
                 disabled={!canWithdraw}
                 required

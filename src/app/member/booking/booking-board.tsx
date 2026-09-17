@@ -14,6 +14,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import { AvailabilityDatePicker } from "@/components/availability-date-picker";
 import { DateQuickPicker } from "@/components/date-quick-picker";
+import { Avatar } from "@/components/ui/avatar";
 
 type PackageOption = {
   packageId: string;
@@ -42,7 +43,7 @@ type Slot = {
   startTime: string;
   endTime: string;
   status: "AVAILABLE" | "BOOKED";
-  coach: { id: string; name: string };
+  coach: { id: string; name: string; photoUrl: string | null };
   bookedByMe: boolean;
   bookingId: string | null;
   bookedForChildName: string | null;
@@ -76,15 +77,6 @@ function todayWib() {
 // (function di-kill paksa tiap 300 detik). 5 detik cukup deket real-time
 // tanpa nahan koneksi kebuka terus.
 const POLL_INTERVAL_MS = 5000;
-
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
 export default function BookingBoard({
   dependents,
@@ -188,10 +180,10 @@ export default function BookingBoard({
 
   const groupedByCoach = useMemo(() => {
     if (!slots) return [];
-    const map = new Map<string, { coachName: string; slots: Slot[] }>();
+    const map = new Map<string, { coachName: string; photoUrl: string | null; slots: Slot[] }>();
     for (const s of slots) {
       if (!map.has(s.coach.id)) {
-        map.set(s.coach.id, { coachName: s.coach.name, slots: [] });
+        map.set(s.coach.id, { coachName: s.coach.name, photoUrl: s.coach.photoUrl, slots: [] });
       }
       map.get(s.coach.id)!.slots.push(s);
     }
@@ -343,7 +335,7 @@ export default function BookingBoard({
             <div className="sm:hidden">
               <div className="mb-1.5 flex items-center justify-between text-[11px] text-text-subtle">
                 <span className="flex items-center gap-1">
-                  <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot ready
+                  <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot kosong
                 </span>
                 <button
                   type="button"
@@ -463,9 +455,7 @@ export default function BookingBoard({
           {groupedByCoach.map((group) => (
             <div key={group.coachName}>
               <div className="mb-2 flex items-center gap-2">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
-                  {initials(group.coachName)}
-                </div>
+                <Avatar src={group.photoUrl} className="h-8 w-8" />
                 <h2 className="text-base font-semibold text-text">{group.coachName}</h2>
               </div>
 

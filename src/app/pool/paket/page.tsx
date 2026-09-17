@@ -29,7 +29,7 @@ export default async function PoolPaketPage() {
         <p className="text-sm text-text-muted">Akun ini belum terhubung ke kolam mana pun. Hubungi admin.</p>
       ) : (
         <>
-          <CreateTemplateForm pools={pools.map((p) => ({ id: p.id, name: p.name }))} action={createPoolTemplate} />
+          <CreateTemplateForm pools={pools.map((p) => ({ id: p.id, name: p.name }))} action={createPoolTemplate} submitLabel="Kirim Usulan" />
           <div className="mt-6 flex flex-col gap-6">
             {pools.map((p) => (
               <section key={p.id}>
@@ -48,7 +48,7 @@ export default async function PoolPaketPage() {
                             yang sedang berlaku.
                           </p>
                         )}
-                        <TemplateEditForm template={t} action={updatePoolTemplate} />
+                        <TemplateEditForm template={t} action={updatePoolTemplate} submitLabel="Kirim Usulan" />
                       </li>
                     ))}
                   </ul>

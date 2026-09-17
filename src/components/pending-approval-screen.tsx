@@ -37,7 +37,7 @@ export function PendingApprovalScreen({ roleLabel }: { roleLabel: string }) {
             rel="noopener noreferrer"
             className="w-full"
           >
-            <Button className="w-full">Kabarin Admin via WhatsApp</Button>
+            <Button className="w-full">Kabari Admin via WhatsApp</Button>
           </a>
           <Link href="/" className="text-sm font-medium text-brand-600 hover:underline">
             Kembali ke Beranda

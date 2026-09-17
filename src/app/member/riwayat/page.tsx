@@ -7,6 +7,7 @@ import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import CancelButton from "./cancel-button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
 
 const statusTone = {
   BOOKED: "brand",
@@ -20,15 +21,6 @@ const statusLabel: Record<string, string> = {
   COMPLETED: "Selesai",
 };
 
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
-
 export default async function MemberRiwayatPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = (await searchParams).q ?? "";
   const session = await requireRole("MEMBER");
@@ -37,7 +29,7 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
     where: { memberId: session.user.id },
     orderBy: { createdAt: "desc" },
     include: {
-      availability: { include: { coach: true, pool: { select: { name: true } } } },
+      availability: { include: { coach: { select: { name: true, coachProfile: { select: { photoUrl: true } } } }, pool: { select: { name: true } } } },
       package: { include: { dependent: { select: { name: true, isSelf: true } } } },
     },
   });
@@ -116,9 +108,7 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                     <Card key={b.id}>
                       <CardBody className="flex items-start justify-between gap-3 py-3">
                         <div className="flex min-w-0 items-center gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
-                            {initials(b.availability.coach.name)}
-                          </div>
+                          <Avatar src={b.availability.coach.coachProfile?.photoUrl} className="h-10 w-10" />
                           <div className="min-w-0">
                             <p className="text-base font-semibold text-text tabular-nums">
                               {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}

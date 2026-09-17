@@ -33,7 +33,7 @@ export default function CopyLinkButton({ link }: { link: string }) {
         className="min-w-0 flex-1 rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm text-text-muted"
       />
       <Button type="button" variant="secondary" size="sm" onClick={handleCopy}>
-        {copied ? "Disalin!" : "Copy Link"}
+        {copied ? "Disalin!" : "Salin Link"}
       </Button>
     </div>
   );

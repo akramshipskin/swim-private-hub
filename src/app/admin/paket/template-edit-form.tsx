@@ -20,7 +20,7 @@ type Template = {
 
 type TemplateAction = (state: { error?: string } | null, formData: FormData) => Promise<{ error?: string } | null>;
 
-export default function TemplateEditForm({ template, action = updateTemplate }: { template: Template; action?: TemplateAction }) {
+export default function TemplateEditForm({ template, action = updateTemplate, submitLabel = "Simpan" }: { template: Template; action?: TemplateAction; submitLabel?: string }) {
   const [state, formAction, pending] = useActionState(action, null);
   const [isEditing, setIsEditing] = useState(false);
   const [formKey, setFormKey] = useState(0);
@@ -143,7 +143,7 @@ export default function TemplateEditForm({ template, action = updateTemplate }: 
                   loading={pending}
                   disabled={justEnteredEdit}
                 >
-                  Simpan
+                  {submitLabel}
                 </Button>
                 <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
                   Batal

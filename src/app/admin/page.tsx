@@ -90,7 +90,7 @@ export default async function AdminDashboardPage() {
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <BentoCard title="Hari ini" className="md:col-span-4">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-5">
             <Stat label="Sesi hari ini" value={todayItems.length} />
             <Stat label="Sesi besok" value={tomorrowItems.length} />
             <Stat label="Uang masuk hari ini" value={formatRupiah(paidToday._sum.amount ?? 0)} hint={`${paidToday._count} transaksi`} />

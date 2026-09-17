@@ -29,7 +29,7 @@ export function AvailabilityDatePicker({
   value,
   onChange,
   fetchUrl = "/api/availability/available-dates",
-  legendLabel = "ada slot ready",
+  legendLabel = "ada slot kosong",
   defaultOpen = false,
 }: {
   value: string;

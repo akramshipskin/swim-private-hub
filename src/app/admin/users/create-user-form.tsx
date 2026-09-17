@@ -58,12 +58,6 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
               <option value="ADMIN">Admin</option>
             </Select>
           </Field>
-          <div className="flex items-end">
-            <Button type="submit" loading={pending} className="w-full">
-              Tambah
-            </Button>
-          </div>
-
           {role === "POOL_OWNER" && (
             <div className="col-span-1 flex flex-col gap-2 sm:col-span-2">
               <p className="text-sm font-medium text-text">Kolam yang dikelola</p>
@@ -155,6 +149,12 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
               </button>
             </div>
           )}
+
+          <div className="col-span-1 sm:col-span-2">
+            <Button type="submit" loading={pending} className="w-full sm:w-auto">
+              Tambah User
+            </Button>
+          </div>
         </form>
         {state?.error && (
           <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">

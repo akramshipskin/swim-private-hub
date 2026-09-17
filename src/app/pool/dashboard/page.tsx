@@ -100,7 +100,7 @@ export default async function PoolDashboardPage() {
                         <div className="h-full rounded-full bg-brand-500" style={{ width: `${(r.booked.length / busiest) * 100}%` }} />
                       </div>
                       <span className="w-40 shrink-0 text-right text-text">
-                        {r.booked.length > 0 ? `${r.booked.length} sesi les` : r.open.length > 0 ? `${r.open.length} slot kosong` : "Sepi / umum"}
+                        {r.booked.length > 0 ? `${r.booked.length} sesi les` : r.open.length > 0 ? `${r.open.length} slot kosong` : "Tidak ada les"}
                       </span>
                     </li>
                   ))}

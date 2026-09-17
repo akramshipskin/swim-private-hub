@@ -11,7 +11,7 @@ type PoolOption = { id: string; name: string };
 
 type TemplateAction = (state: { error?: string } | null, formData: FormData) => Promise<{ error?: string } | null>;
 
-export default function CreateTemplateForm({ pools, action = createTemplate }: { pools: PoolOption[]; action?: TemplateAction }) {
+export default function CreateTemplateForm({ pools, action = createTemplate, submitLabel = "Tambah Katalog" }: { pools: PoolOption[]; action?: TemplateAction; submitLabel?: string }) {
   const [state, formAction, pending] = useActionState(action, null);
 
   return (
@@ -50,7 +50,7 @@ export default function CreateTemplateForm({ pools, action = createTemplate }: {
               <Input type="number" name="durationDays" required min={1} defaultValue={60} className="w-full sm:w-24" />
             </Field>
             <Button type="submit" loading={pending} className="w-full sm:w-auto">
-              Tambah Katalog
+              {submitLabel}
             </Button>
           </div>
         </form>
