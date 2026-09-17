@@ -335,10 +335,10 @@ const PANDUAN_BODY = `
       <div class="brand"><span class="brand-mark"><img src="/logo.png" alt="Logo Swim Private Hub"></span><span>swim<span class="dot">.</span>privatehub</span></div>
       <nav class="tabs" role="tablist">
         <button class="tab active" data-tab="presentasi">Presentasi</button>
-        <button class="tab" data-tab="install">Cara Install ke HP</button>
+        <button class="tab" data-tab="install">Install ke HP</button>
         <button class="tab" data-tab="member">Panduan Member</button>
         <button class="tab" data-tab="coach">Panduan Coach</button>
-        <button class="tab" data-tab="kolam">Panduan Pemilik Kolam</button>
+        <button class="tab" data-tab="kolam">Panduan Kolam</button>
         <button class="tab" data-tab="admin">Panduan Admin</button>
       </nav>
       <div class="btn-row">
