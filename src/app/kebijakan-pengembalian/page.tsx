@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+import { BUSINESS_ADDRESS } from "@/lib/business";
 
 export const metadata: Metadata = {
   title: "Kebijakan Pengembalian | Swim Private Hub",
@@ -57,6 +58,7 @@ export default function KebijakanPengembalianPage() {
         </a>
         .
       </p>
+      <p>Alamat: {BUSINESS_ADDRESS}</p>
     </LegalPageLayout>
   );
 }

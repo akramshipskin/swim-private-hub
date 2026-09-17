@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { platformServerKey } from "@/lib/midtrans";
 import type { Prisma } from "@/generated/prisma/client";
+import { DROP_IN_DURATION_DAYS } from "@/lib/policy";
 
 // Signature Midtrans dihitung pake Server Key platform -- service
 // provider posture (revisi 2026-09-12), 1 akun Midtrans buat semua kolam.
@@ -100,7 +101,9 @@ export async function POST(request: Request) {
     paymentStatus = "PENDING";
   }
 
-  const durationDays = payment.package.template?.durationDays ?? 60;
+  const durationDays = payment.package.isSingleSession
+    ? DROP_IN_DURATION_DAYS
+    : (payment.package.template?.durationDays ?? 60);
   const now = new Date();
   const expiredDate = new Date(now);
   expiredDate.setDate(expiredDate.getDate() + durationDays);

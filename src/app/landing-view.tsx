@@ -8,6 +8,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { StatCounter } from "@/components/ui/stat-counter";
 import { Logotype } from "@/components/ui/logotype";
 import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
+import { BUSINESS_ADDRESS } from "@/lib/business";
 
 const CARD_HOVER = "transition-all duration-300 hover:-translate-y-1 hover:shadow-lg";
 
@@ -895,6 +896,7 @@ export default function LandingView({ stats }: { stats: LandingStats }) {
                 cianjurmarketers@gmail.com
               </a>
             </p>
+            <p className="mt-1">{BUSINESS_ADDRESS}</p>
           </div>
           <div className="flex flex-col gap-1.5 sm:items-end">
             <Link href="/kebijakan-privasi" className="hover:text-brand-600 hover:underline">

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BUSINESS_ADDRESS } from "@/lib/business";
 
 const LEGAL_LINKS = [
   { href: "/kebijakan-privasi", label: "Kebijakan Privasi" },
@@ -57,6 +58,7 @@ export function LegalPageLayout({
             </Link>
           ))}
         </div>
+        <p className="mx-auto mt-3 max-w-3xl px-4 text-xs text-text-subtle">{BUSINESS_ADDRESS}</p>
       </footer>
     </main>
   );

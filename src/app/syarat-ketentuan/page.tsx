@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+import { BUSINESS_ADDRESS } from "@/lib/business";
 
 export const metadata: Metadata = {
   title: "Syarat & Ketentuan | Swim Private Hub",
@@ -87,6 +88,7 @@ export default function SyaratKetentuanPage() {
         </a>
         .
       </p>
+      <p>Alamat: {BUSINESS_ADDRESS}</p>
     </LegalPageLayout>
   );
 }
