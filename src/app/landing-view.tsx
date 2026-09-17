@@ -6,6 +6,7 @@ import { BUSINESS_ADDRESS } from "@/lib/business";
 import { formatRupiah } from "@/lib/format";
 import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT } from "@/lib/policy";
 import { AudienceTabs, type AudienceSteps } from "./landing-tabs";
+import { Avatar } from "@/components/ui/avatar";
 
 // Struktur mengikuti referensi Stride (hero foto penuh, badan krem, kartu
 // kolam selang-seling, kartu coach, FAQ, CTA gelap). Semua angka & data
@@ -95,10 +96,6 @@ const FAQ_ITEMS = [
     a: "Coach bisa mengunggah sertifikat renang/lifeguard. Badge \"Bersertifikat\" hanya tampil setelah sertifikat diperiksa dan disetujui admin.",
   },
 ];
-
-function initials(name: string) {
-  return name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
-}
 
 export default function LandingView({ stats, pools, coaches }: { stats: LandingStats; pools: LandingPool[]; coaches: LandingCoach[] }) {
   const STATS = [
@@ -280,9 +277,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={c.photoUrl} alt={`Foto ${c.name}`} className="h-full w-full object-cover" />
                     ) : (
-                      <span aria-hidden="true" className="flex h-24 w-24 items-center justify-center rounded-full bg-[#9FCC1F] text-3xl font-semibold">
-                        {initials(c.name)}
-                      </span>
+                      <Avatar className="h-24 w-24" />
                     )}
                   </div>
                   <p className="mt-4 text-sm font-medium text-[#5C5945]">{c.specialties.slice(0, 2).join(" · ") || "Renang privat"}</p>

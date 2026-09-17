@@ -5,6 +5,7 @@ import { uploadCoachPhoto, uploadCoachCertificate } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Field, Input } from "@/components/ui/input";
+import { Avatar } from "@/components/ui/avatar";
 
 const certStatus = {
   NONE: { label: "Belum ada sertifikat", tone: "neutral" },
@@ -35,12 +36,7 @@ export default function CoachMediaForm({
         </p>
       )}
       <form action={photoAction} className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        {photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photoUrl} alt="Foto profil" className="h-20 w-20 shrink-0 rounded-full object-cover" />
-        ) : (
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm text-brand-700">Foto</div>
-        )}
+        <Avatar src={photoUrl} alt="Foto profil" className="h-20 w-20" />
         <div className="flex flex-1 flex-col gap-2">
           <Field label="Foto profil (JPG/PNG/WEBP, maks 3MB)">
             <Input type="file" name="photo" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Logotype } from "@/components/ui/logotype";
 import { NavBar } from "@/components/nav-bar";
 import BackButton from "./back-button";
+import { Avatar } from "@/components/ui/avatar";
 
 // Coach shortcut page (pool-first browse + cheap cross-pool discovery,
 // locked /plan-eng-review 2026-09-12, cross-model tension #4): pool-first
@@ -63,14 +64,7 @@ export default async function CoachShortcutPage({
     <main className={session ? "w-full px-4 py-6 sm:py-8" : "mx-auto max-w-lg px-4 py-8"}>
       <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
       <div className="mt-3 flex items-center gap-4">
-        {profile?.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={profile.photoUrl} alt={`Foto ${coach.name}`} className="h-20 w-20 rounded-full object-cover" />
-        ) : (
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-100 text-2xl font-semibold text-brand-700">
-            {coach.name.slice(0, 1)}
-          </div>
-        )}
+        <Avatar src={profile?.photoUrl} alt={`Foto ${coach.name}`} className="h-20 w-20" />
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
           <p className="text-sm text-text-muted">Coach renang privat</p>

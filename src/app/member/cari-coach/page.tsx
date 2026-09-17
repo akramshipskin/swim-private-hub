@@ -3,6 +3,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
 
 // Browse coach lintas-kolam -- fitur ini SENGAJA di luar scope Phase 1
 // (docs/designs/marketplace-pivot.md, "NOT in scope": "Cross-pool coach
@@ -49,14 +50,7 @@ export default async function CariCoachPage() {
           {coaches.map((coach) => (
             <Card key={coach.id}>
               <CardBody className="flex gap-4">
-                {coach.coachProfile?.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={coach.coachProfile.photoUrl} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" />
-                ) : (
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xl font-semibold text-brand-700">
-                    {coach.name.slice(0, 1)}
-                  </div>
-                )}
+                <Avatar src={coach.coachProfile?.photoUrl} className="h-16 w-16" />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-base font-semibold text-text">{coach.name}</h2>

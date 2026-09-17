@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { todayWibDateString, wibDateTime } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
 
 export default async function PoolCoachPage() {
   const session = await requireRole("POOL_OWNER");
@@ -54,14 +55,7 @@ export default async function PoolCoachPage() {
                 return (
                   <Card key={coach.id}>
                     <CardBody className="flex gap-4">
-                      {coach.coachProfile?.photoUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={coach.coachProfile.photoUrl} alt="" className="h-14 w-14 shrink-0 rounded-full object-cover" />
-                      ) : (
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-semibold text-brand-700">
-                          {coach.name.slice(0, 1)}
-                        </div>
-                      )}
+                      <Avatar src={coach.coachProfile?.photoUrl} className="h-14 w-14" />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-base font-semibold text-text">{coach.name}</p>
