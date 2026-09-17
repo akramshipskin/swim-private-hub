@@ -117,7 +117,7 @@ model User {
 }
 
 // Chat bantuan (tombol mengambang) buat member/coach/pemilik kolam. 1 user =
-// 1 thread. Dijawab AI kalau ANTHROPIC_API_KEY ada; pertanyaan yang AI gak
+// 1 thread. Dijawab AI kalau GEMINI_API_KEY / ANTHROPIC_API_KEY ada; pertanyaan yang AI gak
 // yakin (atau AI belum aktif) ditandai needsAdmin dan muncul di tab Pesan admin.
 model ChatThread {
   id         String        @id @default(cuid())

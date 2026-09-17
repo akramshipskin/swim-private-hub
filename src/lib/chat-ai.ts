@@ -38,26 +38,42 @@ export function normalizeTurns(turns: Turn[]): Turn[] {
   return out;
 }
 
+// Provider dipilih dari env: GEMINI_API_KEY (utama) atau ANTHROPIC_API_KEY.
 // null = AI belum dikonfigurasi atau gagal dipanggil -> caller teruskan ke admin.
 export async function askAi(system: string, turns: Turn[]): Promise<string | null> {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) return null;
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({
-        model: process.env.ANTHROPIC_MODEL ?? "claude-haiku-4-5",
-        max_tokens: 400,
-        system,
-        messages: turns,
-      }),
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { content?: { type: string; text?: string }[] };
-    const text = data.content?.find((c) => c.type === "text")?.text?.trim();
-    return text || null;
+    if (process.env.GEMINI_API_KEY) return await askGemini(system, turns);
+    if (process.env.ANTHROPIC_API_KEY) return await askClaude(system, turns);
+    return null;
   } catch {
     return null;
   }
+}
+
+async function askGemini(system: string, turns: Turn[]): Promise<string | null> {
+  const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    method: "POST",
+    headers: { "x-goog-api-key": process.env.GEMINI_API_KEY!, "content-type": "application/json" },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
+      generationConfig: { maxOutputTokens: 400 },
+    }),
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+  const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("").trim();
+  return text || null;
+}
+
+async function askClaude(system: string, turns: Turn[]): Promise<string | null> {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "x-api-key": process.env.ANTHROPIC_API_KEY!, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({ model: process.env.ANTHROPIC_MODEL ?? "claude-haiku-4-5", max_tokens: 400, system, messages: turns }),
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as { content?: { type: string; text?: string }[] };
+  return data.content?.find((c) => c.type === "text")?.text?.trim() || null;
 }
