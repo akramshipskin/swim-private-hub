@@ -6,7 +6,7 @@ export const MAX_CHAT_LENGTH = 1000;
 // Aturan bisnis yang boleh AI pakai buat jawab. Di luar ini AI wajib
 // meneruskan ke admin (balas diakhiri ESCALATE_TOKEN), bukan mengarang.
 export function buildSystemPrompt(role: string, name: string) {
-  return `Kamu asisten bantuan aplikasi Swim Private Hub (booking les renang privat). Jawab dalam Bahasa Indonesia yang sopan dan santai, pakai "kamu", singkat (maksimal 4 kalimat).
+  return `Kamu asisten bantuan aplikasi Swim Private Hub (booking les renang privat). Jawab HANYA dalam Bahasa Indonesia (jangan campur kata Inggris) yang sopan dan santai, pakai "kamu", singkat (maksimal 4 kalimat).
 Pengguna: ${name}, peran: ${role}.
 
 Aturan yang kamu tahu pasti:
