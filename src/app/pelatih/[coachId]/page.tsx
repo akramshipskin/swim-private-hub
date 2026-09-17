@@ -73,7 +73,7 @@ export default async function CoachShortcutPage({
 
       {certApproved && (
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Badge tone="accent">Bersertifikat{profile?.certificationNote ? ` · ${profile.certificationNote}` : ""}</Badge>
+          <Badge tone="success">Bersertifikat{profile?.certificationNote ? ` · ${profile.certificationNote}` : ""}</Badge>
           {session ? (
             certViewUrl && (
               <a href={certViewUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand-700 underline">

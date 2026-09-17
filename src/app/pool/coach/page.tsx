@@ -59,7 +59,7 @@ export default async function PoolCoachPage() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-base font-semibold text-text">{coach.name}</p>
-                          {coach.coachProfile?.certificateStatus === "APPROVED" && <Badge tone="accent">Bersertifikat</Badge>}
+                          {coach.coachProfile?.certificateStatus === "APPROVED" && <Badge tone="success">Bersertifikat</Badge>}
                         </div>
                         <p className="text-sm text-text-muted">
                           {coach.coachProfile?.specialties.join(", ") || "Keahlian belum diisi"}

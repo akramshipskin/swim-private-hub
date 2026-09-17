@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
-import { normalizeTurns, buildSystemPrompt, askAi, ESCALATE_TOKEN } from "./chat-ai";
+import { normalizeTurns, buildSystemPrompt, askAi, stripEscalateToken, ESCALATE_TOKEN } from "./chat-ai";
 
 describe("normalizeTurns", () => {
   it("drops leading assistant turns and merges consecutive same-role turns", () => {
@@ -62,5 +62,17 @@ describe("askAi provider", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 400, text: async () => "bad" }));
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(await askAi("s", [{ role: "user", content: "hai" }])).toBeNull();
+  });
+});
+
+describe("stripEscalateToken", () => {
+  it("removes the token together with surrounding quotes", () => {
+    expect(stripEscalateToken('Saya teruskan ke admin ya. "[ADMIN]"')).toBe("Saya teruskan ke admin ya.");
+    expect(stripEscalateToken("Diteruskan ke admin. `[ADMIN]`")).toBe("Diteruskan ke admin.");
+    expect(stripEscalateToken("Diteruskan ke admin. [ADMIN]")).toBe("Diteruskan ke admin.");
+  });
+
+  it("leaves normal replies untouched", () => {
+    expect(stripEscalateToken('Paket berlaku "14 hari".')).toBe('Paket berlaku "14 hari".');
   });
 });

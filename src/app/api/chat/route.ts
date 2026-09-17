@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { roleLabel } from "@/lib/nav-links";
-import { askAi, buildSystemPrompt, normalizeTurns, ESCALATE_TOKEN, MAX_CHAT_LENGTH } from "@/lib/chat-ai";
+import { askAi, buildSystemPrompt, normalizeTurns, stripEscalateToken, ESCALATE_TOKEN, MAX_CHAT_LENGTH } from "@/lib/chat-ai";
 
 async function currentUser() {
   const session = await auth();
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     const escalate = aiReply.includes(ESCALATE_TOKEN);
     await prisma.$transaction([
       prisma.chatMessage.create({
-        data: { threadId: thread.id, sender: "AI", content: aiReply.replace(ESCALATE_TOKEN, "").trim() },
+        data: { threadId: thread.id, sender: "AI", content: stripEscalateToken(aiReply) },
       }),
       prisma.chatThread.update({ where: { id: thread.id }, data: escalate ? { needsAdmin: true } : { updatedAt: new Date() } }),
     ]);

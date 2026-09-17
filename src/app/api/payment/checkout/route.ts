@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     item = {
       poolId: pool.id,
       templateId: null,
-      name: `1 Sesi — ${pool.name}`,
+      name: "1 Sesi",
       totalSesi: 1,
       // Batal 1x (min. 2 jam sebelum) -> sesinya balik, bisa dibooking
       // ulang di kolam ini selama masa berlaku.

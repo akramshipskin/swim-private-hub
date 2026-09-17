@@ -9,6 +9,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import { isValidIndonesianPhone } from "@/lib/format";
+import { TimeSelect } from "@/components/ui/time-select";
 
 export default function RegisterPoolForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -116,22 +117,8 @@ export default function RegisterPoolForm() {
               <Input value={address} onChange={(e) => setAddress(e.target.value)} required />
             </Field>
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Jam Buka">
-                <Input
-                  type="time"
-                  value={openTime}
-                  onChange={(e) => setOpenTime(e.target.value)}
-                  required
-                />
-              </Field>
-              <Field label="Jam Tutup">
-                <Input
-                  type="time"
-                  value={closeTime}
-                  onChange={(e) => setCloseTime(e.target.value)}
-                  required
-                />
-              </Field>
+              <TimeSelect name="openTime" label="Jam Buka" defaultValue={openTime} onChange={setOpenTime} />
+              <TimeSelect name="closeTime" label="Jam Tutup" defaultValue={closeTime} onChange={setCloseTime} />
             </div>
 
             <Field label="Deskripsi kolam (opsional)">

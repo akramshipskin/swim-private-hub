@@ -55,7 +55,7 @@ export default async function CariCoachPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-base font-semibold text-text">{coach.name}</h2>
                     {coach.coachProfile?.certificateStatus === "APPROVED" && (
-                      <Badge tone="accent">
+                      <Badge tone="success">
                         Bersertifikat{coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
                       </Badge>
                     )}

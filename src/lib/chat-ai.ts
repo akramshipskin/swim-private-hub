@@ -3,6 +3,12 @@ import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT, MIN
 export const ESCALATE_TOKEN = "[ADMIN]";
 export const MAX_CHAT_LENGTH = 1000;
 
+// AI kadang menulis token dalam kutip/backtick ("[ADMIN]") -- buang sekalian
+// kutipnya biar tidak tersisa tanda kutip nyasar di balasan.
+export function stripEscalateToken(text: string) {
+  return text.replace(/["'`“”]*\[ADMIN\]["'`“”]*/g, "").trim();
+}
+
 // Aturan bisnis yang boleh AI pakai buat jawab. Di luar ini AI wajib
 // meneruskan ke admin (balas diakhiri ESCALATE_TOKEN), bukan mengarang.
 export function buildSystemPrompt(role: string, name: string) {

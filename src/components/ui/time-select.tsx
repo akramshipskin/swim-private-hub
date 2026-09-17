@@ -18,11 +18,13 @@ export function TimeSelect({
   label,
   defaultValue = "08:00",
   hourOnly = false,
+  onChange,
 }: {
   name: string;
   label: string;
   defaultValue?: string;
   hourOnly?: boolean;
+  onChange?: (value: string) => void;
 }) {
   const [h, m] = defaultValue.split(":");
   const [hour, setHour] = useState(h ?? "08");
@@ -35,7 +37,10 @@ export function TimeSelect({
         <Select
           aria-label={hourOnly ? label : `${label} - jam`}
           value={hour}
-          onChange={(e) => setHour(e.target.value)}
+          onChange={(e) => {
+            setHour(e.target.value);
+            onChange?.(`${e.target.value}:${hourOnly ? "00" : minute}`);
+          }}
           className="w-[4.5rem]"
         >
           {HOURS.map((hh) => (
@@ -50,7 +55,10 @@ export function TimeSelect({
             <Select
               aria-label={`${label} - menit`}
               value={minute}
-              onChange={(e) => setMinute(e.target.value)}
+              onChange={(e) => {
+                setMinute(e.target.value);
+                onChange?.(`${hour}:${e.target.value}`);
+              }}
               className="w-[4.5rem]"
             >
               {MINUTES.map((mm) => (
