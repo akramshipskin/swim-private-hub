@@ -43,7 +43,7 @@ export default function ResetPasswordButton({
       <ConfirmDialog
         open={open}
         title={`Reset password ${userName}?`}
-        description="Password lamanya langsung tidak berlaku. Kamu dapat password sementara buat dikirim ke dia, dan dia wajib buat password baru saat login."
+        description="Password lamanya langsung tidak berlaku. Kamu mendapat password sementara untuk dikirim ke pengguna, dan pengguna wajib membuat password baru saat login."
         confirmLabel="Ya, reset"
         loading={loading}
         onConfirm={handleReset}

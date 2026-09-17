@@ -127,7 +127,7 @@ export async function POST(request: Request) {
   });
   if (!pkg) {
     return Response.json(
-      { error: "Pembayaran buat paket ini baru saja dibuat. Tunggu 1 menit sebelum coba lagi." },
+      { error: "Pembayaran untuk paket ini baru saja dibuat. Tunggu 1 menit sebelum coba lagi." },
       { status: 409 }
     );
   }

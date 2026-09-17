@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
       if (claimPkg.count === 0) {
         throw new BookingError(
-          "Paket ini tidak bisa dipakai buat slot ini: paketnya buat kolam lain, kuota sesi habis, belum aktif, atau sudah kedaluwarsa.",
+          "Paket ini tidak bisa dipakai untuk slot ini: paketnya untuk kolam lain, kuota sesi habis, belum aktif, atau sudah kedaluwarsa.",
           409
         );
       }

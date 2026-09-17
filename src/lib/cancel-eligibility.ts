@@ -40,7 +40,7 @@ export function evaluateCancelEligibility({
   if (used >= quota) {
     return {
       canCancel: false,
-      reason: "Jatah pembatalan mandiri sudah habis. Ajukan ke admin buat kasus khusus.",
+      reason: "Jatah pembatalan mandiri sudah habis. Hubungi admin untuk kasus khusus.",
       used,
       quota,
     };

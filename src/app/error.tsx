@@ -19,9 +19,9 @@ export default function Error({
     <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-center">
       <Card className="w-full max-w-sm">
         <CardBody className="flex flex-col items-center gap-3 py-8">
-          <h1 className="text-lg font-semibold text-text">Ada yang error</h1>
+          <h1 className="text-lg font-semibold text-text">Terjadi kesalahan</h1>
           <p className="text-sm text-text-muted">
-            Terjadi kesalahan tidak terduga. Coba lagi, atau balik ke halaman sebelumnya.
+            Terjadi kesalahan tidak terduga. Coba lagi, atau kembali ke halaman sebelumnya.
           </p>
           <Button onClick={() => retry()} className="mt-2 w-full">
             Coba Lagi

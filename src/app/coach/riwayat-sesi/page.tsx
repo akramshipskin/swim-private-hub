@@ -52,7 +52,7 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
         <Card>
           <CardBody className="py-10 text-center">
             <p className="text-sm text-text-muted">
-              Belum ada sesi yang sudah lewat waktunya buat ditandai.
+              Belum ada sesi yang sudah lewat waktunya untuk ditandai.
             </p>
           </CardBody>
         </Card>

@@ -67,7 +67,7 @@ export async function cancelBooking({
   // menu Paket admin.
   if (booking.attended !== null) {
     throw new CancelError(
-      "Sesi ini sudah ditandai kehadirannya, tidak bisa dibatalin. Kalau salah tandai, ubah status kehadirannya dulu, lalu koreksi sisa sesi di menu Paket.",
+      "Sesi ini sudah ditandai kehadirannya, tidak bisa dibatalkan. Kalau salah tandai, ubah status kehadirannya dulu, lalu koreksi sisa sesi di menu Paket.",
       409
     );
   }
@@ -75,7 +75,7 @@ export async function cancelBooking({
   // Coach cuma boleh batalin sesi yang belum mulai -- sesi yang udah
   // lewat itu urusan absensi (Hadir/Gak Hadir), bukan pembatalan.
   if (actor.role === "COACH" && booking.availability.startTime <= new Date()) {
-    throw new CancelError("Sesi ini sudah mulai/lewat, tidak bisa dibatalin. Tandai kehadirannya di Riwayat Sesi.", 409);
+    throw new CancelError("Sesi ini sudah mulai/lewat, tidak bisa dibatalkan. Tandai kehadirannya di Riwayat Sesi.", 409);
   }
 
   try {
@@ -108,7 +108,7 @@ export async function cancelBooking({
           const quota = pkg?.jatahCancel ?? 0;
           if (selfCancelCount >= quota) {
             throw new CancelError(
-              "Jatah pembatalan mandiri sudah habis. Ajukan ke admin buat kasus khusus.",
+              "Jatah pembatalan mandiri sudah habis. Hubungi admin untuk kasus khusus.",
               409
             );
           }
@@ -171,7 +171,7 @@ export async function cancelBooking({
       (err as { code?: string }).code === "P2028"
     ) {
       throw new CancelError(
-        "Lagi banyak yang proses pembatalan bareng, coba lagi sebentar.",
+        "Sedang banyak pembatalan bersamaan, coba lagi sebentar.",
         409
       );
     }

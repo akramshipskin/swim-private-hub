@@ -57,7 +57,7 @@ export default function AssignPackageForm({
           <Field label="Peserta">
             {childrenOfMember.length === 0 ? (
               <p className="text-xs text-danger-text">
-                Member ini belum punya peserta terdaftar, tambahin dulu di atas.
+                Member ini belum punya peserta terdaftar, tambahkan dulu di atas.
               </p>
             ) : (
               <Select name="dependentId" required className="w-full sm:w-40">

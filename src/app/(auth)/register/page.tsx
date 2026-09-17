@@ -3,7 +3,7 @@ import RegisterForm from "./register-form";
 
 export const metadata: Metadata = {
   title: "Daftar | Swim Private Hub",
-  description: "Buat akun baru buat booking jadwal renang dengan coach favoritmu.",
+  description: "Buat akun baru untuk booking jadwal renang dengan coach favoritmu.",
 };
 
 export default function RegisterPage() {

@@ -34,7 +34,7 @@ export async function markAttendance(
   });
 
   if (!booking || booking.status !== "BOOKED") {
-    return { error: "Booking tidak ditemukan atau sudah dibatalin." };
+    return { error: "Booking tidak ditemukan atau sudah dibatalkan." };
   }
   if (session.user.role === "COACH" && booking.availability.coachId !== session.user.id) {
     return { error: "Bukan sesi kamu." };
@@ -66,7 +66,7 @@ export async function markAttendance(
         },
       });
       if (claim.count === 0) {
-        throw new Error("Booking ini sudah diubah barengan (dibatalin/ditandai di tempat lain), refresh dulu.");
+        throw new Error("Booking ini baru saja diubah di tempat lain (dibatalkan/ditandai). Muat ulang halaman dulu.");
       }
 
       // Kredit wallet cuma jalan kalau paket ini beneran dibeli lewat
@@ -96,7 +96,7 @@ export async function markAttendance(
       }
     });
   } catch (err) {
-    if (err instanceof Error && err.message.includes("diubah barengan")) {
+    if (err instanceof Error && err.message.includes("baru saja diubah")) {
       return { error: err.message };
     }
     throw err;

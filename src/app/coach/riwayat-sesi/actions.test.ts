@@ -92,7 +92,7 @@ describe("markAttendance", () => {
   it("errors when the booking was already cancelled", async () => {
     bookingFindUnique.mockResolvedValue(baseBooking({ status: "CANCELLED" }));
     const result = await markAttendance(null, formData("booking-1", "true"));
-    expect(result?.error).toContain("dibatalin");
+    expect(result?.error).toContain("dibatalkan");
   });
 
   it("refuses a coach marking a session that isn't theirs", async () => {
@@ -163,7 +163,7 @@ describe("markAttendance", () => {
     bookingFindUnique.mockResolvedValue(baseBooking({ attended: null }));
     bookingUpdateMany.mockResolvedValue({ count: 0 });
     const result = await markAttendance(null, formData("booking-1", "true"));
-    expect(result?.error).toContain("diubah barengan");
+    expect(result?.error).toContain("baru saja diubah");
     expect(creditSessionRevenue).not.toHaveBeenCalled();
   });
 

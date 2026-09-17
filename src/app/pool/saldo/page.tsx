@@ -31,7 +31,7 @@ export default async function PoolSaldoPage() {
   if (pools.length === 0) {
     return (
       <main className="mx-auto max-w-lg px-4 py-8 text-center text-sm text-text-muted">
-        Akun ini belum ke-link ke kolam manapun. Hubungi admin.
+        Akun ini belum terhubung ke kolam mana pun. Hubungi admin.
       </main>
     );
   }

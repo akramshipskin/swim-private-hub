@@ -54,7 +54,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed right-4 bottom-20 z-40 sm:bottom-6">
+    <div className="fixed right-3 bottom-20 z-40 sm:right-4 sm:bottom-6">
       {open && (
         <div
           role="dialog"
@@ -111,9 +111,18 @@ export function ChatWidget() {
           setOpen(!open);
         }}
         aria-expanded={open}
-        className="ml-auto flex items-center gap-2 rounded-full bg-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-brand-700"
+        aria-label={open ? "Tutup chat bantuan" : "Buka chat bantuan"}
+        className="ml-auto flex h-12 min-w-12 items-center justify-center gap-2 rounded-full bg-brand-600 px-3 text-sm font-semibold text-white shadow-lg hover:bg-brand-700 sm:px-4"
       >
-        {open ? "Tutup" : "Butuh bantuan?"}
+        {/* HP: ikon bulat kecil biar tidak menutupi isi halaman; layar lebar: dengan label. */}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5 shrink-0" aria-hidden="true">
+          {open ? (
+            <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16v11H9l-5 4V5z" />
+          )}
+        </svg>
+        <span className="hidden sm:inline">{open ? "Tutup" : "Butuh bantuan?"}</span>
       </button>
     </div>
   );

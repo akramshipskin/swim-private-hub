@@ -104,7 +104,7 @@ export async function assignPackageToMember(
   }
   if (!dependentId) {
     return {
-      error: "Member ini belum punya peserta terdaftar — tambahin dulu di section \"Tambah Peserta\" sebelum assign paket.",
+      error: "Member ini belum punya peserta terdaftar — tambahkan dulu di bagian \"Tambah Peserta\" sebelum assign paket.",
     };
   }
   if (!name) {
@@ -200,7 +200,7 @@ export async function updatePackage(
 
   const pkg = await prisma.package.findUnique({ where: { id: packageId } });
   if (!pkg) {
-    return { error: "Paket tidak bertemu, mungkin sudah dihapus." };
+    return { error: "Paket tidak ditemukan, mungkin sudah dihapus." };
   }
   // Clamp biar sisa sesi gak bisa ngelewatin total sesi paketnya sendiri.
   const sisaSesi = Math.min(sisaSesiRaw, pkg.totalSesi);
@@ -224,7 +224,7 @@ export async function updatePackage(
   });
   if (result.count === 0) {
     return {
-      error: "Sisa sesi paket ini baru saja berubah (ada booking/pembatalan baru). Refresh halaman, cek angkanya, lalu simpan lagi.",
+      error: "Sisa sesi paket ini baru saja berubah (ada booking/pembatalan baru). Muat ulang halaman, cek angkanya, lalu simpan lagi.",
     };
   }
 

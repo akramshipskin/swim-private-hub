@@ -66,7 +66,7 @@ export default async function ProfilPage() {
             <CardBody>
               <h2 className="mb-1 text-lg font-semibold text-text">Profil Coach</h2>
               <p className="mb-3 text-sm text-text-muted">
-                Ditampilin ke orang tua di halaman profil publik kamu.
+                Ditampilkan ke orang tua di halaman profil publik kamu.
               </p>
               <EditCoachProfileForm profile={coachProfile} />
             </CardBody>

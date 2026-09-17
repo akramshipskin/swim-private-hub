@@ -283,7 +283,7 @@ export default function BookingBoard({
         ),
       };
     });
-    setMessage({ text: "Booking dibatalkan, kuota sesi kamu balik.", ok: true });
+    setMessage({ text: "Booking dibatalkan, sesi kembali ke paketmu.", ok: true });
     loadSlots();
     router.refresh();
   }
@@ -403,7 +403,7 @@ export default function BookingBoard({
           <p>
             Belum ada paket aktif buat peserta ini di {selectedPool?.name}.
             {dependentPoolNames.length > 0 && <> Paketnya berlaku di: {dependentPoolNames.join(", ")}.</>}
-            {!canBuySingleSession && " Beli paket dulu buat bisa booking."}
+            {!canBuySingleSession && " Beli paket dulu agar bisa booking."}
             {canBuySingleSession &&
               selectedPool?.singleSessionPrice == null &&
               " Kolam ini belum jual 1 sesi."}

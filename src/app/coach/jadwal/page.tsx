@@ -166,7 +166,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
         <div className="mt-10">
           <h2 className="text-lg font-semibold text-text">Jadwal Coach Lain</h2>
           <p className="mt-1 text-sm text-text-muted">
-            Slot yang sudah dibuka coach lain, agar kamu tahu siapa saja yang jaga di hari yang sama.
+            Slot yang sudah dibuka coach lain, agar kamu tahu siapa saja yang bertugas di hari yang sama.
           </p>
 
           <div className="mt-4 flex flex-col gap-8">

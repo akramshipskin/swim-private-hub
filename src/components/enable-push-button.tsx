@@ -90,7 +90,7 @@ export default function EnablePushButton() {
       </button>
       {status === "error" && (
         <p className="text-xs text-danger-text">
-          Izin notifikasi ditolak/gagal. Cek pengaturan notifikasi browser buat situs ini.
+          Izin notifikasi ditolak/gagal. Cek pengaturan notifikasi browser untuk situs ini.
         </p>
       )}
     </div>

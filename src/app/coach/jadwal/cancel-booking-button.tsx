@@ -23,7 +23,7 @@ export default function CancelBookingButton({ bookingId, label }: { bookingId: s
       <ConfirmDialog
         open={open}
         title={`Batalkan sesi ${label}?`}
-        description="Buat dipakai kalau kamu benar-benar tidak bisa mengajar (sakit/emergency). Sisa sesi member otomatis balik, mereka dapat notif."
+        description="Gunakan jika kamu benar-benar tidak bisa mengajar (sakit/darurat). Sisa sesi member otomatis kembali dan member mendapat notifikasi."
         confirmLabel="Ya, batalkan"
         loading={pending}
         onConfirm={() => {

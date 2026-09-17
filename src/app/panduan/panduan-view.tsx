@@ -894,7 +894,7 @@ const PANDUAN_BODY = `
           </div>
         </div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>1 baris = 1 peserta</h4><p>Member dengan lebih dari 1 anak: ulang No HP yang sama di baris berikutnya, beda di kolom Nama Peserta/Anak.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Upload &amp; klik Import</h4><p>Sistem buat akun, peserta, dan paketnya sekaligus. Password default semua member baru: <code>renang2026</code> — wajib diganti saat login pertama. Baris yang No HP-nya sudah terpakai akan dilewatin dan dilaporin di hasil import.</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Upload &amp; klik Import</h4><p>Sistem buat akun, peserta, dan paketnya sekaligus. Password default semua member baru: <code>renang2026</code> — wajib diganti saat login pertama. Baris yang No HP-nya sudah terpakai akan dilewatin dan dilaporkan di hasil import.</p></div></div>
       </div>
 
       <div class="guide">

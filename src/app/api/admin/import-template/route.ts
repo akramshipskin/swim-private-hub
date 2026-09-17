@@ -34,12 +34,12 @@ export async function GET() {
     ["- 1 baris = 1 peserta. Member yang punya >1 anak, ulang No HP yang sama di baris berikutnya."],
     ["- \"Nama Peserta/Anak\" kosong = peserta itu diri sendiri member (bukan anak)."],
     ["- \"Paket Aktif\" isi nama paket dari Katalog Paket (kalau cocok, total sesi/jatah batal ikut katalog itu)."],
-    ["  Kalau namanya tidak ada di katalog, tetep dibuat paket custom pakai nilai \"Sisa Sesi\" sebagai total sesi juga."],
-    ["- \"Paket Aktif\" & \"Sisa Sesi\" boleh dikosongin kalau peserta itu belum punya paket aktif."],
+    ["  Kalau namanya tidak ada di katalog, tetap dibuat paket custom pakai nilai \"Sisa Sesi\" sebagai total sesi juga."],
+    ["- \"Paket Aktif\" & \"Sisa Sesi\" boleh dikosongkan kalau peserta itu belum punya paket aktif."],
     ["- Baris tanpa \"Nama Peserta/Anak\" DAN tanpa \"Paket Aktif\" = member polos, belum ada peserta terdaftar."],
-    ["  (dia akan diminta isi peserta sendiri saat login pertama, seperti alur biasa)."],
+    ["  (member akan diminta mengisi peserta sendiri saat login pertama, seperti alur biasa)."],
     ["- Password default semua member baru: renang2026 — wajib ganti saat login pertama."],
-    ["- No HP yang sudah terpakai email/HP-nya di sistem akan di-skip (dilaporin di hasil import)."],
+    ["- No HP yang sudah terpakai email/HP-nya di sistem akan di-skip (dilaporkan di hasil import)."],
   ]);
   infoSheet["!cols"] = [{ wch: 100 }];
 

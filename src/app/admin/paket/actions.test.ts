@@ -244,7 +244,7 @@ describe("updatePackage", () => {
       null,
       formData({ packageId: "gone", sisaSesi: "1", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
     );
-    expect(result).toEqual({ error: "Paket tidak bertemu, mungkin sudah dihapus." });
+    expect(result).toEqual({ error: "Paket tidak ditemukan, mungkin sudah dihapus." });
   });
 
   // Clamp: admin gak boleh nge-set sisa sesi ngelewatin total sesi paket
