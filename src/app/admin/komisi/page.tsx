@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
+import { splitPlatformTax } from "@/lib/policy";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -86,7 +87,7 @@ export default async function KomisiPage() {
   const totalPlatform = [...byPool.values()].reduce((n, e) => n + sum([e.own, e.single, e.legacy], "platform"), 0);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Bagi Hasil</h1>
       <p className="mt-1 text-sm text-text-muted">
         Pembagian uang dari setiap sesi yang ditandai Hadir: komisi platform, bagian kolam, dan bagian coach.
@@ -95,7 +96,12 @@ export default async function KomisiPage() {
       <Card className="mt-4">
         <CardBody className="flex items-center justify-between">
           <p className="text-sm font-semibold text-text">Total komisi platform (semua kolam)</p>
-          <p className="text-xl font-bold text-text">{formatRupiah(totalPlatform)}</p>
+          <p className="text-right text-xl font-bold text-text">
+            {formatRupiah(totalPlatform)}
+            <span className="block text-sm font-normal text-text-muted">
+              bersih {formatRupiah(splitPlatformTax(totalPlatform).net)} · PPN {formatRupiah(splitPlatformTax(totalPlatform).tax)}
+            </span>
+          </p>
         </CardBody>
       </Card>
 
@@ -130,7 +136,8 @@ export default async function KomisiPage() {
                         <th className="py-1 font-medium">Sumber</th>
                         <th className="py-1 text-right font-medium">Sesi</th>
                         <th className="py-1 text-right font-medium">Nilai</th>
-                        <th className="py-1 text-right font-medium">Platform</th>
+                        <th className="py-1 text-right font-medium">Platform bersih</th>
+                        <th className="py-1 text-right font-medium">PPN 12%</th>
                         <th className="py-1 text-right font-medium">Kolam</th>
                         <th className="py-1 text-right font-medium">Coach</th>
                       </tr>
@@ -141,7 +148,8 @@ export default async function KomisiPage() {
                           <td className="py-1.5 text-text">{label}</td>
                           <td className="py-1.5 text-right">{p.sessions}</td>
                           <td className="py-1.5 text-right">{formatRupiah(p.gross)}</td>
-                          <td className="py-1.5 text-right">{formatRupiah(p.platform)}</td>
+                          <td className="py-1.5 text-right">{formatRupiah(splitPlatformTax(p.platform).net)}</td>
+                          <td className="py-1.5 text-right">{formatRupiah(splitPlatformTax(p.platform).tax)}</td>
                           <td className="py-1.5 text-right">{formatRupiah(p.pool)}</td>
                           <td className="py-1.5 text-right">{formatRupiah(p.coach)}</td>
                         </tr>
@@ -150,7 +158,8 @@ export default async function KomisiPage() {
                         <td className="py-1.5 text-text">Total</td>
                         <td className="py-1.5 text-right">{sum(all, "sessions")}</td>
                         <td className="py-1.5 text-right">{formatRupiah(sum(all, "gross"))}</td>
-                        <td className="py-1.5 text-right">{formatRupiah(sum(all, "platform"))}</td>
+                        <td className="py-1.5 text-right">{formatRupiah(splitPlatformTax(sum(all, "platform")).net)}</td>
+                        <td className="py-1.5 text-right">{formatRupiah(splitPlatformTax(sum(all, "platform")).tax)}</td>
                         <td className="py-1.5 text-right">{formatRupiah(sum(all, "pool"))}</td>
                         <td className="py-1.5 text-right">{formatRupiah(sum(all, "coach"))}</td>
                       </tr>

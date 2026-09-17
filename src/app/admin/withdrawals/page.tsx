@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import { Card, CardBody } from "@/components/ui/card";
 import WithdrawalRow from "./withdrawal-row";
+import PlatformWithdrawForm from "./platform-withdraw-form";
+import { getPlatformBalance } from "@/lib/platform-wallet";
 
 const STATUS_FILTERS = {
   waiting: { label: "Perlu diproses", statuses: ["PENDING", "PROCESSING"] },
@@ -23,7 +25,7 @@ export default async function AdminWithdrawalsPage({
   const status: StatusKey = params.status && params.status in STATUS_FILTERS ? (params.status as StatusKey) : params.pool ? "all" : "waiting";
   const who = params.who === "pool" || params.who === "coach" ? params.who : "all";
 
-  const [requests, pools, totals] = await Promise.all([
+  const [requests, pools, totals, platform, platformHistory] = await Promise.all([
     prisma.withdrawalRequest.findMany({
       where: {
         status: { in: [...STATUS_FILTERS[status].statuses] },
@@ -38,6 +40,8 @@ export default async function AdminWithdrawalsPage({
     }),
     prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.withdrawalRequest.groupBy({ by: ["status"], _count: true, _sum: { amount: true } }),
+    getPlatformBalance(),
+    prisma.platformWithdrawal.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
   ]);
 
   const total = (keys: readonly string[]) => totals.filter((t) => keys.includes(t.status));
@@ -51,14 +55,56 @@ export default async function AdminWithdrawalsPage({
     `rounded-full border px-3 py-1 text-sm ${active ? "border-brand-600 bg-brand-50 font-semibold text-brand-700" : "border-border text-text hover:bg-surface-muted"}`;
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Pencairan Saldo</h1>
       <p className="mt-1 text-sm text-text-muted">
         Permintaan tarik saldo dari kolam &amp; coach ke rekening mereka. Transfer manual lewat m-banking, lalu tandai
         dibayar. Pengajuan yang ditolak otomatis mengembalikan saldo.
       </p>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <Card className="mt-4">
+        <CardBody className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-text">Saldo Platform</h2>
+            <p className="text-sm text-text-muted">
+              Komisi platform dari setiap sesi Hadir, sudah dipisah dari PPN 12%. Catat di sini setiap kali saldo ditarik dari
+              akun Midtrans.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="rounded-xl bg-surface-muted p-3">
+              <p className="text-sm text-text-muted">Pendapatan bersih bisa ditarik</p>
+              <p className="text-2xl font-bold text-text">{formatRupiah(platform.revenue)}</p>
+            </div>
+            <div className="rounded-xl bg-surface-muted p-3">
+              <p className="text-sm text-text-muted">Saldo pajak (PPN 12%)</p>
+              <p className="text-2xl font-bold text-text">{formatRupiah(platform.tax)}</p>
+            </div>
+          </div>
+          <PlatformWithdrawForm revenue={platform.revenue} tax={platform.tax} />
+          {platformHistory.length > 0 && (
+            <div>
+              <p className="mb-1 text-sm font-semibold text-text">Penarikan terakhir</p>
+              <ul className="flex flex-col divide-y divide-border text-sm">
+                {platformHistory.map((h) => (
+                  <li key={h.id} className="flex flex-wrap justify-between gap-2 py-1.5">
+                    <span className="text-text-muted">
+                      {h.createdAt.toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" })}
+                      {h.note ? ` · ${h.note}` : ""}
+                    </span>
+                    <span className="text-text">
+                      Pendapatan {formatRupiah(h.revenueAmount)} · Pajak {formatRupiah(h.taxAmount)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      <h2 className="mt-8 text-lg font-semibold text-text">Pencairan kolam &amp; coach</h2>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {(["waiting", "paid", "failed"] as const).map((k) => {
           const rows = total(STATUS_FILTERS[k].statuses);
           return (

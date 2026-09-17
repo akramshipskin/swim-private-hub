@@ -73,7 +73,7 @@ export default async function MemberBookingPage() {
   }));
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-text">Booking Coach</h1>

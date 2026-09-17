@@ -57,7 +57,7 @@ export default async function PoolDashboardPage() {
   const pick = <T extends { poolId: string | null }>(rows: T[], id: string) => rows.find((r) => r.poolId === id);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Dashboard</h1>
       <p className="mt-1 text-sm text-text-muted">{formatDateLabel(today)}</p>
 
@@ -77,7 +77,7 @@ export default async function PoolDashboardPage() {
             {pools.length > 1 && <h2 className="mb-3 text-xl font-semibold text-text">{p.name}</h2>}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
               <BentoCard title="Ringkasan bulan ini" href="/pool/laporan" className="md:col-span-4">
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
                   <Stat label="Sesi dihadiri" value={pick(attended, p.id)?._count ?? 0} />
                   <Stat label="Pendapatan kolam" value={formatRupiah(pick(revenue, p.id)?._sum.amount ?? 0)} />
                   <Stat label="Paket terjual" value={pick(sold, p.id)?._count ?? 0} />

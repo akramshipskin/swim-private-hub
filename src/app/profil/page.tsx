@@ -48,7 +48,7 @@ export default async function ProfilPage() {
       links={roleNavLinks[session.user.role]}
       avatarUrl={coachProfile?.photoUrl}
     >
-      <main className="mx-auto max-w-5xl [&>*]:max-w-xl px-4 pb-16 py-6 sm:pb-8 sm:py-8">
+      <main className="w-full [&>*]:max-w-xl px-4 pb-16 py-6 sm:pb-8 sm:py-8">
         <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Edit Profil</h1>
 
         <Card className="mb-4">

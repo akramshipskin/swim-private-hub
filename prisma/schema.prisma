@@ -33,6 +33,21 @@ enum WalletTransactionType {
   SESSION_PAYOUT
   // Saldo keluar pas WithdrawalRequest berhasil diproses.
   WITHDRAWAL
+  // Komisi platform per sesi Hadir, sudah dipisah dari PPN-nya (poolId &
+  // coachProfileId kosong = milik platform). Lihat splitPlatformTax.
+  PLATFORM_REVENUE
+  PLATFORM_TAX
+}
+
+// Penarikan saldo platform oleh admin (transfer manual dari akun Midtrans).
+// Saldo platform = total ledger PLATFORM_* dikurangi baris di sini.
+model PlatformWithdrawal {
+  id            String   @id @default(cuid())
+  revenueAmount Int
+  taxAmount     Int
+  note          String?
+  createdById   String
+  createdAt     DateTime @default(now())
 }
 
 enum WithdrawalStatus {

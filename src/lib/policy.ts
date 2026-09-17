@@ -15,3 +15,12 @@ export const DROP_IN_DURATION_DAYS = 14;
 // Minimal nominal pencairan saldo (kolam & coach). Dipake server
 // (withdrawal.ts) DAN tombol "Cairkan" (saldo-view) biar sama persis.
 export const MIN_WITHDRAWAL = 50_000;
+
+// PPN atas komisi platform. Komisi dianggap SUDAH termasuk PPN:
+// komisi Rp11.200 = pendapatan bersih Rp10.000 + PPN Rp1.200.
+export const PLATFORM_TAX_PERCENT = 12;
+
+export function splitPlatformTax(commission: number) {
+  const tax = Math.round((commission * PLATFORM_TAX_PERCENT) / (100 + PLATFORM_TAX_PERCENT));
+  return { net: commission - tax, tax };
+}

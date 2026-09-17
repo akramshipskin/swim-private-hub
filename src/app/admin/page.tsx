@@ -4,6 +4,7 @@ import { formatRupiah } from "@/lib/format";
 import { usablePackageConditions } from "@/lib/active-package";
 import { todayWibDateString, dateLabel, addDaysToDateString, wibDateTime, formatDateLabel } from "@/lib/datetime";
 import { BentoCard, Stat, ActionRow, SessionList } from "@/components/dashboard";
+import { getPlatformBalance } from "@/lib/platform-wallet";
 
 // Dashboard admin: kondisi bisnis hari ini dalam 1 layar. Semua angka query
 // langsung (bukan cache). Detail lengkap lewat tautan "Selengkapnya".
@@ -31,6 +32,8 @@ export default async function AdminDashboardPage() {
     pendingCerts,
     unmarked,
     coachWallets,
+    platformMonth,
+    platformBalance,
   ] = await Promise.all([
     prisma.booking.findMany({
       where: { status: "BOOKED", availability: { date: { in: [today, tomorrow] } } },
@@ -55,7 +58,14 @@ export default async function AdminDashboardPage() {
     prisma.coachProfile.count({ where: { certificateStatus: "PENDING" } }),
     prisma.booking.count({ where: { status: "BOOKED", attended: null, availability: { endTime: { lt: now } } } }),
     prisma.coachProfile.aggregate({ _sum: { walletBalance: true } }),
+    prisma.walletTransaction.groupBy({
+      by: ["type"],
+      where: { type: { in: ["PLATFORM_REVENUE", "PLATFORM_TAX"] }, createdAt: { gte: startMonth } },
+      _sum: { amount: true },
+    }),
+    getPlatformBalance(),
   ]);
+  const monthSum = (t: string) => platformMonth.find((r) => r.type === t)?._sum.amount ?? 0;
 
   const toItem = (b: (typeof bookings)[number]) => ({
     id: b.id,
@@ -71,13 +81,13 @@ export default async function AdminDashboardPage() {
   const poolWalletTotal = pools.reduce((sum, p) => sum + p.walletBalance, 0);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Dashboard</h1>
       <p className="mt-1 text-sm text-text-muted">{formatDateLabel(today)} · kondisi bisnis hari ini</p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <BentoCard title="Hari ini" className="md:col-span-4">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Sesi hari ini" value={todayItems.length} />
             <Stat label="Sesi besok" value={tomorrowItems.length} />
             <Stat label="Uang masuk hari ini" value={formatRupiah(paidToday._sum.amount ?? 0)} hint={`${paidToday._count} transaksi`} />
@@ -107,8 +117,18 @@ export default async function AdminDashboardPage() {
           <SessionList items={tomorrowItems} empty="Belum ada sesi besok." />
         </BentoCard>
 
+        <BentoCard title="Pendapatan platform" href="/admin/withdrawals" linkLabel="Tarik saldo" className="md:col-span-6">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
+            <Stat label="Pendapatan bersih bulan ini" value={formatRupiah(monthSum("PLATFORM_REVENUE"))} tone="success" />
+            <Stat label="PPN 12% bulan ini" value={formatRupiah(monthSum("PLATFORM_TAX"))} />
+            <Stat label="Saldo pendapatan bisa ditarik" value={formatRupiah(platformBalance.revenue)} />
+            <Stat label="Saldo pajak belum disetor" value={formatRupiah(platformBalance.tax)} />
+          </div>
+          <p className="mt-3 text-xs text-text-subtle">Dihitung dari komisi setiap sesi yang ditandai Hadir (komisi sudah termasuk PPN).</p>
+        </BentoCard>
+
         <BentoCard title="Pengguna" href="/admin/users" className="md:col-span-3">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Member punya paket aktif" value={activeMembers} hint={`dari ${totalMembers} member`} />
             <Stat label="Paket aktif" value={activePackages} />
             <Stat label="Coach aktif" value={activeCoaches} />

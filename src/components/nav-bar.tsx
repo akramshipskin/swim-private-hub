@@ -36,7 +36,7 @@ export function NavBar({
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+        <div className="flex w-full items-center justify-between gap-3 px-4 py-3 lg:px-8">
           {/* prefetch={false} -- "/" cuma redirect server-side ke home per-role
               (lihat src/app/page.tsx), gak pernah nampilin konten sendiri buat
               user yang udah login. Prefetch default Next.js buat link ini
@@ -58,7 +58,7 @@ export function NavBar({
         {links.length > 0 && hasManyLinks && <MobileNavStrip links={links} activePath={activePath} />}
       </header>
 
-      <div className="mx-auto flex max-w-6xl gap-6 px-4">
+      <div className="flex w-full gap-6 px-4 lg:gap-8 lg:px-8">
         {links.length > 0 && <SidebarNav links={links} activePath={activePath} />}
         <div className="min-w-0 flex-1">{children}</div>
       </div>

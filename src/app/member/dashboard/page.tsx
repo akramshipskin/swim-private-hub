@@ -44,13 +44,13 @@ export default async function MemberDashboardPage() {
   const expiringSoon = packages.filter((p) => p.expiredDate && p.expiredDate.getTime() - now.getTime() < 7 * 86_400_000);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Dashboard</h1>
       <p className="mt-1 text-sm text-text-muted">{formatDateLabel(today)}</p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <BentoCard title="Ringkasan" className="md:col-span-6">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Paket aktif" value={packages.length} />
             <Stat label="Total sisa sesi" value={totalSisa} />
             <Stat label="Sesi terjadwal" value={upcoming.length} />

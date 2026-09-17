@@ -42,7 +42,7 @@ export default async function AdminPesanPage({ searchParams }: { searchParams: P
   const waiting = threads.filter((th) => th.needsAdmin).length;
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Pesan</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
         Chat bantuan dari member, coach, dan pemilik kolam. Yang tidak bisa dijawab asisten AI ditandai{" "}

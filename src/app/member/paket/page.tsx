@@ -85,7 +85,7 @@ export default async function MemberPaketPage() {
   );
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-text">Paket Saya</h1>
         {membershipBadge}

@@ -7,6 +7,7 @@ import type { Prisma } from "@/generated/prisma/client";
 function createMockTx(overrides?: {
   pool?: { commissionPercent: number; coachSharePercent: number };
   walletTxns?: unknown[];
+  platformSums?: Record<string, number>;
 }) {
   const pool = overrides?.pool ?? { commissionPercent: 15, coachSharePercent: 55 };
   return {
@@ -19,6 +20,9 @@ function createMockTx(overrides?: {
     },
     walletTransaction: {
       createMany: vi.fn().mockResolvedValue({ count: 0 }),
+      aggregate: vi.fn(async ({ where }: { where: { type: string } }) => ({
+        _sum: { amount: overrides?.platformSums?.[where.type] ?? 0 },
+      })),
       findFirst: vi.fn(async ({ where }: { where: { type: string } }) =>
         (overrides?.walletTxns ?? []).find((t) => (t as { type: string }).type === where.type) ?? null
       ),
@@ -52,6 +56,8 @@ describe("creditSessionRevenue", () => {
       data: [
         { type: "SESSION_REVENUE", poolId: "pool-1", amount: 28125, bookingId: "booking-1" },
         { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: 51563, bookingId: "booking-1" },
+        { type: "PLATFORM_REVENUE", amount: 12555, bookingId: "booking-1" },
+        { type: "PLATFORM_TAX", amount: 1507, bookingId: "booking-1" },
       ],
     });
   });
@@ -71,7 +77,8 @@ describe("creditSessionRevenue", () => {
 
     const call = (tx.walletTransaction.createMany as ReturnType<typeof vi.fn>).mock.calls[0][0];
     const total = call.data.reduce((sum: number, row: { amount: number }) => sum + row.amount, 0);
-    expect(total).toBe(28125 + 51563);
+    // Platform = sisa setelah kolam & coach, jadi total baris = nilai sesi utuh.
+    expect(total).toBe(93750);
   });
 
   it("skips crediting the coach entirely when coachSharePercent is 0", async () => {
@@ -86,7 +93,11 @@ describe("creditSessionRevenue", () => {
 
     expect(tx.coachProfile.update).not.toHaveBeenCalled();
     expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
-      data: [{ type: "SESSION_REVENUE", poolId: "pool-1", amount: 85000, bookingId: "booking-1" }],
+      data: [
+        { type: "SESSION_REVENUE", poolId: "pool-1", amount: 85000, bookingId: "booking-1" },
+        { type: "PLATFORM_REVENUE", amount: 13393, bookingId: "booking-1" },
+        { type: "PLATFORM_TAX", amount: 1607, bookingId: "booking-1" },
+      ],
     });
   });
 
@@ -118,6 +129,7 @@ describe("reverseSessionRevenue", () => {
         { type: "SESSION_REVENUE", poolId: "pool-1", amount: 28125 },
         { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: 51563 },
       ],
+      platformSums: { PLATFORM_REVENUE: 12555, PLATFORM_TAX: 1507 },
     });
 
     await reverseSessionRevenue(tx, { bookingId: "booking-1" });
@@ -134,6 +146,8 @@ describe("reverseSessionRevenue", () => {
       data: [
         { type: "SESSION_REVENUE", poolId: "pool-1", amount: -28125, bookingId: "booking-1" },
         { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: -51563, bookingId: "booking-1" },
+        { type: "PLATFORM_REVENUE", amount: -12555, bookingId: "booking-1" },
+        { type: "PLATFORM_TAX", amount: -1507, bookingId: "booking-1" },
       ],
     });
   });

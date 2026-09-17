@@ -1,4 +1,5 @@
 import type { Prisma } from "@/generated/prisma/client";
+import { splitPlatformTax } from "@/lib/policy";
 
 // Semua fungsi di sini WAJIB dipanggil dalam prisma.$transaction (tx) yang
 // sama dengan perubahan lain (Booking) yang men-trigger-nya -- kredit/debit
@@ -47,6 +48,9 @@ export async function creditSessionRevenue(
     });
   }
 
+  // Sisanya komisi platform, langsung dipisah jadi pendapatan bersih + PPN.
+  const { net, tax } = splitPlatformTax(Math.max(0, perSessionValue - poolAmount - coachAmount));
+
   await tx.walletTransaction.createMany({
     data: [
       { type: "SESSION_REVENUE", poolId, amount: poolAmount, bookingId },
@@ -60,6 +64,8 @@ export async function creditSessionRevenue(
             },
           ]
         : []),
+      ...(net > 0 ? [{ type: "PLATFORM_REVENUE" as const, amount: net, bookingId }] : []),
+      ...(tax > 0 ? [{ type: "PLATFORM_TAX" as const, amount: tax, bookingId }] : []),
     ],
   });
 }
@@ -101,6 +107,15 @@ export async function reverseSessionRevenue(
       amount: -coachTxn.amount,
       bookingId,
     });
+  }
+
+  // Bagian platform dibalikin sebesar total bersih yang masih tercatat buat
+  // booking ini (kredit dikurangi reversal sebelumnya), jadi toggle berulang
+  // gak bikin minus dobel.
+  for (const type of ["PLATFORM_REVENUE", "PLATFORM_TAX"] as const) {
+    const current = await tx.walletTransaction.aggregate({ where: { bookingId, type }, _sum: { amount: true } });
+    const amount = current._sum.amount ?? 0;
+    if (amount > 0) reversals.push({ type, amount: -amount, bookingId });
   }
 
   await tx.walletTransaction.createMany({ data: reversals });

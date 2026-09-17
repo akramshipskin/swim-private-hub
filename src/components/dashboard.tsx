@@ -36,11 +36,11 @@ export function BentoCard({
 
 export function Stat({ label, value, hint, tone }: { label: string; value: React.ReactNode; hint?: string; tone?: "warning" | "success" }) {
   return (
-    <div>
+    <div className="min-w-0">
       <p className="text-sm text-text-muted">{label}</p>
       <p
         className={cn(
-          "text-2xl font-bold tabular-nums",
+          "text-xl leading-tight font-bold tabular-nums break-words sm:text-2xl",
           tone === "warning" ? "text-warning-text" : tone === "success" ? "text-success-text" : "text-text"
         )}
       >

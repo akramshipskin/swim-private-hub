@@ -70,7 +70,7 @@ export default async function PoolLaporanPage({
   );
 
   return (
-    <main className="mx-auto max-w-5xl [&>*]:max-w-4xl px-4 py-6 sm:py-8">
+    <main className="w-full [&>*]:max-w-4xl px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Laporan Kolam</h1>
       <p className="mb-6 text-sm text-text-muted">
         Rincian omzet & komisi per sesi yang benar-benar Hadir, per kolam kamu.

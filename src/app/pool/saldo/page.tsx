@@ -37,7 +37,7 @@ export default async function PoolSaldoPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl [&>*]:max-w-lg px-4 py-6 sm:py-8">
+    <main className="w-full [&>*]:max-w-lg px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Saldo Kolam</h1>
       <p className="mb-6 text-sm text-text-muted">Saldo & pencairan tiap kolam kamu.</p>
       <div className="flex flex-col gap-10">

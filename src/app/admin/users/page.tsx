@@ -50,7 +50,7 @@ export default async function AdminUsersPage() {
   const members = users.filter((u) => u.role === "MEMBER");
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola User</h1>
 
       <PendingCertificates />

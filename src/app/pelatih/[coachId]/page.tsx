@@ -60,7 +60,7 @@ export default async function CoachShortcutPage({
   const content = (
     // Login: samain container sama halaman role lain (judul gak loncat pas
     // pindah dari Cari Coach). Anonim: tengah, sejajar header publik.
-    <main className={session ? "mx-auto max-w-5xl px-4 py-6 sm:py-8 [&>*]:max-w-lg" : "mx-auto max-w-lg px-4 py-8"}>
+    <main className={session ? "w-full px-4 py-6 sm:py-8 [&>*]:max-w-lg" : "mx-auto max-w-lg px-4 py-8"}>
       <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
       <div className="mt-3 flex items-center gap-4">
         {profile?.photoUrl ? (
