@@ -12,7 +12,7 @@ export default async function MemberPesertaPage() {
   });
 
   return (
-    <main className="w-full [&>*]:max-w-xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Peserta</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
         Siapa saja yang ikut les: kamu sendiri dan/atau anak. Setiap peserta punya paket dan sisa sesi masing-masing.

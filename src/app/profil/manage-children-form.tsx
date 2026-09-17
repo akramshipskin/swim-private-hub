@@ -27,7 +27,7 @@ export default function ManageChildrenForm({ children }: { children: Child[] }) 
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
       {active.length === 0 && inactive.length === 0 ? (
         <p className="text-sm text-text-muted">Belum ada anak terdaftar.</p>
       ) : (

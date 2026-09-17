@@ -48,10 +48,11 @@ export default async function ProfilPage() {
       links={roleNavLinks[session.user.role]}
       avatarUrl={coachProfile?.photoUrl}
     >
-      <main className="w-full [&>*]:max-w-xl px-4 pb-16 py-6 sm:pb-8 sm:py-8">
+      <main className="w-full px-4 pb-16 py-6 sm:pb-8 sm:py-8">
         <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Edit Profil</h1>
 
-        <Card className="mb-4">
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+        <Card>
           <CardBody>
             <h2 className="mb-3 text-lg font-semibold text-text">Nama</h2>
             <EditNameForm
@@ -62,7 +63,7 @@ export default async function ProfilPage() {
         </Card>
 
         {coachProfile && (
-          <Card className="mb-4">
+          <Card>
             <CardBody>
               <h2 className="mb-1 text-lg font-semibold text-text">Profil Coach</h2>
               <p className="mb-3 text-sm text-text-muted">
@@ -74,7 +75,7 @@ export default async function ProfilPage() {
         )}
 
         {coachProfile && (
-          <Card className="mb-4">
+          <Card>
             <CardBody>
               <h2 className="mb-3 text-lg font-semibold text-text">Foto &amp; Sertifikat</h2>
               <CoachMediaForm
@@ -87,7 +88,7 @@ export default async function ProfilPage() {
           </Card>
         )}
 
-        <Card className={hasTrailingSection ? "mb-4" : undefined}>
+        <Card>
           <CardBody>
             <h2 className="mb-3 text-lg font-semibold text-text">Ganti Password</h2>
             <EditPasswordForm />
@@ -113,6 +114,7 @@ export default async function ProfilPage() {
             <a href="/member/peserta" className="font-medium text-brand-700 underline">Peserta</a>.
           </p>
         )}
+        </div>
       </main>
     </NavBar>
   );

@@ -25,14 +25,14 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
   return (
     <form key={edit.formKey} action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="poolId" value={pool.id} />
-      <fieldset disabled={edit.locked} className="flex flex-col gap-4 disabled:opacity-90">
+      <fieldset disabled={edit.locked} className="grid gap-4 disabled:opacity-90 lg:grid-cols-2">
         <Field label="Deskripsi kolam">
           <Textarea name="description" rows={3} maxLength={1000} defaultValue={pool.description ?? ""} placeholder="Ukuran kolam, kedalaman, suasana, dll." />
         </Field>
         <Field label="Alamat">
           <Input name="address" defaultValue={pool.address ?? ""} />
         </Field>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-3 lg:col-span-2">
           <Field label="No. telepon kolam">
             <Input name="contactPhone" defaultValue={pool.contactPhone ?? ""} />
           </Field>
@@ -43,7 +43,7 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
             <Input type="time" name="closeTime" defaultValue={pool.closeTime ?? ""} />
           </Field>
         </div>
-        <div>
+        <div className="lg:col-span-2">
           <p className="mb-2 text-sm font-medium text-text">Fasilitas</p>
           <div className="flex flex-wrap gap-2">
             {POOL_FACILITIES.map((f) => (

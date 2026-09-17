@@ -12,7 +12,7 @@ export default async function PoolInfoPage() {
   });
 
   return (
-    <main className="w-full [&>*]:max-w-3xl px-4 py-6 sm:py-8">
+    <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Info Kolam</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
         Informasi ini tampil ke member di halaman booking, profil coach, dan landing page. Perubahan langsung berlaku.
