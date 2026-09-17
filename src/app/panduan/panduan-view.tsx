@@ -138,7 +138,6 @@ const PANDUAN_CSS = `
   .brand-mark { width: 30px; height: 30px; border-radius: 9px; overflow: hidden; flex-shrink: 0; display: flex; }
   .brand-mark img { width: 100%; height: 100%; object-fit: cover; }
   .tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  @media (min-width: 900px) { .topbar-inner { flex-wrap: nowrap; } .tabs { flex: 1 1 auto; min-width: 0; justify-content: center; } .tab { padding-left: 10px; padding-right: 10px; font-size: 13px; } }
   .tabs::-webkit-scrollbar { display: none; }
   .tab {
     font-family: var(--font-body); font-weight: 600; font-size: 13.5px;
@@ -146,6 +145,7 @@ const PANDUAN_CSS = `
     padding: 8px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap;
     transition: background .15s, color .15s, border-color .15s;
   }
+  @media (min-width: 900px) { .topbar-inner { flex-wrap: nowrap; } .tabs { flex: 1 1 auto; min-width: 0; justify-content: center; } .tab { padding-left: 10px; padding-right: 10px; font-size: 13px; } }
   .tab:hover { background: var(--surface-muted); color: var(--text); }
   .tab.active { background: var(--brand); color: white; }
 
