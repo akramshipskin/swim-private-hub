@@ -1,0 +1,595 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Swim Private Hub Brand Guideline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #F6F6EE; --surface: #FFFFFF; --surface-sunken: #ECE9DC;
+    --border: #DEDACA; --text: #17160F; --text-muted: #5C5945; --text-faint: #8B8770;
+    --charcoal: #14140F; --lime: #C6FF3D; --lime-dark: #6F8F1E; --cream: #F6F6EE;
+    --success: #1E8E5A; --warning: #B4770E; --danger: #C23B3B;
+    --shadow: 0 1px 2px rgba(23,22,15,0.04), 0 12px 32px rgba(23,22,15,0.07);
+    --rail-w: 220px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14140F; --surface: #1B1A12; --surface-sunken: #211F15; --border: #34311F;
+      --text: #F2EFE3; --text-muted: #B4AF98; --text-faint: #7D7967;
+      --lime-dark: #9FCB33;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 12px 32px rgba(0,0,0,0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14140F; --surface: #1B1A12; --surface-sunken: #211F15; --border: #34311F;
+    --text: #F2EFE3; --text-muted: #B4AF98; --text-faint: #7D7967;
+    --lime-dark: #9FCB33;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 12px 32px rgba(0,0,0,0.45);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: "Plus Jakarta Sans", system-ui, sans-serif; line-height: 1.6; font-size: 15px; }
+  ::selection { background: var(--lime); color: var(--charcoal); }
+
+  a { color: inherit; }
+  .mono { font-family: "JetBrains Mono", monospace; }
+  .eyebrow { font-family: "JetBrains Mono", monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); }
+
+  h1, h2, h3 { font-family: "Sora", system-ui, sans-serif; letter-spacing: -0.015em; text-wrap: balance; margin: 0; }
+  h2 { font-weight: 800; font-size: clamp(22px, 3.4vw, 28px); }
+  h3 { font-weight: 700; font-size: 16px; }
+  p { margin: 0; color: var(--text-muted); max-width: 62ch; }
+
+  .shell { display: flex; max-width: 1180px; margin: 0 auto; }
+
+  /* --- rail nav --- */
+  .rail {
+    width: var(--rail-w); flex-shrink: 0; position: sticky; top: 0; height: 100vh;
+    padding: 28px 14px; display: flex; flex-direction: column; gap: 4px;
+    border-right: 1px solid var(--border); overflow-y: auto;
+  }
+  .rail-brand { display: flex; align-items: center; gap: 9px; padding: 4px 10px 22px; }
+  .rail-brand .wordmark { font-family: "Sora", sans-serif; font-weight: 700; font-size: 14.5px; letter-spacing: -0.02em; }
+  .rail a {
+    text-decoration: none; font-size: 13px; font-weight: 600; color: var(--text-muted);
+    padding: 8px 10px; border-radius: 8px; transition: background 0.15s, color 0.15s;
+  }
+  .rail a:hover { background: var(--surface-sunken); color: var(--text); }
+  .rail .ver { margin-top: auto; padding: 10px; font-size: 11px; color: var(--text-faint); }
+
+  main { flex: 1; min-width: 0; padding: 0 28px 100px; }
+
+  /* --- cover --- */
+  .cover { padding: 64px 0 40px; border-bottom: 1px solid var(--border); margin-bottom: 48px; }
+  .cover h1 { font-weight: 800; font-size: clamp(32px, 5.5vw, 46px); line-height: 1.08; margin: 14px 0 0; }
+  .cover .lede { margin-top: 14px; font-size: 16px; max-width: 56ch; }
+  .cover .meta { display: flex; gap: 22px; margin-top: 26px; flex-wrap: wrap; }
+  .cover .meta div { font-size: 12px; }
+  .cover .meta b { display: block; font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--text); margin-top: 2px; }
+
+  section { padding: 56px 0; border-bottom: 1px solid var(--border); scroll-margin-top: 20px; }
+  section:last-child { border-bottom: none; }
+  section > .eyebrow { margin-bottom: 10px; }
+  section > p.lede { margin: 12px 0 30px; font-size: 14.5px; }
+
+  .grid { display: grid; gap: 16px; }
+  .cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .cols-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 720px) { .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr; } }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+
+  /* essence */
+  .trait-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .trait { font-family: "JetBrains Mono", monospace; font-size: 12px; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); }
+  .voice-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+  @media (max-width: 640px) { .voice-pair { grid-template-columns: 1fr; } }
+  .voice-card { padding: 16px 18px; border-radius: 12px; font-size: 13.5px; }
+  .voice-card.no { background: color-mix(in srgb, var(--danger) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--danger) 30%, var(--border)); }
+  .voice-card.yes { background: color-mix(in srgb, var(--lime) 16%, var(--surface)); border: 1px solid color-mix(in srgb, var(--lime-dark) 40%, var(--border)); }
+  .voice-card b { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-family: "JetBrains Mono", monospace; }
+  .voice-card.no b { color: var(--danger); } .voice-card.yes b { color: var(--lime-dark); }
+
+  /* logo */
+  .logo-stage { border-radius: 14px; padding: 44px 30px; display: flex; align-items: center; justify-content: center; }
+  .logo-stage.on-charcoal { background: var(--charcoal); }
+  .logo-stage.on-cream { background: var(--cream); border: 1px solid var(--border); }
+  .lockup { display: flex; align-items: center; gap: 12px; }
+  .lockup-text { font-family: "Sora", sans-serif; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
+  .stage-label { font-family: "JetBrains Mono", monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); padding: 10px 4px 0; }
+
+  .clearspace-box { position: relative; width: 160px; height: 160px; margin: 0 auto; }
+  .clearspace-box .unit { position: absolute; border: 1px dashed color-mix(in srgb, var(--lime-dark) 60%, var(--text-faint)); }
+  .minsize-row { display: flex; align-items: flex-end; gap: 26px; justify-content: center; padding: 20px 0 6px; }
+  .minsize-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .minsize-item .px { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--text-faint); }
+
+  .dont-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 16px; }
+  @media (max-width: 720px) { .dont-grid { grid-template-columns: repeat(2, 1fr); } }
+  .dont-card { border-radius: 12px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border)); }
+  .dont-stage { height: 92px; display: flex; align-items: center; justify-content: center; position: relative; background: var(--charcoal); }
+  .dont-stage::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 48%, color-mix(in srgb, var(--danger) 70%, transparent) 49%, color-mix(in srgb, var(--danger) 70%, transparent) 51%, transparent 52%); }
+  .dont-cap { padding: 9px 12px; font-size: 11.5px; color: var(--text-muted); background: var(--surface); }
+  .dont-cap b { color: var(--danger); font-family: "JetBrains Mono", monospace; font-size: 10px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+  /* color */
+  .swatch { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .swatch-fill { height: 84px; }
+  .swatch-meta { padding: 12px 14px; background: var(--surface); }
+  .swatch-meta .name { font-weight: 700; font-size: 13px; font-family: "Sora", sans-serif; }
+  .swatch-meta .code { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--text-faint); margin-top: 3px; }
+  .swatch-meta .note { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
+  .ratio-bar { display: flex; height: 34px; border-radius: 8px; overflow: hidden; margin-top: 18px; border: 1px solid var(--border); }
+  .ratio-bar span { display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--charcoal); }
+
+  /* type */
+  .type-row { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 18px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .type-row:last-child { border-bottom: none; }
+  .type-row .sample { font-family: "Sora", sans-serif; font-weight: 800; }
+  .type-row .meta { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--text-faint); white-space: nowrap; }
+  .face-card { padding: 22px; }
+  .face-card .role { font-family: "JetBrains Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--lime-dark); }
+  .face-card .fname { font-family: "Sora", sans-serif; font-weight: 800; font-size: 24px; margin-top: 8px; }
+  .face-card .sample-body { font-family: "Plus Jakarta Sans", sans-serif; font-size: 14px; margin-top: 10px; color: var(--text-muted); }
+  .face-card.mono .fname { font-family: "JetBrains Mono", monospace; font-weight: 600; }
+
+  /* components */
+  .btn { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: 13.5px; border-radius: 999px; padding: 10px 20px; border: none; display: inline-flex; align-items: center; gap: 8px; cursor: default; }
+  .btn-primary { background: var(--lime); color: var(--charcoal); }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+  .btn-dark { background: var(--charcoal); color: var(--cream); }
+  .pill { font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 600; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
+  .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+  .pill.success { background: color-mix(in srgb, var(--success) 14%, var(--surface)); color: var(--success); } .pill.success::before { background: var(--success); }
+  .pill.warning { background: color-mix(in srgb, var(--warning) 14%, var(--surface)); color: var(--warning); } .pill.warning::before { background: var(--warning); }
+  .pill.danger { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); color: var(--danger); } .pill.danger::before { background: var(--danger); }
+  .comp-stage { padding: 26px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .comp-cap { padding: 10px 22px 18px; font-size: 12px; color: var(--text-faint); font-family: "JetBrains Mono", monospace; }
+
+  /* icons */
+  .icon-row { display: flex; gap: 22px; align-items: flex-end; flex-wrap: wrap; padding: 22px 0 4px; }
+  .icon-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .icon-tile { background: var(--charcoal); display: flex; align-items: center; justify-content: center; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { font-family: "JetBrains Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+  td.mono { font-family: "JetBrains Mono", monospace; font-size: 12px; }
+  .status { font-family: "JetBrains Mono", monospace; font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+  .status.pending { background: color-mix(in srgb, var(--warning) 16%, var(--surface)); color: var(--warning); }
+  .status.done { background: color-mix(in srgb, var(--success) 16%, var(--surface)); color: var(--success); }
+
+  /* marketing mockups */
+  .banner-mock { border-radius: 14px; background: var(--charcoal); padding: 34px 40px; display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--border); }
+  .banner-mock .tag { color: #C9C6B4; font-size: 12.5px; margin-top: 4px; }
+  .profile-mock { width: 96px; height: 96px; border-radius: 50%; background: var(--lime); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+  .profile-mock svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  .caption-note { font-size: 12px; color: var(--text-faint); margin-top: 10px; }
+
+  footer.doc-end { padding: 40px 0 10px; font-size: 12px; color: var(--text-faint); }
+
+  @media (max-width: 860px) {
+    .shell { flex-direction: column; }
+    .rail { position: sticky; top: 0; height: auto; width: 100%; flex-direction: row; overflow-x: auto; padding: 12px; border-right: none; border-bottom: 1px solid var(--border); z-index: 5; background: var(--bg); }
+    .rail-brand { display: none; }
+    .rail a { flex-shrink: 0; }
+    .rail .ver { display: none; }
+    main { padding: 0 16px 80px; }
+  }
+</style>
+
+<div class="shell">
+  <nav class="rail">
+    <div class="rail-brand">
+      <svg viewBox="0 0 100 100" width="22" height="22">
+        <defs><clipPath id="railclip"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs>
+        <rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/>
+        <g clip-path="url(#railclip)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g>
+      </svg>
+      <span class="wordmark">swim.privatehub</span>
+    </div>
+    <a href="#essence">Esensi Brand</a>
+    <a href="#logo">Logo</a>
+    <a href="#color">Warna</a>
+    <a href="#type">Tipografi</a>
+    <a href="#components">Komponen UI</a>
+    <a href="#icons">Ikon &amp; App</a>
+    <a href="#marketing">Aset Marketing</a>
+    <a href="#voice">Voice &amp; Tone</a>
+    <a href="#checklist">Checklist Aset</a>
+    <div class="ver">Brand Guideline<br>v1.0 &middot; Sep 2026</div>
+  </nav>
+
+  <main>
+    <header class="cover">
+      <div class="eyebrow">Swim Private Hub &middot; Brand Guideline</div>
+      <h1>Lime Pulse</h1>
+      <p class="lede">
+        Satu sistem visual buat semua touchpoint: aplikasi, landing page, dan aset marketing.
+        Dokumen ini jadi rujukan biar warna, logo, dan tipografi gak lompat-lompat lagi
+        antar platform.
+      </p>
+      <div class="meta">
+        <div>Versi<b>1.0</b></div>
+        <div>Palette<b>Charcoal &middot; Lime &middot; Cream</b></div>
+        <div>Mark<b>Squircle &amp; Wave</b></div>
+        <div>Wordmark<b>swim.privatehub</b></div>
+      </div>
+    </header>
+
+    <section id="essence">
+      <div class="eyebrow">01 &middot; Esensi Brand</div>
+      <h2>Platform renang privat yang tenang, modern, dan bisa dipercaya</h2>
+      <p class="lede">
+        Swim Private Hub nyambungin member, coach renang privat, dan pemilik kolam dalam satu
+        marketplace. Brand-nya harus kerasa profesional (karena nyangkut uang &amp; jadwal orang)
+        tapi tetep hangat &mdash; bukan aplikasi korporat yang dingin.
+      </p>
+      <div class="trait-list">
+        <span class="trait">Tenang</span>
+        <span class="trait">Modern</span>
+        <span class="trait">Jujur &amp; transparan</span>
+        <span class="trait">Gak lebay</span>
+        <span class="trait">Fokus ke orang, bukan fitur</span>
+      </div>
+      <div class="voice-pair">
+        <div class="voice-card no">
+          <b>Hindari</b>
+          Bahasa marketing berlebihan, klaim yang gak bisa dibuktikan, testimoni/foto yang dipalsukan.
+        </div>
+        <div class="voice-card yes">
+          <b>Pegang ini</b>
+          Klaim seperlunya, foto &amp; data yang jujur (termasuk stok foto yang jelas dilabel sebagai stok), nada bicara kayak ngobrol sama teman yang ngerti renang.
+        </div>
+      </div>
+    </section>
+
+    <section id="logo">
+      <div class="eyebrow">02 &middot; Logo</div>
+      <h2>Lockup, mark, dan area amannya</h2>
+      <p class="lede">Mark (squircle + wave) dan logotype (<span class="mono">swim.privatehub</span>) bisa dipakai bareng atau sendiri-sendiri, tapi warnanya fix &mdash; gak invert ikutan background.</p>
+
+      <div class="grid cols-2">
+        <div>
+          <div class="logo-stage on-charcoal">
+            <div class="lockup">
+              <svg viewBox="0 0 100 100" width="40" height="40">
+                <defs><clipPath id="lgA"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs>
+                <rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/>
+                <g clip-path="url(#lgA)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g>
+              </svg>
+              <span class="lockup-text" style="font-size:24px; color:#F6F6EE;">swim<span style="color:#C6FF3D;">.</span>privatehub</span>
+            </div>
+          </div>
+          <div class="stage-label">Primary lockup &mdash; di atas dasar gelap</div>
+        </div>
+        <div>
+          <div class="logo-stage on-cream">
+            <div class="lockup">
+              <svg viewBox="0 0 100 100" width="40" height="40">
+                <defs><clipPath id="lgB"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs>
+                <rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/>
+                <g clip-path="url(#lgB)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g>
+              </svg>
+              <span class="lockup-text" style="font-size:24px; color:#14140F;">swim<span style="color:#6F8F1E;">.</span>privatehub</span>
+            </div>
+          </div>
+          <div class="stage-label">Primary lockup &mdash; di atas dasar terang</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;" class="grid cols-2">
+        <div class="card" style="padding:26px; text-align:center;">
+          <svg viewBox="0 0 100 100" width="72" height="72">
+            <defs><clipPath id="lgC"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs>
+            <rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/>
+            <g clip-path="url(#lgC)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g>
+          </svg>
+          <div class="stage-label" style="text-align:center; padding-top:14px;">Mark-only &mdash; favicon, app icon, nav sempit</div>
+        </div>
+        <div class="card" style="padding:26px; display:flex; align-items:center; justify-content:center;">
+          <div class="clearspace-box">
+            <svg viewBox="0 0 100 100" width="88" height="88" style="position:absolute; top:36px; left:36px;">
+              <defs><clipPath id="lgD"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs>
+              <rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/>
+              <g clip-path="url(#lgD)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g>
+            </svg>
+            <div class="unit" style="top:0; left:0; width:100%; height:36px; border-bottom:none; border-left:none; border-right:none;"></div>
+            <div class="unit" style="bottom:0; left:0; width:100%; height:36px; border-top:none; border-left:none; border-right:none;"></div>
+            <div class="unit" style="top:0; left:0; width:36px; height:100%; border-right:none; border-top:none; border-bottom:none;"></div>
+            <div class="unit" style="top:0; right:0; width:36px; height:100%; border-left:none; border-top:none; border-bottom:none;"></div>
+          </div>
+        </div>
+      </div>
+      <p class="caption-note" style="text-align:center; margin-top:-4px;">Clear space minimum: 1 unit (=1/3 lebar mark) di semua sisi. Gak boleh ada elemen lain masuk area ini.</p>
+
+      <h3 style="margin-top:34px;">Ukuran minimum</h3>
+      <div class="minsize-row">
+        <div class="minsize-item">
+          <svg viewBox="0 0 100 100" width="16" height="16"><defs><clipPath id="ms1"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#ms1)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          <span class="px">16px &mdash; favicon</span>
+        </div>
+        <div class="minsize-item">
+          <svg viewBox="0 0 100 100" width="24" height="24"><defs><clipPath id="ms2"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#ms2)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          <span class="px">24px &mdash; nav mobile</span>
+        </div>
+        <div class="minsize-item">
+          <svg viewBox="0 0 100 100" width="48" height="48"><defs><clipPath id="ms3"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#ms3)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          <span class="px">48px &mdash; lockup desktop</span>
+        </div>
+      </div>
+      <p style="margin-top:6px; font-size:13px;">Di bawah 16px, wave dalem mark udah gak kebaca &mdash; jangan dipaksa lebih kecil dari ini. Logotype penuh minimum lebar 130px biar gak numpuk.</p>
+
+      <h3 style="margin-top:34px;">Yang gak boleh dilakukan</h3>
+      <div class="dont-grid">
+        <div class="dont-card">
+          <div class="dont-stage">
+            <svg viewBox="0 0 100 100" width="60" height="40" style="transform:scaleX(1.8);"><defs><clipPath id="d1"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#d1)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          </div>
+          <div class="dont-cap"><b>Jangan</b>Stretch / distorsi rasio mark</div>
+        </div>
+        <div class="dont-card">
+          <div class="dont-stage">
+            <svg viewBox="0 0 100 100" width="48" height="48"><defs><clipPath id="d2"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#3D6BFF"/><g clip-path="url(#d2)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          </div>
+          <div class="dont-cap"><b>Jangan</b>Ganti warna di luar palette</div>
+        </div>
+        <div class="dont-card">
+          <div class="dont-stage" style="background:linear-gradient(135deg,#556,#a4d,#3a8);">
+            <svg viewBox="0 0 100 100" width="48" height="48"><defs><clipPath id="d3"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#d3)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          </div>
+          <div class="dont-cap"><b>Jangan</b>Taruh di background ramai/foto tanpa overlay</div>
+        </div>
+        <div class="dont-card">
+          <div class="dont-stage">
+            <svg viewBox="0 0 100 100" width="48" height="48" style="filter:drop-shadow(0 0 10px #C6FF3D) drop-shadow(3px 3px 0 #14140F);"><defs><clipPath id="d4"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#d4)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          </div>
+          <div class="dont-cap"><b>Jangan</b>Tambah shadow, outline, atau efek 3D</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="color">
+      <div class="eyebrow">03 &middot; Warna</div>
+      <h2>Lime Pulse palette</h2>
+      <p class="lede">Charcoal dominan, cream buat konten, lime cuma buat aksen &amp; CTA &mdash; bukan warna dasar. Warna semantik (sukses/warning/danger) tetap standar, gak ganggu identitas brand.</p>
+
+      <div class="grid cols-4">
+        <div class="swatch">
+          <div class="swatch-fill" style="background:#14140F;"></div>
+          <div class="swatch-meta">
+            <div class="name">Charcoal</div>
+            <div class="code">#14140F &middot; rgb(20,20,15)</div>
+            <div class="note">Warna dominan. Teks utama, bg gelap, header/footer.</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-fill" style="background:#C6FF3D;"></div>
+          <div class="swatch-meta">
+            <div class="name">Lime</div>
+            <div class="code">#C6FF3D &middot; rgb(198,255,61)</div>
+            <div class="note">Aksen &amp; CTA doang. Max ~10% area layar.</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-fill" style="background:#F6F6EE;"></div>
+          <div class="swatch-meta">
+            <div class="name">Cream</div>
+            <div class="code">#F6F6EE &middot; rgb(246,246,238)</div>
+            <div class="note">Background terang default, kartu, section.</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-fill" style="background:#6F8F1E;"></div>
+          <div class="swatch-meta">
+            <div class="name">Lime Dark</div>
+            <div class="code">#6F8F1E &middot; rgb(111,143,30)</div>
+            <div class="note">Lime versi AA-contrast buat teks/link di atas terang.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ratio-bar">
+        <span style="background:#14140F; flex:6; color:#F6F6EE;">60% Charcoal</span>
+        <span style="background:#F6F6EE; flex:3;">30% Cream</span>
+        <span style="background:#C6FF3D; flex:1;">10% Lime</span>
+      </div>
+
+      <h3 style="margin-top:34px;">Warna semantik (tetap, gak ikut rebrand)</h3>
+      <div class="grid cols-3" style="margin-top:14px;">
+        <div class="swatch">
+          <div class="swatch-fill" style="background:#1E8E5A;"></div>
+          <div class="swatch-meta"><div class="name">Success</div><div class="code">#1E8E5A</div><div class="note">Sesi selesai, pembayaran sukses.</div></div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-fill" style="background:#B4770E;"></div>
+          <div class="swatch-meta"><div class="name">Warning</div><div class="code">#B4770E</div><div class="note">Pending, menunggu konfirmasi.</div></div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-fill" style="background:#C23B3B;"></div>
+          <div class="swatch-meta"><div class="name">Danger</div><div class="code">#C23B3B</div><div class="note">Dibatalkan, gagal, error.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="type">
+      <div class="eyebrow">04 &middot; Tipografi</div>
+      <h2>Tiga typeface, tiga peran</h2>
+      <p class="lede">Sora buat judul &amp; wordmark (karakter, tegas), Plus Jakarta Sans buat body (gampang dibaca panjang), JetBrains Mono buat label/data/angka.</p>
+
+      <div class="grid cols-3">
+        <div class="card face-card">
+          <div class="role">Display / Heading</div>
+          <div class="fname" style="font-family:'Sora',sans-serif;">Sora</div>
+          <div class="sample-body">Booking sesi renang privat, mudah dan aman.</div>
+        </div>
+        <div class="card face-card">
+          <div class="role">Body / UI</div>
+          <div class="fname" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:800;">Jakarta Sans</div>
+          <div class="sample-body">Booking sesi renang privat, mudah dan aman.</div>
+        </div>
+        <div class="card face-card mono">
+          <div class="role">Label / Data / Mono</div>
+          <div class="fname">JetBrains Mono</div>
+          <div class="sample-body">RP 250.000 &middot; SESI #042</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:8px 24px; margin-top:20px;">
+        <div class="type-row"><span class="sample" style="font-size:34px; font-weight:800;">Display</span><span class="meta">Sora 800 &middot; 34/40 &middot; -0.02em</span></div>
+        <div class="type-row"><span class="sample" style="font-size:24px; font-weight:700;">Heading H2</span><span class="meta">Sora 700 &middot; 24/30 &middot; -0.015em</span></div>
+        <div class="type-row"><span class="sample" style="font-size:18px; font-weight:700;">Heading H3</span><span class="meta">Sora 700 &middot; 18/24</span></div>
+        <div class="type-row"><span class="sample" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:16px;">Body besar</span><span class="meta">Jakarta Sans 600 &middot; 16/26</span></div>
+        <div class="type-row"><span class="sample" style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:400; font-size:14.5px;">Body default</span><span class="meta">Jakarta Sans 400 &middot; 14.5/23</span></div>
+        <div class="type-row"><span class="sample mono" style="font-size:11px; text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">Label / Eyebrow</span><span class="meta">JetBrains Mono 600 &middot; 11/16 &middot; +0.08em</span></div>
+      </div>
+    </section>
+
+    <section id="components">
+      <div class="eyebrow">05 &middot; Komponen UI</div>
+      <h2>Tombol &amp; status pill</h2>
+      <p class="lede">Lime cuma di tombol primary/CTA utama. Status booking pakai warna semantik, bukan lime/charcoal.</p>
+
+      <div class="card">
+        <div class="comp-stage">
+          <button class="btn btn-primary">Booking Sekarang</button>
+          <button class="btn btn-ghost">Lihat Detail</button>
+          <button class="btn btn-dark">Daftar Coach</button>
+        </div>
+        <div class="comp-cap">primary (lime) &middot; ghost (outline) &middot; dark (charcoal)</div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="comp-stage">
+          <span class="pill success">Selesai</span>
+          <span class="pill warning">Menunggu Konfirmasi</span>
+          <span class="pill danger">Dibatalkan</span>
+        </div>
+        <div class="comp-cap">status pill &mdash; warna semantik tetap, gak diganti brand color</div>
+      </div>
+    </section>
+
+    <section id="icons">
+      <div class="eyebrow">06 &middot; Ikon &amp; Aset App</div>
+      <h2>Favicon, app icon, PWA</h2>
+      <p class="lede">Satu source mark, diexport ke semua ukuran. Radius ikutin skala (squircle, bukan lingkaran penuh).</p>
+      <div class="icon-row">
+        <div class="icon-item">
+          <div class="icon-tile" style="width:16px; height:16px; border-radius:5px;">
+            <svg viewBox="0 0 100 100" width="12" height="12"><defs><clipPath id="ic1"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#ic1)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          </div>
+          <span class="px mono">16 &times; 16</span>
+        </div>
+        <div class="icon-item">
+          <div class="icon-tile" style="width:32px; height:32px; border-radius:9px;">
+            <svg viewBox="0 0 100 100" width="26" height="26"><defs><clipPath id="ic2"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#ic2)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          </div>
+          <span class="px mono">32 &times; 32</span>
+        </div>
+        <div class="icon-item">
+          <div class="icon-tile" style="width:48px; height:48px; border-radius:13px;">
+            <svg viewBox="0 0 100 100" width="40" height="40"><defs><clipPath id="ic3"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#ic3)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          </div>
+          <span class="px mono">48 &times; 48</span>
+        </div>
+        <div class="icon-item">
+          <div class="icon-tile" style="width:72px; height:72px; border-radius:20px;">
+            <svg viewBox="0 0 100 100" width="60" height="60"><defs><clipPath id="ic4"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#ic4)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+          </div>
+          <span class="px mono">192 &times; 192 (PWA)</span>
+        </div>
+      </div>
+
+      <table>
+        <tr><th>File</th><th>Ukuran</th><th>Konteks</th></tr>
+        <tr><td class="mono">favicon.ico</td><td class="mono">16, 32, 48</td><td>Tab browser</td></tr>
+        <tr><td class="mono">src/app/icon.png</td><td class="mono">32 &times; 32</td><td>Next.js metadata icon</td></tr>
+        <tr><td class="mono">src/app/apple-icon.png</td><td class="mono">180 &times; 180</td><td>iOS home screen</td></tr>
+        <tr><td class="mono">public/icon-192.png</td><td class="mono">192 &times; 192</td><td>PWA manifest</td></tr>
+        <tr><td class="mono">public/icon-512.png</td><td class="mono">512 &times; 512</td><td>PWA manifest / splash</td></tr>
+        <tr><td class="mono">public/logo.png</td><td class="mono">240 &times; 64 (lockup)</td><td>Header/nav in-app</td></tr>
+      </table>
+    </section>
+
+    <section id="marketing">
+      <div class="eyebrow">07 &middot; Aset Marketing</div>
+      <h2>Social &amp; media digital</h2>
+      <p class="lede">Foto profil pakai mark doang (jelas dibaca ukuran kecil), banner pakai lockup penuh + satu baris tagline jujur.</p>
+
+      <div class="grid cols-2">
+        <div>
+          <div class="card" style="padding:26px; display:flex; align-items:center; justify-content:center; background:var(--charcoal);">
+            <div class="profile-mock">
+              <svg viewBox="0 0 100 100" width="150" height="150">
+                <defs><clipPath id="pfclip"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs>
+                <rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/>
+                <g clip-path="url(#pfclip)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g>
+              </svg>
+            </div>
+          </div>
+          <div class="stage-label">Foto profil (Instagram/WA Business) &mdash; 500 &times; 500, crop mark rapat</div>
+        </div>
+        <div>
+          <div class="banner-mock">
+            <div class="lockup">
+              <svg viewBox="0 0 100 100" width="32" height="32"><defs><clipPath id="bn1"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#bn1)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+              <span class="lockup-text" style="font-size:19px; color:#F6F6EE;">swim<span style="color:#C6FF3D;">.</span>privatehub</span>
+            </div>
+            <div class="tag">Renang privat, coach terverifikasi, jadwal fleksibel.</div>
+          </div>
+          <div class="stage-label">Cover/banner (LinkedIn 1584&times;396, Twitter 1500&times;500)</div>
+        </div>
+      </div>
+      <p class="caption-note">Tagline di aset marketing harus konsisten sama copy landing page &mdash; jangan bikin klaim baru yang gak ada di produk.</p>
+    </section>
+
+    <section id="voice">
+      <div class="eyebrow">08 &middot; Voice &amp; Tone</div>
+      <h2>Ngobrol kayak coach yang lu percaya, bukan sales</h2>
+      <p class="lede">Semua copy in-app &amp; marketing pakai Bahasa Indonesia, nada santai-profesional. Aktif, jelas, gak muter-muter.</p>
+      <div class="voice-pair">
+        <div class="voice-card no">
+          <b>Hindari</b>
+          "Nikmati pengalaman renang terbaik sepanjang masa bersama kami!"
+        </div>
+        <div class="voice-card yes">
+          <b>Pegang ini</b>
+          "Booking sesi sama coach yang cocok, lihat jadwalnya langsung."
+        </div>
+      </div>
+      <div class="voice-pair">
+        <div class="voice-card no">
+          <b>Hindari</b>
+          Error message: "Terjadi kesalahan. Mohon coba lagi."
+        </div>
+        <div class="voice-card yes">
+          <b>Pegang ini</b>
+          "Jadwal ini udah kepesan orang lain. Pilih slot lain, ya."
+        </div>
+      </div>
+    </section>
+
+    <section id="checklist">
+      <div class="eyebrow">09 &middot; Checklist Produksi Aset</div>
+      <h2>Status file yang perlu dibuat</h2>
+      <p class="lede">Semua aset di bawah udah diproduksi. In-app assets diroll-out ke kode &amp; dicek langsung di browser (light+dark); aset marketing di-generate sebagai file lepas (gak nempel ke deploy kode).</p>
+      <table>
+        <tr><th>Aset</th><th>Ukuran</th><th>Status</th></tr>
+        <tr><td>favicon.ico</td><td class="mono">16/32/48</td><td><span class="status done">Selesai</span></td></tr>
+        <tr><td>App icon (Next.js)</td><td class="mono">32, 180</td><td><span class="status done">Selesai</span></td></tr>
+        <tr><td>PWA icon</td><td class="mono">192, 512</td><td><span class="status done">Selesai</span></td></tr>
+        <tr><td>Logo in-app (header/nav)</td><td class="mono">lockup + mark-only</td><td><span class="status done">Selesai</span></td></tr>
+        <tr><td>CSS token warna</td><td class="mono">globals.css</td><td><span class="status done">Selesai</span></td></tr>
+        <tr><td>Landing page recolor</td><td class="mono">hero, CTA, badge</td><td><span class="status done">Selesai</span></td></tr>
+        <tr><td>Foto profil social</td><td class="mono">500&times;500</td><td><span class="status done">Selesai</span></td></tr>
+        <tr><td>Banner social</td><td class="mono">1584&times;396 &amp; 1500&times;500</td><td><span class="status done">Selesai</span></td></tr>
+      </table>
+      <p class="caption-note">Wordmark di banner pake fallback Helvetica/Arial bold (bukan Sora asli) &mdash; file font Sora gak ada di mesin buat render raster.</p>
+    </section>
+
+    <footer class="doc-end">Swim Private Hub &middot; Brand Guideline v1.0 &middot; dokumen hidup, update tiap ada perubahan identitas.</footer>
+  </main>
+</div>
+
+</body></html>

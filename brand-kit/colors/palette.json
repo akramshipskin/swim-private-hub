@@ -1,0 +1,52 @@
+{
+  "brand": {
+    "charcoal": {
+      "hex": "#14140F",
+      "rgb": [
+        20,
+        20,
+        15
+      ],
+      "use": "Warna dominan: teks utama, latar gelap, header/footer (~60%)"
+    },
+    "cream": {
+      "hex": "#F6F6EE",
+      "rgb": [
+        246,
+        246,
+        238
+      ],
+      "use": "Latar terang, kartu, section (~30%)"
+    },
+    "lime": {
+      "hex": "#C6FF3D",
+      "rgb": [
+        198,
+        255,
+        61
+      ],
+      "use": "Aksen & CTA saja (maks ~10% layar)"
+    },
+    "limeDark": {
+      "hex": "#6F8F1E",
+      "rgb": [
+        111,
+        143,
+        30
+      ],
+      "use": "Versi lime kontras AA untuk teks/link di latar terang"
+    }
+  },
+  "semantic": {
+    "success": "#1E8E5A",
+    "warning": "#B4770E",
+    "danger": "#C23B3B",
+    "info": "#3D6BFF"
+  },
+  "neutral": {
+    "textMuted": "#5C5945",
+    "textSubtle": "#8B8770",
+    "border": "#DEDACA",
+    "surfaceMuted": "#ECE9DC"
+  }
+}

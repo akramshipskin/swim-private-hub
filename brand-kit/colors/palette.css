@@ -1,0 +1,14 @@
+:root {
+  --brand-charcoal: #14140F;
+  --brand-cream: #F6F6EE;
+  --brand-lime: #C6FF3D;
+  --brand-limeDark: #6F8F1E;
+  --success: #1E8E5A;
+  --warning: #B4770E;
+  --danger: #C23B3B;
+  --info: #3D6BFF;
+  --textMuted: #5C5945;
+  --textSubtle: #8B8770;
+  --border: #DEDACA;
+  --surfaceMuted: #ECE9DC;
+}
