@@ -149,6 +149,11 @@ model ChatMessage {
   @@index([threadId, createdAt])
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 enum CertificateStatus {
   NONE
   PENDING
@@ -177,6 +182,11 @@ model CoachProfile {
   photoUrl          String?
   certificateUrl    String?
   certificateStatus CertificateStatus @default(NONE)
+  // Tanggal lahir & jenis kelamin coach -- orang tua sering memilih coach
+  // berdasarkan dua hal ini. Umur dihitung dari birthDate (jangan simpan
+  // umur sebagai angka: basi tiap tahun).
+  birthDate         DateTime?
+  gender            Gender?
   // Saldo coach ini dari bagian per-sesi (Pool.coachSharePercent),
   // dikredit pas booking ditandai Hadir. Lihat Pool.walletBalance buat
   // catatan yang sama soal cache-vs-ledger.
@@ -416,6 +426,9 @@ model Pool {
   // pemilik kolam atau admin, tampil di landing, booking, halaman coach.
   description        String?
   facilities         String[] @default([])
+  // Foto fasilitas kolam (URL publik Supabase Storage), diunggah pemilik
+  // kolam/admin. Urutan array = urutan tampil; foto pertama jadi sampul.
+  photos             String[] @default([])
   // Persentase komisi platform, di-set platform (bukan per-coach),
   // provisional 15% (lihat Open Questions di design doc). Config value,
   // bukan struktural -- boleh diubah tanpa migrasi.

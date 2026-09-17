@@ -2,13 +2,15 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
 import PoolInfoForm from "@/components/pool-info-form";
+import { PoolPhotosForm } from "@/components/pool-photos-form";
+import { isStorageConfigured } from "@/lib/storage";
 
 export default async function PoolInfoPage() {
   const session = await requireRole("POOL_OWNER");
   const pools = await prisma.pool.findMany({
     where: { ownerships: { some: { ownerId: session.user.id } } },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, description: true, address: true, contactPhone: true, openTime: true, closeTime: true, facilities: true },
+    select: { id: true, name: true, description: true, address: true, contactPhone: true, openTime: true, closeTime: true, facilities: true, photos: true },
   });
 
   return (
@@ -26,6 +28,10 @@ export default async function PoolInfoPage() {
               <CardBody>
                 <h2 className="mb-4 text-lg font-semibold text-text">{p.name}</h2>
                 <PoolInfoForm pool={p} />
+                <div className="mt-6 border-t border-border pt-4">
+                  <h3 className="mb-2 text-base font-semibold text-text">Foto kolam &amp; fasilitas</h3>
+                  <PoolPhotosForm poolId={p.id} photos={p.photos} storageReady={isStorageConfigured()} />
+                </div>
               </CardBody>
             </Card>
           ))}

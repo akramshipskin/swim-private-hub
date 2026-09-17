@@ -7,6 +7,8 @@ import PoolShareForm from "./pool-share-form";
 import AffiliateCoachForm from "./affiliate-coach-form";
 import PoolActiveToggle from "./pool-active-toggle";
 import PoolInfoForm from "@/components/pool-info-form";
+import { PoolPhotosForm } from "@/components/pool-photos-form";
+import { isStorageConfigured } from "@/lib/storage";
 
 export default async function AdminKolamPage() {
   await requireRole("ADMIN");
@@ -27,6 +29,7 @@ export default async function AdminKolamPage() {
         openTime: true,
         closeTime: true,
         facilities: true,
+        photos: true,
         ownerships: {
           select: { owner: { select: { name: true, phone: true } } },
           orderBy: { createdAt: "asc" },
@@ -36,7 +39,7 @@ export default async function AdminKolamPage() {
           select: { id: true, name: true, price: true, totalSesi: true, durationDays: true, isActive: true },
         },
         affiliations: {
-          select: { id: true, coachId: true, coach: { select: { name: true } } },
+          select: { id: true, coachId: true, coach: { select: { name: true, coachProfile: { select: { photoUrl: true } } } } },
           orderBy: { coach: { name: "asc" } },
         },
       },
@@ -149,7 +152,7 @@ export default async function AdminKolamPage() {
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-semibold text-text">Pembagian per sesi</p>
+                  <p className="mb-2 text-sm font-semibold text-text">Pembagian komisi</p>
                 <PoolShareForm
                   poolId={p.id}
                   commissionPercent={p.commissionPercent}
@@ -160,8 +163,12 @@ export default async function AdminKolamPage() {
                   <summary className="cursor-pointer text-sm font-medium text-text">
                     Info &amp; fasilitas kolam ({p.facilities.length} fasilitas)
                   </summary>
-                  <div className="mt-3">
+                  <div className="mt-3 flex flex-col gap-6">
                     <PoolInfoForm pool={p} />
+                    <div className="border-t border-border pt-4">
+                      <h4 className="mb-2 text-sm font-semibold text-text">Foto kolam &amp; fasilitas</h4>
+                      <PoolPhotosForm poolId={p.id} photos={p.photos} storageReady={isStorageConfigured()} />
+                    </div>
                   </div>
                 </details>
                 <AffiliateCoachForm
@@ -171,6 +178,7 @@ export default async function AdminKolamPage() {
                     id: a.id,
                     coachId: a.coachId,
                     coachName: a.coach.name,
+                    photoUrl: a.coach.coachProfile?.photoUrl ?? null,
                   }))}
                 />
               </CardBody>

@@ -4,10 +4,10 @@ import { useActionState } from "react";
 import { affiliateCoach, removeAffiliation } from "./actions";
 import { Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
 
 type Coach = { id: string; name: string };
-type Affiliation = { id: string; coachId: string; coachName: string };
+type Affiliation = { id: string; coachId: string; coachName: string; photoUrl: string | null };
 
 export default function AffiliateCoachForm({
   poolId,
@@ -25,19 +25,22 @@ export default function AffiliateCoachForm({
   return (
     <div className="mt-2 flex flex-col gap-2">
       <p className="text-xs font-medium text-text-muted">Coach terafiliasi</p>
-      <div className="flex flex-wrap gap-1.5">
-        {affiliations.length === 0 && (
-          <span className="text-xs text-text-subtle">Belum ada coach.</span>
-        )}
+      <div className="flex flex-wrap gap-2">
+        {affiliations.length === 0 && <span className="text-xs text-text-subtle">Belum ada coach.</span>}
         {affiliations.map((a) => (
           <form key={a.id} action={removeAffiliation}>
             <input type="hidden" name="affiliationId" value={a.id} />
-            <button type="submit" className="group">
-              <Badge tone="neutral">
-                {a.coachName}
-                <span className="ml-1 text-text-subtle group-hover:text-danger-text">×</span>
-              </Badge>
-            </button>
+            <div className="flex items-center gap-2 rounded-full border border-border bg-surface py-1 pr-2 pl-1">
+              <Avatar src={a.photoUrl} className="h-7 w-7" />
+              <span className="text-sm text-text">{a.coachName}</span>
+              <button
+                type="submit"
+                aria-label={`Lepas ${a.coachName} dari kolam ini`}
+                className="rounded-full px-1.5 text-text-subtle hover:bg-danger-bg hover:text-danger-text"
+              >
+                ×
+              </button>
+            </div>
           </form>
         ))}
       </div>

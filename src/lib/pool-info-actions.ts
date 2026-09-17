@@ -4,8 +4,22 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
+import { PHOTO_BUCKET, extensionFor, isStorageConfigured, publicObjectUrl, uploadObject, validateUpload } from "@/lib/storage";
 
 export type PoolInfoState = { error?: string; ok?: boolean } | null;
+
+const MAX_POOL_PHOTOS = 6;
+
+// Hak akses info kolam: admin, atau pemilik kolam itu sendiri.
+async function canEditPool(poolId: string) {
+  const session = await auth();
+  if (!session) return { error: "Sesi habis, silakan masuk lagi." as const };
+  const allowed =
+    session.user.role === "ADMIN" ||
+    (session.user.role === "POOL_OWNER" &&
+      (await prisma.poolOwnership.count({ where: { poolId, ownerId: session.user.id } })) > 0);
+  return allowed ? { ok: true as const } : { error: "Kamu tidak punya akses ke kolam ini." as const };
+}
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -15,11 +29,8 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
   if (!session) return { error: "Sesi habis, silakan masuk lagi." };
   const poolId = formData.get("poolId")?.toString() ?? "";
 
-  const allowed =
-    session.user.role === "ADMIN" ||
-    (session.user.role === "POOL_OWNER" &&
-      (await prisma.poolOwnership.count({ where: { poolId, ownerId: session.user.id } })) > 0);
-  if (!allowed) return { error: "Kamu tidak punya akses ke kolam ini." };
+  const access = await canEditPool(poolId);
+  if ("error" in access) return access;
 
   const str = (k: string) => formData.get(k)?.toString().trim() ?? "";
   const description = str("description");
@@ -56,6 +67,53 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
     },
   });
   if (updated.count === 0) return { error: "Kolam tidak ditemukan." };
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+// Foto fasilitas kolam. Disimpan di bucket publik yang sama dengan foto coach
+// (prefix pools/) supaya tidak perlu bucket Supabase baru.
+export async function uploadPoolPhoto(_prev: PoolInfoState, formData: FormData): Promise<PoolInfoState> {
+  const poolId = formData.get("poolId")?.toString() ?? "";
+  const access = await canEditPool(poolId);
+  if ("error" in access) return access;
+  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
+
+  const file = formData.get("photo") as File | null;
+  const invalid = validateUpload(file, "photo");
+  if (invalid) return { error: invalid };
+
+  const pool = await prisma.pool.findUnique({ where: { id: poolId }, select: { photos: true } });
+  if (!pool) return { error: "Kolam tidak ditemukan." };
+  if (pool.photos.length >= MAX_POOL_PHOTOS) return { error: `Maksimal ${MAX_POOL_PHOTOS} foto per kolam.` };
+
+  const path = `pools/${poolId}/${Date.now()}.${extensionFor(file!)}`;
+  try {
+    await uploadObject(PHOTO_BUCKET, path, file!);
+  } catch {
+    return { error: "Upload foto gagal, coba lagi." };
+  }
+  await prisma.pool.update({
+    where: { id: poolId },
+    data: { photos: [...pool.photos, publicObjectUrl(PHOTO_BUCKET, path)] },
+  });
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+export async function deletePoolPhoto(_prev: PoolInfoState, formData: FormData): Promise<PoolInfoState> {
+  const poolId = formData.get("poolId")?.toString() ?? "";
+  const url = formData.get("url")?.toString() ?? "";
+  const access = await canEditPool(poolId);
+  if ("error" in access) return access;
+
+  const pool = await prisma.pool.findUnique({ where: { id: poolId }, select: { photos: true } });
+  if (!pool) return { error: "Kolam tidak ditemukan." };
+  // Baris DB saja yang dihapus; file di storage dibiarkan (hemat, dan tidak
+  // ada risiko menghapus file yang ternyata masih dipakai kolam lain).
+  await prisma.pool.update({ where: { id: poolId }, data: { photos: pool.photos.filter((p) => p !== url) } });
 
   revalidatePath("/", "layout");
   return { ok: true };

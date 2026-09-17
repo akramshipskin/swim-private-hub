@@ -136,17 +136,21 @@ export default function BookingOverviewBoard({
           const allSlots = [...group.byDate.values()].flat();
           const filledCount = allSlots.filter((a) => a.bookings.length > 0).length;
           return (
-            <section key={coachId} className="mb-8">
-              <h2 className="mb-3 text-xl font-semibold text-text">
-                {group.coachName} <span className="text-sm font-normal text-text-muted">({filledCount}/{allSlots.length} terisi)</span>
+            <section key={coachId} className="mb-8 overflow-hidden rounded-2xl border border-border bg-surface">
+              <h2 className="flex flex-wrap items-center gap-2 border-b border-border bg-surface-muted px-4 py-3 text-lg font-semibold text-text">
+                {group.coachName}
+                <span className="text-sm font-normal text-text-muted">
+                  {filledCount}/{allSlots.length} terisi
+                </span>
               </h2>
+              <div className="p-4">
               {[...group.byDate.keys()].sort().map((dKey) => {
                 const rows = group.byDate.get(dKey)!;
                 return (
                   <div key={dKey} className="mb-4">
-                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-l-4 border-brand-500 pl-3">
                       <h3 className="text-base font-semibold text-text">{formatDateLabel(rows[0].date)}</h3>
-                      {dKey >= todayKey && (
+                      {dKey >= todayKey && rows.some((r) => r.startTime > now) && (
                         <a
                           href={buildKabarinWaLink(group.coachName, formatDateLabel(rows[0].date))}
                           target="_blank"
@@ -162,8 +166,10 @@ export default function BookingOverviewBoard({
                     </div>
                     {[...new Set(rows.map((r) => r.pool.name))].map((poolName) => (
                       <div key={poolName} className="mb-3">
-                        <p className="mb-1.5 text-sm font-semibold text-brand-700">{poolName}</p>
-                        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                        <p className="mb-1.5 inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold tracking-wide text-brand-700 uppercase">
+                          {poolName}
+                        </p>
+                        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
                           {rows
                             .filter((r) => r.pool.name === poolName)
                             .map((a) => {
@@ -179,7 +185,7 @@ export default function BookingOverviewBoard({
                                       {booking ? (
                                         <>
                                           <p className="text-sm text-text">Peserta: {booking.package.dependent.isSelf ? booking.member.name : booking.package.dependent.name}</p>
-                                          <p className="truncate text-sm text-text-muted">Akun: {booking.member.name}{booking.member.email ? ` · ${booking.member.email}` : ""}</p>
+                                          <p className="truncate text-sm text-text-muted">Member: {booking.member.name}</p>
                                         </>
                                       ) : (
                                         <p className="text-sm text-text-subtle">Belum ada yang booking</p>
@@ -209,6 +215,7 @@ export default function BookingOverviewBoard({
                   </div>
                 );
               })}
+              </div>
             </section>
           );
         })

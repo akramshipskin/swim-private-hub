@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
+import { coachBioLine } from "@/lib/coach-bio";
 
 // Browse coach lintas-kolam -- fitur ini SENGAJA di luar scope Phase 1
 // (docs/designs/marketplace-pivot.md, "NOT in scope": "Cross-pool coach
@@ -25,7 +26,7 @@ export default async function CariCoachPage() {
       id: true,
       name: true,
       coachProfile: {
-        select: { bio: true, specialties: true, certificationNote: true, certificateStatus: true, photoUrl: true },
+        select: { bio: true, specialties: true, certificationNote: true, certificateStatus: true, photoUrl: true, birthDate: true, gender: true },
       },
       poolAffiliations: {
         select: { pool: { select: { id: true, name: true, address: true } } },
@@ -60,6 +61,9 @@ export default async function CariCoachPage() {
                       </Badge>
                     )}
                   </div>
+                  {coachBioLine(coach.coachProfile) && (
+                    <p className="mt-0.5 text-xs text-text-subtle">{coachBioLine(coach.coachProfile)}</p>
+                  )}
                   {coach.coachProfile?.bio && <p className="mt-1 line-clamp-2 text-sm text-text-muted">{coach.coachProfile.bio}</p>}
                   {coach.coachProfile && coach.coachProfile.specialties.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5">

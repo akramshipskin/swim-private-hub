@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties";
 import { isStorageConfigured, validateUpload, extensionFor, uploadObject, publicObjectUrl, PHOTO_BUCKET, CERT_BUCKET } from "@/lib/storage";
+import { ageFromBirthDate } from "@/lib/coach-bio";
 
 export type ActionState = { error?: string; success?: boolean } | null;
 
@@ -138,11 +139,27 @@ export async function updateCoachProfile(
     return { error: "Bio maksimal 500 karakter." };
   }
 
+  const birthDateRaw = formData.get("birthDate")?.toString().trim() ?? "";
+  let birthDate: Date | null = null;
+  if (birthDateRaw) {
+    const parsed = new Date(`${birthDateRaw}T00:00:00+07:00`);
+    if (Number.isNaN(parsed.getTime())) return { error: "Tanggal lahir tidak valid." };
+    const age = ageFromBirthDate(parsed);
+    if (age === null || age < 17 || age > 80) return { error: "Tanggal lahir tidak masuk akal (umur 17-80 tahun)." };
+    birthDate = parsed;
+  }
+
+  const genderRaw = formData.get("gender")?.toString() ?? "";
+  if (genderRaw && genderRaw !== "MALE" && genderRaw !== "FEMALE") return { error: "Jenis kelamin tidak valid." };
+  const gender = genderRaw ? (genderRaw as "MALE" | "FEMALE") : null;
+
   const updated = await prisma.coachProfile.updateMany({
     where: { userId: session.user.id },
     data: {
       bio: bio || null,
       specialties,
+      birthDate,
+      gender,
     },
   });
   if (updated.count === 0) return { error: "Profil coach tidak ditemukan. Hubungi admin." };

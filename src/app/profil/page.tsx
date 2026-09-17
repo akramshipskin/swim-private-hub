@@ -36,7 +36,7 @@ export default async function ProfilPage() {
     session.user.role === "COACH"
       ? await prisma.coachProfile.findUnique({
           where: { userId: session.user.id },
-          select: { bio: true, specialties: true, certificationNote: true, photoUrl: true, certificateStatus: true },
+          select: { bio: true, specialties: true, certificationNote: true, photoUrl: true, certificateStatus: true, birthDate: true, gender: true },
         })
       : null;
 

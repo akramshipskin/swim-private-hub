@@ -50,7 +50,47 @@ describe("updateCoachProfile", () => {
     expect(res).toEqual({ success: true });
     expect(coachProfileUpdateMany).toHaveBeenCalledWith({
       where: { userId: "coach-1" },
-      data: { bio: "Mengajar 5 tahun", specialties: ["Gaya bebas"] },
+      data: { bio: "Mengajar 5 tahun", specialties: ["Gaya bebas"], birthDate: null, gender: null },
     });
+  });
+
+  it("menyimpan tanggal lahir & jenis kelamin, dan menolak umur tidak masuk akal", async () => {
+    const ok = await updateCoachProfile(
+      null,
+      fd([
+        ["bio", ""],
+        ["specialties", "Gaya bebas"],
+        ["birthDate", "1996-04-12"],
+        ["gender", "FEMALE"],
+      ])
+    );
+    expect(ok).toEqual({ success: true });
+    expect(coachProfileUpdateMany).toHaveBeenCalledWith({
+      where: { userId: "coach-1" },
+      data: {
+        bio: null,
+        specialties: ["Gaya bebas"],
+        birthDate: new Date("1996-04-12T00:00:00+07:00"),
+        gender: "FEMALE",
+      },
+    });
+
+    const tooYoung = await updateCoachProfile(
+      null,
+      fd([
+        ["specialties", "Gaya bebas"],
+        ["birthDate", "2020-01-01"],
+      ])
+    );
+    expect(tooYoung).toEqual({ error: "Tanggal lahir tidak masuk akal (umur 17-80 tahun)." });
+
+    const badGender = await updateCoachProfile(
+      null,
+      fd([
+        ["specialties", "Gaya bebas"],
+        ["gender", "LAINNYA"],
+      ])
+    );
+    expect(badGender).toEqual({ error: "Jenis kelamin tidak valid." });
   });
 });

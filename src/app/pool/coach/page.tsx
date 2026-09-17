@@ -4,6 +4,7 @@ import { todayWibDateString, wibDateTime } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
+import { coachBioLine } from "@/lib/coach-bio";
 
 export default async function PoolCoachPage() {
   const session = await requireRole("POOL_OWNER");
@@ -24,7 +25,7 @@ export default async function PoolCoachPage() {
               id: true,
               name: true,
               phone: true,
-              coachProfile: { select: { photoUrl: true, specialties: true, certificateStatus: true, certificationNote: true } },
+              coachProfile: { select: { photoUrl: true, specialties: true, certificateStatus: true, certificationNote: true, birthDate: true, gender: true } },
               availabilities: {
                 select: { status: true, startTime: true, poolId: true, bookings: { where: { attended: true }, select: { id: true } } },
                 where: { startTime: { gte: startMonth } },
@@ -61,6 +62,9 @@ export default async function PoolCoachPage() {
                           <p className="text-base font-semibold text-text">{coach.name}</p>
                           {coach.coachProfile?.certificateStatus === "APPROVED" && <Badge tone="success">Bersertifikat</Badge>}
                         </div>
+                        {coachBioLine(coach.coachProfile) && (
+                          <p className="text-xs text-text-subtle">{coachBioLine(coach.coachProfile)}</p>
+                        )}
                         <p className="text-sm text-text-muted">
                           {coach.coachProfile?.specialties.join(", ") || "Keahlian belum diisi"}
                         </p>

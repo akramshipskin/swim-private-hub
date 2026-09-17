@@ -3,14 +3,20 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { updateCoachProfile } from "./actions";
 import { Button } from "@/components/ui/button";
-import { Field, Textarea } from "@/components/ui/input";
+import { Field, Select, Textarea } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
+
+// <input type="date"> & DatePicker pakai format YYYY-MM-DD di zona WIB.
+function toDateInput(d: Date) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(d);
+}
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 import { useEditLock } from "@/hooks/use-edit-lock";
 
 export default function EditCoachProfileForm({
   profile,
 }: {
-  profile: { bio: string | null; specialties: string[] };
+  profile: { bio: string | null; specialties: string[]; birthDate: Date | null; gender: "MALE" | "FEMALE" | null };
 }) {
   const [state, formAction, pending] = useActionState(updateCoachProfile, null);
   const [savedAt, setSavedAt] = useState(0);
@@ -27,6 +33,23 @@ export default function EditCoachProfileForm({
   return (
     <form key={edit.formKey} action={formAction} className="flex flex-col gap-4">
       <fieldset disabled={edit.locked} className="flex flex-col gap-4 disabled:opacity-90">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Field label="Tanggal lahir">
+          <DatePicker name="birthDate" defaultValue={profile.birthDate ? toDateInput(profile.birthDate) : ""} clearable />
+        </Field>
+        <Field label="Jenis kelamin">
+          <Select name="gender" defaultValue={profile.gender ?? ""}>
+            <option value="">Belum diisi</option>
+            <option value="MALE">Laki-laki</option>
+            <option value="FEMALE">Perempuan</option>
+          </Select>
+        </Field>
+      </div>
+      <p className="-mt-2 text-xs text-text-subtle">
+        Umur dihitung otomatis dari tanggal lahir dan tampil di profil publik kamu, bersama jenis kelamin. Orang tua
+        sering memilih coach berdasarkan dua hal ini.
+      </p>
+
       <Field label="Bio singkat (opsional)">
         <Textarea
           name="bio"

@@ -94,8 +94,14 @@ export default async function KomisiPage() {
         Sesi yang belum ditandai belum dihitung. Nilai sesi = harga paket ÷ jumlah sesi.
       </p>
       <Card className="mt-4">
-        <CardBody className="flex items-center justify-between">
+        <CardBody className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-semibold text-text">Total komisi platform (semua kolam)</p>
+          <Link
+            href="/admin/withdrawals"
+            className="order-3 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:opacity-90 sm:order-none"
+          >
+            Cairkan saldo →
+          </Link>
           <p className="text-right text-xl font-bold text-text">
             {formatRupiah(totalPlatform)}
             <span className="block text-sm font-normal text-text-muted">

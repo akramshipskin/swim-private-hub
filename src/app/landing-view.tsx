@@ -31,6 +31,7 @@ type LandingCoach = {
   photoUrl: string | null;
   certified: boolean;
   certificationNote: string | null;
+  bioLine: string | null;
   pools: string[];
 };
 

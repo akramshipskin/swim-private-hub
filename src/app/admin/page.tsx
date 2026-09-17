@@ -28,6 +28,7 @@ export default async function AdminDashboardPage() {
     activeCoaches,
     pools,
     activePackages,
+    activeDependents,
     waitingChats,
     pendingWithdrawals,
     pendingCerts,
@@ -55,6 +56,7 @@ export default async function AdminDashboardPage() {
     prisma.user.count({ where: { role: "COACH", isActive: true } }),
     prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, isActive: true, walletBalance: true } }),
     prisma.package.count({ where: usablePackageConditions() }),
+    prisma.dependent.count({ where: { isActive: true, packages: { some: usablePackageConditions() } } }),
     prisma.chatThread.count({ where: { needsAdmin: true } }),
     prisma.withdrawalRequest.aggregate({ where: { status: { in: ["PENDING", "PROCESSING"] } }, _count: true, _sum: { amount: true } }),
     prisma.coachProfile.count({ where: { certificateStatus: "PENDING" } }),
@@ -82,6 +84,10 @@ export default async function AdminDashboardPage() {
   const tomorrowItems = bookings.filter((b) => b.availability.date.getTime() === tomorrow.getTime()).map(toItem);
   const activePools = pools.filter((p) => p.isActive);
   const poolWalletTotal = pools.reduce((sum, p) => sum + p.walletBalance, 0);
+  // "Saldo mengendap" = semua uang yang sudah masuk sistem tapi belum ditarik
+  // siapa pun: bagian kolam + bagian coach + pendapatan & pajak platform.
+  const totalHeldBalance =
+    poolWalletTotal + (coachWallets._sum.walletBalance ?? 0) + platformBalance.revenue + platformBalance.tax;
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -95,6 +101,11 @@ export default async function AdminDashboardPage() {
             <Stat label="Sesi besok" value={tomorrowItems.length} />
             <Stat label="Uang masuk hari ini" value={formatRupiah(paidToday._sum.amount ?? 0)} hint={`${paidToday._count} transaksi`} />
             <Stat label="Uang masuk bulan ini" value={formatRupiah(paidMonth._sum.amount ?? 0)} hint={`${paidMonth._count} transaksi`} />
+            <Stat
+              label="Saldo mengendap"
+              value={formatRupiah(totalHeldBalance)}
+              hint="Kolam + coach + platform, belum dicairkan"
+            />
           </div>
         </BentoCard>
 
@@ -134,7 +145,7 @@ export default async function AdminDashboardPage() {
         <BentoCard title="Pengguna" href="/admin/users" className="md:col-span-3">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Member punya paket aktif" value={activeMembers} hint={`dari ${totalMembers} member`} />
-            <Stat label="Paket aktif" value={activePackages} />
+            <Stat label="Peserta sedang les" value={activeDependents} hint={`${activePackages} paket aktif`} />
             <Stat label="Coach aktif" value={activeCoaches} />
             <Stat label="Kolam aktif" value={activePools.length} />
           </div>
@@ -147,7 +158,7 @@ export default async function AdminDashboardPage() {
           </div>
         </BentoCard>
 
-        <BentoCard title="Per kolam" href="/admin/kolam" className="md:col-span-6">
+        <BentoCard title="Ringkasan tiap kolam" href="/admin/kolam" className="md:col-span-6">
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {pools.map((p) => (
               <li key={p.id} className="rounded-lg border border-border px-3 py-2">

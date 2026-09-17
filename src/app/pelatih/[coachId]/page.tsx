@@ -12,6 +12,7 @@ import { Logotype } from "@/components/ui/logotype";
 import { NavBar } from "@/components/nav-bar";
 import BackButton from "./back-button";
 import { Avatar } from "@/components/ui/avatar";
+import { coachBioLine } from "@/lib/coach-bio";
 
 // Coach shortcut page (pool-first browse + cheap cross-pool discovery,
 // locked /plan-eng-review 2026-09-12, cross-model tension #4): pool-first
@@ -37,7 +38,7 @@ export default async function CoachShortcutPage({
       id: true,
       name: true,
       coachProfile: {
-        select: { bio: true, specialties: true, certificationNote: true, certificateStatus: true, certificateUrl: true, photoUrl: true },
+        select: { bio: true, specialties: true, certificationNote: true, certificateStatus: true, certificateUrl: true, photoUrl: true, birthDate: true, gender: true },
       },
       poolAffiliations: {
         select: {
@@ -67,7 +68,7 @@ export default async function CoachShortcutPage({
         <Avatar src={profile?.photoUrl} alt={`Foto ${coach.name}`} className="h-20 w-20" />
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
-          <p className="text-sm text-text-muted">Coach renang privat</p>
+          <p className="text-sm text-text-muted">{coachBioLine(profile) ?? "Coach renang privat"}</p>
         </div>
       </div>
 
