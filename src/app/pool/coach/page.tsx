@@ -70,7 +70,8 @@ export default async function PoolCoachPage() {
                         </p>
                         {coach.phone && <p className="text-sm text-text-muted">No HP: {coach.phone}</p>}
                         <p className="mt-2 text-sm text-text">
-                          Bulan ini di kolam ini: <b>{attended}</b> sesi hadir · {upcomingBooked} sesi terjadwal · {upcomingOpen} slot kosong
+                          Bulan ini di kolammu: <b>{attended}</b> sesi sudah mengajar · {upcomingBooked} sesi akan datang ·{" "}
+                          {upcomingOpen} slot masih kosong
                         </p>
                       </div>
                     </CardBody>

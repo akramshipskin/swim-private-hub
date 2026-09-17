@@ -116,7 +116,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                       · {dayAvailabilities.filter((a) => a.pool.name === poolName).length} slot
                     </span>
                   </h3>
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {dayAvailabilities
                       .filter((a) => a.pool.name === poolName)
                       .map((a) => (

@@ -50,69 +50,77 @@ export default async function ProfilPage() {
       <main className="w-full px-4 pb-16 py-6 sm:pb-8 sm:py-8">
         <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Edit Profil</h1>
 
+        {/* Dua kolom eksplisit (bukan grid auto): kartu "Nama" pendek, jadi
+            kalau pakai grid biasa muncul lubang besar di bawahnya sebelum
+            kartu berikutnya (Hadi 18 Sep). */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
-        <Card>
-          <CardBody>
-            <h2 className="mb-3 text-lg font-semibold text-text">Nama</h2>
-            <EditNameForm
-              currentName={session.user.name ?? ""}
-              label={session.user.role === "MEMBER" ? "Nama/Orang Tua" : "Nama Lengkap"}
-            />
-          </CardBody>
-        </Card>
+          <div className="flex flex-col gap-4">
+            <Card>
+              <CardBody>
+                <h2 className="mb-3 text-lg font-semibold text-text">Nama</h2>
+                <EditNameForm
+                  currentName={session.user.name ?? ""}
+                  label={session.user.role === "MEMBER" ? "Nama/Orang Tua" : "Nama Lengkap"}
+                />
+              </CardBody>
+            </Card>
 
-        {coachProfile && (
-          <Card>
-            <CardBody>
-              <h2 className="mb-1 text-lg font-semibold text-text">Profil Coach</h2>
-              <p className="mb-3 text-sm text-text-muted">
-                Ditampilkan ke orang tua di halaman profil publik kamu.
+            {coachProfile && (
+              <Card>
+                <CardBody>
+                  <h2 className="mb-3 text-lg font-semibold text-text">Foto &amp; Sertifikat</h2>
+                  <CoachMediaForm
+                    photoUrl={coachProfile.photoUrl}
+                    certificateStatus={coachProfile.certificateStatus}
+                    certificationNote={coachProfile.certificationNote}
+                    storageReady={isStorageConfigured()}
+                  />
+                </CardBody>
+              </Card>
+            )}
+
+            <Card>
+              <CardBody>
+                <h2 className="mb-3 text-lg font-semibold text-text">Ganti Password</h2>
+                <EditPasswordForm />
+              </CardBody>
+            </Card>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {coachProfile && (
+              <Card>
+                <CardBody>
+                  <h2 className="mb-1 text-lg font-semibold text-text">Profil Coach</h2>
+                  <p className="mb-3 text-sm text-text-muted">Ditampilkan ke orang tua di halaman profil publik kamu.</p>
+                  <EditCoachProfileForm profile={coachProfile} />
+                </CardBody>
+              </Card>
+            )}
+
+            {publicProfileLink && (
+              <Card>
+                <CardBody>
+                  <h2 className="mb-1 text-lg font-semibold text-text">Link Profil Publik</h2>
+                  <p className="mb-3 text-sm text-text-muted">
+                    Kirim link ini ke calon member yang bertanya jadwal/kolam kamu — bisa dibuka siapa saja tanpa perlu
+                    masuk.
+                  </p>
+                  <CopyLinkButton link={publicProfileLink} />
+                </CardBody>
+              </Card>
+            )}
+
+            {session.user.role === "MEMBER" && (
+              <p className="text-sm text-text-muted">
+                Tambah atau ubah peserta les ada di menu{" "}
+                <a href="/member/peserta" className="font-medium text-brand-700 underline">
+                  Peserta
+                </a>
+                .
               </p>
-              <EditCoachProfileForm profile={coachProfile} />
-            </CardBody>
-          </Card>
-        )}
-
-        {coachProfile && (
-          <Card>
-            <CardBody>
-              <h2 className="mb-3 text-lg font-semibold text-text">Foto &amp; Sertifikat</h2>
-              <CoachMediaForm
-                photoUrl={coachProfile.photoUrl}
-                certificateStatus={coachProfile.certificateStatus}
-                certificationNote={coachProfile.certificationNote}
-                storageReady={isStorageConfigured()}
-              />
-            </CardBody>
-          </Card>
-        )}
-
-        <Card>
-          <CardBody>
-            <h2 className="mb-3 text-lg font-semibold text-text">Ganti Password</h2>
-            <EditPasswordForm />
-          </CardBody>
-        </Card>
-
-        {publicProfileLink && (
-          <Card>
-            <CardBody>
-              <h2 className="mb-1 text-lg font-semibold text-text">Link Profil Publik</h2>
-              <p className="mb-3 text-sm text-text-muted">
-                Kirim link ini ke calon member yang bertanya jadwal/kolam kamu — bisa dibuka
-                siapa saja tanpa perlu login.
-              </p>
-              <CopyLinkButton link={publicProfileLink} />
-            </CardBody>
-          </Card>
-        )}
-
-        {session.user.role === "MEMBER" && (
-          <p className="text-sm text-text-muted">
-            Tambah atau ubah peserta les ada di menu{" "}
-            <a href="/member/peserta" className="font-medium text-brand-700 underline">Peserta</a>.
-          </p>
-        )}
+            )}
+          </div>
         </div>
       </main>
     </NavBar>

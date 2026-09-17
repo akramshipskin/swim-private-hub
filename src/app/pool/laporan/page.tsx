@@ -81,7 +81,7 @@ export default async function PoolLaporanPage({
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Laporan Kolam</h1>
       <p className="mb-6 text-sm text-text-muted">
-        Rincian omzet & komisi per sesi yang benar-benar Hadir, per kolam kamu.
+        Rincian bagian kolam kamu per sesi yang benar-benar ditandai Hadir.
       </p>
 
       <Card className="mb-6">
@@ -119,14 +119,13 @@ export default async function PoolLaporanPage({
             })
             .filter((r): r is NonNullable<typeof r> => r !== null);
 
-          const totalOmzet = rows.reduce((sum, r) => sum + r.perSessionValue, 0);
           const totalPoolShare = rows.reduce((sum, r) => sum + r.poolAmount, 0);
 
           return (
             <div key={pool.id}>
               <h2 className="mb-3 text-lg font-semibold text-text">{pool.name}</h2>
 
-              <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <Card>
                   <CardBody className="py-3">
                     <p className="text-xs text-text-subtle">Sesi Hadir</p>
@@ -135,8 +134,18 @@ export default async function PoolLaporanPage({
                 </Card>
                 <Card>
                   <CardBody className="py-3">
-                    <p className="text-xs text-text-subtle">Total Omzet</p>
-                    <p className="text-lg font-semibold text-text">{formatRupiah(totalOmzet)}</p>
+                    <p className="text-xs text-text-subtle">Rata-rata per sesi</p>
+                    <p className="text-lg font-semibold text-text">
+                      {formatRupiah(rows.length ? Math.round(totalPoolShare / rows.length) : 0)}
+                    </p>
+                  </CardBody>
+                </Card>
+                <Card>
+                  <CardBody className="py-3">
+                    <p className="text-xs text-text-subtle">Peserta berbeda</p>
+                    <p className="text-lg font-semibold text-text">
+                      {new Set(rows.map((r) => r.booking.package.dependent.name)).size}
+                    </p>
                   </CardBody>
                 </Card>
                 <Card>
@@ -161,8 +170,7 @@ export default async function PoolLaporanPage({
                         <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
                           <th className="px-4 py-3 font-medium">Tanggal</th>
                           <th className="px-4 py-3 font-medium">Coach</th>
-                          <th className="px-4 py-3 font-medium">Anak</th>
-                          <th className="px-4 py-3 text-right font-medium">Omzet Sesi</th>
+                          <th className="px-4 py-3 font-medium">Peserta</th>
                           <th className="px-4 py-3 text-right font-medium">Bagian Kolam</th>
                         </tr>
                       </thead>
@@ -178,14 +186,8 @@ export default async function PoolLaporanPage({
                             </td>
                             <td className="px-4 py-3 text-text">{r.booking.availability.coach.name}</td>
                             <td className="px-4 py-3 text-text">{r.booking.package.dependent.name}</td>
-                            <td className="px-4 py-3 text-right font-mono text-text">
-                              {formatRupiah(r.perSessionValue)}
-                            </td>
                             <td className="px-4 py-3 text-right font-mono font-semibold text-text">
                               {formatRupiah(r.poolAmount)}
-                              <p className="text-xs font-normal text-text-subtle">
-                                komisi {formatRupiah(r.platformAmount)} · coach {formatRupiah(r.coachAmount)}
-                              </p>
                             </td>
                           </tr>
                         ))}
@@ -201,7 +203,8 @@ export default async function PoolLaporanPage({
 
       <p className="mt-4 text-xs text-text-subtle">
         Hanya sesi yang benar-benar ditandai Hadir dan paketnya berbayar (bukan assign manual/gratis)
-        yang dihitung di sini — sama seperti dasar hitung saldo kolam.
+        yang dihitung di sini — sama seperti dasar hitung saldo kolam. Yang ditampilkan adalah bagian kolam kamu
+        sesuai persentase yang berlaku saat sesi itu ditandai Hadir.
       </p>
     </main>
   );

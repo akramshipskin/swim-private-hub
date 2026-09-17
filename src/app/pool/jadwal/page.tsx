@@ -5,6 +5,7 @@ import { todayWibDateString, dateLabel, addDaysToDateString, formatDateLabel, fo
 import { groupByHour } from "@/lib/pool-occupancy";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -31,7 +32,13 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
           endTime: true,
           status: true,
           coach: { select: { name: true } },
-          bookings: { where: { status: "BOOKED" }, select: { package: { select: { dependent: { select: { name: true } } } } } },
+          bookings: {
+            where: { status: "BOOKED" },
+            select: {
+              member: { select: { name: true } },
+              package: { select: { dependent: { select: { name: true, isSelf: true } } } },
+            },
+          },
         },
       },
     },
@@ -45,8 +52,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, -1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted">&larr; Sebelumnya</Link>
         <form className="flex items-center gap-2">
-          <label htmlFor="jadwal-date" className="sr-only">Tanggal</label>
-          <input id="jadwal-date" type="date" name="date" defaultValue={dateStr} className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-text" />
+          <DatePicker name="date" defaultValue={dateStr} className="w-52" />
           <button type="submit" className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white">Lihat</button>
         </form>
         <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, 1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted">Berikutnya &rarr;</Link>
@@ -60,7 +66,11 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
             endTime: a.endTime,
             booked: a.status === "BOOKED",
             coachName: a.coach.name,
-            who: a.bookings[0]?.package.dependent.name,
+            who: a.bookings[0]
+              ? a.bookings[0].package.dependent.isSelf
+                ? a.bookings[0].member.name
+                : `${a.bookings[0].package.dependent.name} (akun ${a.bookings[0].member.name})`
+              : undefined,
           })),
           p.openTime,
           p.closeTime
@@ -79,7 +89,8 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
                       {r.booked.length === 0 && r.open.length === 0 && <span className="text-sm text-text-subtle">Tidak ada les</span>}
                       {r.booked.map((s, i) => (
                         <Badge key={`b${i}`} tone="brand">
-                          Les: {s.coachName}{s.who ? ` · ${s.who}` : ""} ({formatTimeWib(s.startTime)})
+                          {formatTimeWib(s.startTime)} · Coach {s.coachName}
+                          {s.who ? ` · peserta ${s.who}` : ""}
                         </Badge>
                       ))}
                       {r.open.map((s, i) => (
