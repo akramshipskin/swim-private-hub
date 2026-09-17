@@ -93,21 +93,32 @@ export default function AssignPackageForm({
               ))}
             </Select>
           </Field>
+          {/* Paket dari katalog sudah terikat ke kolamnya sendiri, jadi
+              pilihan kolam tidak ditampilkan -- dulu tampil tapi mati, dan itu
+              membingungkan (Hadi 18 Sep). Kolam hanya dipilih untuk paket custom. */}
           <Field label="Kolam">
-            <Select
-              name="poolId"
-              required
-              disabled={!!templateId}
-              value={poolId}
-              onChange={(e) => setPoolId(e.target.value)}
-              className="w-full sm:w-36"
-            >
-              {pools.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </Select>
+            {templateId ? (
+              <>
+                <p className="flex min-h-[44px] items-center rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
+                  {pools.find((p) => p.id === poolId)?.name ?? "-"} <span className="ml-1 text-xs">(ikut katalog)</span>
+                </p>
+                <input type="hidden" name="poolId" value={poolId} />
+              </>
+            ) : (
+              <Select
+                name="poolId"
+                required
+                value={poolId}
+                onChange={(e) => setPoolId(e.target.value)}
+                className="w-full sm:w-36"
+              >
+                {pools.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </Select>
+            )}
           </Field>
           <Field label="Nama Paket">
             <Input

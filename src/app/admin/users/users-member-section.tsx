@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PesertaList, UserActions, type PesertaRow } from "./user-display";
+import Link from "next/link";
 
 type Row = {
   id: string;
@@ -65,7 +66,9 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                   {filtered.map((u) => (
                     <tr key={u.id} className="border-b border-border last:border-0">
                       <td className="px-5 py-4">
-                        <p className="font-medium text-text">{u.name}</p>
+                        <Link href={`/admin/users/${u.id}`} className="font-medium text-text hover:underline">
+                          {u.name}
+                        </Link>
                         {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
                       </td>
                       <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
@@ -78,7 +81,13 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                         </Badge>
                       </td>
                       <td className="px-5 py-4 text-right">
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/admin/users/${u.id}`}
+                            className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-text hover:bg-surface-muted"
+                          >
+                            Info detail
+                          </Link>
                           <UserActions user={u} />
                         </div>
                       </td>
@@ -96,7 +105,9 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
               <Card key={u.id}>
                 <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="min-w-0 truncate text-sm font-medium text-text">{u.name}</p>
+                    <Link href={`/admin/users/${u.id}`} className="min-w-0 truncate text-sm font-medium text-text underline-offset-2 hover:underline">
+                      {u.name}
+                    </Link>
                     <Badge tone={u.isActive ? "success" : "neutral"}>
                       {u.isActive ? "Aktif" : "Nonaktif"}
                     </Badge>

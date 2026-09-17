@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Label } from "@/components/ui/input";
 import { PriceInput } from "@/components/ui/price-input";
 import { Button } from "@/components/ui/button";
+import { formatRupiah } from "@/lib/format";
 
 type Template = {
   id: string;
@@ -57,15 +58,27 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
   return (
     <Card>
       <CardBody>
-        {template.pool && (
-          <p className="mb-3 flex flex-wrap items-center gap-2 text-sm">
-            <span className="font-semibold text-brand-700">{template.pool.name}</span>
-            <span className="text-text-muted">
-              · Rp{Math.round(template.price / template.totalSesi).toLocaleString("id-ID")}/sesi
-            </span>
-            {!template.isActive && <span className="text-warning-text">· tidak dijual</span>}
-          </p>
-        )}
+        {/* Terkunci = ringkasan 1-2 baris (Hadi: kartu paket terlalu makan
+            tempat). Semua isian baru muncul setelah klik Edit. */}
+        {locked ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="flex flex-wrap items-center gap-x-2 text-sm">
+                <span className="font-semibold text-text">{template.name}</span>
+                {template.pool && <span className="text-text-muted">· {template.pool.name}</span>}
+                {!template.isActive && <span className="text-warning-text">· tidak dijual</span>}
+              </p>
+              <p className="mt-0.5 text-sm text-text-muted">
+                <span className="font-semibold text-text">{formatRupiah(template.price)}</span> · {template.totalSesi} sesi
+                (Rp{Math.round(template.price / template.totalSesi).toLocaleString("id-ID")}/sesi) · berlaku{" "}
+                {template.durationDays} hari · jatah batal {template.jatahCancel}x
+              </p>
+            </div>
+            <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
+              Edit
+            </Button>
+          </div>
+        ) : (
         <form
           key={formKey}
           action={formAction}
@@ -73,13 +86,13 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
         >
           <input type="hidden" name="templateId" value={template.id} />
           <Field label="Nama">
-            <Input name="name" defaultValue={template.name} disabled={locked} className="w-full sm:w-44" />
+            <Input name="name" defaultValue={template.name} className="w-full sm:w-44" />
           </Field>
           <Field label="Harga (Rp)">
             <PriceInput
               name="price"
               defaultValue={template.price}
-              disabled={locked}
+             
               className="w-full sm:w-32"
             />
           </Field>
@@ -90,7 +103,7 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
                 name="totalSesi"
                 defaultValue={template.totalSesi}
                 min={1}
-                disabled={locked}
+               
                 className="w-full sm:w-24"
               />
             </Field>
@@ -100,7 +113,7 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
                 name="jatahCancel"
                 defaultValue={template.jatahCancel}
                 min={0}
-                disabled={locked}
+               
                 className="w-full sm:w-24"
               />
             </Field>
@@ -111,7 +124,7 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
               name="durationDays"
               defaultValue={template.durationDays}
               min={1}
-              disabled={locked}
+             
               className="w-full sm:w-24"
             />
           </Field>
@@ -121,7 +134,7 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
               name="isActive"
               id={`active-${template.id}`}
               defaultChecked={template.isActive}
-              disabled={locked}
+             
               className="h-4 w-4 rounded border-border disabled:opacity-50"
             />
             <Label htmlFor={`active-${template.id}`} className="text-sm text-text">
@@ -130,32 +143,21 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
           </div>
 
           <div className="flex items-center gap-2">
-            {locked ? (
-              <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
-                Edit
-              </Button>
-            ) : (
-              <>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="sm"
-                  loading={pending}
-                  disabled={justEnteredEdit}
-                >
-                  {submitLabel}
-                </Button>
-                <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
-                  Batal
-                </Button>
-              </>
-            )}
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={pending}
+              disabled={justEnteredEdit}
+            >
+              {submitLabel}
+            </Button>
+            <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={cancel}>
+              Batal
+            </Button>
           </div>
+          {state?.error && <p className="w-full text-xs text-danger-text">{state.error}</p>}
         </form>
-        {state?.error && (
-          <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">
-            {state.error}
-          </p>
         )}
       </CardBody>
     </Card>

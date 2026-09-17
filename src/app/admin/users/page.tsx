@@ -10,6 +10,10 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserActions } from "./user-display";
 import PendingCertificates from "./pending-certificates";
+import Link from "next/link";
+import { Avatar } from "@/components/ui/avatar";
+import { coachBioLine } from "@/lib/coach-bio";
+import { formatRupiah } from "@/lib/format";
 
 const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] = [
   { role: "ADMIN", label: "Admin" },
@@ -36,6 +40,9 @@ export default async function AdminUsersPage() {
           orderBy: { name: "asc" },
           select: { id: true, name: true, isSelf: true },
         },
+        coachProfile: { select: { photoUrl: true, certificateStatus: true, walletBalance: true, birthDate: true, gender: true } },
+        poolAffiliations: { select: { pool: { select: { id: true, name: true } } }, orderBy: { pool: { name: "asc" } } },
+        poolOwnerships: { select: { pool: { select: { id: true, name: true, walletBalance: true } } } },
       },
     }),
     prisma.packageTemplate.findMany({ orderBy: { totalSesi: "asc" } }),
@@ -55,28 +62,33 @@ export default async function AdminUsersPage() {
 
       <PendingCertificates />
 
+      {/* Kolom kanan diisi migrasi + Tambah Peserta supaya tidak ada ruang
+          kosong di sebelah form Tambah User Baru yang tinggi (Hadi 18 Sep). */}
       <div className="mb-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <CreateUserForm pools={pools} />
-        <details className="rounded-2xl border border-border bg-surface p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-text">
-            Migrasi data: import member dari Excel (.xlsx)
-          </summary>
-          <p className="mt-2 text-sm text-text-muted">Dipakai saat kolam baru bergabung dan membawa data member lama.</p>
-          <div className="mt-3">
-            <ImportMembersForm pools={pools} />
-          </div>
-        </details>
-      </div>
+        <div className="flex flex-col gap-4">
+          <details className="rounded-2xl border border-border bg-surface p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-text">
+              Migrasi data: import member dari Excel (.xlsx)
+            </summary>
+            <p className="mt-2 text-sm text-text-muted">Dipakai saat kolam baru bergabung dan membawa data member lama.</p>
+            <div className="mt-3">
+              <ImportMembersForm pools={pools} />
+            </div>
+          </details>
 
-      {/* --- Tambah peserta (anak atau diri sendiri) buat member -- dibutuhin
-          sebelum bisa assign paket --- */}
-      <h2 className="mb-3 text-lg font-semibold text-text">Tambah Peserta</h2>
-      <p className="mb-3 text-sm text-text-muted">
-        1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang
-        belum pernah masuk belum punya peserta terdaftar — tambahkan di sini
-        dulu kalau mau langsung assign paket.
-      </p>
-      <AddChildForm members={members} />
+          {/* Tambah peserta (anak atau diri sendiri) -- dibutuhkan sebelum
+              bisa assign paket. */}
+          <div className="rounded-2xl border border-border bg-surface p-4">
+            <h2 className="text-sm font-semibold text-text">Tambah Peserta</h2>
+            <p className="mt-1 mb-3 text-sm text-text-muted">
+              1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang belum pernah masuk belum punya
+              peserta terdaftar — tambahkan di sini dulu kalau mau langsung assign paket.
+            </p>
+            <AddChildForm members={members} />
+          </div>
+        </div>
+      </div>
 
       {/* --- Assign paket khusus ke member --- */}
       <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Assign Paket ke Peserta</h2>
@@ -97,64 +109,63 @@ export default async function AdminUsersPage() {
             <h2 className="mb-2 text-sm font-semibold text-text-muted">
               {label} <span className="text-text-subtle">({rows.length})</span>
             </h2>
-            {/* Desktop: tabel -- Nama & Email digabung 1 kolom (email di
-                bawah nama) biar kolom gak sesek, kolom sisanya dapet napas
-                lebih (padding naik dikit). */}
-            <Card className="hidden sm:block">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
-                      <th className="px-5 py-3.5 font-medium">Nama</th>
-                      <th className="px-5 py-3.5 font-medium">No HP</th>
-                      <th className="px-5 py-3.5 font-medium">Status</th>
-                      <th className="px-5 py-3.5"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((u) => (
-                      <tr key={u.id} className="border-b border-border last:border-0">
-                        <td className="px-5 py-4">
-                          <p className="font-medium text-text">{u.name}</p>
-                          {u.email && (
-                            <p className="text-xs text-text-subtle">{u.email}</p>
-                          )}
-                        </td>
-                        <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
-                        <td className="px-5 py-4">
-                          <Badge tone={u.isActive ? "success" : "neutral"}>
-                            {u.isActive ? "Aktif" : "Nonaktif"}
-                          </Badge>
-                        </td>
-                        <td className="px-5 py-4 text-right">
-                          <div className="flex items-center justify-end">
-                            <UserActions user={u} isSelf={u.id === session.user.id} />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-
-            {/* Mobile: card compact biasa -- semua info langsung keliatan,
-                gak perlu di-tap buat expand. */}
-            <ul className="flex flex-col gap-1.5 sm:hidden">
+            {/* Kartu 2 kolom (Hadi 18 Sep): muat foto, kontak, ringkasan, dan
+                tombol ke halaman detail -- tabel lama terlalu sempit untuk itu. */}
+            <ul className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
               {rows.map((u) => (
-                <Card key={u.id}>
-                  <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="min-w-0 truncate text-sm font-medium text-text">{u.name}</p>
-                      <Badge tone={u.isActive ? "success" : "neutral"}>
-                        {u.isActive ? "Aktif" : "Nonaktif"}
-                      </Badge>
-                    </div>
-                    {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
-                    <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
-                    <UserActions user={u} isSelf={u.id === session.user.id} />
-                  </CardBody>
-                </Card>
+                <li key={u.id}>
+                  <Card>
+                    <CardBody className="flex flex-col gap-3">
+                      <div className="flex items-start gap-3">
+                        {role === "COACH" && <Avatar src={u.coachProfile?.photoUrl} className="h-12 w-12" />}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Link href={`/admin/users/${u.id}`} className="font-semibold text-text hover:underline">
+                              {u.name}
+                            </Link>
+                            <Badge tone={u.isActive ? "success" : "neutral"}>{u.isActive ? "Aktif" : "Nonaktif"}</Badge>
+                            {role === "COACH" && u.coachProfile?.certificateStatus === "APPROVED" && (
+                              <Badge tone="brand">Bersertifikat</Badge>
+                            )}
+                          </div>
+                          {role === "COACH" && coachBioLine(u.coachProfile) && (
+                            <p className="text-xs text-text-subtle">{coachBioLine(u.coachProfile)}</p>
+                          )}
+                          <p className="text-sm text-text-muted">
+                            {u.phone ?? "No HP belum diisi"}
+                            {u.email ? ` · ${u.email}` : ""}
+                          </p>
+                          {role === "COACH" && (
+                            <p className="mt-1 text-sm text-text-muted">
+                              {u.poolAffiliations.length > 0
+                                ? `Mengajar di ${u.poolAffiliations.map((a) => a.pool.name).join(", ")}`
+                                : "Belum terafiliasi ke kolam"}
+                              {u.coachProfile ? ` · saldo ${formatRupiah(u.coachProfile.walletBalance)}` : ""}
+                            </p>
+                          )}
+                          {role === "POOL_OWNER" && (
+                            <p className="mt-1 text-sm text-text-muted">
+                              {u.poolOwnerships.length > 0
+                                ? u.poolOwnerships
+                                    .map((o) => `${o.pool.name} (saldo ${formatRupiah(o.pool.walletBalance)})`)
+                                    .join(", ")
+                                : "Belum memegang kolam"}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <Link
+                          href={`/admin/users/${u.id}`}
+                          className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-muted"
+                        >
+                          Info detail
+                        </Link>
+                        <UserActions user={u} isSelf={u.id === session.user.id} />
+                      </div>
+                    </CardBody>
+                  </Card>
+                </li>
               ))}
             </ul>
           </div>

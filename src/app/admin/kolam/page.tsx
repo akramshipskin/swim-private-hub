@@ -112,7 +112,7 @@ export default async function AdminKolamPage() {
                   <PoolActiveToggle poolId={p.id} poolName={p.name} isActive={p.isActive} />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                   <div className="rounded-xl bg-surface-muted p-3">
                     <p className="text-sm font-semibold text-text">Harga paket</p>
                     {p.packageTemplates.length === 0 ? (
@@ -149,15 +149,14 @@ export default async function AdminKolamPage() {
                       </div>
                     );
                   })()}
-                </div>
-
-                <div>
-                  <p className="mb-2 text-sm font-semibold text-text">Pembagian komisi</p>
-                <PoolShareForm
-                  poolId={p.id}
-                  commissionPercent={p.commissionPercent}
-                  coachSharePercent={p.coachSharePercent}
-                />
+                  <div className="rounded-xl bg-surface-muted p-3">
+                    <p className="mb-2 text-sm font-semibold text-text">Pembagian komisi</p>
+                    <PoolShareForm
+                      poolId={p.id}
+                      commissionPercent={p.commissionPercent}
+                      coachSharePercent={p.coachSharePercent}
+                    />
+                  </div>
                 </div>
                 <details className="rounded-lg border border-border px-3 py-2">
                   <summary className="cursor-pointer text-sm font-medium text-text">
