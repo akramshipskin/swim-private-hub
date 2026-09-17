@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useClientValue } from "@/hooks/use-client-value";
+
+import { useState } from "react";
 
 type Mode = "system" | "light" | "dark";
 
@@ -25,12 +27,16 @@ function applyMode(mode: Mode) {
 // lewat localStorage. Baca state awal dari localStorage di useEffect
 // (bukan pas render pertama) biar gak mismatch sama SSR.
 export function ThemeMenu() {
-  const [mode, setMode] = useState<Mode>("system");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    setMode(stored === "light" || stored === "dark" ? stored : "system");
-  }, []);
+  const stored = useClientValue<Mode>(() => {
+    try {
+      const v = localStorage.getItem("theme");
+      return v === "light" || v === "dark" ? v : "system";
+    } catch {
+      return "system";
+    }
+  }, "system");
+  const [picked, setMode] = useState<Mode | null>(null);
+  const mode = picked ?? stored;
 
   return (
     <div className="grid grid-cols-3 gap-1 rounded-lg bg-surface-muted p-1">

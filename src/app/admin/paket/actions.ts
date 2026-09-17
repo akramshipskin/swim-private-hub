@@ -2,6 +2,8 @@
 
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
+import { withDedupeLock } from "@/lib/dedupe-lock";
+import { createTemplateRecord, updateTemplateRecord } from "@/lib/package-template";
 import { createDependent, createSelfDependent } from "@/lib/dependents";
 import { toProperCase } from "@/lib/format";
 import { revalidatePath } from "next/cache";
@@ -15,30 +17,10 @@ export async function createTemplate(
   formData: FormData
 ): Promise<ActionState> {
   await requireRole("ADMIN");
-
-  const poolId = formData.get("poolId") as string;
-  const name = toProperCase(formData.get("name")?.toString().trim() ?? "");
-  const totalSesi = Number(formData.get("totalSesi"));
-  const price = Number(formData.get("price"));
-  const durationDays = Number(formData.get("durationDays"));
-  const jatahCancel = Number(formData.get("jatahCancel"));
-
-  if (
-    !poolId ||
-    !name ||
-    !Number.isInteger(totalSesi) || totalSesi < 1 ||
-    !Number.isFinite(price) || price < 0 ||
-    !Number.isInteger(durationDays) || durationDays < 1 ||
-    !Number.isInteger(jatahCancel) || jatahCancel < 0
-  ) {
-    return { error: "Kolam & nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel tidak boleh negatif" };
-  }
-
-  await prisma.packageTemplate.create({
-    data: { poolId, name, totalSesi, price, durationDays, jatahCancel },
-  });
-
+  const res = await createTemplateRecord(formData);
+  if (res) return res;
   revalidatePath("/admin/paket");
+  revalidatePath("/pool/paket");
   return null;
 }
 
@@ -47,31 +29,10 @@ export async function updateTemplate(
   formData: FormData
 ): Promise<ActionState> {
   await requireRole("ADMIN");
-
-  const templateId = formData.get("templateId") as string;
-  const name = toProperCase(formData.get("name")?.toString().trim() ?? "");
-  const totalSesi = Number(formData.get("totalSesi"));
-  const price = Number(formData.get("price"));
-  const durationDays = Number(formData.get("durationDays"));
-  const jatahCancel = Number(formData.get("jatahCancel"));
-  const isActive = formData.get("isActive") === "on";
-
-  if (
-    !name ||
-    !Number.isInteger(totalSesi) || totalSesi < 1 ||
-    !Number.isFinite(price) || price < 0 ||
-    !Number.isInteger(durationDays) || durationDays < 1 ||
-    !Number.isInteger(jatahCancel) || jatahCancel < 0
-  ) {
-    return { error: "Nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel tidak boleh negatif" };
-  }
-
-  await prisma.packageTemplate.update({
-    where: { id: templateId },
-    data: { name, totalSesi, price, durationDays, jatahCancel, isActive },
-  });
-
+  const res = await updateTemplateRecord(formData);
+  if (res) return res;
   revalidatePath("/admin/paket");
+  revalidatePath("/pool/paket");
   return null;
 }
 
@@ -177,7 +138,14 @@ export async function assignPackageToMember(
     return { error: "Kolam wajib dipilih (kalau bukan dari katalog paket)" };
   }
 
-  await prisma.package.create({
+  // Klik ganda Assign: paket yang sama (nama & kolam) untuk peserta yang sama
+  // dalam 30 detik terakhir dianggap duplikat.
+  const assigned = await withDedupeLock(`assign:${dependentId}`, async (tx) => {
+    const dup = await tx.package.count({
+      where: { dependentId, poolId, name, createdAt: { gte: new Date(Date.now() - 30_000) } },
+    });
+    if (dup > 0) return false;
+    await tx.package.create({
     data: {
       memberId,
       dependentId,
@@ -191,7 +159,10 @@ export async function assignPackageToMember(
       startDate: new Date(),
       expiredDate: expiredDateRaw ? new Date(`${expiredDateRaw}T23:59:59+07:00`) : null,
     },
+    });
+    return true;
   });
+  if (!assigned) return { error: "Paket yang sama baru saja di-assign ke peserta ini." };
 
   revalidatePath("/admin/paket");
   revalidatePath("/admin/users");

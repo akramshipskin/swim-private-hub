@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useClientValue } from "@/hooks/use-client-value";
 import { Button } from "@/components/ui/button";
 
 export function CookieConsentBanner() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
+  const needsConsent = useClientValue(() => {
     try {
-      if (!localStorage.getItem("cookieConsent")) setVisible(true);
+      return !localStorage.getItem("cookieConsent");
     } catch {
-      // localStorage gak available (private mode dll) -- gak fatal,
-      // banner cuma gak muncul, aplikasi tetep jalan normal.
+      // localStorage tidak tersedia (private mode dll) -- banner tidak muncul.
+      return false;
     }
-  }, []);
+  }, false);
+  const [dismissed, setDismissed] = useState(false);
+  const visible = needsConsent && !dismissed;
 
   function dismiss() {
     try {
@@ -21,7 +22,7 @@ export function CookieConsentBanner() {
     } catch {
       // sama kayak di atas -- gak fatal kalau gagal disimpan.
     }
-    setVisible(false);
+    setDismissed(true);
   }
 
   if (!visible) return null;

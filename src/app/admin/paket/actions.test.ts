@@ -10,6 +10,8 @@ const dependentFindUnique = vi.fn();
 const packageCreate = vi.fn().mockResolvedValue({});
 const packageFindUnique = vi.fn();
 const packageUpdate = vi.fn().mockResolvedValue({ count: 1 });
+const templateCount = vi.fn().mockResolvedValue(0);
+const packageCount = vi.fn().mockResolvedValue(0);
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -17,15 +19,22 @@ vi.mock("@/lib/prisma", () => ({
       create: (...args: unknown[]) => templateCreate(...args),
       update: (...args: unknown[]) => templateUpdate(...args),
       findUnique: (...args: unknown[]) => templateFindUnique(...args),
+      count: (...args: unknown[]) => templateCount(...args),
     },
     dependent: { findUnique: (...args: unknown[]) => dependentFindUnique(...args) },
     package: {
       create: (...args: unknown[]) => packageCreate(...args),
       findUnique: (...args: unknown[]) => packageFindUnique(...args),
       updateMany: (...args: unknown[]) => packageUpdate(...args),
+      count: (...args: unknown[]) => packageCount(...args),
     },
   },
 }));
+// Lock dilewati di unit test; tx = mock prisma yang sama.
+vi.mock("@/lib/dedupe-lock", async () => {
+  const { prisma } = await import("@/lib/prisma");
+  return { withDedupeLock: (_key: string, fn: (tx: unknown) => unknown) => fn(prisma) };
+});
 
 const createDependent = vi.fn().mockResolvedValue({});
 const createSelfDependent = vi.fn().mockResolvedValue({});
@@ -46,6 +55,17 @@ function formData(entries: Record<string, string>) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+});
+
+describe("createTemplate duplicate name", () => {
+  it("refuses a second template with the same name in the same pool", async () => {
+    templateCount.mockResolvedValueOnce(1);
+    const fd = new FormData();
+    for (const [k, v] of Object.entries({ poolId: "p1", name: "Paket A", totalSesi: "8", price: "100", durationDays: "60", jatahCancel: "2" })) fd.set(k, v);
+    const res = await createTemplate(null, fd);
+    expect(res?.error).toMatch(/sudah ada/);
+    expect(templateCreate).not.toHaveBeenCalled();
+  });
 });
 
 describe("createTemplate", () => {

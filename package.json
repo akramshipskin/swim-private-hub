@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test:race": "vitest run -c vitest.race.config.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

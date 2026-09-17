@@ -12,8 +12,8 @@ export default function KebijakanPrivasiPage() {
     <LegalPageLayout title="Kebijakan Privasi" updatedAt="10 September 2026">
       <p>
         Kebijakan Privasi ini menjelaskan jenis data pribadi yang dikumpulkan oleh
-        Swim Private Hub ("kami") melalui aplikasi pemesanan dan manajemen les
-        renang ("Aplikasi"), tujuan penggunaannya, serta hak Pengguna atas data
+        Swim Private Hub (&ldquo;kami&rdquo;) melalui aplikasi pemesanan dan manajemen les
+        renang (&ldquo;Aplikasi&rdquo;), tujuan penggunaannya, serta hak Pengguna atas data
         tersebut. Kebijakan ini berlaku bagi seluruh Pengguna Aplikasi, yaitu
         orang tua/member, pelatih (coach), pemilik kolam, dan administrator.
       </p>

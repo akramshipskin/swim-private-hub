@@ -27,40 +27,40 @@ export default function AttendanceToggle({
   const formRef = useRef<HTMLFormElement>(null);
   const [localAttended, setLocalAttended] = useState(attended);
   const wasPending = useRef(false);
-
-  useEffect(() => {
+  // Sinkron kalau nilai dari server berubah (pola "adjust state during render").
+  const [syncedAttended, setSyncedAttended] = useState(attended);
+  if (attended !== syncedAttended) {
+    setSyncedAttended(attended);
     setLocalAttended(attended);
-  }, [attended]);
+  }
 
   useEffect(() => {
     if (wasPending.current && !pending) {
-      if (state?.error) {
-        setLocalAttended(attended);
-      } else {
-        router.refresh();
-      }
+      if (!state?.error) router.refresh();
     }
     wasPending.current = pending;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pending]);
 
+  // Gagal simpan -> tampilkan lagi nilai asli dari server.
+  const shown = state?.error && !pending ? attended : localAttended;
   const toneClass =
-    localAttended === true
+    shown === true
       ? "border-success-text/25 bg-success-bg text-success-text"
-      : localAttended === false
+      : shown === false
         ? "border-danger-text/25 bg-danger-bg text-danger-text"
         : "border-border bg-surface text-text-muted";
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col items-end gap-1">
       <input type="hidden" name="bookingId" value={bookingId} />
-      <input type="hidden" name="attended" value={localAttended === null ? "" : String(localAttended)} />
+      <input type="hidden" name="attended" value={shown === null ? "" : String(shown)} />
       {/* appearance-none + chevron manual -- native <select> pake OS
           chrome-nya sendiri (paling kentara di iOS), gak konsisten sama
           dropdown lain di app ini yang udah dibikin gitu juga. */}
       <div className="relative inline-block">
         <select
-          value={localAttended === null ? "" : String(localAttended)}
+          value={shown === null ? "" : String(shown)}
           disabled={pending}
           onChange={(e) => {
             const v = e.target.value;

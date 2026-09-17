@@ -12,11 +12,8 @@ import { Button } from "@/components/ui/button";
 // jelas" tapi sampe sekarang pool owner cuma punya halaman Saldo (angka
 // akhir doang, gak ada rincian per sesi). Halaman ini nutup gap itu.
 //
-// Rumus PERSIS SAMA kayak creditSessionRevenue/admin/komisi: perSessionValue
-// = harga paket berbayar / totalSesi, dipecah pake commissionPercent/
-// coachSharePercent MILIK KOLAM (rate SAAT INI, bukan rate historis yang
-// kepake pas kredit beneran terjadi -- sama kayak simplifikasi admin/komisi,
-// biar angka yang dilihat pool owner konsisten sama yang dilihat admin).
+// Nilai sesi = harga paket berbayar / totalSesi. Bagian kolam & coach diambil
+// dari ledger (yang benar-benar dikredit), sama seperti halaman Bagi Hasil admin.
 export default async function PoolLaporanPage({
   searchParams,
 }: {
@@ -33,7 +30,7 @@ export default async function PoolLaporanPage({
   const pools = await prisma.pool.findMany({
     where: { ownerships: { some: { ownerId: session.user.id } } },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, commissionPercent: true, coachSharePercent: true },
+    select: { id: true, name: true },
   });
 
   if (pools.length === 0) {
@@ -69,6 +66,17 @@ export default async function PoolLaporanPage({
     )
   );
 
+  const ledger = await prisma.walletTransaction.groupBy({
+    by: ["bookingId", "type"],
+    where: {
+      bookingId: { in: bookingsByPool.flat().map((b) => b.id) },
+      type: { in: ["SESSION_REVENUE", "SESSION_PAYOUT"] },
+    },
+    _sum: { amount: true },
+  });
+  const credited = (bookingId: string, type: "SESSION_REVENUE" | "SESSION_PAYOUT") =>
+    ledger.find((l) => l.bookingId === bookingId && l.type === type)?._sum.amount ?? 0;
+
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Laporan Kolam</h1>
@@ -101,14 +109,12 @@ export default async function PoolLaporanPage({
               const payment = b.package.payments[0];
               if (!payment) return null;
               const perSessionValue = Math.round(payment.amount / b.package.totalSesi);
-              const coachAmount = Math.round((perSessionValue * pool.coachSharePercent) / 100);
-              const poolAmount = Math.round(
-                (perSessionValue * (100 - pool.commissionPercent - pool.coachSharePercent)) / 100
-              );
-              // Dihitung langsung (bukan perSessionValue - coachAmount - poolAmount) biar
-              // sama persis kayak angka yang ditampilin admin/komisi -- 3 pembagian
-              // dibulatin independen, jadi gak selalu pas nutup ke perSessionValue.
-              const platformAmount = Math.round((perSessionValue * pool.commissionPercent) / 100);
+              // Angka kolam & coach dari pembukuan (yang benar-benar dikredit saat
+              // sesi ditandai Hadir, dengan persen yang berlaku saat itu), bukan
+              // dihitung ulang dari persen sekarang. Platform = sisanya.
+              const poolAmount = credited(b.id, "SESSION_REVENUE");
+              const coachAmount = credited(b.id, "SESSION_PAYOUT");
+              const platformAmount = perSessionValue - poolAmount - coachAmount;
               return { booking: b, perSessionValue, coachAmount, poolAmount, platformAmount };
             })
             .filter((r): r is NonNullable<typeof r> => r !== null);

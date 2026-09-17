@@ -39,7 +39,6 @@ export default async function ProfilPage() {
           select: { bio: true, specialties: true, certificationNote: true, photoUrl: true, certificateStatus: true },
         })
       : null;
-  const hasTrailingSection = session.user.role === "MEMBER" || publicProfileLink !== null;
 
   return (
     <NavBar

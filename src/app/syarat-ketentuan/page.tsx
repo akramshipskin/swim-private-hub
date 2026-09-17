@@ -12,7 +12,7 @@ export default function SyaratKetentuanPage() {
     <LegalPageLayout title="Syarat & Ketentuan" updatedAt="10 September 2026">
       <p>
         Dengan mendaftar dan menggunakan aplikasi pemesanan dan manajemen les
-        renang Swim Private Hub ("Aplikasi"), Pengguna menyatakan setuju
+        renang Swim Private Hub (&ldquo;Aplikasi&rdquo;), Pengguna menyatakan setuju
         terhadap Syarat &amp; Ketentuan berikut ini.
       </p>
 

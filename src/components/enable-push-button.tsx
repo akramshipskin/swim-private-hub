@@ -1,5 +1,7 @@
 "use client";
 
+import { useClientValue } from "@/hooks/use-client-value";
+
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { BellIcon } from "@/components/icons";
@@ -16,11 +18,10 @@ export default function EnablePushButton() {
     "idle" | "unsupported" | "subscribed" | "loading" | "error"
   >("idle");
 
+  const supported = useClientValue(() => "serviceWorker" in navigator && "PushManager" in window, true);
+
   useEffect(() => {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      setStatus("unsupported");
-      return;
-    }
+    if (!supported) return;
     navigator.serviceWorker.ready.then(async (reg) => {
       const existing = await reg.pushManager.getSubscription();
       if (existing) {
@@ -38,7 +39,7 @@ export default function EnablePushButton() {
         setStatus("subscribed");
       }
     });
-  }, []);
+  }, [supported]);
 
   async function handleEnable() {
     setStatus("loading");
@@ -69,7 +70,7 @@ export default function EnablePushButton() {
     }
   }
 
-  if (status === "unsupported") {
+  if (!supported || status === "unsupported") {
     return <Badge tone="neutral">Notifikasi tidak didukung browser ini</Badge>;
   }
 

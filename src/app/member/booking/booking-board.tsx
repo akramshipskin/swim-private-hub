@@ -131,7 +131,14 @@ export default function BookingBoard({
       sisa: packageOptions.filter((p) => p.poolId === pool.id).reduce((n, p) => n + p.sisaSesi, 0),
     }))
     .filter((x) => x.sisa > 0);
-  const [slots, setSlots] = useState<Slot[] | null>(null);
+  // Slot disimpan bersama kunci (tanggal|kolam) asalnya: ganti tanggal/kolam
+  // langsung dianggap "belum dimuat" tanpa setState di dalam effect.
+  const slotsKey = `${date}|${poolId}`;
+  const [slotsState, setSlotsState] = useState<{ key: string; slots: Slot[] } | null>(null);
+  const slots = useMemo(
+    () => (!poolId ? [] : slotsState?.key === slotsKey ? slotsState.slots : null),
+    [poolId, slotsState, slotsKey]
+  );
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(
     null
   );
@@ -149,22 +156,18 @@ export default function BookingBoard({
     // Slot tetep bisa dilihat di kolam manapun; booking-nya yang butuh
     // paket di kolam itu (lihat selectedPkg). Belum ada kolam dipilih =
     // belum ada yang bisa ditampilin.
-    if (!poolId) {
-      setSlots([]);
-      return;
-    }
+    if (!poolId) return;
     const myRequestId = ++requestIdRef.current;
     const res = await fetch(`/api/availability?date=${date}&poolId=${poolId}`);
     if (requestIdRef.current !== myRequestId) return;
     if (res.ok) {
       const data = await res.json();
       if (requestIdRef.current !== myRequestId) return;
-      setSlots(data.availabilities);
+      setSlotsState({ key: `${date}|${poolId}`, slots: data.availabilities });
     }
   }, [date, poolId]);
 
   useEffect(() => {
-    setSlots(null);
     loadSlots();
     const interval = setInterval(loadSlots, POLL_INTERVAL_MS);
 
@@ -268,15 +271,18 @@ export default function BookingBoard({
     // masih jalan buat sinkron beneran, tapi feedback visual gak nunggu
     // round-trip RSC lagi di atas DELETE yang barusan (kerasa lambat kalau
     // latency ke DB tinggi).
-    setSlots((prev) =>
-      prev
-        ? prev.map((s) =>
-            s.id === targetId
-              ? { ...s, status: "AVAILABLE", bookedByMe: false, bookingId: null, bookedForChildName: null, canCancel: false }
-              : s
-          )
-        : prev
-    );
+    setSlotsState((prevState) => {
+      if (!prevState) return prevState;
+      const prev = prevState.slots;
+      return {
+        ...prevState,
+        slots: prev.map((s) =>
+          s.id === targetId
+            ? { ...s, status: "AVAILABLE" as const, bookedByMe: false, bookingId: null, bookedForChildName: null, canCancel: false }
+            : s
+        ),
+      };
+    });
     setMessage({ text: "Booking dibatalkan, kuota sesi kamu balik.", ok: true });
     loadSlots();
     router.refresh();

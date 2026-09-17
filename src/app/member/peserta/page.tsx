@@ -19,7 +19,7 @@ export default async function MemberPesertaPage() {
       </p>
       <Card>
         <CardBody>
-          <ManageChildrenForm children={children} />
+          <ManageChildrenForm dependents={children} />
         </CardBody>
       </Card>
     </main>

@@ -20,6 +20,11 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+vi.mock("@/lib/dedupe-lock", async () => {
+  const { prisma } = await import("@/lib/prisma");
+  return { withDedupeLock: (_key: string, fn: (tx: unknown) => unknown) => fn(prisma) };
+});
+
 const { POST } = await import("./route");
 
 function req(body: object) {

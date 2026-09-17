@@ -9,8 +9,10 @@ import { Button } from "@/components/ui/button";
 
 type PoolOption = { id: string; name: string };
 
-export default function CreateTemplateForm({ pools }: { pools: PoolOption[] }) {
-  const [state, formAction, pending] = useActionState(createTemplate, null);
+type TemplateAction = (state: { error?: string } | null, formData: FormData) => Promise<{ error?: string } | null>;
+
+export default function CreateTemplateForm({ pools, action = createTemplate }: { pools: PoolOption[]; action?: TemplateAction }) {
+  const [state, formAction, pending] = useActionState(action, null);
 
   return (
     <Card className="mb-4">

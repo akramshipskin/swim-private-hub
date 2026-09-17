@@ -67,7 +67,7 @@ export function PullToRefresh({ children }: { children: React.ReactNode }) {
         className="flex items-center justify-center overflow-hidden sm:hidden"
         style={{
           height: indicatorHeight,
-          transition: pullingRef.current ? "none" : "height 0.2s ease-out",
+          transition: pullDistance > 0 && !refreshing ? "none" : "height 0.2s ease-out",
         }}
       >
         {showIndicator && (

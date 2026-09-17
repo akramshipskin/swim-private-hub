@@ -9,7 +9,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type Child = { id: string; name: string; isActive: boolean; isSelf: boolean };
 
-export default function ManageChildrenForm({ children }: { children: Child[] }) {
+export default function ManageChildrenForm({ dependents: children }: { dependents: Child[] }) {
   const [state, formAction, pending] = useActionState(addChild, null);
   const [type, setType] = useState<"self" | "child">("child");
   const [confirming, setConfirming] = useState<Child | null>(null);

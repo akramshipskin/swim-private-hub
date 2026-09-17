@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { snap } from "@/lib/midtrans";
 import { assertDependentOwnedByMember } from "@/lib/dependents";
 import { dropInPrice, dropInEligibilityWhere } from "@/lib/drop-in";
+import { withDedupeLock } from "@/lib/dedupe-lock";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -95,42 +96,41 @@ export async function POST(request: Request) {
   // Klik Beli dobel (atau 2 tab) dulu bikin paket "Menunggu pembayaran"
   // numpuk. Tolak pembelian barang yang sama buat anak yang sama kalau
   // yang sebelumnya baru dibuat < 1 menit lalu.
-  // ponytail: cek-lalu-create, bukan lock -- 2 request di milidetik yang
-  // sama masih bisa lolos dua-duanya. Dampaknya cuma 1 paket pending
-  // ekstra (kedaluwarsa sendiri lewat webhook expire), bukan duit.
-  const recentDuplicate = await prisma.package.findFirst({
-    where: {
-      memberId: session.user.id,
-      dependentId,
-      status: "PENDING_PAYMENT",
-      poolId: item.poolId,
-      templateId: item.templateId,
-      isSingleSession: item.isSingleSession,
-      createdAt: { gte: new Date(Date.now() - 60_000) },
-    },
-    select: { id: true },
+  const pkg = await withDedupeLock(`checkout:${session.user.id}:${dependentId}`, async (tx) => {
+    const recentDuplicate = await tx.package.findFirst({
+      where: {
+        memberId: session.user.id,
+        dependentId,
+        status: "PENDING_PAYMENT",
+        poolId: item.poolId,
+        templateId: item.templateId,
+        isSingleSession: item.isSingleSession,
+        createdAt: { gte: new Date(Date.now() - 60_000) },
+      },
+      select: { id: true },
+    });
+    if (recentDuplicate) return null;
+    return tx.package.create({
+      data: {
+        memberId: session.user.id,
+        dependentId,
+        poolId: item.poolId,
+        templateId: item.templateId,
+        name: item.name,
+        totalSesi: item.totalSesi,
+        sisaSesi: item.totalSesi,
+        jatahCancel: item.jatahCancel,
+        isSingleSession: item.isSingleSession,
+        status: "PENDING_PAYMENT",
+      },
+    });
   });
-  if (recentDuplicate) {
+  if (!pkg) {
     return Response.json(
       { error: "Pembayaran buat paket ini baru saja dibuat. Tunggu 1 menit sebelum coba lagi." },
       { status: 409 }
     );
   }
-
-  const pkg = await prisma.package.create({
-    data: {
-      memberId: session.user.id,
-      dependentId,
-      poolId: item.poolId,
-      templateId: item.templateId,
-      name: item.name,
-      totalSesi: item.totalSesi,
-      sisaSesi: item.totalSesi,
-      jatahCancel: item.jatahCancel,
-      isSingleSession: item.isSingleSession,
-      status: "PENDING_PAYMENT",
-    },
-  });
 
   const orderId = `PKG-${pkg.id}-${Date.now()}`;
   const origin = new URL(request.url).origin;

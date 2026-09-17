@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { updateCoachProfile } from "./actions";
 import { Button } from "@/components/ui/button";
-import { Field, Input, Textarea } from "@/components/ui/input";
+import { Field, Textarea } from "@/components/ui/input";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 
 export default function EditCoachProfileForm({

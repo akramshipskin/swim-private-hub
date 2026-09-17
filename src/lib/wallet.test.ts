@@ -21,7 +21,13 @@ function createMockTx(overrides?: {
     walletTransaction: {
       createMany: vi.fn().mockResolvedValue({ count: 0 }),
       aggregate: vi.fn(async ({ where }: { where: { type: string } }) => ({
-        _sum: { amount: overrides?.platformSums?.[where.type] ?? 0 },
+        _sum: {
+          amount:
+            overrides?.platformSums?.[where.type] ??
+            ((overrides?.walletTxns ?? []) as { type: string; amount: number }[])
+              .filter((t) => t.type === where.type)
+              .reduce((n, t) => n + t.amount, 0),
+        },
       })),
       findFirst: vi.fn(async ({ where }: { where: { type: string } }) =>
         (overrides?.walletTxns ?? []).find((t) => (t as { type: string }).type === where.type) ?? null
@@ -129,7 +135,7 @@ describe("reverseSessionRevenue", () => {
         { type: "SESSION_REVENUE", poolId: "pool-1", amount: 28125 },
         { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: 51563 },
       ],
-      platformSums: { PLATFORM_REVENUE: 12555, PLATFORM_TAX: 1507 },
+      platformSums: { SESSION_REVENUE: 28125, SESSION_PAYOUT: 51563, PLATFORM_REVENUE: 12555, PLATFORM_TAX: 1507 },
     });
 
     await reverseSessionRevenue(tx, { bookingId: "booking-1" });
@@ -201,5 +207,24 @@ describe("reverseSessionRevenue", () => {
     expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
       data: [{ type: "SESSION_REVENUE", poolId: "pool-1", amount: -85000, bookingId: "booking-1" }],
     });
+  });
+
+  it("reverses the net credited amount, not a leftover negative row, after repeated toggles", async () => {
+    const tx = createMockTx({
+      walletTxns: [
+        { type: "SESSION_REVENUE", poolId: "pool-1", amount: -28125 },
+        { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: -51563 },
+      ],
+      platformSums: { SESSION_REVENUE: 28125, SESSION_PAYOUT: 51563 },
+    });
+    await reverseSessionRevenue(tx, { bookingId: "booking-1" });
+    expect(tx.pool.update).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { walletBalance: { decrement: 28125 } } });
+  });
+
+  it("does nothing when the booking has no net credit left", async () => {
+    const tx = createMockTx({ walletTxns: [{ type: "SESSION_REVENUE", poolId: "pool-1", amount: 0 }] });
+    await reverseSessionRevenue(tx, { bookingId: "booking-1" });
+    expect(tx.pool.update).not.toHaveBeenCalled();
+    expect(tx.walletTransaction.createMany).not.toHaveBeenCalled();
   });
 });

@@ -18,8 +18,10 @@ type Template = {
   pool?: { name: string };
 };
 
-export default function TemplateEditForm({ template }: { template: Template }) {
-  const [state, formAction, pending] = useActionState(updateTemplate, null);
+type TemplateAction = (state: { error?: string } | null, formData: FormData) => Promise<{ error?: string } | null>;
+
+export default function TemplateEditForm({ template, action = updateTemplate }: { template: Template; action?: TemplateAction }) {
+  const [state, formAction, pending] = useActionState(action, null);
   const [isEditing, setIsEditing] = useState(false);
   const [formKey, setFormKey] = useState(0);
   // Tombol Simpan nempatin posisi klik yang sama kayak Edit sebelumnya --

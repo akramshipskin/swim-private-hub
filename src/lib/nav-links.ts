@@ -52,6 +52,8 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/pool/laporan", label: "Laporan", icon: "clipboard-check" },
     { href: "/pool/saldo", label: "Saldo", icon: "credit-card" },
     { href: "/pool/info", label: "Info Kolam", icon: "package" },
+    { href: "/pool/paket", label: "Paket & Harga", icon: "credit-card" },
+    { href: "/pool/coach", label: "Coach", icon: "users" },
     { href: "/profil", label: "Profil Saya", icon: "settings", group: "Pengaturan" },
   ],
 };

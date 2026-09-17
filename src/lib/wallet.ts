@@ -80,43 +80,39 @@ export async function reverseSessionRevenue(
   tx: Prisma.TransactionClient,
   { bookingId }: { bookingId: string }
 ) {
+  // Dibalikin sebesar total BERSIH yang masih tercatat buat booking ini
+  // (kredit dikurangi reversal sebelumnya) per jenis -- bukan baris pertama
+  // yang ketemu, yang setelah toggle Hadir berulang bisa berupa baris minus.
+  const net = async (type: "SESSION_REVENUE" | "SESSION_PAYOUT" | "PLATFORM_REVENUE" | "PLATFORM_TAX") =>
+    (await tx.walletTransaction.aggregate({ where: { bookingId, type }, _sum: { amount: true } }))._sum.amount ?? 0;
+
+  const reversals: Prisma.WalletTransactionCreateManyInput[] = [];
+
   const poolTxn = await tx.walletTransaction.findFirst({
     where: { bookingId, type: "SESSION_REVENUE", poolId: { not: null } },
   });
+  const poolNet = await net("SESSION_REVENUE");
+  if (poolTxn?.poolId && poolNet > 0) {
+    await tx.pool.update({ where: { id: poolTxn.poolId }, data: { walletBalance: { decrement: poolNet } } });
+    reversals.push({ type: "SESSION_REVENUE", poolId: poolTxn.poolId, amount: -poolNet, bookingId });
+  }
+
   const coachTxn = await tx.walletTransaction.findFirst({
     where: { bookingId, type: "SESSION_PAYOUT", coachProfileId: { not: null } },
   });
-  if (!poolTxn || !poolTxn.poolId) return;
-
-  await tx.pool.update({
-    where: { id: poolTxn.poolId },
-    data: { walletBalance: { decrement: poolTxn.amount } },
-  });
-  const reversals: Prisma.WalletTransactionCreateManyInput[] = [
-    { type: "SESSION_REVENUE", poolId: poolTxn.poolId, amount: -poolTxn.amount, bookingId },
-  ];
-
-  if (coachTxn && coachTxn.coachProfileId) {
+  const coachNet = await net("SESSION_PAYOUT");
+  if (coachTxn?.coachProfileId && coachNet > 0) {
     await tx.coachProfile.update({
       where: { id: coachTxn.coachProfileId },
-      data: { walletBalance: { decrement: coachTxn.amount } },
+      data: { walletBalance: { decrement: coachNet } },
     });
-    reversals.push({
-      type: "SESSION_PAYOUT",
-      coachProfileId: coachTxn.coachProfileId,
-      amount: -coachTxn.amount,
-      bookingId,
-    });
+    reversals.push({ type: "SESSION_PAYOUT", coachProfileId: coachTxn.coachProfileId, amount: -coachNet, bookingId });
   }
 
-  // Bagian platform dibalikin sebesar total bersih yang masih tercatat buat
-  // booking ini (kredit dikurangi reversal sebelumnya), jadi toggle berulang
-  // gak bikin minus dobel.
   for (const type of ["PLATFORM_REVENUE", "PLATFORM_TAX"] as const) {
-    const current = await tx.walletTransaction.aggregate({ where: { bookingId, type }, _sum: { amount: true } });
-    const amount = current._sum.amount ?? 0;
+    const amount = await net(type);
     if (amount > 0) reversals.push({ type, amount: -amount, bookingId });
   }
 
-  await tx.walletTransaction.createMany({ data: reversals });
+  if (reversals.length > 0) await tx.walletTransaction.createMany({ data: reversals });
 }
