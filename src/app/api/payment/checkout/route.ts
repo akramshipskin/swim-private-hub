@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     });
     const price = pool ? dropInPrice(pool.packageTemplates) : null;
     if (!pool || price === null) {
-      return Response.json({ error: "Kolam ini belum jual 1 sesi" }, { status: 400 });
+      return Response.json({ error: "Kolam ini belum menjual 1 sesi" }, { status: 400 });
     }
     item = {
       poolId: pool.id,
@@ -172,7 +172,7 @@ export async function POST(request: Request) {
     await prisma.package.delete({ where: { id: pkg.id } });
     return Response.json(
       {
-        error: "Gagal membuat transaksi pembayaran. Cek kredensial Midtrans di .env.",
+        error: "Gagal membuat transaksi pembayaran. Coba lagi beberapa saat lagi.",
         detail: err instanceof Error ? err.message : String(err),
       },
       { status: 502 }

@@ -125,7 +125,7 @@ export async function assignPackageToMember(
     select: { memberId: true },
   });
   if (!dependent || dependent.memberId !== memberId) {
-    return { error: "Anak tidak ditemukan atau bukan punya member ini" };
+    return { error: "Anak tidak ditemukan atau bukan milik member ini" };
   }
 
   // Paket wajib pin ke 1 kolam (locked /plan-eng-review 2026-09-12) --

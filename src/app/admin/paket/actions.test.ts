@@ -187,7 +187,7 @@ describe("assignPackageToMember", () => {
   it("rejects when the dependent belongs to a different member (IDOR)", async () => {
     dependentFindUnique.mockResolvedValueOnce({ memberId: "someone-else" });
     const result = await assignPackageToMember(null, formData({ ...base, poolId: "pool-1" }));
-    expect(result).toEqual({ error: "Anak tidak ditemukan atau bukan punya member ini" });
+    expect(result).toEqual({ error: "Anak tidak ditemukan atau bukan milik member ini" });
     expect(packageCreate).not.toHaveBeenCalled();
   });
 

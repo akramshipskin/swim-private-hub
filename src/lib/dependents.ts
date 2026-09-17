@@ -63,6 +63,6 @@ export async function assertDependentOwnedByMember(dependentId: string, memberId
     select: { memberId: true },
   });
   if (!dep || dep.memberId !== memberId) {
-    throw new Error("Anak tidak ditemukan atau bukan punya kamu");
+    throw new Error("Anak tidak ditemukan atau bukan milik kamu");
   }
 }

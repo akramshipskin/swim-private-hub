@@ -5,6 +5,7 @@ import { updateCoachProfile } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Field, Textarea } from "@/components/ui/input";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
+import { useEditLock } from "@/hooks/use-edit-lock";
 
 export default function EditCoachProfileForm({
   profile,
@@ -14,6 +15,7 @@ export default function EditCoachProfileForm({
   const [state, formAction, pending] = useActionState(updateCoachProfile, null);
   const [savedAt, setSavedAt] = useState(0);
   const wasPending = useRef(false);
+  const edit = useEditLock(pending, state?.error);
 
   useEffect(() => {
     if (wasPending.current && !pending && state?.success) {
@@ -23,7 +25,8 @@ export default function EditCoachProfileForm({
   }, [pending, state]);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form key={edit.formKey} action={formAction} className="flex flex-col gap-4">
+      <fieldset disabled={edit.locked} className="flex flex-col gap-4 disabled:opacity-90">
       <Field label="Bio singkat (opsional)">
         <Textarea
           name="bio"
@@ -53,11 +56,23 @@ export default function EditCoachProfileForm({
           ))}
         </div>
       </fieldset>
+      </fieldset>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" loading={pending} className="w-full sm:w-auto">
-          Simpan Profil Coach
-        </Button>
+        {edit.locked ? (
+          <Button type="button" variant="secondary" onClick={edit.startEdit} className="w-full sm:w-auto">
+            Edit Profil Coach
+          </Button>
+        ) : (
+          <>
+            <Button type="submit" loading={pending} disabled={edit.saveDisabled}>
+              Simpan
+            </Button>
+            <Button type="button" variant="ghost" onClick={edit.cancel} disabled={pending}>
+              Batal
+            </Button>
+          </>
+        )}
         {state?.error && (
           <p role="alert" className="text-sm text-danger-text">
             {state.error}

@@ -406,7 +406,7 @@ export default function BookingBoard({
             {!canBuySingleSession && " Beli paket dulu agar bisa booking."}
             {canBuySingleSession &&
               selectedPool?.singleSessionPrice == null &&
-              " Kolam ini belum jual 1 sesi."}
+              " Kolam ini belum menjual 1 sesi."}
           </p>
           {canBuySingleSession && selectedPool?.singleSessionPrice != null ? (
             <Button size="sm" loading={buyLoading} onClick={() => setConfirmBuy(true)} className="shrink-0">
@@ -576,7 +576,7 @@ export default function BookingBoard({
         title="Batalkan booking ini?"
         description={
           cancelTarget
-            ? `${cancelTarget.coach.name}, ${formatTime(cancelTarget.startTime)}–${formatTime(cancelTarget.endTime)}. Kuota sesi kamu akan balik, tapi jatah pembatalan mandiri berkurang.`
+            ? `${cancelTarget.coach.name}, ${formatTime(cancelTarget.startTime)}–${formatTime(cancelTarget.endTime)}. Kuota sesi kamu akan kembali, tapi jatah pembatalan mandiri berkurang.`
             : ""
         }
         confirmLabel="Ya, batalkan"

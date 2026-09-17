@@ -58,7 +58,7 @@ export default async function PembayaranSuksesPage({
           </h1>
           <p className="mb-6 text-sm text-text-muted">
             {isPending
-              ? "Selesaiin pembayarannya sesuai instruksi (VA/QRIS/dll) sebelum batas waktunya. Paket aktif otomatis begitu pembayaran masuk."
+              ? "Selesaikan pembayaran sesuai instruksi (VA/QRIS/dll) sebelum batas waktunya. Paket aktif otomatis begitu pembayaran masuk."
               : "Terima kasih! Paketmu sedang diproses otomatis dan akan aktif dalam beberapa saat."}
           </p>
           <div className="flex w-full flex-col gap-2">

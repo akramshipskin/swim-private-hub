@@ -99,7 +99,7 @@ export default async function ProfilPage() {
             <CardBody>
               <h2 className="mb-1 text-lg font-semibold text-text">Link Profil Publik</h2>
               <p className="mb-3 text-sm text-text-muted">
-                Kirim link ini ke calon member yang nanya jadwal/kolam kamu — bisa dibuka
+                Kirim link ini ke calon member yang bertanya jadwal/kolam kamu — bisa dibuka
                 siapa saja tanpa perlu login.
               </p>
               <CopyLinkButton link={publicProfileLink} />

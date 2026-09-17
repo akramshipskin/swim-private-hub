@@ -29,7 +29,7 @@ export function PendingApprovalScreen({ roleLabel }: { roleLabel: string }) {
           <h1 className="text-xl font-semibold text-text">Pendaftaran diterima</h1>
           <p className="text-sm text-text-muted">
             Akun {roleLabel} kamu lagi direview admin. Kamu baru bisa login setelah akunnya
-            diaktifkan admin. Mau dipercepat? Kabarin admin lewat tombol di bawah.
+            diaktifkan admin. Mau dipercepat? Kabari admin lewat tombol di bawah.
           </p>
           <a
             href={buildAdminWaLink(`Halo admin, saya baru daftar sebagai ${roleLabel} di Swim Private Hub. Mohon dicek ya.`)}

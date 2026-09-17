@@ -183,7 +183,7 @@ export default function PanduanMemberView() {
         </Card>
       </Step>
 
-      <Part label="Jalur B &mdash; Akun Dibikinin Admin (lebih umum)" />
+      <Part label="Jalur B &mdash; Akun Dibuatkan Admin (lebih umum)" />
 
       <Step
         n={4}
@@ -199,7 +199,7 @@ export default function PanduanMemberView() {
       <Step
         n={5}
         title="Wajib ganti password dulu"
-        desc="Otomatis diarahkan ke /ganti-password, tidak bisa dilewatin sebelum ganti."
+        desc="Otomatis diarahkan ke /ganti-password, tidak bisa dilewati sebelum ganti password."
         note="Field &ldquo;Siapa yang mau les?&rdquo; tetap muncul di sini walau anaknya sudah diinput admin — itu memang alur baku form ini."
       >
         <p className="text-xs text-text-muted">Ini login pertama kamu — ganti password bawaan dulu ya.</p>
@@ -242,11 +242,11 @@ export default function PanduanMemberView() {
       <Step
         n={8}
         title="Pilih tanggal"
-        desc="8 pilihan tanggal terdekat — titik nandain ada slot ready. Butuh tanggal lebih jauh? Tap &ldquo;Pilih tanggal lain&rdquo; buat buka kalender penuh."
+        desc="8 pilihan tanggal terdekat — titik menandakan ada slot kosong. Butuh tanggal lebih jauh? Tap &ldquo;Pilih tanggal lain&rdquo; untuk membuka kalender penuh."
       >
         <div className="flex items-center justify-between text-[11px] text-text-subtle">
           <span className="flex items-center gap-1">
-            <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot ready
+            <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot kosong
           </span>
           <span className="font-medium text-brand-700 underline underline-offset-2">Pilih tanggal lain</span>
         </div>
@@ -338,7 +338,7 @@ export default function PanduanMemberView() {
       <Step
         n={13}
         title="Kalau sudah &lt; 2 jam atau jatah habis"
-        note="Ini benar-benar kejadian pas didemo — booking dites live, kurang dari 2 jam sebelum jadwal."
+        note="Ini benar-benar terjadi saat demo — booking dites live, kurang dari 2 jam sebelum jadwal."
       >
         <div className="flex items-center justify-between rounded-xl border border-border bg-surface p-3">
           <p className="text-xs text-text-muted">Pembatalan hanya bisa minimal 2 jam sebelum jadwal.</p>

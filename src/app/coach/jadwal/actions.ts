@@ -138,7 +138,7 @@ export async function addAvailability(
       .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
       .join(", ");
     return {
-      warning: `Jam ${times} sudah pernah dibuka sebelumnya, dilewatin. Jam lainnya berhasil ditambahin.`,
+      warning: `Jam ${times} sudah pernah dibuka sebelumnya, jadi dilewati. Jam lainnya berhasil ditambahkan.`,
     };
   }
 
