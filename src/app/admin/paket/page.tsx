@@ -97,7 +97,7 @@ export default async function AdminPaketPage() {
         {[...new Set(templates.map((t) => t.pool.name))].map((poolName) => (
           <section key={poolName}>
             <h3 className="mb-2 text-base font-semibold text-brand-700">{poolName}</h3>
-            <ul className="grid gap-3 lg:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {templates
                 .filter((t) => t.pool.name === poolName)
                 .map((t) => (

@@ -53,7 +53,7 @@ export default function PaketPerMemberList({ rows }: { rows: Row[] }) {
       {filtered.length === 0 ? (
         <p className="text-sm text-text-subtle">Tidak ada yang cocok sama pencarian &ldquo;{search}&rdquo;.</p>
       ) : (
-        <ul className="grid gap-3 lg:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {filtered.map((r) => (
             <li key={r.memberId}>
               <MemberCard

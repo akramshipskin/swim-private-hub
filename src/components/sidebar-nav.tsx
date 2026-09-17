@@ -37,11 +37,17 @@ export function SidebarNav({
   const groups = groupLinks(links);
 
   return (
-    <nav className="hidden w-48 shrink-0 flex-col gap-5 py-6 sm:sticky sm:top-16 sm:flex sm:self-start" aria-label="Navigasi">
+    // Sidebar dikasih latar + border sendiri: tanpa itu daftar menunya
+    // "menyatu" dengan isi halaman (Hadi 18 Sep). Nama kategori tebal,
+    // nama tab tidak -- kebalikan dari versi sebelumnya.
+    <nav
+      className="hidden w-52 shrink-0 flex-col gap-4 self-start rounded-2xl border border-border bg-surface p-3 sm:sticky sm:top-20 sm:my-6 sm:flex"
+      aria-label="Navigasi"
+    >
       {groups.map(([group, items]) => (
         <div key={group} className="flex flex-col gap-0.5">
           {group && (
-            <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-text-subtle">
+            <p className="mb-1 px-3 text-[11px] font-bold uppercase tracking-wide text-text-muted">
               {group}
             </p>
           )}
@@ -56,8 +62,10 @@ export function SidebarNav({
                 key={link.href}
                 href={link.href}
                 prefetch={active ? false : undefined}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  active ? "bg-brand-600 text-white" : "text-text-muted hover:bg-surface-muted hover:text-text"
+                className={`rounded-lg px-3 py-2 text-sm transition-colors ${
+                  active
+                    ? "bg-brand-600 font-semibold text-white"
+                    : "font-normal text-text-muted hover:bg-surface-muted hover:text-text"
                 }`}
               >
                 {link.label}

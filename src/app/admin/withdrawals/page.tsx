@@ -138,7 +138,7 @@ export default async function AdminWithdrawalsPage({
           <CardBody className="py-10 text-center text-sm text-text-muted">Tidak ada pengajuan untuk filter ini.</CardBody>
         </Card>
       ) : (
-        <div className="mt-6 grid gap-3 lg:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
           {requests.map((w) => (
             <WithdrawalRow
               key={w.id}

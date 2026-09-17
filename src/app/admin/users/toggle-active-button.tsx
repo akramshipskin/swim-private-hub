@@ -40,7 +40,7 @@ export default function ToggleActiveButton({
       <ConfirmDialog
         open={open}
         title={`Nonaktifkan ${userName}?`}
-        description="Pengguna ini tidak bisa login lagi sampai diaktifkan ulang."
+        description="Pengguna ini tidak bisa masuk lagi sampai diaktifkan ulang."
         confirmLabel="Ya, nonaktifkan"
         loading={loading}
         onConfirm={handleToggle}

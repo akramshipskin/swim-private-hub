@@ -109,7 +109,7 @@ export default async function AdminKolamPage() {
                   <PoolActiveToggle poolId={p.id} poolName={p.name} isActive={p.isActive} />
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="rounded-xl bg-surface-muted p-3">
                     <p className="text-sm font-semibold text-text">Harga paket</p>
                     {p.packageTemplates.length === 0 ? (

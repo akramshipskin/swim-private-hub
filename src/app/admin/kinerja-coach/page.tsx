@@ -93,7 +93,7 @@ export default async function KinerjaCoachPage({
                     {r.total.notHadir > 0 && <> · {r.total.notHadir} tidak hadir</>}
                   </p>
                 </div>
-                <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {[...r.pools.entries()].map(([poolName, c]) => (
                     <li key={poolName} className="rounded-lg border border-border px-3 py-2">
                       <p className="text-sm font-semibold text-brand-700">{poolName}</p>

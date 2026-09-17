@@ -33,7 +33,7 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
         <Field label="Alamat">
           <Input name="address" defaultValue={pool.address ?? ""} />
         </Field>
-        <div className="grid gap-3 sm:grid-cols-3 lg:col-span-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:col-span-2">
           <Field label="No. telepon kolam">
             <Input name="contactPhone" defaultValue={pool.contactPhone ?? ""} />
           </Field>

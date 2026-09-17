@@ -26,7 +26,7 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
           </button>
         ))}
       </div>
-      <ol role="tabpanel" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ol role="tabpanel" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {current.steps.map((s, i) => (
           <li key={s.title} className="rounded-2xl bg-white p-6">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#9FCC1F] text-sm font-bold text-[#14140F]">

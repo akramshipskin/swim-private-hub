@@ -16,7 +16,7 @@ export async function updateName(
   formData: FormData
 ): Promise<ActionState> {
   const session = await auth();
-  if (!session) return { error: "Sesi habis, login ulang." };
+  if (!session) return { error: "Sesi habis, silakan masuk lagi." };
 
   const rawName = formData.get("name")?.toString().trim() ?? "";
   if (!rawName) {
@@ -39,7 +39,7 @@ export async function updatePasswordProfil(
   formData: FormData
 ): Promise<ActionState> {
   const session = await auth();
-  if (!session) return { error: "Sesi habis, login ulang." };
+  if (!session) return { error: "Sesi habis, silakan masuk lagi." };
 
   const currentPassword = formData.get("currentPassword") as string;
   const newPassword = formData.get("newPassword") as string;
@@ -83,7 +83,7 @@ export async function addChild(
   formData: FormData
 ): Promise<ActionState> {
   const session = await auth();
-  if (!session) return { error: "Sesi habis, login ulang." };
+  if (!session) return { error: "Sesi habis, silakan masuk lagi." };
   if (session.user.role !== "MEMBER") return { error: "Hanya member yang bisa menambah anak." };
 
   const type = formData.get("type")?.toString();
@@ -106,7 +106,7 @@ export async function addChild(
 
 export async function toggleChildActive(dependentId: string, isActive: boolean) {
   const session = await auth();
-  if (!session) throw new Error("Sesi habis, login ulang.");
+  if (!session) throw new Error("Sesi habis, silakan masuk lagi.");
 
   await assertDependentOwnedByMember(dependentId, session.user.id);
   await prisma.dependent.update({ where: { id: dependentId }, data: { isActive } });
@@ -122,7 +122,7 @@ export async function updateCoachProfile(
   formData: FormData
 ): Promise<ActionState> {
   const session = await auth();
-  if (!session) return { error: "Sesi habis, login ulang." };
+  if (!session) return { error: "Sesi habis, silakan masuk lagi." };
   if (session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
 
   const bio = formData.get("bio")?.toString().trim() ?? "";

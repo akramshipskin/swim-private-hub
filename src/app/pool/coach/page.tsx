@@ -46,7 +46,7 @@ export default async function PoolCoachPage() {
           {p.affiliations.length === 0 ? (
             <p className="text-sm text-text-muted">Belum ada coach. Hubungi admin untuk menambahkan coach ke kolam ini.</p>
           ) : (
-            <ul className="grid gap-3 lg:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {p.affiliations.map(({ coach }) => {
                 const here = coach.availabilities.filter((a) => a.poolId === p.id);
                 const attended = here.reduce((n, a) => n + a.bookings.length, 0);

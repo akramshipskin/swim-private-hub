@@ -89,7 +89,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Kalau butuh bantuan saat memakai aplikasi?",
-    a: "Setelah login, ada tombol bantuan di pojok kanan bawah. Pertanyaan umum dijawab asisten, dan yang perlu dicek admin (misal pembayaran) diteruskan ke admin — balasannya muncul di jendela chat yang sama.",
+    a: "Setelah masuk, ada tombol bantuan di pojok kanan bawah. Pertanyaan umum dijawab asisten, dan yang perlu dicek admin (misal pembayaran) diteruskan ke admin — balasannya muncul di jendela chat yang sama.",
   },
   {
     q: "Apakah coach-nya bersertifikat?",
@@ -269,7 +269,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           {coaches.length === 0 ? (
             <p className="text-center text-[#5C5945]">Coach segera hadir.</p>
           ) : (
-            <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {coaches.map((c, i) => (
                 <li key={c.id} className={`rounded-2xl bg-white p-4 shadow-sm transition-transform hover:rotate-0 ${["-rotate-2", "rotate-1", "rotate-2"][i % 3]}`}>
                   <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl bg-[#F3F2EC]">

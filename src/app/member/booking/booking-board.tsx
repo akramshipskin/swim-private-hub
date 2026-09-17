@@ -15,6 +15,7 @@ import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import { AvailabilityDatePicker } from "@/components/availability-date-picker";
 import { DateQuickPicker } from "@/components/date-quick-picker";
 import { Avatar } from "@/components/ui/avatar";
+import { Loader } from "@/components/ui/loader";
 
 type PackageOption = {
   packageId: string;
@@ -438,11 +439,9 @@ export default function BookingBoard({
       )}
 
       {slots === null ? (
-        <ul className="flex flex-col gap-2" aria-busy="true" aria-label="Memuat jadwal">
-          {[0, 1, 2].map((i) => (
-            <li key={i} className="h-[68px] animate-pulse rounded-xl bg-surface-muted" />
-          ))}
-        </ul>
+        <div className="flex justify-center py-10" aria-busy="true">
+          <Loader label="Memuat jadwal" />
+        </div>
       ) : slots.length === 0 ? (
         <Card>
           <CardBody className="py-10 text-center">

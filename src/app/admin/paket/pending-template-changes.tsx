@@ -36,7 +36,7 @@ export default async function PendingTemplateChanges() {
       <CardBody>
         <h2 className="mb-1 text-lg font-semibold text-text">Usulan paket dari pemilik kolam ({pending.length})</h2>
         <p className="mb-3 text-sm text-text-muted">Belum berlaku sampai disetujui. Paket yang sudah dibeli member tidak ikut berubah.</p>
-        <ul className="grid gap-3 lg:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {pending.map((t) => {
             const p = t.pendingChanges as unknown as PendingTemplateChange;
             return (

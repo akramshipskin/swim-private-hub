@@ -317,7 +317,7 @@ export async function importMembersXlsx(
     parts.push(`${skipped.length} dilewati: ${skipped.slice(0, 5).join("; ")}${skipped.length > 5 ? "..." : ""}`);
   }
   if (membersCreated > 0) {
-    parts.push(`Password default member baru: "${IMPORT_DEFAULT_PASSWORD}" — kasih tahu mereka, wajib ganti saat login pertama.`);
+    parts.push(`Password default member baru: "${IMPORT_DEFAULT_PASSWORD}" — kasih tahu mereka, wajib ganti saat pertama masuk.`);
   }
 
   return { result: parts.join(" ") };

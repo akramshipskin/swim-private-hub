@@ -152,7 +152,7 @@ export default function RegisterPoolForm() {
 
             <hr className="border-border" />
             <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">
-              Akun pemilik (buat login)
+              Akun pemilik (buat masuk)
             </p>
 
             <Field label="Nama Pemilik">
@@ -218,7 +218,7 @@ export default function RegisterPoolForm() {
           <p className="mt-5 text-center text-sm text-text-muted">
             Sudah punya akun?{" "}
             <a href="/login" className="font-medium text-brand-600 hover:underline">
-              Login
+              Masuk
             </a>
           </p>
         </CardBody>

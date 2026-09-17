@@ -55,3 +55,6 @@ next-env.d.ts
 skills-lock.json
 marketing-assets/
 graphify-out/
+
+# Postgres lokal untuk development (npm run db:dev)
+.dev-db/

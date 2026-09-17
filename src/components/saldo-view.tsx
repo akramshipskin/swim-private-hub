@@ -79,7 +79,7 @@ export default function SaldoView({
     .reduce((sum, w) => sum + w.amount, 0);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
       <div className="flex flex-col gap-6">
       <Card>
         <CardBody className="flex flex-col gap-4 py-6">

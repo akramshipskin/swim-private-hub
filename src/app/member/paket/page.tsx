@@ -98,7 +98,7 @@ export default async function MemberPaketPage() {
           </CardBody>
         </Card>
       ) : (
-        <div className="mb-10 grid gap-4 md:grid-cols-2">
+        <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2">
           {[...new Map(packages.map((p) => [p.pool.id, p.pool])).values()].map((pool) => (
             <Card key={pool.id}>
               <CardBody>
@@ -161,7 +161,7 @@ export default async function MemberPaketPage() {
                 </p>
                 {pool.facilities.length > 0 && <p className="text-sm text-text-muted">Fasilitas: {pool.facilities.join(", ")}</p>}
               </div>
-              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {templates
                   .filter((t) => t.pool.id === pool.id)
                   .map((t) => (

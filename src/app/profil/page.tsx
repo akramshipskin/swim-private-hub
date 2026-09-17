@@ -50,7 +50,7 @@ export default async function ProfilPage() {
       <main className="w-full px-4 pb-16 py-6 sm:pb-8 sm:py-8">
         <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Edit Profil</h1>
 
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
         <Card>
           <CardBody>
             <h2 className="mb-3 text-lg font-semibold text-text">Nama</h2>

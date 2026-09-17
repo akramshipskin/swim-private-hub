@@ -174,7 +174,7 @@ export default async function CoachShortcutPage({
           <div className="flex items-center gap-2">
             <Link href="/login">
               <Button variant="ghost" size="sm">
-                Login
+                Masuk
               </Button>
             </Link>
             <Link href="/register">

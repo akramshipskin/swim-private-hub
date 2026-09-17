@@ -11,7 +11,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
   const [state, action, pending] = useActionState(withdrawPlatform, null);
   return (
     <form action={action} className="flex flex-col gap-3">
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label={`Tarik pendapatan (maks. ${formatRupiah(Math.max(0, revenue))})`}>
           <PriceInput name="revenueAmount" defaultValue={Math.max(0, revenue)} required />
         </Field>

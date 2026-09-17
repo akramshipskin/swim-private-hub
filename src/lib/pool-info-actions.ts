@@ -12,7 +12,7 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 // Info kolam bisa diubah admin ATAU pemilik kolam itu sendiri.
 export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): Promise<PoolInfoState> {
   const session = await auth();
-  if (!session) return { error: "Sesi habis, login ulang." };
+  if (!session) return { error: "Sesi habis, silakan masuk lagi." };
   const poolId = formData.get("poolId")?.toString() ?? "";
 
   const allowed =

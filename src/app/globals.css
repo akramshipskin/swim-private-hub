@@ -51,44 +51,48 @@
    ulang di layout lewat inline script biar gak FOUC). Guard
    :not([data-theme="light"]) supaya pilihan manual "light" menang walau
    OS lagi dark. */
+/* Dark mode v2 (18 Sep 2026): latar dinaikkan sedikit dari hitam pekat dan
+   kartu/border dibuat lebih terang satu tingkat, supaya pemisah antar kartu &
+   section kelihatan dan teks tidak terlalu silau. Kontras dicek: teks utama
+   di kartu 11.6:1, teks samar 4.3:1, teks putih di brand-600 5.0:1. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #14140f;
-    --foreground: #f2efe3;
+    --background: #191a17;
+    --foreground: #e8e6dc;
 
     /* brand-600 di dark mode GAK BISA charcoal (background-nya udah
        charcoal, tombol jadi invisible) -- lime-dark (olive) dipilih:
        cukup vivid buat nongol di atas bg gelap, tapi masih cukup gelap
        biar text-white di atasnya (dipake statis di banyak komponen)
        tetep kebaca. Sama pola kayak indigo dark-600 dulu. */
-    --color-brand-50: #1e210f;
-    --color-brand-100: #262b14;
-    --color-brand-500: #c6ff3d;
-    --color-brand-600: #6f8f1e;
-    --color-brand-700: #c6ff3d;
+    --color-brand-50: #2a3119;
+    --color-brand-100: #333d1c;
+    --color-brand-500: #bde85a;
+    --color-brand-600: #5a7a12;
+    --color-brand-700: #b9e063;
 
-    --color-accent-50: #4c0519;
-    --color-accent-100: #881337;
-    --color-accent-500: #fb7185;
-    --color-accent-600: #fda4af;
+    --color-accent-50: #3d1a22;
+    --color-accent-100: #5c2230;
+    --color-accent-500: #f28b9c;
+    --color-accent-600: #f5a8b5;
 
-    --color-surface: #1b1a12;
-    --color-surface-muted: #211f15;
-    --color-border: #34311f;
+    --color-surface: #282a25;
+    --color-surface-muted: #32342e;
+    --color-border: #4a4c44;
 
-    --color-text: #f2efe3;
-    --color-text-muted: #b4af98;
-    --color-text-subtle: #7d7967;
+    --color-text: #e8e6dc;
+    --color-text-muted: #b6b3a5;
+    --color-text-subtle: #8f8c80;
 
-    --color-success-bg: #0d2e22;
-    --color-success-text: #34d399;
-    --color-warning-bg: #2e2109;
-    --color-warning-text: #fbbf24;
-    --color-danger-bg: #2e1215;
-    --color-danger-text: #f87171;
+    --color-success-bg: #1b3a2d;
+    --color-success-text: #6fd6a8;
+    --color-warning-bg: #3d2f12;
+    --color-warning-text: #f2c14e;
+    --color-danger-bg: #3f2023;
+    --color-danger-text: #f29191;
 
-    --color-disabled-bg: #334155;
-    --color-disabled-text: #64748b;
+    --color-disabled-bg: #3d3f39;
+    --color-disabled-text: #7c7e76;
 
     /* Hijau WA asli (#25D366) kesaturasi terlalu tinggi buat nyala di
        atas bg gelap -- "pedes di mata" kalau dipake mentah kayak di
@@ -104,37 +108,37 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --background: #14140f;
-  --foreground: #f2efe3;
+  --background: #191a17;
+  --foreground: #e8e6dc;
 
-  --color-brand-50: #1e210f;
-  --color-brand-100: #262b14;
-  --color-brand-500: #c6ff3d;
-  --color-brand-600: #6f8f1e;
-  --color-brand-700: #c6ff3d;
+  --color-brand-50: #2a3119;
+  --color-brand-100: #333d1c;
+  --color-brand-500: #bde85a;
+  --color-brand-600: #5a7a12;
+  --color-brand-700: #b9e063;
 
-  --color-accent-50: #4c0519;
-  --color-accent-100: #881337;
-  --color-accent-500: #fb7185;
-  --color-accent-600: #fda4af;
+  --color-accent-50: #3d1a22;
+  --color-accent-100: #5c2230;
+  --color-accent-500: #f28b9c;
+  --color-accent-600: #f5a8b5;
 
-  --color-surface: #1b1a12;
-  --color-surface-muted: #211f15;
-  --color-border: #34311f;
+  --color-surface: #282a25;
+  --color-surface-muted: #32342e;
+  --color-border: #4a4c44;
 
-  --color-text: #f2efe3;
-  --color-text-muted: #b4af98;
-  --color-text-subtle: #7d7967;
+  --color-text: #e8e6dc;
+  --color-text-muted: #b6b3a5;
+  --color-text-subtle: #8f8c80;
 
-  --color-success-bg: #0d2e22;
-  --color-success-text: #34d399;
-  --color-warning-bg: #2e2109;
-  --color-warning-text: #fbbf24;
-  --color-danger-bg: #2e1215;
-  --color-danger-text: #f87171;
+  --color-success-bg: #1b3a2d;
+  --color-success-text: #6fd6a8;
+  --color-warning-bg: #3d2f12;
+  --color-warning-text: #f2c14e;
+  --color-danger-bg: #3f2023;
+  --color-danger-text: #f29191;
 
-  --color-disabled-bg: #334155;
-  --color-disabled-text: #64748b;
+  --color-disabled-bg: #3d3f39;
+  --color-disabled-text: #7c7e76;
 
   --color-whatsapp: #1d9e56;
 }

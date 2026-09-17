@@ -46,7 +46,7 @@ export default async function CariCoachPage() {
       {coaches.length === 0 ? (
         <p className="mt-6 text-sm text-text-muted">Belum ada coach aktif.</p>
       ) : (
-        <div className="mt-6 grid gap-3 lg:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
           {coaches.map((coach) => (
             <Card key={coach.id}>
               <CardBody className="flex gap-4">

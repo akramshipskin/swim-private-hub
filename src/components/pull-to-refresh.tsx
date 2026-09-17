@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loader } from "@/components/ui/loader";
 
 const THRESHOLD = 70;
 const MAX_PULL = 100;
@@ -70,14 +71,15 @@ export function PullToRefresh({ children }: { children: React.ReactNode }) {
           transition: pullDistance > 0 && !refreshing ? "none" : "height 0.2s ease-out",
         }}
       >
-        {showIndicator && (
-          <div
-            className={`h-5 w-5 rounded-full border-2 border-brand-500 border-t-transparent ${
-              refreshing ? "animate-spin" : ""
-            }`}
-            style={!refreshing ? { transform: `rotate(${pullDistance * 3.2}deg)` } : undefined}
-          />
-        )}
+        {showIndicator &&
+          (refreshing ? (
+            <Loader size={20} label="Memuat ulang" />
+          ) : (
+            <div
+              className="h-5 w-5 rounded-full border-2 border-brand-500 border-t-transparent"
+              style={{ transform: `rotate(${pullDistance * 3.2}deg)` }}
+            />
+          ))}
       </div>
       {children}
     </div>

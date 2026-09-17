@@ -73,7 +73,7 @@ export default async function AdminUsersPage() {
       <h2 className="mb-3 text-lg font-semibold text-text">Tambah Peserta</h2>
       <p className="mb-3 text-sm text-text-muted">
         1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang
-        belum pernah login belum punya peserta terdaftar — tambahkan di sini
+        belum pernah masuk belum punya peserta terdaftar — tambahkan di sini
         dulu kalau mau langsung assign paket.
       </p>
       <AddChildForm members={members} />

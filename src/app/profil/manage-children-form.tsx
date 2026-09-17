@@ -27,7 +27,7 @@ export default function ManageChildrenForm({ dependents: children }: { dependent
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
       {active.length === 0 && inactive.length === 0 ? (
         <p className="text-sm text-text-muted">Belum ada anak terdaftar.</p>
       ) : (
