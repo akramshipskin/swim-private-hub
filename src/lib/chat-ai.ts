@@ -86,3 +86,27 @@ async function askClaude(system: string, turns: Turn[]): Promise<string | null> 
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
   return data.content?.find((c) => c.type === "text")?.text?.trim() || null;
 }
+
+// Cek cepat untuk halaman Pesan admin: provider mana yang aktif dan apakah
+// panggilan uji berhasil. Pesan error dipotong & tidak memuat API key.
+export async function checkAiStatus(): Promise<{ provider: string; ok: boolean; detail: string }> {
+  if (process.env.GEMINI_API_KEY) {
+    const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: "POST",
+        headers: { "x-goog-api-key": process.env.GEMINI_API_KEY, "content-type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: "Balas satu kata: siap" }] }],
+          generationConfig: { maxOutputTokens: 20, thinkingConfig: { thinkingBudget: 0 } },
+        }),
+      });
+      const body = await res.text();
+      return { provider: `Gemini (${model})`, ok: res.ok, detail: res.ok ? "Terhubung" : `HTTP ${res.status}: ${body.slice(0, 200)}` };
+    } catch (err) {
+      return { provider: `Gemini (${model})`, ok: false, detail: err instanceof Error ? err.message : "Gagal terhubung" };
+    }
+  }
+  if (process.env.ANTHROPIC_API_KEY) return { provider: "Claude", ok: true, detail: "Key terpasang (belum diuji)" };
+  return { provider: "Belum ada", ok: false, detail: "GEMINI_API_KEY / ANTHROPIC_API_KEY belum diisi" };
+}

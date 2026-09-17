@@ -5,6 +5,7 @@ import { roleLabel } from "@/lib/nav-links";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ReplyForm from "./reply-form";
+import { checkAiStatus } from "@/lib/chat-ai";
 
 const senderLabel = { USER: "Pengguna", AI: "Asisten AI", ADMIN: "Admin", SYSTEM: "Sistem" } as const;
 
@@ -40,6 +41,7 @@ export default async function AdminPesanPage({ searchParams }: { searchParams: P
       })
     : null;
   const waiting = threads.filter((th) => th.needsAdmin).length;
+  const ai = await checkAiStatus();
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -47,6 +49,10 @@ export default async function AdminPesanPage({ searchParams }: { searchParams: P
       <p className="mt-1 mb-6 text-sm text-text-muted">
         Chat bantuan dari member, coach, dan pemilik kolam. Yang tidak bisa dijawab asisten AI ditandai{" "}
         <b>Perlu dibalas</b>. {waiting > 0 ? `${waiting} percakapan menunggu.` : "Tidak ada yang menunggu."}
+      </p>
+
+      <p className={`mb-4 rounded-lg px-3 py-2 text-sm ${ai.ok ? "bg-success-bg text-success-text" : "bg-warning-bg text-warning-text"}`}>
+        Asisten AI: <b>{ai.provider}</b> — {ai.detail}
       </p>
 
       {threads.length === 0 ? (
