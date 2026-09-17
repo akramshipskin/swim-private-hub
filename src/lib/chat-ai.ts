@@ -38,6 +38,18 @@ export function normalizeTurns(turns: Turn[]): Turn[] {
   return out;
 }
 
+// Google menonaktifkan 2.5 Flash untuk user baru (Sep 2026) dan
+// menyarankan 3.6 Flash. Bisa diganti lewat env GEMINI_MODEL.
+const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
+
+// Model 2.5 "berpikir" dulu dan itu makan jatah token keluaran -> matikan.
+// Model lain: biarkan default, cukup beri ruang token yang lebih longgar.
+function geminiGenerationConfig(model: string, maxOutputTokens: number) {
+  return model.startsWith("gemini-2.5")
+    ? { maxOutputTokens, thinkingConfig: { thinkingBudget: 0 } }
+    : { maxOutputTokens };
+}
+
 // Provider dipilih dari env: GEMINI_API_KEY (utama) atau ANTHROPIC_API_KEY.
 // null = AI belum dikonfigurasi atau gagal dipanggil -> caller teruskan ke admin.
 export async function askAi(system: string, turns: Turn[]): Promise<string | null> {
@@ -51,16 +63,14 @@ export async function askAi(system: string, turns: Turn[]): Promise<string | nul
 }
 
 async function askGemini(system: string, turns: Turn[]): Promise<string | null> {
-  const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+  const model = process.env.GEMINI_MODEL ?? DEFAULT_GEMINI_MODEL;
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: "POST",
     headers: { "x-goog-api-key": process.env.GEMINI_API_KEY!, "content-type": "application/json" },
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: system }] },
       contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
-      // thinkingBudget 0: model 2.5 Flash defaultnya "berpikir" dulu dan itu
-      // ikut makan jatah maxOutputTokens, jawaban bisa kosong.
-      generationConfig: { maxOutputTokens: 800, thinkingConfig: { thinkingBudget: 0 } },
+      generationConfig: geminiGenerationConfig(model, 1024),
     }),
   });
   if (!res.ok) {
@@ -91,14 +101,14 @@ async function askClaude(system: string, turns: Turn[]): Promise<string | null> 
 // panggilan uji berhasil. Pesan error dipotong & tidak memuat API key.
 export async function checkAiStatus(): Promise<{ provider: string; ok: boolean; detail: string }> {
   if (process.env.GEMINI_API_KEY) {
-    const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+    const model = process.env.GEMINI_MODEL ?? DEFAULT_GEMINI_MODEL;
     try {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: "POST",
         headers: { "x-goog-api-key": process.env.GEMINI_API_KEY, "content-type": "application/json" },
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: "Balas satu kata: siap" }] }],
-          generationConfig: { maxOutputTokens: 20, thinkingConfig: { thinkingBudget: 0 } },
+          generationConfig: geminiGenerationConfig(model, 256),
         }),
       });
       const body = await res.text();
