@@ -58,12 +58,18 @@ async function askGemini(system: string, turns: Turn[]): Promise<string | null> 
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: system }] },
       contents: turns.map((t) => ({ role: t.role === "assistant" ? "model" : "user", parts: [{ text: t.content }] })),
-      generationConfig: { maxOutputTokens: 400 },
+      // thinkingBudget 0: model 2.5 Flash defaultnya "berpikir" dulu dan itu
+      // ikut makan jatah maxOutputTokens, jawaban bisa kosong.
+      generationConfig: { maxOutputTokens: 800, thinkingConfig: { thinkingBudget: 0 } },
     }),
   });
-  if (!res.ok) return null;
-  const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
+  if (!res.ok) {
+    console.error("[chat-ai] Gemini error", res.status, (await res.text()).slice(0, 300));
+    return null;
+  }
+  const data = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[] };
   const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("").trim();
+  if (!text) console.error("[chat-ai] Gemini empty reply", data.candidates?.[0]?.finishReason);
   return text || null;
 }
 
@@ -73,7 +79,10 @@ async function askClaude(system: string, turns: Turn[]): Promise<string | null> 
     headers: { "x-api-key": process.env.ANTHROPIC_API_KEY!, "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({ model: process.env.ANTHROPIC_MODEL ?? "claude-haiku-4-5", max_tokens: 400, system, messages: turns }),
   });
-  if (!res.ok) return null;
+  if (!res.ok) {
+    console.error("[chat-ai] Claude error", res.status, (await res.text()).slice(0, 300));
+    return null;
+  }
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
   return data.content?.find((c) => c.type === "text")?.text?.trim() || null;
 }

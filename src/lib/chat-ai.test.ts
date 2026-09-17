@@ -59,7 +59,8 @@ describe("askAi provider", () => {
 
   it("returns null (forward to admin) when Gemini errors", async () => {
     vi.stubEnv("GEMINI_API_KEY", "g-key");
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 400, text: async () => "bad" }));
+    vi.spyOn(console, "error").mockImplementation(() => {});
     expect(await askAi("s", [{ role: "user", content: "hai" }])).toBeNull();
   });
 });
