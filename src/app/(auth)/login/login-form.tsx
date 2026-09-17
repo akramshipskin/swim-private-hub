@@ -36,6 +36,20 @@ export default function LoginForm() {
       return;
     }
 
+    // Login di sini lewat fetch + pindah halaman client-side, jadi browser
+    // tidak pernah melihat "form submit" biasa dan tidak menawarkan simpan
+    // password. Credential Management API memberi tahu browser secara
+    // eksplisit (Chrome/Edge; browser lain mengabaikannya).
+    type PasswordCredentialCtor = new (data: { id: string; password: string }) => Credential;
+    const w = window as unknown as { PasswordCredential?: PasswordCredentialCtor };
+    if (w.PasswordCredential && navigator.credentials) {
+      try {
+        await navigator.credentials.store(new w.PasswordCredential({ id: identifier, password }));
+      } catch {
+        // Browser menolak menyimpan -- bukan alasan untuk menggagalkan login.
+      }
+    }
+
     router.push("/");
     router.refresh();
   }
@@ -63,6 +77,8 @@ export default function LoginForm() {
             <Field label="No HP atau Email">
               <Input
                 type="text"
+                name="username"
+                id="login-username"
                 placeholder="0812xxxxxxx atau email"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
@@ -72,6 +88,8 @@ export default function LoginForm() {
             </Field>
             <Field label="Password">
               <PasswordInput
+                name="password"
+                id="login-password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -87,7 +105,7 @@ export default function LoginForm() {
             )}
 
             <Button type="submit" loading={loading} className="mt-1 w-full">
-              Login
+              Masuk
             </Button>
           </form>
 

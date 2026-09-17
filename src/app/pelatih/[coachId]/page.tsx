@@ -13,6 +13,7 @@ import { NavBar } from "@/components/nav-bar";
 import BackButton from "./back-button";
 import { Avatar } from "@/components/ui/avatar";
 import { coachBioLine } from "@/lib/coach-bio";
+import Image from "next/image";
 
 // Coach shortcut page (pool-first browse + cheap cross-pool discovery,
 // locked /plan-eng-review 2026-09-12, cross-model tension #4): pool-first
@@ -178,7 +179,8 @@ export default async function CoachShortcutPage({
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
         <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
-          <Link href="/" className="inline-block">
+          <Link href="/" className="inline-flex items-center gap-2">
+            <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-contain" />
             <Logotype className="text-lg" />
           </Link>
           <div className="flex items-center gap-2">
