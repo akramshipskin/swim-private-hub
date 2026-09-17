@@ -1,5 +1,9 @@
 const ADMIN_WHATSAPP_NUMBER = "6282117173124";
 
+export function buildAdminWaLink(message: string) {
+  return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
 function normalizePhoneForWa(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.startsWith("0")) return "62" + digits.slice(1);

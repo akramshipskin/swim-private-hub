@@ -125,6 +125,13 @@ describe("createUser", () => {
 });
 
 describe("toggleUserActive", () => {
+  // Regression (sweep 2026-09-17): admin bisa nonaktifin akunnya sendiri ->
+  // ke-logout permanen, gak ada admin lain buat ngaktifin balik.
+  it("refuses to deactivate the admin's own account", async () => {
+    await toggleUserActive("admin-1", false);
+    expect(userUpdate).not.toHaveBeenCalled();
+  });
+
   it("updates isActive to the given value", async () => {
     await toggleUserActive("user-1", false);
     expect(userUpdate).toHaveBeenCalledWith({ where: { id: "user-1" }, data: { isActive: false } });

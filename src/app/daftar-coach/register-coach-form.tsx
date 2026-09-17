@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { PendingApprovalScreen } from "@/components/pending-approval-screen";
 import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import { isValidIndonesianPhone } from "@/lib/format";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 
 export default function RegisterCoachForm() {
-  const router = useRouter();
+  const [submitted, setSubmitted] = useState(false);
   const [formRenderedAt] = useState(() => Date.now());
   const [website, setWebsite] = useState("");
   const [name, setName] = useState("");
@@ -70,21 +69,11 @@ export default function RegisterCoachForm() {
       return;
     }
 
-    const signInResult = await signIn("credentials", {
-      identifier: phone,
-      password,
-      redirect: false,
-    });
-
     setLoading(false);
-
-    if (signInResult?.error) {
-      router.push("/login");
-      return;
-    }
-
-    router.push("/coach/jadwal");
+    setSubmitted(true);
   }
+
+  if (submitted) return <PendingApprovalScreen roleLabel="coach" />;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 py-12">

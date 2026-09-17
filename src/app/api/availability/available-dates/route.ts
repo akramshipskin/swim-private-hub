@@ -19,9 +19,18 @@ export async function GET(request: Request) {
 
   const from = new Date(Date.UTC(year, month - 1, 1));
   const to = new Date(Date.UTC(year, month, 1));
+  // Titik "ada slot" harus sesuai kolam yang lagi dipilih member & cuma
+  // slot yang jamnya belum lewat -- dulu nandain tanggal yang slotnya
+  // cuma ada di kolam lain / udah lewat, member klik terus kosong.
+  const poolId = searchParams.get("poolId") ?? undefined;
 
   const rows = await prisma.availability.findMany({
-    where: { date: { gte: from, lt: to }, status: "AVAILABLE" },
+    where: {
+      date: { gte: from, lt: to },
+      status: "AVAILABLE",
+      startTime: { gt: new Date() },
+      ...(poolId ? { poolId } : {}),
+    },
     select: { date: true },
     distinct: ["date"],
   });

@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   const template = templateId
     ? await prisma.packageTemplate.findFirst({
-        where: { id: templateId, isActive: true },
+        where: { id: templateId, isActive: true, pool: { isActive: true } },
       })
     : null;
 

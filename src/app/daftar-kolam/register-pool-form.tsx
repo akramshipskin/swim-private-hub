@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { PendingApprovalScreen } from "@/components/pending-approval-screen";
 import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import { Field, Input } from "@/components/ui/input";
 import { isValidIndonesianPhone } from "@/lib/format";
 
 export default function RegisterPoolForm() {
-  const router = useRouter();
+  const [submitted, setSubmitted] = useState(false);
   const [formRenderedAt] = useState(() => Date.now());
   const [website, setWebsite] = useState("");
   const [poolName, setPoolName] = useState("");
@@ -65,21 +64,11 @@ export default function RegisterPoolForm() {
       return;
     }
 
-    const signInResult = await signIn("credentials", {
-      identifier: phone,
-      password,
-      redirect: false,
-    });
-
     setLoading(false);
-
-    if (signInResult?.error) {
-      router.push("/login");
-      return;
-    }
-
-    router.push("/pool/saldo");
+    setSubmitted(true);
   }
+
+  if (submitted) return <PendingApprovalScreen roleLabel="pemilik kolam" />;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 py-12">

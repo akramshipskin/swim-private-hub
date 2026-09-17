@@ -280,6 +280,7 @@ export default function BookingBoard({
               {showFullCalendar && (
                 <div className="mb-2">
                   <AvailabilityDatePicker
+                    fetchUrl={`/api/availability/available-dates?poolId=${poolId}`}
                     value={date}
                     onChange={(d) => {
                       setDate(d);
@@ -289,10 +290,19 @@ export default function BookingBoard({
                   />
                 </div>
               )}
-              <DateQuickPicker value={date} onChange={setDate} days={8} />
+              <DateQuickPicker
+                value={date}
+                onChange={setDate}
+                days={8}
+                fetchUrl={`/api/availability/available-dates?poolId=${poolId}`}
+              />
             </div>
             <div className="hidden sm:block">
-              <AvailabilityDatePicker value={date} onChange={setDate} />
+              <AvailabilityDatePicker
+                value={date}
+                onChange={setDate}
+                fetchUrl={`/api/availability/available-dates?poolId=${poolId}`}
+              />
             </div>
           </Field>
           {selectedChild && (

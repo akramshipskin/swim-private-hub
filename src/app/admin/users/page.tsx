@@ -17,7 +17,7 @@ const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] 
 ];
 
 export default async function AdminUsersPage() {
-  await requireRole("ADMIN");
+  const session = await requireRole("ADMIN");
 
   const [users, templates, dependents, pools] = await Promise.all([
     prisma.user.findMany({
@@ -117,7 +117,7 @@ export default async function AdminUsersPage() {
                         </td>
                         <td className="px-5 py-4 text-right">
                           <div className="flex items-center justify-end">
-                            <UserActions user={u} />
+                            <UserActions user={u} isSelf={u.id === session.user.id} />
                           </div>
                         </td>
                       </tr>
@@ -141,7 +141,7 @@ export default async function AdminUsersPage() {
                     </div>
                     {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
                     <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
-                    <UserActions user={u} />
+                    <UserActions user={u} isSelf={u.id === session.user.id} />
                   </CardBody>
                 </Card>
               ))}

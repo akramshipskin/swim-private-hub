@@ -51,7 +51,7 @@ export default async function CoachShortcutPage({
   const content = (
     <main className="mx-auto max-w-lg px-4 py-8">
       <div className="flex items-center gap-2">
-        <BackButton />
+        <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
         <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
       </div>
       {coach.coachProfile?.hasCertification && (

@@ -6,6 +6,7 @@ import { Field, Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
+import { MIN_WITHDRAWAL } from "@/lib/policy";
 
 type Withdrawal = {
   id: string;
@@ -54,14 +55,20 @@ export default function SaldoView({
           <form action={cairAction} className="mt-4">
             <Button
               type="submit"
-              disabled={!hasBankInfo || walletBalance <= 0 || cairPending}
+              disabled={!hasBankInfo || walletBalance < MIN_WITHDRAWAL || cairPending}
               loading={cairPending}
             >
               Cairkan Saldo
             </Button>
           </form>
-          {!hasBankInfo && (
+          {!hasBankInfo ? (
             <p className="mt-2 text-xs text-warning-text">Isi rekening tujuan dulu di bawah.</p>
+          ) : (
+            walletBalance < MIN_WITHDRAWAL && (
+              <p className="mt-2 text-xs text-text-subtle">
+                Minimal pencairan {formatRupiah(MIN_WITHDRAWAL)}.
+              </p>
+            )
           )}
           {cairState?.error && (
             <p role="alert" className="mt-2 text-xs text-danger-text">

@@ -16,6 +16,8 @@ export async function POST(request: Request) {
     return Response.json({ error: "Payload tidak lengkap" }, { status: 400 });
   }
 
+  // P2002 = 2 request subscribe barengan buat endpoint yang sama, yang
+  // satu udah kebikin duluan -- aman diabaikan (lihat affiliateCoach).
   await prisma.pushSubscription.upsert({
     where: { endpoint },
     update: { userId: session.user.id, p256dh: keys.p256dh, auth: keys.auth },
@@ -25,6 +27,8 @@ export async function POST(request: Request) {
       p256dh: keys.p256dh,
       auth: keys.auth,
     },
+  }).catch((err: { code?: string }) => {
+    if (err?.code !== "P2002") throw err;
   });
 
   return Response.json({ ok: true });

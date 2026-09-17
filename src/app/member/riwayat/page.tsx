@@ -128,7 +128,15 @@ export default async function MemberRiwayatPage() {
                                 : b.package.dependent.name}
                             </p>
                             <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                              <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
+                              {/* Status COMPLETED gak pernah di-set di mana pun -- booking
+                                  yang sesinya udah lewat tetep BOOKED selamanya, jadi dulu
+                                  kebaca "Terjadwal" buat sesi minggu lalu. Label diturunin
+                                  dari jam sesi. */}
+                              {b.status === "BOOKED" && b.availability.endTime <= now ? (
+                                <Badge tone="neutral">Udah lewat</Badge>
+                              ) : (
+                                <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
+                              )}
                               {b.status === "CANCELLED" && b.cancelledBy && (
                                 <span className="text-xs text-text-subtle">
                                   oleh{" "}

@@ -40,7 +40,9 @@ export default async function MemberPaketPage() {
       },
     }),
     prisma.packageTemplate.findMany({
-      where: { isActive: true },
+      // Kolam yang dinonaktifin admin (atau belum di-approve) gak boleh
+      // jualan paket lagi.
+      where: { isActive: true, pool: { isActive: true } },
       orderBy: { totalSesi: "asc" },
       include: { pool: { select: { name: true } } },
     }),
@@ -50,6 +52,8 @@ export default async function MemberPaketPage() {
       select: { id: true, name: true },
     }),
   ]);
+
+  const now = new Date();
 
   // "Member" cuma valid begitu paket pernah aktif (beli/diassign) --
   // sebelum itu dia masih pengunjung biasa, jangan diklaim member.
@@ -101,7 +105,16 @@ export default async function MemberPaketPage() {
                     )}
                   </p>
                 </div>
-                <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
+                {/* Status di DB bisa tetep ACTIVE walau sesinya abis / udah lewat
+                    masa berlaku (gak ada cron yang nge-flip) -- dulu kebaca
+                    "Aktif" padahal di halaman Booking paket ini udah gak muncul. */}
+                {p.status === "ACTIVE" && p.sisaSesi <= 0 ? (
+                  <Badge tone="neutral">Sesi habis</Badge>
+                ) : p.status === "ACTIVE" && p.expiredDate && p.expiredDate < now ? (
+                  <Badge tone="neutral">Kedaluwarsa</Badge>
+                ) : (
+                  <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
+                )}
               </CardBody>
             </Card>
           ))}

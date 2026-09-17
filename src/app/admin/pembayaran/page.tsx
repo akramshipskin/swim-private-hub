@@ -6,7 +6,7 @@ import { Field } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { formatRupiah } from "@/lib/format";
-import { todayWibDateString, wibDateTime } from "@/lib/datetime";
+import { wibDateTime, resolveDateRange } from "@/lib/datetime";
 
 const statusTone = {
   PENDING: "warning",
@@ -21,12 +21,6 @@ const statusLabel: Record<string, string> = {
   FAILED: "Gagal",
   EXPIRED: "Kedaluwarsa",
 };
-
-function daysAgoWib(n: number): string {
-  const today = new Date(`${todayWibDateString()}T00:00:00+07:00`);
-  today.setDate(today.getDate() - n);
-  return today.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
-}
 
 function dateKeyWib(d: Date) {
   return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
@@ -54,8 +48,7 @@ export default async function AdminPembayaranPage({
   await requireRole("ADMIN");
   const params = await searchParams;
 
-  const from = params.from || daysAgoWib(29);
-  const to = params.to || todayWibDateString();
+  const { from, to } = resolveDateRange(params.from, params.to, 29);
 
   const fromDateTime = wibDateTime(from, "00:00");
   const toDateTime = wibDateTime(to, "23:59");

@@ -1,12 +1,11 @@
 import { prisma } from "@/lib/prisma";
+import { MIN_WITHDRAWAL } from "@/lib/policy";
 
 export class WithdrawalError extends Error {
   constructor(message: string) {
     super(message);
   }
 }
-
-const MIN_WITHDRAWAL = 50_000;
 
 // Dipake dari Pool owner ATAU Coach -- exactly 1 dari poolId/coachProfileId
 // keisi (dicek caller). Saldo langsung dipotong pas request dibuat (bukan

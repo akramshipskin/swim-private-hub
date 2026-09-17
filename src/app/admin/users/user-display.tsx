@@ -79,8 +79,10 @@ export function PesertaList({ items }: { items: PesertaRow[] }) {
 
 export function UserActions({
   user,
+  isSelf = false,
 }: {
   user: { id: string; name: string; phone: string | null; isActive: boolean };
+  isSelf?: boolean;
 }) {
   return (
     <div className="flex items-center gap-2">
@@ -94,7 +96,9 @@ export function UserActions({
           Hubungi
         </a>
       )}
-      <ToggleActiveButton userId={user.id} userName={user.name} isActive={user.isActive} />
+      {/* Admin nonaktifin akunnya sendiri = langsung ke-logout & gak ada
+          admin lain buat ngaktifin balik (cuma bisa lewat DB). */}
+      {!isSelf && <ToggleActiveButton userId={user.id} userName={user.name} isActive={user.isActive} />}
     </div>
   );
 }

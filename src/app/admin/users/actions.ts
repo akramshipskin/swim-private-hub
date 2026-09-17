@@ -53,29 +53,38 @@ export async function createUser(
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  await prisma.$transaction(async (tx) => {
-    const created = await tx.user.create({
-      data: {
-        name,
-        email,
-        phone,
-        passwordHash,
-        role,
-        // MEMBER wajib ganti password pas login pertama -- samain kayak
-        // jalur import xlsx.
-        ...(role === "MEMBER" ? { mustChangePassword: true } : {}),
-        ...(role === "COACH" ? { coachProfile: { create: {} } } : {}),
-      },
-    });
-    if (childNames.length > 0) {
-      await tx.dependent.createMany({
-        data: childNames.map((childName) => ({ memberId: created.id, name: childName })),
+  try {
+    await prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          name,
+          email,
+          phone,
+          passwordHash,
+          role,
+          // MEMBER wajib ganti password pas login pertama -- samain kayak
+          // jalur import xlsx.
+          ...(role === "MEMBER" ? { mustChangePassword: true } : {}),
+          ...(role === "COACH" ? { coachProfile: { create: {} } } : {}),
+        },
       });
+      if (childNames.length > 0) {
+        await tx.dependent.createMany({
+          data: childNames.map((childName) => ({ memberId: created.id, name: childName })),
+        });
+      }
+      if (wantsSelf) {
+        await createSelfDependent(created.id, tx);
+      }
+    });
+  } catch (err) {
+    // Double-submit barengan: 2 request lolos cek `existing` di atas, yang
+    // kalah kena unique constraint -- dulu jadi halaman error.
+    if ((err as { code?: string })?.code === "P2002") {
+      return { error: "No HP atau email sudah terdaftar" };
     }
-    if (wantsSelf) {
-      await createSelfDependent(created.id, tx);
-    }
-  });
+    throw err;
+  }
 
   revalidatePath("/admin/users");
   return null;
@@ -268,9 +277,13 @@ export async function importMembersXlsx(
       paketCreated += groupPaketCreated;
       skipped.push(...groupSkipped);
     } catch (err) {
-      skipped.push(
-        `${name} (${phone}) -- gagal diimport: ${err instanceof Error ? err.message : "error gak dikenal"}`
-      );
+      // Jangan tempel err.message mentah -- isinya pesan internal Prisma
+      // lengkap sama path file server (kebukti di tes race lokal).
+      const reason =
+        (err as { code?: string })?.code === "P2002"
+          ? "No HP/email udah kepake akun lain"
+          : "error gak terduga, coba import ulang baris ini";
+      skipped.push(`${name} (${phone}) -- gagal diimport: ${reason}`);
     }
   }
 
@@ -290,7 +303,9 @@ export async function importMembersXlsx(
 }
 
 export async function toggleUserActive(userId: string, nextActive: boolean) {
-  await requireRole("ADMIN");
+  const session = await requireRole("ADMIN");
+  // Guard server-side juga (tombolnya udah disembunyiin buat diri sendiri).
+  if (userId === session.user.id && !nextActive) return;
 
   await prisma.user.update({
     where: { id: userId },

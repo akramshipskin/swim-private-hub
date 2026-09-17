@@ -44,6 +44,7 @@ export default function BookingOverviewBoard({
   // gak ada navigasi/refetch ke server lagi, jadi instant.
   const [selectedCoach, setSelectedCoach] = useState("all");
   const now = useMemo(() => new Date(), []);
+  const todayKey = dateKey(now);
 
   const byCoach = useMemo(() => {
     const map = new Map<string, { coachName: string; byDate: Map<string, Availability[]> }>();
@@ -110,17 +111,20 @@ export default function BookingOverviewBoard({
                       <h3 className="text-xs font-medium text-text-subtle">
                         {formatDateLabel(rows[0].date)}
                       </h3>
-                      <a
-                        href={buildKabarinWaLink(group.coachName, formatDateLabel(rows[0].date))}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-whatsapp px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90"
-                      >
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
-                          <path d="M12.04 2c-5.52 0-10 4.48-10 10 0 1.77.46 3.45 1.28 4.9L2 22l5.25-1.38a9.96 9.96 0 004.79 1.22h.01c5.52 0 10-4.48 10-10s-4.48-9.84-10.01-9.84zm5.87 14.1c-.25.7-1.45 1.33-2 1.42-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.69-.62-2.97-1.28-4.9-4.28-5.05-4.48-.15-.2-1.22-1.62-1.22-3.09s.77-2.19 1.05-2.49c.27-.3.6-.37.8-.37h.57c.18 0 .43-.07.67.51.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.5-.15.18-.32.4-.45.53-.15.15-.3.32-.13.62.17.3.77 1.27 1.65 2.06 1.14 1.02 2.1 1.33 2.4 1.48.3.15.47.13.65-.08.17-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.73.82 2.03.97.3.15.5.22.57.35.08.12.08.72-.17 1.42z" />
-                        </svg>
-                        Kabarin Grup WhatsApp
-                      </a>
+                      {/* Ngabarin grup soal jadwal tanggal yang udah lewat gak ada gunanya. */}
+                      {dKey >= todayKey && (
+                        <a
+                          href={buildKabarinWaLink(group.coachName, formatDateLabel(rows[0].date))}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-whatsapp px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90"
+                        >
+                          <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+                            <path d="M12.04 2c-5.52 0-10 4.48-10 10 0 1.77.46 3.45 1.28 4.9L2 22l5.25-1.38a9.96 9.96 0 004.79 1.22h.01c5.52 0 10-4.48 10-10s-4.48-9.84-10.01-9.84zm5.87 14.1c-.25.7-1.45 1.33-2 1.42-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.69-.62-2.97-1.28-4.9-4.28-5.05-4.48-.15-.2-1.22-1.62-1.22-3.09s.77-2.19 1.05-2.49c.27-.3.6-.37.8-.37h.57c.18 0 .43-.07.67.51.25.6.85 2.07.92 2.22.07.15.12.33.02.53-.1.2-.15.32-.3.5-.15.18-.32.4-.45.53-.15.15-.3.32-.13.62.17.3.77 1.27 1.65 2.06 1.14 1.02 2.1 1.33 2.4 1.48.3.15.47.13.65-.08.17-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.27.1 1.73.82 2.03.97.3.15.5.22.57.35.08.12.08.72-.17 1.42z" />
+                          </svg>
+                          Kabarin Grup WhatsApp
+                        </a>
+                      )}
                     </div>
 
                     {/* 2 kolom baru mulai di lg, bukan sm -- di lebar sm

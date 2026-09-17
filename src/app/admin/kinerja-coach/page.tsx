@@ -1,16 +1,10 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
-import { dateLabel, formatDateLabel, todayWibDateString } from "@/lib/datetime";
+import { dateLabel, formatDateLabel, resolveDateRange } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
-
-function daysAgoWib(n: number): string {
-  const today = new Date(`${todayWibDateString()}T00:00:00+07:00`);
-  today.setDate(today.getDate() - n);
-  return today.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
-}
 
 export default async function KinerjaCoachPage({
   searchParams,
@@ -20,8 +14,7 @@ export default async function KinerjaCoachPage({
   await requireRole("ADMIN");
   const params = await searchParams;
 
-  const from = params.from || daysAgoWib(6);
-  const to = params.to || todayWibDateString();
+  const { from, to } = resolveDateRange(params.from, params.to, 6);
 
   const fromDate = dateLabel(from);
   const toDateExclusive = new Date(dateLabel(to));

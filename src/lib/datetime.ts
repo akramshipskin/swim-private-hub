@@ -40,3 +40,27 @@ export function formatTimeWib(d: Date): string {
     timeZone: "Asia/Jakarta",
   });
 }
+
+function isDateKey(s: string | undefined): s is string {
+  if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const d = new Date(`${s}T00:00:00Z`);
+  return !isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+}
+
+// Rentang tanggal filter laporan dari query string (?from=&to=). Nilai yang
+// gak valid jatuh ke default (dulu bikin halaman error 500), rentang
+// kebalik (from > to) ditukar (dulu diterima diem-diem & hasilnya selalu
+// kosong).
+export function resolveDateRange(
+  rawFrom: string | undefined,
+  rawTo: string | undefined,
+  defaultDaysBack: number
+): { from: string; to: string } {
+  const today = todayWibDateString();
+  const fallbackFrom = new Date(`${today}T00:00:00Z`);
+  fallbackFrom.setUTCDate(fallbackFrom.getUTCDate() - defaultDaysBack);
+  let from = isDateKey(rawFrom) ? rawFrom : fallbackFrom.toISOString().slice(0, 10);
+  let to = isDateKey(rawTo) ? rawTo : today;
+  if (from > to) [from, to] = [to, from];
+  return { from, to };
+}

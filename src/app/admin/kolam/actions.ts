@@ -18,11 +18,18 @@ export async function affiliateCoach(
     return { error: "Pilih coach dulu." };
   }
 
-  await prisma.poolAffiliation.upsert({
-    where: { poolId_coachId: { poolId, coachId } },
-    update: {},
-    create: { poolId, coachId },
-  });
+  // upsert Prisma bukan atomic di DB -- 2 submit barengan bisa dua-duanya
+  // nyoba create dan yang kalah kena unique constraint (P2002), yang dulu
+  // bikin halaman error. Afiliasinya udah ada = tujuan tercapai, abaikan.
+  await prisma.poolAffiliation
+    .upsert({
+      where: { poolId_coachId: { poolId, coachId } },
+      update: {},
+      create: { poolId, coachId },
+    })
+    .catch((err: { code?: string }) => {
+      if (err?.code !== "P2002") throw err;
+    });
 
   revalidatePath("/admin/kolam");
   return null;

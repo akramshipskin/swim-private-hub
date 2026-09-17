@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { requireRole } from "@/lib/require-role";
 import { NavBar } from "@/components/nav-bar";
 import { PullToRefresh } from "@/components/pull-to-refresh";
-import { roleNavLinks } from "@/lib/nav-links";
+import { roleNavLinks, roleLabel } from "@/lib/nav-links";
 
 export const metadata: Metadata = {
   title: "Coach | Swim Private Hub",
@@ -19,7 +19,7 @@ export default async function CoachLayout({
   return (
     <NavBar
       userName={session.user.name ?? ""}
-      userRole="Coach"
+      userRole={roleLabel.COACH}
       links={roleNavLinks.COACH}
     >
       <PullToRefresh>

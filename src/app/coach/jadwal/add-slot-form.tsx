@@ -73,7 +73,8 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
         )}
         <p className="mt-2 text-xs text-text-subtle">
           Slot otomatis dipecah per jam -- misal 08.00–10.00 jadi 2 slot terpisah (08–09,
-          09–10), masing-masing bisa dibooking member beda.
+          09–10), masing-masing bisa dibooking member beda. Jam 12.00–13.00 (istirahat) gak
+          dijadiin slot.
         </p>
       </CardBody>
     </Card>

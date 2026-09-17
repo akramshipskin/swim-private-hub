@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { requireRole } from "@/lib/require-role";
 import { NavBar } from "@/components/nav-bar";
 import { PullToRefresh } from "@/components/pull-to-refresh";
-import { roleNavLinks } from "@/lib/nav-links";
+import { roleNavLinks, roleLabel } from "@/lib/nav-links";
 
 export const metadata: Metadata = {
   title: "Member | Swim Private Hub",
@@ -19,7 +19,7 @@ export default async function MemberLayout({
   return (
     <NavBar
       userName={session.user.name ?? ""}
-      userRole="Member"
+      userRole={roleLabel.MEMBER}
       links={roleNavLinks.MEMBER}
     >
       <PullToRefresh>
