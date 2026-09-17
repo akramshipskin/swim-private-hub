@@ -40,3 +40,47 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
     </div>
   );
 }
+
+export type FaqGroup = { key: string; label: string; items: { q: string; a: string }[] };
+
+// FAQ per peran: tab yang sama polanya dengan "Cara kerja" supaya landing
+// terasa satu bahasa.
+export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
+  const [active, setActive] = useState(groups[0].key);
+  const current = groups.find((g) => g.key === active)!;
+  return (
+    <div>
+      <div role="tablist" aria-label="Pertanyaan umum untuk" className="mb-6 flex flex-wrap justify-center gap-2">
+        {groups.map((g) => (
+          <button
+            key={g.key}
+            role="tab"
+            type="button"
+            aria-selected={g.key === active}
+            onClick={() => setActive(g.key)}
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
+              g.key === active
+                ? "bg-[#14140F] text-white"
+                : "border border-[#14140F]/15 bg-white text-[#14140F] hover:bg-[#ECE9DC]"
+            }`}
+          >
+            {g.label}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" className="flex flex-col divide-y divide-[#14140F]/10 border-y border-[#14140F]/10">
+        {current.items.map((item) => (
+          <details key={item.q} className="group py-5">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold marker:content-none">
+              {item.q}
+              <span aria-hidden="true" className="text-2xl leading-none transition-transform group-open:rotate-45">
+                +
+              </span>
+            </summary>
+            <p className="mt-3 text-base text-[#3D3B2E]">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  );
+}

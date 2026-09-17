@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/login", priority: 0.5 },
     { path: "/register", priority: 0.8 },
     { path: "/panduan", priority: 0.6 },
-    { path: "/panduan-member", priority: 0.5 },
     { path: "/kebijakan-privasi", priority: 0.3 },
     { path: "/syarat-ketentuan", priority: 0.3 },
     { path: "/kebijakan-pengembalian", priority: 0.3 },

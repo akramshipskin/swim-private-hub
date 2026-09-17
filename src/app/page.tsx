@@ -8,7 +8,7 @@ export default async function Home() {
   const session = await auth();
 
   if (!session) {
-    const [pools, coaches, memberCount, attendedCount] = await Promise.all([
+    const [pools, coaches, memberCount, attendedCount, packagesPerPool] = await Promise.all([
       prisma.pool.findMany({
         where: { isActive: true },
         orderBy: { name: "asc" },
@@ -18,6 +18,7 @@ export default async function Home() {
           address: true,
           description: true,
           facilities: true,
+          photos: true,
           openTime: true,
           closeTime: true,
           packageTemplates: { where: { isActive: true }, select: { price: true, totalSesi: true } },
@@ -36,16 +37,37 @@ export default async function Home() {
       }),
       prisma.user.count({ where: { role: "MEMBER" } }),
       prisma.booking.count({ where: { attended: true } }),
+      // Paket yang pernah aktif per kolam -> dasar "paling laris" + jumlah
+      // member di kolam itu (member unik, bukan jumlah paket).
+      prisma.package.findMany({
+        where: { startDate: { not: null } },
+        select: { poolId: true, memberId: true },
+      }),
     ]);
+
+    const poolStats = new Map<string, { sold: number; members: Set<string> }>();
+    for (const pkg of packagesPerPool) {
+      const entry = poolStats.get(pkg.poolId) ?? { sold: 0, members: new Set<string>() };
+      entry.sold += 1;
+      entry.members.add(pkg.memberId);
+      poolStats.set(pkg.poolId, entry);
+    }
+    // Landing menampilkan maksimal 5 kolam paling laris, bukan semuanya.
+    const topPools = [...pools]
+      .sort((a, b) => (poolStats.get(b.id)?.sold ?? 0) - (poolStats.get(a.id)?.sold ?? 0) || a.name.localeCompare(b.name))
+      .slice(0, 5);
+
     return (
       <LandingView
         stats={{ poolCount: pools.length, coachCount: coaches.length, memberCount, attendedCount }}
-        pools={pools.map((p) => ({
+        pools={topPools.map((p) => ({
           id: p.id,
           name: p.name,
           address: p.address,
           description: p.description,
           facilities: p.facilities,
+          photos: p.photos,
+          memberCount: poolStats.get(p.id)?.members.size ?? 0,
           hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
           coachCount: p._count.affiliations,
           // Harga per sesi termurah dari katalog kolam itu.
@@ -53,7 +75,7 @@ export default async function Home() {
             ? Math.min(...p.packageTemplates.map((t) => Math.round(t.price / t.totalSesi)))
             : null,
         }))}
-        coaches={coaches.map((c) => ({
+        coaches={coaches.slice(0, 5).map((c) => ({
           id: c.id,
           name: c.name,
           bio: c.coachProfile?.bio ?? null,
