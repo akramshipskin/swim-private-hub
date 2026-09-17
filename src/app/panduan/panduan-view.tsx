@@ -352,28 +352,28 @@ const PANDUAN_BODY = `
     <!-- ============ PRESENTASI ============ -->
     <section class="panel active" id="presentasi">
       <div class="hero">
-        <h1>Satu aplikasi buat <span class="accent-word">booking</span>, <span class="accent-word">jadwal</span>, dan <span class="accent-word">paket</span> les renang</h1>
-        <p class="lead">Tidak ada lagi bolak-balik chat WhatsApp buat atur jadwal, itung sisa sesi manual, atau lupa siapa yang sudah bayar. Member booking sendiri, coach kelola jadwal sendiri, admin pantau semuanya dari satu tempat.</p>
+        <h1>Satu aplikasi untuk <span class="accent-word">booking</span>, <span class="accent-word">jadwal</span>, dan <span class="accent-word">bagi hasil</span> les renang</h1>
+        <p class="lead">Tidak ada lagi bolak-balik chat WhatsApp untuk atur jadwal, menghitung sisa sesi manual, atau membagi hasil ke kolam dan coach. Member booking sendiri, coach mengelola jadwal per kolam, pemilik kolam memantau pemakaian kolam, dan admin melihat semuanya dari satu dashboard.</p>
         <div class="btn-row" style="justify-content:center;margin-top:22px;">
-          <a class="btn btn-primary" href="https://wa.me/6282117173124?text=${encodeURIComponent("Halo, saya tertarik pakai sistem Swim Private Hub buat kelola tempat les renang saya. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
+          <a class="btn btn-primary" href="https://wa.me/6282117173124?text=${encodeURIComponent("Halo, saya tertarik bergabung sebagai kolam mitra Swim Private Hub. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
           <a class="btn btn-secondary" href="/register">Daftar Sekarang</a>
         </div>
         <div class="hero-actions">
           <span class="pill-stat">${ICON.phone} <b>Web-based</b> — buka dari HP, tidak perlu install apa-apa</span>
           <span class="pill-stat">${ICON.bolt} <b>Real-time</b> — slot terkunci begitu diambil</span>
-          <span class="pill-stat">${ICON.bell} <b>Notifikasi dua arah</b> — member &amp; coach saling kekabarin otomatis</span>
+          <span class="pill-stat">${ICON.bell} <b>Chat bantuan</b> — dijawab asisten, diteruskan ke admin bila perlu</span>
         </div>
       </div>
 
       <div class="quote-block">
         <span class="mark">"</span>
-        <p>Sebelumnya: itung sisa sesi manual dari chat WA, sering tertukar antar anak, admin harus konfirmasi jadwal satu-satu. Sekarang: member booking sendiri, sisa sesi dan jatah pembatalan dihitung otomatis per anak, admin tinggal pantau.</p>
+        <p>Sebelumnya: sisa sesi dihitung manual dari chat WA, sering tertukar antar anak, dan bagi hasil ke kolam &amp; coach direkap di akhir bulan. Sekarang: member booking sendiri, sisa sesi dihitung otomatis per peserta, dan setiap sesi Hadir langsung dibagi ke saldo kolam, coach, dan platform.</p>
       </div>
 
       <div class="section-head">
         <span class="kicker">Kenapa ini beda</span>
-        <h2>Dibangun buat masalah nyata operasional les renang</h2>
-        <p>Bukan booking generik — tiap fitur disesuain sama cara kerja les privat: 1 paket per anak, jadwal per coach per jam, dan pembatalan yang adil buat member maupun coach.</p>
+        <h2>Dibangun untuk masalah nyata les renang privat</h2>
+        <p>Bukan booking generik — setiap fitur disesuaikan dengan cara kerja les privat: paket per peserta dan per kolam, jadwal per coach per jam, dan pembatalan yang adil untuk member maupun coach.</p>
       </div>
       <div class="grid3">
         <div class="card">
@@ -384,32 +384,32 @@ const PANDUAN_BODY = `
         <div class="card">
           <div class="icon" style="background:var(--accent-light);color:var(--accent);">${ICON.lock}</div>
           <h3>Slot terkunci otomatis</h3>
-          <p>Begitu 1 member ambil jam tertentu sama coach tertentu, slot itu langsung terkunci buat member lain. Tidak ada lagi bentrok jadwal.</p>
+          <p>Begitu satu member mengambil jam tertentu dengan coach tertentu, slot itu langsung terkunci untuk member lain. Coach juga tidak bisa membuka jadwal bentrok di dua kolam.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--success-bg);color:var(--success);">${ICON.checkCircle}</div>
           <h3>Pembatalan yang adil</h3>
-          <p>Member bisa batalin sendiri minimal 2 jam sebelum jadwal, sesuai jatah per paket. Lewat itu, tetep bisa minta bantuan admin lewat WhatsApp.</p>
+          <p>Member bisa membatalkan sendiri paling lambat 2 jam sebelum jadwal, sesuai jatah per paket. Setelah itu, tetap bisa minta bantuan admin.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--member-bg);color:var(--member);">${ICON.barChart}</div>
-          <h3>Honor coach otomatis dihitung</h3>
-          <p>Hanya sesi yang benar-benar ditandai "Hadir" yang dihitung valid. Admin tinggal buka laporan Kinerja Coach per rentang tanggal, tidak perlu rekap manual.</p>
+          <h3>Bagi hasil otomatis</h3>
+          <p>Setiap sesi yang ditandai Hadir langsung dibagi ke saldo kolam dan coach, plus komisi platform (termasuk PPN 12%). Kolam &amp; coach mencairkan saldo sendiri, minimal Rp50.000.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--coach-bg);color:var(--coach);">${ICON.inboxDownload}</div>
-          <h3>Import data massal</h3>
-          <p>Migrasi dari data lama (Excel/chat) bisa lewat template import — isi nama, kontak, paket, sisa sesi, sistem yang buatkan akun dan paketnya sekaligus.</p>
+          <h3>Paket per kolam</h3>
+          <p>Setiap kolam punya katalog dan harga sendiri (perubahan harga disetujui admin). Member yang sesekali ingin les di kolam lain bisa beli 1 sesi di sana.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--admin-bg);color:var(--admin);">${ICON.creditCard}</div>
-          <h3>Riwayat pembayaran tercatat</h3>
-          <p>Setiap transaksi paket tercatat lengkap — status berhasil, menunggu, atau gagal — bisa difilter per rentang tanggal kapan saja.</p>
+          <h3>Pemilik kolam ikut memantau</h3>
+          <p>Pemilik kolam melihat jam ramai kolam setiap hari, coach yang mengajar, laporan pendapatan, dan mengelola info &amp; fasilitas kolam.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--brand-light);color:var(--brand);">${ICON.bell}</div>
-          <h3>Notifikasi dua arah, tidak perlu buka app terus</h3>
-          <p>Member booking → coach dapat notif. Coach buka slot baru → semua member aktif dapat notif. Keduanya cukup aktifin sekali, notif sampai walau aplikasi lagi tertutup.</p>
+          <h3>Notifikasi dua arah</h3>
+          <p>Member booking → coach dapat notifikasi. Coach membuka slot baru → member aktif dapat notifikasi. Cukup diaktifkan sekali, notifikasi tetap sampai walau aplikasi sedang ditutup.</p>
         </div>
       </div>
 
@@ -476,17 +476,17 @@ const PANDUAN_BODY = `
         <h2>Dari daftar sampai selesai les, 5 langkah</h2>
       </div>
       <div class="card">
-        <div class="feature-row"><span class="num">1</span><div><h4>Member daftar &amp; beli paket</h4><p>Isi data diri, tentuin siapa saja yang mau les (diri sendiri dan/atau anak), lalu beli paket sesuai kebutuhan.</p></div></div>
+        <div class="feature-row"><span class="num">1</span><div><h4>Member daftar &amp; beli paket</h4><p>Isi data diri, tentukan siapa saja yang ikut les (diri sendiri dan/atau anak), lalu beli paket di kolam pilihan.</p></div></div>
         <div class="feature-row"><span class="num">2</span><div><h4>Booking jadwal</h4><p>Pilih peserta, kolam (tempat paket dibeli), coach, tanggal, dan jam yang masih kosong. Slot langsung terkunci setelah dibooking.</p></div></div>
-        <div class="feature-row"><span class="num">3</span><div><h4>Coach buka &amp; kelola jadwal</h4><p>Coach menentukan sendiri jam berapa saja dia available, member hanya bisa pilih dari situ.</p></div></div>
-        <div class="feature-row"><span class="num">4</span><div><h4>Sesi berlangsung, coach tandai kehadiran</h4><p>Habis sesi selesai, coach tandai Hadir atau Tidak Hadir — saat Hadir, bagian kolam, coach, dan platform otomatis dibagi. Ini juga jadi dasar hitung honor.</p></div></div>
-        <div class="feature-row"><span class="num">5</span><div><h4>Admin pantau semuanya</h4><p>Dari satu dashboard: siapa booking apa, siapa yang belum bayar, berapa sesi valid tiap coach bulan ini.</p></div></div>
+        <div class="feature-row"><span class="num">3</span><div><h4>Coach buka &amp; kelola jadwal</h4><p>Coach membuka jam yang tersedia di setiap kolam tempatnya mengajar; member memilih dari jam tersebut.</p></div></div>
+        <div class="feature-row"><span class="num">4</span><div><h4>Sesi berlangsung, coach tandai kehadiran</h4><p>Setelah sesi selesai, coach menandai Hadir atau Tidak Hadir. Saat Hadir, bagian kolam, coach, dan platform otomatis masuk ke saldo masing-masing.</p></div></div>
+        <div class="feature-row"><span class="num">5</span><div><h4>Admin &amp; pemilik kolam memantau</h4><p>Dashboard admin: sesi hari ini &amp; besok, uang masuk, pendapatan platform, dan hal yang perlu ditindaklanjuti. Pemilik kolam melihat jam ramai dan saldo kolamnya.</p></div></div>
       </div>
 
       <div class="section-head">
         <span class="kicker">Coba sendiri</span>
         <h2>Akun test buat login langsung</h2>
-        <p>Semua password sama: <b>qwertyuiop</b> &mdash; tinggal login pakai email &amp; password di bawah buat coba tiap peran. (Akun admin tidak dishare di sini demi keamanan &mdash; hubungi kami kalau perlu akses admin buat evaluasi.)</p>
+        <p>Semua password sama: <b>qwertyuiop</b> &mdash; tinggal login pakai email &amp; password di bawah untuk mencoba tiap peran. (Akun admin tidak dishare di sini demi keamanan &mdash; hubungi kami kalau perlu akses admin buat evaluasi.)</p>
       </div>
       <div class="table-wrap">
         <table class="mini-table">
@@ -706,11 +706,11 @@ const PANDUAN_BODY = `
           <table class="mini-table">
             <tr><th>Status</th><th>Artinya</th></tr>
             <tr><td><span class="badge-chip chip-success">Terjadwal</span></td><td>Booking aktif, belum waktunya sesi</td></tr>
-            <tr><td><span class="badge-chip chip-success">Hadir</span></td><td>Coach sudah tandain kamu/anak hadir di sesi itu</td></tr>
-            <tr><td>Dibatalkan</td><td>Booking sudah dibatalin (oleh kamu sendiri atau admin)</td></tr>
+            <tr><td><span class="badge-chip chip-success">Hadir</span></td><td>Coach sudah tandai kamu/anak hadir di sesi itu</td></tr>
+            <tr><td>Dibatalkan</td><td>Booking sudah dibatalkan (oleh kamu sendiri atau admin)</td></tr>
           </table>
         </div>
-        <div class="step"><span class="sn">2</span><div class="st"><h4>Batalkan booking (kalau memenuhi syarat)</h4><p>Tombol <b>Batalkan</b> hanya muncul kalau: (a) minimal 2 jam sebelum jadwal, dan (b) jatah pembatalan mandiri buat paket itu masih ada. Sisa sesi otomatis balik kalau berhasil dibatalin.</p></div></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Batalkan booking (kalau memenuhi syarat)</h4><p>Tombol <b>Batalkan</b> hanya muncul kalau: (a) minimal 2 jam sebelum jadwal, dan (b) jatah pembatalan mandiri buat paket itu masih ada. Sisa sesi otomatis balik kalau berhasil dibatalkan.</p></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Kalau tidak memenuhi syarat</h4><p>Tombol <b>Hubungi Admin</b> muncul sebagai gantinya — klik buat langsung buka WhatsApp dengan pesan yang sudah terisi otomatis (nama, jadwal, alasan).</p></div></div>
       </div>
 
@@ -755,16 +755,16 @@ const PANDUAN_BODY = `
         <div class="guide-head" id="c-jadwal"><span class="gi">1</span><h3>Buka Jadwal (Buat Slot Baru)</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Jadwal</h4></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih Kolam dan Tanggal</h4><p>Kolam yang muncul hanya kolam tempat kamu terdaftar. Jadwal kamu ditampilkan per tanggal lalu per kolam.</p></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih Jam mulai dan Jam selesai</h4><p>Sistem otomatis mecah rentang jam itu jadi slot per jam. Misalnya 08.00–10.00 jadi 2 slot terpisah: 08–09 dan 09–10, dan masing-masing bisa dibooking member yang beda.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Klik Tambah Slot</h4><p>Slot baru langsung muncul dan bisa dibooking member secara real-time. Semua member aktif yang sudah nyalain notifikasi otomatis dapat notif "Slot jadwal baru".</p></div></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih Jam mulai dan Jam selesai</h4><p>Sistem otomatis memecah rentang jam itu jadi slot per jam. Misalnya 08.00–10.00 jadi 2 slot terpisah: 08–09 dan 09–10, dan masing-masing bisa dibooking member yang beda.</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Klik Tambah Slot</h4><p>Slot baru langsung muncul dan bisa dibooking member secara real-time. Semua member aktif yang sudah nyalakan notifikasi otomatis dapat notif "Slot jadwal baru".</p></div></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="c-lihat"><span class="gi">2</span><h3>Lihat &amp; Hapus Slot</h3></div>
         <div class="note tip"><span>${ICON.bulb}</span><p>Slot kosong yang jamnya sudah lewat otomatis disembunyikan karena sudah tidak bisa dibooking.</p></div>
-        <div class="step"><span class="sn">1</span><div class="st"><h4>Slot yang belum dibooking</h4><p>Ada label "Belum dibooking" dan tombol <b>Hapus</b> kalau kamu mau batalin slot itu (misal salah jam).</p></div></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Slot yang belum dibooking</h4><p>Ada label "Belum dibooking" dan tombol <b>Hapus</b> kalau kamu mau batalkan slot itu (misal salah jam).</p></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Klik Hapus</h4><p>Akan muncul konfirmasi dulu sebelum slot benar-benar hilang — slot yang sudah dihapus tidak bisa dibooking lagi kecuali dibuka ulang.</p></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Slot yang sudah dibooking</h4><p>Menunjukkan nama peserta yang booking dan status "Terisi" — tidak bisa dihapus lagi, hanya bisa dibatalin lewat admin kalau perlu.</p></div></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Slot yang sudah dibooking</h4><p>Menunjukkan nama peserta yang booking dan status "Terisi" — tidak bisa dihapus lagi, hanya bisa dibatalkan lewat admin kalau perlu.</p></div></div>
       </div>
 
       <div class="guide">
@@ -776,7 +776,7 @@ const PANDUAN_BODY = `
         <div class="guide-head" id="c-hadir"><span class="gi">4</span><h3>Tandai Kehadiran</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Riwayat Sesi</h4><p>Semua sesi yang pernah kamu ajar tercatat di sini, dikelompokin per tanggal.</p></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih status di dropdown tiap booking</h4><p>Pilih <b>Hadir</b> kalau member benar-benar datang, atau <b>Tidak Hadir</b> kalau tidak. Langsung tersimpan otomatis begitu dipilih, tidak perlu tombol Simpan.</p></div></div>
-        <div class="note warn"><span>${ICON.warningTriangle}</span><p><b>Perhatian:</b> status yang sudah dipilih (Hadir/Tidak Hadir) tidak bisa dikembalikan lagi ke "Belum ditandai" — pastiin pilihannya benar sebelum diklik.</p></div>
+        <div class="note warn"><span>${ICON.warningTriangle}</span><p><b>Perhatian:</b> status yang sudah dipilih (Hadir/Tidak Hadir) tidak bisa dikembalikan lagi ke "Belum ditandai" — pastikan pilihannya benar sebelum diklik.</p></div>
       </div>
 
       <div class="guide">
@@ -826,7 +826,7 @@ const PANDUAN_BODY = `
       </div>
       <div class="guide">
         <div class="guide-head" id="k-paket"><span class="gi">3</span><h3>Paket &amp; Harga</h3></div>
-        <div class="step"><span class="sn">1</span><div class="st"><h4>Tambah atau ubah paket</h4><p>Isi nama, harga, jumlah sesi, masa berlaku, dan jatah batal. Klik Edit untuk mengubah paket yang ada. Perubahan harga berlaku untuk pembelian berikutnya; paket yang sudah dibeli tidak berubah.</p></div></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Usulkan paket atau perubahan harga</h4><p>Isi nama, harga, jumlah sesi, masa berlaku, dan jatah batal, atau klik Edit pada paket yang ada. Usulan <b>baru berlaku setelah disetujui admin</b> — sampai saat itu yang dijual tetap harga lama, dan paket baru belum tampil ke member. Status "menunggu persetujuan admin" tampil di atas paket. Paket yang sudah dibeli member tidak ikut berubah.</p></div></div>
       </div>
       <div class="guide">
         <div class="guide-head" id="k-info"><span class="gi">4</span><h3>Info Kolam</h3></div>
@@ -868,7 +868,7 @@ const PANDUAN_BODY = `
       <div class="guide">
         <div class="guide-head" id="a-users"><span class="gi">1</span><h3>Kelola Users</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Users</h4></div></div>
-        <div class="step"><span class="sn">2</span><div class="st"><h4>Tambah user manual</h4><p>Isi Nama, No HP, Email (opsional), Password, dan pilih Role (Member/Coach/Pemilik Kolam/Admin). Untuk Pemilik Kolam, pilih kolam yang sudah ada atau buat kolam baru sekaligus. Khusus Role Member, tentuin juga siapa saja peserta yang mau les (diri sendiri/anak) — persis seperti alur daftar sendiri.</p></div></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Tambah user manual</h4><p>Isi Nama, No HP, Email (opsional), Password, dan pilih Role (Member/Coach/Pemilik Kolam/Admin). Untuk Pemilik Kolam, pilih kolam yang sudah ada atau buat kolam baru sekaligus. Khusus Role Member, tentukan juga siapa saja peserta yang mau les (diri sendiri/anak) — persis seperti alur daftar sendiri.</p></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Tambah peserta buat member yang sudah ada</h4><p>Di bagian "Tambah Peserta", pilih member, tipe (Anak/Diri sendiri), isi nama kalau perlu, klik Tambah. Berguna buat member lama yang belum pernah menambah anaknya sendiri.</p></div></div>
         <div class="step"><span class="sn">4</span><div class="st"><h4>Assign paket ke peserta</h4><p>Di bagian "Assign Paket ke Peserta" — pilih member dan pesertanya, lalu pilih dari Katalog (otomatis mengisi nama paket, total sesi, jatah cancel) atau buat custom. Klik "Assign (langsung Aktif)". Berguna buat koreksi, promo, atau kasus di luar alur beli-online.</p></div></div>
         <div class="step"><span class="sn">5</span><div class="st"><h4>Nonaktifkan / aktifkan user</h4><p>Tombol <b>Nonaktifkan</b> di tiap baris user — akan ada konfirmasi dulu karena user yang dinonaktifkan tidak bisa login lagi sampai diaktifkan ulang.</p></div></div>
@@ -901,6 +901,7 @@ const PANDUAN_BODY = `
         <div class="guide-head" id="a-paket"><span class="gi">3</span><h3>Kolam &amp; Paket</h3></div>
         <div class="step"><span class="sn">0</span><div class="st"><h4>Tab Kolam</h4><p>Setiap kartu kolam berisi pemilik, harga paket, rincian saldo kolam (paket kolam ini / beli 1 sesi / sudah dicairkan), pembagian komisi (klik Edit untuk mengubah), info &amp; fasilitas, dan coach terdaftar.</p></div></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Paket</h4><p>Katalog dikelompokkan per kolam; paket per member menampilkan kolam tiap paket peserta.</p></div></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Setujui usulan dari pemilik kolam</h4><p>Bagian <b>Usulan paket dari pemilik kolam</b> di atas halaman menunjukkan perubahan sebelum → sesudah. Klik Setujui agar berlaku, atau Tolak agar harga lama tetap dipakai. Jumlah usulan juga tampil di Dashboard (Perlu tindakan).</p></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Kelola Katalog Paket</h4><p>Ini paket generik yang muncul di halaman "Beli Paket" member. Tambah lewat form di atas (Nama, Harga, Total Sesi, Jatah Cancel, Berlaku berapa hari), atau edit paket yang sudah ada (termasuk nonaktifin dari katalog lewat checkbox Aktif).</p></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Kelola Paket per Member</h4><p>Daftar semua member yang punya paket, dikelompokin per keluarga. Bisa dicari pakai kolom pencarian di atas. Klik <b>Edit</b> buat buka form edit semua peserta member itu sekaligus.</p></div></div>
         <div class="step"><span class="sn">4</span><div class="st"><h4>Edit sisa sesi, status, jatah cancel, atau masa berlaku</h4><p>Berguna buat koreksi manual (misal sesi hangus karena force majeure, perpanjangan masa berlaku, dst). Klik Simpan per peserta.</p></div></div>
@@ -911,7 +912,7 @@ const PANDUAN_BODY = `
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Jadwal Booking</h4><p>Semua slot dikelompokkan per coach → tanggal → kolam, lengkap dengan peserta dan akun yang booking.</p></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Cari &amp; filter</h4><p>Cari nama coach/member/peserta/kolam, filter periode (mendatang, lewat belum ditandai, sudah lewat), coach, dan kolam.</p></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Tandai kehadiran langsung dari sini</h4><p>Admin juga bisa nandain Hadir/Tidak Hadir tanpa harus login sebagai coach.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Batalkan booking member</h4><p>Tombol <b>Batalkan</b> di tiap slot terisi — akan ada konfirmasi dulu. Sisa sesi member otomatis balik, dan jatah pembatalan mandirinya berkurang (sama seperti kalau member batalin sendiri).</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Batalkan booking member</h4><p>Tombol <b>Batalkan</b> di tiap slot terisi — akan ada konfirmasi dulu. Sisa sesi member otomatis balik, dan jatah pembatalan mandirinya berkurang (sama seperti kalau member batalkan sendiri).</p></div></div>
         <div class="step"><span class="sn">5</span><div class="st"><h4>Broadcast jadwal ke grup WhatsApp</h4><p>Tombol <b>Kabarin Grup WhatsApp</b> per hari — buka WhatsApp buat share jadwal hari itu ke grup.</p></div></div>
       </div>
 

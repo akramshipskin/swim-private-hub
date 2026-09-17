@@ -51,7 +51,7 @@ const AUDIENCES: AudienceSteps[] = [
     key: "coach",
     label: "Coach",
     steps: [
-      { title: "Daftar sebagai coach", body: "Isi profil, keahlian, dan upload sertifikat. Admin memeriksa sebelum akun aktif." },
+      { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, upload foto dan sertifikat untuk badge Bersertifikat." },
       { title: "Buka jadwal per kolam", body: "Tentukan tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
       { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi." },
       { title: "Cairkan saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening." },
@@ -62,7 +62,7 @@ const AUDIENCES: AudienceSteps[] = [
     label: "Pemilik kolam",
     steps: [
       { title: "Gabung jadi mitra", body: "Daftarkan kolam, lengkapi alamat, jam buka, dan fasilitas." },
-      { title: "Atur harga paket", body: "Setiap kolam punya katalog dan harga paketnya sendiri." },
+      { title: "Usulkan paket & harga", body: "Setiap kolam punya katalog dan harga sendiri; perubahan berlaku setelah diperiksa admin." },
       { title: "Pantau jam ramai", body: "Lihat jam berapa kolam dipakai les privat, oleh coach siapa, setiap hari." },
       { title: "Terima bagi hasil", body: "Bagian kolam masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening." },
     ],
@@ -85,6 +85,10 @@ const FAQ_ITEMS = [
   {
     q: "Pembayarannya lewat apa?",
     a: "Lewat Midtrans: virtual account bank, QRIS, e-wallet, atau kartu. Bagian kolam dan coach dibagikan otomatis setiap sesi ditandai Hadir.",
+  },
+  {
+    q: "Kalau butuh bantuan saat memakai aplikasi?",
+    a: "Setelah login, ada tombol bantuan di pojok kanan bawah. Pertanyaan umum dijawab asisten, dan yang perlu dicek admin (misal pembayaran) diteruskan ke admin — balasannya muncul di jendela chat yang sama.",
   },
   {
     q: "Apakah coach-nya bersertifikat?",

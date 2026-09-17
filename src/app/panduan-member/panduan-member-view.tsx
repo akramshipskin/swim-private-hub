@@ -165,7 +165,7 @@ export default function PanduanMemberView() {
       <Step
         n={3}
         title="Otomatis login, diarahkan ke halaman Paket"
-        note="Bukan ke Booking — karena akun baru belum punya paket aktif, sistem ngarahin ke Paket dulu agar beli."
+        note="Bukan ke Booking — karena akun baru belum punya paket aktif, sistem mengarahkan ke Paket dulu agar beli."
       >
         <div className="rounded-xl border border-amber-200 bg-warning-bg px-3 py-2 text-xs text-warning-text">
           Belum ada paket. Pilih salah satu di bawah.
