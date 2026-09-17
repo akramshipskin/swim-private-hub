@@ -72,7 +72,7 @@ export default function AssignPackageForm({
           <Field label="Dari Katalog (opsional)">
             <Select
               name="templateId"
-              className="w-full sm:w-44"
+              className="w-full sm:w-72"
               value={templateId}
               onChange={(e) => {
                 const t = templates.find((t) => t.id === e.target.value);
@@ -86,7 +86,9 @@ export default function AssignPackageForm({
               <option value="">-- custom --</option>
               {templates.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.name}
+                  {/* Nama paket bisa sama persis antar kolam (harga beda) --
+                      tanpa nama kolam, 2 opsi kebaca identik. */}
+                  {t.name} — {pools.find((p) => p.id === t.poolId)?.name ?? "kolam ?"}
                 </option>
               ))}
             </Select>

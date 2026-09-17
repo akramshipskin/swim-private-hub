@@ -49,7 +49,9 @@ export default async function CoachShortcutPage({
   if (!coach) notFound();
 
   const content = (
-    <main className="mx-auto max-w-lg px-4 py-8">
+    // Login: samain container sama halaman role lain (judul gak loncat pas
+    // pindah dari Cari Coach). Anonim: tengah, sejajar header publik.
+    <main className={session ? "mx-auto max-w-5xl px-4 py-6 sm:py-8 [&>*]:max-w-lg" : "mx-auto max-w-lg px-4 py-8"}>
       <div className="flex items-center gap-2">
         <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
         <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
@@ -106,8 +108,9 @@ export default async function CoachShortcutPage({
       )}
 
       <p className="mt-4 text-xs text-text-subtle">
-        Buat booking beneran, tetep lewat paket kolam yang kamu punya -- halaman ini cuma buat
-        bantu nemuin coach yang lagi ngajar di kolam lain.
+        {session?.user.role === "MEMBER"
+          ? "Mau booking coach ini? Pilih kolam & coach-nya di menu Booking -- paketmu berlaku di semua kolam mitra."
+          : "Mau booking coach ini? Daftar/login sebagai member, lalu pilih kolam & coach-nya di menu Booking -- paket berlaku di semua kolam mitra."}
       </p>
     </main>
   );

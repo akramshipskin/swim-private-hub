@@ -61,10 +61,10 @@ export default async function KinerjaCoachPage({
         <CardBody>
           <form className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end" method="get">
             <Field label="Dari">
-              <DatePicker name="from" defaultValue={from} className="sm:w-40" />
+              <DatePicker name="from" defaultValue={from} className="sm:w-56" />
             </Field>
             <Field label="Sampai">
-              <DatePicker name="to" defaultValue={to} className="sm:w-40" />
+              <DatePicker name="to" defaultValue={to} className="sm:w-56" />
             </Field>
             <Button type="submit">Terapkan</Button>
           </form>

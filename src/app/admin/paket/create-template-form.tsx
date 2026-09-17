@@ -21,7 +21,7 @@ export default function CreateTemplateForm({ pools }: { pools: PoolOption[] }) {
               punya admin per-pool, jadi founder (superadmin) yang pilih
               kolam mana di sini. */}
           <Field label="Kolam">
-            <Select name="poolId" required className="w-full sm:w-40">
+            <Select name="poolId" required className="w-full sm:w-60">
               {pools.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}

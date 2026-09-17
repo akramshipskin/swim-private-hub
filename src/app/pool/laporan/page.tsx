@@ -70,7 +70,7 @@ export default async function PoolLaporanPage({
   );
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-5xl [&>*]:max-w-4xl px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Laporan Kolam</h1>
       <p className="mb-6 text-sm text-text-muted">
         Rincian omzet & komisi per sesi yang beneran Hadir, per kolam kamu.
@@ -80,10 +80,10 @@ export default async function PoolLaporanPage({
         <CardBody>
           <form className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end" method="get">
             <Field label="Dari">
-              <DatePicker name="from" defaultValue={from} className="sm:w-40" />
+              <DatePicker name="from" defaultValue={from} className="sm:w-56" />
             </Field>
             <Field label="Sampai">
-              <DatePicker name="to" defaultValue={to} className="sm:w-40" />
+              <DatePicker name="to" defaultValue={to} className="sm:w-56" />
             </Field>
             <Button type="submit">Terapkan</Button>
           </form>

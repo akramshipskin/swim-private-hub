@@ -35,11 +35,11 @@ export default async function CariCoachPage() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-5xl [&>*]:max-w-3xl px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Cari Coach</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Semua coach aktif, lintas kolam. Booking beneran tetap lewat paket kolam yang kamu
-        punya -- ini cuma buat bantu nemuin coach yang cocok dulu.
+        Semua coach aktif, lintas kolam. Paketmu bisa dipake di kolam manapun -- booking-nya
+        lewat menu Booking, pilih kolam & coach yang cocok.
       </p>
 
       {coaches.length === 0 ? (

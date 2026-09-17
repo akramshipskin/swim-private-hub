@@ -46,13 +46,16 @@ export default async function ProfilPage() {
       userRole={roleLabel[session.user.role] ?? session.user.role}
       links={roleNavLinks[session.user.role]}
     >
-      <main className="mx-auto max-w-xl px-4 pb-16 py-6 sm:pb-8 sm:py-8">
+      <main className="mx-auto max-w-5xl [&>*]:max-w-xl px-4 pb-16 py-6 sm:pb-8 sm:py-8">
         <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Edit Profil</h1>
 
         <Card className="mb-4">
           <CardBody>
             <h2 className="mb-3 text-lg font-semibold text-text">Nama</h2>
-            <EditNameForm currentName={session.user.name ?? ""} />
+            <EditNameForm
+              currentName={session.user.name ?? ""}
+              label={session.user.role === "MEMBER" ? "Nama/Orang Tua" : "Nama Lengkap"}
+            />
           </CardBody>
         </Card>
 

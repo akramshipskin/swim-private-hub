@@ -57,7 +57,7 @@ export default async function MemberBookingPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-text">Booking Coach</h1>
           <p className="mt-1 text-sm text-text-muted">
-            Pilih anak, coach, dan jam. Slot yang udah diambil otomatis kekunci.
+            Pilih peserta, kolam, coach, dan jam. Slot yang udah diambil otomatis kekunci.
           </p>
         </div>
         <EnablePushButton />

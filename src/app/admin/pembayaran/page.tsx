@@ -56,7 +56,11 @@ export default async function AdminPembayaranPage({
   const payments = await prisma.payment.findMany({
     where: { createdAt: { gte: fromDateTime, lte: toDateTime } },
     orderBy: { createdAt: "desc" },
-    include: { package: { include: { member: { select: { name: true, email: true } } } } },
+    include: {
+      package: {
+        include: { member: { select: { name: true, email: true } }, pool: { select: { name: true } } },
+      },
+    },
   });
 
   const byDate = new Map<string, typeof payments>();
@@ -75,10 +79,10 @@ export default async function AdminPembayaranPage({
         <CardBody>
           <form className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end" method="get">
             <Field label="Dari">
-              <DatePicker name="from" defaultValue={from} className="sm:w-40" />
+              <DatePicker name="from" defaultValue={from} className="sm:w-56" />
             </Field>
             <Field label="Sampai">
-              <DatePicker name="to" defaultValue={to} className="sm:w-40" />
+              <DatePicker name="to" defaultValue={to} className="sm:w-56" />
             </Field>
             <Button type="submit">Terapkan</Button>
           </form>
@@ -122,7 +126,10 @@ export default async function AdminPembayaranPage({
                               {p.package.member.email}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-text-muted">{p.package.name}</td>
+                          <td className="px-4 py-3 text-text-muted">
+                            {p.package.name}
+                            <span className="block text-xs text-text-subtle">{p.package.pool.name}</span>
+                          </td>
                           <td className="px-4 py-3 font-mono text-xs text-text-subtle">
                             {p.midtransOrderId}
                           </td>
@@ -149,7 +156,9 @@ export default async function AdminPembayaranPage({
                         </div>
                         <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
                       </div>
-                      <p className="text-sm text-text-muted">{p.package.name}</p>
+                      <p className="text-sm text-text-muted">
+                        {p.package.name} · {p.package.pool.name}
+                      </p>
                       <p className="font-mono text-xs text-text-subtle">{p.midtransOrderId}</p>
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-medium text-text">{formatRupiah(p.amount)}</p>

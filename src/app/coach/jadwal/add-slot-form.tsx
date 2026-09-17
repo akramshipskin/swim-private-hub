@@ -34,7 +34,7 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
               dropdown ini wajib dipilih tiap buka slot, gak ada
               default "semua kolam". */}
           <Field label="Kolam">
-            <Select name="poolId" defaultValue={pools[0].id} className="w-full sm:w-48">
+            <Select name="poolId" defaultValue={pools[0].id} className="w-full sm:w-60">
               {pools.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}

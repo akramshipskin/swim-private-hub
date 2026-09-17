@@ -15,7 +15,7 @@ export default async function AdminWithdrawalsPage() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-5xl [&>*]:max-w-3xl px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Pencairan Saldo</h1>
       <p className="mt-1 text-sm text-text-muted">
         Pengajuan cairin dari kolam & coach. Belum ada Midtrans Iris terpasang -- transfer

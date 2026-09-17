@@ -159,7 +159,7 @@ export default function BookingBoard({
 
   async function handleBook(availabilityId: string) {
     if (!packageId) {
-      setMessage({ text: "Pilih anak dulu sebelum booking", ok: false });
+      setMessage({ text: "Pilih peserta dulu sebelum booking", ok: false });
       return;
     }
     setPendingId(availabilityId);
@@ -226,7 +226,7 @@ export default function BookingBoard({
     <div>
       <Card className="mb-4">
         <CardBody className="flex flex-col gap-3 py-3 sm:flex-row sm:items-end sm:flex-wrap">
-          <Field label="Buat anak">
+          <Field label="Buat peserta">
             <Select
               value={packageId}
               onChange={(e) => setPackageId(e.target.value)}
@@ -244,7 +244,7 @@ export default function BookingBoard({
             <Select
               value={poolId}
               onChange={(e) => setPoolId(e.target.value)}
-              className="w-full sm:w-48"
+              className="w-full sm:w-60"
             >
               {pools.length === 0 && <option value="">-- belum ada kolam --</option>}
               {pools.map((p) => (

@@ -5,7 +5,7 @@ import { updateName } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 
-export default function EditNameForm({ currentName }: { currentName: string }) {
+export default function EditNameForm({ currentName, label }: { currentName: string; label: string }) {
   const [state, formAction, pending] = useActionState(updateName, null);
   const [savedAt, setSavedAt] = useState(0);
   const wasPending = useRef(false);
@@ -20,7 +20,7 @@ export default function EditNameForm({ currentName }: { currentName: string }) {
   return (
     <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:items-end">
       <div className="flex-1">
-        <Field label="Nama/Orang Tua">
+        <Field label={label}>
           {/* key={currentName} biar input remount tiap currentName berubah dari
               server (abis revalidatePath) -- defaultValue cuma dibaca sekali
               pas mount, gak reaktif ke prop baru, jadi field kelihatan "gak
