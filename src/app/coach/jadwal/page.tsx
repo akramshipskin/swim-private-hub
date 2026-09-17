@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/require-role";
+import { SearchForm, matchesQuery } from "@/components/search-form";
 import { prisma } from "@/lib/prisma";
 import AddSlotForm from "./add-slot-form";
 import DeleteSlotButton from "./delete-slot-button";
@@ -8,7 +9,8 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import EnablePushButton from "@/components/enable-push-button";
 
-export default async function CoachJadwalPage() {
+export default async function CoachJadwalPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const q = (await searchParams).q ?? "";
   const session = await requireRole("COACH");
 
   // Jadwal coach lain di tanggal yang sama -- biar coach ini tau siapa
@@ -60,7 +62,7 @@ export default async function CoachJadwalPage() {
   const isExpiredOpen = (a: { status: string; startTime: Date }) => a.status === "AVAILABLE" && a.startTime <= now;
   const hiddenExpired = availabilities.filter(isExpiredOpen).length;
   const byDate = new Map<string, typeof availabilities>();
-  for (const a of availabilities.filter((x) => !isExpiredOpen(x))) {
+  for (const a of availabilities.filter((x) => !isExpiredOpen(x) && matchesQuery(q, x.pool.name, x.bookings[0]?.package.dependent.name))) {
     const key = a.date.toISOString();
     if (!byDate.has(key)) byDate.set(key, []);
     byDate.get(key)!.push(a);
@@ -86,6 +88,8 @@ export default async function CoachJadwalPage() {
       </div>
 
       <AddSlotForm pools={myPools} />
+
+      <SearchForm q={q} placeholder="Cari kolam atau peserta di jadwalmu" />
 
       {hiddenExpired > 0 && (
         <p className="mb-3 text-sm text-text-subtle">

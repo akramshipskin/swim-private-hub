@@ -48,7 +48,7 @@ export async function requestWithdrawal(_prev: ActionState, formData: FormData):
     const profile = await getOwnCoachProfile(session.user.id);
     await requestCoachWithdrawal(profile.id, Number(formData.get("amount")));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal ajuin pencairan" };
+    return { error: err instanceof Error ? err.message : "Gagal ajukan pencairan" };
   }
 
   revalidatePath("/coach/saldo");

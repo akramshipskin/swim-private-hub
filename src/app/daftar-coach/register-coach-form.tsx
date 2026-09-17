@@ -175,7 +175,13 @@ export default function RegisterCoachForm() {
                 onChange={(e) => setHasCertification(e.target.checked)}
                 className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500"
               />
-              <span>Saya punya sertifikasi renang/lifeguard resmi</span>
+              <span>
+                Saya punya sertifikasi renang/lifeguard resmi
+                <span className="block text-xs text-text-muted">
+                  File sertifikat diupload di menu Profil setelah akun disetujui admin. Badge &quot;Bersertifikat&quot; tampil
+                  setelah sertifikat diperiksa.
+                </span>
+              </span>
             </label>
             {hasCertification && (
               <Field label="Nama sertifikat/lembaga">

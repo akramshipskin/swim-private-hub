@@ -6,7 +6,8 @@ import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
-import { Field, Input } from "@/components/ui/input";
+import { Field, Input, Textarea } from "@/components/ui/input";
+import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import { isValidIndonesianPhone } from "@/lib/format";
 
 export default function RegisterPoolForm() {
@@ -17,6 +18,8 @@ export default function RegisterPoolForm() {
   const [address, setAddress] = useState("");
   const [openTime, setOpenTime] = useState("06:00");
   const [closeTime, setCloseTime] = useState("21:00");
+  const [description, setDescription] = useState("");
+  const [facilities, setFacilities] = useState<string[]>([]);
   const [ownerName, setOwnerName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -52,6 +55,8 @@ export default function RegisterPoolForm() {
         address,
         openTime,
         closeTime,
+        description: description || undefined,
+        facilities,
         website,
         formRenderedAt,
       }),
@@ -127,6 +132,35 @@ export default function RegisterPoolForm() {
                   required
                 />
               </Field>
+            </div>
+
+            <Field label="Deskripsi kolam (opsional)">
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={2}
+                maxLength={1000}
+                placeholder="Ukuran kolam, kedalaman, suasana, dll."
+              />
+            </Field>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium text-text">Fasilitas (opsional)</p>
+              <div className="flex flex-wrap gap-2">
+                {POOL_FACILITIES.map((f) => {
+                  const active = facilities.includes(f);
+                  return (
+                    <button
+                      key={f}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setFacilities((prev) => (active ? prev.filter((x) => x !== f) : [...prev, f]))}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${active ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border bg-surface text-text-muted"}`}
+                    >
+                      {f}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <hr className="border-border" />

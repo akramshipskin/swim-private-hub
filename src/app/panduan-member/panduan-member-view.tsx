@@ -228,9 +228,14 @@ export default function PanduanMemberView() {
 
       <Part label="Booking Sesi (Lengkap)" />
 
-      <Step n={7} title="Pilih anak" desc="Dropdown &ldquo;Buat anak&rdquo; — nunjukin paket &amp; sisa sesi tiap peserta.">
-        <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-surface px-3 text-sm text-text">
-          Anak Satu &mdash; 8x Renang, sisa 8
+      <Step
+        n={7}
+        title="Pilih peserta &amp; kolam"
+        desc="Paket hanya berlaku di kolam tempat dibeli. Di kolam lain, member yang masih punya paket aktif bisa beli 1 sesi (muncul rincian harga &amp; aturannya sebelum bayar)."
+      >
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-surface px-3 text-sm text-text">Anak Satu</div>
+          <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-surface px-3 text-sm text-text">Kolam Renang Melati</div>
         </div>
       </Step>
 
@@ -351,7 +356,7 @@ export default function PanduanMemberView() {
         <PaketCard name="8x Renang" forWhom="Anak Satu" sisa={7} total={8} berlaku="Rabu, 21 Oktober 2026" />
       </Step>
 
-      <Step n={15} title="Beli paket tambahan" desc="Kalau sesi sudah mau habis, bisa beli lagi kapan saja.">
+      <Step n={15} title="Beli paket tambahan" desc="Katalog dikelompokkan per kolam, lengkap dengan alamat, jam buka, fasilitas, dan harga per sesi. Pilih kolam yang paling sering kamu datangi.">
         <Card>
           <CardBody>
             <p className="text-sm font-semibold text-text">Private | 8x Renang</p>
@@ -377,7 +382,7 @@ export default function PanduanMemberView() {
         </Button>
       </Step>
 
-      <Step n={17} title="Tambah anak baru">
+      <Step n={17} title="Tambah peserta di menu Peserta" desc="Tambah atau nonaktifkan peserta (kamu sendiri / anak) sekarang ada di menu Peserta, bukan di Profil.">
         <div className="flex gap-2">
           <Select disabled className="w-24 shrink-0">
             <option>Anak</option>
@@ -395,9 +400,15 @@ export default function PanduanMemberView() {
         </button>
       </Step>
 
+      <Step n={19} title="Butuh bantuan?" note="Pertanyaan yang tidak bisa dijawab asisten diteruskan ke admin, balasannya muncul di jendela chat yang sama.">
+        <span className="inline-flex w-fit items-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
+          Butuh bantuan?
+        </span>
+      </Step>
+
       <footer className="mt-14 border-t border-border pt-6 text-xs text-text-subtle">
         Swim Private Hub &mdash; dokumentasi internal. Copy &amp; urutan tiap step diverifikasi dari kode
-        aplikasi &amp; akun demo aktif per 25 Agustus 2026, bukan mockup karangan.
+        aplikasi &amp; akun demo aktif per 25 Agustus 2026, diperbarui dari kode per 17 September 2026 (paket per kolam, menu Peserta, chat bantuan).
       </footer>
     </main>
   );

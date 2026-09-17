@@ -84,7 +84,7 @@ export async function addChild(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, login ulang." };
-  if (session.user.role !== "MEMBER") return { error: "Cuma member yang bisa menambah anak." };
+  if (session.user.role !== "MEMBER") return { error: "Hanya member yang bisa menambah anak." };
 
   const type = formData.get("type")?.toString();
   const name = formData.get("name")?.toString() ?? "";
@@ -123,7 +123,7 @@ export async function updateCoachProfile(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, login ulang." };
-  if (session.user.role !== "COACH") return { error: "Cuma buat akun coach." };
+  if (session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
 
   const bio = formData.get("bio")?.toString().trim() ?? "";
   const specialties = formData
@@ -154,7 +154,7 @@ export async function updateCoachProfile(
 
 export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
-  if (!session || session.user.role !== "COACH") return { error: "Cuma buat akun coach." };
+  if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
   if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
   const file = formData.get("photo") as File | null;
   const invalid = validateUpload(file, "photo");
@@ -179,7 +179,7 @@ export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): 
 // tampil setelah admin menyetujui (lihat admin/users/certificate-actions.ts).
 export async function uploadCoachCertificate(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
-  if (!session || session.user.role !== "COACH") return { error: "Cuma buat akun coach." };
+  if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
   if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
   const file = formData.get("certificate") as File | null;
   const note = formData.get("certificationNote")?.toString().trim() ?? "";

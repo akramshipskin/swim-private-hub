@@ -60,7 +60,7 @@ export async function requestWithdrawal(
     const pool = await getOwnedPool(session.user.id, poolId);
     await requestPoolWithdrawal(pool.id, Number(formData.get("amount")));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal ajuin pencairan" };
+    return { error: err instanceof Error ? err.message : "Gagal ajukan pencairan" };
   }
 
   revalidatePath("/pool/saldo");

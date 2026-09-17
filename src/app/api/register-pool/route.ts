@@ -1,3 +1,4 @@
+import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { isValidIndonesianPhone, toProperCase } from "@/lib/format";
@@ -13,6 +14,8 @@ export async function POST(request: Request) {
     address,
     openTime,
     closeTime,
+    description,
+    facilities,
     website,
     formRenderedAt,
   } = body as {
@@ -24,6 +27,8 @@ export async function POST(request: Request) {
     address?: string;
     openTime?: string;
     closeTime?: string;
+    description?: string;
+    facilities?: string[];
     website?: string;
     formRenderedAt?: number;
   };
@@ -92,6 +97,8 @@ export async function POST(request: Request) {
           contactPhone: phone,
           openTime,
           closeTime,
+          description: description?.trim().slice(0, 1000) || null,
+          facilities: (facilities ?? []).filter((f) => (POOL_FACILITIES as readonly string[]).includes(f)),
           isActive: false,
           ownerships: { create: { ownerId: user.id } },
         },

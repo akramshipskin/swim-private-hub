@@ -200,8 +200,8 @@ export default async function PoolLaporanPage({
       </div>
 
       <p className="mt-4 text-xs text-text-subtle">
-        Cuma sesi yang benar-benar ditandai Hadir dan paketnya berbayar (bukan assign manual/gratis)
-        yang kehitung di sini — sama seperti dasar hitung saldo kolam.
+        Hanya sesi yang benar-benar ditandai Hadir dan paketnya berbayar (bukan assign manual/gratis)
+        yang dihitung di sini — sama seperti dasar hitung saldo kolam.
       </p>
     </main>
   );

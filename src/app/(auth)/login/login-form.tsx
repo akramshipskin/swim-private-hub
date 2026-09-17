@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { buildAdminWaLink } from "@/lib/whatsapp";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -90,7 +91,18 @@ export default function LoginForm() {
             </Button>
           </form>
 
-          <p className="mt-5 text-center text-sm text-text-muted">
+          <p className="mt-4 text-center text-sm text-text-muted">
+            Lupa password?{" "}
+            <a
+              href={buildAdminWaLink("Halo Admin Swim Private Hub, saya lupa password akun saya. No HP akun saya: ")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block -my-3 py-3 font-medium text-brand-600 hover:underline"
+            >
+              Minta reset ke admin
+            </a>
+          </p>
+          <p className="mt-2 text-center text-sm text-text-muted">
             Belum punya akun?{" "}
             <a
               href="/register"

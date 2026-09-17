@@ -20,7 +20,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
           Kolom: Nama Member, No HP, Email (opsional), Nama Peserta/Anak, Paket Aktif,
           Sisa Sesi. 1 baris = 1 peserta — member dengan &gt;1 anak, ulang No HP yang
           sama di baris berikutnya. Member baru login pakai No HP + password default
-          yang sama, wajib ganti pas login pertama. 1 file = 1 kolam tujuan — kalau
+          yang sama, wajib ganti saat login pertama. 1 file = 1 kolam tujuan — kalau
           data kamu lintas kolam, pisah filenya dan import satu-satu per kolam.
         </p>
         <a

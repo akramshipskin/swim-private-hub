@@ -37,8 +37,8 @@ export async function GET() {
     ["  Kalau namanya tidak ada di katalog, tetep dibuat paket custom pakai nilai \"Sisa Sesi\" sebagai total sesi juga."],
     ["- \"Paket Aktif\" & \"Sisa Sesi\" boleh dikosongin kalau peserta itu belum punya paket aktif."],
     ["- Baris tanpa \"Nama Peserta/Anak\" DAN tanpa \"Paket Aktif\" = member polos, belum ada peserta terdaftar."],
-    ["  (dia akan diminta isi peserta sendiri pas login pertama, seperti alur biasa)."],
-    ["- Password default semua member baru: renang2026 — wajib ganti pas login pertama."],
+    ["  (dia akan diminta isi peserta sendiri saat login pertama, seperti alur biasa)."],
+    ["- Password default semua member baru: renang2026 — wajib ganti saat login pertama."],
     ["- No HP yang sudah terpakai email/HP-nya di sistem akan di-skip (dilaporin di hasil import)."],
   ]);
   infoSheet["!cols"] = [{ wch: 100 }];

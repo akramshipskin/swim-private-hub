@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     const eligible = await prisma.package.count({ where: dropInEligibilityWhere(session.user.id) });
     if (eligible === 0) {
       return Response.json(
-        { error: "Beli 1 sesi cuma bisa kalau kamu masih punya paket aktif. Beli paket dulu." },
+        { error: "Beli 1 sesi hanya bisa kalau kamu masih punya paket aktif. Beli paket dulu." },
         { status: 403 }
       );
     }

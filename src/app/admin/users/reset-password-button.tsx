@@ -43,7 +43,7 @@ export default function ResetPasswordButton({
       <ConfirmDialog
         open={open}
         title={`Reset password ${userName}?`}
-        description="Password lamanya langsung tidak berlaku. Kamu dapat password sementara buat dikirim ke dia, dan dia wajib buat password baru pas login."
+        description="Password lamanya langsung tidak berlaku. Kamu dapat password sementara buat dikirim ke dia, dan dia wajib buat password baru saat login."
         confirmLabel="Ya, reset"
         loading={loading}
         onConfirm={handleReset}
@@ -65,7 +65,7 @@ export default function ResetPasswordButton({
             ) : (
               <>
                 <p className="mt-1.5 text-sm text-text-muted">
-                  Password sementara {userName} (cuma ditampilin sekali ini):
+                  Password sementara {userName} (hanya ditampilin sekali ini):
                 </p>
                 <p className="mt-2 select-all rounded-md bg-surface-muted px-3 py-2 font-mono text-base tracking-wide text-text">
                   {tempPassword}

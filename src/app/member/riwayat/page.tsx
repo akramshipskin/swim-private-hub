@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/require-role";
+import { SearchForm, matchesQuery } from "@/components/search-form";
 import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { getCancelQuotaUsage, evaluateCancelEligibility } from "@/lib/cancel-eligibility";
@@ -28,7 +29,8 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export default async function MemberRiwayatPage() {
+export default async function MemberRiwayatPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const q = (await searchParams).q ?? "";
   const session = await requireRole("MEMBER");
 
   const bookings = await prisma.booking.findMany({
@@ -45,7 +47,7 @@ export default async function MemberRiwayatPage() {
   }
 
   const byDate = new Map<string, typeof bookings>();
-  for (const b of bookings) {
+  for (const b of bookings.filter((x) => matchesQuery(q, x.availability.coach.name, x.availability.pool.name, x.package.dependent.name))) {
     const key = dateKey(b.availability.date);
     if (!byDate.has(key)) byDate.set(key, []);
     byDate.get(key)!.push(b);
@@ -81,7 +83,8 @@ export default async function MemberRiwayatPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Riwayat Booking</h1>
+      <h1 className="mb-4 text-2xl font-semibold tracking-tight text-text">Riwayat Booking</h1>
+      <SearchForm q={q} placeholder="Cari coach, kolam, atau peserta" />
 
       {bookings.length === 0 ? (
         <Card>

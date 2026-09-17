@@ -1,10 +1,12 @@
 import { requireRole } from "@/lib/require-role";
+import { SearchForm, matchesQuery } from "@/components/search-form";
 import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import AttendanceToggle from "@/components/attendance-toggle";
 
-export default async function CoachRiwayatSesiPage() {
+export default async function CoachRiwayatSesiPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const q = (await searchParams).q ?? "";
   const session = await requireRole("COACH");
 
   const bookings = await prisma.booking.findMany({
@@ -28,7 +30,7 @@ export default async function CoachRiwayatSesiPage() {
     return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
   }
   const byDate = new Map<string, typeof bookings>();
-  for (const b of bookings) {
+  for (const b of bookings.filter((x) => matchesQuery(q, x.package.dependent.name, x.member.name, x.availability.pool.name))) {
     const key = dateKey(b.availability.date);
     if (!byDate.has(key)) byDate.set(key, []);
     byDate.get(key)!.push(b);
@@ -38,6 +40,7 @@ export default async function CoachRiwayatSesiPage() {
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Riwayat Sesi</h1>
+      <SearchForm q={q} placeholder="Cari peserta, nama akun, atau kolam" />
       <p className="mb-4 text-sm text-text-muted">Tandai kehadiran setelah sesi selesai. Saldo kamu dan kolam masuk setelah ditandai Hadir.</p>
       <div className="mb-6 grid grid-cols-3 gap-3">
         <Card><CardBody className="py-3"><p className="text-sm text-text-muted">Belum ditandai</p><p className={`text-2xl font-bold ${unmarkedCount > 0 ? "text-warning-text" : "text-text"}`}>{unmarkedCount}</p></CardBody></Card>
