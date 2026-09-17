@@ -9,9 +9,11 @@ import { ThemeMenu } from "@/components/theme-toggle";
 export function UserMenu({
   userName,
   userRole,
+  avatarUrl,
 }: {
   userName: string;
   userRole: string;
+  avatarUrl?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -35,6 +37,10 @@ export function UserMenu({
         aria-expanded={open}
         className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-text-muted hover:bg-surface-muted"
       >
+        {avatarUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatarUrl} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover" />
+        )}
         <div className="text-right leading-tight">
           <p className="max-w-[110px] truncate text-sm font-medium text-text sm:max-w-none">
             {userName}

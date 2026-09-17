@@ -43,7 +43,7 @@ export default function PembayaranGagalPage() {
           </h1>
           <p className="mb-6 text-sm text-text-muted">
             Pembayaran dibatalkan atau gagal diproses. Belum ada saldo yang
-            terpotong -- kamu bisa coba lagi kapan aja.
+            terpotong — kamu bisa coba lagi kapan saja.
           </p>
           <div className="flex w-full flex-col gap-2">
             <Link href="/member/paket" className="w-full">

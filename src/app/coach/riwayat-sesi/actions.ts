@@ -19,7 +19,7 @@ export async function markAttendance(
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.role !== "COACH" && session.user.role !== "ADMIN") {
-    return { error: "Gak punya akses." };
+    return { error: "Tidak punya akses." };
   }
 
   const bookingId = formData.get("bookingId") as string;
@@ -34,7 +34,7 @@ export async function markAttendance(
   });
 
   if (!booking || booking.status !== "BOOKED") {
-    return { error: "Booking gak ditemukan atau udah dibatalin." };
+    return { error: "Booking tidak ditemukan atau sudah dibatalin." };
   }
   if (session.user.role === "COACH" && booking.availability.coachId !== session.user.id) {
     return { error: "Bukan sesi kamu." };
@@ -66,7 +66,7 @@ export async function markAttendance(
         },
       });
       if (claim.count === 0) {
-        throw new Error("Booking ini udah diubah barengan (dibatalin/ditandai di tempat lain), refresh dulu.");
+        throw new Error("Booking ini sudah diubah barengan (dibatalin/ditandai di tempat lain), refresh dulu.");
       }
 
       // Kredit wallet cuma jalan kalau paket ini beneran dibeli lewat

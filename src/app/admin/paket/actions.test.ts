@@ -136,9 +136,9 @@ describe("addChildForMember", () => {
   });
 
   it("surfaces the underlying error message instead of throwing", async () => {
-    createDependent.mockRejectedValueOnce(new Error("Nama anak gak boleh kosong"));
+    createDependent.mockRejectedValueOnce(new Error("Nama anak tidak boleh kosong"));
     const result = await addChildForMember(null, formData({ memberId: "member-1", type: "child", name: "" }));
-    expect(result).toEqual({ error: "Nama anak gak boleh kosong" });
+    expect(result).toEqual({ error: "Nama anak tidak boleh kosong" });
   });
 });
 
@@ -167,7 +167,7 @@ describe("assignPackageToMember", () => {
   it("rejects when the dependent belongs to a different member (IDOR)", async () => {
     dependentFindUnique.mockResolvedValueOnce({ memberId: "someone-else" });
     const result = await assignPackageToMember(null, formData({ ...base, poolId: "pool-1" }));
-    expect(result).toEqual({ error: "Anak gak ditemukan atau bukan punya member ini" });
+    expect(result).toEqual({ error: "Anak tidak ditemukan atau bukan punya member ini" });
     expect(packageCreate).not.toHaveBeenCalled();
   });
 
@@ -224,7 +224,7 @@ describe("updatePackage", () => {
       null,
       formData({ packageId: "gone", sisaSesi: "1", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
     );
-    expect(result).toEqual({ error: "Paket gak ketemu, mungkin udah dihapus." });
+    expect(result).toEqual({ error: "Paket tidak bertemu, mungkin sudah dihapus." });
   });
 
   // Clamp: admin gak boleh nge-set sisa sesi ngelewatin total sesi paket
@@ -260,6 +260,6 @@ describe("updatePackage", () => {
       formData({ packageId: "pkg-1", sisaSesi: "5", expectedSisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
     );
     expect(packageUpdate).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "pkg-1", sisaSesi: 5 } }));
-    expect(result?.error).toContain("barusan berubah");
+    expect(result?.error).toContain("baru saja berubah");
   });
 });

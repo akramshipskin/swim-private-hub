@@ -8,6 +8,7 @@ import PesertaPackageRow from "./peserta-package-row";
 type PesertaPkg = {
   id: string;
   name: string;
+  poolName: string;
   sisaSesi: number;
   totalSesi: number;
   jatahCancel: number;
@@ -69,7 +70,7 @@ export default function MemberCard({
 
         <div key={formKey} className="flex flex-col divide-y divide-border">
           {peserta.map((p) => (
-            <PesertaPackageRow key={p.dependentId} label={p.label} pkg={p.pkg} isEditing={isEditing} />
+            <PesertaPackageRow key={`${p.dependentId}-${p.pkg?.id ?? "none"}`} label={p.label} pkg={p.pkg} isEditing={isEditing} />
           ))}
         </div>
       </CardBody>

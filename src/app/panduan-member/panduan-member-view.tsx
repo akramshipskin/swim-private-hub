@@ -117,9 +117,9 @@ export default function PanduanMemberView() {
           </h1>
           <p className="mt-2 max-w-xl text-sm text-text-muted">
             Urutan step + isi tiap layar di bawah diambil dari kode aplikasi &amp; data akun demo yang
-            beneran aktif -- bukan dikira-kira. Ada 2 jalur masuk (Daftar Sendiri vs Login dari akun yang
+            benar-benar aktif — bukan dikira-kira. Ada 2 jalur masuk (Daftar Sendiri vs Login dari akun yang
             dibikinin admin), lanjut sampai booking, riwayat, paket, dan profil. Mockup di bawah sengaja
-            dibikin tampilan mobile -- di dunia nyata member akses aplikasinya lewat HP.
+            dibuat tampilan mobile — di dunia nyata member akses aplikasinya lewat HP.
           </p>
         </div>
       </div>
@@ -131,7 +131,7 @@ export default function PanduanMemberView() {
           <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-xl object-contain" />
           <p className="text-sm text-text"><Logotype className="text-sm" /></p>
           <p className="max-w-[220px] text-xs text-text-muted">
-            Booking jadwal renang dengan coach favoritmu, kapan aja lewat HP.
+            Booking jadwal renang dengan coach favoritmu, kapan saja lewat HP.
           </p>
           <div className="mt-1 flex gap-2">
             <Button size="sm">Login</Button>
@@ -165,7 +165,7 @@ export default function PanduanMemberView() {
       <Step
         n={3}
         title="Otomatis login, diarahkan ke halaman Paket"
-        note="Bukan ke Booking -- karena akun baru belum punya paket aktif, sistem ngarahin ke Paket dulu biar beli."
+        note="Bukan ke Booking — karena akun baru belum punya paket aktif, sistem ngarahin ke Paket dulu agar beli."
       >
         <div className="rounded-xl border border-amber-200 bg-warning-bg px-3 py-2 text-xs text-warning-text">
           Belum ada paket. Pilih salah satu di bawah.
@@ -187,8 +187,8 @@ export default function PanduanMemberView() {
 
       <Step
         n={4}
-        title="Login pake No HP + password default"
-        desc="Admin udah input data member (termasuk anak &amp; paket) lewat import xlsx atau input manual."
+        title="Login pakai No HP + password default"
+        desc="Admin sudah input data member (termasuk anak &amp; paket) lewat import xlsx atau input manual."
       >
         <FakeField label="No HP atau Email" value="0812xxxxxxx" />
         <FakeField label="Password" value="renang2026" />
@@ -199,10 +199,10 @@ export default function PanduanMemberView() {
       <Step
         n={5}
         title="Wajib ganti password dulu"
-        desc="Otomatis diarahkan ke /ganti-password, gak bisa dilewatin sebelum ganti."
-        note="Field &ldquo;Siapa yang mau les?&rdquo; tetap muncul di sini walau anaknya udah diinput admin -- itu emang alur baku form ini."
+        desc="Otomatis diarahkan ke /ganti-password, tidak bisa dilewatin sebelum ganti."
+        note="Field &ldquo;Siapa yang mau les?&rdquo; tetap muncul di sini walau anaknya sudah diinput admin — itu memang alur baku form ini."
       >
-        <p className="text-xs text-text-muted">Ini login pertama kamu -- ganti password bawaan dulu ya.</p>
+        <p className="text-xs text-text-muted">Ini login pertama kamu — ganti password bawaan dulu ya.</p>
         <FakeField label="Password Baru" value="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
         <FakeField label="Konfirmasi Password Baru" value="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
         <div>
@@ -228,7 +228,7 @@ export default function PanduanMemberView() {
 
       <Part label="Booking Sesi (Lengkap)" />
 
-      <Step n={7} title="Pilih anak" desc="Dropdown &ldquo;Buat anak&rdquo; -- nunjukin paket &amp; sisa sesi tiap peserta.">
+      <Step n={7} title="Pilih anak" desc="Dropdown &ldquo;Buat anak&rdquo; — nunjukin paket &amp; sisa sesi tiap peserta.">
         <div className="flex min-h-[44px] items-center rounded-xl border border-border bg-surface px-3 text-sm text-text">
           Anak Satu &mdash; 8x Renang, sisa 8
         </div>
@@ -237,7 +237,7 @@ export default function PanduanMemberView() {
       <Step
         n={8}
         title="Pilih tanggal"
-        desc="8 pilihan tanggal terdekat -- titik nandain ada slot ready. Butuh tanggal lebih jauh? Tap &ldquo;Pilih tanggal lain&rdquo; buat buka kalender penuh."
+        desc="8 pilihan tanggal terdekat — titik nandain ada slot ready. Butuh tanggal lebih jauh? Tap &ldquo;Pilih tanggal lain&rdquo; buat buka kalender penuh."
       >
         <div className="flex items-center justify-between text-[11px] text-text-subtle">
           <span className="flex items-center gap-1">
@@ -288,7 +288,7 @@ export default function PanduanMemberView() {
         </Card>
       </Step>
 
-      <Step n={10} title="Booking berhasil" note="Sisa sesi kepotong 1, dan coach dapet notif kalau notifikasinya udah aktif.">
+      <Step n={10} title="Booking berhasil" note="Sisa sesi terpotong 1, dan coach dapat notif kalau notifikasinya sudah aktif.">
         <div className="rounded-xl bg-success-bg px-3 py-2 text-xs font-medium text-success-text">
           Booking berhasil! Cek di halaman Riwayat.
         </div>
@@ -332,8 +332,8 @@ export default function PanduanMemberView() {
 
       <Step
         n={13}
-        title="Kalau udah &lt; 2 jam atau jatah abis"
-        note="Ini beneran kejadian pas didemo -- booking dites live, kurang dari 2 jam sebelum jadwal."
+        title="Kalau sudah &lt; 2 jam atau jatah habis"
+        note="Ini benar-benar kejadian pas didemo — booking dites live, kurang dari 2 jam sebelum jadwal."
       >
         <div className="flex items-center justify-between rounded-xl border border-border bg-surface p-3">
           <p className="text-xs text-text-muted">Pembatalan hanya bisa minimal 2 jam sebelum jadwal.</p>
@@ -341,7 +341,7 @@ export default function PanduanMemberView() {
             Hubungi Admin
           </Button>
         </div>
-        <p className="text-xs text-text-subtle">Klik langsung buka WhatsApp, pesannya udah keisi otomatis.</p>
+        <p className="text-xs text-text-subtle">Klik langsung buka WhatsApp, pesannya sudah terisi otomatis.</p>
       </Step>
 
       <Part label="Paket" />
@@ -351,7 +351,7 @@ export default function PanduanMemberView() {
         <PaketCard name="8x Renang" forWhom="Anak Satu" sisa={7} total={8} berlaku="Rabu, 21 Oktober 2026" />
       </Step>
 
-      <Step n={15} title="Beli paket tambahan" desc="Kalau sesi udah mau habis, bisa beli lagi kapan aja.">
+      <Step n={15} title="Beli paket tambahan" desc="Kalau sesi sudah mau habis, bisa beli lagi kapan saja.">
         <Card>
           <CardBody>
             <p className="text-sm font-semibold text-text">Private | 8x Renang</p>
@@ -389,7 +389,7 @@ export default function PanduanMemberView() {
         </Button>
       </Step>
 
-      <Step n={18} title="Aktifkan notifikasi" note="Sekali aktif, dapet notif tiap booking berhasil dan tiap coach buka slot baru.">
+      <Step n={18} title="Aktifkan notifikasi" note="Sekali aktif, dapat notif tiap booking berhasil dan tiap coach buka slot baru.">
         <button className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
           Aktifkan Notifikasi
         </button>

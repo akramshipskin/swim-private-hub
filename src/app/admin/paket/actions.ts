@@ -31,7 +31,7 @@ export async function createTemplate(
     !Number.isInteger(durationDays) || durationDays < 1 ||
     !Number.isInteger(jatahCancel) || jatahCancel < 0
   ) {
-    return { error: "Kolam & nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel gak boleh negatif" };
+    return { error: "Kolam & nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel tidak boleh negatif" };
   }
 
   await prisma.packageTemplate.create({
@@ -63,7 +63,7 @@ export async function updateTemplate(
     !Number.isInteger(durationDays) || durationDays < 1 ||
     !Number.isInteger(jatahCancel) || jatahCancel < 0
   ) {
-    return { error: "Nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel gak boleh negatif" };
+    return { error: "Nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel tidak boleh negatif" };
   }
 
   await prisma.packageTemplate.update({
@@ -101,7 +101,7 @@ export async function addChildForMember(
       await createDependent(memberId, name);
     }
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal nambah peserta" };
+    return { error: err instanceof Error ? err.message : "Gagal menambah peserta" };
   }
 
   revalidatePath("/admin/paket");
@@ -135,7 +135,7 @@ export async function assignPackageToMember(
   }
   if (!dependentId) {
     return {
-      error: "Member ini belum punya peserta terdaftar -- tambahin dulu di section \"Tambah Peserta\" sebelum assign paket.",
+      error: "Member ini belum punya peserta terdaftar — tambahin dulu di section \"Tambah Peserta\" sebelum assign paket.",
     };
   }
   if (!name) {
@@ -145,7 +145,7 @@ export async function assignPackageToMember(
     return { error: "Total sesi minimal 1" };
   }
   if (!Number.isInteger(jatahCancel) || jatahCancel < 0) {
-    return { error: "Jatah cancel gak boleh negatif" };
+    return { error: "Jatah cancel tidak boleh negatif" };
   }
 
   // Anak yang dipilih harus emang punya member ini -- dropdown di form
@@ -156,7 +156,7 @@ export async function assignPackageToMember(
     select: { memberId: true },
   });
   if (!dependent || dependent.memberId !== memberId) {
-    return { error: "Anak gak ditemukan atau bukan punya member ini" };
+    return { error: "Anak tidak ditemukan atau bukan punya member ini" };
   }
 
   // Paket wajib pin ke 1 kolam (locked /plan-eng-review 2026-09-12) --
@@ -169,7 +169,7 @@ export async function assignPackageToMember(
       select: { poolId: true },
     });
     if (!template) {
-      return { error: "Template paket gak ditemukan" };
+      return { error: "Template paket tidak ditemukan" };
     }
     poolId = template.poolId;
   }
@@ -213,15 +213,15 @@ export async function updatePackage(
   const expiredDateRaw = formData.get("expiredDate") as string;
 
   if (!packageId || !Number.isInteger(sisaSesiRaw) || sisaSesiRaw < 0) {
-    return { error: "Sisa sesi gak boleh negatif" };
+    return { error: "Sisa sesi tidak boleh negatif" };
   }
   if (!Number.isInteger(jatahCancelRaw) || jatahCancelRaw < 0) {
-    return { error: "Jatah cancel gak boleh negatif" };
+    return { error: "Jatah cancel tidak boleh negatif" };
   }
 
   const pkg = await prisma.package.findUnique({ where: { id: packageId } });
   if (!pkg) {
-    return { error: "Paket gak ketemu, mungkin udah dihapus." };
+    return { error: "Paket tidak bertemu, mungkin sudah dihapus." };
   }
   // Clamp biar sisa sesi gak bisa ngelewatin total sesi paketnya sendiri.
   const sisaSesi = Math.min(sisaSesiRaw, pkg.totalSesi);
@@ -245,7 +245,7 @@ export async function updatePackage(
   });
   if (result.count === 0) {
     return {
-      error: "Sisa sesi paket ini barusan berubah (ada booking/pembatalan baru). Refresh halaman, cek angkanya, lalu simpan lagi.",
+      error: "Sisa sesi paket ini baru saja berubah (ada booking/pembatalan baru). Refresh halaman, cek angkanya, lalu simpan lagi.",
     };
   }
 

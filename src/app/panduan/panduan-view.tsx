@@ -351,21 +351,21 @@ const PANDUAN_BODY = `
     <section class="panel active" id="presentasi">
       <div class="hero">
         <h1>Satu aplikasi buat <span class="accent-word">booking</span>, <span class="accent-word">jadwal</span>, dan <span class="accent-word">paket</span> les renang</h1>
-        <p class="lead">Gak ada lagi bolak-balik chat WhatsApp buat atur jadwal, itung sisa sesi manual, atau lupa siapa yang udah bayar. Member booking sendiri, coach kelola jadwal sendiri, admin pantau semuanya dari satu tempat.</p>
+        <p class="lead">Tidak ada lagi bolak-balik chat WhatsApp buat atur jadwal, itung sisa sesi manual, atau lupa siapa yang sudah bayar. Member booking sendiri, coach kelola jadwal sendiri, admin pantau semuanya dari satu tempat.</p>
         <div class="btn-row" style="justify-content:center;margin-top:22px;">
-          <a class="btn btn-primary" href="https://wa.me/6282117173124?text=${encodeURIComponent("Halo, saya tertarik pake sistem Swim Private Hub buat kelola tempat les renang saya. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
+          <a class="btn btn-primary" href="https://wa.me/6282117173124?text=${encodeURIComponent("Halo, saya tertarik pakai sistem Swim Private Hub buat kelola tempat les renang saya. Boleh minta info lebih lanjut?")}" target="_blank" rel="noopener noreferrer">Punya Kolam Renang? Hubungi Kami</a>
           <a class="btn btn-secondary" href="/register">Daftar Sekarang</a>
         </div>
         <div class="hero-actions">
-          <span class="pill-stat">${ICON.phone} <b>Web-based</b> — buka dari HP, gak perlu install apa-apa</span>
-          <span class="pill-stat">${ICON.bolt} <b>Real-time</b> — slot kekunci begitu diambil</span>
+          <span class="pill-stat">${ICON.phone} <b>Web-based</b> — buka dari HP, tidak perlu install apa-apa</span>
+          <span class="pill-stat">${ICON.bolt} <b>Real-time</b> — slot terkunci begitu diambil</span>
           <span class="pill-stat">${ICON.bell} <b>Notifikasi dua arah</b> — member &amp; coach saling kekabarin otomatis</span>
         </div>
       </div>
 
       <div class="quote-block">
         <span class="mark">"</span>
-        <p>Sebelumnya: itung sisa sesi manual dari chat WA, sering ketuker antar anak, admin harus konfirmasi jadwal satu-satu. Sekarang: member booking sendiri, sisa sesi dan jatah pembatalan kehitung otomatis per anak, admin tinggal pantau.</p>
+        <p>Sebelumnya: itung sisa sesi manual dari chat WA, sering tertukar antar anak, admin harus konfirmasi jadwal satu-satu. Sekarang: member booking sendiri, sisa sesi dan jatah pembatalan kehitung otomatis per anak, admin tinggal pantau.</p>
       </div>
 
       <div class="section-head">
@@ -377,12 +377,12 @@ const PANDUAN_BODY = `
         <div class="card">
           <div class="icon" style="background:var(--brand-light);color:var(--brand);">${ICON.family}</div>
           <h3>1 akun, banyak anak</h3>
-          <p>Satu orang tua daftar sekali, bisa tambah beberapa anak sekaligus. Tiap anak punya paket dan sisa sesi sendiri-sendiri, gak ketuker.</p>
+          <p>Satu orang tua daftar sekali, bisa tambah beberapa anak sekaligus. Tiap anak punya paket dan sisa sesi sendiri-sendiri, tidak tertukar.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--accent-light);color:var(--accent);">${ICON.lock}</div>
           <h3>Slot terkunci otomatis</h3>
-          <p>Begitu 1 member ambil jam tertentu sama coach tertentu, slot itu langsung kekunci buat member lain. Gak ada lagi bentrok jadwal.</p>
+          <p>Begitu 1 member ambil jam tertentu sama coach tertentu, slot itu langsung terkunci buat member lain. Tidak ada lagi bentrok jadwal.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--success-bg);color:var(--success);">${ICON.checkCircle}</div>
@@ -392,22 +392,22 @@ const PANDUAN_BODY = `
         <div class="card">
           <div class="icon" style="background:var(--member-bg);color:var(--member);">${ICON.barChart}</div>
           <h3>Honor coach otomatis kehitung</h3>
-          <p>Cuma sesi yang beneran ditandain "Hadir" yang kehitung valid. Admin tinggal buka laporan Kinerja Coach per rentang tanggal, gak perlu rekap manual.</p>
+          <p>Cuma sesi yang benar-benar ditandai "Hadir" yang kehitung valid. Admin tinggal buka laporan Kinerja Coach per rentang tanggal, tidak perlu rekap manual.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--coach-bg);color:var(--coach);">${ICON.inboxDownload}</div>
           <h3>Import data massal</h3>
-          <p>Migrasi dari data lama (Excel/chat) bisa lewat template import — isi nama, kontak, paket, sisa sesi, sistem yang bikinin akun dan paketnya sekaligus.</p>
+          <p>Migrasi dari data lama (Excel/chat) bisa lewat template import — isi nama, kontak, paket, sisa sesi, sistem yang buatkan akun dan paketnya sekaligus.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--admin-bg);color:var(--admin);">${ICON.creditCard}</div>
           <h3>Riwayat pembayaran tercatat</h3>
-          <p>Setiap transaksi paket tercatat lengkap — status berhasil, menunggu, atau gagal — bisa difilter per rentang tanggal kapan aja.</p>
+          <p>Setiap transaksi paket tercatat lengkap — status berhasil, menunggu, atau gagal — bisa difilter per rentang tanggal kapan saja.</p>
         </div>
         <div class="card">
           <div class="icon" style="background:var(--brand-light);color:var(--brand);">${ICON.bell}</div>
-          <h3>Notifikasi dua arah, gak perlu buka app terus</h3>
-          <p>Member booking → coach dapet notif. Coach buka slot baru → semua member aktif dapet notif. Keduanya cukup aktifin sekali, notif nyampe walau aplikasi lagi ketutup.</p>
+          <h3>Notifikasi dua arah, tidak perlu buka app terus</h3>
+          <p>Member booking → coach dapat notif. Coach buka slot baru → semua member aktif dapat notif. Keduanya cukup aktifin sekali, notif sampai walau aplikasi lagi tertutup.</p>
         </div>
       </div>
 
@@ -426,7 +426,7 @@ const PANDUAN_BODY = `
             <li>Lihat sisa sesi &amp; jatah batal per anak</li>
             <li>Batalkan booking sendiri (dengan syarat)</li>
             <li>Riwayat lengkap semua sesi</li>
-            <li>Dapet notifikasi tiap coach buka slot baru</li>
+            <li>Dapat notifikasi tiap coach buka slot baru</li>
           </ul>
           <button class="go-btn" data-goto="member">Lihat panduan Member →</button>
         </div>
@@ -437,9 +437,9 @@ const PANDUAN_BODY = `
           <ul>
             <li>Buka slot per tanggal &amp; jam</li>
             <li>Lihat siapa yang booking</li>
-            <li>Tandai Hadir / Gak Hadir</li>
+            <li>Tandai Hadir / Tidak Hadir</li>
             <li>Pantau jadwal coach lain di hari sama</li>
-            <li>Dapet notifikasi tiap ada booking baru</li>
+            <li>Dapat notifikasi tiap ada booking baru</li>
           </ul>
           <button class="go-btn" data-goto="coach">Lihat panduan Coach →</button>
         </div>
@@ -450,7 +450,7 @@ const PANDUAN_BODY = `
           <ul>
             <li>Kelola semua akun &amp; peserta</li>
             <li>Kelola katalog &amp; assign paket</li>
-            <li>Pantau &amp; batalkan booking siapa aja</li>
+            <li>Pantau &amp; batalkan booking siapa saja</li>
             <li>Laporan pembayaran &amp; kinerja coach</li>
           </ul>
           <button class="go-btn" data-goto="admin">Lihat panduan Admin →</button>
@@ -472,17 +472,17 @@ const PANDUAN_BODY = `
         <h2>Dari daftar sampai selesai les, 5 langkah</h2>
       </div>
       <div class="card">
-        <div class="feature-row"><span class="num">1</span><div><h4>Member daftar &amp; beli paket</h4><p>Isi data diri, tentuin siapa aja yang mau les (diri sendiri dan/atau anak), lalu beli paket sesuai kebutuhan.</p></div></div>
+        <div class="feature-row"><span class="num">1</span><div><h4>Member daftar &amp; beli paket</h4><p>Isi data diri, tentuin siapa saja yang mau les (diri sendiri dan/atau anak), lalu beli paket sesuai kebutuhan.</p></div></div>
         <div class="feature-row"><span class="num">2</span><div><h4>Booking jadwal</h4><p>Pilih anak, coach, tanggal, dan jam yang masih kosong. Slot langsung terkunci setelah dibooking.</p></div></div>
-        <div class="feature-row"><span class="num">3</span><div><h4>Coach buka &amp; kelola jadwal</h4><p>Coach nentuin sendiri jam berapa aja dia available, member cuma bisa pilih dari situ.</p></div></div>
-        <div class="feature-row"><span class="num">4</span><div><h4>Sesi berlangsung, coach tandai kehadiran</h4><p>Abis sesi selesai, coach tandai Hadir atau Gak Hadir — ini yang jadi dasar hitung honor.</p></div></div>
+        <div class="feature-row"><span class="num">3</span><div><h4>Coach buka &amp; kelola jadwal</h4><p>Coach nentuin sendiri jam berapa saja dia available, member cuma bisa pilih dari situ.</p></div></div>
+        <div class="feature-row"><span class="num">4</span><div><h4>Sesi berlangsung, coach tandai kehadiran</h4><p>Habis sesi selesai, coach tandai Hadir atau Tidak Hadir — ini yang jadi dasar hitung honor.</p></div></div>
         <div class="feature-row"><span class="num">5</span><div><h4>Admin pantau semuanya</h4><p>Dari satu dashboard: siapa booking apa, siapa yang belum bayar, berapa sesi valid tiap coach bulan ini.</p></div></div>
       </div>
 
       <div class="section-head">
         <span class="kicker">Coba sendiri</span>
         <h2>Akun test buat login langsung</h2>
-        <p>Semua password sama: <b>qwertyuiop</b> &mdash; tinggal login pake email &amp; password di bawah buat coba tiap peran. (Akun admin gak dishare di sini demi keamanan &mdash; hubungi kami kalau perlu akses admin buat evaluasi.)</p>
+        <p>Semua password sama: <b>qwertyuiop</b> &mdash; tinggal login pakai email &amp; password di bawah buat coba tiap peran. (Akun admin tidak dishare di sini demi keamanan &mdash; hubungi kami kalau perlu akses admin buat evaluasi.)</p>
       </div>
       <div class="table-wrap">
         <table class="mini-table">
@@ -500,7 +500,7 @@ const PANDUAN_BODY = `
 
       <div class="cta-band">
         <h2>Siap dipakai hari ini</h2>
-        <p>Tinggal bagikan link login ke member dan coach — gak perlu training panjang, semua alurnya udah familiar kayak booking online pada umumnya.</p>
+        <p>Tinggal bagikan link login ke member dan coach — tidak perlu training panjang, semua alurnya sudah familiar seperti booking online pada umumnya.</p>
       </div>
 
       <footer class="credit">Swim Private Hub &mdash; sistem booking &amp; manajemen les renang.</footer>
@@ -512,11 +512,11 @@ const PANDUAN_BODY = `
         <div class="badge-lg" style="background:var(--brand-light);color:var(--brand);">${ICON.phone}</div>
         <div>
           <h1>Cara Install ke HP</h1>
-          <p>Gak perlu Play Store atau App Store — tinggal tambahkan dari browser, ikonnya muncul di layar utama kayak aplikasi biasa.</p>
+          <p>Tidak perlu Play Store atau App Store — tinggal tambahkan dari browser, ikonnya muncul di layar utama seperti aplikasi biasa.</p>
         </div>
       </div>
 
-      <div class="note tip" style="margin:20px 0 8px;"><span>${ICON.bulb}</span><p>Ini <b>bukan</b> aplikasi terpisah yang perlu di-download — tetap website yang sama, cuma "dipasangkan" ikonnya ke HP biar gampang dibuka lagi tanpa harus ketik alamat website tiap kali.</p></div>
+      <div class="note tip" style="margin:20px 0 8px;"><span>${ICON.bulb}</span><p>Ini <b>bukan</b> aplikasi terpisah yang perlu di-download — tetap website yang sama, cuma "dipasangkan" ikonnya ke HP agar gampang dibuka lagi tanpa harus ketik alamat website tiap kali.</p></div>
 
       <div class="grid3" style="margin-top:24px;">
         <div class="card" style="border-top:3px solid #3ddc84;">
@@ -533,7 +533,7 @@ const PANDUAN_BODY = `
             </div>
             <div class="step">
               <span class="sn" style="background:#1a7a43;">3</span>
-              <div class="st"><h4>Kalau gak muncul otomatis, tap titik tiga (⋮)</h4><p>Ada di pojok kanan atas Chrome.</p></div>
+              <div class="st"><h4>Kalau tidak muncul otomatis, tap titik tiga (⋮)</h4><p>Ada di pojok kanan atas Chrome.</p></div>
             </div>
             <div class="step">
               <span class="sn" style="background:#1a7a43;">4</span>
@@ -545,7 +545,7 @@ const PANDUAN_BODY = `
             </div>
             <div class="step">
               <span class="sn" style="background:#1a7a43;">6</span>
-              <div class="st"><h4>Selesai — ikon muncul di layar utama</h4><p>Buka dari situ, tampilannya fullscreen tanpa address bar, kayak aplikasi biasa.</p></div>
+              <div class="st"><h4>Selesai — ikon muncul di layar utama</h4><p>Buka dari situ, tampilannya fullscreen tanpa address bar, seperti aplikasi biasa.</p></div>
             </div>
           </div>
         </div>
@@ -576,7 +576,7 @@ const PANDUAN_BODY = `
             </div>
             <div class="step">
               <span class="sn" style="background:#4285f4;">6</span>
-              <div class="st"><h4>Selesai — ikon muncul di layar utama</h4><p>Buka dari situ, tampilannya fullscreen tanpa address bar, kayak aplikasi biasa.</p></div>
+              <div class="st"><h4>Selesai — ikon muncul di layar utama</h4><p>Buka dari situ, tampilannya fullscreen tanpa address bar, seperti aplikasi biasa.</p></div>
             </div>
           </div>
         </div>
@@ -611,7 +611,7 @@ const PANDUAN_BODY = `
             </div>
             <div class="step">
               <span class="sn" style="background:#1c1c1e;">7</span>
-              <div class="st"><h4>Selesai — ikon muncul di layar utama</h4><p>Buka dari situ, tampilannya fullscreen tanpa address bar, kayak aplikasi biasa.</p></div>
+              <div class="st"><h4>Selesai — ikon muncul di layar utama</h4><p>Buka dari situ, tampilannya fullscreen tanpa address bar, seperti aplikasi biasa.</p></div>
             </div>
           </div>
         </div>
@@ -667,7 +667,7 @@ const PANDUAN_BODY = `
             <p>Akun langsung aktif dan kamu otomatis masuk (login).</p>
           </div>
         </div>
-        <div class="note tip"><span>${ICON.bulb}</span><p><b>Tips:</b> peserta (anak/diri sendiri) masih bisa ditambah lagi belakangan lewat menu Profil, gak harus lengkap dari awal.</p></div>
+        <div class="note tip"><span>${ICON.bulb}</span><p><b>Tips:</b> peserta (anak/diri sendiri) masih bisa ditambah lagi belakangan lewat menu Profil, tidak harus lengkap dari awal.</p></div>
       </div>
 
       <div class="guide">
@@ -678,20 +678,20 @@ const PANDUAN_BODY = `
 
       <div class="guide">
         <div class="guide-head" id="m-paket"><span class="gi">3</span><h3>Beli Paket</h3></div>
-        <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Paket</h4><p>Lihat daftar paket yang udah kamu punya di bagian atas (<b>Paket Saya</b>) — nama paket, sisa sesi, dan berlaku sampai kapan.</p></div></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Paket</h4><p>Lihat daftar paket yang sudah kamu punya di bagian atas (<b>Paket Saya</b>) — nama paket, sisa sesi, dan berlaku sampai kapan.</p></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih paket di bagian "Beli Paket Baru"</h4><p>Tiap paket nunjukin harga, jumlah sesi, masa berlaku, dan jatah pembatalan booking.</p></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih paket ini buat siapa</h4><p>Kalau kamu punya lebih dari 1 peserta (misal 2 anak), pilih dulu di dropdown "Buat [nama]" sebelum klik Beli.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Klik Beli, lanjut ke pembayaran</h4><p>Kamu bakal diarahkan ke halaman pembayaran online. Setelah pembayaran berhasil, paket otomatis aktif dan sesi langsung bisa dipakai booking.</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Klik Beli, lanjut ke pembayaran</h4><p>Kamu akan diarahkan ke halaman pembayaran online. Setelah pembayaran berhasil, paket otomatis aktif dan sesi langsung bisa dipakai booking.</p></div></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="m-booking"><span class="gi">4</span><h3>Booking Sesi</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Booking</h4></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih peserta &amp; kolam</h4><p>Paket cuma berlaku di kolam tempat paket itu dibeli. Kalau peserta punya paket di kolam yang dipilih, sisa sesi &amp; jatah batalnya langsung muncul. Kalau belum, dan kamu masih punya paket aktif di kolam lain, ada tombol <b>Beli 1 sesi di sini</b> (harga per sesi kolam itu + 20%, berlaku 14 hari, jatah batal 1x).</p></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih Tanggal</h4><p>Kalender nunjukin titik penanda di tanggal yang masih ada slot kosong. Tanggal yang udah lewat otomatis gak bisa dipilih.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Pilih coach &amp; jam</h4><p>Slot yang masih kosong ada tombol <b>Booking</b>. Slot yang udah diambil member lain otomatis kekunci ("Sudah dibooking").</p></div></div>
-        <div class="step"><span class="sn">5</span><div class="st"><h4>Klik Booking</h4><p>Sisa sesi berkurang 1 otomatis, dan kamu dapet notifikasi konfirmasi (kalau notifikasi udah diaktifkan).</p></div></div>
-        <div class="note tip"><span>${ICON.bulb}</span><p>Kebijakan pembatalan selalu ditampilin di halaman ini: kalau jatah pembatalan mandiri udah abis, kamu masih bisa minta bantuan admin langsung lewat tombol WhatsApp.</p></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih Tanggal</h4><p>Kalender nunjukin titik penanda di tanggal yang masih ada slot kosong. Tanggal yang sudah lewat otomatis tidak bisa dipilih.</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Pilih coach &amp; jam</h4><p>Slot yang masih kosong ada tombol <b>Booking</b>. Slot yang sudah diambil member lain otomatis terkunci ("Sudah dibooking").</p></div></div>
+        <div class="step"><span class="sn">5</span><div class="st"><h4>Klik Booking</h4><p>Sisa sesi berkurang 1 otomatis, dan kamu dapat notifikasi konfirmasi (kalau notifikasi sudah diaktifkan).</p></div></div>
+        <div class="note tip"><span>${ICON.bulb}</span><p>Kebijakan pembatalan selalu ditampilin di halaman ini: kalau jatah pembatalan mandiri sudah habis, kamu masih bisa minta bantuan admin langsung lewat tombol WhatsApp.</p></div>
       </div>
 
       <div class="guide">
@@ -701,24 +701,24 @@ const PANDUAN_BODY = `
           <table class="mini-table">
             <tr><th>Status</th><th>Artinya</th></tr>
             <tr><td><span class="badge-chip chip-success">Terjadwal</span></td><td>Booking aktif, belum waktunya sesi</td></tr>
-            <tr><td><span class="badge-chip chip-success">Hadir</span></td><td>Coach udah tandain kamu/anak hadir di sesi itu</td></tr>
-            <tr><td>Dibatalkan</td><td>Booking udah dibatalin (oleh kamu sendiri atau admin)</td></tr>
+            <tr><td><span class="badge-chip chip-success">Hadir</span></td><td>Coach sudah tandain kamu/anak hadir di sesi itu</td></tr>
+            <tr><td>Dibatalkan</td><td>Booking sudah dibatalin (oleh kamu sendiri atau admin)</td></tr>
           </table>
         </div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Batalkan booking (kalau memenuhi syarat)</h4><p>Tombol <b>Batalkan</b> cuma muncul kalau: (a) minimal 2 jam sebelum jadwal, dan (b) jatah pembatalan mandiri buat paket itu masih ada. Sisa sesi otomatis balik kalau berhasil dibatalin.</p></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Kalau gak memenuhi syarat</h4><p>Tombol <b>Hubungi Admin</b> muncul sebagai gantinya — klik buat langsung buka WhatsApp dengan pesan yang udah keisi otomatis (nama, jadwal, alasan).</p></div></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Kalau tidak memenuhi syarat</h4><p>Tombol <b>Hubungi Admin</b> muncul sebagai gantinya — klik buat langsung buka WhatsApp dengan pesan yang sudah terisi otomatis (nama, jadwal, alasan).</p></div></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="m-profil"><span class="gi">6</span><h3>Kelola Profil</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka menu akun → Profil</h4></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Ganti nama atau password</h4><p>Isi field yang mau diubah, klik Simpan.</p></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Tambah atau nonaktifkan peserta</h4><p>Di bagian "Anak", bisa tambah peserta baru (anak atau diri sendiri kalau belum ada), atau nonaktifkan peserta yang udah gak aktif les — bakal ada konfirmasi dulu sebelum nonaktif.</p></div></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Tambah atau nonaktifkan peserta</h4><p>Di bagian "Anak", bisa tambah peserta baru (anak atau diri sendiri kalau belum ada), atau nonaktifkan peserta yang sudah tidak aktif les — akan ada konfirmasi dulu sebelum nonaktif.</p></div></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="m-notif"><span class="gi">7</span><h3>Aktifkan Notifikasi</h3></div>
-        <div class="step"><span class="sn">1</span><div class="st"><h4>Klik "Aktifkan Notifikasi" di halaman Booking</h4><p>Browser bakal minta izin — pilih Izinkan. Sekali aktif, kamu dapet notifikasi tiap booking berhasil, dan tiap ada coach yang buka slot jadwal baru — walau aplikasi lagi gak dibuka.</p></div></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Klik "Aktifkan Notifikasi" di halaman Booking</h4><p>Browser akan minta izin — pilih Izinkan. Sekali aktif, kamu dapat notifikasi tiap booking berhasil, dan tiap ada coach yang buka slot jadwal baru — walau aplikasi lagi tidak dibuka.</p></div></div>
       </div>
     </section>
 
@@ -741,41 +741,41 @@ const PANDUAN_BODY = `
       </div>
 
       <div class="guide">
-        <div class="guide-head" id="c-jadwal"><span class="gi">1</span><h3>Buka Jadwal (Bikin Slot Baru)</h3></div>
+        <div class="guide-head" id="c-jadwal"><span class="gi">1</span><h3>Buka Jadwal (Buat Slot Baru)</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Jadwal</h4></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih Tanggal</h4></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Pilih Jam mulai dan Jam selesai</h4><p>Sistem otomatis mecah rentang jam itu jadi slot per jam. Misalnya 08.00–10.00 jadi 2 slot terpisah: 08–09 dan 09–10, dan masing-masing bisa dibooking member yang beda.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Klik Tambah Slot</h4><p>Slot baru langsung muncul dan bisa dibooking member secara real-time. Semua member aktif yang udah nyalain notifikasi otomatis dapet notif "Slot jadwal baru".</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Klik Tambah Slot</h4><p>Slot baru langsung muncul dan bisa dibooking member secara real-time. Semua member aktif yang sudah nyalain notifikasi otomatis dapat notif "Slot jadwal baru".</p></div></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="c-lihat"><span class="gi">2</span><h3>Lihat &amp; Hapus Slot</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Slot yang belum dibooking</h4><p>Ada label "Belum dibooking" dan tombol <b>Hapus</b> kalau kamu mau batalin slot itu (misal salah jam).</p></div></div>
-        <div class="step"><span class="sn">2</span><div class="st"><h4>Klik Hapus</h4><p>Bakal muncul konfirmasi dulu sebelum slot beneran hilang — slot yang udah dihapus gak bisa dibooking lagi kecuali dibuka ulang.</p></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Slot yang udah dibooking</h4><p>Nunjukin nama peserta yang booking dan status "Terisi" — gak bisa dihapus lagi, cuma bisa dibatalin lewat admin kalau perlu.</p></div></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Klik Hapus</h4><p>Akan muncul konfirmasi dulu sebelum slot benar-benar hilang — slot yang sudah dihapus tidak bisa dibooking lagi kecuali dibuka ulang.</p></div></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Slot yang sudah dibooking</h4><p>Nunjukin nama peserta yang booking dan status "Terisi" — tidak bisa dihapus lagi, cuma bisa dibatalin lewat admin kalau perlu.</p></div></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="c-lain"><span class="gi">3</span><h3>Lihat Jadwal Coach Lain</h3></div>
-        <div class="step"><span class="sn">1</span><div class="st"><h4>Scroll ke bagian "Jadwal Coach Lain"</h4><p>Nunjukin slot yang udah dibuka coach lain di hari yang sama — status Terisi atau Kosong doang, gak bisa diedit dari sini. Berguna buat tau siapa aja yang jaga bareng.</p></div></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Scroll ke bagian "Jadwal Coach Lain"</h4><p>Nunjukin slot yang sudah dibuka coach lain di hari yang sama — status Terisi atau Kosong saja, tidak bisa diedit dari sini. Berguna buat tahu siapa saja yang jaga bareng.</p></div></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="c-hadir"><span class="gi">4</span><h3>Tandai Kehadiran</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Riwayat Sesi</h4><p>Semua sesi yang pernah kamu ajar tercatat di sini, dikelompokin per tanggal.</p></div></div>
-        <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih status di dropdown tiap booking</h4><p>Pilih <b>Hadir</b> kalau member beneran datang, atau <b>Gak Hadir</b> kalau enggak. Langsung tersimpan otomatis begitu dipilih, gak perlu tombol Simpan.</p></div></div>
-        <div class="note warn"><span>${ICON.warningTriangle}</span><p><b>Perhatian:</b> status yang udah dipilih (Hadir/Gak Hadir) gak bisa dibalikin lagi ke "Belum ditandai" — pastiin pilihannya bener sebelum diklik.</p></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Pilih status di dropdown tiap booking</h4><p>Pilih <b>Hadir</b> kalau member benar-benar datang, atau <b>Tidak Hadir</b> kalau tidak. Langsung tersimpan otomatis begitu dipilih, tidak perlu tombol Simpan.</p></div></div>
+        <div class="note warn"><span>${ICON.warningTriangle}</span><p><b>Perhatian:</b> status yang sudah dipilih (Hadir/Tidak Hadir) tidak bisa dikembalikan lagi ke "Belum ditandai" — pastiin pilihannya benar sebelum diklik.</p></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="c-honor"><span class="gi">5</span><h3>Soal Honor: "Total Sesi Valid"</h3></div>
-        <div class="step"><span class="sn">1</span><div class="st"><h4>Cuma sesi "Hadir" yang kehitung</h4><p>Angka "Total sesi valid" di atas halaman Riwayat Sesi cuma ngitung booking yang udah kamu tandain <b>Hadir</b>. Yang "Gak Hadir" atau belum ditandai sama sekali gak ikut kehitung.</p></div></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Cuma sesi "Hadir" yang kehitung</h4><p>Angka "Total sesi valid" di atas halaman Riwayat Sesi cuma menghitung booking yang sudah kamu tandain <b>Hadir</b>. Yang "Tidak Hadir" atau belum ditandai sama sekali tidak ikut kehitung.</p></div></div>
         <div class="note tip"><span>${ICON.bulb}</span><p>Admin pakai angka ini buat hitung honor lewat laporan Kinerja Coach — jadi penting buat selalu update status kehadiran setelah tiap sesi selesai.</p></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="c-notif"><span class="gi">6</span><h3>Aktifkan Notifikasi</h3></div>
-        <div class="step"><span class="sn">1</span><div class="st"><h4>Klik "Aktifkan Notifikasi" di halaman Jadwal</h4><p>Browser bakal minta izin — pilih Izinkan. Sekali aktif, kamu dapet notifikasi tiap ada member yang booking slot kamu, walau aplikasi lagi gak dibuka.</p></div></div>
+        <div class="step"><span class="sn">1</span><div class="st"><h4>Klik "Aktifkan Notifikasi" di halaman Jadwal</h4><p>Browser akan minta izin — pilih Izinkan. Sekali aktif, kamu dapat notifikasi tiap ada member yang booking slot kamu, walau aplikasi lagi tidak dibuka.</p></div></div>
       </div>
     </section>
 
@@ -800,10 +800,10 @@ const PANDUAN_BODY = `
       <div class="guide">
         <div class="guide-head" id="a-users"><span class="gi">1</span><h3>Kelola Users</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Users</h4></div></div>
-        <div class="step"><span class="sn">2</span><div class="st"><h4>Tambah user manual</h4><p>Isi Nama, No HP, Email (opsional), Password, dan pilih Role (Member/Coach/Admin). Khusus Role Member, tentuin juga siapa aja peserta yang mau les (diri sendiri/anak) — persis kayak alur daftar sendiri.</p></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Tambah peserta buat member yang udah ada</h4><p>Di bagian "Tambah Peserta", pilih member, tipe (Anak/Diri sendiri), isi nama kalau perlu, klik Tambah. Berguna buat member lama yang belum pernah nambah anaknya sendiri.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Assign paket ke member</h4><p>Di bagian "Assign Paket ke Member" — pilih member dan pesertanya, lalu pilih dari Katalog (otomatis ngisi nama paket, total sesi, jatah cancel) atau bikin custom. Klik "Assign (langsung Aktif)". Berguna buat koreksi, promo, atau kasus di luar alur beli-online.</p></div></div>
-        <div class="step"><span class="sn">5</span><div class="st"><h4>Nonaktifkan / aktifkan user</h4><p>Tombol <b>Nonaktifkan</b> di tiap baris user — bakal ada konfirmasi dulu karena user yang dinonaktifkan gak bisa login lagi sampai diaktifkan ulang.</p></div></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Tambah user manual</h4><p>Isi Nama, No HP, Email (opsional), Password, dan pilih Role (Member/Coach/Admin). Khusus Role Member, tentuin juga siapa saja peserta yang mau les (diri sendiri/anak) — persis seperti alur daftar sendiri.</p></div></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Tambah peserta buat member yang sudah ada</h4><p>Di bagian "Tambah Peserta", pilih member, tipe (Anak/Diri sendiri), isi nama kalau perlu, klik Tambah. Berguna buat member lama yang belum pernah menambah anaknya sendiri.</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Assign paket ke peserta</h4><p>Di bagian "Assign Paket ke Peserta" — pilih member dan pesertanya, lalu pilih dari Katalog (otomatis mengisi nama paket, total sesi, jatah cancel) atau buat custom. Klik "Assign (langsung Aktif)". Berguna buat koreksi, promo, atau kasus di luar alur beli-online.</p></div></div>
+        <div class="step"><span class="sn">5</span><div class="st"><h4>Nonaktifkan / aktifkan user</h4><p>Tombol <b>Nonaktifkan</b> di tiap baris user — akan ada konfirmasi dulu karena user yang dinonaktifkan tidak bisa login lagi sampai diaktifkan ulang.</p></div></div>
         <div class="step"><span class="sn">6</span><div class="st"><h4>Hubungi user lewat WhatsApp</h4><p>Tombol <b>Hubungi</b> (kalau user punya No HP) langsung buka chat WhatsApp ke user itu.</p></div></div>
       </div>
 
@@ -824,13 +824,13 @@ const PANDUAN_BODY = `
           </div>
         </div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>1 baris = 1 peserta</h4><p>Member dengan lebih dari 1 anak: ulang No HP yang sama di baris berikutnya, beda di kolom Nama Peserta/Anak.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Upload &amp; klik Import</h4><p>Sistem bikin akun, peserta, dan paketnya sekaligus. Password default semua member baru: <code>renang2026</code> — wajib diganti pas login pertama. Baris yang No HP-nya udah kepake bakal dilewatin dan dilaporin di hasil import.</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Upload &amp; klik Import</h4><p>Sistem buat akun, peserta, dan paketnya sekaligus. Password default semua member baru: <code>renang2026</code> — wajib diganti pas login pertama. Baris yang No HP-nya sudah terpakai akan dilewatin dan dilaporin di hasil import.</p></div></div>
       </div>
 
       <div class="guide">
         <div class="guide-head" id="a-paket"><span class="gi">3</span><h3>Kelola Paket</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Paket</h4></div></div>
-        <div class="step"><span class="sn">2</span><div class="st"><h4>Kelola Katalog Paket</h4><p>Ini paket generik yang muncul di halaman "Beli Paket" member. Tambah lewat form di atas (Nama, Harga, Total Sesi, Jatah Cancel, Berlaku berapa hari), atau edit paket yang udah ada (termasuk nonaktifin dari katalog lewat checkbox Aktif).</p></div></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Kelola Katalog Paket</h4><p>Ini paket generik yang muncul di halaman "Beli Paket" member. Tambah lewat form di atas (Nama, Harga, Total Sesi, Jatah Cancel, Berlaku berapa hari), atau edit paket yang sudah ada (termasuk nonaktifin dari katalog lewat checkbox Aktif).</p></div></div>
         <div class="step"><span class="sn">3</span><div class="st"><h4>Kelola Paket per Member</h4><p>Daftar semua member yang punya paket, dikelompokin per keluarga. Bisa dicari pakai kolom pencarian di atas. Klik <b>Edit</b> buat buka form edit semua peserta member itu sekaligus.</p></div></div>
         <div class="step"><span class="sn">4</span><div class="st"><h4>Edit sisa sesi, status, jatah cancel, atau masa berlaku</h4><p>Berguna buat koreksi manual (misal sesi hangus karena force majeure, perpanjangan masa berlaku, dst). Klik Simpan per peserta.</p></div></div>
       </div>
@@ -838,9 +838,9 @@ const PANDUAN_BODY = `
       <div class="guide">
         <div class="guide-head" id="a-booking"><span class="gi">4</span><h3>Booking Overview</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Booking</h4><p>Lihat semua jadwal semua coach dalam satu tampilan, 7 hari ke depan.</p></div></div>
-        <div class="step"><span class="sn">2</span><div class="st"><h4>Filter per coach</h4><p>Pakai dropdown "Semua Coach" buat fokus ke satu coach aja.</p></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Tandai kehadiran langsung dari sini</h4><p>Admin juga bisa nandain Hadir/Gak Hadir tanpa harus login sebagai coach.</p></div></div>
-        <div class="step"><span class="sn">4</span><div class="st"><h4>Batalkan booking member</h4><p>Tombol <b>Batalkan</b> di tiap slot terisi — bakal ada konfirmasi dulu. Sisa sesi member otomatis balik, dan jatah pembatalan mandirinya berkurang (sama kayak kalau member batalin sendiri).</p></div></div>
+        <div class="step"><span class="sn">2</span><div class="st"><h4>Filter per coach</h4><p>Pakai dropdown "Semua Coach" buat fokus ke satu coach saja.</p></div></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Tandai kehadiran langsung dari sini</h4><p>Admin juga bisa nandain Hadir/Tidak Hadir tanpa harus login sebagai coach.</p></div></div>
+        <div class="step"><span class="sn">4</span><div class="st"><h4>Batalkan booking member</h4><p>Tombol <b>Batalkan</b> di tiap slot terisi — akan ada konfirmasi dulu. Sisa sesi member otomatis balik, dan jatah pembatalan mandirinya berkurang (sama seperti kalau member batalin sendiri).</p></div></div>
         <div class="step"><span class="sn">5</span><div class="st"><h4>Broadcast jadwal ke grup WhatsApp</h4><p>Tombol <b>Kabarin Grup WhatsApp</b> per hari — buka WhatsApp buat share jadwal hari itu ke grup.</p></div></div>
       </div>
 
@@ -852,7 +852,7 @@ const PANDUAN_BODY = `
           <table class="mini-table">
             <tr><th>Status</th><th>Artinya</th></tr>
             <tr><td><span class="badge-chip chip-success">Berhasil</span></td><td>Pembayaran sukses, paket aktif</td></tr>
-            <tr><td><span class="badge-chip chip-warn">Menunggu</span></td><td>Member udah checkout, belum bayar/belum keverifikasi</td></tr>
+            <tr><td><span class="badge-chip chip-warn">Menunggu</span></td><td>Member sudah checkout, belum bayar/belum keverifikasi</td></tr>
             <tr><td>Gagal</td><td>Transaksi gagal atau dibatalkan</td></tr>
           </table>
         </div>
@@ -862,7 +862,7 @@ const PANDUAN_BODY = `
         <div class="guide-head" id="a-kinerja"><span class="gi">6</span><h3>Kinerja Coach (Dasar Honor)</h3></div>
         <div class="step"><span class="sn">1</span><div class="st"><h4>Buka tab Kinerja</h4></div></div>
         <div class="step"><span class="sn">2</span><div class="st"><h4>Filter tanggal Dari–Sampai, klik Terapkan</h4></div></div>
-        <div class="step"><span class="sn">3</span><div class="st"><h4>Baca "Sesi Valid" per coach</h4><p>Cuma booking yang ditandain <b>Hadir</b> yang kehitung. Booking yang belum ditandai atau ditandai Gak Hadir gak ikut kehitung — kalau angkanya kelihatan kurang, cek dulu ke tab Booking apa masih ada yang belum ditandai.</p></div></div>
+        <div class="step"><span class="sn">3</span><div class="st"><h4>Baca "Sesi Valid" per coach</h4><p>Cuma booking yang ditandai <b>Hadir</b> yang kehitung. Booking yang belum ditandai atau ditandai Tidak Hadir tidak ikut kehitung — kalau angkanya kelihatan kurang, cek dulu ke tab Booking apa masih ada yang belum ditandai.</p></div></div>
         <div class="note tip"><span>${ICON.bulb}</span><p>Ini angka mentah (jumlah sesi), bukan nominal rupiah — tarif per sesi dihitung manual di luar sistem sesuai kesepakatan tiap coach.</p></div>
       </div>
     </section>

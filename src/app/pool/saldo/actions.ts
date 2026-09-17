@@ -49,12 +49,16 @@ export async function updateBankInfo(
   return { ok: true };
 }
 
-export async function requestWithdrawal(poolId: string): Promise<ActionState> {
+export async function requestWithdrawal(
+  poolId: string,
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const session = await requireRole("POOL_OWNER");
 
   try {
     const pool = await getOwnedPool(session.user.id, poolId);
-    await requestPoolWithdrawal(pool.id);
+    await requestPoolWithdrawal(pool.id, Number(formData.get("amount")));
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Gagal ajuin pencairan" };
   }

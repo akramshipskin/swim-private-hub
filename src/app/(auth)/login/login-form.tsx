@@ -31,7 +31,7 @@ export default function LoginForm() {
     setLoading(false);
 
     if (result?.error) {
-      setError("No HP/Email atau password salah -- atau akunmu (coach/pemilik kolam yang baru daftar) belum diaktifkan admin.");
+      setError("No HP/Email atau password salah — atau akunmu (coach/pemilik kolam yang baru daftar) belum diaktifkan admin.");
       return;
     }
 

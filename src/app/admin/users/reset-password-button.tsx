@@ -32,7 +32,7 @@ export default function ResetPasswordButton({
   }
 
   const waMessage = tempPassword
-    ? `Halo ${userName}, password akun Swim Private Hub kamu udah direset admin.\n\nLogin: ${loginId}\nPassword sementara: ${tempPassword}\n\nPas login kamu bakal diminta bikin password baru.`
+    ? `Halo ${userName}, password akun Swim Private Hub kamu sudah direset admin.\n\nLogin: ${loginId}\nPassword sementara: ${tempPassword}\n\nPas login kamu akan diminta buat password baru.`
     : "";
 
   return (
@@ -43,7 +43,7 @@ export default function ResetPasswordButton({
       <ConfirmDialog
         open={open}
         title={`Reset password ${userName}?`}
-        description="Password lamanya langsung gak berlaku. Kamu dapet password sementara buat dikirim ke dia, dan dia wajib bikin password baru pas login."
+        description="Password lamanya langsung tidak berlaku. Kamu dapat password sementara buat dikirim ke dia, dan dia wajib buat password baru pas login."
         confirmLabel="Ya, reset"
         loading={loading}
         onConfirm={handleReset}

@@ -36,7 +36,7 @@ export default async function MemberPaketPage() {
       orderBy: { createdAt: "desc" },
       include: {
         dependent: { select: { name: true, isSelf: true } },
-        pool: { select: { name: true } },
+        pool: { select: { id: true, name: true } },
       },
     }),
     prisma.packageTemplate.findMany({
@@ -45,7 +45,7 @@ export default async function MemberPaketPage() {
       where: { isActive: true, pool: { isActive: true } },
       orderBy: { totalSesi: "asc" },
       include: {
-        pool: { select: { name: true } },
+        pool: { select: { id: true, name: true, address: true, facilities: true, openTime: true, closeTime: true } },
         // Paket yang pernah aktif (startDate keisi = dibayar/diassign) --
         // dasar badge "Populer", bukan urutan kartu.
         _count: { select: { packages: { where: { startDate: { not: null } } } } },
@@ -79,7 +79,7 @@ export default async function MemberPaketPage() {
   const membershipBadge = activePkg && earliestStart ? (
     <Badge tone="success">Member sejak {toDateLabelFromDate(earliestStart)}</Badge>
   ) : latestExpired ? (
-    <Badge tone="neutral">Paket abis sejak {toDateLabelFromDate(latestExpired)}</Badge>
+    <Badge tone="neutral">Paket habis sejak {toDateLabelFromDate(latestExpired)}</Badge>
   ) : (
     <Badge tone="neutral">Belum ada paket</Badge>
   );
@@ -98,78 +98,100 @@ export default async function MemberPaketPage() {
           </CardBody>
         </Card>
       ) : (
-        <ul className="mb-8 flex flex-col gap-2">
-          {packages.map((p) => (
-            <Card key={p.id}>
-              <CardBody className="flex items-center justify-between py-3">
-                <div>
-                  <p className="text-sm font-medium text-text">{p.name}</p>
-                  <p className="text-xs text-text-subtle">
-                    buat {p.dependent.isSelf ? "kamu sendiri" : p.dependent.name} · {p.pool.name}
-                  </p>
-                  <p className="text-sm text-text-muted">
-                    Sisa sesi {p.sisaSesi}/{p.totalSesi}
-                    {p.expiredDate && (
-                      <> · Berlaku sampai {formatDateLabel(p.expiredDate)}</>
-                    )}
-                  </p>
-                </div>
-                {/* Status di DB bisa tetep ACTIVE walau sesinya abis / udah lewat
-                    masa berlaku (gak ada cron yang nge-flip) -- dulu kebaca
-                    "Aktif" padahal di halaman Booking paket ini udah gak muncul. */}
-                {p.status === "ACTIVE" && p.sisaSesi <= 0 ? (
-                  <Badge tone="neutral">Sesi habis</Badge>
-                ) : p.status === "ACTIVE" && p.expiredDate && p.expiredDate < now ? (
-                  <Badge tone="neutral">Kedaluwarsa</Badge>
-                ) : (
-                  <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
-                )}
+        <div className="mb-10 grid gap-4 md:grid-cols-2">
+          {[...new Map(packages.map((p) => [p.pool.id, p.pool])).values()].map((pool) => (
+            <Card key={pool.id}>
+              <CardBody>
+                <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Kolam</p>
+                <h2 className="text-lg font-semibold text-brand-700">{pool.name}</h2>
+                <ul className="mt-3 flex flex-col divide-y divide-border">
+                  {packages
+                    .filter((p) => p.pool.id === pool.id)
+                    .map((p) => {
+                      const used = p.status === "ACTIVE" && p.sisaSesi <= 0;
+                      const expired = p.status === "ACTIVE" && p.expiredDate && p.expiredDate < now;
+                      return (
+                        <li key={p.id} className="flex items-start justify-between gap-3 py-3">
+                          <div className="min-w-0">
+                            <p className="text-base font-semibold text-text">
+                              {p.dependent.isSelf ? "Kamu sendiri" : p.dependent.name}
+                            </p>
+                            <p className="text-sm text-text">{p.name}</p>
+                            <p className="text-sm text-text-muted">
+                              Sisa <b className="text-text">{p.sisaSesi}</b> dari {p.totalSesi} sesi
+                              {p.expiredDate && <> · berlaku s.d. {formatDateLabel(p.expiredDate)}</>}
+                            </p>
+                          </div>
+                          {used ? (
+                            <Badge tone="neutral">Sesi habis</Badge>
+                          ) : expired ? (
+                            <Badge tone="neutral">Kedaluwarsa</Badge>
+                          ) : (
+                            <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
+                          )}
+                        </li>
+                      );
+                    })}
+                </ul>
               </CardBody>
             </Card>
           ))}
-        </ul>
+        </div>
       )}
 
-      <h2 className="mb-1 text-lg font-semibold text-text">Beli Paket Baru</h2>
-      <p className="mb-3 text-sm text-text-muted">
-        Paket cuma bisa dipake booking di kolam tempat paket itu dibeli.
+      <h2 className="mb-1 text-xl font-semibold text-text">Beli Paket Baru</h2>
+      <p className="mb-4 text-sm text-text-muted">
+        Paket hanya bisa dipakai booking di kolam tempat paket itu dibeli. Pilih kolam yang paling sering kamu datangi.
       </p>
       {children.length === 0 ? (
         <p className="text-sm text-text-muted">
-          Belum ada anak terdaftar. Tambah anak dulu di halaman{" "}
-          <a href="/profil" className="font-medium text-brand-600 underline">
-            Profil
-          </a>{" "}
-          sebelum beli paket.
+          Belum ada peserta terdaftar. Tambah peserta dulu di menu{" "}
+          <a href="/member/peserta" className="font-medium text-brand-700 underline">Peserta</a> sebelum beli paket.
         </p>
       ) : templates.length === 0 ? (
         <p className="text-sm text-text-muted">Belum ada katalog paket tersedia.</p>
       ) : (
-        <ul className="flex flex-wrap justify-center gap-3">
-          {templates.map((t) => (
-            <Card
-              key={t.id}
-              className={`w-full sm:w-72 ${t.id === popularTemplateId ? "border-brand-500 ring-1 ring-brand-500" : ""}`}
-            >
-              <CardBody className="flex flex-col items-center gap-3 text-center">
-                <div>
-                  {t.id === popularTemplateId && (
-                    <span className="mb-1 inline-block rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">
-                      Populer
-                    </span>
-                  )}
-                  <p className="font-medium text-text">{t.name}</p>
-                  <p className="text-xs text-text-subtle">{t.pool.name}</p>
-                  <p className="text-lg font-semibold text-text">{formatRupiah(t.price)}</p>
-                  <p className="mt-1 text-sm text-text-muted">
-                    {t.totalSesi} Sesi · Berlaku {t.durationDays} Hari · Jatah Batal Booking {t.jatahCancel}x
-                  </p>
-                </div>
-                <CheckoutButton templateId={t.id} dependents={children} />
-              </CardBody>
-            </Card>
+        <div className="flex flex-col gap-8">
+          {[...new Map(templates.map((t) => [t.pool.id, t.pool])).values()].map((pool) => (
+            <section key={pool.id}>
+              <div className="mb-3 border-b border-border pb-2">
+                <h3 className="text-lg font-semibold text-brand-700">{pool.name}</h3>
+                <p className="text-sm text-text-muted">
+                  {[pool.address, pool.openTime && pool.closeTime && `Buka ${pool.openTime}–${pool.closeTime}`].filter(Boolean).join(" · ") || "Info kolam belum dilengkapi"}
+                </p>
+                {pool.facilities.length > 0 && <p className="text-sm text-text-muted">Fasilitas: {pool.facilities.join(", ")}</p>}
+              </div>
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {templates
+                  .filter((t) => t.pool.id === pool.id)
+                  .map((t) => (
+                    <Card key={t.id} className={t.id === popularTemplateId ? "border-brand-500 ring-1 ring-brand-500" : ""}>
+                      <CardBody className="flex h-full flex-col gap-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-base font-semibold text-text">{t.name}</p>
+                          {t.id === popularTemplateId && (
+                            <span className="shrink-0 rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">Populer</span>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold text-text">{formatRupiah(t.price)}</p>
+                          <p className="text-sm text-text-muted">{formatRupiah(Math.round(t.price / t.totalSesi))} per sesi</p>
+                        </div>
+                        <ul className="flex flex-col gap-0.5 text-sm text-text">
+                          <li>{t.totalSesi} sesi les</li>
+                          <li>Berlaku {t.durationDays} hari</li>
+                          <li>Jatah batal booking {t.jatahCancel}x</li>
+                        </ul>
+                        <div className="mt-auto">
+                          <CheckoutButton templateId={t.id} dependents={children} />
+                        </div>
+                      </CardBody>
+                    </Card>
+                  ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       )}
     </main>
   );

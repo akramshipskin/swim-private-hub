@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Nama, No HP, dan password wajib diisi" }, { status: 400 });
   }
   if (!isValidIndonesianPhone(phone)) {
-    return Response.json({ error: "Format No HP gak valid (contoh: 0812xxxxxxx)" }, { status: 400 });
+    return Response.json({ error: "Format No HP tidak valid (contoh: 0812xxxxxxx)" }, { status: 400 });
   }
   if (password.length < 8) {
     return Response.json({ error: "Password minimal 8 karakter" }, { status: 400 });

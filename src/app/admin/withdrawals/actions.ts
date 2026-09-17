@@ -20,13 +20,13 @@ export async function processWithdrawal(
   const withdrawalId = formData.get("withdrawalId") as string;
   const request = await prisma.withdrawalRequest.findUnique({ where: { id: withdrawalId } });
   if (!request || request.status !== "PENDING") {
-    return { error: "Pengajuan gak ditemukan atau udah diproses." };
+    return { error: "Pengajuan tidak ditemukan atau sudah diproses." };
   }
 
   if (!isIrisConfigured()) {
     return {
       error:
-        "Midtrans Iris belum dikonfigurasi -- transfer manual dulu, lalu klik \"Tandai Dibayar\".",
+        "Midtrans Iris belum dikonfigurasi — transfer manual dulu, lalu klik \"Tandai Dibayar\".",
     };
   }
 
@@ -35,7 +35,7 @@ export async function processWithdrawal(
     data: { status: "PROCESSING" },
   });
   if (claim.count === 0) {
-    return { error: "Pengajuan gak ditemukan atau udah diproses." };
+    return { error: "Pengajuan tidak ditemukan atau sudah diproses." };
   }
 
   const result = await disburseViaIris({
@@ -65,13 +65,13 @@ export async function markPaidManually(
   const withdrawalId = formData.get("withdrawalId") as string;
   const request = await prisma.withdrawalRequest.findUnique({ where: { id: withdrawalId } });
   if (!request || (request.status !== "PENDING" && request.status !== "PROCESSING")) {
-    return { error: "Pengajuan gak ditemukan atau udah diproses." };
+    return { error: "Pengajuan tidak ditemukan atau sudah diproses." };
   }
 
   const claimed = await markWithdrawalPaid(withdrawalId);
   revalidatePath("/admin/withdrawals");
   if (!claimed) {
-    return { error: "Pengajuan ini barusan udah diproses (dibayar/ditolak). Refresh dulu." };
+    return { error: "Pengajuan ini baru saja diproses (dibayar/ditolak). Muat ulang halaman dulu." };
   }
   return null;
 }
@@ -85,13 +85,13 @@ export async function rejectWithdrawal(
   const withdrawalId = formData.get("withdrawalId") as string;
   const request = await prisma.withdrawalRequest.findUnique({ where: { id: withdrawalId } });
   if (!request || (request.status !== "PENDING" && request.status !== "PROCESSING")) {
-    return { error: "Pengajuan gak ditemukan atau udah diproses." };
+    return { error: "Pengajuan tidak ditemukan atau sudah diproses." };
   }
 
   const claimed = await markWithdrawalFailed(withdrawalId, "Ditolak admin");
   revalidatePath("/admin/withdrawals");
   if (!claimed) {
-    return { error: "Pengajuan ini barusan udah diproses (dibayar/ditolak). Refresh dulu." };
+    return { error: "Pengajuan ini baru saja diproses (dibayar/ditolak). Muat ulang halaman dulu." };
   }
   return null;
 }

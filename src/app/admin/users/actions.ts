@@ -45,6 +45,19 @@ export async function createUser(
     return { error: "Pilih minimal 1 peserta (diri sendiri atau anak)" };
   }
 
+  const poolMode = formData.get("poolMode")?.toString();
+  const poolId = formData.get("poolId")?.toString() ?? "";
+  const newPoolName = formData.get("newPoolName")?.toString().trim() ?? "";
+  const newPoolAddress = formData.get("newPoolAddress")?.toString().trim() ?? "";
+  if (role === "POOL_OWNER") {
+    if (poolMode === "new" ? !newPoolName : !poolId) {
+      return { error: "Pilih kolam yang ada atau isi nama kolam baru" };
+    }
+    if (poolMode !== "new" && (await prisma.pool.count({ where: { id: poolId } })) === 0) {
+      return { error: "Kolam tidak ditemukan" };
+    }
+  }
+
   const existing = await prisma.user.findFirst({
     where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
   });
@@ -76,6 +89,13 @@ export async function createUser(
       }
       if (wantsSelf) {
         await createSelfDependent(created.id, tx);
+      }
+      if (role === "POOL_OWNER") {
+        const pool =
+          poolMode === "new"
+            ? await tx.pool.create({ data: { name: newPoolName, address: newPoolAddress || null, isActive: true } })
+            : { id: poolId };
+        await tx.poolOwnership.create({ data: { poolId: pool.id, ownerId: created.id } });
       }
     });
   } catch (err) {
@@ -149,7 +169,7 @@ export async function importMembersXlsx(
   }
 
   if (rawRows.length === 0) {
-    return { error: "File kosong atau gak ada data di sheet pertama." };
+    return { error: "File kosong atau tidak ada data di sheet pertama." };
   }
 
   const rows: ImportRow[] = rawRows.map((row) => ({
@@ -168,7 +188,7 @@ export async function importMembersXlsx(
 
   for (const row of rows) {
     if (!row.phone) {
-      skipped.push(row.name ? `${row.name} -- No HP kosong` : "Baris tanpa No HP dilewati");
+      skipped.push(row.name ? `${row.name} — No HP kosong` : "Baris tanpa No HP dilewati");
       continue;
     }
     const phone = row.phone.replace(/[^\d+]/g, "");
@@ -191,7 +211,7 @@ export async function importMembersXlsx(
     const first = groupRows[0];
     const rawName = first.name;
     if (!rawName) {
-      skipped.push(`${phone} -- baris pertama gak ada Nama Member`);
+      skipped.push(`${phone} — baris pertama tidak ada Nama Member`);
       continue;
     }
     const name = toProperCase(rawName);
@@ -201,7 +221,7 @@ export async function importMembersXlsx(
       where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
     });
     if (existing) {
-      skipped.push(`${name} (${phone}) -- HP atau email udah terdaftar`);
+      skipped.push(`${name} (${phone}) — HP atau email sudah terdaftar`);
       continue;
     }
 
@@ -243,7 +263,7 @@ export async function importMembersXlsx(
 
           const sisaSesiNum = row.sisaSesi ? Number(row.sisaSesi) : NaN;
           if (!Number.isInteger(sisaSesiNum) || sisaSesiNum < 0) {
-            groupSkipped.push(`${name} -- peserta "${dependent.name}": Sisa Sesi gak valid, paket dilewati`);
+            groupSkipped.push(`${name} — peserta "${dependent.name}": Sisa Sesi tidak valid, paket dilewati`);
             continue;
           }
 
@@ -282,9 +302,9 @@ export async function importMembersXlsx(
       // lengkap sama path file server (kebukti di tes race lokal).
       const reason =
         (err as { code?: string })?.code === "P2002"
-          ? "No HP/email udah kepake akun lain"
-          : "error gak terduga, coba import ulang baris ini";
-      skipped.push(`${name} (${phone}) -- gagal diimport: ${reason}`);
+          ? "No HP/email sudah terpakai akun lain"
+          : "error tidak terduga, coba import ulang baris ini";
+      skipped.push(`${name} (${phone}) — gagal diimport: ${reason}`);
     }
   }
 
@@ -297,7 +317,7 @@ export async function importMembersXlsx(
     parts.push(`${skipped.length} dilewati: ${skipped.slice(0, 5).join("; ")}${skipped.length > 5 ? "..." : ""}`);
   }
   if (membersCreated > 0) {
-    parts.push(`Password default member baru: "${IMPORT_DEFAULT_PASSWORD}" -- kasih tau mereka, wajib ganti pas login pertama.`);
+    parts.push(`Password default member baru: "${IMPORT_DEFAULT_PASSWORD}" — kasih tahu mereka, wajib ganti pas login pertama.`);
   }
 
   return { result: parts.join(" ") };
@@ -343,7 +363,7 @@ export async function resetUserPassword(
     data: { passwordHash, mustChangePassword: true },
   });
   if (updated.count === 0) {
-    return { error: "User gak ditemukan." };
+    return { error: "User tidak ditemukan." };
   }
   return { tempPassword };
 }

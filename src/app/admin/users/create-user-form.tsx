@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 type Role = "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
 type Participant = { type: "self" | "child"; name: string };
 
-export default function CreateUserForm() {
+export default function CreateUserForm({ pools }: { pools: { id: string; name: string }[] }) {
   const [state, formAction, pending] = useActionState(createUser, null);
   const [role, setRole] = useState<Role>("MEMBER");
   const [participants, setParticipants] = useState<Participant[]>([{ type: "self", name: "" }]);
   const [newUserName, setNewUserName] = useState("");
+  const [poolMode, setPoolMode] = useState<"existing" | "new">(pools.length > 0 ? "existing" : "new");
 
   function updateParticipant(i: number, patch: Partial<Participant>) {
     setParticipants((prev) => prev.map((p, idx) => (idx === i ? { ...p, ...patch } : p)));
@@ -53,6 +54,7 @@ export default function CreateUserForm() {
             >
               <option value="MEMBER">Member</option>
               <option value="COACH">Coach</option>
+              <option value="POOL_OWNER">Pemilik Kolam</option>
               <option value="ADMIN">Admin</option>
             </Select>
           </Field>
@@ -61,6 +63,37 @@ export default function CreateUserForm() {
               Tambah
             </Button>
           </div>
+
+          {role === "POOL_OWNER" && (
+            <div className="col-span-1 flex flex-col gap-2 sm:col-span-2">
+              <p className="text-sm font-medium text-text">Kolam yang dikelola</p>
+              <div className="flex gap-4 text-sm text-text">
+                {pools.length > 0 && (
+                  <label className="flex items-center gap-2">
+                    <input type="radio" name="poolMode" value="existing" checked={poolMode === "existing"} onChange={() => setPoolMode("existing")} />
+                    Kolam yang sudah ada
+                  </label>
+                )}
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="poolMode" value="new" checked={poolMode === "new"} onChange={() => setPoolMode("new")} />
+                  Kolam baru
+                </label>
+              </div>
+              {poolMode === "existing" ? (
+                <Select name="poolId" required className="w-full">
+                  {pools.map((pl) => (
+                    <option key={pl.id} value={pl.id}>{pl.name}</option>
+                  ))}
+                </Select>
+              ) : (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <Input name="newPoolName" placeholder="Nama kolam" required />
+                  <Input name="newPoolAddress" placeholder="Alamat kolam (opsional)" />
+                </div>
+              )}
+              <p className="text-xs text-text-subtle">Kolam baru langsung aktif. Harga paket diatur di tab Paket, info &amp; fasilitas di tab Kolam.</p>
+            </div>
+          )}
 
           {role === "MEMBER" && (
             <div className="col-span-1 flex flex-col gap-2 sm:col-span-2">
@@ -99,6 +132,16 @@ export default function CreateUserForm() {
                         required
                         className="min-w-0 flex-1"
                       />
+                    )}
+                    {participants.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setParticipants((prev) => prev.filter((_, idx) => idx !== i))}
+                        aria-label="Hapus peserta ini"
+                        className="shrink-0 rounded-lg border border-border px-3 text-sm text-danger-text hover:bg-danger-bg"
+                      >
+                        Hapus
+                      </button>
                     )}
                   </div>
                 );

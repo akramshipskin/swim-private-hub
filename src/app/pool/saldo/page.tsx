@@ -23,7 +23,7 @@ export default async function PoolSaldoPage() {
       bankAccountName: true,
       withdrawalRequests: {
         orderBy: { requestedAt: "desc" },
-        select: { id: true, amount: true, status: true, requestedAt: true, failureReason: true },
+        select: { id: true, amount: true, status: true, requestedAt: true, processedAt: true, failureReason: true, bankName: true, bankAccountNumber: true, bankAccountName: true, midtransReferenceId: true },
       },
     },
   });
@@ -52,6 +52,7 @@ export default async function PoolSaldoPage() {
               withdrawals={pool.withdrawalRequests.map((w) => ({
                 ...w,
                 requestedAt: w.requestedAt.toISOString(),
+          processedAt: w.processedAt?.toISOString() ?? null,
               }))}
               updateBankInfoAction={updateBankInfo.bind(null, pool.id)}
               requestWithdrawalAction={requestWithdrawal.bind(null, pool.id)}

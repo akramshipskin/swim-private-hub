@@ -50,10 +50,27 @@ export default async function MemberBookingPage() {
       select: {
         id: true,
         name: true,
+        address: true,
+        description: true,
+        facilities: true,
+        openTime: true,
+        closeTime: true,
         packageTemplates: { where: { isActive: true }, select: { price: true, totalSesi: true } },
       },
     })
-  ).map((p) => ({ id: p.id, name: p.name, singleSessionPrice: dropInPrice(p.packageTemplates) }));
+  ).map((p) => ({
+    id: p.id,
+    name: p.name,
+    address: p.address,
+    description: p.description,
+    facilities: p.facilities,
+    hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
+    singleSessionPrice: dropInPrice(p.packageTemplates),
+    // Harga per sesi termahal tanpa markup, buat pembanding di konfirmasi.
+    packagePerSession: p.packageTemplates.length
+      ? Math.max(...p.packageTemplates.map((t) => Math.round(t.price / t.totalSesi)))
+      : null,
+  }));
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
@@ -61,7 +78,7 @@ export default async function MemberBookingPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-text">Booking Coach</h1>
           <p className="mt-1 text-sm text-text-muted">
-            Pilih peserta, kolam, coach, dan jam. Slot yang udah diambil otomatis kekunci.
+            Pilih peserta, kolam, coach, dan jam. Slot yang sudah diambil otomatis terkunci.
           </p>
         </div>
         <EnablePushButton />
@@ -70,7 +87,7 @@ export default async function MemberBookingPage() {
       {children.length === 0 && (
         <div className="mb-6 rounded-lg border border-amber-200 bg-warning-bg px-4 py-3 text-sm text-warning-text">
           Belum ada anak terdaftar.{" "}
-          <Link href="/profil" className="font-medium underline">
+          <Link href="/member/peserta" className="font-medium underline">
             Tambah anak dulu
           </Link>
           .
@@ -108,8 +125,8 @@ export default async function MemberBookingPage() {
         </summary>
         <p className="mt-2">
           Pembatalan booking min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
-          batal paket (lihat di bawah). Gak hadir tanpa pembatalan = sesi tetap kepotong, no
-          refund. Jatah abis? Hubungi admin via WhatsApp.
+          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan = sesi tetap terpotong, no
+          refund. Jatah habis? Hubungi admin via WhatsApp.
         </p>
       </details>
 
@@ -117,8 +134,8 @@ export default async function MemberBookingPage() {
         <p className="mb-1 font-medium text-text">KEBIJAKAN PEMBATALAN</p>
         <p>
           Pembatalan booking min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
-          batal paket (lihat di bawah). Gak hadir tanpa pembatalan = sesi tetap kepotong, no
-          refund. Jatah abis? Hubungi admin via WhatsApp.
+          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan = sesi tetap terpotong, no
+          refund. Jatah habis? Hubungi admin via WhatsApp.
         </p>
       </div>
 

@@ -30,7 +30,7 @@ export async function addAvailability(
     where: { poolId_coachId: { poolId, coachId: session.user.id } },
   });
   if (!affiliated) {
-    return { error: "Kamu gak terafiliasi ke kolam ini." };
+    return { error: "Kamu tidak terafiliasi ke kolam ini." };
   }
 
   const startDateTime = wibDateTime(date, startTime);
@@ -41,7 +41,7 @@ export async function addAvailability(
   }
 
   if (startDateTime < new Date()) {
-    return { error: "Gak bisa bikin slot di tanggal/jam yang udah lewat." };
+    return { error: "Tidak bisa buat slot di tanggal/jam yang sudah lewat." };
   }
 
   // Slot selalu dipecah per jam bulat -- TimeSelect (hourOnly) udah
@@ -91,7 +91,7 @@ export async function addAvailability(
       .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
       .join(", ");
     return {
-      error: `Slot jam ${times} di tanggal ini udah pernah dibuka sebelumnya. Pilih jam lain atau hapus slot lamanya dulu.`,
+      error: `Slot jam ${times} di tanggal ini sudah pernah dibuka sebelumnya. Pilih jam lain atau hapus slot lamanya dulu.`,
     };
   }
 
@@ -138,7 +138,7 @@ export async function addAvailability(
       .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
       .join(", ");
     return {
-      warning: `Jam ${times} udah pernah dibuka sebelumnya, dilewatin. Jam lainnya berhasil ditambahin.`,
+      warning: `Jam ${times} sudah pernah dibuka sebelumnya, dilewatin. Jam lainnya berhasil ditambahin.`,
     };
   }
 
@@ -180,7 +180,7 @@ export async function cancelBookingAsCoach(
   const session = await requireRole("COACH");
 
   const bookingId = formData.get("bookingId") as string;
-  if (!bookingId) return { error: "Booking gak ditemukan." };
+  if (!bookingId) return { error: "Booking tidak ditemukan." };
 
   try {
     await cancelBooking({ bookingId, actor: { role: "COACH", coachId: session.user.id } });

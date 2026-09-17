@@ -15,7 +15,7 @@ export default async function CoachSaldoPage() {
       bankAccountName: true,
       withdrawalRequests: {
         orderBy: { requestedAt: "desc" },
-        select: { id: true, amount: true, status: true, requestedAt: true, failureReason: true },
+        select: { id: true, amount: true, status: true, requestedAt: true, processedAt: true, failureReason: true, bankName: true, bankAccountNumber: true, bankAccountName: true, midtransReferenceId: true },
       },
     },
   });
@@ -23,7 +23,7 @@ export default async function CoachSaldoPage() {
   if (!profile) {
     return (
       <main className="mx-auto max-w-lg px-4 py-8 text-center text-sm text-text-muted">
-        Profil coach gak ditemukan. Hubungi admin.
+        Profil coach tidak ditemukan. Hubungi admin.
       </main>
     );
   }
@@ -42,6 +42,7 @@ export default async function CoachSaldoPage() {
         withdrawals={profile.withdrawalRequests.map((w) => ({
           ...w,
           requestedAt: w.requestedAt.toISOString(),
+          processedAt: w.processedAt?.toISOString() ?? null,
         }))}
         updateBankInfoAction={updateBankInfo}
         requestWithdrawalAction={requestWithdrawal}

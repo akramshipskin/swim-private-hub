@@ -40,7 +40,7 @@ async function createWithdrawalRequest({
         data: { walletBalance: { decrement: amount } },
       });
       if (claim.count === 0) {
-        throw new WithdrawalError("Saldo gak cukup.");
+        throw new WithdrawalError("Saldo tidak cukup.");
       }
     } else if (coachProfileId) {
       const claim = await tx.coachProfile.updateMany({
@@ -48,7 +48,7 @@ async function createWithdrawalRequest({
         data: { walletBalance: { decrement: amount } },
       });
       if (claim.count === 0) {
-        throw new WithdrawalError("Saldo gak cukup.");
+        throw new WithdrawalError("Saldo tidak cukup.");
       }
     }
 
@@ -77,7 +77,17 @@ async function createWithdrawalRequest({
   });
 }
 
-export async function requestPoolWithdrawal(poolId: string) {
+// amount opsional: default = seluruh saldo. Nominal bebas, minimal
+// MIN_WITHDRAWAL, dan tidak boleh melebihi saldo (dijaga CAS di atas).
+function parseAmount(amount: number | undefined, balance: number) {
+  const value = amount ?? balance;
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new WithdrawalError("Nominal pencairan tidak valid.");
+  }
+  return value;
+}
+
+export async function requestPoolWithdrawal(poolId: string, amount?: number) {
   const pool = await prisma.pool.findUniqueOrThrow({
     where: { id: poolId },
     select: {
@@ -88,18 +98,18 @@ export async function requestPoolWithdrawal(poolId: string) {
     },
   });
   if (!pool.bankName || !pool.bankAccountNumber || !pool.bankAccountName) {
-    throw new WithdrawalError("Isi rekening tujuan dulu sebelum cairin saldo.");
+    throw new WithdrawalError("Isi rekening tujuan dulu sebelum cairkan saldo.");
   }
   return createWithdrawalRequest({
     poolId,
-    amount: pool.walletBalance,
+    amount: parseAmount(amount, pool.walletBalance),
     bankName: pool.bankName,
     bankAccountNumber: pool.bankAccountNumber,
     bankAccountName: pool.bankAccountName,
   });
 }
 
-export async function requestCoachWithdrawal(coachProfileId: string) {
+export async function requestCoachWithdrawal(coachProfileId: string, amount?: number) {
   const coach = await prisma.coachProfile.findUniqueOrThrow({
     where: { id: coachProfileId },
     select: {
@@ -110,11 +120,11 @@ export async function requestCoachWithdrawal(coachProfileId: string) {
     },
   });
   if (!coach.bankName || !coach.bankAccountNumber || !coach.bankAccountName) {
-    throw new WithdrawalError("Isi rekening tujuan dulu sebelum cairin saldo.");
+    throw new WithdrawalError("Isi rekening tujuan dulu sebelum cairkan saldo.");
   }
   return createWithdrawalRequest({
     coachProfileId,
-    amount: coach.walletBalance,
+    amount: parseAmount(amount, coach.walletBalance),
     bankName: coach.bankName,
     bankAccountNumber: coach.bankAccountNumber,
     bankAccountName: coach.bankAccountName,

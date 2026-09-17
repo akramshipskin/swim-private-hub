@@ -43,7 +43,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
         className="mb-3 max-w-sm"
       />
       {filtered.length === 0 ? (
-        <p className="text-sm text-text-subtle">Gak ada yang cocok sama pencarian &ldquo;{search}&rdquo;.</p>
+        <p className="text-sm text-text-subtle">Tidak ada yang cocok sama pencarian &ldquo;{search}&rdquo;.</p>
       ) : (
         <>
           {/* Desktop: tabel -- Nama & Email digabung 1 kolom (email di

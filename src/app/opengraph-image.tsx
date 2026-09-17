@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Swim Private Hub -- booking & manajemen les renang";
+export const alt = "Swim Private Hub — booking & manajemen les renang";
 
 export default async function OpengraphImage() {
   return new ImageResponse(

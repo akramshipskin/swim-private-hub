@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         select: { poolId: true },
       });
       if (!slot) {
-        throw new BookingError("Slot gak ditemukan.", 404);
+        throw new BookingError("Slot tidak ditemukan.", 404);
       }
 
       const claimPkg = await tx.package.updateMany({
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
       if (claimPkg.count === 0) {
         throw new BookingError(
-          "Paket ini gak bisa dipake buat slot ini: paketnya buat kolam lain, kuota sesi habis, belum aktif, atau udah kedaluwarsa.",
+          "Paket ini tidak bisa dipakai buat slot ini: paketnya buat kolam lain, kuota sesi habis, belum aktif, atau sudah kedaluwarsa.",
           409
         );
       }
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
 
       if (claim.count === 0) {
         throw new BookingError(
-          "Slot ini udah gak bisa dibooking (baru aja diambil member lain, atau jamnya udah lewat). Pilih slot lain.",
+          "Slot ini sudah tidak bisa dibooking (baru saja diambil member lain, atau jamnya sudah lewat). Pilih slot lain.",
           409
         );
       }
@@ -120,7 +120,7 @@ export async function POST(request: Request) {
     // Unique constraint di Booking.availabilityId sebagai lapis kedua
     // kalau ada race condition yang lolos dari conditional update di atas.
     return Response.json(
-      { error: "Slot ini baru aja diambil member lain, coba pilih slot lain." },
+      { error: "Slot ini baru saja diambil member lain, coba pilih slot lain." },
       { status: 409 }
     );
   }

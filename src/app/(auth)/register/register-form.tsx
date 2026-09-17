@@ -36,7 +36,7 @@ export default function RegisterForm() {
     setError(null);
 
     if (!isValidIndonesianPhone(phone)) {
-      setError("Format No HP gak valid (contoh: 0812xxxxxxx)");
+      setError("Format No HP tidak valid (contoh: 0812xxxxxxx)");
       return;
     }
 

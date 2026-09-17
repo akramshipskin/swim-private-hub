@@ -20,17 +20,6 @@ export function buildContactWaLink(phone: string, name: string) {
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
-// Coach shortcut page (pool-first browse + cheap cross-pool discovery,
-// locked /plan-eng-review 2026-09-12): parent yang tau nama coach tapi
-// coach-nya lagi di kolam yang beda dari paket parent itu, chat
-// langsung ke coach-nya buat nanya arahan/pool mana yang cocok --
-// bukan admin.
-export function buildCoachInquiryWaLink(coachPhone: string, coachName: string) {
-  const number = normalizePhoneForWa(coachPhone);
-  const message = `Halo Coach ${coachName}, saya mau tanya jadwal/kolam buat les renang.`;
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-}
-
 export function buildAdminCancelWaLink({
   memberName,
   childName,
@@ -51,7 +40,7 @@ Nama: ${memberName}${forLine}
 Coach: ${coachName}
 Jadwal: ${dateLabel}, ${timeRange}
 
-Jatah pembatalan mandiri saya udah habis / di luar waktu yang diizinkan. Mohon dibantu ya, terima kasih.`;
+Jatah pembatalan mandiri saya sudah habis / di luar waktu yang diizinkan. Mohon dibantu ya, terima kasih.`;
 
   return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }

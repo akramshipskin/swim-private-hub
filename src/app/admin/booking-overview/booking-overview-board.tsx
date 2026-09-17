@@ -28,9 +28,11 @@ function dateKey(d: Date) {
 }
 
 function buildKabarinWaLink(coachName: string, dateLabel: string) {
-  const message = `Halo semua! Coach ${coachName} baru aja buka jadwal baru tanggal ${dateLabel}. Buruan booking sebelum kehabisan slot ya! 🏊`;
+  const message = `Halo semua! Coach ${coachName} baru saja buka jadwal baru tanggal ${dateLabel}. Buruan booking sebelum kehabisan slot ya! 🏊`;
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }
+
+type Period = "upcoming" | "unmarked" | "past" | "all";
 
 export default function BookingOverviewBoard({
   availabilities,
@@ -39,79 +41,111 @@ export default function BookingOverviewBoard({
   availabilities: Availability[];
   coaches: { id: string; name: string }[];
 }) {
-  // Semua availability (semua coach) udah kebawa dari server sekaligus --
-  // ganti coach di dropdown cuma filter array yang UDAH ADA di memory,
-  // gak ada navigasi/refetch ke server lagi, jadi instant.
   const [selectedCoach, setSelectedCoach] = useState("all");
+  const [selectedPool, setSelectedPool] = useState("all");
+  const [period, setPeriod] = useState<Period>("upcoming");
+  const [query, setQuery] = useState("");
   const now = useMemo(() => new Date(), []);
   const todayKey = dateKey(now);
+  const poolNames = useMemo(() => [...new Set(availabilities.map((a) => a.pool.name))].sort(), [availabilities]);
 
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return availabilities.filter((a) => {
+      if (selectedCoach !== "all" && a.coach.id !== selectedCoach) return false;
+      if (selectedPool !== "all" && a.pool.name !== selectedPool) return false;
+      const b = a.bookings[0];
+      const past = a.endTime <= now;
+      if (period === "upcoming" && dateKey(a.date) < todayKey) return false;
+      if (period === "unmarked" && !(past && b && b.attended === null)) return false;
+      if (period === "past" && !past) return false;
+      // Slot kosong yang sudah lewat tidak berguna ditampilkan.
+      if (past && !b && period !== "all") return false;
+      if (!q) return true;
+      return [a.coach.name, a.pool.name, b?.member.name, b?.package.dependent.name]
+        .filter(Boolean)
+        .some((v) => v!.toLowerCase().includes(q));
+    });
+  }, [availabilities, selectedCoach, selectedPool, period, query, now, todayKey]);
+
+  // Kelompok: coach -> tanggal -> kolam.
   const byCoach = useMemo(() => {
     const map = new Map<string, { coachName: string; byDate: Map<string, Availability[]> }>();
-    for (const a of availabilities) {
-      if (selectedCoach !== "all" && a.coach.id !== selectedCoach) continue;
-      const coachKey = a.coach.id;
-      if (!map.has(coachKey)) map.set(coachKey, { coachName: a.coach.name, byDate: new Map() });
-      const group = map.get(coachKey)!;
+    for (const a of filtered) {
+      if (!map.has(a.coach.id)) map.set(a.coach.id, { coachName: a.coach.name, byDate: new Map() });
+      const group = map.get(a.coach.id)!;
       const dKey = dateKey(a.date);
       if (!group.byDate.has(dKey)) group.byDate.set(dKey, []);
       group.byDate.get(dKey)!.push(a);
     }
     return map;
-  }, [availabilities, selectedCoach]);
+  }, [filtered]);
 
   return (
     <>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-text">Semua Booking</h1>
-        <Select
-          value={selectedCoach}
-          onChange={(e) => setSelectedCoach(e.target.value)}
-          className="w-full sm:w-56"
-        >
-          <option value="all">Semua Coach</option>
-          {coaches.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </Select>
-      </div>
+      <h1 className="text-2xl font-semibold tracking-tight text-text">Jadwal Booking</h1>
+      <p className="mt-1 mb-4 text-sm text-text-muted">Semua slot coach: siapa, tanggal berapa, di kolam mana, dan dibooking siapa.</p>
+
+      <Card className="mb-6">
+        <CardBody className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <label className="flex flex-col gap-1 text-sm text-text-muted">
+            Cari
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Nama coach, member, peserta, kolam"
+              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-text-muted">
+            Periode
+            <Select value={period} onChange={(e) => setPeriod(e.target.value as Period)} className="w-full">
+              <option value="upcoming">Hari ini &amp; mendatang</option>
+              <option value="unmarked">Lewat, belum ditandai hadir</option>
+              <option value="past">Sudah lewat</option>
+              <option value="all">Semua</option>
+            </Select>
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-text-muted">
+            Coach
+            <Select value={selectedCoach} onChange={(e) => setSelectedCoach(e.target.value)} className="w-full">
+              <option value="all">Semua coach</option>
+              {coaches.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </Select>
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-text-muted">
+            Kolam
+            <Select value={selectedPool} onChange={(e) => setSelectedPool(e.target.value)} className="w-full">
+              <option value="all">Semua kolam</option>
+              {poolNames.map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </Select>
+          </label>
+        </CardBody>
+      </Card>
 
       {byCoach.size === 0 ? (
         <Card>
-          <CardBody className="py-10 text-center">
-            <p className="text-sm text-text-muted">
-              {selectedCoach === "all"
-                ? "Belum ada slot dibuka coach manapun."
-                : "Coach ini belum buka slot."}
-            </p>
-          </CardBody>
+          <CardBody className="py-10 text-center text-sm text-text-muted">Tidak ada slot yang cocok dengan filter.</CardBody>
         </Card>
       ) : (
         [...byCoach.entries()].map(([coachId, group]) => {
           const allSlots = [...group.byDate.values()].flat();
           const filledCount = allSlots.filter((a) => a.bookings.length > 0).length;
-          const sortedDates = [...group.byDate.keys()].sort();
-
           return (
-            <div key={coachId} className="mb-6">
-              <h2 className="mb-3 text-lg font-semibold text-text">
-                {group.coachName}{" "}
-                <span className="text-sm font-normal text-text-subtle">
-                  ({filledCount}/{allSlots.length} terisi)
-                </span>
+            <section key={coachId} className="mb-8">
+              <h2 className="mb-3 text-xl font-semibold text-text">
+                {group.coachName} <span className="text-sm font-normal text-text-muted">({filledCount}/{allSlots.length} terisi)</span>
               </h2>
-
-              {sortedDates.map((dKey) => {
+              {[...group.byDate.keys()].sort().map((dKey) => {
                 const rows = group.byDate.get(dKey)!;
                 return (
-                  <div key={dKey} className="mb-3">
-                    <div className="mb-1.5 flex items-center justify-between gap-2">
-                      <h3 className="text-xs font-medium text-text-subtle">
-                        {formatDateLabel(rows[0].date)}
-                      </h3>
-                      {/* Ngabarin grup soal jadwal tanggal yang udah lewat gak ada gunanya. */}
+                  <div key={dKey} className="mb-4">
+                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="text-base font-semibold text-text">{formatDateLabel(rows[0].date)}</h3>
                       {dKey >= todayKey && (
                         <a
                           href={buildKabarinWaLink(group.coachName, formatDateLabel(rows[0].date))}
@@ -126,58 +160,56 @@ export default function BookingOverviewBoard({
                         </a>
                       )}
                     </div>
-
-                    {/* 2 kolom baru mulai di lg, bukan sm -- di lebar sm
-                        kartu kesempitan sampe nama kolam/member ke-truncate
-                        jadi "Kolam Renang ..." (gak kebaca Melati apa Tirta
-                        Asri, padahal itu inti infonya). */}
-                    <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-                      {rows.map((a) => {
-                        const booking = a.bookings[0];
-                        const isPast = a.endTime <= now;
-
-                        return (
-                          <Card key={a.id}>
-                            <CardBody className="flex items-center justify-between gap-3 py-2.5">
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium text-text">
-                                  {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
-                                </p>
-                                <p className="text-xs text-text-subtle">{a.pool.name}</p>
-                                {booking ? (
-                                  <p className="truncate text-xs text-text-muted">
-                                    {booking.package.dependent.isSelf
-                                      ? booking.member.name
-                                      : `${booking.package.dependent.name} (${booking.member.name})`}
-                                  </p>
-                                ) : (
-                                  <p className="text-xs text-text-subtle">Belum ada yang book</p>
-                                )}
-                              </div>
-
-                              <div className="flex shrink-0 items-center gap-2">
-                                {booking ? (
-                                  <>
-                                    <Badge tone="brand">Terisi</Badge>
-                                    {isPast ? (
-                                      <AttendanceToggle bookingId={booking.id} attended={booking.attended} />
-                                    ) : (
-                                      <AdminCancelButton bookingId={booking.id} />
-                                    )}
-                                  </>
-                                ) : (
-                                  <Badge tone="neutral">Kosong</Badge>
-                                )}
-                              </div>
-                            </CardBody>
-                          </Card>
-                        );
-                      })}
-                    </div>
+                    {[...new Set(rows.map((r) => r.pool.name))].map((poolName) => (
+                      <div key={poolName} className="mb-3">
+                        <p className="mb-1.5 text-sm font-semibold text-brand-700">{poolName}</p>
+                        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                          {rows
+                            .filter((r) => r.pool.name === poolName)
+                            .map((a) => {
+                              const booking = a.bookings[0];
+                              const isPast = a.endTime <= now;
+                              return (
+                                <Card key={a.id}>
+                                  <CardBody className="flex items-center justify-between gap-3 py-3">
+                                    <div className="min-w-0">
+                                      <p className="text-base font-semibold text-text tabular-nums">
+                                        {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
+                                      </p>
+                                      {booking ? (
+                                        <>
+                                          <p className="text-sm text-text">Peserta: {booking.package.dependent.isSelf ? booking.member.name : booking.package.dependent.name}</p>
+                                          <p className="truncate text-sm text-text-muted">Akun: {booking.member.name}{booking.member.email ? ` · ${booking.member.email}` : ""}</p>
+                                        </>
+                                      ) : (
+                                        <p className="text-sm text-text-subtle">Belum ada yang booking</p>
+                                      )}
+                                    </div>
+                                    <div className="flex shrink-0 flex-col items-end gap-2">
+                                      {booking ? (
+                                        isPast ? (
+                                          <AttendanceToggle bookingId={booking.id} attended={booking.attended} />
+                                        ) : (
+                                          <>
+                                            <Badge tone="brand">Terisi</Badge>
+                                            <AdminCancelButton bookingId={booking.id} />
+                                          </>
+                                        )
+                                      ) : (
+                                        <Badge tone="neutral">{isPast ? "Lewat" : "Kosong"}</Badge>
+                                      )}
+                                    </div>
+                                  </CardBody>
+                                </Card>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 );
               })}
-            </div>
+            </section>
           );
         })
       )}

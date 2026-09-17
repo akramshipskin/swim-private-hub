@@ -24,10 +24,10 @@ export default async function CariCoachPage() {
       id: true,
       name: true,
       coachProfile: {
-        select: { specialties: true, hasCertification: true, certificationNote: true },
+        select: { bio: true, specialties: true, certificationNote: true, certificateStatus: true, photoUrl: true },
       },
       poolAffiliations: {
-        select: { pool: { select: { id: true, name: true } } },
+        select: { pool: { select: { id: true, name: true, address: true } } },
         orderBy: { pool: { name: "asc" } },
       },
     },
@@ -38,7 +38,7 @@ export default async function CariCoachPage() {
     <main className="mx-auto max-w-5xl [&>*]:max-w-3xl px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Cari Coach</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Semua coach aktif, lintas kolam. Paket berlaku di kolam tempat dibeli -- mau ke kolam lain,
+        Semua coach aktif, lintas kolam. Paket berlaku di kolam tempat dibeli — mau ke kolam lain,
         beli 1 sesi di sana lewat menu Booking.
       </p>
 
@@ -48,39 +48,51 @@ export default async function CariCoachPage() {
         <div className="mt-6 flex flex-col gap-3">
           {coaches.map((coach) => (
             <Card key={coach.id}>
-              <CardBody>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-semibold text-text">{coach.name}</h2>
-                  {coach.coachProfile?.hasCertification && (
-                    <Badge tone="accent">
-                      Bersertifikat
-                      {coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
-                    </Badge>
-                  )}
-                </div>
-
-                {coach.coachProfile && coach.coachProfile.specialties.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {coach.coachProfile.specialties.map((s) => (
-                      <Badge key={s} tone="brand">
-                        {s}
-                      </Badge>
-                    ))}
+              <CardBody className="flex gap-4">
+                {coach.coachProfile?.photoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={coach.coachProfile.photoUrl} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" />
+                ) : (
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xl font-semibold text-brand-700">
+                    {coach.name.slice(0, 1)}
                   </div>
                 )}
-
-                <p className="mt-2 text-xs text-text-subtle">
-                  {coach.poolAffiliations.length === 0
-                    ? "Belum terafiliasi ke kolam manapun."
-                    : `Ngajar di: ${coach.poolAffiliations.map((a) => a.pool.name).join(", ")}`}
-                </p>
-
-                <Link
-                  href={`/pelatih/${coach.id}`}
-                  className="mt-3 inline-block text-xs font-medium text-brand-600 hover:underline"
-                >
-                  Lihat profil &amp; kontak &rarr;
-                </Link>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-base font-semibold text-text">{coach.name}</h2>
+                    {coach.coachProfile?.certificateStatus === "APPROVED" && (
+                      <Badge tone="accent">
+                        Bersertifikat{coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
+                      </Badge>
+                    )}
+                  </div>
+                  {coach.coachProfile?.bio && <p className="mt-1 line-clamp-2 text-sm text-text-muted">{coach.coachProfile.bio}</p>}
+                  {coach.coachProfile && coach.coachProfile.specialties.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {coach.coachProfile.specialties.map((sp) => (
+                        <Badge key={sp} tone="brand">{sp}</Badge>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-3">
+                    <p className="text-sm font-medium text-text">Mengajar di</p>
+                    {coach.poolAffiliations.length === 0 ? (
+                      <p className="text-sm text-text-muted">Belum terdaftar di kolam mana pun.</p>
+                    ) : (
+                      <ul className="mt-1 flex flex-col gap-1">
+                        {coach.poolAffiliations.map(({ pool }) => (
+                          <li key={pool.id} className="text-sm text-text">
+                            <span className="font-medium">{pool.name}</span>
+                            {pool.address && <span className="text-text-muted"> · {pool.address}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <Link href={`/pelatih/${coach.id}`} className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline">
+                    Lihat profil lengkap &rarr;
+                  </Link>
+                </div>
               </CardBody>
             </Card>
           ))}

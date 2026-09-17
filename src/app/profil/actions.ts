@@ -7,6 +7,7 @@ import { toProperCase } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties";
+import { isStorageConfigured, validateUpload, extensionFor, uploadObject, publicObjectUrl, PHOTO_BUCKET, CERT_BUCKET } from "@/lib/storage";
 
 export type ActionState = { error?: string; success?: boolean } | null;
 
@@ -19,7 +20,7 @@ export async function updateName(
 
   const rawName = formData.get("name")?.toString().trim() ?? "";
   if (!rawName) {
-    return { error: "Nama gak boleh kosong" };
+    return { error: "Nama tidak boleh kosong" };
   }
   const name = toProperCase(rawName);
 
@@ -51,7 +52,7 @@ export async function updatePasswordProfil(
     return { error: "Password baru minimal 8 karakter" };
   }
   if (newPassword !== confirmPassword) {
-    return { error: "Konfirmasi password gak sama" };
+    return { error: "Konfirmasi password tidak sama" };
   }
 
   // Ganti password dari sini WAJIB verifikasi password lama dulu -- tanpa
@@ -83,7 +84,7 @@ export async function addChild(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, login ulang." };
-  if (session.user.role !== "MEMBER") return { error: "Cuma member yang bisa nambah anak." };
+  if (session.user.role !== "MEMBER") return { error: "Cuma member yang bisa menambah anak." };
 
   const type = formData.get("type")?.toString();
   const name = formData.get("name")?.toString() ?? "";
@@ -95,10 +96,11 @@ export async function addChild(
       await createDependent(session.user.id, name);
     }
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal nambah peserta" };
+    return { error: err instanceof Error ? err.message : "Gagal menambah peserta" };
   }
 
   revalidatePath("/profil");
+  revalidatePath("/member/peserta");
   return { success: true };
 }
 
@@ -109,6 +111,7 @@ export async function toggleChildActive(dependentId: string, isActive: boolean) 
   await assertDependentOwnedByMember(dependentId, session.user.id);
   await prisma.dependent.update({ where: { id: dependentId }, data: { isActive } });
   revalidatePath("/profil");
+  revalidatePath("/member/peserta");
 }
 
 // Coach edit bio/keahlian/sertifikasi sendiri -- sebelumnya cuma bisa diisi
@@ -127,8 +130,6 @@ export async function updateCoachProfile(
     .getAll("specialties")
     .map(String)
     .filter((s): s is CoachSpecialty => (COACH_SPECIALTIES as readonly string[]).includes(s));
-  const hasCertification = formData.get("hasCertification") === "on";
-  const certificationNote = formData.get("certificationNote")?.toString().trim() ?? "";
 
   if (specialties.length === 0) {
     return { error: "Pilih minimal 1 keahlian." };
@@ -142,13 +143,60 @@ export async function updateCoachProfile(
     data: {
       bio: bio || null,
       specialties,
-      hasCertification,
-      certificationNote: hasCertification ? certificationNote || null : null,
     },
   });
-  if (updated.count === 0) return { error: "Profil coach gak ditemukan. Hubungi admin." };
+  if (updated.count === 0) return { error: "Profil coach tidak ditemukan. Hubungi admin." };
 
   revalidatePath("/profil");
   revalidatePath(`/pelatih/${session.user.id}`);
+  return { success: true };
+}
+
+export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const session = await auth();
+  if (!session || session.user.role !== "COACH") return { error: "Cuma buat akun coach." };
+  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
+  const file = formData.get("photo") as File | null;
+  const invalid = validateUpload(file, "photo");
+  if (invalid) return { error: invalid };
+
+  const path = `${session.user.id}/photo.${extensionFor(file!)}`;
+  try {
+    await uploadObject(PHOTO_BUCKET, path, file!);
+  } catch {
+    return { error: "Upload foto gagal, coba lagi." };
+  }
+  // ?v= biar browser gak nampilin foto lama dari cache setelah ganti.
+  await prisma.coachProfile.updateMany({
+    where: { userId: session.user.id },
+    data: { photoUrl: `${publicObjectUrl(PHOTO_BUCKET, path)}?v=${Date.now()}` },
+  });
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
+// Sertifikat baru selalu masuk status PENDING -- badge "Bersertifikat" baru
+// tampil setelah admin menyetujui (lihat admin/users/certificate-actions.ts).
+export async function uploadCoachCertificate(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const session = await auth();
+  if (!session || session.user.role !== "COACH") return { error: "Cuma buat akun coach." };
+  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
+  const file = formData.get("certificate") as File | null;
+  const note = formData.get("certificationNote")?.toString().trim() ?? "";
+  if (!note) return { error: "Isi nama sertifikat/lembaga." };
+  const invalid = validateUpload(file, "certificate");
+  if (invalid) return { error: invalid };
+
+  const path = `${session.user.id}/certificate-${Date.now()}.${extensionFor(file!)}`;
+  try {
+    await uploadObject(CERT_BUCKET, path, file!);
+  } catch {
+    return { error: "Upload sertifikat gagal, coba lagi." };
+  }
+  await prisma.coachProfile.updateMany({
+    where: { userId: session.user.id },
+    data: { certificateUrl: path, certificationNote: note, certificateStatus: "PENDING", hasCertification: false },
+  });
+  revalidatePath("/profil");
   return { success: true };
 }

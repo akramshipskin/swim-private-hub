@@ -79,7 +79,7 @@ describe("markAttendance", () => {
   it("refuses a MEMBER (only COACH/ADMIN can mark attendance)", async () => {
     auth.mockResolvedValue({ user: { id: "member-1", role: "MEMBER" } });
     const result = await markAttendance(null, formData("booking-1", "true"));
-    expect(result).toEqual({ error: "Gak punya akses." });
+    expect(result).toEqual({ error: "Tidak punya akses." });
     expect(bookingFindUnique).not.toHaveBeenCalled();
   });
 
@@ -130,7 +130,7 @@ describe("markAttendance", () => {
     expect(reverseSessionRevenue).not.toHaveBeenCalled();
   });
 
-  it("reverses the wallet credit when toggled from Hadir back to Gak Hadir", async () => {
+  it("reverses the wallet credit when toggled from Hadir back to Tidak Hadir", async () => {
     bookingFindUnique.mockResolvedValue(baseBooking({ attended: true }));
     const result = await markAttendance(null, formData("booking-1", "false"));
     expect(result).toBeNull();

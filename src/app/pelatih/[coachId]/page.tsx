@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { buildCoachInquiryWaLink } from "@/lib/whatsapp";
+import { signedObjectUrl, CERT_BUCKET } from "@/lib/storage";
 import { roleNavLinks, roleLabel } from "@/lib/nav-links";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,12 +35,13 @@ export default async function CoachShortcutPage({
     select: {
       id: true,
       name: true,
-      phone: true,
       coachProfile: {
-        select: { bio: true, specialties: true, hasCertification: true, certificationNote: true },
+        select: { bio: true, specialties: true, certificationNote: true, certificateStatus: true, certificateUrl: true, photoUrl: true },
       },
       poolAffiliations: {
-        select: { pool: { select: { id: true, name: true, address: true } } },
+        select: {
+          pool: { select: { id: true, name: true, address: true, openTime: true, closeTime: true, facilities: true } },
+        },
         orderBy: { pool: { name: "asc" } },
       },
     },
@@ -48,70 +49,102 @@ export default async function CoachShortcutPage({
 
   if (!coach) notFound();
 
+  // Sumber info dibedakan: pengunjung tanpa akun cuma dapat ringkasan publik;
+  // pengguna yang login dapat detail kolam (jam, fasilitas) dan bisa membuka
+  // file sertifikat (signed URL berumur pendek, bukan link permanen).
+  const profile = coach.coachProfile;
+  const certApproved = profile?.certificateStatus === "APPROVED";
+  const certViewUrl =
+    session && certApproved && profile?.certificateUrl ? await signedObjectUrl(CERT_BUCKET, profile.certificateUrl) : null;
+
   const content = (
     // Login: samain container sama halaman role lain (judul gak loncat pas
     // pindah dari Cari Coach). Anonim: tengah, sejajar header publik.
     <main className={session ? "mx-auto max-w-5xl px-4 py-6 sm:py-8 [&>*]:max-w-lg" : "mx-auto max-w-lg px-4 py-8"}>
-      <div className="flex items-center gap-2">
-        <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
-        <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
+      <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
+      <div className="mt-3 flex items-center gap-4">
+        {profile?.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={profile.photoUrl} alt={`Foto ${coach.name}`} className="h-20 w-20 rounded-full object-cover" />
+        ) : (
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-100 text-2xl font-semibold text-brand-700">
+            {coach.name.slice(0, 1)}
+          </div>
+        )}
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
+          <p className="text-sm text-text-muted">Coach renang privat</p>
+        </div>
       </div>
-      {coach.coachProfile?.hasCertification && (
-        <div className="mt-2">
-          <Badge tone="accent">
-            Bersertifikat{coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
-          </Badge>
+
+      {certApproved && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Badge tone="accent">Bersertifikat{profile?.certificationNote ? ` · ${profile.certificationNote}` : ""}</Badge>
+          {session ? (
+            certViewUrl && (
+              <a href={certViewUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand-700 underline">
+                Lihat sertifikat
+              </a>
+            )
+          ) : (
+            <Link href="/register" className="text-sm font-medium text-brand-700 underline">
+              Lihat sertifikat (daftar dulu)
+            </Link>
+          )}
         </div>
       )}
-      {coach.coachProfile?.bio && (
-        <p className="mt-2 text-sm text-text-muted">{coach.coachProfile.bio}</p>
-      )}
 
-      {coach.coachProfile && coach.coachProfile.specialties.length > 0 && (
+      {profile?.bio && <p className="mt-4 text-base text-text">{profile.bio}</p>}
+
+      {profile && profile.specialties.length > 0 && (
         <>
-          <h2 className="mt-6 text-sm font-semibold text-text-muted">Keahlian</h2>
+          <h2 className="mt-6 text-base font-semibold text-text">Keahlian</h2>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {coach.coachProfile.specialties.map((s) => (
-              <Badge key={s} tone="brand">
-                {s}
-              </Badge>
+            {profile.specialties.map((sp) => (
+              <Badge key={sp} tone="brand">{sp}</Badge>
             ))}
           </div>
         </>
       )}
 
-      <h2 className="mt-6 text-sm font-semibold text-text-muted">Ngajar di kolam</h2>
+      <h2 className="mt-6 text-base font-semibold text-text">Mengajar di kolam</h2>
       {coach.poolAffiliations.length === 0 ? (
-        <p className="mt-2 text-sm text-text-muted">Belum terafiliasi ke kolam manapun.</p>
+        <p className="mt-2 text-sm text-text-muted">Belum terdaftar di kolam mana pun.</p>
       ) : (
         <ul className="mt-2 flex flex-col gap-2">
           {coach.poolAffiliations.map(({ pool }) => (
             <Card key={pool.id}>
               <CardBody className="py-3">
-                <p className="text-sm font-medium text-text">{pool.name}</p>
-                {pool.address && <p className="text-xs text-text-muted">{pool.address}</p>}
+                <p className="text-base font-semibold text-text">{pool.name}</p>
+                {pool.address && <p className="text-sm text-text-muted">{pool.address}</p>}
+                {session && (
+                  <>
+                    {pool.openTime && pool.closeTime && (
+                      <p className="mt-1 text-sm text-text-muted">Buka {pool.openTime}–{pool.closeTime}</p>
+                    )}
+                    {pool.facilities.length > 0 && (
+                      <p className="mt-1 text-sm text-text-muted">Fasilitas: {pool.facilities.join(", ")}</p>
+                    )}
+                  </>
+                )}
               </CardBody>
             </Card>
           ))}
         </ul>
       )}
 
-      {coach.phone && (
-        <a
-          href={buildCoachInquiryWaLink(coach.phone, coach.name)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-6 inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-        >
-          Hubungi {coach.name} (WA)
-        </a>
-      )}
-
-      <p className="mt-4 text-xs text-text-subtle">
+      <p className="mt-6 text-sm text-text-muted">
         {session?.user.role === "MEMBER"
-          ? "Mau booking coach ini? Pilih kolam & coach-nya di menu Booking. Paket berlaku di kolam tempat dibeli; di kolam lain bisa beli 1 sesi."
-          : "Mau booking coach ini? Daftar/login sebagai member, beli paket di kolam tempat coach ini ngajar, lalu booking lewat menu Booking."}
+          ? "Mau les dengan coach ini? Pilih kolam dan coach di menu Booking. Paket berlaku di kolam tempat dibeli; di kolam lain bisa beli 1 sesi."
+          : session
+            ? "Booking coach dilakukan member lewat menu Booking."
+            : "Mau les dengan coach ini? Daftar sebagai member untuk melihat jadwal, fasilitas kolam, dan sertifikat lengkap."}
       </p>
+      {!session && (
+        <Link href="/register" className="mt-3 inline-block">
+          <Button>Daftar sekarang</Button>
+        </Link>
+      )}
     </main>
   );
 

@@ -30,7 +30,7 @@ export function CookieConsentBanner() {
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface px-4 py-3 shadow-[0_-4px_16px_-4px_rgba(8,145,178,0.15)]">
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
         <p className="text-xs text-text-muted sm:text-sm">
-          Kami pakai cookie login &amp; local storage tema seperlunya biar aplikasi
+          Kami pakai cookie login &amp; local storage tema seperlunya agar aplikasi
           ini jalan.{" "}
           <a href="/kebijakan-cookie" className="font-medium text-brand-600 hover:underline">
             Kebijakan Cookie

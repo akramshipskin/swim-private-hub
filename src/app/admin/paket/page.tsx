@@ -23,7 +23,7 @@ export default async function AdminPaketPage() {
 
   const [templates, members, pools] = await Promise.all([
     prisma.packageTemplate.findMany({
-      orderBy: { totalSesi: "asc" },
+      orderBy: [{ pool: { name: "asc" } }, { totalSesi: "asc" }],
       include: { pool: { select: { name: true } } },
     }),
     // Grup per member (bukan per paket) -- 1 member bisa punya >1 peserta,
@@ -57,6 +57,8 @@ export default async function AdminPaketPage() {
             status: true,
             expiredDate: true,
             dependentId: true,
+            poolId: true,
+            pool: { select: { name: true } },
           },
         },
       },
@@ -82,20 +84,28 @@ export default async function AdminPaketPage() {
       {/* --- Katalog Paket --- */}
       <h2 className="mb-3 text-lg font-semibold text-text">Katalog Paket</h2>
       <p className="mb-3 text-sm text-text-muted">
-        Paket generik, gak ditujukan ke member manapun -- ini yang muncul di halaman
+        Paket generik, tidak ditujukan ke member manapun — ini yang muncul di halaman
         &ldquo;Beli Paket&rdquo; member.
       </p>
 
       <CreateTemplateForm pools={pools} />
 
-      <ul className="mb-8 flex flex-col gap-2">
-        {templates.map((t) => (
-          <li key={t.id}>
-            <TemplateEditForm template={t} />
-            <p className="mt-1 pl-1 text-xs text-text-subtle">Kolam: {t.pool.name}</p>
-          </li>
+      <div className="mb-10 flex flex-col gap-6">
+        {[...new Set(templates.map((t) => t.pool.name))].map((poolName) => (
+          <section key={poolName}>
+            <h3 className="mb-2 text-base font-semibold text-brand-700">{poolName}</h3>
+            <ul className="grid gap-3 lg:grid-cols-2">
+              {templates
+                .filter((t) => t.pool.name === poolName)
+                .map((t) => (
+                  <li key={t.id}>
+                    <TemplateEditForm template={t} />
+                  </li>
+                ))}
+            </ul>
+          </section>
         ))}
-      </ul>
+      </div>
 
       {/* --- List member + paket, advanced --- */}
       <p className="mb-3 text-xs text-text-subtle">
@@ -109,25 +119,32 @@ export default async function AdminPaketPage() {
           memberName: m.name,
           memberContact: m.email ?? m.phone ?? "-",
           memberSinceLabel: memberSince(m.createdAt),
-          peserta: m.dependents.map((d) => {
-            const pkg = m.packages.find((p) => p.dependentId === d.id) ?? null;
-            return {
+          // 1 baris per (peserta, kolam): paket sekarang per kolam, jadi 1 peserta
+          // bisa punya paket di beberapa kolam. Ambil paket terbaru per kolam.
+          peserta: m.dependents.flatMap((d): Parameters<typeof PaketPerMemberList>[0]["rows"][number]["peserta"] => {
+            const latestPerPool = [
+              ...new Map(
+                m.packages.filter((p) => p.dependentId === d.id).reverse().map((p) => [p.poolId, p])
+              ).values(),
+            ];
+            const label = d.isSelf ? "Diri sendiri" : d.name;
+            if (latestPerPool.length === 0) return [{ dependentId: d.id, label, pkg: null }];
+            return latestPerPool.map((pkg) => ({
               dependentId: d.id,
-              label: d.isSelf ? "Diri sendiri" : d.name,
-              pkg: pkg
-                ? {
-                    id: pkg.id,
-                    name: pkg.name,
-                    sisaSesi: pkg.sisaSesi,
-                    totalSesi: pkg.totalSesi,
-                    jatahCancel: pkg.jatahCancel,
-                    status: pkg.status,
-                    expiredDate: pkg.expiredDate,
-                    expiredDateInput: toInputDate(pkg.expiredDate),
-                    cancelRemaining: Math.max(0, pkg.jatahCancel - (cancelUsedByPackage.get(pkg.id) ?? 0)),
-                  }
-                : null,
-            };
+              label,
+              pkg: {
+                id: pkg.id,
+                name: pkg.name,
+                poolName: pkg.pool.name,
+                sisaSesi: pkg.sisaSesi,
+                totalSesi: pkg.totalSesi,
+                jatahCancel: pkg.jatahCancel,
+                status: pkg.status,
+                expiredDate: pkg.expiredDate,
+                expiredDateInput: toInputDate(pkg.expiredDate),
+                cancelRemaining: Math.max(0, pkg.jatahCancel - (cancelUsedByPackage.get(pkg.id) ?? 0)),
+              },
+            }));
           }),
         }))}
       />

@@ -15,6 +15,7 @@ type Template = {
   durationDays: number;
   jatahCancel: number;
   isActive: boolean;
+  pool?: { name: string };
 };
 
 export default function TemplateEditForm({ template }: { template: Template }) {
@@ -54,6 +55,15 @@ export default function TemplateEditForm({ template }: { template: Template }) {
   return (
     <Card>
       <CardBody>
+        {template.pool && (
+          <p className="mb-3 flex flex-wrap items-center gap-2 text-sm">
+            <span className="font-semibold text-brand-700">{template.pool.name}</span>
+            <span className="text-text-muted">
+              · Rp{Math.round(template.price / template.totalSesi).toLocaleString("id-ID")}/sesi
+            </span>
+            {!template.isActive && <span className="text-warning-text">· tidak dijual</span>}
+          </p>
+        )}
         <form
           key={formKey}
           action={formAction}

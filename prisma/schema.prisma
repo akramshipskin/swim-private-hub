@@ -98,6 +98,47 @@ model User {
   pushSubscriptions   PushSubscription[]
   poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
   poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
+  chatThread          ChatThread?
+}
+
+// Chat bantuan (tombol mengambang) buat member/coach/pemilik kolam. 1 user =
+// 1 thread. Dijawab AI kalau ANTHROPIC_API_KEY ada; pertanyaan yang AI gak
+// yakin (atau AI belum aktif) ditandai needsAdmin dan muncul di tab Pesan admin.
+model ChatThread {
+  id         String        @id @default(cuid())
+  userId     String        @unique
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  needsAdmin Boolean       @default(false)
+  updatedAt  DateTime      @updatedAt
+  createdAt  DateTime      @default(now())
+  messages   ChatMessage[]
+
+  @@index([needsAdmin, updatedAt])
+}
+
+enum ChatSender {
+  USER
+  AI
+  ADMIN
+  SYSTEM
+}
+
+model ChatMessage {
+  id        String     @id @default(cuid())
+  threadId  String
+  thread    ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender    ChatSender
+  content   String
+  createdAt DateTime   @default(now())
+
+  @@index([threadId, createdAt])
+}
+
+enum CertificateStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model CoachProfile {
@@ -116,6 +157,11 @@ model CoachProfile {
   // opsional -- nama sertifikat/lembaga, ditampilin di sebelah badge.
   hasCertification  Boolean  @default(false)
   certificationNote String?
+  // Foto profil & file sertifikat (URL Supabase Storage). Badge
+  // "Bersertifikat" cuma tampil kalau certificateStatus APPROVED oleh admin.
+  photoUrl          String?
+  certificateUrl    String?
+  certificateStatus CertificateStatus @default(NONE)
   // Saldo coach ini dari bagian per-sesi (Pool.coachSharePercent),
   // dikredit pas booking ditandai Hadir. Lihat Pool.walletBalance buat
   // catatan yang sama soal cache-vs-ledger.
@@ -348,6 +394,10 @@ model Pool {
   // divalidasi di action layer, murni informasional buat sekarang).
   openTime           String?
   closeTime          String?
+  // Deskripsi & fasilitas kolam (warung, mushola, toilet, dst) -- diisi
+  // pemilik kolam atau admin, tampil di landing, booking, halaman coach.
+  description        String?
+  facilities         String[] @default([])
   // Persentase komisi platform, di-set platform (bukan per-coach),
   // provisional 15% (lihat Open Questions di design doc). Config value,
   // bukan struktural -- boleh diubah tanpa migrasi.

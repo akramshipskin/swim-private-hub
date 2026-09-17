@@ -74,7 +74,7 @@ export default function AttendanceToggle({
             Belum ditandai
           </option>
           <option value="true">Hadir</option>
-          <option value="false">Gak Hadir</option>
+          <option value="false">Tidak Hadir</option>
         </select>
         <svg
           aria-hidden="true"

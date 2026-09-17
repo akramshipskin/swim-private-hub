@@ -70,7 +70,7 @@ export default function EnablePushButton() {
   }
 
   if (status === "unsupported") {
-    return <Badge tone="neutral">Notifikasi gak didukung browser ini</Badge>;
+    return <Badge tone="neutral">Notifikasi tidak didukung browser ini</Badge>;
   }
 
   if (status === "subscribed") {

@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
   if (!isValidIndonesianPhone(phone)) {
     return Response.json(
-      { error: "Format No HP gak valid (contoh: 0812xxxxxxx)" },
+      { error: "Format No HP tidak valid (contoh: 0812xxxxxxx)" },
       { status: 400 }
     );
   }

@@ -98,7 +98,7 @@ export async function updatePoolShares(
   // Sisa (100 - commission - coach) itu bagian kolam -- kalau dua-duanya
   // udah >100, gak ada sisa buat kolam sama sekali, itu jelas salah input.
   if (commissionPercent + coachSharePercent > 100) {
-    return { error: "Total komisi platform + bagian coach gak boleh lebih dari 100%." };
+    return { error: "Total komisi platform + bagian coach tidak boleh lebih dari 100%." };
   }
 
   await prisma.pool.update({

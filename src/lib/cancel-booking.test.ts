@@ -45,14 +45,14 @@ describe("cancelBooking", () => {
   it("refuses to cancel a booking whose attendance is already marked, for every role", async () => {
     for (const actor of [{ role: "ADMIN" as const }, { role: "COACH" as const, coachId: "c-1" }]) {
       findUnique.mockResolvedValue(booking({ attended: true }));
-      await expect(cancelBooking({ bookingId: "b-1", actor })).rejects.toThrow("udah ditandai kehadirannya");
+      await expect(cancelBooking({ bookingId: "b-1", actor })).rejects.toThrow("sudah ditandai kehadirannya");
     }
     expect(bookingUpdateMany).not.toHaveBeenCalled();
   });
 
   it("refuses a coach cancelling a session that already started", async () => {
     findUnique.mockResolvedValue(booking({ availability: { coachId: "c-1", startTime: new Date(Date.now() - 3600e3) } }));
-    await expect(cancelBooking({ bookingId: "b-1", actor: { role: "COACH", coachId: "c-1" } })).rejects.toThrow("udah mulai/lewat");
+    await expect(cancelBooking({ bookingId: "b-1", actor: { role: "COACH", coachId: "c-1" } })).rejects.toThrow("sudah mulai/lewat");
     expect(bookingUpdateMany).not.toHaveBeenCalled();
   });
 

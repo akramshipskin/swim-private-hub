@@ -57,7 +57,7 @@ export default function CancelButton({
       <ConfirmDialog
         open={open}
         title="Batalkan booking ini?"
-        description={`${label}. Kuota sesi kamu bakal balik, tapi jatah pembatalan mandiri berkurang.`}
+        description={`${label}. Kuota sesi kamu akan balik, tapi jatah pembatalan mandiri berkurang.`}
         confirmLabel="Ya, batalkan"
         loading={loading}
         onConfirm={handleCancel}

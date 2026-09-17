@@ -15,8 +15,18 @@ export type WithdrawalRowData = {
   bankName: string;
   bankAccountNumber: string;
   bankAccountName: string;
-  holderLabel: string;
+  processedAt: string | null;
+  failureReason: string | null;
+  referenceId: string | null;
+  holderType: "Kolam" | "Coach";
+  holderName: string;
+  holderContact: string | null;
+  currentBalance: number;
 };
+
+function dateTime(iso: string) {
+  return new Date(iso).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" });
+}
 
 export default function WithdrawalRow({ w }: { w: WithdrawalRowData }) {
   const [processState, processAction, processPending] = useActionState(processWithdrawal, null);
@@ -28,18 +38,28 @@ export default function WithdrawalRow({ w }: { w: WithdrawalRowData }) {
   return (
     <Card>
       <CardBody className="flex flex-col gap-2 py-3">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-medium text-text">{w.holderLabel}</p>
-            <p className="text-lg font-semibold text-text">{formatRupiah(w.amount)}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">{w.holderType}</p>
+            <p className="text-base font-semibold text-text">{w.holderName}</p>
+            <p className="text-2xl font-bold text-text">{formatRupiah(w.amount)}</p>
           </div>
-          <Badge tone={w.status === "PAID" ? "success" : w.status === "FAILED" ? "danger" : "neutral"}>
-            {w.status === "PENDING" ? "Menunggu" : w.status === "PROCESSING" ? "Diproses" : w.status === "PAID" ? "Selesai" : "Gagal"}
+          <Badge tone={w.status === "PAID" ? "success" : w.status === "FAILED" ? "danger" : "warning"}>
+            {w.status === "PENDING" ? "Menunggu" : w.status === "PROCESSING" ? "Diproses" : w.status === "PAID" ? "Sudah ditransfer" : "Gagal / ditolak"}
           </Badge>
         </div>
-        <p className="text-xs text-text-subtle">
-          {w.bankName} · {w.bankAccountNumber} a.n. {w.bankAccountName}
-        </p>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm">
+          <dt className="text-text-subtle">Rekening</dt>
+          <dd className="text-text">{w.bankName} · {w.bankAccountNumber} a.n. {w.bankAccountName}</dd>
+          <dt className="text-text-subtle">Diajukan</dt>
+          <dd className="text-text">{dateTime(w.requestedAt)}</dd>
+          {w.processedAt && (<><dt className="text-text-subtle">Diproses</dt><dd className="text-text">{dateTime(w.processedAt)}</dd></>)}
+          {w.referenceId && (<><dt className="text-text-subtle">No. referensi</dt><dd className="text-text">{w.referenceId}</dd></>)}
+          {w.failureReason && (<><dt className="text-text-subtle">Alasan</dt><dd className="text-danger-text">{w.failureReason}</dd></>)}
+          {w.holderContact && (<><dt className="text-text-subtle">Kontak</dt><dd className="text-text">{w.holderContact}</dd></>)}
+          <dt className="text-text-subtle">Sisa saldo</dt>
+          <dd className="text-text">{formatRupiah(w.currentBalance)}</dd>
+        </dl>
 
         {canAct && (
           <div className="mt-1 flex flex-wrap gap-2">

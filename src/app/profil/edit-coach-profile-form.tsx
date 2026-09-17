@@ -9,10 +9,9 @@ import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 export default function EditCoachProfileForm({
   profile,
 }: {
-  profile: { bio: string | null; specialties: string[]; hasCertification: boolean; certificationNote: string | null };
+  profile: { bio: string | null; specialties: string[] };
 }) {
   const [state, formAction, pending] = useActionState(updateCoachProfile, null);
-  const [hasCertification, setHasCertification] = useState(profile.hasCertification);
   const [savedAt, setSavedAt] = useState(0);
   const wasPending = useRef(false);
 
@@ -31,7 +30,7 @@ export default function EditCoachProfileForm({
           defaultValue={profile.bio ?? ""}
           rows={3}
           maxLength={500}
-          placeholder="Pengalaman ngajar, pendekatan ngajar, dll."
+          placeholder="Pengalaman mengajar, pendekatan mengajar, dll."
         />
       </Field>
 
@@ -54,26 +53,6 @@ export default function EditCoachProfileForm({
           ))}
         </div>
       </fieldset>
-
-      <label className="flex items-start gap-2 text-sm text-text">
-        <input
-          type="checkbox"
-          name="hasCertification"
-          checked={hasCertification}
-          onChange={(e) => setHasCertification(e.target.checked)}
-          className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500"
-        />
-        <span>Saya punya sertifikasi renang/lifeguard resmi</span>
-      </label>
-      {hasCertification && (
-        <Field label="Nama sertifikat/lembaga">
-          <Input
-            name="certificationNote"
-            defaultValue={profile.certificationNote ?? ""}
-            placeholder="Misal: Sertifikasi Pelatih Renang FASI"
-          />
-        </Field>
-      )}
 
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" loading={pending} className="w-full sm:w-auto">

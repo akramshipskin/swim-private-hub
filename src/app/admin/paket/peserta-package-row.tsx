@@ -31,6 +31,7 @@ function shortDate(d: Date) {
 type Pkg = {
   id: string;
   name: string;
+  poolName: string;
   sisaSesi: number;
   totalSesi: number;
   jatahCancel: number;
@@ -65,7 +66,7 @@ export default function PesertaPackageRow({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-text">{label}</p>
-          <p className="mb-1 text-sm text-text-muted">{pkg.name}</p>
+          <p className="mb-1 text-sm"><span className="font-semibold text-brand-700">{pkg.poolName}</span> <span className="text-text-muted">· {pkg.name}</span></p>
 
           {isEditing && (
             <form action={formAction} className="mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
@@ -133,7 +134,7 @@ export default function PesertaPackageRow({
             {pkg.sisaSesi}/{pkg.totalSesi} sesi
           </p>
           <p className="text-xs text-text-subtle">
-            {pkg.expiredDate ? `Berlaku s.d. ${shortDate(pkg.expiredDate)}` : "Gak ada batas waktu"}
+            {pkg.expiredDate ? `Berlaku s.d. ${shortDate(pkg.expiredDate)}` : "Tidak ada batas waktu"}
           </p>
           <p className="mt-1 text-xs text-text-subtle">
             Jatah batal: {pkg.cancelRemaining}/{pkg.jatahCancel}

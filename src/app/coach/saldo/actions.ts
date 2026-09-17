@@ -9,7 +9,7 @@ export type ActionState = { error?: string; ok?: boolean } | null;
 
 async function getOwnCoachProfile(userId: string) {
   const profile = await prisma.coachProfile.findUnique({ where: { userId } });
-  if (!profile) throw new WithdrawalError("Profil coach gak ditemukan.");
+  if (!profile) throw new WithdrawalError("Profil coach tidak ditemukan.");
   return profile;
 }
 
@@ -41,12 +41,12 @@ export async function updateBankInfo(
   return { ok: true };
 }
 
-export async function requestWithdrawal(): Promise<ActionState> {
+export async function requestWithdrawal(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await requireRole("COACH");
 
   try {
     const profile = await getOwnCoachProfile(session.user.id);
-    await requestCoachWithdrawal(profile.id);
+    await requestCoachWithdrawal(profile.id, Number(formData.get("amount")));
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Gagal ajuin pencairan" };
   }

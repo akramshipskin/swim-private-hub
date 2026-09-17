@@ -134,14 +134,14 @@ describe("lost CAS claim", () => {
     findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
     markWithdrawalPaid.mockResolvedValueOnce(false);
     const result = await markPaidManually(null, formData("wd-1"));
-    expect(result?.error).toContain("barusan udah diproses");
+    expect(result?.error).toContain("baru saja diproses");
   });
 
   it("rejectWithdrawal returns an error when the request was resolved in between", async () => {
     findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
     markWithdrawalFailed.mockResolvedValueOnce(false);
     const result = await rejectWithdrawal(null, formData("wd-1"));
-    expect(result?.error).toContain("barusan udah diproses");
+    expect(result?.error).toContain("baru saja diproses");
   });
 
   it("processWithdrawal refuses when another click already moved it out of PENDING", async () => {

@@ -9,7 +9,7 @@ type Db = typeof prisma | Prisma.TransactionClient;
 
 export async function createDependent(memberId: string, name: string, db: Db = prisma) {
   const trimmed = toProperCase(name.trim());
-  if (!trimmed) throw new Error("Nama anak gak boleh kosong");
+  if (!trimmed) throw new Error("Nama anak tidak boleh kosong");
   return db.dependent.create({ data: { memberId, name: trimmed } });
 }
 
@@ -53,7 +53,7 @@ export async function assertPackageOwnedByMember(packageId: string, memberId: st
     select: { memberId: true },
   });
   if (!pkg || pkg.memberId !== memberId) {
-    throw new Error("Paket gak ditemukan atau bukan milik kamu");
+    throw new Error("Paket tidak ditemukan atau bukan milik kamu");
   }
 }
 
@@ -63,6 +63,6 @@ export async function assertDependentOwnedByMember(dependentId: string, memberId
     select: { memberId: true },
   });
   if (!dep || dep.memberId !== memberId) {
-    throw new Error("Anak gak ditemukan atau bukan punya kamu");
+    throw new Error("Anak tidak ditemukan atau bukan punya kamu");
   }
 }

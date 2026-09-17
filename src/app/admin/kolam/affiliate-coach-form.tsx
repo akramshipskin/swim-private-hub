@@ -46,7 +46,7 @@ export default function AffiliateCoachForm({
           <input type="hidden" name="poolId" value={poolId} />
           <Select name="coachId" className="w-full sm:w-52" defaultValue="">
             <option value="" disabled>
-              -- pilih coach --
+              — pilih coach --
             </option>
             {availableCoaches.map((c) => (
               <option key={c.id} value={c.id}>

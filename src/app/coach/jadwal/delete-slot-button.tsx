@@ -26,7 +26,7 @@ export default function DeleteSlotButton({
       <ConfirmDialog
         open={open}
         title={`Hapus slot ${label}?`}
-        description="Slot ini gak bisa dibooking lagi kecuali dibuka ulang."
+        description="Slot ini tidak bisa dibooking lagi kecuali dibuka ulang."
         confirmLabel="Ya, hapus"
         onConfirm={() => {
           setOpen(false);

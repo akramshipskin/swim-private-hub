@@ -35,7 +35,7 @@ export default function RegisterCoachForm() {
     setError(null);
 
     if (!isValidIndonesianPhone(phone)) {
-      setError("Format No HP gak valid (contoh: 0812xxxxxxx)");
+      setError("Format No HP tidak valid (contoh: 0812xxxxxxx)");
       return;
     }
     if (specialties.length === 0) {
@@ -87,7 +87,7 @@ export default function RegisterCoachForm() {
           priority
         />
         <p className="text-lg text-text"><Logotype /></p>
-        <p className="text-sm text-text-muted">Ngajar renang di beberapa kolam mitra</p>
+        <p className="text-sm text-text-muted">Mengajar renang di beberapa kolam mitra</p>
       </div>
 
       <Card className="w-full max-w-sm">
@@ -141,7 +141,7 @@ export default function RegisterCoachForm() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={2}
-                placeholder="Pengalaman ngajar, pendekatan ngajar, dll."
+                placeholder="Pengalaman mengajar, pendekatan mengajar, dll."
               />
             </Field>
 

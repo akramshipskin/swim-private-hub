@@ -88,7 +88,7 @@ export default async function MemberRiwayatPage() {
           <CardBody className="py-10 text-center">
             <p className="text-sm font-medium text-text">Belum ada riwayat booking</p>
             <p className="mt-1 text-sm text-text-muted">
-              Booking pertamamu bakal muncul di sini.
+              Booking pertamamu akan muncul di sini.
             </p>
           </CardBody>
         </Card>
@@ -97,11 +97,14 @@ export default async function MemberRiwayatPage() {
           const rows = byDate.get(key)!;
           return (
             <div key={key} className="mb-5">
-              <h2 className="mb-2 text-sm font-semibold text-text-muted">
+              <h2 className="mb-3 text-lg font-semibold text-text">
                 {formatDateLabel(rows[0].availability.date)}
               </h2>
+              {[...new Set(rows.map((r) => r.availability.pool.name))].map((poolName) => (
+              <div key={poolName} className="mb-3">
+              <h3 className="mb-2 text-sm font-semibold text-brand-700">{poolName}</h3>
               <ul className="flex flex-col gap-2">
-                {rows.map((b) => {
+                {rows.filter((r) => r.availability.pool.name === poolName).map((b) => {
                   const eligibility = eligibilityByBooking.get(b.id);
                   const remaining = eligibility ? Math.max(0, eligibility.quota - eligibility.used) : 0;
                   const showActions = b.status === "BOOKED" && b.availability.startTime > now;
@@ -114,18 +117,14 @@ export default async function MemberRiwayatPage() {
                             {initials(b.availability.coach.name)}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-text">
-                              {b.availability.coach.name}
+                            <p className="text-base font-semibold text-text tabular-nums">
+                              {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}
                             </p>
-                            <p className="text-sm text-text-muted">
-                              {formatTimeWib(b.availability.startTime)}–
-                              {formatTimeWib(b.availability.endTime)} · {b.availability.pool.name}
+                            <p className="truncate text-sm text-text">
+                              Coach {b.availability.coach.name} · {b.availability.pool.name}
                             </p>
-                            <p className="truncate text-xs text-text-subtle">
-                              buat{" "}
-                              {b.package.dependent.isSelf
-                                ? "kamu sendiri"
-                                : b.package.dependent.name}
+                            <p className="truncate text-sm text-text-muted">
+                              Peserta: {b.package.dependent.isSelf ? "kamu sendiri" : b.package.dependent.name} · {b.package.name}
                             </p>
                             <div className="mt-1 flex flex-wrap items-center gap-1.5">
                               {/* Status COMPLETED gak pernah di-set di mana pun -- booking
@@ -133,7 +132,7 @@ export default async function MemberRiwayatPage() {
                                   kebaca "Terjadwal" buat sesi minggu lalu. Label diturunin
                                   dari jam sesi. */}
                               {b.status === "BOOKED" && b.availability.endTime <= now ? (
-                                <Badge tone="neutral">Udah lewat</Badge>
+                                <Badge tone="neutral">Sudah lewat</Badge>
                               ) : (
                                 <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
                               )}
@@ -151,7 +150,7 @@ export default async function MemberRiwayatPage() {
                                 <Badge tone="success">Hadir</Badge>
                               )}
                               {b.status === "BOOKED" && b.attended === false && (
-                                <Badge tone="danger">Gak Hadir</Badge>
+                                <Badge tone="danger">Tidak Hadir</Badge>
                               )}
                             </div>
                           </div>
@@ -195,6 +194,8 @@ export default async function MemberRiwayatPage() {
                   );
                 })}
               </ul>
+              </div>
+              ))}
             </div>
           );
         })

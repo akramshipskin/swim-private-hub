@@ -44,7 +44,7 @@ describe("evaluateCancelEligibility", () => {
       startTime: hoursFromNow(CANCEL_WINDOW_HOURS + 10),
     });
     expect(result.canCancel).toBe(false);
-    expect(result.reason).toContain("Jatah pembatalan mandiri udah abis");
+    expect(result.reason).toContain("Jatah pembatalan mandiri sudah habis");
   });
 
   it("checks the time window before the quota (time-window reason wins when both fail)", () => {

@@ -7,6 +7,7 @@ import MemberCard from "./package-member-card";
 type PesertaPkg = {
   id: string;
   name: string;
+  poolName: string;
   sisaSesi: number;
   totalSesi: number;
   jatahCancel: number;
@@ -36,7 +37,7 @@ export default function PaketPerMemberList({ rows }: { rows: Row[] }) {
   const filtered = search.trim()
     ? rows.filter((r) => {
         const q = search.trim().toLowerCase();
-        return r.memberName.toLowerCase().includes(q) || r.peserta.some((p) => p.label.toLowerCase().includes(q));
+        return r.memberName.toLowerCase().includes(q) || r.peserta.some((p) => p.label.toLowerCase().includes(q) || (p.pkg?.poolName.toLowerCase().includes(q) ?? false));
       })
     : rows;
 
@@ -44,15 +45,15 @@ export default function PaketPerMemberList({ rows }: { rows: Row[] }) {
     <>
       <Input
         type="search"
-        placeholder="Cari nama ortu atau anak..."
+        placeholder="Cari nama akun, peserta, atau kolam..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="mb-3 max-w-sm"
       />
       {filtered.length === 0 ? (
-        <p className="text-sm text-text-subtle">Gak ada yang cocok sama pencarian &ldquo;{search}&rdquo;.</p>
+        <p className="text-sm text-text-subtle">Tidak ada yang cocok sama pencarian &ldquo;{search}&rdquo;.</p>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="grid gap-3 lg:grid-cols-2">
           {filtered.map((r) => (
             <li key={r.memberId}>
               <MemberCard

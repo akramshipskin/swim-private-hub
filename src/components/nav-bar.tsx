@@ -4,6 +4,8 @@ import { MobileBottomNav, type BottomNavLink } from "@/components/mobile-bottom-
 import { SidebarNav, MobileNavStrip } from "@/components/sidebar-nav";
 import { UserMenu } from "@/components/user-menu";
 import { Logotype } from "@/components/ui/logotype";
+import { ChatWidget } from "@/components/chat-widget";
+import { roleLabel } from "@/lib/nav-links";
 
 // Shell dashboard: header full-width (logo+user menu) di atas, sidebar kiri
 // (desktop) + konten di bawahnya -- gantiin pola lama (tab horizontal numpuk
@@ -19,12 +21,14 @@ export function NavBar({
   userName,
   userRole,
   activePath,
+  avatarUrl,
   children,
 }: {
   links: BottomNavLink[];
   userName: string;
   userRole: string;
   activePath?: string;
+  avatarUrl?: string | null;
   children: React.ReactNode;
 }) {
   const hasManyLinks = links.length > 5;
@@ -45,11 +49,11 @@ export function NavBar({
             prefetch={false}
             className="flex shrink-0 items-center gap-2 text-sm font-semibold text-text"
           >
-            <Image src="/logo.png" alt="" width={28} height={28} className="h-7 w-7 rounded-lg object-contain" />
-            <Logotype className="text-sm" />
+            <Image src="/logo.png" alt="" width={44} height={44} className="h-11 w-11 rounded-xl object-contain" />
+            <Logotype className="text-lg" />
           </Link>
 
-          <UserMenu userName={userName} userRole={userRole} />
+          <UserMenu userName={userName} userRole={userRole} avatarUrl={avatarUrl} />
         </div>
         {links.length > 0 && hasManyLinks && <MobileNavStrip links={links} activePath={activePath} />}
       </header>
@@ -60,6 +64,7 @@ export function NavBar({
       </div>
 
       {links.length > 0 && !hasManyLinks && <MobileBottomNav links={links} activePath={activePath} />}
+      {userRole !== roleLabel.ADMIN && <ChatWidget />}
     </div>
   );
 }

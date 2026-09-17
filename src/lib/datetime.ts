@@ -64,3 +64,8 @@ export function resolveDateRange(
   if (from > to) [from, to] = [to, from];
   return { from, to };
 }
+
+// Geser tanggal YYYY-MM-DD sebanyak n hari (aman lintas bulan/tahun).
+export function addDaysToDateString(dateStr: string, days: number): string {
+  return new Date(Date.parse(`${dateStr}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
+}

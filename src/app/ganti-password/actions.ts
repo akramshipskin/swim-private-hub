@@ -23,7 +23,7 @@ export async function changePassword(
     return { error: "Password baru minimal 8 karakter" };
   }
   if (newPassword !== confirmPassword) {
-    return { error: "Konfirmasi password gak sama" };
+    return { error: "Konfirmasi password tidak sama" };
   }
 
   // Cuma role MEMBER yang punya konsep peserta (diri sendiri/anak) --
@@ -72,9 +72,9 @@ export async function changePassword(
   // sini padahal udah ada di roleHome-nya src/app/page.tsx).
   const roleHome: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", string> = {
     ADMIN: "/admin",
-    COACH: "/coach",
+    COACH: "/coach/dashboard",
     MEMBER: "/member/booking",
-    POOL_OWNER: "/pool/saldo",
+    POOL_OWNER: "/pool/dashboard",
   };
   redirect(roleHome[session.user.role]);
 }

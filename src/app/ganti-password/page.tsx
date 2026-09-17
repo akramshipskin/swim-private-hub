@@ -28,9 +28,9 @@ export default async function GantiPasswordPage() {
     // karena Record<string,...> gak maksa semua role keisi.
     const roleHome: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", string> = {
       ADMIN: "/admin",
-      COACH: "/coach",
+      COACH: "/coach/dashboard",
       MEMBER: "/member/booking",
-      POOL_OWNER: "/pool/saldo",
+      POOL_OWNER: "/pool/dashboard",
     };
     redirect(roleHome[session.user.role]);
   }
@@ -55,7 +55,7 @@ export default async function GantiPasswordPage() {
         <p className="text-lg text-text"><Logotype /></p>
         <p className="text-sm text-text-muted">
           {needsParticipants
-            ? "Ini login pertama kamu -- ganti password bawaan dulu ya."
+            ? "Ini login pertama kamu — ganti password bawaan dulu ya."
             : "Ganti password sementara kamu dulu ya sebelum lanjut."}
         </p>
       </div>

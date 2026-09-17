@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     await assertDependentOwnedByMember(dependentId, session.user.id);
   } catch (err) {
     return Response.json(
-      { error: err instanceof Error ? err.message : "Anak gak valid" },
+      { error: err instanceof Error ? err.message : "Anak tidak valid" },
       { status: 403 }
     );
   }
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
   });
   if (recentDuplicate) {
     return Response.json(
-      { error: "Pembayaran buat paket ini barusan udah dibuat. Tunggu 1 menit sebelum coba lagi." },
+      { error: "Pembayaran buat paket ini baru saja dibuat. Tunggu 1 menit sebelum coba lagi." },
       { status: 409 }
     );
   }

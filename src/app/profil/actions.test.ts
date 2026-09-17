@@ -37,11 +37,11 @@ describe("updateCoachProfile", () => {
     expect(res).toEqual({ error: "Pilih minimal 1 keahlian." });
   });
 
-  it("saves only the coach's own profile and clears the note when certification is unchecked", async () => {
+  it("saves bio and known specialties of the coach's own profile only", async () => {
     const res = await updateCoachProfile(
       null,
       fd([
-        ["bio", "  Ngajar 5 tahun  "],
+        ["bio", "  Mengajar 5 tahun  "],
         ["specialties", "Gaya bebas"],
         ["specialties", "Terbang"],
         ["certificationNote", "FASI"],
@@ -50,7 +50,7 @@ describe("updateCoachProfile", () => {
     expect(res).toEqual({ success: true });
     expect(coachProfileUpdateMany).toHaveBeenCalledWith({
       where: { userId: "coach-1" },
-      data: { bio: "Ngajar 5 tahun", specialties: ["Gaya bebas"], hasCertification: false, certificationNote: null },
+      data: { bio: "Mengajar 5 tahun", specialties: ["Gaya bebas"] },
     });
   });
 });

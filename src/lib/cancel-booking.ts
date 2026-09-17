@@ -67,7 +67,7 @@ export async function cancelBooking({
   // menu Paket admin.
   if (booking.attended !== null) {
     throw new CancelError(
-      "Sesi ini udah ditandai kehadirannya, gak bisa dibatalin. Kalau salah tandai, ubah status kehadirannya dulu, lalu koreksi sisa sesi di menu Paket.",
+      "Sesi ini sudah ditandai kehadirannya, tidak bisa dibatalin. Kalau salah tandai, ubah status kehadirannya dulu, lalu koreksi sisa sesi di menu Paket.",
       409
     );
   }
@@ -75,7 +75,7 @@ export async function cancelBooking({
   // Coach cuma boleh batalin sesi yang belum mulai -- sesi yang udah
   // lewat itu urusan absensi (Hadir/Gak Hadir), bukan pembatalan.
   if (actor.role === "COACH" && booking.availability.startTime <= new Date()) {
-    throw new CancelError("Sesi ini udah mulai/lewat, gak bisa dibatalin. Tandai kehadirannya di Riwayat Sesi.", 409);
+    throw new CancelError("Sesi ini sudah mulai/lewat, tidak bisa dibatalin. Tandai kehadirannya di Riwayat Sesi.", 409);
   }
 
   try {
@@ -108,7 +108,7 @@ export async function cancelBooking({
           const quota = pkg?.jatahCancel ?? 0;
           if (selfCancelCount >= quota) {
             throw new CancelError(
-              "Jatah pembatalan mandiri udah abis. Ajukan ke admin buat kasus khusus.",
+              "Jatah pembatalan mandiri sudah habis. Ajukan ke admin buat kasus khusus.",
               409
             );
           }
@@ -149,13 +149,13 @@ export async function cancelBooking({
     if (actor.role === "COACH") {
       sendPushToUser(booking.memberId, {
         title: "Booking dibatalkan coach",
-        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} dibatalin coach. Sisa sesi udah balik.`,
+        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} dibatalin coach. Sisa sesi sudah balik.`,
         url: "/member/riwayat",
       }).catch(() => {});
     } else {
       sendPushToUser(booking.availability.coachId, {
         title: "Booking dibatalkan",
-        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} udah kosong lagi`,
+        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} sudah kosong lagi`,
         url: "/coach/jadwal",
       }).catch(() => {});
     }

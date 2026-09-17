@@ -12,12 +12,17 @@ const packageTemplateFindMany = vi.fn().mockResolvedValue([]);
 const packageCreate = vi.fn().mockResolvedValue({});
 const userUpdate = vi.fn().mockResolvedValue({});
 const userUpdateMany = vi.fn().mockResolvedValue({ count: 1 });
+const poolCreate = vi.fn().mockResolvedValue({ id: "pool-new" });
+const ownershipCreate = vi.fn().mockResolvedValue({});
+const poolCount = vi.fn().mockResolvedValue(1);
 
 function makeTx() {
   return {
     user: { create: (...args: unknown[]) => userCreate(...args) },
     dependent: { createMany: (...args: unknown[]) => dependentCreateMany(...args) },
     package: { create: (...args: unknown[]) => packageCreate(...args) },
+    pool: { create: (...args: unknown[]) => poolCreate(...args) },
+    poolOwnership: { create: (...args: unknown[]) => ownershipCreate(...args) },
   };
 }
 
@@ -30,6 +35,7 @@ vi.mock("@/lib/prisma", () => ({
       updateMany: (...args: unknown[]) => userUpdateMany(...args),
     },
     packageTemplate: { findMany: (...args: unknown[]) => packageTemplateFindMany(...args) },
+    pool: { count: (...args: unknown[]) => poolCount(...args) },
   },
 }));
 
@@ -140,6 +146,31 @@ describe("toggleUserActive", () => {
   });
 });
 
+describe("createUser POOL_OWNER", () => {
+  const base = { name: "sari", phone: "081200000099", password: "rahasia123", role: "POOL_OWNER" };
+
+  it("creates a new pool and links the owner to it", async () => {
+    userCreate.mockResolvedValueOnce({ id: "owner-1" });
+    const res = await createUser(null, formData({ ...base, poolMode: "new", newPoolName: "Kolam Baru", newPoolAddress: "Jl. A" }));
+    expect(res).toBeNull();
+    expect(poolCreate).toHaveBeenCalledWith({ data: { name: "Kolam Baru", address: "Jl. A", isActive: true } });
+    expect(ownershipCreate).toHaveBeenCalledWith({ data: { poolId: "pool-new", ownerId: "owner-1" } });
+  });
+
+  it("links to an existing pool", async () => {
+    userCreate.mockResolvedValueOnce({ id: "owner-2" });
+    await createUser(null, formData({ ...base, poolMode: "existing", poolId: "pool-1" }));
+    expect(poolCreate).not.toHaveBeenCalled();
+    expect(ownershipCreate).toHaveBeenCalledWith({ data: { poolId: "pool-1", ownerId: "owner-2" } });
+  });
+
+  it("requires a pool", async () => {
+    const res = await createUser(null, formData({ ...base, poolMode: "new" }));
+    expect(res?.error).toMatch(/kolam/);
+    expect(userCreate).not.toHaveBeenCalled();
+  });
+});
+
 describe("resetUserPassword", () => {
   it("refuses to reset the admin's own password", async () => {
     const res = await resetUserPassword("admin-1");
@@ -160,7 +191,7 @@ describe("resetUserPassword", () => {
   it("reports a missing user", async () => {
     userUpdateMany.mockResolvedValueOnce({ count: 0 });
     const res = await resetUserPassword("gone");
-    expect(res).toEqual({ error: "User gak ditemukan." });
+    expect(res).toEqual({ error: "User tidak ditemukan." });
   });
 });
 
@@ -255,7 +286,7 @@ describe("importMembersXlsx", () => {
     userFindFirst.mockResolvedValue({ id: "existing" });
     const result = await importMembersXlsx(null, importFormData([{ "Nama Member": "Budi", "No HP": "081200000001" }]));
     expect(userCreate).not.toHaveBeenCalled();
-    expect(result?.result).toContain("udah terdaftar");
+    expect(result?.result).toContain("sudah terdaftar");
   });
 
   it("skips a package with a non-numeric Sisa Sesi but still creates the member and participant", async () => {
@@ -267,7 +298,7 @@ describe("importMembersXlsx", () => {
     );
     expect(userCreate).toHaveBeenCalled();
     expect(packageCreate).not.toHaveBeenCalled();
-    expect(result?.result).toContain("Sisa Sesi gak valid");
+    expect(result?.result).toContain("Sisa Sesi tidak valid");
   });
 
   it("creates a bare member with no participant/package when the row has neither", async () => {

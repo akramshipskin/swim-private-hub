@@ -25,35 +25,32 @@ export default async function KinerjaCoachPage({
       status: "BOOKED",
       availability: { date: { gte: fromDate, lt: toDateExclusive } },
     },
-    include: { availability: { include: { coach: { select: { id: true, name: true } } } } },
+    include: { availability: { include: { coach: { select: { id: true, name: true } }, pool: { select: { name: true } } } } },
   });
 
-  const byCoach = new Map<
-    string,
-    { name: string; valid: number; notHadir: number; unmarked: number }
-  >();
-
-  function bucket(coachId: string, name: string) {
-    if (!byCoach.has(coachId)) byCoach.set(coachId, { name, valid: 0, notHadir: 0, unmarked: 0 });
-    return byCoach.get(coachId)!;
-  }
-
+  // Per coach, lalu dipecah per kolam tempat sesi berlangsung.
+  type Counts = { valid: number; notHadir: number; unmarked: number };
+  const byCoach = new Map<string, { name: string; total: Counts; pools: Map<string, Counts> }>();
+  const empty = (): Counts => ({ valid: 0, notHadir: 0, unmarked: 0 });
   for (const b of bookings) {
     const coach = b.availability.coach;
-    const entry = bucket(coach.id, coach.name);
-    if (b.attended === true) entry.valid++;
-    else if (b.attended === false) entry.notHadir++;
-    else entry.unmarked++;
+    if (!byCoach.has(coach.id)) byCoach.set(coach.id, { name: coach.name, total: empty(), pools: new Map() });
+    const entry = byCoach.get(coach.id)!;
+    const poolName = b.availability.pool.name;
+    if (!entry.pools.has(poolName)) entry.pools.set(poolName, empty());
+    const key: keyof Counts = b.attended === true ? "valid" : b.attended === false ? "notHadir" : "unmarked";
+    entry.total[key]++;
+    entry.pools.get(poolName)![key]++;
   }
 
-  const rows = [...byCoach.values()].sort((a, b) => b.valid - a.valid);
-  const totalValid = rows.reduce((n, r) => n + r.valid, 0);
+  const rows = [...byCoach.values()].sort((a, b) => b.total.valid - a.total.valid);
+  const totalValid = rows.reduce((n, r) => n + r.total.valid, 0);
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Kinerja Coach</h1>
       <p className="mb-6 text-sm text-text-muted">
-        Jumlah sesi valid (member beneran hadir) per coach di rentang tanggal -- dasar hitung
+        Jumlah sesi valid (member benar-benar hadir) per coach di rentang tanggal — dasar hitung
         honor.
       </p>
 
@@ -81,47 +78,39 @@ export default async function KinerjaCoachPage({
           </CardBody>
         </Card>
       ) : (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
-                  <th className="px-4 py-3 font-medium">Coach</th>
-                  <th className="px-4 py-3 text-right font-medium">Sesi Valid</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.name} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-text">{r.name}</p>
-                      {(r.unmarked > 0 || r.notHadir > 0) && (
-                        <p className="mt-0.5 text-xs text-text-subtle">
-                          {r.unmarked > 0 && <>{r.unmarked} belum ditandai</>}
-                          {r.unmarked > 0 && r.notHadir > 0 && " · "}
-                          {r.notHadir > 0 && <>{r.notHadir} gak hadir</>}
-                        </p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-text">{r.valid}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td className="px-4 py-3 text-sm font-semibold text-text">Total</td>
-                  <td className="px-4 py-3 text-right font-mono font-semibold text-text">
-                    {totalValid}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </Card>
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-text">
+            Total sesi valid: <b>{totalValid}</b>
+          </p>
+          {rows.map((r) => (
+            <Card key={r.name}>
+              <CardBody>
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h2 className="text-lg font-semibold text-text">{r.name}</h2>
+                  <p className="text-sm text-text-muted">
+                    <b className="text-2xl text-text">{r.total.valid}</b> sesi valid
+                    {r.total.unmarked > 0 && <span className="text-warning-text"> · {r.total.unmarked} belum ditandai</span>}
+                    {r.total.notHadir > 0 && <> · {r.total.notHadir} tidak hadir</>}
+                  </p>
+                </div>
+                <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {[...r.pools.entries()].map(([poolName, c]) => (
+                    <li key={poolName} className="rounded-lg border border-border px-3 py-2">
+                      <p className="text-sm font-semibold text-brand-700">{poolName}</p>
+                      <p className="text-sm text-text">
+                        {c.valid} valid · {c.unmarked} belum ditandai · {c.notHadir} tidak hadir
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
       )}
 
       <p className="mt-4 text-xs text-text-subtle">
-        Booking yang belum ditandai atau ditandai gak hadir gak ikut kehitung sesi valid -- cek
+        Booking yang belum ditandai atau ditandai tidak hadir tidak ikut kehitung sesi valid — cek
         di Booking &amp; Riwayat Sesi coach.
       </p>
     </main>

@@ -107,7 +107,7 @@ export default function ManageChildrenForm({ children }: { children: Child[] }) 
       <ConfirmDialog
         open={confirming !== null}
         title={`Nonaktifkan ${confirming?.name}?`}
-        description="Paket & booking dia gak bisa diakses lagi sampai diaktifkan ulang."
+        description="Paket & booking dia tidak bisa diakses lagi sampai diaktifkan ulang."
         confirmLabel="Ya, nonaktifkan"
         loading={deactivating}
         onConfirm={handleDeactivate}

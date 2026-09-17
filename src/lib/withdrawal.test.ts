@@ -66,6 +66,22 @@ describe("requestPoolWithdrawal", () => {
     });
   });
 
+  it("withdraws a chosen partial amount, not the whole balance", async () => {
+    poolFindUniqueOrThrow.mockResolvedValue(okPool);
+    await requestPoolWithdrawal("pool-1", 60_000);
+    expect(poolUpdateMany).toHaveBeenCalledWith({
+      where: { id: "pool-1", walletBalance: { gte: 60_000 } },
+      data: { walletBalance: { decrement: 60_000 } },
+    });
+  });
+
+  it("rejects a chosen amount below the minimum or not a whole number", async () => {
+    poolFindUniqueOrThrow.mockResolvedValue(okPool);
+    await expect(requestPoolWithdrawal("pool-1", 40_000)).rejects.toThrow("Minimal pencairan");
+    await expect(requestPoolWithdrawal("pool-1", 0)).rejects.toThrow("tidak valid");
+    expect(poolUpdateMany).not.toHaveBeenCalled();
+  });
+
   it("rejects below the minimum withdrawal amount without touching the balance", async () => {
     poolFindUniqueOrThrow.mockResolvedValue({ ...okPool, walletBalance: 10_000 });
     await expect(requestPoolWithdrawal("pool-1")).rejects.toThrow(WithdrawalError);
@@ -83,7 +99,7 @@ describe("requestPoolWithdrawal", () => {
   it("aborts the whole request when the balance-sufficiency claim fails (race with a concurrent credit/debit)", async () => {
     poolFindUniqueOrThrow.mockResolvedValue(okPool);
     poolUpdateMany.mockResolvedValueOnce({ count: 0 });
-    await expect(requestPoolWithdrawal("pool-1")).rejects.toThrow("Saldo gak cukup");
+    await expect(requestPoolWithdrawal("pool-1")).rejects.toThrow("Saldo tidak cukup");
     expect(withdrawalCreate).not.toHaveBeenCalled();
   });
 });

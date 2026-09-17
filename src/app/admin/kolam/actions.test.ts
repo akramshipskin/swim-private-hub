@@ -55,7 +55,7 @@ describe("updatePoolShares", () => {
   // jelas input yang salah, bukan konfigurasi valid.
   it("rejects when commission + coach share exceeds 100%, leaving nothing for the pool", async () => {
     const result = await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "60", coachSharePercent: "50" }));
-    expect(result).toEqual({ error: "Total komisi platform + bagian coach gak boleh lebih dari 100%." });
+    expect(result).toEqual({ error: "Total komisi platform + bagian coach tidak boleh lebih dari 100%." });
     expect(poolUpdate).not.toHaveBeenCalled();
   });
 

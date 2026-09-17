@@ -9,6 +9,7 @@ import UsersMemberSection from "./users-member-section";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserActions } from "./user-display";
+import PendingCertificates from "./pending-certificates";
 
 const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] = [
   { role: "ADMIN", label: "Admin" },
@@ -52,9 +53,19 @@ export default async function AdminUsersPage() {
     <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola User</h1>
 
+      <PendingCertificates />
+
       <div className="mb-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-        <CreateUserForm />
-        <ImportMembersForm pools={pools} />
+        <CreateUserForm pools={pools} />
+        <details className="rounded-2xl border border-border bg-surface p-4">
+          <summary className="cursor-pointer text-sm font-semibold text-text">
+            Migrasi data: import member dari Excel (.xlsx)
+          </summary>
+          <p className="mt-2 text-sm text-text-muted">Dipakai saat kolam baru bergabung dan membawa data member lama.</p>
+          <div className="mt-3">
+            <ImportMembersForm pools={pools} />
+          </div>
+        </details>
       </div>
 
       {/* --- Tambah peserta (anak atau diri sendiri) buat member -- dibutuhin
@@ -62,13 +73,13 @@ export default async function AdminUsersPage() {
       <h2 className="mb-3 text-lg font-semibold text-text">Tambah Peserta</h2>
       <p className="mb-3 text-sm text-text-muted">
         1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang
-        belum pernah login belum punya peserta terdaftar -- tambahin di sini
+        belum pernah login belum punya peserta terdaftar — tambahin di sini
         dulu kalau mau langsung assign paket.
       </p>
       <AddChildForm members={members} />
 
       {/* --- Assign paket khusus ke member --- */}
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Assign Paket ke Member</h2>
+      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Assign Paket ke Peserta</h2>
       <p className="mb-3 text-sm text-text-muted">
         Buat paket khusus buat 1 anak tertentu (koreksi, promo, atau kasus di luar
         alur beli-online).

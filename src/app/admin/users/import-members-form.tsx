@@ -18,10 +18,10 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
         <h2 className="mb-1 text-sm font-semibold text-text">Import Users dari xlsx</h2>
         <p className="mb-2 text-xs text-text-subtle">
           Kolom: Nama Member, No HP, Email (opsional), Nama Peserta/Anak, Paket Aktif,
-          Sisa Sesi. 1 baris = 1 peserta -- member dengan &gt;1 anak, ulang No HP yang
+          Sisa Sesi. 1 baris = 1 peserta — member dengan &gt;1 anak, ulang No HP yang
           sama di baris berikutnya. Member baru login pakai No HP + password default
-          yang sama, wajib ganti pas login pertama. 1 file = 1 kolam tujuan -- kalau
-          data lu lintas kolam, pisah filenya dan import satu-satu per kolam.
+          yang sama, wajib ganti pas login pertama. 1 file = 1 kolam tujuan — kalau
+          data kamu lintas kolam, pisah filenya dan import satu-satu per kolam.
         </p>
         <a
           href="/api/admin/import-template"

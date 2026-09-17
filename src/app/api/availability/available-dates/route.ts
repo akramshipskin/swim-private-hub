@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   const month = Number(searchParams.get("month")); // 1-12
 
   if (!year || !month || month < 1 || month > 12) {
-    return Response.json({ error: "year/month gak valid" }, { status: 400 });
+    return Response.json({ error: "year/month tidak valid" }, { status: 400 });
   }
 
   const from = new Date(Date.UTC(year, month - 1, 1));
