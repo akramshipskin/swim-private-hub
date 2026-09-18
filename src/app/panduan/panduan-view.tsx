@@ -287,16 +287,16 @@ export default function PanduanView() {
     // Panduan mengikuti landing: selalu tampilan terang, lebar maksimal sama.
     <main className="flex min-h-screen flex-col bg-[#F3F2EC] text-[#14140F]" style={{ colorScheme: "light" }}>
       <header className="border-b border-[#14140F]/10">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4">
-          <Link href="/" className="flex items-center gap-2">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-4">
+          <Link href="/" className="flex shrink-0 items-center gap-2">
             <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
-            <Logotype className="text-xl" />
+            <Logotype className="text-base sm:text-xl" />
           </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="rounded-full px-4 py-2 text-sm font-semibold hover:bg-[#ECE9DC]">
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/login" className="rounded-full px-3 py-2 text-sm font-semibold hover:bg-[#ECE9DC] sm:px-4">
               Masuk
             </Link>
-            <Link href="/register" className="rounded-full bg-[#14140F] px-4 py-2 text-sm font-semibold text-white hover:bg-black">
+            <Link href="/register" className="rounded-full bg-[#14140F] px-3 py-2 text-sm font-semibold text-white hover:bg-black sm:px-4">
               Daftar
             </Link>
           </div>

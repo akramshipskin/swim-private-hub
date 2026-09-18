@@ -199,10 +199,10 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/35 via-black/10 to-black/85" />
 
-        <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-5">
-          <Link href="/" className="flex items-center gap-2 text-white">
+        <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-5 sm:gap-4">
+          <Link href="/" className="flex shrink-0 items-center gap-2 text-white">
             <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
-            <Logotype className="text-xl" />
+            <Logotype className="text-base sm:text-xl" />
           </Link>
           <nav aria-label="Navigasi utama" className="hidden items-center gap-7 text-sm font-medium md:flex">
             <a href="#kolam" className="hover:underline">Kolam</a>
@@ -210,9 +210,9 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             <a href="#cara-kerja" className="hover:underline">Cara Kerja</a>
             <a href="#faq" className="hover:underline">FAQ</a>
           </nav>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="rounded-full px-4 py-2 text-sm font-semibold hover:bg-white/10">Masuk</Link>
-            <Link href="/register" className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#14140F] hover:bg-[#E3F5B0]">Daftar</Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/login" className="rounded-full px-3 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4">Masuk</Link>
+            <Link href="/register" className="rounded-full bg-white px-3 py-2 text-sm font-semibold text-[#14140F] hover:bg-[#E3F5B0] sm:px-4">Daftar</Link>
           </div>
         </header>
 
