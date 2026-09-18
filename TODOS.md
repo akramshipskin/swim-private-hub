@@ -1,6 +1,10 @@
 # TODOS
 
-## Verifikasi beneran integrasi Midtrans Iris (disbursement) -- belum ada akun buat ditest
+## Verifikasi integrasi Midtrans Iris (pencairan otomatis) — menunggu persetujuan Hadi
+
+**Status 18 Sep 2026:** bukan dibatalkan. Hadi mau ini dikerjakan, tapi nunggu
+keputusan/persetujuan dia dulu buat daftar akun Iris. Sampai itu ada, pencairan
+tetap jalan manual: admin transfer lewat m-banking lalu klik "Tandai Dibayar".
 
 **What:** `src/lib/disbursement.ts` (`disburseViaIris`) nembak endpoint
 `/iris/api/v1/payouts` berdasarkan baca dokumentasi doang -- shape
@@ -20,7 +24,13 @@ khususnya), baru percaya penuh sama jalur otomatisnya di `/admin/withdrawals`.
 **Depends on / blocked by:** Founder daftar Midtrans Iris (proses bisnis,
 bukan teknis).
 
-## Test integrasi DB buat concurrency booking, onboarding script, & wallet math (belum ada, Postgres sekarang UDAH ADA)
+## Test integrasi DB: sebagian SUDAH ADA (sisanya wallet edge case)
+
+**Status 18 Sep 2026:** `tests/race/` sudah menutup booking bersamaan, CAS
+attendance, dan wallet math dasar (`npm run test:race`, 32 tes, Postgres 17
+lokal). Sejak 18 Sep ada juga DB development terpisah dari production:
+`npm run db:dev` + `npm run db:dev:sync`. Yang BELUM: edge case attendance
+di-toggle bolak-balik dan perubahan `coachSharePercent` di tengah transaksi.
 
 **What:** Beberapa path kritis (uang & concurrency) masih diverifikasi manual
 (browser + script sekali jalan), belum otomatis:
@@ -51,7 +61,12 @@ sama), lalu tulis test paralel (`Promise.all`) buat tiap path di atas.
 **Depends on / blocked by:** Provision Supabase project KEDUA khusus buat
 testing (jangan pake yang production -- ini masih perlu dilakukan).
 
-## Tahap 2 — Visibilitas nama anak per role (deferred dari fitur multi-anak)
+## Tahap 2 — Visibilitas nama anak per role (SELESAI 18 Sep 2026)
+
+**Status:** sudah jalan di semua halaman yang disebut di bawah — coach jadwal &
+riwayat sesi, member booking & riwayat, admin booking overview & paket, jadwal
+kolam (coach + peserta + akun pemesan), dan link WhatsApp eskalasi. Catatan di
+bawah disimpan sebagai riwayat keputusan.
 
 **What:** Tampilan nama anak (bukan nama ortu) di halaman-halaman berikut:
 - `/coach/jadwal`, `/coach/riwayat-sesi` — ganti label "Dibooking oleh {parent.name}" jadi nama anak.

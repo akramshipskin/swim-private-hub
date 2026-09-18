@@ -49,8 +49,8 @@ export function NavBar({
             prefetch={false}
             className="flex shrink-0 items-center gap-2 text-sm font-semibold text-text"
           >
-            <Image src="/logo.png" alt="" width={44} height={44} className="h-11 w-11 rounded-xl object-contain" />
-            <Logotype className="text-lg" />
+            <Image src="/logo.png" alt="" width={44} height={44} className="h-9 w-9 rounded-xl object-contain sm:h-11 sm:w-11" />
+            <Logotype className="text-base sm:text-lg" />
           </Link>
 
           <UserMenu userName={userName} userRole={userRole} avatarUrl={avatarUrl} />

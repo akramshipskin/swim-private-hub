@@ -87,6 +87,36 @@ describe("creditSessionRevenue", () => {
     expect(total).toBe(93750);
   });
 
+  it("tidak pernah kehilangan atau menciptakan rupiah, berapa pun harga & persennya", async () => {
+    // Pembulatan tiap bagian bisa meleset 1 rupiah, tapi bagian platform =
+    // sisa, jadi jumlah semua baris ledger harus persis nilai sesi.
+    for (const perSessionValue of [93_750, 112_500, 100_000, 133_333, 1, 7, 999_999]) {
+      for (const [commissionPercent, coachSharePercent] of [
+        [15, 55],
+        [10, 60],
+        [0, 100],
+        [33, 33],
+        [12, 45],
+      ]) {
+        const tx = createMockTx({ pool: { commissionPercent, coachSharePercent } });
+        await creditSessionRevenue(tx, {
+          poolId: "pool-1",
+          coachProfileId: "coach-1",
+          bookingId: "booking-1",
+          perSessionValue,
+        });
+        const call = (tx.walletTransaction.createMany as ReturnType<typeof vi.fn>).mock.calls[0][0];
+        const total = call.data.reduce((sum: number, row: { amount: number }) => sum + row.amount, 0);
+        expect({ perSessionValue, commissionPercent, coachSharePercent, total }).toEqual({
+          perSessionValue,
+          commissionPercent,
+          coachSharePercent,
+          total: perSessionValue,
+        });
+      }
+    }
+  });
+
   it("skips crediting the coach entirely when coachSharePercent is 0", async () => {
     const tx = createMockTx({ pool: { commissionPercent: 15, coachSharePercent: 0 } });
 

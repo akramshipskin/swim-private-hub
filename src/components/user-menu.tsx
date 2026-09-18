@@ -36,12 +36,12 @@ export function UserMenu({
         onClick={() => setOpen((o) => !o)}
         aria-label="Menu akun"
         aria-expanded={open}
-        className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-text-muted hover:bg-surface-muted"
+        className="flex min-w-0 max-w-[62vw] items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-text-muted hover:bg-surface-muted sm:max-w-none"
       >
         {/* undefined = role tanpa foto profil; null = coach belum upload (siluet default) */}
         {avatarUrl !== undefined && <Avatar src={avatarUrl} className="h-8 w-8" />}
-        <div className="text-right leading-tight">
-          <p className="max-w-[110px] truncate text-sm font-medium text-text sm:max-w-none">
+        <div className="min-w-0 text-right leading-tight">
+          <p className="max-w-[84px] truncate text-sm font-medium text-text sm:max-w-none">
             {userName}
           </p>
           <p className="text-xs text-text-subtle">{userRole}</p>
