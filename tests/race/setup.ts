@@ -6,12 +6,18 @@ if (!process.env.DATABASE_URL?.includes("localhost:54329")) {
   throw new Error("REFUSING TO RUN: DATABASE_URL bukan DB race lokal");
 }
 
-type S = { user: { id: string; role: "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER"; name: string; email: string | null; mustChangePassword: boolean } };
+export type Role = "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
+export type S = { user: { id: string; role: Role; name: string; email: string | null; mustChangePassword: boolean } };
+
+declare global {
+  var __als: AsyncLocalStorage<S | null>;
+}
+
 export const als = new AsyncLocalStorage<S | null>();
-(globalThis as any).__als = als;
+globalThis.__als = als;
 
 vi.mock("@/auth", () => ({
-  auth: async () => (globalThis as any).__als.getStore() ?? null,
+  auth: async () => globalThis.__als.getStore() ?? null,
   unstable_update: async () => {},
   signIn: async () => {},
   signOut: async () => {},
@@ -19,7 +25,7 @@ vi.mock("@/auth", () => ({
 }));
 vi.mock("@/lib/require-role", () => ({
   requireRole: async (role: string) => {
-    const s = (globalThis as any).__als.getStore();
+    const s = globalThis.__als.getStore();
     if (!s || s.user.role !== role) throw new Error("REDIRECT:/login");
     return s;
   },

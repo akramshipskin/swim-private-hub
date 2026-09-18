@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import type { Role } from "./setup";
 
-export function as<T>(s: { id: string; role: any; name?: string } | null, fn: () => Promise<T>): Promise<T> {
-  const als = (globalThis as any).__als;
+export function as<T>(s: { id: string; role: Role; name?: string } | null, fn: () => Promise<T>): Promise<T> {
+  const als = globalThis.__als;
   return als.run(s ? { user: { id: s.id, role: s.role, name: s.name ?? "X", email: null, mustChangePassword: false } } : null, fn);
 }
 
@@ -15,7 +16,7 @@ const uid = () => `${Date.now()}${++n}${Math.floor(Math.random() * 1e6)}`;
 export async function mkPool(opts: { commission?: number; coachShare?: number; balance?: number; bank?: boolean } = {}) {
   return prisma.pool.create({ data: { name: "Pool " + uid(), commissionPercent: opts.commission ?? 15, coachSharePercent: opts.coachShare ?? 55, walletBalance: opts.balance ?? 0, ...(opts.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } });
 }
-export async function mkUser(role: "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", extra: any = {}) {
+export async function mkUser(role: Role, extra: { coachBalance?: number; bank?: boolean } = {}) {
   const u = await prisma.user.create({ data: { name: role + uid(), phone: "08" + uid().slice(-10), passwordHash: "x", role, ...(role === "COACH" ? { coachProfile: { create: { walletBalance: extra.coachBalance ?? 0, ...(extra.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } } } : {}) }, include: { coachProfile: true } });
   return u;
 }
@@ -39,6 +40,6 @@ export async function book(memberId: string, availabilityId: string, packageId: 
 }
 export function fd(obj: Record<string, string>) { const f = new FormData(); for (const [k, v] of Object.entries(obj)) f.append(k, v); return f; }
 export async function settle<T>(ps: Promise<T>[]) { return Promise.allSettled(ps); }
-export function summarize(rs: PromiseSettledResult<any>[]) {
-  return rs.map((r) => (r.status === "fulfilled" ? (r.value instanceof Response ? `HTTP${r.value.status}` : JSON.stringify(r.value)) : "THROW:" + String((r as any).reason?.message ?? r.reason).slice(0, 80)));
+export function summarize(rs: PromiseSettledResult<unknown>[]) {
+  return rs.map((r) => (r.status === "fulfilled" ? (r.value instanceof Response ? `HTTP${r.value.status}` : JSON.stringify(r.value)) : "THROW:" + String(r.reason?.message ?? r.reason).slice(0, 80)));
 }
