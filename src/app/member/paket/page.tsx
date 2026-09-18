@@ -165,66 +165,80 @@ export default async function MemberPaketPage() {
       ) : templates.length === 0 ? (
         <p className="text-sm text-text-muted">Belum ada katalog paket tersedia.</p>
       ) : (
-        <div className="flex flex-col gap-8">
+        // Tiap kolam dibungkus SATU Card (pola yang sama dengan bagian
+        // "Paket Saya" di atas dan halaman lain). Sebelumnya header kolam
+        // cuma dipisah garis border-b memanjang, jadi ambigu: garisnya
+        // kebaca sebagai pemisah antar blok, padahal paket di bawahnya
+        // punya kolam di atasnya (Hadi 18 Sep v3).
+        <div className="flex flex-col gap-4">
           {[...new Map(templates.map((t) => [t.pool.id, t.pool])).values()].map((pool) => (
-            <section key={pool.id}>
-              <div className="mb-3 flex flex-col gap-3 border-b border-border pb-3 sm:flex-row">
-                {pool.photos.length > 0 && (
-                  <div className="flex gap-2 sm:w-56 sm:shrink-0">
-                    {pool.photos.slice(0, 2).map((url, i) => (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img key={url + i} src={url} alt={`Foto ${pool.name}`} className="h-24 min-w-0 flex-1 rounded-lg object-cover" />
-                    ))}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <h3 className="text-lg font-semibold text-brand-700">{pool.name}</h3>
-                  <p className="text-sm text-text-muted">
-                    {[pool.address, pool.openTime && pool.closeTime && `Buka ${pool.openTime}–${pool.closeTime}`]
-                      .filter(Boolean)
-                      .join(" · ") || "Info kolam belum dilengkapi"}
-                  </p>
-                  {pool.description && <p className="mt-1 text-sm text-text-muted">{pool.description}</p>}
-                  {pool.facilities.length > 0 && (
-                    <ul className="mt-2 flex flex-wrap gap-1.5">
-                      {pool.facilities.map((f) => (
-                        <li key={f} className="rounded-full bg-surface-muted px-2.5 py-1 text-xs text-text-muted">
-                          {f}
-                        </li>
+            <Card key={pool.id}>
+              <CardBody className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  {pool.photos.length > 0 && (
+                    <div className="flex gap-2 sm:w-56 sm:shrink-0">
+                      {pool.photos.slice(0, 2).map((url, i) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img key={url + i} src={url} alt={`Foto ${pool.name}`} className="h-24 min-w-0 flex-1 rounded-xl object-cover" />
                       ))}
-                    </ul>
+                    </div>
                   )}
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Kolam</p>
+                    <h3 className="text-lg font-semibold text-brand-700">{pool.name}</h3>
+                    <p className="mt-0.5 text-sm text-text-muted">
+                      {[pool.address, pool.openTime && pool.closeTime && `Buka ${pool.openTime}–${pool.closeTime}`]
+                        .filter(Boolean)
+                        .join(" · ") || "Info kolam belum dilengkapi"}
+                    </p>
+                    {pool.description && <p className="mt-1 text-sm text-text-muted">{pool.description}</p>}
+                    {pool.facilities.length > 0 && (
+                      <ul className="mt-2 flex flex-wrap gap-1.5">
+                        {pool.facilities.map((f) => (
+                          <li key={f} className="rounded-full bg-surface-muted px-2.5 py-1 text-xs text-text-muted">
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {templates
-                  .filter((t) => t.pool.id === pool.id)
-                  .map((t) => (
-                    <Card key={t.id} className={t.id === popularTemplateId ? "border-brand-500 ring-1 ring-brand-500" : ""}>
-                      <CardBody className="flex h-full flex-col gap-3">
+
+                <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {templates
+                    .filter((t) => t.pool.id === pool.id)
+                    .map((t) => (
+                      <li
+                        key={t.id}
+                        className={
+                          t.id === popularTemplateId
+                            ? "flex flex-col gap-3 rounded-xl border border-brand-500 bg-surface-muted p-4 ring-1 ring-brand-500"
+                            : "flex flex-col gap-3 rounded-xl border border-border bg-surface-muted p-4"
+                        }
+                      >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="text-base font-semibold text-text">{t.name}</p>
+                          <h4 className="text-base font-semibold leading-snug text-text">{t.name}</h4>
                           {t.id === popularTemplateId && (
                             <span className="shrink-0 rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">Populer</span>
                           )}
                         </div>
                         <div>
-                          <p className="text-2xl font-bold text-text">{formatRupiah(t.price)}</p>
+                          <p className="text-2xl font-bold leading-tight text-text">{formatRupiah(t.price)}</p>
                           <p className="text-sm text-text-muted">{formatRupiah(Math.round(t.price / t.totalSesi))} per sesi</p>
                         </div>
-                        <ul className="flex flex-col gap-0.5 text-sm text-text">
-                          <li>{t.totalSesi} sesi les</li>
-                          <li>Berlaku {t.durationDays} hari</li>
-                          <li>Jatah batal booking {t.jatahCancel}x</li>
+                        <ul className="flex flex-wrap gap-1.5">
+                          <li><Badge tone="brand">{t.totalSesi} sesi les</Badge></li>
+                          <li><Badge tone="neutral">Berlaku {t.durationDays} hari</Badge></li>
+                          <li><Badge tone="neutral">Jatah batal {t.jatahCancel}×</Badge></li>
                         </ul>
-                        <div className="mt-auto">
+                        <div className="mt-auto pt-1">
                           <CheckoutButton templateId={t.id} dependents={children} />
                         </div>
-                      </CardBody>
-                    </Card>
-                  ))}
-              </ul>
-            </section>
+                      </li>
+                    ))}
+                </ul>
+              </CardBody>
+            </Card>
           ))}
         </div>
       )}

@@ -25,43 +25,48 @@ export default function AffiliateCoachForm({
   return (
     <div className="mt-2 flex flex-col gap-2">
       <p className="text-xs font-medium text-text-muted">Coach terafiliasi</p>
-      <div className="flex flex-wrap gap-2">
-        {affiliations.length === 0 && <span className="text-xs text-text-subtle">Belum ada coach.</span>}
+      {/* Chip coach existing dan form tambah dijadikan satu baris flow yang
+          sama (Hadi 18 Sep v3: "bikin sejajar") -- form-nya ikut ngalir di
+          ujung daftar chip, bukan ditumpuk di baris sendiri di bawahnya. */}
+      <div className="flex flex-wrap items-center gap-2">
+        {affiliations.length === 0 && availableCoaches.length === 0 && (
+          <span className="text-xs text-text-subtle">Belum ada coach.</span>
+        )}
         {affiliations.map((a) => (
           <form key={a.id} action={removeAffiliation}>
             <input type="hidden" name="affiliationId" value={a.id} />
-            <div className="flex items-center gap-2 rounded-full border border-border bg-surface py-1 pr-2 pl-1">
-              <Avatar src={a.photoUrl} className="h-7 w-7" />
+            <div className="flex min-h-[44px] items-center gap-2 rounded-full border border-border bg-surface py-1 pr-2 pl-1">
+              <Avatar src={a.photoUrl} className="h-8 w-8" />
               <span className="text-sm text-text">{a.coachName}</span>
               <button
                 type="submit"
                 aria-label={`Lepas ${a.coachName} dari kolam ini`}
-                className="rounded-full px-1.5 text-text-subtle hover:bg-danger-bg hover:text-danger-text"
+                className="rounded-full px-1.5 text-lg leading-none text-text-subtle hover:bg-danger-bg hover:text-danger-text"
               >
                 ×
               </button>
             </div>
           </form>
         ))}
-      </div>
-      {availableCoaches.length > 0 && (
-        <form action={formAction} className="flex gap-2">
-          <input type="hidden" name="poolId" value={poolId} />
-          <Select name="coachId" className="w-full sm:w-52" defaultValue="">
-            <option value="" disabled>
-              — pilih coach --
-            </option>
-            {availableCoaches.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
+        {availableCoaches.length > 0 && (
+          <form action={formAction} className="flex items-center gap-2">
+            <input type="hidden" name="poolId" value={poolId} />
+            <Select name="coachId" className="w-44 sm:w-52" defaultValue="">
+              <option value="" disabled>
+                — pilih coach --
               </option>
-            ))}
-          </Select>
-          <Button type="submit" size="sm" variant="secondary" loading={pending}>
-            Tambah
-          </Button>
-        </form>
-      )}
+              {availableCoaches.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </Select>
+            <Button type="submit" variant="secondary" loading={pending}>
+              Tambah
+            </Button>
+          </form>
+        )}
+      </div>
       {state?.error && <p className="text-xs text-danger-text">{state.error}</p>}
     </div>
   );

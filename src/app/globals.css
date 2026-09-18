@@ -208,6 +208,13 @@ body {
 /* Heading pake Sora (geometris, karakter beda dari body Jakarta Sans) --
    sengaja global di sini, bukan class per-komponen, biar konsisten di
    seluruh app tanpa nyentuh tiap file yang punya <h1>-<h6>. */
+/* Tipografi v3 (18 Sep 2026): tracking & wrapping heading dipusatkan di
+   sini. Sebelumnya cuma sebagian halaman yang nempelin `tracking-tight`
+   di h1-nya, jadi judul halaman yang satu kelihatan lebih renggang dari
+   yang lain padahal ukurannya sama. Sora itu geometris dan optically
+   renggang di ukuran besar, jadi butuh tracking negatif yang makin kuat
+   makin gede ukurannya. Ditaruh sebagai element selector (bukan utility)
+   supaya halaman yang udah nulis `tracking-*` sendiri tetap menang. */
 h1,
 h2,
 h3,
@@ -215,6 +222,25 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.017em;
+  /* Judul 2-3 baris dibagi rata, gak nyisain 1 kata sendirian di baris
+     terakhir. Kalau browser gak dukung, jatuhnya wrapping biasa. */
+  text-wrap: balance;
+}
+
+h1 {
+  letter-spacing: -0.025em;
+}
+
+h2 {
+  letter-spacing: -0.021em;
+}
+
+/* Paragraf: cegah kata yatim (1 kata sendirian di baris terakhir) tanpa
+   nyentuh panjang baris. `pretty` cuma ngatur titik potong, gak ngubah
+   lebar/ukuran, jadi aman dipasang global. */
+p {
+  text-wrap: pretty;
 }
 
 /* Smooth anchor/CTA scroll app-wide -- guarded biar gak jalan pas user

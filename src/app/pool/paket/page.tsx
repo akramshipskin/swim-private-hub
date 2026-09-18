@@ -14,7 +14,7 @@ export default async function PoolPaketPage() {
     select: {
       id: true,
       name: true,
-      packageTemplates: { orderBy: { totalSesi: "asc" }, include: { pool: { select: { name: true } } } },
+      packageTemplates: { orderBy: { totalSesi: "asc" } },
     },
   });
 
@@ -37,7 +37,7 @@ export default async function PoolPaketPage() {
                 {p.packageTemplates.length === 0 ? (
                   <p className="text-sm text-text-muted">Belum ada paket. Tambah lewat form di atas.</p>
                 ) : (
-                  <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                  <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                     {p.packageTemplates.map((t) => (
                       <li key={t.id}>
                         {t.pendingChanges && (

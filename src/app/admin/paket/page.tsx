@@ -93,11 +93,14 @@ export default async function AdminPaketPage() {
 
       <CreateTemplateForm pools={pools} />
 
-      <div className="mb-10 flex flex-col gap-6">
+      {/* 2 kolom = 2 KOLAM sejajar, paketnya numpuk ke bawah di dalam
+          kolomnya masing-masing (Hadi 18 Sep v3). Sebelumnya kebalik:
+          1 kolam sebaris penuh, paketnya yang melebar ke samping. */}
+      <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {[...new Set(templates.map((t) => t.pool.name))].map((poolName) => (
           <section key={poolName}>
             <h3 className="mb-2 text-base font-semibold text-brand-700">{poolName}</h3>
-            <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+            <ul className="flex flex-col gap-3">
               {templates
                 .filter((t) => t.pool.name === poolName)
                 .map((t) => (

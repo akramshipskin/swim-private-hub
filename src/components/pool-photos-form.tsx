@@ -30,7 +30,7 @@ export function PoolPhotosForm({
       {photos.length > 0 && (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {photos.map((url, i) => (
-            <li key={url} className="overflow-hidden rounded-xl border border-border bg-surface-muted">
+            <li key={`${url}-${i}`} className="overflow-hidden rounded-xl border border-border bg-surface-muted">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={url} alt={`Foto kolam ${i + 1}`} className="h-28 w-full object-cover" />
               <form action={deleteAction} className="flex items-center justify-between gap-2 px-2 py-1.5">

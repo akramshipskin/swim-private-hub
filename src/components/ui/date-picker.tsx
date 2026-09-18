@@ -2,12 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
+import { Select } from "@/components/ui/input";
 
 const DAY_LABELS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 const MONTH_LABELS = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
+
+// Rentang tahun yang bisa dipilih lewat dropdown. Batas bawah 80 tahun ke
+// belakang supaya tanggal lahir coach kepake tanpa harus mundur satu-satu
+// per bulan (Hadi 18 Sep v3); batas atas 5 tahun ke depan buat field yang
+// nunjuk masa depan (mis. "Berlaku Sampai").
+const YEAR_BACK = 80;
+const YEAR_FORWARD = 5;
+
+function yearOptions(current: number, today: number) {
+  const min = Math.min(today - YEAR_BACK, current);
+  const max = Math.max(today + YEAR_FORWARD, current);
+  return Array.from({ length: max - min + 1 }, (_, i) => min + i);
+}
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
@@ -123,39 +137,67 @@ export function DatePicker({
       {open && (
         <div
           className={cn(
-            "absolute z-20 mt-1 w-72 rounded-xl border border-border bg-surface p-3 shadow-lg",
+            // Popup ngikut lebar trigger (w-full), dengan lantai 18rem supaya
+            // grid 7 kolom tanggal gak kejepit, dan plafon selebar layar
+            // dikurangi margin supaya gak nembus keluar di HP. Sebelumnya
+            // lebarnya dipatok tanpa lihat trigger, jadi nyembul ke kanan dan
+            // nabrak tombol di sebelahnya (Hadi 18 Sep v3, Jadwal Kolam).
+            "absolute z-20 mt-1 w-full min-w-[18rem] max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-surface p-3 shadow-lg",
             popupAlign === "right" ? "right-0" : "left-0"
           )}
         >
-          <div className="mb-2 flex items-center justify-between">
+          <div className="mb-2 flex items-center gap-1">
             <button
               type="button"
               onClick={prevMonth}
-              className="rounded-md p-1 text-text-muted hover:bg-surface-muted"
+              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted"
               aria-label="Bulan sebelumnya"
             >
               ‹
             </button>
-            <p className="text-sm font-medium text-text">
-              {MONTH_LABELS[viewM]} {viewY}
-            </p>
+            {/* Bulan & tahun sebagai dropdown, bukan cuma panah maju-mundur:
+                lompat ke tahun lahir lewat panah butuh puluhan klik. */}
+            <Select
+              aria-label="Bulan"
+              value={viewM}
+              onChange={(e) => setViewM(Number(e.target.value))}
+              className="min-w-0 flex-1"
+            >
+              {MONTH_LABELS.map((m, i) => (
+                <option key={m} value={i}>
+                  {m}
+                </option>
+              ))}
+            </Select>
+            <Select
+              aria-label="Tahun"
+              value={viewY}
+              onChange={(e) => setViewY(Number(e.target.value))}
+              className="w-[5.5rem] shrink-0"
+            >
+              {yearOptions(viewY, Number(todayKey.slice(0, 4))).map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </Select>
             <button
               type="button"
               onClick={nextMonth}
-              className="rounded-md p-1 text-text-muted hover:bg-surface-muted"
+              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted"
               aria-label="Bulan berikutnya"
             >
               ›
             </button>
           </div>
 
-          <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[11px] font-medium text-text-subtle">
+          <div className="mb-1 grid grid-cols-7 justify-items-center gap-1 text-center text-[11px] font-medium text-text-subtle">
             {DAY_LABELS.map((d) => (
               <span key={d}>{d}</span>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 justify-items-center gap-1">
             {cells.map((day, i) => {
               if (day === null) return <span key={`empty-${i}`} />;
               const key = toKey(viewY, viewM, day);

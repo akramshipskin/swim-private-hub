@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Label } from "@/components/ui/input";
 import { PriceInput } from "@/components/ui/price-input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
 
 type Template = {
@@ -16,7 +17,6 @@ type Template = {
   durationDays: number;
   jatahCancel: number;
   isActive: boolean;
-  pool?: { name: string };
 };
 
 type TemplateAction = (state: { error?: string } | null, formData: FormData) => Promise<{ error?: string } | null>;
@@ -61,22 +61,28 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
         {/* Terkunci = ringkasan 1-2 baris (Hadi: kartu paket terlalu makan
             tempat). Semua isian baru muncul setelah klik Edit. */}
         {locked ? (
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="flex flex-wrap items-center gap-x-2 text-sm">
-                <span className="font-semibold text-text">{template.name}</span>
-                {template.pool && <span className="text-text-muted">· {template.pool.name}</span>}
-                {!template.isActive && <span className="text-warning-text">· tidak dijual</span>}
-              </p>
-              <p className="mt-0.5 text-sm text-text-muted">
-                <span className="font-semibold text-text">{formatRupiah(template.price)}</span> · {template.totalSesi} sesi
-                (Rp{Math.round(template.price / template.totalSesi).toLocaleString("id-ID")}/sesi) · berlaku{" "}
-                {template.durationDays} hari · jatah batal {template.jatahCancel}x
-              </p>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-lg font-semibold leading-snug text-text">{template.name}</h3>
+                <p className="mt-1 text-xl font-bold leading-tight text-text">{formatRupiah(template.price)}</p>
+                <p className="mt-0.5 text-sm text-text-muted">
+                  {formatRupiah(Math.round(template.price / template.totalSesi))} per sesi
+                </p>
+              </div>
+              <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
+                Edit
+              </Button>
             </div>
-            <Button type="button" variant="secondary" size="sm" onClick={startEdit}>
-              Edit
-            </Button>
+            {/* Spesifikasi turun ke bawah sebagai badge (Hadi 18 Sep v3) --
+                sebelumnya nempel jadi satu kalimat panjang dipisah titik
+                tengah, kebaca sebagai paragraf, bukan sebagai spek. */}
+            <ul className="flex flex-wrap gap-1.5">
+              <li><Badge tone="brand">{template.totalSesi} sesi</Badge></li>
+              <li><Badge tone="neutral">Berlaku {template.durationDays} hari</Badge></li>
+              <li><Badge tone="neutral">Jatah batal {template.jatahCancel}×</Badge></li>
+              {!template.isActive && <li><Badge tone="warning">Tidak dijual</Badge></li>}
+            </ul>
           </div>
         ) : (
         <form

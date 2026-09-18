@@ -33,7 +33,11 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
         <Field label="Alamat">
           <Input name="address" defaultValue={pool.address ?? ""} />
         </Field>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:col-span-2">
+        {/* Jam buka & jam tutup ukurannya ikut isi (auto), bukan 1/3 lebar
+            baris masing-masing -- dengan 3 kolom sama rata, dua dropdown
+            jam yang cuma ~150px ketarik berjauhan di layar lebar
+            (Hadi 18 Sep v3: "gapnya kejauhan"). */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] lg:col-span-2">
           <Field label="No. telepon kolam">
             <Input name="contactPhone" defaultValue={pool.contactPhone ?? ""} />
           </Field>
