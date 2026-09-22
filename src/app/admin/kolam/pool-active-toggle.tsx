@@ -27,7 +27,7 @@ export default function PoolActiveToggle({
   if (!isActive) {
     return (
       <Button variant="ghost" size="sm" onClick={handleToggle} loading={loading}>
-        Approve
+        Setujui
       </Button>
     );
   }

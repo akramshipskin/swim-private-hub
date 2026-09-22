@@ -281,7 +281,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                       <span className="text-text-muted">{shortDate(w.requestedAt)}</span>
                       <span className="font-medium text-text">{formatRupiah(w.amount)}</span>
                       <Badge tone={w.status === "PAID" ? "success" : w.status === "FAILED" ? "danger" : "warning"}>
-                        {w.status === "PAID" ? "Dibayar" : w.status === "FAILED" ? "Gagal/ditolak" : "Menunggu"}
+                        {w.status === "PAID" ? "Sudah ditransfer" : w.status === "FAILED" ? "Gagal / ditolak" : "Menunggu"}
                       </Badge>
                     </li>
                   ))}

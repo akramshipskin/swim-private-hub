@@ -152,7 +152,7 @@ const GUIDES: Guide[] = [
     key: "kolam",
     label: "Pemilik Kolam",
     title: "Panduan Pemilik Kolam",
-    lead: "Pantau pemakaian kolam, atur paket & info kolam, dan cairkan bagian kolam.",
+    lead: "Pantau pemakaian kolam, atur paket & info kolam, dan cairkan komisi kolam.",
     sections: [
       {
         heading: "1. Dashboard & jadwal",
@@ -175,7 +175,7 @@ const GUIDES: Guide[] = [
         steps: [
           { title: "Saldo kolam", body: "Bertambah setiap sesi yang ditandai Hadir oleh coach." },
           { title: "Ajukan pencairan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat Edit), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Admin memproses transfernya.` },
-          { title: "Laporan", body: "Rincian bagian kolam per sesi yang benar-benar Hadir, bisa disaring per rentang tanggal." },
+          { title: "Laporan", body: "Rincian komisi kolam per sesi yang benar-benar Hadir, bisa disaring per rentang tanggal." },
         ],
       },
     ],
@@ -215,7 +215,7 @@ const GUIDES: Guide[] = [
         heading: "4. Keuangan",
         steps: [
           { title: "Uang Masuk", body: "Semua pembayaran paket dari member lewat Midtrans beserta statusnya." },
-          { title: "Bagi Hasil", body: "Rincian per kolam: komisi platform (termasuk PPN 12%), bagian kolam, dan bagian coach untuk tiap sesi Hadir." },
+          { title: "Bagi Hasil", body: "Rincian per kolam: komisi platform (termasuk PPN 12%), komisi kolam, dan komisi coach untuk tiap sesi Hadir." },
           { title: "Pencairan Saldo", body: "Proses pengajuan dari kolam & coach (Tandai Dibayar / Tolak), dan catat penarikan pendapatan platform." },
         ],
       },

@@ -41,7 +41,7 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Riwayat Sesi</h1>
       <SearchForm q={q} placeholder="Cari peserta, nama akun, atau kolam" />
-      <p className="mb-4 text-sm text-text-muted">Tandai kehadiran setelah sesi selesai. Saldo kamu dan kolam masuk setelah ditandai Hadir.</p>
+      <p className="mb-4 text-sm text-text-muted">Tandai kehadiran setelah sesi selesai. Saldo kamu dan saldo kolam bertambah setelah sesi ditandai Hadir.</p>
       <div className="mb-6 grid grid-cols-3 gap-3">
         <Card><CardBody className="py-3"><p className="text-sm text-text-muted">Belum ditandai</p><p className={`text-2xl font-bold ${unmarkedCount > 0 ? "text-warning-text" : "text-text"}`}>{unmarkedCount}</p></CardBody></Card>
         <Card><CardBody className="py-3"><p className="text-sm text-text-muted">Hadir</p><p className="text-2xl font-bold text-success-text">{validSessionCount}</p></CardBody></Card>

@@ -84,7 +84,7 @@ export default async function AdminKolamPage() {
       <h1 className="text-2xl font-semibold tracking-tight text-text">Kelola Kolam</h1>
       <p className="mt-1 text-sm text-text-muted">
         Persentase pembagian per kolam — bisa diubah kapan saja, tidak butuh migrasi. Sisanya
-        (100% - komisi - bagian coach) otomatis jadi bagian kolam.
+        (100% - komisi platform - komisi coach) otomatis jadi komisi kolam.
       </p>
 
       {pools.length === 0 ? (
@@ -139,7 +139,7 @@ export default async function AdminKolamPage() {
                           <p className="text-sm font-semibold text-text">Saldo kolam (bisa dicairkan)</p>
                           <p className="text-lg font-bold text-text">{formatRupiah(p.walletBalance)}</p>
                         </div>
-                        <p className="text-xs text-text-subtle">Bagian kolam dari tiap sesi yang ditandai Hadir, dikurangi pencairan.</p>
+                        <p className="text-xs text-text-subtle">Komisi kolam dari tiap sesi yang ditandai Hadir, dikurangi pencairan.</p>
                         <dl className="mt-2 grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5 text-sm">
                           <dt className="text-text-muted">Dari paket kolam ini</dt><dd className="text-right text-text">{formatRupiah(r.own)}</dd>
                           <dt className="text-text-muted">Dari beli 1 sesi (member kolam lain)</dt><dd className="text-right text-text">{formatRupiah(r.single)}</dd>

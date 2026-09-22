@@ -81,7 +81,7 @@ export default async function PoolLaporanPage({
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Laporan Kolam</h1>
       <p className="mb-6 text-sm text-text-muted">
-        Rincian bagian kolam kamu per sesi yang benar-benar ditandai Hadir.
+        Rincian komisi kolam kamu per sesi yang benar-benar ditandai Hadir.
       </p>
 
       <Card className="mb-6">
@@ -134,7 +134,7 @@ export default async function PoolLaporanPage({
                 </Card>
                 <Card>
                   <CardBody className="py-3">
-                    <p className="text-xs text-text-subtle">Rata-rata per sesi</p>
+                    <p className="text-xs text-text-subtle">Rata-rata komisi kolam per sesi</p>
                     <p className="text-lg font-semibold text-text">
                       {formatRupiah(rows.length ? Math.round(totalPoolShare / rows.length) : 0)}
                     </p>
@@ -150,7 +150,7 @@ export default async function PoolLaporanPage({
                 </Card>
                 <Card>
                   <CardBody className="py-3">
-                    <p className="text-xs text-text-subtle">Bagian Kolam Kamu</p>
+                    <p className="text-xs text-text-subtle">Komisi Kolam Kamu</p>
                     <p className="text-lg font-semibold text-text">{formatRupiah(totalPoolShare)}</p>
                   </CardBody>
                 </Card>
@@ -171,7 +171,7 @@ export default async function PoolLaporanPage({
                           <th className="px-4 py-3 font-medium">Tanggal</th>
                           <th className="px-4 py-3 font-medium">Coach</th>
                           <th className="px-4 py-3 font-medium">Peserta</th>
-                          <th className="px-4 py-3 text-right font-medium">Bagian Kolam</th>
+                          <th className="px-4 py-3 text-right font-medium">Komisi Kolam</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -203,7 +203,7 @@ export default async function PoolLaporanPage({
 
       <p className="mt-4 text-xs text-text-subtle">
         Hanya sesi yang benar-benar ditandai Hadir dan paketnya berbayar (bukan assign manual/gratis)
-        yang dihitung di sini — sama seperti dasar hitung saldo kolam. Yang ditampilkan adalah bagian kolam kamu
+        yang dihitung di sini — sama seperti dasar hitung saldo kolam. Yang ditampilkan adalah komisi kolam kamu
         sesuai persentase yang berlaku saat sesi itu ditandai Hadir.
       </p>
     </main>

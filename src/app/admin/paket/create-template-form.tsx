@@ -41,7 +41,7 @@ export default function CreateTemplateForm({ pools, action = createTemplate, sub
             <Field label="Total Sesi">
               <Input type="number" name="totalSesi" required min={1} className="w-full sm:w-24" />
             </Field>
-            <Field label="Jatah Cancel">
+            <Field label="Jatah Batal">
               <Input type="number" name="jatahCancel" required min={0} defaultValue={2} className="w-full sm:w-24" />
             </Field>
           </div>

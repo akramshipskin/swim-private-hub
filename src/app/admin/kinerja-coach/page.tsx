@@ -51,7 +51,7 @@ export default async function KinerjaCoachPage({
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Kinerja Coach</h1>
       <p className="mb-6 text-sm text-text-muted">
         Jumlah sesi valid (member benar-benar hadir) per coach di rentang tanggal — dasar hitung
-        honor.
+        komisi coach.
       </p>
 
       <Card className="mb-6">

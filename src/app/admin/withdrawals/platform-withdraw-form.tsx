@@ -21,7 +21,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
       </div>
       <label className="flex items-center gap-2 text-sm text-text">
         <input type="checkbox" name="includeTax" className="h-4 w-4" />
-        Sertakan saldo pajak (PPN) {formatRupiah(Math.max(0, tax))}
+        Tarik juga saldo pajak (PPN) sekaligus — {formatRupiah(Math.max(0, tax))}
       </label>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" loading={pending}>Catat Penarikan</Button>

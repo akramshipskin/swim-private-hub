@@ -113,7 +113,7 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
                 className="w-full sm:w-24"
               />
             </Field>
-            <Field label="Jatah Cancel">
+            <Field label="Jatah Batal">
               <Input
                 type="number"
                 name="jatahCancel"

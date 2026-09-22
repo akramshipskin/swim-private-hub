@@ -17,7 +17,7 @@ export default async function PoolInfoPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Info Kolam</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
-        Informasi ini tampil ke member di halaman booking, profil coach, dan landing page. Perubahan langsung berlaku.
+        Informasi ini tampil ke member di halaman jadwal, profil coach, dan landing page. Perubahan langsung berlaku.
       </p>
       {pools.length === 0 ? (
         <p className="text-sm text-text-muted">Akun ini belum terhubung ke kolam mana pun. Hubungi admin.</p>

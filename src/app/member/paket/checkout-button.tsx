@@ -19,7 +19,7 @@ export default function CheckoutButton({
 
   async function handleCheckout() {
     if (!dependentId) {
-      setError("Pilih anak dulu");
+      setError("Pilih peserta dulu");
       return;
     }
     setLoading(true);

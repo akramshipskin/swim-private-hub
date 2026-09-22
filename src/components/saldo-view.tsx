@@ -89,7 +89,7 @@ export default function SaldoView({
               <p className="mt-1 text-3xl font-semibold text-text">{formatRupiah(walletBalance)}</p>
             </div>
             <div>
-              <p className="text-sm text-text-muted">Sedang dalam proses</p>
+              <p className="text-sm text-text-muted">Dalam proses pencairan</p>
               <p className="mt-1 text-xl font-semibold text-text-muted">{formatRupiah(inProcess)}</p>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function SaldoView({
                     <dd className="text-text">{dateTime(w.requestedAt)}</dd>
                     {w.processedAt && (
                       <>
-                        <dt className="text-text-subtle">{w.status === "FAILED" ? "Ditolak" : "Diproses"}</dt>
+                        <dt className="text-text-subtle">{w.status === "FAILED" ? "Ditolak" : w.status === "PAID" ? "Ditransfer" : "Diproses"}</dt>
                         <dd className="text-text">{dateTime(w.processedAt)}</dd>
                       </>
                     )}
@@ -200,7 +200,7 @@ export default function SaldoView({
                     )}
                   </dl>
                   {w.status === "FAILED" && (
-                    <p className="text-xs text-text-subtle">Saldo pengajuan yang gagal sudah dikembalikan.</p>
+                    <p className="text-xs text-text-subtle">Saldo dari pengajuan yang gagal ini sudah dikembalikan ke saldo kamu.</p>
                   )}
                 </CardBody>
               </Card>

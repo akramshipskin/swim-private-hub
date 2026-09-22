@@ -78,7 +78,7 @@ export async function uploadPoolPhoto(_prev: PoolInfoState, formData: FormData):
   const poolId = formData.get("poolId")?.toString() ?? "";
   const access = await canEditPool(poolId);
   if ("error" in access) return access;
-  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
+  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan (storage belum dikonfigurasi)." };
 
   const file = formData.get("photo") as File | null;
   const invalid = validateUpload(file, "photo");

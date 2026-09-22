@@ -595,7 +595,7 @@ export default function BookingBoard({
         title="Batalkan booking ini?"
         description={
           cancelTarget
-            ? `${cancelTarget.coach.name}, ${formatTime(cancelTarget.startTime)}–${formatTime(cancelTarget.endTime)}. Kuota sesi kamu akan kembali, tapi jatah pembatalan mandiri berkurang.`
+            ? `${cancelTarget.coach.name}, ${formatTime(cancelTarget.startTime)}–${formatTime(cancelTarget.endTime)}. Sisa sesi kamu akan kembali, tapi jatah batal berkurang.`
             : ""
         }
         confirmLabel="Ya, batalkan"

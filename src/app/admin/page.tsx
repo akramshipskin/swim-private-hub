@@ -121,7 +121,7 @@ export default async function AdminDashboardPage() {
             <ActionRow label="Sertifikat coach menunggu" count={pendingCerts} href="/admin/users" />
             <ActionRow label="Usulan paket/harga kolam" count={pendingTemplates} href="/admin/paket" />
             <ActionRow label="Kolam belum disetujui" count={pools.length - activePools.length} href="/admin/kolam" />
-            <ActionRow label="Sesi lewat belum ditandai hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach belum masuk" />
+            <ActionRow label="Sesi lewat belum ditandai hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach baru masuk setelah ditandai hadir" />
           </div>
         </BentoCard>
 

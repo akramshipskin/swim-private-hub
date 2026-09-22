@@ -116,7 +116,7 @@ export default async function AdminPaketPage() {
       {/* --- List member + paket, advanced --- */}
       <p className="mb-3 text-xs text-text-subtle">
         Mau tambah peserta atau assign paket khusus ke member? Sekarang ada di
-        tab <span className="font-medium text-text-muted">Users</span>.
+        tab <span className="font-medium text-text-muted">Kelola User</span>.
       </p>
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>
       <PaketPerMemberList

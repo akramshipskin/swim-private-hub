@@ -42,7 +42,7 @@ export default function KebijakanPrivasiPage() {
       <ul>
         <li>Mengelola pemesanan jadwal, penugasan pelatih, dan sisa sesi paket Pengguna.</li>
         <li>Memproses pembayaran dan mengaktifkan paket secara otomatis.</li>
-        <li>Menghitung bagian kolam dan pelatih per sesi serta memproses pencairan saldo ke rekening tujuan.</li>
+        <li>Menghitung komisi kolam dan pelatih per sesi serta memproses pencairan saldo ke rekening tujuan.</li>
         <li>Mengirimkan notifikasi terkait pemesanan (apabila fitur ini diaktifkan oleh Pengguna).</li>
         <li>Melakukan analisis penggunaan Aplikasi secara agregat untuk kepentingan pengembangan layanan.</li>
       </ul>

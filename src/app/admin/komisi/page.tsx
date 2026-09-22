@@ -90,7 +90,7 @@ export default async function KomisiPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Bagi Hasil</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Pembagian uang dari setiap sesi yang ditandai Hadir: komisi platform, bagian kolam, dan bagian coach.
+        Pembagian uang dari setiap sesi yang ditandai Hadir: komisi platform, komisi kolam, dan komisi coach.
         Sesi yang belum ditandai belum dihitung. Nilai sesi = harga paket ÷ jumlah sesi.
       </p>
       <Card className="mt-4">

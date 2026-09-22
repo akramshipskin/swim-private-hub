@@ -23,7 +23,7 @@ export function PoolPhotosForm({
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm text-text-muted">
-        Foto kolam dan fasilitasnya. Tampil di halaman booking member, profil coach, dan landing page. Foto pertama
+        Foto kolam dan fasilitasnya. Tampil di halaman jadwal member, profil coach, dan landing page. Foto pertama
         dipakai sebagai sampul. Maksimal 6 foto.
       </p>
 
@@ -56,7 +56,7 @@ export function PoolPhotosForm({
         </Button>
       </form>
 
-      {!storageReady && <p className="text-sm text-warning-text">Upload file belum aktif. Hubungi admin.</p>}
+      {!storageReady && <p className="text-sm text-warning-text">Upload file belum diaktifkan (storage belum dikonfigurasi).</p>}
       {error && (
         <p role="alert" className="text-sm text-danger-text">
           {error}

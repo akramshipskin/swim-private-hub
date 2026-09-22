@@ -15,7 +15,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
   return (
     <Card>
       <CardBody>
-        <h2 className="mb-1 text-sm font-semibold text-text">Import Users dari xlsx</h2>
+        <h2 className="mb-1 text-sm font-semibold text-text">Import Pengguna dari xlsx</h2>
         <p className="mb-2 text-xs text-text-subtle">
           Kolom: Nama Member, No HP, Email (opsional), Nama Peserta/Anak, Paket Aktif,
           Sisa Sesi. 1 baris = 1 peserta — member dengan &gt;1 anak, ulang No HP yang
@@ -45,7 +45,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
             accept=".xlsx,.xls"
             required
             onChange={(e) => setHasFile((e.target.files?.length ?? 0) > 0)}
-            className="text-sm text-text file:mr-3 file:rounded-lg file:border-0 file:bg-brand-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-brand-700"
+            className="text-sm text-text file:mr-3 file:rounded-lg file:border-0 file:bg-brand-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#0a0a08]"
           />
           <Button type="submit" disabled={!hasFile} loading={pending}>
             Import
