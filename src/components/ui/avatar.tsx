@@ -13,7 +13,7 @@ export function Avatar({ src, alt = "", className }: { src?: string | null; alt?
       role={alt ? "img" : undefined}
       aria-label={alt || undefined}
       aria-hidden={alt ? undefined : true}
-      className={cn("shrink-0 rounded-full bg-[#D6D9DE] text-white", className)}
+      className={cn("shrink-0 rounded-full bg-surface-muted text-text-subtle", className)}
     >
       <circle cx="32" cy="25" r="11" fill="currentColor" />
       <path d="M11 58c2-12 10.5-18 21-18s19 6 21 18z" fill="currentColor" />

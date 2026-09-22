@@ -63,7 +63,7 @@ export default async function CoachShortcutPage({
   const content = (
     // Login: samain container sama halaman role lain (judul gak loncat pas
     // pindah dari Cari Coach). Anonim: tengah, sejajar header publik.
-    <main className={session ? "w-full px-4 py-6 sm:py-8" : "mx-auto max-w-lg px-4 py-8"}>
+    <main className={session ? "w-full px-4 py-6 sm:py-8" : "w-full px-4 py-8"}>
       <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
       <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
         <Avatar src={profile?.photoUrl} alt={`Foto ${coach.name}`} className="h-24 w-24 sm:h-28 sm:w-28" />
@@ -178,7 +178,7 @@ export default async function CoachShortcutPage({
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
-        <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <Link href="/" className="inline-flex items-center gap-2">
             <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-contain" />
             <Logotype className="text-lg" />

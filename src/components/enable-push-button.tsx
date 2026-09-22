@@ -83,7 +83,7 @@ export default function EnablePushButton() {
       <button
         onClick={handleEnable}
         disabled={status === "loading"}
-        className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-[#0a0a08] disabled:opacity-50"
       >
         <BellIcon className="h-3.5 w-3.5" />
         {status === "loading" ? "Mengaktifkan..." : "Aktifkan Notifikasi"}
