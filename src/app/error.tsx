@@ -6,10 +6,10 @@ import { Card, CardBody } from "@/components/ui/card";
 
 export default function Error({
   error,
-  retry,
+  reset,
 }: {
   error: Error & { digest?: string };
-  retry: () => void;
+  reset: () => void;
 }) {
   useEffect(() => {
     console.error(error);
@@ -23,7 +23,7 @@ export default function Error({
           <p className="text-sm text-text-muted">
             Terjadi kesalahan tidak terduga. Coba lagi, atau kembali ke halaman sebelumnya.
           </p>
-          <Button onClick={() => retry()} className="mt-2 w-full">
+          <Button onClick={() => reset()} className="mt-2 w-full">
             Coba Lagi
           </Button>
         </CardBody>
