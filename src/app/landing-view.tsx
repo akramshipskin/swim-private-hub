@@ -6,7 +6,7 @@ import { BUSINESS_ADDRESS } from "@/lib/business";
 import { formatRupiah } from "@/lib/format";
 import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT, MIN_WITHDRAWAL } from "@/lib/policy";
 import { AudienceTabs, FaqTabs, type AudienceSteps, type FaqGroup } from "./landing-tabs";
-import { Avatar } from "@/components/ui/avatar";
+import { CoachLeaders } from "./coach-leaders";
 import { Reveal } from "@/components/ui/reveal";
 import { PAYMENT_METHODS } from "./landing-payments";
 
@@ -27,7 +27,7 @@ type LandingPool = {
   coachCount: number;
   fromPerSession: number | null;
 };
-type LandingCoach = {
+export type LandingCoach = {
   id: string;
   name: string;
   bio: string | null;
@@ -70,7 +70,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Gabung jadi mitra", body: "Daftarkan kolam, lengkapi alamat, jam buka, dan fasilitas." },
       { title: "Usulkan paket & harga", body: "Setiap kolam punya katalog dan harga sendiri; perubahan berlaku setelah diperiksa admin." },
       { title: "Pantau jam ramai", body: "Lihat jam berapa kolam dipakai les privat, oleh coach siapa, setiap hari." },
-      { title: "Terima bagi hasil", body: "Bagian kolam masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening." },
+      { title: "Terima bagi hasil", body: "Komisi kolam masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening." },
     ],
   },
 ];
@@ -130,7 +130,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kapan bagian saya masuk?",
-        a: "Setiap sesi yang kamu tandai Hadir langsung menambah saldo kamu, sesuai persentase bagian coach yang berlaku di kolam tersebut.",
+        a: "Setiap sesi yang kamu tandai Hadir langsung menambah saldo kamu, sesuai persentase komisi coach yang berlaku di kolam tersebut.",
       },
       {
         q: "Cara mencairkan saldo?",
@@ -185,21 +185,29 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
   return (
     // Landing selalu tampilan terang (warna dipaku), tidak ikut dark mode.
     <main className="flex min-h-screen flex-col bg-[#F3F2EC] text-[#14140F]" style={{ colorScheme: "light" }}>
-      {/* Hero foto penuh: gambar perenang sengaja ditaruh agak ke atas, dan
-          headline turun ke bawah, supaya yang pertama dilihat foto dulu baru
-          judulnya (Hadi 18 Sep). */}
-      <section className="relative isolate flex min-h-[760px] flex-col overflow-hidden text-white sm:min-h-[860px]">
-        <Image
-          src="/images/landing/hero-swim.jpg"
-          alt=""
-          fill
-          priority
-          className="-z-20 object-cover object-[50%_18%]"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/35 via-black/10 to-black/85" />
+      {/* Hero setinggi layar ala Stride: foto perenang jadi BLOK ATAS
+          (42svh) — bukan full-bleed — supaya posisi perenang bisa dipaku
+          presisi (container pendek = object-position punya ruang gerak
+          penuh). Headline + CTA di bawah foto, nyambung seamless via fade
+          gelap ke bg konten. */}
+      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-[#0b0c0a] text-white">
+        <div className="relative h-[52svh] min-h-[320px] overflow-hidden">
+          <Image
+            src="/images/landing/hero-swim-v2.jpg"
+            alt=""
+            fill
+            priority
+            className="object-cover object-[70%_20%] sm:object-[55%_20%]"
+            sizes="100vw"
+          />
+          {/* Overlay DITURUNIN: bukan nutupin sefoto, cuma nempel di bawah
+              (30% terbawah, buat nyambung ke konten) + shade tipis di atas
+              buat nav. 70% tengah = foto murni tanpa overlay. */}
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[15%] bg-gradient-to-b from-transparent to-[#0b0c0a]" />
+        </div>
 
-        <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-5 sm:gap-4">
+        <header className="absolute inset-x-0 top-0 mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-5 sm:gap-4">
           <Link href="/" className="flex shrink-0 items-center gap-2 text-white">
             <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
             <Logotype className="text-base sm:text-xl" />
@@ -216,7 +224,10 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           </div>
         </header>
 
-        <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-end px-4 pb-8 text-center">
+        {/* -mt-10svh: konten ketarik naik numpang 10svh ke atas foto, jadi
+            headline balik ke posisi semula sementara BG foto manjang sampai
+            garis ijo. relative+z-10 biar teks di atas foto. */}
+        <div className="relative z-10 mx-auto -mt-[10svh] flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 py-10 text-center">
           <p className="rounded-full border border-white/30 px-4 py-1.5 text-sm">
             Les renang privat · {stats.poolCount} kolam mitra · {stats.coachCount} coach
           </p>
@@ -379,11 +390,12 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
         </div>
       </section>
 
-      {/* Coach: maksimal 5 coach, muncul satu per satu saat di-scroll
-          (gaya referensi Stride), kartunya lebih besar & lebih lengkap. */}
+      {/* Coach: maksimal 5 coach gaya referensi Stride "meet the leaders" --
+          kartu polaroid agak miring, nyebar kiri-kanan, muncul satu per satu
+          saat scroll vertikal. Info lengkap tiap coach ada di /pelatih/[id]. */}
       <section id="coach" className="scroll-mt-20 bg-[#ECE9DC] py-20">
         <div className="mx-auto w-full max-w-6xl px-4">
-          <div className="mb-12 text-center">
+          <div className="mb-14 text-center">
             <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-[#5C5945]">
               Umur, jenis kelamin, keahlian, dan kolam tempat mengajar. Jadwal dan sertifikat lengkapnya bisa dilihat
@@ -393,49 +405,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           {coaches.length === 0 ? (
             <p className="text-center text-[#5C5945]">Coach segera hadir.</p>
           ) : (
-            <ul className="flex flex-col gap-6">
-              {coaches.map((c, i) => (
-                <li key={c.id}>
-                  <Reveal delay={i * 90}>
-                    <article className="flex flex-col gap-6 rounded-3xl bg-white p-6 sm:flex-row sm:items-start sm:p-8">
-                      <div className="h-44 w-full shrink-0 overflow-hidden rounded-2xl bg-[#F3F2EC] sm:h-40 sm:w-40">
-                        {c.photoUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={c.photoUrl} alt={`Foto ${c.name}`} className="h-full w-full object-cover" />
-                        ) : (
-                          <Avatar className="h-full w-full rounded-2xl" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h3 className="text-3xl font-semibold leading-tight">{c.name}</h3>
-                          {c.certified && (
-                            <span className="rounded-full bg-[#E3F5B0] px-3 py-1 text-xs font-semibold">
-                              Bersertifikat{c.certificationNote ? ` · ${c.certificationNote}` : ""}
-                            </span>
-                          )}
-                        </div>
-                        {c.bioLine && <p className="mt-1 text-sm text-[#5C5945]">{c.bioLine}</p>}
-                        {c.bio && <p className="mt-3 text-base text-[#3D3B2E]">{c.bio}</p>}
-                        {c.specialties.length > 0 && (
-                          <ul className="mt-4 flex flex-wrap gap-1.5">
-                            {c.specialties.map((s) => (
-                              <li key={s} className="rounded-full bg-[#F3F2EC] px-3 py-1 text-sm">{s}</li>
-                            ))}
-                          </ul>
-                        )}
-                        <p className="mt-4 text-sm text-[#5C5945]">
-                          Mengajar di: <span className="font-semibold text-[#14140F]">{c.pools.join(", ") || "-"}</span>
-                        </p>
-                        <Link href={`/pelatih/${c.id}`} className="mt-3 inline-block text-sm font-semibold underline">
-                          Lihat profil lengkap
-                        </Link>
-                      </div>
-                    </article>
-                  </Reveal>
-                </li>
-              ))}
-            </ul>
+            <CoachLeaders coaches={coaches} />
           )}
         </div>
       </section>

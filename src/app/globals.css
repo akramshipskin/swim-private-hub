@@ -250,3 +250,54 @@ p {
     scroll-behavior: smooth;
   }
 }
+
+/* Kartu coach landing (coach-leaders.tsx): buka-tutup dikontrol state JS
+   lewat data-open (hover intent + jeda tutup 250ms, anti-flicker). Sengaja
+   CSS biasa, bukan variant group-hover Tailwind, supaya urutan menang-kalah
+   selektornya deterministik dan gak tergantung variant eksotis. */
+.coach-card {
+  min-height: 36rem;
+  transition: width 0.3s ease, rotate 0.3s ease;
+}
+.coach-card .coach-face {
+  max-height: 30rem;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+.coach-card .coach-panel {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, max-width 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+}
+.coach-card[data-open="true"] {
+  rotate: 0deg;
+  z-index: 20;
+}
+.coach-card[data-open="true"] .coach-face {
+  max-height: 0;
+  opacity: 0;
+}
+.coach-card[data-open="true"] .coach-panel {
+  margin-top: 0.75rem;
+  max-height: 36rem;
+  opacity: 1;
+}
+@media (min-width: 640px) {
+  .coach-card[data-open="true"] {
+    width: 42rem;
+  }
+  .coach-card .coach-panel {
+    margin-top: 0;
+    max-height: none;
+    max-width: 0;
+    opacity: 0;
+  }
+  .coach-card[data-open="true"] .coach-panel {
+    margin-top: 0;
+    max-height: none;
+    max-width: 22rem;
+    opacity: 1;
+  }
+}
