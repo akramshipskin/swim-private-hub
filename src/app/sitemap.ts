@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://swim-private-hub.vercel.app";
+const BASE_URL = "https://swimprivatehub.biz.id";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

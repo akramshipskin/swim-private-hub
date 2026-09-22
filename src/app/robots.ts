@@ -17,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         "/ganti-password",
       ],
     },
-    sitemap: "https://swim-private-hub.vercel.app/sitemap.xml",
+    sitemap: "https://swimprivatehub.biz.id/sitemap.xml",
   };
 }

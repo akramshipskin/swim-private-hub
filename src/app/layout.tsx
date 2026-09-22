@@ -25,7 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://swim-private-hub.vercel.app"),
+  metadataBase: new URL("https://swimprivatehub.biz.id"),
   title: "Swim Private Hub",
   description: "Booking jadwal renang dengan coach favoritmu.",
   manifest: "/manifest.json",
