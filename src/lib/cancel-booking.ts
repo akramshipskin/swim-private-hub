@@ -149,13 +149,13 @@ export async function cancelBooking({
     if (actor.role === "COACH") {
       sendPushToUser(booking.memberId, {
         title: "Booking dibatalkan coach",
-        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} dibatalkan coach. Sisa sesi sudah kembali.`,
+        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.date)} ${formatTimeWib(booking.availability.startTime)} dibatalkan coach. Sisa sesi sudah kembali.`,
         url: "/member/riwayat",
       }).catch(() => {});
     } else {
       sendPushToUser(booking.availability.coachId, {
         title: "Booking dibatalkan",
-        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)} sudah kosong lagi`,
+        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.date)} ${formatTimeWib(booking.availability.startTime)} sudah kosong lagi`,
         url: "/coach/jadwal",
       }).catch(() => {});
     }

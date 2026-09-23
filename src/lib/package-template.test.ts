@@ -58,3 +58,14 @@ describe("admin review", () => {
     expect(updateMany).not.toHaveBeenCalled();
   });
 });
+
+describe("price validation", () => {
+  // Regression: harga 0 dulu lolos -> checkout Rp0 / paket gratis.
+  it("rejects a Rp0 or fractional price", async () => {
+    for (const price of ["0", "-5", "150000.5"]) {
+      const res = await proposeNewTemplate("p1", fd({ ...fields, price }));
+      expect(res).toMatchObject({ error: expect.stringContaining("harga minimal Rp1") });
+    }
+    expect(create).not.toHaveBeenCalled();
+  });
+});

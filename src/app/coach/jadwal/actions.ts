@@ -122,7 +122,7 @@ export async function addAvailability(
           members.map((m) =>
             sendPushToUser(m.id, {
               title: "Slot jadwal baru",
-              body: `${session.user.name}, ${formatDateLabel(first.startTime)} ${rangeLabel}`,
+              body: `${session.user.name}, ${formatDateLabel(first.date)} ${rangeLabel}`,
               url: "/member/booking",
             })
           )

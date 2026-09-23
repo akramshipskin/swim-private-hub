@@ -15,7 +15,7 @@ export type TemplateFields = {
 // Usulan pemilik kolam yang menunggu persetujuan admin (PackageTemplate.pendingChanges).
 export type PendingTemplateChange = TemplateFields & { isNew: boolean; submittedAt: string };
 
-const INVALID = "Nama wajib diisi, total sesi/durasi minimal 1, harga & jatah cancel tidak boleh negatif";
+const INVALID = "Nama wajib diisi, total sesi/durasi minimal 1, harga minimal Rp1 (angka bulat), jatah pembatalan tidak boleh negatif";
 
 export function parseTemplateFields(formData: FormData, defaultActive: boolean): TemplateFields | { error: string } {
   const name = toProperCase(formData.get("name")?.toString().trim() ?? "");
@@ -27,7 +27,7 @@ export function parseTemplateFields(formData: FormData, defaultActive: boolean):
   if (
     !name ||
     !Number.isInteger(totalSesi) || totalSesi < 1 ||
-    !Number.isFinite(price) || price < 0 ||
+    !Number.isInteger(price) || price < 1 ||
     !Number.isInteger(durationDays) || durationDays < 1 ||
     !Number.isInteger(jatahCancel) || jatahCancel < 0
   ) {

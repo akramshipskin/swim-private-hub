@@ -27,7 +27,7 @@ function booking(overrides: Record<string, unknown> = {}) {
     availabilityId: "a-1",
     status: "BOOKED",
     attended: null,
-    availability: { coachId: "c-1", startTime: new Date(Date.now() + 48 * 3600e3) },
+    availability: { coachId: "c-1", date: new Date("2026-09-23T00:00:00Z"), startTime: new Date(Date.now() + 48 * 3600e3) },
     package: { dependent: { name: "Bimo" } },
     ...overrides,
   };
@@ -36,6 +36,27 @@ function booking(overrides: Record<string, unknown> = {}) {
 beforeEach(() => {
   vi.clearAllMocks();
   bookingUpdateMany.mockResolvedValue({ count: 1 });
+});
+
+describe("cancelBooking notification date", () => {
+  // Regression: notif dulu pakai startTime (UTC) buat tanggal -> sesi
+  // Rabu 00.30 WIB (= Selasa 17.30 UTC) ketulis "Selasa, 00.30".
+  it("labels an early-morning WIB session with its WIB calendar day", async () => {
+    const { sendPushToUser } = await import("@/lib/push");
+    findUnique.mockResolvedValue(
+      booking({
+        availability: {
+          coachId: "c-1",
+          date: new Date("2099-09-23T00:00:00Z"),
+          startTime: new Date("2099-09-22T17:30:00Z"),
+        },
+      })
+    );
+    await cancelBooking({ bookingId: "b-1", actor: { role: "ADMIN" } });
+    const body = vi.mocked(sendPushToUser).mock.calls[0][1].body;
+    expect(body).toContain("23 September 2099");
+    expect(body).toContain("00.30");
+  });
 });
 
 describe("cancelBooking", () => {
@@ -51,13 +72,13 @@ describe("cancelBooking", () => {
   });
 
   it("refuses a coach cancelling a session that already started", async () => {
-    findUnique.mockResolvedValue(booking({ availability: { coachId: "c-1", startTime: new Date(Date.now() - 3600e3) } }));
+    findUnique.mockResolvedValue(booking({ availability: { coachId: "c-1", date: new Date("2026-09-23T00:00:00Z"), startTime: new Date(Date.now() - 3600e3) } }));
     await expect(cancelBooking({ bookingId: "b-1", actor: { role: "COACH", coachId: "c-1" } })).rejects.toThrow("sudah mulai/lewat");
     expect(bookingUpdateMany).not.toHaveBeenCalled();
   });
 
   it("still lets admin cancel an unmarked past session (force majeure)", async () => {
-    findUnique.mockResolvedValue(booking({ availability: { coachId: "c-1", startTime: new Date(Date.now() - 3600e3) } }));
+    findUnique.mockResolvedValue(booking({ availability: { coachId: "c-1", date: new Date("2026-09-23T00:00:00Z"), startTime: new Date(Date.now() - 3600e3) } }));
     await cancelBooking({ bookingId: "b-1", actor: { role: "ADMIN" } });
     expect(bookingUpdateMany).toHaveBeenCalled();
   });

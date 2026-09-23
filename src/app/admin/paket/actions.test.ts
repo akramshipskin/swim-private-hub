@@ -130,7 +130,7 @@ describe("updateTemplate", () => {
   });
 
   it("treats a missing isActive field as false (unchecked checkbox)", async () => {
-    const fd = formData({ templateId: "tpl-1", name: "X", totalSesi: "1", price: "0", durationDays: "1", jatahCancel: "0" });
+    const fd = formData({ templateId: "tpl-1", name: "X", totalSesi: "1", price: "1", durationDays: "1", jatahCancel: "0" });
     await updateTemplate(null, fd);
     expect(templateUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ isActive: false }) }));
   });

@@ -98,6 +98,12 @@ export async function POST(request: Request) {
     };
   }
 
+  // Form katalog sekarang nolak harga < Rp1, tapi data lama bisa aja
+  // udah terlanjur Rp0 -- jangan sampai jadi paket gratis lewat checkout.
+  if (!Number.isInteger(item.price) || item.price < 1) {
+    return Response.json({ error: "Harga paket ini belum valid. Hubungi admin." }, { status: 400 });
+  }
+
   // Klik Beli dobel (atau 2 tab) dulu bikin paket "Menunggu pembayaran"
   // numpuk. Tolak pembelian barang yang sama buat anak yang sama kalau
   // yang sebelumnya baru dibuat < 1 menit lalu.

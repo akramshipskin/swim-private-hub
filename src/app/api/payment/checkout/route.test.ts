@@ -86,6 +86,14 @@ describe("checkout 1 sesi", () => {
     expect(packageDelete).toHaveBeenCalledWith({ where: { id: "pkg-new" } });
   });
 
+  it("refuses a catalog package that is priced Rp0 (legacy data)", async () => {
+    templateFindFirst.mockResolvedValue({ id: "t0", poolId: "pool-A", name: "Gratis", totalSesi: 4, jatahCancel: 1, price: 0 });
+    const res = await POST(req({ dependentId: "d1", templateId: "t0" }));
+    expect(res.status).toBe(400);
+    expect(packageCreate).not.toHaveBeenCalled();
+    expect(createTransaction).not.toHaveBeenCalled();
+  });
+
   it("blocks an account that still has a temporary password", async () => {
     const { auth } = await import("@/auth");
     vi.mocked(auth).mockResolvedValueOnce({ user: { id: "m1", role: "MEMBER", mustChangePassword: true } } as never);
