@@ -28,6 +28,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/admin/komisi", label: "Bagi Hasil", icon: "credit-card", group: "Keuangan" },
     { href: "/admin/withdrawals", label: "Pencairan Saldo", icon: "credit-card", group: "Keuangan" },
     { href: "/admin/pesan", label: "Pesan", icon: "users", group: "Bantuan" },
+    { href: "/admin/email", label: "Email", icon: "users", group: "Bantuan" },
     { href: "/profil", label: "Profil Saya", icon: "settings", group: "Pengaturan" },
   ],
   COACH: [

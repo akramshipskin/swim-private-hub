@@ -533,3 +533,42 @@ model Booking {
   @@index([availabilityId])
   @@index([packageId])
 }
+
+// Inbox email eksternal (hello@swimprivatehub.biz.id, via Resend Inbound) --
+// beda dari ChatThread (itu chat bantuan in-app member/coach/pool <-> admin).
+// 1 alamat email eksternal = 1 thread, sama kayak pola ChatThread per user.
+model EmailThread {
+  id            String         @id @default(cuid())
+  externalEmail String         @unique
+  subject       String
+  needsAdmin    Boolean        @default(true)
+  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime       @default(now())
+  messages      EmailMessage[]
+
+  @@index([needsAdmin, updatedAt])
+}
+
+enum EmailDirection {
+  INBOUND
+  OUTBOUND
+}
+
+model EmailMessage {
+  id          String         @id @default(cuid())
+  threadId    String
+  thread      EmailThread    @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  direction   EmailDirection
+  fromAddress String
+  toAddress   String
+  subject     String
+  textBody    String
+  htmlBody    String?
+  // id dari Resend (email_id pas INBOUND, id hasil send pas OUTBOUND) --
+  // dipakai buat header In-Reply-To/References biar thread nyambung di
+  // client email eksternal, dan cegah dobel-simpan webhook retry.
+  resendId    String?        @unique
+  createdAt   DateTime       @default(now())
+
+  @@index([threadId, createdAt])
+}
