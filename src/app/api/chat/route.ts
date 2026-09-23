@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { withDedupeLock } from "@/lib/dedupe-lock";
 import { roleLabel } from "@/lib/nav-links";
 import { askAi, buildSystemPrompt, normalizeTurns, stripEscalateToken, ESCALATE_TOKEN, MAX_CHAT_LENGTH } from "@/lib/chat-ai";
 
@@ -37,14 +38,19 @@ export async function POST(request: Request) {
   });
 
   // Batas wajar biar biaya AI gak bisa dihabisin 1 akun: 20 pesan per jam.
-  const recent = await prisma.chatMessage.count({
-    where: { threadId: thread.id, sender: "USER", createdAt: { gte: new Date(Date.now() - 3_600_000) } },
+  // Hitung + simpan di bawah kunci per-user: tanpa kunci, burst request
+  // barengan semua lolos hitungan sebelum ada yang kesimpen.
+  const allowed = await withDedupeLock(`chat:${user.id}`, async (tx) => {
+    const recent = await tx.chatMessage.count({
+      where: { threadId: thread.id, sender: "USER", createdAt: { gte: new Date(Date.now() - 3_600_000) } },
+    });
+    if (recent >= 20) return false;
+    await tx.chatMessage.create({ data: { threadId: thread.id, sender: "USER", content: text } });
+    return true;
   });
-  if (recent >= 20) {
+  if (!allowed) {
     return Response.json({ error: "Terlalu banyak pesan dalam 1 jam. Coba lagi nanti." }, { status: 429 });
   }
-
-  await prisma.chatMessage.create({ data: { threadId: thread.id, sender: "USER", content: text } });
 
   const history = await prisma.chatMessage.findMany({
     where: { threadId: thread.id, sender: { in: ["USER", "AI", "ADMIN"] } },
