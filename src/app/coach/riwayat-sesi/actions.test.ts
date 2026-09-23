@@ -125,9 +125,20 @@ describe("markAttendance", () => {
       poolId: "pool-1",
       coachProfileId: "coachprofile-1",
       bookingId: "booking-1",
-      perSessionValue: 93_750, // round(750000 / 8)
+      perSessionValue: 93_750, // 750000 / 8
     });
     expect(reverseSessionRevenue).not.toHaveBeenCalled();
+  });
+
+  it("never lets the per-session value sum above the amount actually paid", async () => {
+    // Regression: 100000/6 dulu di-round jadi 16667 -> 6 sesi = 100.002.
+    bookingFindUnique.mockResolvedValue(
+      baseBooking({ attended: null, package: { totalSesi: 6, payments: [{ amount: 100_000 }] } })
+    );
+    await markAttendance(null, formData("booking-1", "true"));
+    const { perSessionValue } = vi.mocked(creditSessionRevenue).mock.calls[0][1];
+    expect(perSessionValue).toBe(16_666);
+    expect(perSessionValue * 6).toBeLessThanOrEqual(100_000);
   });
 
   it("reverses the wallet credit when toggled from Hadir back to Tidak Hadir", async () => {

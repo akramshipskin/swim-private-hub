@@ -82,7 +82,11 @@ export async function markAttendance(
       const coachProfile = booking.availability.coach.coachProfile;
       if (!successPayment || !coachProfile) return;
 
-      const perSessionValue = Math.round(successPayment.amount / booking.package.totalSesi);
+      // floor, bukan round: round bisa bikin total semua sesi > harga
+      // paket (100.000/6 -> 16.667 x 6 = 100.002), artinya kredit uang
+      // yang gak pernah dibayar. floor bikin sisanya (< totalSesi rupiah
+      // per paket) tetap di platform, sesuai aturan sisa pembulatan.
+      const perSessionValue = Math.floor(successPayment.amount / booking.package.totalSesi);
 
       if (!wasAttended && attended) {
         await creditSessionRevenue(tx, {

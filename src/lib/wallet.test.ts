@@ -95,6 +95,9 @@ describe("creditSessionRevenue", () => {
         [15, 55],
         [10, 60],
         [0, 100],
+        // Regression: komisi 0% + coach 50% -> coach & kolam sama-sama
+        // dibulatkan ke atas, dulu total kredit > nilai sesi (+Rp1).
+        [0, 50],
         [33, 33],
         [12, 45],
       ]) {

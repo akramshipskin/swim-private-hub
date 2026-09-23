@@ -33,8 +33,12 @@ export async function creditSessionRevenue(
   // Sisa abis komisi platform DAN bagian coach -- bukan cuma
   // (100-commission)%, karena bagian coach juga keluar dari harga sesi
   // yang sama, bukan dari sisa kolam kayak model lama.
-  const poolAmount = Math.round(
-    (perSessionValue * (100 - pool.commissionPercent - pool.coachSharePercent)) / 100
+  // Dibatasi supaya coach+kolam gak pernah melebihi nilai sesi: kalau
+  // komisi platform 0%, dua pembulatan ke atas bisa bikin total +Rp1
+  // (uang yang gak pernah masuk). Sisa pembulatan tetap jatuh ke platform.
+  const poolAmount = Math.min(
+    Math.round((perSessionValue * (100 - pool.commissionPercent - pool.coachSharePercent)) / 100),
+    perSessionValue - coachAmount
   );
 
   await tx.pool.update({
