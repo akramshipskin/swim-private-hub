@@ -33,6 +33,15 @@ export function todayWibDateString(): string {
   return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
 }
 
+// Sisa waktu yang dibulatkan ke BAWAH (jangan menjanjikan lebih lama dari
+// kenyataan): di bawah 1 jam, di bawah 1 hari dalam jam, selebihnya dalam hari.
+export function formatTimeLeft(ms: number): string {
+  const HOUR = 3_600_000;
+  if (ms < HOUR) return "kurang dari 1 jam";
+  if (ms < 24 * HOUR) return `${Math.floor(ms / HOUR)} jam`;
+  return `${Math.floor(ms / (24 * HOUR))} hari`;
+}
+
 export function formatTimeWib(d: Date): string {
   return d.toLocaleTimeString("id-ID", {
     hour: "2-digit",

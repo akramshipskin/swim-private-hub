@@ -1,7 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { activePackageWhere } from "@/lib/active-package";
-import { todayWibDateString, dateLabel, formatDateLabel } from "@/lib/datetime";
+import { todayWibDateString, dateLabel, formatDateLabel, formatTimeLeft, formatTimeWib } from "@/lib/datetime";
 import { BentoCard, Stat, SessionList } from "@/components/dashboard";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
@@ -63,7 +63,10 @@ export default async function MemberDashboardPage() {
   const topCoach = Object.entries(coachCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
   const totalSisa = packages.reduce((s, p) => s + p.sisaSesi, 0);
+  // orderBy expiredDate asc di atas -> elemen pertama = yang paling dekat habis.
   const expiringSoon = packages.filter((p) => p.expiredDate && p.expiredDate.getTime() - now.getTime() < 7 * 86_400_000);
+  const nearest = expiringSoon[0];
+  const nearestLeft = nearest?.expiredDate ? formatTimeLeft(nearest.expiredDate.getTime() - now.getTime()) : "";
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -84,7 +87,10 @@ export default async function MemberDashboardPage() {
           </div>
           {expiringSoon.length > 0 && (
             <p className="mt-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
-              {expiringSoon.length} paket akan kedaluwarsa dalam 7 hari. Pakai sisa sesinya sebelum hangus.
+              {expiringSoon.length === 1
+                ? `Paket ${nearest.name} (${nearest.dependent.name}) kedaluwarsa dalam ${nearestLeft}.`
+                : `${expiringSoon.length} paket akan kedaluwarsa. Terdekat: ${nearest.name} (${nearest.dependent.name}) dalam ${nearestLeft}.`}{" "}
+              Pakai sisa sesinya sebelum hangus.
             </p>
           )}
         </BentoCard>
@@ -105,7 +111,7 @@ export default async function MemberDashboardPage() {
                   </p>
                   <p className="text-sm text-text-muted">
                     Sisa {p.sisaSesi}/{p.totalSesi} sesi · jatah batal {Math.max(0, p.jatahCancel - p._count.bookings)}
-                    {p.expiredDate && ` · s.d. ${p.expiredDate.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" })}`}
+                    {p.expiredDate && ` · s.d. ${p.expiredDate.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" })}${p.expiredDate.getTime() - now.getTime() < 2 * 86_400_000 ? `, ${formatTimeWib(p.expiredDate)} WIB` : ""}`}
                   </p>
                 </li>
               ))}
