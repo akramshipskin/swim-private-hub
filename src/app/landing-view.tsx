@@ -491,8 +491,8 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline">
               WhatsApp +62 821-1717-3124
             </a>
-            <a href="mailto:swimprivatehub@gmail.com" className="hover:text-white hover:underline">
-              swimprivatehub@gmail.com
+            <a href="mailto:hello@swimprivatehub.biz.id" className="hover:text-white hover:underline">
+              hello@swimprivatehub.biz.id
             </a>
             <p>{BUSINESS_ADDRESS}</p>
           </div>
