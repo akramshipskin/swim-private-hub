@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type Msg = { id: string; sender: "USER" | "AI" | "ADMIN" | "SYSTEM"; content: string; createdAt: string };
 
@@ -90,13 +91,13 @@ export function ChatWidget() {
           <form onSubmit={send} className="flex flex-col gap-1.5 border-t border-border p-3">
             <div className="flex gap-2">
               <label htmlFor="chat-input" className="sr-only">Tulis pesan</label>
-              <input
+              <Input
                 id="chat-input"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 maxLength={1000}
                 placeholder="Tulis pertanyaan…"
-                className="min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="min-w-0 flex-1"
               />
               <Button type="submit" size="sm" loading={sending}>Kirim</Button>
             </div>
