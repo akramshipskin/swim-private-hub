@@ -6,6 +6,7 @@ import { signOutAction } from "@/lib/auth-actions";
 import { MenuIcon, UserEditIcon, LogoutIcon } from "@/components/icons";
 import { ThemeMenu } from "@/components/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
+import { PushMenuItem, usePushSubscription } from "@/components/push-subscription";
 
 export function UserMenu({
   userName,
@@ -18,6 +19,7 @@ export function UserMenu({
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const push = usePushSubscription();
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -58,6 +60,9 @@ export function UserMenu({
           <div className="border-b border-border px-3.5 py-3">
             <p className="mb-2 text-xs font-medium text-text-muted">Tampilan</p>
             <ThemeMenu />
+          </div>
+          <div className="border-b border-border">
+            <PushMenuItem {...push} />
           </div>
           <Link
             href="/profil"

@@ -2,7 +2,6 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import BookingBoard from "./booking-board";
 import Link from "next/link";
-import EnablePushButton from "@/components/enable-push-button";
 import { activePackageWhere } from "@/lib/active-package";
 import { dropInPrice } from "@/lib/drop-in";
 import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
@@ -83,7 +82,6 @@ export default async function MemberBookingPage() {
             Pilih peserta, kolam, coach, dan jam. Slot yang sudah diambil otomatis terkunci.
           </p>
         </div>
-        <EnablePushButton />
       </div>
 
       {children.length === 0 && (

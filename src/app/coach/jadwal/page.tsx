@@ -7,7 +7,6 @@ import CancelBookingButton from "./cancel-booking-button";
 import { formatDateLabel, formatTimeWib, dateLabel, todayWibDateString } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import EnablePushButton from "@/components/enable-push-button";
 
 export default async function CoachJadwalPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = (await searchParams).q ?? "";
@@ -84,7 +83,6 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
             Tambah slot per tanggal. Member akan lihat & booking slot ini secara real-time.
           </p>
         </div>
-        <EnablePushButton />
       </div>
 
       <AddSlotForm pools={myPools} />
