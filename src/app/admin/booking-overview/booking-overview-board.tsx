@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select } from "@/components/ui/input";
+import { Input, Select } from "@/components/ui/input";
 import AdminCancelButton from "./admin-cancel-button";
 import AttendanceToggle from "@/components/attendance-toggle";
 
@@ -90,11 +90,10 @@ export default function BookingOverviewBoard({
         <CardBody className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <label className="flex flex-col gap-1 text-sm text-text-muted">
             Cari
-            <input
+            <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Nama coach, member, peserta, kolam"
-              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm text-text-muted">
@@ -166,9 +165,9 @@ export default function BookingOverviewBoard({
                     </div>
                     {[...new Set(rows.map((r) => r.pool.name))].map((poolName) => (
                       <div key={poolName} className="mb-3">
-                        <p className="mb-1.5 inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold tracking-wide text-brand-700 uppercase">
+                        <Badge tone="brand" className="mb-1.5 tracking-wide uppercase">
                           {poolName}
-                        </p>
+                        </Badge>
                         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
                           {rows
                             .filter((r) => r.pool.name === poolName)

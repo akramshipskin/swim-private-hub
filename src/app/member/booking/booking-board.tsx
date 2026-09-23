@@ -397,7 +397,7 @@ export default function BookingBoard({
       </Card>
 
       {dependentId && poolId && !selectedPkg && (
-        <div className="mb-4 flex flex-col gap-3 rounded-lg border border-amber-200 bg-warning-bg px-4 py-3 text-sm text-warning-text sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4 flex flex-col gap-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text sm:flex-row sm:items-center sm:justify-between">
           <p>
             Belum ada paket aktif buat peserta ini di {selectedPool?.name}.
             {dependentPoolNames.length > 0 && <> Paketnya berlaku di: {dependentPoolNames.join(", ")}.</>}

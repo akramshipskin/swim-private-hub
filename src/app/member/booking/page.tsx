@@ -87,7 +87,7 @@ export default async function MemberBookingPage() {
       </div>
 
       {children.length === 0 && (
-        <div className="mb-6 rounded-lg border border-amber-200 bg-warning-bg px-4 py-3 text-sm text-warning-text">
+        <div className="mb-6 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
           Belum ada anak terdaftar.{" "}
           <Link href="/member/peserta" className="font-medium underline">
             Tambah anak dulu
@@ -97,7 +97,7 @@ export default async function MemberBookingPage() {
       )}
 
       {children.length > 0 && packageOptions.length === 0 && (
-        <div className="mb-6 rounded-lg border border-amber-200 bg-warning-bg px-4 py-3 text-sm text-warning-text">
+        <div className="mb-6 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
           Belum ada anak yang punya paket aktif dengan sisa sesi.{" "}
           <Link href="/member/paket" className="font-medium underline">
             Beli paket dulu

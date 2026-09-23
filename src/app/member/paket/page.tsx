@@ -219,7 +219,7 @@ export default async function MemberPaketPage() {
                         <div className="flex items-start justify-between gap-2">
                           <h4 className="text-base font-semibold leading-snug text-text">{t.name}</h4>
                           {t.id === popularTemplateId && (
-                            <span className="shrink-0 rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600">Populer</span>
+                            <Badge tone="accent" className="shrink-0">Populer</Badge>
                           )}
                         </div>
                         <div>
