@@ -80,7 +80,7 @@ describe("addAvailability input validation", () => {
   // Regression: tanggal/jam ngaco dulu jadi Invalid Date -> 0 slot kebuat
   // tapi dianggap sukses.
   it("rejects a malformed date or time instead of reporting a fake success", async () => {
-    for (const bad of [{ date: "xyz" }, { startTime: "abc" }, { endTime: "9" }]) {
+    for (const bad of [{ date: "xyz" }, { startTime: "abc" }, { endTime: "9" }] as Record<string, string>[]) {
       const res = await addAvailability(null, slotForm(bad));
       expect(res).toMatchObject({ error: expect.stringContaining("tidak valid") });
     }
