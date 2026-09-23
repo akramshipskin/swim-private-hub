@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { signedObjectUrl, CERT_BUCKET } from "@/lib/storage";
 import { Card, CardBody } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { reviewCertificate } from "./certificate-actions";
 
 export default async function PendingCertificates() {
@@ -35,12 +35,21 @@ export default async function PendingCertificates() {
                 )}
               </div>
               <div className="flex gap-2">
-                <form action={reviewCertificate.bind(null, r.id, true)}>
-                  <Button type="submit" size="sm">Setujui</Button>
-                </form>
-                <form action={reviewCertificate.bind(null, r.id, false)}>
-                  <Button type="submit" size="sm" variant="danger">Tolak</Button>
-                </form>
+                <ConfirmSubmit
+                  action={reviewCertificate.bind(null, r.id, true)}
+                  label="Setujui"
+                  title={`Setujui sertifikat ${r.user.name}?`}
+                  description={`Badge "Bersertifikat" langsung tampil di profil coach ini untuk semua orang.`}
+                  confirmLabel="Ya, setujui"
+                />
+                <ConfirmSubmit
+                  action={reviewCertificate.bind(null, r.id, false)}
+                  label="Tolak"
+                  variant="danger"
+                  title={`Tolak sertifikat ${r.user.name}?`}
+                  description="Coach perlu mengunggah ulang sertifikatnya."
+                  confirmLabel="Ya, tolak"
+                />
               </div>
             </li>
           ))}

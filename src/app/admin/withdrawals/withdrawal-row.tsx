@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { processWithdrawal, markPaidManually, rejectWithdrawal } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export type WithdrawalRowData = {
   id: string;
@@ -28,10 +29,14 @@ function dateTime(iso: string) {
   return new Date(iso).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" });
 }
 
-export default function WithdrawalRow({ w }: { w: WithdrawalRowData }) {
+export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData; irisEnabled: boolean }) {
   const [processState, processAction, processPending] = useActionState(processWithdrawal, null);
   const [paidState, paidAction, paidPending] = useActionState(markPaidManually, null);
   const [rejectState, rejectAction, rejectPending] = useActionState(rejectWithdrawal, null);
+  // Aksi uang (tandai dibayar / tolak) gak bisa dibatalin -- konfirmasi dulu.
+  const [confirming, setConfirming] = useState<"paid" | "reject" | null>(null);
+  const paidForm = useRef<HTMLFormElement>(null);
+  const rejectForm = useRef<HTMLFormElement>(null);
 
   const canAct = w.status === "PENDING" || w.status === "PROCESSING";
 
@@ -63,7 +68,7 @@ export default function WithdrawalRow({ w }: { w: WithdrawalRowData }) {
 
         {canAct && (
           <div className="mt-1 flex flex-wrap gap-2">
-            {w.status === "PENDING" && (
+            {w.status === "PENDING" && irisEnabled && (
               <form action={processAction}>
                 <input type="hidden" name="withdrawalId" value={w.id} />
                 <Button type="submit" size="sm" loading={processPending}>
@@ -71,16 +76,16 @@ export default function WithdrawalRow({ w }: { w: WithdrawalRowData }) {
                 </Button>
               </form>
             )}
-            <form action={paidAction}>
+            <form ref={paidForm} action={paidAction}>
               <input type="hidden" name="withdrawalId" value={w.id} />
-              <Button type="submit" size="sm" variant="secondary" loading={paidPending}>
+              <Button type="button" size="sm" variant="secondary" loading={paidPending} onClick={() => setConfirming("paid")}>
                 Tandai Dibayar (Manual)
               </Button>
             </form>
-            <form action={rejectAction}>
+            <form ref={rejectForm} action={rejectAction}>
               <input type="hidden" name="withdrawalId" value={w.id} />
               {w.status === "PROCESSING" && <input type="hidden" name="confirmedFailed" value="true" />}
-              <Button type="submit" size="sm" variant="danger" loading={rejectPending}>
+              <Button type="button" size="sm" variant="danger" loading={rejectPending} onClick={() => setConfirming("reject")}>
                 {w.status === "PROCESSING" ? "Tandai Gagal (sudah dicek di Iris)" : "Tolak"}
               </Button>
             </form>
@@ -96,6 +101,30 @@ export default function WithdrawalRow({ w }: { w: WithdrawalRowData }) {
           </p>
         )}
       </CardBody>
+      <ConfirmDialog
+        open={confirming === "paid"}
+        title="Tandai sudah ditransfer?"
+        description={`Pastikan ${formatRupiah(w.amount)} sudah benar-benar ditransfer ke ${w.bankName} ${w.bankAccountNumber} a.n. ${w.bankAccountName}. Status tidak bisa dikembalikan.`}
+        confirmLabel="Ya, sudah ditransfer"
+        loading={paidPending}
+        onCancel={() => setConfirming(null)}
+        onConfirm={() => {
+          setConfirming(null);
+          paidForm.current?.requestSubmit();
+        }}
+      />
+      <ConfirmDialog
+        open={confirming === "reject"}
+        title={w.status === "PROCESSING" ? "Tandai pencairan gagal?" : "Tolak pencairan?"}
+        description={`Saldo ${formatRupiah(w.amount)} akan dikembalikan ke ${w.holderName}.${w.status === "PROCESSING" ? " Pastikan di dashboard Iris transfernya benar-benar gagal." : ""}`}
+        confirmLabel={w.status === "PROCESSING" ? "Ya, gagal" : "Ya, tolak"}
+        loading={rejectPending}
+        onCancel={() => setConfirming(null)}
+        onConfirm={() => {
+          setConfirming(null);
+          rejectForm.current?.requestSubmit();
+        }}
+      />
     </Card>
   );
 }

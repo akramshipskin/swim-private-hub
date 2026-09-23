@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import WithdrawalRow from "./withdrawal-row";
 import PlatformWithdrawForm from "./platform-withdraw-form";
 import { getPlatformBalance } from "@/lib/platform-wallet";
+import { isIrisConfigured } from "@/lib/disbursement";
 
 const STATUS_FILTERS = {
   waiting: { label: "Perlu diproses", statuses: ["PENDING", "PROCESSING"] },
@@ -141,6 +142,7 @@ export default async function AdminWithdrawalsPage({
         <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
           {requests.map((w) => (
             <WithdrawalRow
+              irisEnabled={isIrisConfigured()}
               key={w.id}
               w={{
                 id: w.id,

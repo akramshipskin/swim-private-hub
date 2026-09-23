@@ -3,7 +3,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { formatRupiah } from "@/lib/format";
 import type { PendingTemplateChange } from "@/lib/package-template";
 import { Card, CardBody } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { reviewTemplate } from "./actions";
 
 const LABELS: [keyof PendingTemplateChange, string][] = [
@@ -61,12 +61,21 @@ export default async function PendingTemplateChanges() {
                   })}
                 </dl>
                 <div className="mt-3 flex gap-2">
-                  <form action={reviewTemplate.bind(null, t.id, true)}>
-                    <Button type="submit" size="sm">Setujui</Button>
-                  </form>
-                  <form action={reviewTemplate.bind(null, t.id, false)}>
-                    <Button type="submit" size="sm" variant="danger">Tolak</Button>
-                  </form>
+                  <ConfirmSubmit
+                    action={reviewTemplate.bind(null, t.id, true)}
+                    label="Setujui"
+                    title={`Setujui usulan "${p.name}"?`}
+                    description={`Harga ${formatRupiah(p.price)} langsung berlaku untuk pembelian baru di ${t.pool.name}.`}
+                    confirmLabel="Ya, setujui"
+                  />
+                  <ConfirmSubmit
+                    action={reviewTemplate.bind(null, t.id, false)}
+                    label="Tolak"
+                    variant="danger"
+                    title={`Tolak usulan "${p.name}"?`}
+                    description="Usulan ini dibuang. Pemilik kolam perlu mengusulkan ulang kalau mau diubah."
+                    confirmLabel="Ya, tolak"
+                  />
                 </div>
               </li>
             );

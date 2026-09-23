@@ -37,6 +37,14 @@ export default async function PoolCoachPage() {
     },
   });
 
+  if (pools.length === 0) {
+    return (
+      <main className="mx-auto max-w-lg px-4 py-8 text-center text-sm text-text-muted">
+        Akun ini belum terhubung ke kolam mana pun. Hubungi admin.
+      </main>
+    );
+  }
+
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Coach di Kolam</h1>
