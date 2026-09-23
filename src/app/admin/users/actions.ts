@@ -360,7 +360,7 @@ export async function resetUserPassword(
 
   const updated = await prisma.user.updateMany({
     where: { id: userId },
-    data: { passwordHash, mustChangePassword: true },
+    data: { passwordHash, mustChangePassword: true, sessionVersion: { increment: 1 } },
   });
   if (updated.count === 0) {
     return { error: "User tidak ditemukan." };

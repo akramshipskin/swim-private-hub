@@ -184,7 +184,7 @@ describe("resetUserPassword", () => {
     expect(res.tempPassword).toMatch(/^[a-hjkmnp-z2-9]{10}$/);
     expect(userUpdateMany).toHaveBeenCalledWith({
       where: { id: "user-1" },
-      data: { passwordHash: "hashed", mustChangePassword: true },
+      data: { passwordHash: "hashed", mustChangePassword: true, sessionVersion: { increment: 1 } },
     });
   });
 

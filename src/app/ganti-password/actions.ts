@@ -15,6 +15,12 @@ export async function changePassword(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) redirect("/login");
+  // Action ini sengaja gak minta password lama -- cuma sah buat akun yang
+  // lagi wajib ganti password sementara. Ganti password biasa lewat
+  // /profil (updatePasswordProfil) yang verifikasi password lama.
+  if (!session.user.mustChangePassword) {
+    return { error: "Ganti password lewat menu Profil (butuh password saat ini)." };
+  }
 
   const newPassword = formData.get("newPassword") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
@@ -49,10 +55,11 @@ export async function changePassword(
 
   const passwordHash = await bcrypt.hash(newPassword, 12);
 
-  await prisma.$transaction(async (tx) => {
-    await tx.user.update({
+  const updated = await prisma.$transaction(async (tx) => {
+    const u = await tx.user.update({
       where: { id: session.user.id },
-      data: { passwordHash, mustChangePassword: false },
+      data: { passwordHash, mustChangePassword: false, sessionVersion: { increment: 1 } },
+      select: { sessionVersion: true },
     });
     if (childNames.length > 0) {
       await tx.dependent.createMany({
@@ -62,9 +69,10 @@ export async function changePassword(
     if (wantsSelf) {
       await createSelfDependent(session.user.id, tx);
     }
+    return u;
   });
 
-  await unstable_update({ user: { mustChangePassword: false } });
+  await unstable_update({ user: { mustChangePassword: false }, sessionVersion: updated.sessionVersion });
 
   // Record<Role, string> (bukan Record<string, string>) sengaja -- biar
   // TypeScript maksa tiap role kekasih entry, gak ada yang keskip diem-diem

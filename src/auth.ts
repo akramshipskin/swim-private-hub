@@ -35,17 +35,26 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           email: user.email,
           role: user.role,
           mustChangePassword: user.mustChangePassword,
+          sessionVersion: user.sessionVersion,
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.mustChangePassword = user.mustChangePassword;
+        token.sessionVersion = user.sessionVersion ?? 0;
         return token;
+      }
+
+      // Pemilik akun sendiri yang barusan ganti password: sesinya ikut
+      // naik versi (dikirim lewat unstable_update), sesi LAIN yang masih
+      // bawa versi lama ditolak di bawah.
+      if (trigger === "update" && typeof session?.sessionVersion === "number") {
+        token.sessionVersion = session.sessionVersion;
       }
 
       // Request selanjutnya (bukan sign-in baru) -- cek ulang ke DB tiap
@@ -55,10 +64,17 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
 
       const dbUser = await prisma.user.findUnique({
         where: { id: token.id as string },
-        select: { isActive: true, role: true, mustChangePassword: true, name: true },
+        select: { isActive: true, role: true, mustChangePassword: true, name: true, sessionVersion: true },
       });
 
       if (!dbUser || !dbUser.isActive) {
+        return null;
+      }
+      // Token lama (sebelum kolom ini ada) belum bawa versi -- diadopsi,
+      // bukan ditolak, biar deploy ini gak nge-logout semua user.
+      if (token.sessionVersion === undefined) {
+        token.sessionVersion = dbUser.sessionVersion;
+      } else if (token.sessionVersion !== dbUser.sessionVersion) {
         return null;
       }
 

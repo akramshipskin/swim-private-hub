@@ -71,10 +71,13 @@ export async function updatePasswordProfil(
 
   const passwordHash = await bcrypt.hash(newPassword, 12);
 
-  await prisma.user.update({
+  const updated = await prisma.user.update({
     where: { id: session.user.id },
-    data: { passwordHash },
+    data: { passwordHash, sessionVersion: { increment: 1 } },
+    select: { sessionVersion: true },
   });
+  // Sesi ini tetep hidup, sesi lain (perangkat lain / sesi curian) mati.
+  await unstable_update({ sessionVersion: updated.sessionVersion });
 
   return { success: true };
 }

@@ -101,6 +101,9 @@ model User {
   role               Role     @default(MEMBER)
   isActive           Boolean  @default(true)
   mustChangePassword Boolean  @default(false)
+  // Naik tiap password diganti/direset -- JWT yang nyimpen versi lama
+  // ditolak di callback jwt (src/auth.ts), jadi sesi curian ikut mati.
+  sessionVersion     Int      @default(0)
   createdAt          DateTime @default(now())
   registeredReferer  String?
   registeredIp       String?
