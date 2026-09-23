@@ -135,6 +135,9 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                                   dari jam sesi. */}
                               {b.status === "BOOKED" && b.availability.endTime <= now ? (
                                 <Badge tone="neutral">Sudah lewat</Badge>
+                              ) : b.status === "BOOKED" && b.availability.startTime <= now ? (
+                                // Tombol batal ilang begitu sesi mulai -- kasih tau kenapa.
+                                <Badge tone="brand">Sedang berlangsung</Badge>
                               ) : (
                                 <Badge tone={statusTone[b.status]}>{statusLabel[b.status]}</Badge>
                               )}

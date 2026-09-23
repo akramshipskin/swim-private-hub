@@ -44,7 +44,10 @@ export function Stat({ label, value, hint, tone }: { label: string; value: React
           tone === "warning" ? "text-warning-text" : tone === "success" ? "text-success-text" : "text-text"
         )}
       >
-        {value}
+        {/* formatRupiah pakai non-breaking space setelah "Rp", jadi di kolom
+            sempit (320px) break-words motong DI TENGAH angka ("Rp 750.00"/"0").
+            Spasi biasa di sini bikin pindah barisnya di antara Rp dan angka. */}
+        {typeof value === "string" ? value.replace(/ /g, " ") : value}
       </p>
       {hint && <p className="text-xs text-text-subtle">{hint}</p>}
     </div>

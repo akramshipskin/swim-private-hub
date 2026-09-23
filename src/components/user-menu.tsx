@@ -30,13 +30,13 @@ export function UserMenu({
   }, []);
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative min-w-0">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-label="Menu akun"
         aria-expanded={open}
-        className="flex min-w-0 max-w-[62vw] items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-text-muted hover:bg-surface-muted sm:max-w-none"
+        className="flex min-w-0 max-w-full items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-text-muted hover:bg-surface-muted sm:max-w-none"
       >
         {/* undefined = role tanpa foto profil; null = coach belum upload (siluet default) */}
         {avatarUrl !== undefined && <Avatar src={avatarUrl} className="h-8 w-8" />}

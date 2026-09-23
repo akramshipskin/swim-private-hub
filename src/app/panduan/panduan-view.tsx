@@ -290,13 +290,13 @@ export default function PanduanView() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-4">
           <Link href="/" className="flex shrink-0 items-center gap-2">
             <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
-            <Logotype className="text-base sm:text-xl" />
+            <Logotype className="text-sm sm:text-xl" />
           </Link>
-          <div className="flex shrink-0 items-center gap-2">
-            <Link href="/login" className="rounded-full px-3 py-2 text-sm font-semibold hover:bg-[#ECE9DC] sm:px-4">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-[#ECE9DC] sm:px-4">
               Masuk
             </Link>
-            <Link href="/register" className="rounded-full bg-[#14140F] px-3 py-2 text-sm font-semibold text-white hover:bg-black sm:px-4">
+            <Link href="/register" className="rounded-full bg-[#14140F] px-2.5 py-2 text-sm font-semibold text-white hover:bg-black sm:px-4">
               Daftar
             </Link>
           </div>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
@@ -93,7 +94,12 @@ export default async function MemberPembayaranPage() {
                     <div className="flex shrink-0 flex-col items-end gap-1.5">
                       <p className="text-base font-bold text-text">{formatRupiah(p.amount)}</p>
                       {expired ? (
-                        <Badge tone="neutral">Kedaluwarsa</Badge>
+                        <>
+                          <Badge tone="neutral">Kedaluwarsa</Badge>
+                          <Link href="/member/paket" className="text-sm font-medium text-brand-700 hover:underline">
+                            Beli lagi &rarr;
+                          </Link>
+                        </>
                       ) : (
                         <Badge tone={statusTone[p.status as keyof typeof statusTone] ?? "neutral"}>
                           {statusLabel[p.status] ?? p.status}

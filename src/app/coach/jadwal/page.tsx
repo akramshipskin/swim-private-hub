@@ -190,7 +190,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                                     {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
                                   </span>
                                   <Badge tone={a.bookings.length > 0 ? "brand" : "neutral"}>
-                                    {a.bookings.length > 0 ? (a.startTime <= now ? "Selesai/berjalan" : "Terisi") : "Kosong"}
+                                    {a.bookings.length > 0 ? (a.endTime <= now ? "Selesai" : a.startTime <= now ? "Berjalan" : "Terisi") : "Kosong"}
                                   </Badge>
                                 </div>
                               ))}

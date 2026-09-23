@@ -3,7 +3,7 @@ import PanduanView from "./panduan-view";
 
 export const metadata: Metadata = {
   title: "Panduan | Swim Private Hub",
-  description: "Presentasi produk dan panduan penggunaan lengkap untuk Member, Coach, dan Admin.",
+  description: "Presentasi produk dan panduan penggunaan lengkap untuk Member, Coach, Pemilik Kolam, dan Admin.",
 };
 
 // Halaman publik -- gak butuh login, biar bisa dibagikan/dibuka siapa aja
