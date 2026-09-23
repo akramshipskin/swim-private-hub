@@ -1,16 +1,28 @@
 import webpush from "web-push";
+import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+type Payload = { title: string; body: string; url?: string };
 
-export async function sendPushToUser(
-  userId: string,
-  payload: { title: string; body: string; url?: string }
-) {
+let vapidReady = false;
+
+// Dimuat malas & aman: kalau env VAPID belum diisi, push dilewati diam-diam.
+// Sebelumnya setVapidDetails jalan saat modul di-import, jadi env kosong bikin
+// SEMUA route yang meng-import modul ini (termasuk webhook pembayaran) crash.
+function ensureVapid() {
+  if (vapidReady) return true;
+  const subject = process.env.VAPID_SUBJECT;
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
+  if (!subject || !publicKey || !privateKey) return false;
+  webpush.setVapidDetails(subject, publicKey, privateKey);
+  vapidReady = true;
+  return true;
+}
+
+async function deliver(userId: string, payload: Payload) {
+  if (!ensureVapid()) return;
+
   const subscriptions = await prisma.pushSubscription.findMany({
     where: { userId },
   });
@@ -35,4 +47,21 @@ export async function sendPushToUser(
       }
     })
   );
+}
+
+// Dijadwalkan lewat after(): di serverless (Vercel) promise yang dilempar
+// begitu saja bisa terputus saat fungsi selesai membalas, jadi push gak
+// sampai. Di luar request (tes/skrip) after() melempar error -> jalan langsung.
+export async function sendPushToUser(userId: string, payload: Payload) {
+  const job = () => deliver(userId, payload).catch(() => {});
+  try {
+    after(job);
+  } catch {
+    await job();
+  }
+}
+
+export async function sendPushToRole(role: "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", payload: Payload) {
+  const users = await prisma.user.findMany({ where: { role, isActive: true }, select: { id: true } });
+  await Promise.all(users.map((u) => sendPushToUser(u.id, payload)));
 }

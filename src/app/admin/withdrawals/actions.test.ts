@@ -21,6 +21,11 @@ vi.mock("@/lib/withdrawal", () => ({
   markWithdrawalFailed: (...args: unknown[]) => markWithdrawalFailed(...args),
 }));
 
+const notifyWithdrawalOutcome = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/withdrawal-notify", () => ({
+  notifyWithdrawalOutcome: (...args: unknown[]) => notifyWithdrawalOutcome(...args),
+}));
+
 const isIrisConfigured = vi.fn();
 const disburseViaIris = vi.fn();
 vi.mock("@/lib/disbursement", () => ({
@@ -184,5 +189,55 @@ describe("lost CAS claim", () => {
     const result = await processWithdrawal(null, formData("wd-1"));
     expect(result?.error).toBeTruthy();
     expect(disburseViaIris).not.toHaveBeenCalled();
+  });
+});
+
+describe("withdrawal outcome notifications", () => {
+  it("notifies the requester when an admin marks a request paid", async () => {
+    findUnique.mockResolvedValue({ id: "w1", status: "PENDING" });
+    markWithdrawalPaid.mockResolvedValueOnce(true);
+    await markPaidManually(null, formData("w1"));
+    expect(notifyWithdrawalOutcome).toHaveBeenCalledWith("w1", "PAID");
+  });
+
+  it("does not notify when someone else already processed the request", async () => {
+    findUnique.mockResolvedValue({ id: "w1", status: "PENDING" });
+    markWithdrawalPaid.mockResolvedValueOnce(false);
+    await markPaidManually(null, formData("w1"));
+    expect(notifyWithdrawalOutcome).not.toHaveBeenCalled();
+  });
+
+  it("notifies the requester when a request is rejected", async () => {
+    findUnique.mockResolvedValue({ id: "w2", status: "PENDING" });
+    markWithdrawalFailed.mockResolvedValueOnce(true);
+    await rejectWithdrawal(null, formData("w2"));
+    expect(notifyWithdrawalOutcome).toHaveBeenCalledWith("w2", "FAILED");
+  });
+
+  it("does not notify when the rejection lost the race", async () => {
+    findUnique.mockResolvedValue({ id: "w2", status: "PENDING" });
+    markWithdrawalFailed.mockResolvedValueOnce(false);
+    await rejectWithdrawal(null, formData("w2"));
+    expect(notifyWithdrawalOutcome).not.toHaveBeenCalled();
+  });
+
+  it("notifies PAID after an automatic transfer succeeds, FAILED after a definite rejection", async () => {
+    findUnique.mockResolvedValue({ id: "w3", status: "PENDING", amount: 50000, bankName: "bca", bankAccountNumber: "1", bankAccountName: "a" });
+    isIrisConfigured.mockReturnValue(true);
+    disburseViaIris.mockResolvedValueOnce({ success: true, midtransReferenceId: "ref-1" });
+    await processWithdrawal(null, formData("w3"));
+    expect(notifyWithdrawalOutcome).toHaveBeenLastCalledWith("w3", "PAID");
+
+    disburseViaIris.mockResolvedValueOnce({ success: false, definite: true, reason: "ditolak" });
+    await processWithdrawal(null, formData("w3"));
+    expect(notifyWithdrawalOutcome).toHaveBeenLastCalledWith("w3", "FAILED");
+  });
+
+  it("does not notify when the automatic transfer result is uncertain", async () => {
+    findUnique.mockResolvedValue({ id: "w4", status: "PENDING", amount: 50000, bankName: "bca", bankAccountNumber: "1", bankAccountName: "a" });
+    isIrisConfigured.mockReturnValue(true);
+    disburseViaIris.mockResolvedValueOnce({ success: false, definite: false, reason: "timeout" });
+    await processWithdrawal(null, formData("w4"));
+    expect(notifyWithdrawalOutcome).not.toHaveBeenCalled();
   });
 });

@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { markWithdrawalFailed, markWithdrawalPaid } from "@/lib/withdrawal";
 import { disburseViaIris, isIrisConfigured } from "@/lib/disbursement";
+import { notifyWithdrawalOutcome } from "@/lib/withdrawal-notify";
 import { revalidatePath } from "next/cache";
 
 export type ActionState = { error?: string } | null;
@@ -47,9 +48,13 @@ export async function processWithdrawal(
   });
 
   if (result.success) {
-    await markWithdrawalPaid(withdrawalId, result.midtransReferenceId);
+    if (await markWithdrawalPaid(withdrawalId, result.midtransReferenceId)) {
+      await notifyWithdrawalOutcome(withdrawalId, "PAID");
+    }
   } else if (result.definite) {
-    await markWithdrawalFailed(withdrawalId, result.reason);
+    if (await markWithdrawalFailed(withdrawalId, result.reason)) {
+      await notifyWithdrawalOutcome(withdrawalId, "FAILED");
+    }
   } else {
     // Hasil gak pasti: transfer mungkin udah jalan. Saldo JANGAN
     // dibalikin -- biarin PROCESSING sampai admin cek dashboard Iris.
@@ -85,6 +90,7 @@ export async function markPaidManually(
   if (!claimed) {
     return { error: "Pengajuan ini baru saja diproses (dibayar/ditolak). Muat ulang halaman dulu." };
   }
+  await notifyWithdrawalOutcome(withdrawalId, "PAID");
   return null;
 }
 
@@ -115,5 +121,6 @@ export async function rejectWithdrawal(
   if (!claimed) {
     return { error: "Pengajuan ini baru saja diproses (dibayar/ditolak). Muat ulang halaman dulu." };
   }
+  await notifyWithdrawalOutcome(withdrawalId, "FAILED");
   return null;
 }

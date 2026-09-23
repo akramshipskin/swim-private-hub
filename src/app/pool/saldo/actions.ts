@@ -3,6 +3,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { requestPoolWithdrawal, WithdrawalError } from "@/lib/withdrawal";
+import { notifyAdminsWithdrawalRequested } from "@/lib/withdrawal-notify";
 import { revalidatePath } from "next/cache";
 
 export type ActionState = { error?: string; ok?: boolean } | null;
@@ -58,7 +59,8 @@ export async function requestWithdrawal(
 
   try {
     const pool = await getOwnedPool(session.user.id, poolId);
-    await requestPoolWithdrawal(pool.id, Number(formData.get("amount")));
+    const request = await requestPoolWithdrawal(pool.id, Number(formData.get("amount")));
+    await notifyAdminsWithdrawalRequested(pool.name, request.amount);
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Gagal ajukan pencairan" };
   }

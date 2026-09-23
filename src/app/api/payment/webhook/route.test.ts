@@ -3,6 +3,9 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/midtrans", () => ({ platformServerKey: () => "server-key" }));
 
+const sendPushToUser = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/push", () => ({ sendPushToUser: (...a: unknown[]) => sendPushToUser(...a) }));
+
 const paymentFindUnique = vi.fn();
 const packageUpdate = vi.fn().mockResolvedValue({});
 const tx = {
@@ -109,5 +112,54 @@ describe("webhook signature check", () => {
       expect((await res.json()).error).toBe("Signature tidak valid");
     }
     expect(paymentFindUnique).not.toHaveBeenCalled();
+  });
+});
+
+describe("webhook push notification", () => {
+  function pendingPayment(over: Record<string, unknown> = {}) {
+    return {
+      id: "pay-9",
+      status: "PENDING",
+      packageId: "pkg-9",
+      package: { memberId: "member-9", isSingleSession: false, template: { name: "Private 4x", durationDays: 30 } },
+      ...over,
+    };
+  }
+
+  it("tells the member once when the payment first turns SUCCESS", async () => {
+    paymentFindUnique.mockResolvedValue(pendingPayment());
+    await POST(settlement());
+    expect(sendPushToUser).toHaveBeenCalledTimes(1);
+    expect(sendPushToUser).toHaveBeenCalledWith(
+      "member-9",
+      expect.objectContaining({ title: "Pembayaran berhasil", url: "/member/booking" })
+    );
+    expect(sendPushToUser.mock.calls[0][1].body).toContain("Private 4x");
+  });
+
+  it("stays silent for a duplicate notification on an already SUCCESS payment", async () => {
+    paymentFindUnique.mockResolvedValue(pendingPayment({ status: "SUCCESS" }));
+    await POST(settlement());
+    expect(sendPushToUser).not.toHaveBeenCalled();
+  });
+
+  it("stays silent when a concurrent notification already claimed the payment", async () => {
+    paymentFindUnique.mockResolvedValue(pendingPayment());
+    tx.payment.updateMany.mockResolvedValueOnce({ count: 0 });
+    await POST(settlement());
+    expect(sendPushToUser).not.toHaveBeenCalled();
+  });
+
+  it("stays silent for a challenged capture (still PENDING)", async () => {
+    paymentFindUnique.mockResolvedValue(pendingPayment());
+    await POST(capture("challenge"));
+    expect(sendPushToUser).not.toHaveBeenCalled();
+  });
+
+  it("still answers ok when sending the push fails", async () => {
+    paymentFindUnique.mockResolvedValue(pendingPayment());
+    sendPushToUser.mockRejectedValueOnce(new Error("push down"));
+    const res = await POST(settlement());
+    expect((await res.json()).ok).toBe(true);
   });
 });

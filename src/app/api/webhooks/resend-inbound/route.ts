@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import { fetchReceivedEmail } from "@/lib/email";
+import { sendPushToRole } from "@/lib/push";
 
 // Resend ngirim webhook `email.received` cuma metadata (from/to/subject/
 // email_id) -- body/html/headers HARUS ditarik lagi via
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
     update: { needsAdmin: true, subject: subject || "(tanpa subjek)" },
   });
 
+  let created = false;
   try {
     await prisma.emailMessage.create({
       data: {
@@ -60,11 +62,20 @@ export async function POST(request: Request) {
         resendId: emailId,
       },
     });
+    created = true;
   } catch (err: unknown) {
     // Resend bisa kirim ulang webhook yang sama (retry) -- resendId unique,
     // constraint violation di sini artinya emang duplikat, bukan error.
     const code = (err as { code?: string })?.code;
     if (code !== "P2002") throw err;
+  }
+
+  if (created) {
+    await sendPushToRole("ADMIN", {
+      title: "Email baru",
+      body: `${from}: ${subject || "(tanpa subjek)"}`,
+      url: "/admin/email",
+    }).catch(() => {});
   }
 
   return Response.json({ ok: true });

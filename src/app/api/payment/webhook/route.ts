@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { platformServerKey } from "@/lib/midtrans";
 import type { Prisma } from "@/generated/prisma/client";
 import { DROP_IN_DURATION_DAYS } from "@/lib/policy";
+import { sendPushToUser } from "@/lib/push";
 
 // Signature Midtrans dihitung pake Server Key platform -- service
 // provider posture (revisi 2026-09-12), 1 akun Midtrans buat semua kolam.
@@ -125,6 +126,8 @@ export async function POST(request: Request) {
   const expiredDate = new Date(now);
   expiredDate.setDate(expiredDate.getDate() + durationDays);
 
+  let activated = false;
+
   await prisma.$transaction(async (tx) => {
     // Payment yang udah SUCCESS gak boleh turun status lagi -- notif
     // "pending"/"expire" yang telat nyampe (retry Midtrans, urutan gak
@@ -153,7 +156,19 @@ export async function POST(request: Request) {
     // 2026-09-12) artinya kolam mana yang dikredit baru ketauan pas
     // tiap sesi BENERAN dipake (lihat src/lib/wallet.ts, dipanggil dari
     // markAttendance). Payment sukses cuma bikin Package aktif.
+    activated = packageStatus === "ACTIVE";
   });
+
+  // Setelah commit & cuma untuk transisi pertama ke SUCCESS (notifikasi
+  // duplikat sudah keluar di atas). Gagal kirim push tidak boleh
+  // menggagalkan webhook -- Midtrans akan mengirim ulang.
+  if (activated) {
+    await sendPushToUser(payment.package.memberId, {
+      title: "Pembayaran berhasil",
+      body: `${payment.package.template?.name ?? "Paket 1 sesi"} sudah aktif. Yuk booking jadwal.`,
+      url: "/member/booking",
+    }).catch(() => {});
+  }
 
   return Response.json({ ok: true });
 }

@@ -3,6 +3,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { requestCoachWithdrawal, WithdrawalError } from "@/lib/withdrawal";
+import { notifyAdminsWithdrawalRequested } from "@/lib/withdrawal-notify";
 import { revalidatePath } from "next/cache";
 
 export type ActionState = { error?: string; ok?: boolean } | null;
@@ -46,7 +47,8 @@ export async function requestWithdrawal(_prev: ActionState, formData: FormData):
 
   try {
     const profile = await getOwnCoachProfile(session.user.id);
-    await requestCoachWithdrawal(profile.id, Number(formData.get("amount")));
+    const request = await requestCoachWithdrawal(profile.id, Number(formData.get("amount")));
+    await notifyAdminsWithdrawalRequested(session.user.name ?? "Coach", request.amount);
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Gagal ajukan pencairan" };
   }

@@ -12,6 +12,9 @@ vi.mock("@/lib/email", () => ({
   fetchReceivedEmail: (...a: unknown[]) => fetchReceivedEmail(...a),
 }));
 
+const sendPushToRole = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/push", () => ({ sendPushToRole: (...a: unknown[]) => sendPushToRole(...a) }));
+
 const upsert = vi.fn();
 const create = vi.fn();
 vi.mock("@/lib/prisma", () => ({
@@ -73,6 +76,10 @@ describe("resend inbound webhook", () => {
         data: expect.objectContaining({ threadId: "thread-1", direction: "INBOUND", resendId: "em-1" }),
       })
     );
+    expect(sendPushToRole).toHaveBeenCalledWith(
+      "ADMIN",
+      expect.objectContaining({ title: "Email baru", body: "cust@example.com: Halo", url: "/admin/email" })
+    );
   });
 
   it("swallows a duplicate webhook retry (unique constraint) instead of throwing", async () => {
@@ -82,6 +89,19 @@ describe("resend inbound webhook", () => {
     });
     fetchReceivedEmail.mockResolvedValue({ to: ["hello@swimprivatehub.biz.id"], text: "isi email", html: null });
     create.mockRejectedValue({ code: "P2002" });
+
+    const res = await POST(req());
+    expect(res.status).toBe(200);
+    expect(sendPushToRole).not.toHaveBeenCalled();
+  });
+
+  it("still answers 200 when the admin push fails", async () => {
+    verify.mockReturnValue({
+      type: "email.received",
+      data: { email_id: "em-2", from: "cust@example.com", subject: "" },
+    });
+    fetchReceivedEmail.mockResolvedValue({ to: ["hello@swimprivatehub.biz.id"], text: "x", html: null });
+    sendPushToRole.mockRejectedValueOnce(new Error("push down"));
 
     const res = await POST(req());
     expect(res.status).toBe(200);
