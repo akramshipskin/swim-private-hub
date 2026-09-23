@@ -179,13 +179,13 @@ export default async function MemberPaketPage() {
                     <div className="flex gap-2 sm:w-56 sm:shrink-0">
                       {pool.photos.slice(0, 2).map((url, i) => (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img key={url + i} src={url} alt={`Foto ${pool.name}`} className="h-24 min-w-0 flex-1 rounded-xl object-cover" />
+                        <img key={url + i} src={url} alt={`Foto ${pool.name}`} className="h-24 min-w-0 flex-1 rounded-lg object-cover" />
                       ))}
                     </div>
                   )}
                   <div className="min-w-0">
                     <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Kolam</p>
-                    <h3 className="text-lg font-semibold text-brand-700">{pool.name}</h3>
+                    <h2 className="text-lg font-semibold text-brand-700">{pool.name}</h2>
                     <p className="mt-0.5 text-sm text-text-muted">
                       {[pool.address, pool.openTime && pool.closeTime && `Buka ${pool.openTime}–${pool.closeTime}`]
                         .filter(Boolean)

@@ -141,7 +141,7 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
               id={`active-${template.id}`}
               defaultChecked={template.isActive}
              
-              className="h-4 w-4 rounded border-border disabled:opacity-50"
+              className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-500 disabled:opacity-50"
             />
             <Label htmlFor={`active-${template.id}`} className="text-sm text-text">
               Aktif

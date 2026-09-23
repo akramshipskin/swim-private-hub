@@ -557,7 +557,7 @@ export default function BookingBoard({
 
       {confirmBuy && selectedPool?.singleSessionPrice != null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="buy-title">
-          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-surface p-5 shadow-lg">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-surface p-5 shadow-lg">
             <h2 id="buy-title" className="text-lg font-semibold text-text">Beli 1 sesi di {selectedPool.name}?</h2>
             <p className="mt-1 text-2xl font-bold text-text">{formatRupiah(selectedPool.singleSessionPrice)}</p>
             <ul className="mt-3 flex list-disc flex-col gap-1 pl-5 text-sm text-text">
