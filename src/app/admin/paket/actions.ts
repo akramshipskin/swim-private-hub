@@ -114,7 +114,7 @@ export async function assignPackageToMember(
     return { error: "Total sesi minimal 1" };
   }
   if (!Number.isInteger(jatahCancel) || jatahCancel < 0) {
-    return { error: "Jatah cancel tidak boleh negatif" };
+    return { error: "Jatah batal tidak boleh negatif" };
   }
 
   // Anak yang dipilih harus emang punya member ini -- dropdown di form
@@ -195,7 +195,7 @@ export async function updatePackage(
     return { error: "Sisa sesi tidak boleh negatif" };
   }
   if (!Number.isInteger(jatahCancelRaw) || jatahCancelRaw < 0) {
-    return { error: "Jatah cancel tidak boleh negatif" };
+    return { error: "Jatah batal tidak boleh negatif" };
   }
 
   const pkg = await prisma.package.findUnique({ where: { id: packageId } });

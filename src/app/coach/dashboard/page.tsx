@@ -78,10 +78,10 @@ export default async function CoachDashboardPage() {
           />
         </BentoCard>
         <BentoCard title="Jadwal hari ini" href="/coach/jadwal" className="md:col-span-2">
-          <SessionList items={slots.filter((s) => s.date.getTime() === today.getTime()).map(toItem)} empty="Tidak ada sesi terbooking hari ini." />
+          <SessionList items={slots.filter((s) => s.date.getTime() === today.getTime()).map(toItem)} empty="Tidak ada sesi yang dibooking hari ini." />
         </BentoCard>
         <BentoCard title="Jadwal besok" href="/coach/jadwal" className="md:col-span-2">
-          <SessionList items={slots.filter((s) => s.date.getTime() === tomorrow.getTime()).map(toItem)} empty="Belum ada sesi terbooking besok." />
+          <SessionList items={slots.filter((s) => s.date.getTime() === tomorrow.getTime()).map(toItem)} empty="Belum ada sesi yang dibooking besok." />
         </BentoCard>
 
         {profile?.certificateStatus !== "APPROVED" && (

@@ -126,7 +126,7 @@ export default function RegisterForm() {
               />
             </div>
 
-            <Field label="Nama/Orang Tua">
+            <Field label="Nama orang tua / pemilik akun">
               <Input
                 type="text"
                 placeholder="Nama kamu"

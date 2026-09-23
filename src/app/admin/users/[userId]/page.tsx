@@ -220,7 +220,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                         ) : (
                           pkgs.map((p) => (
                             <p key={p.id} className="text-sm text-text-muted">
-                              {p.pool?.name ?? "Kolam ?"} · {p.name} · sisa {p.sisaSesi}/{p.totalSesi} sesi · jatah batal{" "}
+                              {p.pool?.name ?? "Kolam tidak diketahui"} · {p.name} · sisa {p.sisaSesi}/{p.totalSesi} sesi · jatah batal{" "}
                               {p.jatahCancel}x{p.expiredDate ? ` · s.d. ${shortDate(p.expiredDate)}` : ""}
                             </p>
                           ))

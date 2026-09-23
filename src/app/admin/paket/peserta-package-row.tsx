@@ -97,7 +97,7 @@ export default function PesertaPackageRow({
                   selebar baris di atas, jadi ujung kanannya otomatis
                   sejajar tanpa perlu bagi rata. */}
               <div className="grid grid-cols-[5rem_1fr] gap-3 sm:contents">
-                <Field label="Jatah Cancel">
+                <Field label="Jatah batal">
                   <Input
                     type="number"
                     name="jatahCancel"

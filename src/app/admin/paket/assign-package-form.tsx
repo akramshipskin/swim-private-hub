@@ -88,7 +88,7 @@ export default function AssignPackageForm({
                 <option key={t.id} value={t.id}>
                   {/* Nama paket bisa sama persis antar kolam (harga beda) --
                       tanpa nama kolam, 2 opsi kebaca identik. */}
-                  {t.name} — {pools.find((p) => p.id === t.poolId)?.name ?? "kolam ?"}
+                  {t.name} — {pools.find((p) => p.id === t.poolId)?.name ?? "kolam tidak diketahui"}
                 </option>
               ))}
             </Select>
@@ -141,7 +141,7 @@ export default function AssignPackageForm({
                 className="w-full sm:w-20"
               />
             </Field>
-            <Field label="Jatah Cancel">
+            <Field label="Jatah batal">
               <Input
                 type="number"
                 name="jatahCancel"

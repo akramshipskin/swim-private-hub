@@ -60,7 +60,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, upload foto dan sertifikat untuk badge Bersertifikat." },
       { title: "Buka jadwal per kolam", body: "Tentukan tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
       { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi." },
-      { title: "Cairkan saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening." },
+      { title: "Cairkan saldo", body: "Komisimu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening." },
     ],
   },
   {

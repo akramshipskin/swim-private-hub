@@ -133,7 +133,7 @@ const GUIDES: Guide[] = [
         steps: [
           { title: "Buka menu Riwayat Sesi", body: "Semua sesi yang sudah lewat waktunya menunggu ditandai." },
           { title: "Pilih Hadir atau Tidak Hadir", body: "Langsung tersimpan begitu dipilih, tidak perlu tombol Simpan." },
-          { title: "Saldo masuk", body: "Bagianmu masuk ke saldo hanya untuk sesi yang ditandai Hadir." },
+          { title: "Saldo masuk", body: "Komisimu masuk ke saldo hanya untuk sesi yang ditandai Hadir." },
         ],
         note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum ditandai — pastikan pilihannya benar.",
       },

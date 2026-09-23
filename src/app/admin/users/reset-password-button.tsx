@@ -65,7 +65,7 @@ export default function ResetPasswordButton({
             ) : (
               <>
                 <p className="mt-1.5 text-sm text-text-muted">
-                  Password sementara {userName} (hanya ditampilin sekali ini):
+                  Password sementara {userName} (hanya ditampilkan sekali ini):
                 </p>
                 <p className="mt-2 select-all rounded-md bg-surface-muted px-3 py-2 font-mono text-base tracking-wide text-text">
                   {tempPassword}
