@@ -41,12 +41,14 @@ export async function POST(request: Request) {
     gross_amount: grossAmount,
     signature_key: signatureKey,
     transaction_status: transactionStatus,
+    fraud_status: fraudStatus,
   } = body as {
     order_id?: string;
     status_code?: string;
     gross_amount?: string;
     signature_key?: string;
     transaction_status?: string;
+    fraud_status?: string;
   };
 
   if (!orderId || !signatureKey) {
@@ -88,7 +90,18 @@ export async function POST(request: Request) {
   let paymentStatus: "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED" = "PENDING";
   let packageStatus: "PENDING_PAYMENT" | "ACTIVE" | "EXPIRED" | null = null;
 
-  if (transactionStatus === "capture" || transactionStatus === "settlement") {
+  // `capture` (kartu) belum tentu aman: Midtrans FDS bisa ngasih
+  // fraud_status "challenge" (perlu review manual) atau "deny". Cuma
+  // "accept" yang boleh ngaktifin paket. Challenge ditahan PENDING --
+  // setelah diputuskan di dashboard Midtrans, notifikasi berikutnya
+  // (settlement/deny) yang nentuin. fraud_status kosong juga ditahan
+  // (gagal aman: paket telat aktif lebih baik dari aktif tanpa dibayar).
+  if (transactionStatus === "capture" && fraudStatus === "deny") {
+    paymentStatus = "FAILED";
+    packageStatus = "EXPIRED";
+  } else if (transactionStatus === "capture" && fraudStatus !== "accept") {
+    paymentStatus = "PENDING";
+  } else if (transactionStatus === "capture" || transactionStatus === "settlement") {
     paymentStatus = "SUCCESS";
     packageStatus = "ACTIVE";
   } else if (transactionStatus === "deny" || transactionStatus === "cancel") {
