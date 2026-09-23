@@ -145,6 +145,7 @@ export default function BookingBoard({
   // kepasang duluan. requestIdRef nolak response yang bukan dari fetch
   // terakhir yang di-trigger.
   const requestIdRef = useRef(0);
+  const [loadError, setLoadError] = useState(false);
 
   const loadSlots = useCallback(async () => {
     // Slot tetep bisa dilihat di kolam manapun; booking-nya yang butuh
@@ -152,12 +153,18 @@ export default function BookingBoard({
     // belum ada yang bisa ditampilin.
     if (!poolId) return;
     const myRequestId = ++requestIdRef.current;
-    const res = await fetch(`/api/availability?date=${date}&poolId=${poolId}`);
-    if (requestIdRef.current !== myRequestId) return;
-    if (res.ok) {
+    // Gagal muat (jaringan/500) dulu diem aja -> loader muter selamanya.
+    // Polling tetap jalan; error dihapus lagi begitu muat berhasil.
+    try {
+      const res = await fetch(`/api/availability?date=${date}&poolId=${poolId}`);
+      if (requestIdRef.current !== myRequestId) return;
+      if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
       if (requestIdRef.current !== myRequestId) return;
       setSlotsState({ key: `${date}|${poolId}`, slots: data.availabilities });
+      setLoadError(false);
+    } catch {
+      if (requestIdRef.current === myRequestId) setLoadError(true);
     }
   }, [date, poolId]);
 
@@ -468,7 +475,17 @@ export default function BookingBoard({
         </p>
       )}
 
-      {slots === null ? (
+      {slots === null && loadError ? (
+        <Card>
+          <CardBody className="py-10 text-center">
+            <p className="text-sm font-medium text-text">Jadwal gagal dimuat</p>
+            <p className="mt-1 text-sm text-text-muted">Cek koneksi internetmu. Halaman akan mencoba lagi otomatis.</p>
+            <Button type="button" size="sm" variant="secondary" className="mt-3" onClick={() => loadSlots()}>
+              Coba lagi sekarang
+            </Button>
+          </CardBody>
+        </Card>
+      ) : slots === null ? (
         <div className="flex justify-center py-10" aria-busy="true">
           <Loader label="Memuat jadwal" />
         </div>

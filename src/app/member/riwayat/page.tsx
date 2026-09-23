@@ -87,6 +87,13 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
             </p>
           </CardBody>
         </Card>
+      ) : sortedDateKeys.length === 0 ? (
+        <Card>
+          <CardBody className="py-10 text-center">
+            <p className="text-sm font-medium text-text">Tidak ada hasil untuk &quot;{q}&quot;</p>
+            <p className="mt-1 text-sm text-text-muted">Coba kata kunci lain: nama coach, kolam, atau peserta.</p>
+          </CardBody>
+        </Card>
       ) : (
         sortedDateKeys.map((key) => {
           const rows = byDate.get(key)!;

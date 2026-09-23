@@ -56,6 +56,13 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
             </p>
           </CardBody>
         </Card>
+      ) : sortedDateKeys.length === 0 ? (
+        <Card>
+          <CardBody className="py-10 text-center">
+            <p className="text-sm font-medium text-text">Tidak ada hasil untuk &quot;{q}&quot;</p>
+            <p className="mt-1 text-sm text-text-muted">Coba kata kunci lain: nama peserta, member, atau kolam.</p>
+          </CardBody>
+        </Card>
       ) : (
         sortedDateKeys.map((key) => {
           const rows = byDate.get(key)!;
