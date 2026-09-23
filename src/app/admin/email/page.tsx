@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ReplyForm from "./reply-form";
-import ComposeForm from "./compose-form";
 import { INBOX_ADDRESSES } from "@/lib/email";
 
 function time(d: Date) {
@@ -70,7 +69,12 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
       </p>
 
       <div className="mt-4">
-        <ComposeForm />
+        <Link
+          href="/admin/email/compose"
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-muted"
+        >
+          Tulis email baru
+        </Link>
       </div>
 
       <div className="mt-4 mb-6 flex flex-wrap gap-2">
