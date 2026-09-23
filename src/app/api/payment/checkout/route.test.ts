@@ -11,12 +11,15 @@ const packageCreate = vi.fn().mockResolvedValue({ id: "pkg-new" });
 const poolFindFirst = vi.fn();
 const templateFindFirst = vi.fn();
 const paymentCreate = vi.fn().mockResolvedValue({});
+const paymentDeleteMany = vi.fn().mockResolvedValue({ count: 1 });
+const packageDelete = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    package: { count: packageCount, findFirst: packageFindFirst, create: packageCreate, delete: vi.fn() },
+    package: { count: packageCount, findFirst: packageFindFirst, create: packageCreate, delete: (...a: unknown[]) => packageDelete(...a) },
     pool: { findFirst: poolFindFirst },
     packageTemplate: { findFirst: templateFindFirst },
-    payment: { create: paymentCreate },
+    payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a) },
+    $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
   },
 }));
 
@@ -62,6 +65,33 @@ describe("checkout 1 sesi", () => {
     // 200000/4 = 50000 * 1.2 = 60000
     expect(paymentCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ amount: 60_000 }) });
     expect(templateFindFirst).not.toHaveBeenCalled();
+  });
+
+  it("records the Payment before opening the Midtrans transaction", async () => {
+    packageCount.mockResolvedValue(1);
+    poolFindFirst.mockResolvedValue({ id: "pool-B", name: "Kolam B", packageTemplates: [{ price: 200_000, totalSesi: 4 }] });
+    await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    expect(paymentCreate.mock.invocationCallOrder[0]).toBeLessThan(createTransaction.mock.invocationCallOrder[0]);
+  });
+
+  it("cleans up package+payment and hides Midtrans details when Snap fails", async () => {
+    packageCount.mockResolvedValue(1);
+    poolFindFirst.mockResolvedValue({ id: "pool-B", name: "Kolam B", packageTemplates: [{ price: 200_000, totalSesi: 4 }] });
+    createTransaction.mockRejectedValueOnce(new Error("ServerKey invalid: SB-Mid-xxx"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    expect(res.status).toBe(502);
+    expect(JSON.stringify(await res.json())).not.toMatch(/ServerKey/);
+    expect(paymentDeleteMany).toHaveBeenCalledWith({ where: { packageId: "pkg-new" } });
+    expect(packageDelete).toHaveBeenCalledWith({ where: { id: "pkg-new" } });
+  });
+
+  it("blocks an account that still has a temporary password", async () => {
+    const { auth } = await import("@/auth");
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: "m1", role: "MEMBER", mustChangePassword: true } } as never);
+    const res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    expect(res.status).toBe(403);
+    expect(packageCreate).not.toHaveBeenCalled();
   });
 
   it("refuses a pool with no catalog", async () => {

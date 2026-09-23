@@ -17,11 +17,19 @@ export async function POST(request: Request) {
   if (!session || session.user.role !== "MEMBER") {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+  // Proxy cuma nge-redirect halaman; API ini di luar matcher-nya, jadi
+  // akun berpassword sementara dicegat di sini juga.
+  if (session.user.mustChangePassword) {
+    return Response.json({ error: "Ganti password sementara dulu sebelum booking." }, { status: 403 });
+  }
 
-  const { availabilityId, packageId } = (await request.json()) as {
-    availabilityId?: string;
-    packageId?: string;
-  };
+  let body: { availabilityId?: string; packageId?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ error: "Format permintaan tidak valid." }, { status: 400 });
+  }
+  const { availabilityId, packageId } = body;
 
   if (!availabilityId || !packageId) {
     return Response.json(
@@ -46,10 +54,15 @@ export async function POST(request: Request) {
       // gak pernah berubah, jadi baca-dulu di sini aman dari race.
       const slot = await tx.availability.findUnique({
         where: { id: availabilityId },
-        select: { poolId: true },
+        select: { poolId: true, pool: { select: { isActive: true } } },
       });
       if (!slot) {
         throw new BookingError("Slot tidak ditemukan.", 404);
+      }
+      // Kolam dinonaktifin admin: booking BARU ditolak. Booking yang udah
+      // ada gak disentuh (keputusan default, bisa diubah Hadi).
+      if (!slot.pool.isActive) {
+        throw new BookingError("Kolam ini sedang tidak aktif, belum bisa dibooking.", 409);
       }
 
       const claimPkg = await tx.package.updateMany({
@@ -119,9 +132,14 @@ export async function POST(request: Request) {
     }
     // Unique constraint di Booking.availabilityId sebagai lapis kedua
     // kalau ada race condition yang lolos dari conditional update di atas.
-    return Response.json(
-      { error: "Slot ini baru saja diambil member lain, coba pilih slot lain." },
-      { status: 409 }
-    );
+    if ((err as { code?: string })?.code === "P2002") {
+      return Response.json(
+        { error: "Slot ini baru saja diambil member lain, coba pilih slot lain." },
+        { status: 409 }
+      );
+    }
+    // Error lain (DB putus, dll) jangan disamarin jadi "slot diambil orang".
+    console.error("booking failed", err);
+    return Response.json({ error: "Gagal memproses booking. Coba lagi sebentar." }, { status: 500 });
   }
 }

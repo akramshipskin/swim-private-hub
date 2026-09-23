@@ -10,12 +10,17 @@ export async function POST(request: Request) {
   if (!session || session.user.role !== "MEMBER") {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (session.user.mustChangePassword) {
+    return Response.json({ error: "Ganti password sementara dulu sebelum membeli paket." }, { status: 403 });
+  }
 
-  const { templateId, dependentId, singleSessionPoolId } = (await request.json()) as {
-    templateId?: string;
-    dependentId?: string;
-    singleSessionPoolId?: string;
-  };
+  let body: { templateId?: string; dependentId?: string; singleSessionPoolId?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ error: "Format permintaan tidak valid." }, { status: 400 });
+  }
+  const { templateId, dependentId, singleSessionPoolId } = body;
 
   if (!dependentId) {
     return Response.json({ error: "Pilih anak dulu" }, { status: 400 });
@@ -135,6 +140,19 @@ export async function POST(request: Request) {
   const orderId = `PKG-${pkg.id}-${Date.now()}`;
   const origin = new URL(request.url).origin;
 
+  // Payment dicatat SEBELUM transaksi Midtrans dibuat -- kebalikannya
+  // (Snap dulu baru Payment) bisa ninggalin transaksi Midtrans hidup
+  // tanpa Payment di DB kalau simpan gagal: member tetep bisa bayar, uang
+  // masuk, webhook gak nemu Payment, paket gak pernah aktif.
+  await prisma.payment.create({
+    data: {
+      packageId: pkg.id,
+      midtransOrderId: orderId,
+      amount: item.price,
+      status: "PENDING",
+    },
+  });
+
   try {
     const transaction = await snap.createTransaction({
       transaction_details: { order_id: orderId, gross_amount: item.price },
@@ -158,23 +176,17 @@ export async function POST(request: Request) {
       },
     });
 
-    await prisma.payment.create({
-      data: {
-        packageId: pkg.id,
-        midtransOrderId: orderId,
-        amount: item.price,
-        status: "PENDING",
-      },
-    });
-
     return Response.json({ redirectUrl: transaction.redirect_url });
   } catch (err) {
-    await prisma.package.delete({ where: { id: pkg.id } });
+    // Snap gagal = belum ada transaksi yang bisa dibayar, aman dibersihin.
+    await prisma.$transaction([
+      prisma.payment.deleteMany({ where: { packageId: pkg.id } }),
+      prisma.package.delete({ where: { id: pkg.id } }),
+    ]);
+    // Detail error Midtrans cuma ke log server, gak dikirim ke browser.
+    console.error("snap.createTransaction failed", err);
     return Response.json(
-      {
-        error: "Gagal membuat transaksi pembayaran. Coba lagi beberapa saat lagi.",
-        detail: err instanceof Error ? err.message : String(err),
-      },
+      { error: "Gagal membuat transaksi pembayaran. Coba lagi beberapa saat lagi." },
       { status: 502 }
     );
   }
