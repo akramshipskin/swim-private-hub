@@ -912,3 +912,33 @@ Hadi wants to avoid burning tokens on an oversized model for a small task, and a
 > [Claude stops here, does not touch code, waits]
 > User: "oke udah gue ganti"
 > Claude: proceeds.
+
+---
+
+# 29. Claude = Otak, OpenCode = Tangan (Hadi, 2026-09-23)
+
+Hadi gak perlu tau mana kerjaan berat/ringan -- itu tugas Claude.
+
+1. Tiap Hadi kasih list revisi/fitur: Claude pelajari dulu, lalu kasih
+   **menu**: tiap item + berat/ringan + gear/model Claude + boleh lewat
+   OpenCode atau tidak. Hadi pilih urutan & ganti model.
+2. Item mekanis (UI, copy, rename, refactor tanpa logika) -> Claude tulis
+   dokumen eksekusi di `docs/plans/<nama>.md` (format: lihat
+   `docs/plans/ui-consistency-batch-1.md`: snippet LAMA/BARU verbatim,
+   scope file, aturan main, verifikasi, format laporan). Semua keputusan
+   desain sudah diputuskan Claude di dokumen; OpenCode cuma eksekusi.
+3. **Haram lewat OpenCode:** duit, wallet, booking/CAS, auth, schema,
+   webhook. Selalu Claude langsung.
+4. Sequential, bukan paralel: Claude diam saat OpenCode kerja.
+5. Setelah OpenCode lapor: Claude validasi independen (git diff per hunk,
+   tsc, vitest, build, browser) SEBELUM commit. Laporan OpenCode bukan bukti.
+
+# 30. Checklist deploy (wajib)
+
+- Ada file baru di `prisma/migrations/` sejak `origin/main`? Hadi jalankan
+  migrasi ke DB produksi DULU, baru push (Claude diblokir akses DB prod):
+  `set -a; source .env.prod; set +a; DATABASE_URL=$PROD_DIRECT_URL DIRECT_URL=$PROD_DIRECT_URL npx prisma migrate deploy`
+  Kode yang select kolom baru + DB belum migrasi = semua login rusak.
+- `npm run build` TIDAK menjalankan migrasi.
+- Cek exit code `npx tsc --noEmit` langsung, jangan lewat `| tail`
+  (pipe nyembunyiin kegagalan).
