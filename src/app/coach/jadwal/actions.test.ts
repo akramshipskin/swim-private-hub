@@ -20,7 +20,16 @@ vi.mock("@/lib/cancel-booking", () => ({
   CancelError: MockCancelError,
 }));
 
-const { cancelBookingAsCoach } = await import("./actions");
+const affiliationFindUnique = vi.fn().mockResolvedValue({ poolId: "pool-1" });
+const availabilityCreateMany = vi.fn();
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    poolAffiliation: { findUnique: (...a: unknown[]) => affiliationFindUnique(...a) },
+    availability: { createMany: (...a: unknown[]) => availabilityCreateMany(...a), findMany: vi.fn().mockResolvedValue([]) },
+  },
+}));
+
+const { cancelBookingAsCoach, addAvailability } = await import("./actions");
 
 function formData(bookingId: string) {
   const fd = new FormData();
@@ -58,5 +67,29 @@ describe("cancelBookingAsCoach", () => {
   it("rethrows a non-CancelError instead of swallowing it", async () => {
     cancelBooking.mockRejectedValue(new Error("unexpected DB error"));
     await expect(cancelBookingAsCoach(null, formData("booking-1"))).rejects.toThrow("unexpected DB error");
+  });
+});
+
+function slotForm(o: Record<string, string>) {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries({ date: "2099-01-05", startTime: "08:00", endTime: "10:00", poolId: "pool-1", ...o })) fd.set(k, v);
+  return fd;
+}
+
+describe("addAvailability input validation", () => {
+  // Regression: tanggal/jam ngaco dulu jadi Invalid Date -> 0 slot kebuat
+  // tapi dianggap sukses.
+  it("rejects a malformed date or time instead of reporting a fake success", async () => {
+    for (const bad of [{ date: "xyz" }, { startTime: "abc" }, { endTime: "9" }]) {
+      const res = await addAvailability(null, slotForm(bad));
+      expect(res).toMatchObject({ error: expect.stringContaining("tidak valid") });
+    }
+    expect(availabilityCreateMany).not.toHaveBeenCalled();
+  });
+
+  it("tells the coach when the range only covers the lunch break", async () => {
+    const res = await addAvailability(null, slotForm({ startTime: "12:00", endTime: "13:00" }));
+    expect(res).toMatchObject({ error: expect.stringContaining("istirahat") });
+    expect(availabilityCreateMany).not.toHaveBeenCalled();
   });
 });

@@ -11,6 +11,9 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date") ?? todayWibDateString();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(dateLabel(date).getTime())) {
+    return Response.json({ error: "Format tanggal harus YYYY-MM-DD" }, { status: 400 });
+  }
   // Pool-first browse (locked /plan-eng-review 2026-09-12): member
   // selalu tau kolamnya lewat paket/anak yang dipilih. poolId dibiarin
   // opsional (bukan wajib) di level API supaya endpoint ini tetep aman

@@ -23,6 +23,12 @@ export async function addAvailability(
   if (!date || !startTime || !endTime || !poolId) {
     return { error: "Tanggal, jam mulai, jam selesai, dan kolam wajib diisi" };
   }
+  // Tanpa ini, tanggal/jam ngaco jadi Invalid Date -> semua pengecekan
+  // di bawah (dibandingin sama NaN) diem-diem false, 0 slot kebuat tapi
+  // coach dapet "berhasil".
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(startTime) || !/^\d{2}:\d{2}$/.test(endTime)) {
+    return { error: "Format tanggal atau jam tidak valid." };
+  }
 
   // Coach cuma boleh buka slot di kolam yang dia terafiliasi -- dicek di
   // sini (bukan cuma dropdown UI) karena formData bisa dipalsu.
@@ -61,6 +67,9 @@ export async function addAvailability(
       startTime: wibDateTime(date, `${pad(h)}:00`),
       endTime: wibDateTime(date, `${pad(h + 1)}:00`),
     });
+  }
+  if (chunks.length === 0) {
+    return { error: "Tidak ada jam yang bisa dibuka di rentang ini (jam 12.00–13.00 adalah jam istirahat)." };
   }
 
   // Cek dulu jam-jam yang udah pernah dibuka -- kalau createMany langsung
