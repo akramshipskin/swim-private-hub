@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
+import { dateLabel, todayWibDateString } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import PoolShareForm from "./pool-share-form";
@@ -61,6 +62,19 @@ export default async function AdminKolamPage() {
     }),
     prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { not: null }, status: "PAID" }, _sum: { amount: true } }),
   ]);
+  // Booking mendatang yang masih jalan di kolam nonaktif (kolam dinonaktifkan
+  // setelah member booking): tetap berlaku, admin perlu menghubungi member.
+  const stuckBookings = await prisma.booking.findMany({
+    where: {
+      status: "BOOKED",
+      availability: { pool: { isActive: false }, date: { gte: dateLabel(todayWibDateString()) } },
+    },
+    select: { availability: { select: { poolId: true } } },
+  });
+  const stuckByPool = new Map<string, number>();
+  for (const b of stuckBookings) {
+    stuckByPool.set(b.availability.poolId, (stuckByPool.get(b.availability.poolId) ?? 0) + 1);
+  }
   const bookingIds = [...new Set(revenueTxns.map((t) => t.bookingId).filter((id): id is string => !!id))];
   const bookingPkgs = await prisma.booking.findMany({
     where: { id: { in: bookingIds } },
@@ -111,6 +125,14 @@ export default async function AdminKolamPage() {
                   </div>
                   <PoolActiveToggle poolId={p.id} poolName={p.name} isActive={p.isActive} />
                 </div>
+
+                {(stuckByPool.get(p.id) ?? 0) > 0 && (
+                  <div className="rounded-xl border border-warning-text/15 bg-warning-bg p-3 text-sm text-warning-text">
+                    <strong>{stuckByPool.get(p.id)} booking mendatang</strong> masih terjadwal di kolam nonaktif ini.
+                    Sesi tetap berlaku — hubungi member, lalu batalkan lewat{" "}
+                    <a href="/admin/booking-overview" className="underline">Booking Overview</a> kalau kolam tidak bisa melayani.
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                   <div className="rounded-xl bg-surface-muted p-3">
