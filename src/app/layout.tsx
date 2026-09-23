@@ -25,7 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://swimprivatehub.biz.id"),
+  metadataBase: new URL("https://www.swimprivatehub.biz.id"),
   title: "Swim Private Hub",
   description: "Booking jadwal renang dengan coach favoritmu.",
   manifest: "/manifest.json",
@@ -49,7 +49,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // localStorage sebelum hydrate) -- server gak pernah tau nilainya,
     // jadi mismatch attribute ini expected, bukan bug beneran.
     <html
-      lang="en"
+      lang="id"
+      data-scroll-behavior="smooth"
       className={`${jakartaSans.variable} ${sora.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >

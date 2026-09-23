@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://swimprivatehub.biz.id";
+const BASE_URL = "https://www.swimprivatehub.biz.id";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
@@ -9,6 +9,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/", priority: 1 },
     { path: "/login", priority: 0.5 },
     { path: "/register", priority: 0.8 },
+    { path: "/daftar-coach", priority: 0.7 },
+    { path: "/daftar-kolam", priority: 0.7 },
     { path: "/panduan", priority: 0.6 },
     { path: "/kebijakan-privasi", priority: 0.3 },
     { path: "/syarat-ketentuan", priority: 0.3 },

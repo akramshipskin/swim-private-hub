@@ -13,10 +13,12 @@ export default function robots(): MetadataRoute.Robots {
         "/coach/",
         "/member",
         "/member/",
+        "/pool",
+        "/pool/",
         "/profil",
         "/ganti-password",
       ],
     },
-    sitemap: "https://swimprivatehub.biz.id/sitemap.xml",
+    sitemap: "https://www.swimprivatehub.biz.id/sitemap.xml",
   };
 }
