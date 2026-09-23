@@ -182,6 +182,14 @@
   --color-whatsapp: var(--color-whatsapp);
 }
 
+/* Matikan pantulan/tarik-refresh bawaan browser HP: header sticky ikut
+   tertarik saat halaman ditarik dari atas. Tarik-refresh sendiri tetap ada
+   lewat komponen PullToRefresh (hanya isi halaman yang bergeser). */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 body {
   /* Gradient asalnya cuma di landing page (bg-[radial-gradient(...)] di
      page.tsx) -- dipindah ke sini biar 1 sumber kepake di semua halaman/role,
