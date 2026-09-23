@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Dokumen Alur Transaksi - Swim Private Hub</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: #1a1a17; font-size: 11.5pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 22pt; margin: 0 0 4px; }
+  h2 { page-break-after: avoid; font-size: 14pt; margin: 22px 0 6px; padding-bottom: 4px; border-bottom: 2px solid #c8ff3e; }
+  h3 { font-size: 12pt; margin: 0 0 4px; }
+  .sub { color: #5c5c52; margin: 0 0 14px; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0 12px; }
+  td, th { border: 1px solid #d9d9cf; padding: 6px 9px; text-align: left; vertical-align: top; font-size: 10.5pt; }
+  th { background: #f3f3ea; width: 32%; }
+  .step { page-break-inside: avoid; margin: 0 0 16px; }
+  .step .no { display: inline-block; background: #14140f; color: #c8ff3e; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 24px; font-size: 10.5pt; margin-right: 8px; }
+  .step img { width: 78%; display: block; border: 1px solid #d9d9cf; border-radius: 6px; margin-top: 6px; }
+  .step img.narrow { width: 40%; }
+  .note { background: #f7f7ef; border-left: 4px solid #c8ff3e; padding: 8px 12px; margin: 10px 0; font-size: 10.5pt; }
+  code { background: #f0f0e6; padding: 1px 5px; border-radius: 3px; font-size: 10pt; }
+  ul { margin: 4px 0 8px; padding-left: 20px; }
+</style>
+</head>
+<body>
+
+<h1>Dokumen Alur Transaksi</h1>
+<p class="sub">Swim Private Hub &mdash; https://www.swimprivatehub.biz.id</p>
+
+<h2>1. Ringkasan Bisnis dan Produk</h2>
+<table>
+  <tr><th>Nama merchant (Midtrans)</th><td>Swim Private Hub</td></tr>
+  <tr><th>Website</th><td>https://www.swimprivatehub.biz.id</td></tr>
+  <tr><th>Jenis usaha</th><td>Platform pemesanan les renang privat. Orang tua atau peserta membeli paket sesi les, lalu memesan jadwal dengan coach di kolam renang mitra.</td></tr>
+  <tr><th>Produk yang dijual</th><td>Paket sesi les renang privat, misalnya Private 4x (4 sesi, berlaku 30 hari, Rp400.000) dan Private 8x (8 sesi, berlaku 60 hari, Rp750.000 di Kolam Renang Melati atau Rp900.000 di Kolam Renang Tirta Asri). Setiap paket memiliki jatah pembatalan.</td></tr>
+  <tr><th>Metode integrasi Midtrans</th><td>Snap (halaman pembayaran Midtrans, mode redirect) dengan notifikasi HTTP (webhook) dari Midtrans. Pencairan dana ke coach dan kolam mitra dijelaskan pada bagian 4, dan pengajuan layanan Payouts pada bagian 5.</td></tr>
+  <tr><th>Alamat</th><td>Perumahan Rantau Indah Residence City, Blok F2 No. 3, Bojong, Karangtengah, Cianjur, 43281</td></tr>
+  <tr><th>Kontak</th><td>hello@swimprivatehub.biz.id &middot; WhatsApp +62 821-1717-3124</td></tr>
+</table>
+
+<h2>2. Alur dari Pemilihan Produk sampai Checkout dengan Midtrans</h2>
+
+<div class="step">
+  <h3><span class="no">1</span>Beranda</h3>
+  Calon pengguna membuka beranda untuk melihat layanan, kolam mitra, coach, cara kerja, dan FAQ. Tombol <b>Daftar</b> dan <b>Masuk</b> tersedia di pojok kanan atas.
+  <img src="01-landing.png" alt="Beranda">
+</div>
+
+<div class="step">
+  <h3><span class="no">2</span>Masuk atau daftar akun</h3>
+  Pembeli masuk dengan No HP atau email dan password. Pengguna baru mendaftar lewat tautan <b>Daftar</b>.
+  <img src="02-login.png" alt="Halaman masuk">
+</div>
+
+<div class="step">
+  <h3><span class="no">3</span>Dashboard member</h3>
+  Setelah masuk, member melihat dashboard dengan menu Booking, Cari Coach, Riwayat, Paket, Riwayat Bayar, dan Peserta.
+  <img src="03-dashboard.png" alt="Dashboard member">
+</div>
+
+<div class="step">
+  <h3><span class="no">4</span>Memilih produk (paket) dan peserta</h3>
+  Pada menu <b>Paket</b>, bagian <b>Beli Paket Baru</b> menampilkan paket per kolam lengkap dengan harga, harga per sesi, jumlah sesi, masa berlaku, dan jatah batal. Pembeli memilih peserta (diri sendiri atau anak) pada dropdown, lalu menekan tombol <b>Beli</b>.
+  <img src="04-pilih-paket.png" alt="Memilih paket">
+</div>
+
+<div class="step">
+  <h3><span class="no">5</span>Checkout dengan Midtrans</h3>
+  Setelah menekan <b>Beli</b>, sistem membuat transaksi pada server (order ID berformat <code>PKG-...</code>) dan meminta token pembayaran ke Midtrans Snap. Pembeli diarahkan ke halaman pembayaran Midtrans, yang menampilkan total tagihan, order ID, batas waktu pembayaran, dan daftar metode pembayaran. Pembeli memilih metode dan menyelesaikan pembayaran di halaman Midtrans.
+  <img class="narrow" style="width:46%" src="05-snap-crop.png" alt="Halaman pembayaran Midtrans Snap">
+  <div class="note">Screenshot halaman Midtrans di atas diambil dari lingkungan Production Midtrans. Transaksi contoh ini tidak dibayar dan kedaluwarsa otomatis.</div>
+</div>
+
+<div class="step">
+  <h3><span class="no">6</span>Kembali ke situs setelah pembayaran</h3>
+  Midtrans mengarahkan pembeli kembali ke situs (halaman finish) sesuai status transaksi. Berikut tampilan untuk status <code>settlement</code> (berhasil) dan <code>pending</code> (menunggu pembayaran, misalnya virtual account). Pembayaran yang dibatalkan atau gagal diarahkan ke halaman "Pembayaran Belum Selesai".
+  <img class="narrow" src="08-sukses.png" alt="Pembayaran berhasil">
+  <img class="narrow" src="09-pending.png" alt="Menunggu pembayaran">
+</div>
+
+<div class="step">
+  <h3><span class="no">7</span>Status pembayaran di Riwayat Bayar</h3>
+  Status pembayaran yang sebenarnya diperbarui otomatis oleh notifikasi HTTP dari Midtrans, bukan oleh halaman di browser pembeli. Pembeli dapat melihat status pada menu <b>Riwayat Bayar</b>: <b>Menunggu pembayaran</b> sebelum dibayar, dan <b>Berhasil</b> setelah Midtrans mengirim notifikasi settlement. Paket menjadi aktif otomatis setelah pembayaran berhasil.
+  <img src="06a-pending.png" alt="Riwayat bayar - menunggu pembayaran">
+  <img class="narrow" src="06b-berhasil.png" alt="Riwayat bayar - berhasil">
+  <div class="note">Data pada screenshot adalah data uji internal.</div>
+</div>
+
+<div class="step">
+  <h3><span class="no">8</span>Memesan jadwal dengan paket yang sudah aktif</h3>
+  Setelah paket aktif, member memilih peserta, kolam, dan tanggal pada menu <b>Booking</b>, lalu memesan jam yang tersedia dengan coach. Setiap sesi yang dipesan memotong sisa sesi pada paket.
+  <img src="07-booking.png" alt="Booking jadwal">
+</div>
+
+<h2>3. Integrasi Teknis dengan Midtrans</h2>
+<ul>
+  <li><b>Pembuatan transaksi:</b> server memvalidasi paket, peserta, dan harga, menyimpan transaksi berstatus menunggu pembayaran, lalu memanggil Midtrans Snap untuk mendapatkan halaman pembayaran.</li>
+  <li><b>URL kembali:</b> selesai <code>/pembayaran/sukses</code>, belum selesai <code>/pembayaran/gagal</code>.</li>
+  <li><b>Notifikasi HTTP:</b> Midtrans mengirim status transaksi ke <code>https://www.swimprivatehub.biz.id/api/payment/webhook</code>. Server memverifikasi tanda tangan (signature key, SHA-512) sebelum memproses.</li>
+  <li><b>Pemetaan status:</b> <code>settlement</code> (atau <code>capture</code> dengan fraud status accept) mengaktifkan paket; <code>pending</code> tetap menunggu; <code>deny</code> dan <code>cancel</code> menggagalkan transaksi; <code>expire</code> menandai transaksi kedaluwarsa. Transaksi kartu dengan fraud status <code>challenge</code> ditahan sampai ada keputusan.</li>
+  <li><b>Perlindungan duplikat:</b> notifikasi yang datang berulang tidak mengaktifkan atau mengkredit paket dua kali.</li>
+</ul>
+
+
+<h2>4. Pencairan Dana ke Coach dan Kolam Mitra</h2>
+<p><b>Model aliran dana.</b> Seluruh pembayaran member diterima pada satu akun merchant Midtrans. Dana tidak langsung dibagi saat pembayaran. Setelah sebuah sesi ditandai <b>Hadir</b>, sistem mencatat bagian masing-masing pihak (coach, kolam mitra, dan platform) sesuai persentase bagi hasil ke saldo internal, dan komisi platform sudah dipisahkan dari PPN 12%. Coach dan kolam mitra kemudian mengajukan pencairan saldo mereka ke rekening bank sendiri.</p>
+
+<div class="step">
+  <h3><span class="no">A</span>Coach atau kolam mengisi rekening dan mengajukan pencairan</h3>
+  Pada menu <b>Saldo</b>, coach atau pemilik kolam mengisi rekening tujuan (nama bank, nomor rekening, nama pemilik rekening), lalu mengajukan pencairan dengan nominal minimal Rp50.000. Nominal yang diajukan langsung dipisahkan dari saldo yang bisa dicairkan dan tampil sebagai <b>Dalam proses pencairan</b> dengan status <b>Menunggu diproses</b>.
+  <img src="12-coach-saldo-ajukan.png" alt="Pengajuan pencairan oleh coach">
+  <div class="note">Data rekening dan nominal pada screenshot adalah data uji internal.</div>
+</div>
+
+<div class="step">
+  <h3><span class="no">B</span>Admin memeriksa dan memproses pengajuan</h3>
+  Admin melihat pengajuan pada halaman <b>Pencairan Saldo</b> (pemilik saldo, nominal, rekening tujuan, waktu pengajuan), lalu memprosesnya. Saat ini pemrosesan dilakukan dengan transfer manual oleh admin, kemudian pengajuan ditandai <b>Dibayar</b>. Admin juga dapat <b>Menolak</b> pengajuan.
+  <img src="14-admin-crop.png" alt="Halaman admin pencairan saldo">
+</div>
+
+<ul>
+  <li><b>Alur status:</b> Menunggu, Diproses, Dibayar, atau Gagal/Ditolak.</li>
+  <li><b>Pengajuan ditolak atau gagal:</b> nominal dikembalikan otomatis ke saldo pengaju.</li>
+  <li><b>Tidak bisa diproses dua kali:</b> satu pengajuan hanya bisa diklaim satu kali, sehingga dua admin tidak dapat membayar pengajuan yang sama.</li>
+  <li><b>Pencairan otomatis (rencana):</b> tahap pemrosesan akan memakai Midtrans Payouts. Jika hasil dari Midtrans tidak pasti (misalnya koneksi terputus), saldo tidak dikembalikan dan pengajuan tetap berstatus <b>Diproses</b> sampai admin memeriksanya, supaya dana tidak keluar dua kali. Menolak pengajuan yang sedang diproses wajib dikonfirmasi admin setelah dicek gagal.</li>
+  <li><b>Jejak audit:</b> setiap perubahan saldo (pendapatan sesi, pengajuan, pengembalian) tercatat sebagai transaksi terpisah pada buku besar saldo.</li>
+</ul>
+
+<h2>5. Pengajuan Layanan Payouts dan Pertanyaan kepada Midtrans</h2>
+<p><b>Pengajuan.</b> Kami mengajukan aktivasi <b>Midtrans Payouts (Disbursement, sebelumnya IRIS)</b> untuk pencairan otomatis ke rekening bank coach dan pemilik kolam mitra sesuai alur pada bagian 4. Setiap pengajuan pencairan bernilai minimal Rp50.000, dikirim ke rekening bank di Indonesia atas nama penerima yang terdaftar pada aplikasi, dan disetujui admin sebelum dikirim.</p>
+<p><b>Pertanyaan yang perlu kami pastikan:</b></p>
+<ol>
+  <li>Apakah Snap API yang kami pakai saat ini (halaman pembayaran plus notifikasi HTTP) wajib pindah ke BI-SNAP? Jika ya, kapan batas waktunya, dan sampai kapan integrasi saat ini tetap didukung?</li>
+  <li>Untuk Payouts di production, apakah otentikasinya memakai Server Key yang sama dengan Snap atau key terpisah? Apakah ada peran Creator dan Approver yang terpisah? Dashboard kami menampilkan keterangan bahwa BI SNAP membutuhkan credential khusus untuk metode pembayaran dan disbursement API. Apakah Payouts untuk transfer bank wajib memakai credential BI-SNAP (public key, Client ID, Client Secret, Partner ID), atau cukup Basic Auth?</li>
+  <li>Apa syarat, dokumen, biaya, dan estimasi waktu aktivasi Payouts untuk akun merchant kami?</li>
+</ol>
+
+<h2>6. Kebijakan dan Kontak untuk Pembeli</h2>
+<table>
+  <tr><th>Syarat dan Ketentuan</th><td>https://www.swimprivatehub.biz.id/syarat-ketentuan</td></tr>
+  <tr><th>Kebijakan Privasi</th><td>https://www.swimprivatehub.biz.id/kebijakan-privasi</td></tr>
+  <tr><th>Kebijakan Pengembalian (refund)</th><td>https://www.swimprivatehub.biz.id/kebijakan-pengembalian &mdash; refund dapat diajukan untuk pembayaran ganda, paket keliru aktif, atau dana terpotong dengan transaksi gagal; diproses paling lambat 14 hari kerja ke metode pembayaran asal.</td></tr>
+  <tr><th>Kebijakan Cookie</th><td>https://www.swimprivatehub.biz.id/kebijakan-cookie</td></tr>
+  <tr><th>Layanan pelanggan</th><td>hello@swimprivatehub.biz.id &middot; WhatsApp +62 821-1717-3124</td></tr>
+</table>
+
+</body>
+</html>
