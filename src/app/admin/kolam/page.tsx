@@ -116,7 +116,7 @@ export default async function AdminKolamPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg font-semibold text-text">{p.name}</h2>
-                      <Badge tone={p.isActive ? "success" : "warning"}>{p.isActive ? "Aktif" : "Belum disetujui"}</Badge>
+                      <Badge tone={p.isActive ? "success" : "warning"}>{p.isActive ? "Aktif" : "Nonaktif"}</Badge>
                     </div>
                     <p className="text-sm text-text-muted">{p.address ?? "Alamat belum diisi"}</p>
                     <p className="text-sm text-text-muted">

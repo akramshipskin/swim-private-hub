@@ -190,7 +190,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                     <li key={pool.id} className="rounded-xl bg-surface-muted p-3">
                       <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-text">
                         {pool.name}
-                        <Badge tone={pool.isActive ? "success" : "warning"}>{pool.isActive ? "Aktif" : "Belum disetujui"}</Badge>
+                        <Badge tone={pool.isActive ? "success" : "warning"}>{pool.isActive ? "Aktif" : "Nonaktif"}</Badge>
                       </p>
                       <p className="text-sm text-text-muted">{pool.address ?? "Alamat belum diisi"}</p>
                       <p className="text-sm text-text">Saldo kolam: {formatRupiah(pool.walletBalance)}</p>
