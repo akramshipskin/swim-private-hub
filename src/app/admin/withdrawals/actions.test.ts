@@ -86,12 +86,28 @@ describe("processWithdrawal", () => {
   it("marks failed with the reason when Iris disbursement is rejected", async () => {
     findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING", amount: 100_000, bankName: "BCA", bankAccountNumber: "1", bankAccountName: "Budi" });
     isIrisConfigured.mockReturnValue(true);
-    disburseViaIris.mockResolvedValue({ success: false, reason: "Rekening tidak valid" });
+    disburseViaIris.mockResolvedValue({ success: false, definite: true, reason: "Rekening tidak valid" });
 
     await processWithdrawal(null, formData("wd-1"));
 
     expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Rekening tidak valid");
     expect(markWithdrawalPaid).not.toHaveBeenCalled();
+  });
+
+  // Regression: hasil Iris yang gak pasti (jaringan putus/5xx) dulu
+  // langsung dianggap gagal + saldo dibalikin, padahal transfer mungkin
+  // udah jalan.
+  it("keeps an ambiguous Iris result PROCESSING without refunding", async () => {
+    findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING", amount: 100_000, bankName: "BCA", bankAccountNumber: "1", bankAccountName: "Budi" });
+    isIrisConfigured.mockReturnValue(true);
+    updateMany.mockResolvedValue({ count: 1 });
+    disburseViaIris.mockResolvedValue({ success: false, definite: false, reason: "socket hang up" });
+
+    const result = await processWithdrawal(null, formData("wd-1"));
+
+    expect(markWithdrawalFailed).not.toHaveBeenCalled();
+    expect(markWithdrawalPaid).not.toHaveBeenCalled();
+    expect(result?.error).toMatch(/belum pasti/);
   });
 });
 
@@ -124,6 +140,23 @@ describe("rejectWithdrawal", () => {
     const result = await rejectWithdrawal(null, formData("wd-1"));
     expect(result?.error).toBeTruthy();
     expect(markWithdrawalFailed).not.toHaveBeenCalled();
+  });
+
+  // Regression: PROCESSING = udah dikirim ke Iris. Nolak tanpa cek bisa
+  // bikin transfer tetap jalan DAN saldo dibalikin (uang keluar 2x).
+  it("refuses to refund a PROCESSING request without explicit confirmation", async () => {
+    findUnique.mockResolvedValue({ id: "wd-1", status: "PROCESSING" });
+    const result = await rejectWithdrawal(null, formData("wd-1"));
+    expect(result?.error).toBeTruthy();
+    expect(markWithdrawalFailed).not.toHaveBeenCalled();
+  });
+
+  it("allows it once the admin confirms the failure was checked in Iris", async () => {
+    findUnique.mockResolvedValue({ id: "wd-1", status: "PROCESSING" });
+    const fd = formData("wd-1");
+    fd.set("confirmedFailed", "true");
+    await rejectWithdrawal(null, fd);
+    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Gagal di Iris (dicek admin)");
   });
 });
 

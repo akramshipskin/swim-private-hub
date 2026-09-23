@@ -25,10 +25,18 @@ export async function disburseViaIris({
   bankAccountNumber: string;
   bankAccountName: string;
   referenceNo: string;
-}): Promise<{ success: true; midtransReferenceId: string } | { success: false; reason: string }> {
+}): Promise<
+  | { success: true; midtransReferenceId: string }
+  // definite: true  = Iris jelas MENOLAK request (belum ada uang keluar),
+  //                   aman balikin saldo.
+  // definite: false = hasilnya gak pasti (jaringan putus, 5xx, respons
+  //                   gak kebaca) -- transfer MUNGKIN udah jalan, JANGAN
+  //                   balikin saldo sebelum dicek manual di dashboard Iris.
+  | { success: false; definite: boolean; reason: string }
+> {
   const serverKey = process.env.MIDTRANS_IRIS_SERVER_KEY;
   if (!serverKey) {
-    return { success: false, reason: "Midtrans Iris belum dikonfigurasi." };
+    return { success: false, definite: true, reason: "Midtrans Iris belum dikonfigurasi." };
   }
 
   // ponytail: implementasi API call Iris beneran belum ditulis -- belum
@@ -63,17 +71,26 @@ export async function disburseViaIris({
     });
 
     if (!res.ok) {
-      const detail = await res.text();
-      return { success: false, reason: `Iris API error (${res.status}): ${detail}` };
+      const detail = await res.text().catch(() => "");
+      // 4xx = request ditolak Iris; 5xx = server mereka error, bisa aja
+      // payout-nya sempat kebuat -- dianggap gak pasti.
+      const definite = res.status >= 400 && res.status < 500;
+      return { success: false, definite, reason: `Iris API error (${res.status}): ${detail}` };
     }
 
-    const data = (await res.json()) as { payouts?: { reference_no?: string }[] };
+    let data: { payouts?: { reference_no?: string }[] };
+    try {
+      data = await res.json();
+    } catch {
+      return { success: false, definite: false, reason: "Respons Iris sukses tapi tidak bisa dibaca." };
+    }
     const reference = data.payouts?.[0]?.reference_no;
     if (!reference) {
-      return { success: false, reason: "Iris API tidak mengembalikan reference_no." };
+      return { success: false, definite: false, reason: "Iris API tidak mengembalikan reference_no." };
     }
     return { success: true, midtransReferenceId: reference };
   } catch (err) {
-    return { success: false, reason: err instanceof Error ? err.message : String(err) };
+    // Error jaringan: gak tau request-nya nyampe atau enggak.
+    return { success: false, definite: false, reason: err instanceof Error ? err.message : String(err) };
   }
 }

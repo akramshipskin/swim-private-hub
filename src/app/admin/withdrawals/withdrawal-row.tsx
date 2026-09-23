@@ -63,12 +63,14 @@ export default function WithdrawalRow({ w }: { w: WithdrawalRowData }) {
 
         {canAct && (
           <div className="mt-1 flex flex-wrap gap-2">
-            <form action={processAction}>
-              <input type="hidden" name="withdrawalId" value={w.id} />
-              <Button type="submit" size="sm" loading={processPending}>
-                Proses via Iris
-              </Button>
-            </form>
+            {w.status === "PENDING" && (
+              <form action={processAction}>
+                <input type="hidden" name="withdrawalId" value={w.id} />
+                <Button type="submit" size="sm" loading={processPending}>
+                  Proses via Iris
+                </Button>
+              </form>
+            )}
             <form action={paidAction}>
               <input type="hidden" name="withdrawalId" value={w.id} />
               <Button type="submit" size="sm" variant="secondary" loading={paidPending}>
@@ -77,8 +79,9 @@ export default function WithdrawalRow({ w }: { w: WithdrawalRowData }) {
             </form>
             <form action={rejectAction}>
               <input type="hidden" name="withdrawalId" value={w.id} />
+              {w.status === "PROCESSING" && <input type="hidden" name="confirmedFailed" value="true" />}
               <Button type="submit" size="sm" variant="danger" loading={rejectPending}>
-                Tolak
+                {w.status === "PROCESSING" ? "Tandai Gagal (sudah dicek di Iris)" : "Tolak"}
               </Button>
             </form>
           </div>

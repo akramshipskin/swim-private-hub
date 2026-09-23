@@ -48,8 +48,20 @@ export async function processWithdrawal(
 
   if (result.success) {
     await markWithdrawalPaid(withdrawalId, result.midtransReferenceId);
-  } else {
+  } else if (result.definite) {
     await markWithdrawalFailed(withdrawalId, result.reason);
+  } else {
+    // Hasil gak pasti: transfer mungkin udah jalan. Saldo JANGAN
+    // dibalikin -- biarin PROCESSING sampai admin cek dashboard Iris.
+    await prisma.withdrawalRequest.updateMany({
+      where: { id: withdrawalId, status: "PROCESSING" },
+      data: { failureReason: `Status belum pasti, cek dashboard Iris: ${result.reason}` },
+    });
+    revalidatePath("/admin/withdrawals");
+    return {
+      error:
+        "Status transfer dari Iris belum pasti. Cek dashboard Iris dulu, lalu klik \"Tandai Dibayar\" atau \"Tandai Gagal\".",
+    };
   }
 
   revalidatePath("/admin/withdrawals");
@@ -83,12 +95,22 @@ export async function rejectWithdrawal(
   await requireRole("ADMIN");
 
   const withdrawalId = formData.get("withdrawalId") as string;
+  const confirmedFailed = formData.get("confirmedFailed") === "true";
   const request = await prisma.withdrawalRequest.findUnique({ where: { id: withdrawalId } });
   if (!request || (request.status !== "PENDING" && request.status !== "PROCESSING")) {
     return { error: "Pengajuan tidak ditemukan atau sudah diproses." };
   }
+  // PROCESSING = udah dikirim ke Iris; nolak tanpa cek bisa bikin transfer
+  // tetep jalan DAN saldo dibalikin (uang keluar 2x). Cuma boleh kalau
+  // admin eksplisit konfirmasi udah cek gagal di dashboard Iris.
+  if (request.status === "PROCESSING" && !confirmedFailed) {
+    return { error: "Pengajuan ini sedang diproses Iris. Cek dashboard Iris dulu." };
+  }
 
-  const claimed = await markWithdrawalFailed(withdrawalId, "Ditolak admin");
+  const claimed = await markWithdrawalFailed(
+    withdrawalId,
+    request.status === "PROCESSING" ? "Gagal di Iris (dicek admin)" : "Ditolak admin"
+  );
   revalidatePath("/admin/withdrawals");
   if (!claimed) {
     return { error: "Pengajuan ini baru saja diproses (dibayar/ditolak). Muat ulang halaman dulu." };
