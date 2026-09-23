@@ -16,7 +16,11 @@ function verifySignature(
     .createHash("sha512")
     .update(orderId + statusCode + grossAmount + platformServerKey())
     .digest("hex");
-  return expected === signatureKey;
+  // Perbandingan waktu-konstan: `===` berhenti di karakter pertama yang
+  // beda, jadi lama prosesnya bocorin berapa karakter awal yang udah benar.
+  const a = Buffer.from(expected);
+  const b = Buffer.from(signatureKey);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
 export async function POST(request: Request) {

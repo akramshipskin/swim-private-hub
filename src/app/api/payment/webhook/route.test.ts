@@ -100,3 +100,14 @@ describe("webhook fraud_status on card capture", () => {
     expect(packageUpdate.mock.calls[0][0].data.status).toBe("EXPIRED");
   });
 });
+
+describe("webhook signature check", () => {
+  it("rejects a tampered signature of the same length and of a different length", async () => {
+    for (const signature_key of ["a".repeat(128), "short"]) {
+      const body = { order_id: "PKG-1", status_code: "200", gross_amount: "135000.00", transaction_status: "settlement", signature_key };
+      const res = await POST(new Request("http://x/api/payment/webhook", { method: "POST", body: JSON.stringify(body) }));
+      expect((await res.json()).error).toBe("Signature tidak valid");
+    }
+    expect(paymentFindUnique).not.toHaveBeenCalled();
+  });
+});

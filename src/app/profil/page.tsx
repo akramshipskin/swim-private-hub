@@ -30,7 +30,7 @@ export default async function ProfilPage() {
   // coach bisa copy & kirim manual via WA, sesuai niat aslinya.
   const publicProfileLink =
     session.user.role === "COACH"
-      ? `${process.env.NEXT_PUBLIC_APP_URL}/pelatih/${session.user.id}`
+      ? `${process.env.NEXT_PUBLIC_APP_URL || "https://www.swimprivatehub.biz.id"}/pelatih/${session.user.id}`
       : null;
   const coachProfile =
     session.user.role === "COACH"

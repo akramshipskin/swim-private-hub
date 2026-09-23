@@ -61,8 +61,8 @@ export default function KebijakanCookiePage() {
           +62 821-1717-3124
         </a>{" "}
         atau email{" "}
-        <a href="mailto:cianjurmarketers@gmail.com" className="text-brand-600 hover:underline">
-          cianjurmarketers@gmail.com
+        <a href="mailto:hello@swimprivatehub.biz.id" className="text-brand-600 hover:underline">
+          hello@swimprivatehub.biz.id
         </a>
         .
       </p>

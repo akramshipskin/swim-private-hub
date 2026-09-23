@@ -31,7 +31,9 @@ export default async function AdminWithdrawalsPage({
       where: {
         status: { in: [...STATUS_FILTERS[status].statuses] },
         ...(who === "pool" ? { poolId: { not: null } } : who === "coach" ? { coachProfileId: { not: null } } : {}),
-        ...(params.pool ? { poolId: params.pool } : {}),
+        // Pengajuan coach gak terikat kolam (poolId null) -- filter kolam cuma
+        // berlaku buat pengajuan kolam, biar "coach + kolam X" gak selalu kosong.
+        ...(params.pool && who !== "coach" ? { poolId: params.pool } : {}),
       },
       orderBy: { requestedAt: "desc" },
       include: {
