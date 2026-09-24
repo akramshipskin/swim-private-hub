@@ -169,6 +169,9 @@ export default function BookingBoard({
   }, [date, poolId]);
 
   useEffect(() => {
+    // Sinkronisasi dengan server (fetch saat mount + polling): pola yang sah,
+    // setState terjadi setelah await, bukan sinkron di badan effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadSlots();
     const interval = setInterval(loadSlots, POLL_INTERVAL_MS);
 
