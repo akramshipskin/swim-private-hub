@@ -48,6 +48,13 @@ export default async function ProfilPage() {
       ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { deletionRequestedAt: true } })
       : null;
 
+  // 2FA opsional untuk coach/member/pemilik kolam (admin wajib, diurus di
+  // /keamanan lewat pengalihan otomatis).
+  const totp =
+    session.user.role !== "ADMIN"
+      ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { totpEnabledAt: true } })
+      : null;
+
   return (
     <NavBar
       userName={session.user.name ?? ""}
@@ -93,6 +100,22 @@ export default async function ProfilPage() {
                 <EditPasswordForm />
               </CardBody>
             </Card>
+
+            {totp && (
+              <Card>
+                <CardBody>
+                  <h2 className="mb-1 text-lg font-semibold text-text">Verifikasi 2 Langkah (2FA)</h2>
+                  <p className="mb-3 text-sm text-text-muted">
+                    {totp.totpEnabledAt
+                      ? "Aktif — setiap masuk kamu diminta kode dari Google Authenticator."
+                      : "Belum aktif. Tambahan pengaman: selain password, masuk juga butuh kode dari HP-mu."}
+                  </p>
+                  <a href="/keamanan" className="inline-block text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                    {totp.totpEnabledAt ? "Kelola 2FA →" : "Pasang 2FA →"}
+                  </a>
+                </CardBody>
+              </Card>
+            )}
           </div>
 
           <div className="flex flex-col gap-4">

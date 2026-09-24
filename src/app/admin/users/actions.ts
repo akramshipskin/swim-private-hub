@@ -409,3 +409,18 @@ export async function resetUserPassword(
   }
   return { tempPassword };
 }
+
+// Reset 2FA coach/member/pemilik kolam yang kehilangan HP. Setelah ini mereka
+// masuk pakai password saja (bisa pasang 2FA lagi dari Profil). Semua sesi
+// yang terbuka ikut keluar. Akun admin TIDAK lewat sini (2FA admin wajib;
+// reset lewat scripts/reset-admin-2fa.mts).
+export async function resetUserTotp(userId: string): Promise<{ error?: string }> {
+  await requireRole("ADMIN");
+  const res = await prisma.user.updateMany({
+    where: { id: userId, role: { not: "ADMIN" } },
+    data: { totpSecret: null, totpEnabledAt: null, totpLastStep: null, sessionVersion: { increment: 1 } },
+  });
+  if (res.count === 0) return { error: "User tidak ditemukan, atau akun admin (reset admin lewat skrip server)." };
+  revalidatePath(`/admin/users/${userId}`);
+  return {};
+}

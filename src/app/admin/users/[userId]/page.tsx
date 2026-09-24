@@ -12,6 +12,7 @@ import { coachBioLine } from "@/lib/coach-bio";
 import { roleLabel } from "@/lib/nav-links";
 import { deletionImpact } from "@/lib/account-deletion";
 import AnonymizeCard from "./anonymize-card";
+import ResetTotpButton from "./reset-totp-button";
 
 export const metadata = { title: "Detail User | Swim Private Hub" };
 
@@ -130,6 +131,19 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             <Row label="Email" value={user.email ?? "-"} />
             <Row label="Terdaftar" value={shortDate(user.createdAt)} />
             <Row label="Wajib ganti password" value={user.mustChangePassword ? "Ya" : "Tidak"} />
+            {/* Reset 2FA hanya untuk coach/member/pemilik kolam; 2FA admin
+                direset lewat scripts/reset-admin-2fa.mts. */}
+            <Row
+              label="2FA (Google Authenticator)"
+              value={
+                <span className="inline-flex flex-wrap items-center justify-end gap-2">
+                  {user.totpEnabledAt ? "Aktif" : "Tidak aktif"}
+                  {user.role !== "ADMIN" && (user.totpEnabledAt || user.totpSecret) && !user.anonymizedAt && (
+                    <ResetTotpButton userId={user.id} userName={user.name} />
+                  )}
+                </span>
+              }
+            />
             {user.registeredReferer && <Row label="Sumber pendaftaran" value={user.registeredReferer} />}
           </CardBody>
         </Card>

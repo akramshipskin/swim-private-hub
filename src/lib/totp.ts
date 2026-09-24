@@ -72,3 +72,9 @@ export function otpauthUrl(secret: string, account: string): string {
   const issuer = "Swim Private Hub";
   return `otpauth://totp/${encodeURIComponent(`${issuer}:${account}`)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
 }
+
+// 2FA wajib hanya untuk admin (keputusan Hadi 25 Sep); coach, member, dan
+// pemilik kolam boleh memasang tapi tidak dipaksa.
+export function needsTotpSetup(role: string, totpEnabledAt: Date | null): boolean {
+  return role === "ADMIN" && !totpEnabledAt;
+}

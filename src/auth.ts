@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { authorizeCredentials } from "@/lib/authorize";
+import { needsTotpSetup } from "@/lib/totp";
 
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   trustHost: true,
@@ -57,8 +58,8 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
 
       token.role = dbUser.role;
       token.mustChangePassword = dbUser.mustChangePassword;
-      // Admin wajib pasang 2FA dulu (proxy.ts mengarahkan ke /admin/keamanan).
-      token.needsTotpSetup = dbUser.role === "ADMIN" && !dbUser.totpEnabledAt;
+      // Admin wajib pasang 2FA dulu (proxy.ts mengarahkan ke /keamanan).
+      token.needsTotpSetup = needsTotpSetup(dbUser.role, dbUser.totpEnabledAt);
       // Nama juga disinkron ulang tiap request (bukan cuma pas sign-in) --
       // tanpa ini, ganti nama di /profil kesimpen bener di DB tapi
       // session.user.name kebawa stale sampe logout-login ulang.

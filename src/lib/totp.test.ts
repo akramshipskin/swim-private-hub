@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { base32Decode, base32Encode, newTotpSecret, otpauthUrl, totpAt, verifyTotp } from "./totp";
+import { base32Decode, base32Encode, needsTotpSetup, newTotpSecret, otpauthUrl, totpAt, verifyTotp } from "./totp";
 
 // RFC 6238 lampiran B: kunci ASCII "12345678901234567890", SHA-1.
 const RFC_SECRET = base32Encode(Buffer.from("12345678901234567890"));
@@ -45,5 +45,15 @@ describe("totp", () => {
     expect(otpauthUrl("ABC", "admin@x.id")).toBe(
       "otpauth://totp/Swim%20Private%20Hub%3Aadmin%40x.id?secret=ABC&issuer=Swim%20Private%20Hub&algorithm=SHA1&digits=6&period=30"
     );
+  });
+});
+
+describe("needsTotpSetup", () => {
+  it("admin tanpa 2FA dipaksa pasang; admin dengan 2FA tidak", () => {
+    expect(needsTotpSetup("ADMIN", null)).toBe(true);
+    expect(needsTotpSetup("ADMIN", new Date())).toBe(false);
+  });
+  it("coach, member, pemilik kolam tidak pernah dipaksa (opsional)", () => {
+    for (const role of ["COACH", "MEMBER", "POOL_OWNER"]) expect(needsTotpSetup(role, null)).toBe(false);
   });
 });
