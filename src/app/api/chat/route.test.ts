@@ -8,6 +8,7 @@ vi.mock("@/lib/chat-ai", () => ({
   stripEscalateToken: vi.fn((s: string) => s),
   ESCALATE_TOKEN: "[[ESC]]",
   MAX_CHAT_LENGTH: 1000,
+  chatVisibleSince: () => new Date("2026-06-27T00:00:00Z"),
 }));
 
 const lockKeys: string[] = [];
@@ -27,7 +28,8 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-const { POST } = await import("./route");
+const { POST, GET } = await import("./route");
+const { prisma } = await import("@/lib/prisma");
 
 const send = (content: string) =>
   POST(new Request("http://x/api/chat", { method: "POST", body: JSON.stringify({ content }) }));
@@ -72,5 +74,25 @@ describe("POST /api/chat first message from a user without a thread", () => {
     vi.mocked(prisma.chatThread.upsert).mockRejectedValueOnce(new Error("db down"));
     await expect(send("halo")).rejects.toThrow("db down");
     expect(prisma.chatThread.findUniqueOrThrow).not.toHaveBeenCalled();
+  });
+});
+
+// Keputusan Hadi 25 Sep: pengguna melihat 90 hari terakhir; arsip tetap ada.
+describe("GET /api/chat riwayat", () => {
+  it("returns only the visible window, newest 100, in chronological order", async () => {
+    vi.mocked(prisma.chatThread.findUnique).mockResolvedValueOnce({
+      messages: [
+        { id: "m3", sender: "AI", content: "c", createdAt: new Date("2026-09-25T03:00:00Z") },
+        { id: "m2", sender: "USER", content: "b", createdAt: new Date("2026-09-25T02:00:00Z") },
+      ],
+    } as never);
+    const res = await GET();
+    expect((await res.json()).messages.map((m: { id: string }) => m.id)).toEqual(["m2", "m3"]);
+    const arg = vi.mocked(prisma.chatThread.findUnique).mock.calls[0][0] as { select: { messages: Record<string, unknown> } };
+    expect(arg.select.messages).toMatchObject({
+      where: { createdAt: { gte: new Date("2026-06-27T00:00:00Z") } },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    });
   });
 });

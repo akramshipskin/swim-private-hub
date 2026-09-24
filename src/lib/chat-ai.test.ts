@@ -76,3 +76,12 @@ describe("stripEscalateToken", () => {
     expect(stripEscalateToken('Paket berlaku "14 hari".')).toBe('Paket berlaku "14 hari".');
   });
 });
+
+describe("chatVisibleSince", () => {
+  it("is exactly 90 days before now", async () => {
+    const { chatVisibleSince, CHAT_VISIBLE_DAYS } = await import("./chat-ai");
+    const now = Date.UTC(2026, 8, 25);
+    expect(CHAT_VISIBLE_DAYS).toBe(90);
+    expect(chatVisibleSince(now).getTime()).toBe(now - 90 * 86_400_000);
+  });
+});

@@ -66,6 +66,10 @@ export function ChatWidget() {
             <div>
               <p className="text-sm font-semibold text-text">Bantuan</p>
               <p className="text-xs text-text-subtle">Dijawab asisten, diteruskan ke admin bila perlu</p>
+              <p className="text-[11px] text-text-subtle">
+                Riwayat yang tampil 90 hari terakhir. Arsip disimpan untuk penyelesaian masalah, sesuai{" "}
+                <a href="/kebijakan-privasi" target="_blank" className="underline">Kebijakan Privasi</a>.
+              </p>
             </div>
             <button type="button" onClick={() => setOpen(false)} aria-label="Tutup chat" className="rounded-md px-2 py-1 text-text-muted hover:bg-surface-muted">
               ✕

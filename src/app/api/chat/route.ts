@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { withDedupeLock } from "@/lib/dedupe-lock";
 import { roleLabel } from "@/lib/nav-links";
-import { askAi, buildSystemPrompt, normalizeTurns, stripEscalateToken, ESCALATE_TOKEN, MAX_CHAT_LENGTH } from "@/lib/chat-ai";
+import { askAi, buildSystemPrompt, normalizeTurns, stripEscalateToken, chatVisibleSince, ESCALATE_TOKEN, MAX_CHAT_LENGTH } from "@/lib/chat-ai";
 
 async function currentUser() {
   const session = await auth();
@@ -13,11 +13,22 @@ async function currentUser() {
 export async function GET() {
   const user = await currentUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  // Pengguna hanya melihat 90 hari terakhir (keputusan Hadi 25 Sep); arsip
+  // lengkap tetap tersimpan untuk penyelesaian masalah dan terlihat admin.
+  // 100 pesan TERBARU (dulu urut naik + take = 100 pesan paling lama, jadi
+  // percakapan panjang tidak menampilkan pesan baru).
   const thread = await prisma.chatThread.findUnique({
     where: { userId: user.id },
-    select: { messages: { orderBy: { createdAt: "asc" }, take: 100, select: { id: true, sender: true, content: true, createdAt: true } } },
+    select: {
+      messages: {
+        where: { createdAt: { gte: chatVisibleSince() } },
+        orderBy: { createdAt: "desc" },
+        take: 100,
+        select: { id: true, sender: true, content: true, createdAt: true },
+      },
+    },
   });
-  return Response.json({ messages: thread?.messages ?? [] });
+  return Response.json({ messages: (thread?.messages ?? []).reverse() });
 }
 
 export async function POST(request: Request) {
@@ -62,7 +73,8 @@ export async function POST(request: Request) {
   }
 
   const history = await prisma.chatMessage.findMany({
-    where: { threadId: thread.id, sender: { in: ["USER", "AI", "ADMIN"] } },
+    // Konteks AI = yang juga dilihat pengguna (90 hari terakhir).
+    where: { threadId: thread.id, sender: { in: ["USER", "AI", "ADMIN"] }, createdAt: { gte: chatVisibleSince() } },
     orderBy: { createdAt: "desc" },
     take: 12,
     select: { sender: true, content: true },

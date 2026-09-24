@@ -1,6 +1,13 @@
 import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT, MIN_WITHDRAWAL } from "@/lib/policy";
 
 export const ESCALATE_TOKEN = "[ADMIN]";
+// Riwayat chat yang ditampilkan ke pengguna (dan dipakai sebagai konteks AI):
+// 90 hari terakhir. Arsip tidak dihapus -- keputusan Hadi 25 Sep.
+export const CHAT_VISIBLE_DAYS = 90;
+export function chatVisibleSince(now = Date.now()): Date {
+  return new Date(now - CHAT_VISIBLE_DAYS * 86_400_000);
+}
+
 export const MAX_CHAT_LENGTH = 1000;
 
 // AI kadang menulis token dalam kutip/backtick ("[ADMIN]") -- buang sekalian
