@@ -55,8 +55,9 @@ export async function authorizeCredentials(credentials: Partial<Record<string, u
     return null;
   }
 
-  // 2FA (wajib untuk admin yang sudah memasangnya). Password benar tapi
-  // kode belum diisi -> minta kode, dan percobaan ini tidak dihitung salah.
+  // 2FA (wajib untuk admin, opsional untuk peran lain -- berlaku untuk siapa
+  // pun yang sudah memasangnya). Password benar tapi kode belum diisi -> minta
+  // kode, dan percobaan ini tidak dihitung salah.
   if (user.totpEnabledAt && user.totpSecret) {
     if (!otp) {
       await notAFailure();
@@ -64,9 +65,11 @@ export async function authorizeCredentials(credentials: Partial<Record<string, u
     }
     const step = verifyTotp(user.totpSecret, otp);
     if (step === null) throw new OtpInvalidError();
-    // Kode yang sama tidak boleh dipakai dua kali (CAS di langkah waktu).
+    // Kode yang sama tidak boleh dipakai dua kali (CAS di langkah waktu), dan
+    // kuncinya harus masih kunci yang barusan dicek: 2FA yang dinonaktifkan/
+    // direset admin di antaranya -> ditolak (coba lagi, tanpa kode lama).
     const claimed = await prisma.user.updateMany({
-      where: { id: user.id, OR: [{ totpLastStep: null }, { totpLastStep: { lt: step } }] },
+      where: { id: user.id, totpSecret: user.totpSecret, OR: [{ totpLastStep: null }, { totpLastStep: { lt: step } }] },
       data: { totpLastStep: step },
     });
     if (claimed.count === 0) throw new OtpInvalidError();

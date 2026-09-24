@@ -1,0 +1,91 @@
+name: Backup DB
+
+# Backup harian database produksi (skema public = semua data aplikasi) ke
+# penyimpanan kompatibel-S3, terenkripsi. Penjelasan & cara memulihkan:
+# docs/backup.md. BELUM DIUJI dengan secret asli -- jalankan manual sekali
+# (tab Actions -> Backup DB -> Run workflow) dan cek hasilnya sebelum diandalkan.
+on:
+  schedule:
+    - cron: "0 19 * * *" # 02:00 WIB. Jadwal hanya jalan dari branch main.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-db
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Server produksi Postgres 17. pg_dump harus versi yang sama atau lebih
+      # baru dari server; ubuntu-latest bawaannya lebih lama, jadi dipasang dari
+      # repo resmi PostgreSQL.
+      PG_MAJOR: "17"
+      KEEP_DAYS: "30"
+      PREFIX: db
+    steps:
+      - name: Pasang pg_dump ${{ env.PG_MAJOR }}
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "postgresql-client-${PG_MAJOR}"
+          echo "/usr/lib/postgresql/${PG_MAJOR}/bin" >> "$GITHUB_PATH"
+
+      - name: Dump + enkripsi
+        env:
+          DB_URL: ${{ secrets.PROD_DIRECT_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$DB_URL" || { echo "Secret PROD_DIRECT_URL kosong"; exit 1; }
+          test -n "$BACKUP_PASSPHRASE" || { echo "Secret BACKUP_PASSPHRASE kosong"; exit 1; }
+          pg_dump --version
+          FILE="swim-$(date -u +%Y%m%dT%H%M%SZ).dump.gpg"
+          # Format custom = sudah terkompres (-Z 6) dan bisa dipulihkan per
+          # tabel. Hanya skema public (data aplikasi + _prisma_migrations);
+          # skema internal Supabase (auth, storage, ...) tidak ikut.
+          pg_dump --format=custom --compress=6 --schema=public --no-owner --no-privileges "$DB_URL" \
+            | gpg --batch --yes --symmetric --cipher-algo AES256 --compress-algo none \
+                  --passphrase-fd 3 --output "$FILE" 3<<< "$BACKUP_PASSPHRASE"
+          # Uji baca: dekripsi + daftar isi. Gagal di sini = backup rusak.
+          gpg --batch --quiet --decrypt --passphrase-fd 3 "$FILE" 3<<< "$BACKUP_PASSPHRASE" | pg_restore --list > toc.txt
+          grep -q 'TABLE DATA public User ' toc.txt || { echo "Tabel User tidak ada di backup"; exit 1; }
+          echo "Ukuran: $(du -h "$FILE" | cut -f1), $(grep -c 'TABLE DATA' toc.txt) tabel berisi data"
+          echo "FILE=$FILE" >> "$GITHUB_ENV"
+
+      - name: Unggah + hapus yang lebih dari ${{ env.KEEP_DAYS }} hari
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_ACCESS_KEY }}
+          # R2: "auto". Backblaze B2: region dari endpoint (mis. us-west-004).
+          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
+          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+          # aws cli baru menambah checksum yang ditolak sebagian penyedia non-AWS.
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: |
+          set -euo pipefail
+          test -n "$ENDPOINT" && test -n "$BUCKET" || { echo "Secret BACKUP_S3_ENDPOINT/BACKUP_S3_BUCKET kosong"; exit 1; }
+          aws --version
+          aws s3 cp "$FILE" "s3://$BUCKET/$PREFIX/$FILE" --endpoint-url "$ENDPOINT" --only-show-errors
+          # Hapus backup lama HANYA setelah unggahan hari ini berhasil, dan hanya
+          # file yang namanya cocok pola backup ini (tanggal dibaca dari nama).
+          CUTOFF="swim-$(date -u -d "$KEEP_DAYS days ago" +%Y%m%dT%H%M%SZ)"
+          aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$PREFIX/" --endpoint-url "$ENDPOINT" \
+              --query 'Contents[].Key' --output text | tr '\t' '\n' \
+            | { grep -E "^$PREFIX/swim-[0-9]{8}T[0-9]{6}Z\.dump\.gpg$" || true; } \
+            | while read -r key; do
+                name="${key#"$PREFIX/"}"
+                if [[ "$name" < "$CUTOFF" ]]; then
+                  echo "hapus $key"
+                  aws s3 rm "s3://$BUCKET/$key" --endpoint-url "$ENDPOINT" --only-show-errors
+                fi
+              done

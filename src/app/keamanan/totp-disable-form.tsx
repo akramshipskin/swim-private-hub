@@ -1,0 +1,30 @@
+"use client";
+
+import { useActionState } from "react";
+import { disableTotp } from "./actions";
+import { Button } from "@/components/ui/button";
+import { Field, Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+
+export default function TotpDisableForm() {
+  const [state, formAction, pending] = useActionState(disableTotp, null);
+  return (
+    <form action={formAction} className="flex flex-col gap-3">
+      <p className="text-sm text-text-muted">Setelah dimatikan, masuk cukup dengan password. Kamu bisa memasangnya lagi kapan saja.</p>
+      <Field label="Password">
+        <PasswordInput name="password" autoComplete="current-password" required />
+      </Field>
+      <Field label="Kode 6 digit dari aplikasi">
+        <Input name="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9 ]{6,7}" maxLength={7} placeholder="123456" required />
+      </Field>
+      {state?.error && (
+        <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">
+          {state.error}
+        </p>
+      )}
+      <Button type="submit" variant="danger" loading={pending} className="w-full">
+        Matikan 2FA
+      </Button>
+    </form>
+  );
+}

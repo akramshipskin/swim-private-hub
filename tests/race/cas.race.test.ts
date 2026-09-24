@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize } from "./fx";
+import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle } from "./fx";
 import { adminCancelBooking } from "@/app/admin/booking-overview/actions";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 beforeEach(reset);
@@ -17,7 +17,7 @@ describe("CAS batal vs absen", () => {
         () => as({ id: admin.id, role: "ADMIN" }, () => adminCancelBooking(null, fd({ bookingId: b.id }))),
         () => as({ id: coach.id, role: "COACH" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" }))),
       ];
-      const rs = await settle((i % 2 ? calls.reverse() : calls).map((c) => c()));
+      await settle((i % 2 ? calls.reverse() : calls).map((c) => c()));
       const bb = await prisma.booking.findUniqueOrThrow({ where: { id: b.id } });
       const cp = await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } });
       const p = await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } });

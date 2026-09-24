@@ -25,11 +25,10 @@ declare module "midtrans-client" {
     redirect_url: string;
   }
 
-  class Snap {
-    constructor(config: SnapConfig);
+  interface Snap {
     createTransaction(params: TransactionParams): Promise<TransactionResult>;
   }
 
-  const midtransClient: { Snap: typeof Snap };
+  const midtransClient: { Snap: new (config: SnapConfig) => Snap };
   export default midtransClient;
 }

@@ -23,7 +23,8 @@ export default function LoginForm() {
   const router = useRouter();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  // Diisi setelah server membalas "otp_required" (admin dengan 2FA).
+  // Diisi setelah server membalas "otp_required" (akun peran apa pun yang
+  // memasang 2FA: wajib untuk admin, opsional untuk yang lain).
   const [otp, setOtp] = useState("");
   const [needsOtp, setNeedsOtp] = useState(false);
   const [error, setError] = useState<string | null>(null);

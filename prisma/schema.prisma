@@ -230,8 +230,8 @@ model WalletTransaction {
   id     String                @id @default(cuid())
   type   WalletTransactionType
   // Persis 1 dari dua ini yang keisi -- baris punya Pool ATAU CoachProfile,
-  // gak pernah dua-duanya (dicek di action layer, bukan constraint DB,
-  // pola yang sama kayak Pool.ownerUserId).
+  // gak pernah dua-duanya (dijaga CHECK "WalletTransaction_owner_matches_type"
+  // di DB, lihat migrasi money_controls + validate_money_checks).
   poolId         String?
   pool           Pool?          @relation(fields: [poolId], references: [id], onDelete: Cascade)
   coachProfileId String?

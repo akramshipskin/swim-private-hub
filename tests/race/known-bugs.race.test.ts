@@ -19,7 +19,9 @@ import { toggleUserActive } from "@/app/admin/users/actions";
 import { reviewTemplate } from "@/app/admin/paket/actions";
 import { updatePoolTemplate } from "@/app/pool/paket/actions";
 
-const known = process.env.RACE_KNOWN_BUGS === "run" ? it : it.fails;
+// Semua bug di file ini sudah diperbaiki (tesnya sudah `it`). Untuk bug baru
+// yang belum diperbaiki, pasang lagi:
+//   const known = process.env.RACE_KNOWN_BUGS === "run" ? it : it.fails;
 const bookReq = (body: unknown) => new Request("http://x/api/booking", { method: "POST", body: JSON.stringify(body) });
 const HOUR = 3600e3;
 
