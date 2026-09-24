@@ -11,10 +11,21 @@ import { Field, Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { buildAdminWaLink } from "@/lib/whatsapp";
 
+// Kode dari src/auth.ts (LockedError dll). Selain itu = salah HP/password
+// atau akun belum aktif -- sengaja tidak dibedakan.
+export function loginErrorMessage(code: string | undefined): string {
+  if (code === "locked") return "Terlalu banyak percobaan salah. Tunggu 15 menit, lalu coba lagi.";
+  if (code === "otp_invalid") return "Kode 2FA salah atau sudah dipakai. Tunggu kode berikutnya di aplikasi.";
+  return "No HP/Email atau password salah — atau akunmu (coach/pemilik kolam yang baru daftar) belum diaktifkan admin.";
+}
+
 export default function LoginForm() {
   const router = useRouter();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  // Diisi setelah server membalas "otp_required" (admin dengan 2FA).
+  const [otp, setOtp] = useState("");
+  const [needsOtp, setNeedsOtp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,13 +37,18 @@ export default function LoginForm() {
     const result = await signIn("credentials", {
       identifier,
       password,
+      otp,
       redirect: false,
     });
 
     setLoading(false);
 
     if (result?.error) {
-      setError("No HP/Email atau password salah — atau akunmu (coach/pemilik kolam yang baru daftar) belum diaktifkan admin.");
+      if (result.code === "otp_required") {
+        setNeedsOtp(true);
+        return;
+      }
+      setError(loginErrorMessage(result.code));
       return;
     }
 
@@ -97,6 +113,23 @@ export default function LoginForm() {
                 autoComplete="current-password"
               />
             </Field>
+
+            {needsOtp && (
+              <Field label="Kode 2FA (Google Authenticator)">
+                <Input
+                  name="otp"
+                  id="login-otp"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  maxLength={7}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required
+                  autoFocus
+                />
+              </Field>
+            )}
 
             {error && (
               <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">

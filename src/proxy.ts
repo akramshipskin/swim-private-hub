@@ -13,6 +13,11 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/ganti-password", req.nextUrl));
   }
 
+  // Admin wajib memasang 2FA dulu (halaman /keamanan, di luar matcher ini).
+  if (role === "ADMIN" && req.auth.user.needsTotpSetup) {
+    return NextResponse.redirect(new URL("/keamanan", req.nextUrl));
+  }
+
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }

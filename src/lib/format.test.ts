@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isValidIndonesianPhone, toProperCase } from "./format";
+import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants, toProperCase } from "./format";
 
 describe("toProperCase", () => {
   it("capitalizes the first letter of an all-lowercase name", () => {
@@ -46,5 +46,58 @@ describe("isValidIndonesianPhone", () => {
 
   it("rejects non-numeric input", () => {
     expect(isValidIndonesianPhone("bukan-nomor-hp")).toBe(false);
+  });
+});
+
+describe("normalizePhone", () => {
+  it.each([
+    ["081234567890", "081234567890"],
+    ["0812-3456-7890", "081234567890"],
+    ["+62 812 3456 7890", "081234567890"],
+    ["6281234567890", "081234567890"],
+    [" (0812) 3456.7890 ", "081234567890"],
+  ])("%s -> %s", (input, expected) => {
+    expect(normalizePhone(input)).toBe(expected);
+  });
+
+  it("returns an invalid number unchanged (trimmed) so validation still rejects it", () => {
+    expect(normalizePhone(" 12345 ")).toBe("12345");
+  });
+});
+
+describe("phoneVariants", () => {
+  it("lists the legacy stored forms of the same number", () => {
+    expect(phoneVariants("+62 812-3456-7890")).toEqual(["081234567890", "6281234567890", "+6281234567890"]);
+  });
+
+  it("returns just the input for a non-phone value", () => {
+    expect(phoneVariants("abc")).toEqual(["abc"]);
+  });
+});
+
+describe("normalizeEmail", () => {
+  it("lowercases and trims", () => {
+    expect(normalizeEmail("  Budi.Santoso@Example.COM ")).toBe("budi.santoso@example.com");
+  });
+
+  it("turns empty/missing into null", () => {
+    expect(normalizeEmail("  ")).toBeNull();
+    expect(normalizeEmail(null)).toBeNull();
+    expect(normalizeEmail(undefined)).toBeNull();
+  });
+});
+
+describe("identityTakenWhere", () => {
+  it("matches every phone form and the email case-insensitively", () => {
+    expect(identityTakenWhere("081234567890", "budi@example.com")).toEqual({
+      OR: [
+        { phone: { in: ["081234567890", "6281234567890", "+6281234567890"] } },
+        { email: { equals: "budi@example.com", mode: "insensitive" } },
+      ],
+    });
+  });
+
+  it("omits the email condition when there is no email", () => {
+    expect(identityTakenWhere("081234567890", null).OR).toHaveLength(1);
   });
 });

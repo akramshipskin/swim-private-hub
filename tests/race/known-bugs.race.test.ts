@@ -136,10 +136,10 @@ describe("S3 / D3: saldo yang sudah dicairkan tidak boleh jadi minus", () => {
 describe("S4 / D4: nomor HP dan email dibakukan", () => {
   const ago = Date.now() - 10000;
   const reg = (over: Record<string, unknown>) =>
-    register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", password: "12345678", wantsSelf: true, formRenderedAt: ago, ...over }) }));
+    register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", password: "12345678", acceptedTerms: true, wantsSelf: true, formRenderedAt: ago, ...over }) }));
 
   // Bug: "0812-3456-7890", "081234567890" dan "+6281234567890" dianggap 3 orang berbeda.
-  known("K4a: HP yang sama dengan format beda (spasi, '-', +62) -> daftar kedua ditolak 409, hanya 1 akun", async () => {
+  it("K4a: HP yang sama dengan format beda (spasi, '-', +62) -> daftar kedua ditolak 409, hanya 1 akun", async () => {
     expect((await reg({ phone: "081234567890" })).status).toBe(201);
     expect((await reg({ phone: "0812-3456-7890" })).status).toBe(409);
     expect((await reg({ phone: "+62 812 3456 7890" })).status).toBe(409);
@@ -147,25 +147,25 @@ describe("S4 / D4: nomor HP dan email dibakukan", () => {
     expect(await prisma.user.count()).toBe(1);
   });
 
-  known("K4b: nomor HP disimpan dalam bentuk baku 08xxxxxxxxxx", async () => {
+  it("K4b: nomor HP disimpan dalam bentuk baku 08xxxxxxxxxx", async () => {
     await reg({ phone: "+62 812-3456-7891" });
     const u = await prisma.user.findFirstOrThrow();
     expect(u.phone).toBe("081234567891");
   });
 
-  known("K4c: email yang sama dengan huruf besar/kecil beda -> daftar kedua ditolak 409", async () => {
+  it("K4c: email yang sama dengan huruf besar/kecil beda -> daftar kedua ditolak 409", async () => {
     expect((await reg({ phone: "081211110001", email: "Budi@Example.com" })).status).toBe(201);
     expect((await reg({ phone: "081211110002", email: "budi@example.com" })).status).toBe(409);
     expect(await prisma.user.count()).toBe(1);
   });
 
-  known("K4d: email disimpan huruf kecil semua", async () => {
+  it("K4d: email disimpan huruf kecil semua", async () => {
     await reg({ phone: "081211110003", email: "Budi.Santoso@Example.COM" });
     const u = await prisma.user.findFirstOrThrow();
     expect(u.email).toBe("budi.santoso@example.com");
   });
 
-  known("K4e: 4 pendaftaran barengan dengan format HP beda-beda untuk orang yang sama -> hanya 1 akun", async () => {
+  it("K4e: 4 pendaftaran barengan dengan format HP beda-beda untuk orang yang sama -> hanya 1 akun", async () => {
     const formats = ["081234567892", "0812-3456-7892", "+6281234567892", "6281234567892"];
     await Promise.allSettled(formats.map((phone) => reg({ phone })));
     expect(await prisma.user.count()).toBe(1);

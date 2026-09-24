@@ -1,15 +1,18 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { isValidIndonesianPhone, toProperCase } from "@/lib/format";
+import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
+import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
+import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 
 export async function POST(request: Request) {
   const body = await request.json();
   const {
     name,
-    phone,
-    email,
+    phone: rawPhone,
+    email: rawEmail,
     password,
+    acceptedTerms,
     bio,
     specialties,
     hasCertification,
@@ -21,6 +24,7 @@ export async function POST(request: Request) {
     phone?: string;
     email?: string;
     password?: string;
+    acceptedTerms?: boolean;
     bio?: string;
     specialties?: string[];
     hasCertification?: boolean;
@@ -37,10 +41,10 @@ export async function POST(request: Request) {
     return Response.json({ error: "Registrasi gagal, coba lagi" }, { status: 400 });
   }
 
-  if (!name || !phone || !password) {
+  if (!name || !rawPhone || !password) {
     return Response.json({ error: "Nama, No HP, dan password wajib diisi" }, { status: 400 });
   }
-  if (!isValidIndonesianPhone(phone)) {
+  if (!isValidIndonesianPhone(rawPhone)) {
     return Response.json({ error: "Format No HP tidak valid (contoh: 0812xxxxxxx)" }, { status: 400 });
   }
   if (password.length < 8) {
@@ -54,11 +58,23 @@ export async function POST(request: Request) {
     return Response.json({ error: "Pilih minimal 1 keahlian" }, { status: 400 });
   }
 
-  const existing = await prisma.user.findFirst({
-    where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
-  });
+  const consent = consentData(acceptedTerms);
+  if (!consent) {
+    return Response.json({ error: CONSENT_REQUIRED_ERROR }, { status: 400 });
+  }
+
+  // Bentuk baku (08xxxxxxxxxx, email huruf kecil) -- lihat /api/register.
+  const phone = normalizePhone(rawPhone);
+  const email = normalizeEmail(rawEmail);
+
+  const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
     return Response.json({ error: "No HP atau email sudah terdaftar" }, { status: 409 });
+  }
+
+  const registerHit = await takeAttempt(`register-staff:${clientIp(request.headers)}`, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS);
+  if (!registerHit) {
+    return Response.json({ error: RATE_LIMIT_REGISTER_ERROR }, { status: 429 });
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -68,8 +84,9 @@ export async function POST(request: Request) {
       data: {
         name: toProperCase(name.trim()),
         phone,
-        email: email || null,
+        email,
         passwordHash,
+        ...consent,
         role: "COACH",
         // Coach yang daftar sendiri gak langsung bisa login/keliatan --
         // nunggu admin approve dulu (toggle isActive di /admin/users).

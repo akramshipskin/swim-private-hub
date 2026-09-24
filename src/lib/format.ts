@@ -16,6 +16,44 @@ export function isValidIndonesianPhone(phone: string): boolean {
   return /^(\+62|62|0)8[1-9][0-9]{6,10}$/.test(digits);
 }
 
+// Bentuk baku nomor HP yang disimpan: 08xxxxxxxxxx. "+62 812-3456-7890",
+// "6281234567890", "0812 3456 7890" -> "081234567890". Input yang bukan nomor
+// HP Indonesia valid dikembalikan apa adanya (hanya di-trim), jadi pemanggil
+// tetap wajib validasi dulu.
+export function normalizePhone(phone: string): string {
+  const trimmed = phone.trim();
+  const compact = trimmed.replace(/[\s\-().]/g, "");
+  if (!isValidIndonesianPhone(compact)) return trimmed;
+  return compact.replace(/^(\+62|62)/, "0");
+}
+
+// Bentuk-bentuk lama yang mungkin sudah tersimpan untuk nomor yang sama
+// (data sebelum pembakuan 25 Sep 2026): cari pakai semuanya supaya akun
+// lama tetap bisa login dan tidak bisa didaftarkan ulang.
+export function phoneVariants(phone: string): string[] {
+  const p = normalizePhone(phone);
+  if (!p.startsWith("08")) return [p];
+  const rest = p.slice(1);
+  return [p, `62${rest}`, `+62${rest}`];
+}
+
+// Email disimpan huruf kecil semua; string kosong = tidak ada email.
+export function normalizeEmail(email: string | null | undefined): string | null {
+  const e = email?.trim().toLowerCase();
+  return e ? e : null;
+}
+
+// Kondisi "HP atau email ini sudah dipakai akun lain" (Prisma where) --
+// email dicocokkan tanpa beda huruf besar/kecil untuk data lama.
+export function identityTakenWhere(phone: string, email: string | null) {
+  return {
+    OR: [
+      { phone: { in: phoneVariants(phone) } },
+      ...(email ? [{ email: { equals: email, mode: "insensitive" as const } }] : []),
+    ],
+  };
+}
+
 export function formatRupiah(n: number): string {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",

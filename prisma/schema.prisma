@@ -107,6 +107,16 @@ model User {
   createdAt          DateTime @default(now())
   registeredReferer  String?
   registeredIp       String?
+  // Bukti persetujuan S&K + Kebijakan Privasi saat daftar sendiri (versi =
+  // tanggal dokumen, lihat src/lib/legal.ts). Null = akun dibuat admin/import.
+  termsAcceptedAt    DateTime?
+  termsVersion       String?
+  // 2FA (TOTP, Google Authenticator) -- wajib untuk ADMIN. totpSecret terisi
+  // saat setup dimulai; baru berlaku setelah totpEnabledAt terisi.
+  // totpLastStep = langkah waktu kode terakhir yang dipakai (tolak kode ulang).
+  totpSecret         String?
+  totpEnabledAt      DateTime?
+  totpLastStep       Int?
 
   coachProfile        CoachProfile?
   dependents          Dependent[]
@@ -574,4 +584,14 @@ model EmailMessage {
   createdAt   DateTime       @default(now())
 
   @@index([threadId, createdAt])
+}
+
+// Catatan percobaan untuk pembatasan (login salah, pendaftaran) -- lihat
+// src/lib/rate-limit.ts. Satu baris = satu percobaan yang dihitung.
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
 }

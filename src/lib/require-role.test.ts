@@ -30,6 +30,11 @@ describe("requireRole", () => {
     await expect(requireRole("ADMIN")).rejects.toThrow("NEXT_REDIRECT:/ganti-password");
   });
 
+  it("sends an admin without 2FA to /keamanan (server actions bypass proxy.ts)", async () => {
+    auth.mockResolvedValue({ user: { id: "u1", role: "ADMIN", mustChangePassword: false, needsTotpSetup: true } });
+    await expect(requireRole("ADMIN")).rejects.toThrow("NEXT_REDIRECT:/keamanan");
+  });
+
   it("returns the session user when role matches", async () => {
     auth.mockResolvedValue({ user: { id: "u1", role: "ADMIN", name: "Hadi", email: "h@x.id", mustChangePassword: false } });
     const res = await requireRole("ADMIN");

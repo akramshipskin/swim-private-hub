@@ -23,6 +23,9 @@ vi.mock("@/auth", () => ({
   signOut: async () => {},
   handlers: {},
 }));
+// next-auth (paket) butuh runtime Next; tes cuma perlu kelas error-nya
+// (src/lib/authorize.ts). Kelas asli dari @auth/core, bukan tiruan.
+vi.mock("next-auth", async () => ({ CredentialsSignin: (await import("@auth/core/errors")).CredentialsSignin }));
 vi.mock("@/lib/require-role", () => ({
   requireRole: async (role: string) => {
     const s = globalThis.__als.getStore();

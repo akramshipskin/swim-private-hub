@@ -38,7 +38,7 @@ export async function GET() {
     ["- \"Paket Aktif\" & \"Sisa Sesi\" boleh dikosongkan kalau peserta itu belum punya paket aktif."],
     ["- Baris tanpa \"Nama Peserta/Anak\" DAN tanpa \"Paket Aktif\" = member polos, belum ada peserta terdaftar."],
     ["  (member akan diminta mengisi peserta sendiri saat login pertama, seperti alur biasa)."],
-    ["- Password default semua member baru: renang2026 — wajib ganti saat login pertama."],
+    ["- Password sementara tiap member dibuat acak dan tampil di layar setelah import — wajib ganti saat login pertama."],
     ["- No HP yang sudah terpakai email/HP-nya di sistem akan di-skip (dilaporkan di hasil import)."],
   ]);
   infoSheet["!cols"] = [{ wch: 100 }];

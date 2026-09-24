@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { authorizeCredentials } from "@/lib/authorize";
 
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   trustHost: true,
@@ -12,32 +12,9 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       credentials: {
         identifier: {},
         password: {},
+        otp: {},
       },
-      authorize: async (credentials) => {
-        const identifier = (credentials?.identifier as string | undefined)?.trim();
-        const password = credentials?.password as string | undefined;
-        if (!identifier || !password) return null;
-
-        // Identifier bisa email atau no HP -- coba dua-duanya, gak
-        // asumsi format berdasarkan isi string (nomor HP kadang ada yang
-        // isi pake format aneh).
-        const user = await prisma.user.findFirst({
-          where: { OR: [{ email: identifier }, { phone: identifier }] },
-        });
-        if (!user || !user.isActive) return null;
-
-        const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          mustChangePassword: user.mustChangePassword,
-          sessionVersion: user.sessionVersion,
-        };
-      },
+      authorize: (credentials, request) => authorizeCredentials(credentials, request),
     }),
   ],
   callbacks: {
@@ -64,7 +41,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
 
       const dbUser = await prisma.user.findUnique({
         where: { id: token.id as string },
-        select: { isActive: true, role: true, mustChangePassword: true, name: true, sessionVersion: true },
+        select: { isActive: true, role: true, mustChangePassword: true, name: true, sessionVersion: true, totpEnabledAt: true },
       });
 
       if (!dbUser || !dbUser.isActive) {
@@ -80,6 +57,8 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
 
       token.role = dbUser.role;
       token.mustChangePassword = dbUser.mustChangePassword;
+      // Admin wajib pasang 2FA dulu (proxy.ts mengarahkan ke /admin/keamanan).
+      token.needsTotpSetup = dbUser.role === "ADMIN" && !dbUser.totpEnabledAt;
       // Nama juga disinkron ulang tiap request (bukan cuma pas sign-in) --
       // tanpa ini, ganti nama di /profil kesimpen bener di DB tapi
       // session.user.name kebawa stale sampe logout-login ulang.
@@ -91,6 +70,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         session.user.id = token.id as string;
         session.user.role = token.role as "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
         session.user.mustChangePassword = token.mustChangePassword as boolean;
+        session.user.needsTotpSetup = token.needsTotpSetup === true;
       }
       return session;
     },

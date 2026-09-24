@@ -52,6 +52,7 @@ export default function RegisterPoolForm() {
         phone,
         email: email || undefined,
         password,
+        acceptedTerms: agreed,
         poolName,
         address,
         openTime,

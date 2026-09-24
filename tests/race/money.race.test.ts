@@ -158,14 +158,14 @@ describe("PAYMENT webhook races", () => {
 describe("REGISTRATION / ACCOUNT races", () => {
   const ago = Date.now() - 10000;
   it("A1: daftar member No HP sama 6x barengan -> 1 akun, sisanya 409 (bukan 500)", async () => {
-    const rs = await settle(Array.from({ length: 6 }, () => register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone: "081234567890", password: "12345678", wantsSelf: true, formRenderedAt: ago }) }))));
+    const rs = await settle(Array.from({ length: 6 }, () => register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone: "081234567890", password: "12345678", acceptedTerms: true, wantsSelf: true, formRenderedAt: ago }) }))));
     console.log("A1", summarize(rs));
     expect(await prisma.user.count({ where: { phone: "081234567890" } })).toBe(1);
     expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
     expect(await prisma.dependent.count()).toBe(1);
   });
   it("A2: daftar coach & daftar kolam No HP sama barengan -> 1 akun, gak ada 500 / kolam yatim", async () => {
-    const body = { name: "a", ownerName: "a", phone: "081299999999", password: "12345678", specialties: ["Gaya bebas"], poolName: "K", address: "J", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago };
+    const body = { name: "a", ownerName: "a", phone: "081299999999", password: "12345678", acceptedTerms: true, specialties: ["Gaya bebas"], poolName: "K", address: "J", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago };
     const rs = await settle([0, 1, 2].flatMap(() => [registerCoach(new Request("http://x", { method: "POST", body: JSON.stringify(body) })), registerPool(new Request("http://x", { method: "POST", body: JSON.stringify(body) }))]));
     console.log("A2", summarize(rs));
     expect(await prisma.user.count({ where: { phone: "081299999999" } })).toBe(1);

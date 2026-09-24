@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+import { PRIVACY_UPDATED_AT } from "@/lib/legal";
 import { BUSINESS_ADDRESS } from "@/lib/business";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function KebijakanPrivasiPage() {
   return (
-    <LegalPageLayout title="Kebijakan Privasi" updatedAt="10 September 2026">
+    <LegalPageLayout title="Kebijakan Privasi" updatedAt={PRIVACY_UPDATED_AT}>
       <p>
         Kebijakan Privasi ini menjelaskan jenis data pribadi yang dikumpulkan oleh
         Swim Private Hub (&ldquo;kami&rdquo;) melalui aplikasi pemesanan dan manajemen les

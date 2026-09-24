@@ -53,6 +53,7 @@ export default function RegisterCoachForm() {
         phone,
         email: email || undefined,
         password,
+        acceptedTerms: agreed,
         bio,
         specialties,
         hasCertification,

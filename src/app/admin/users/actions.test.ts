@@ -276,6 +276,31 @@ describe("importMembersXlsx", () => {
     );
   });
 
+  // Temuan sweep keamanan 25 Sep: dulu semua member import dapat password sama
+  // ("renang2026") -- siapa pun yang tahu No HP member baru bisa masuk.
+  it("gives every imported member a different random temporary password, shown once to the admin", async () => {
+    const result = await importMembersXlsx(
+      null,
+      importFormData([
+        { "Nama Member": "Ani", "No HP": "+62 812-0000-0011" },
+        { "Nama Member": "Beni", "No HP": "081200000012" },
+      ])
+    );
+    const creds = result?.credentials ?? [];
+    expect(creds.map((c) => c.phone)).toEqual(["081200000011", "081200000012"]);
+    expect(creds[0].password).toMatch(/^[a-z2-9]{10}$/);
+    expect(creds[0].password).not.toBe(creds[1].password);
+    expect(result?.result).not.toContain("renang2026");
+    // Nomor disimpan dalam bentuk baku.
+    expect(userCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ phone: "081200000011" }) }));
+  });
+
+  it("does not list a member whose import failed among the credentials", async () => {
+    userCreate.mockRejectedValueOnce(Object.assign(new Error("dup"), { code: "P2002" }));
+    const result = await importMembersXlsx(null, importFormData([{ "Nama Member": "Ani", "No HP": "081200000013" }]));
+    expect(result?.credentials).toEqual([]);
+  });
+
   it("skips a row with no phone number instead of failing the whole import", async () => {
     const result = await importMembersXlsx(null, importFormData([{ "Nama Member": "Tanpa HP" }]));
     expect(userCreate).not.toHaveBeenCalled();

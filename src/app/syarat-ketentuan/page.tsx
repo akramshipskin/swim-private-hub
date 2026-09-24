@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/legal-page-layout";
+import { TERMS_UPDATED_AT } from "@/lib/legal";
 import { BUSINESS_ADDRESS } from "@/lib/business";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function SyaratKetentuanPage() {
   return (
-    <LegalPageLayout title="Syarat & Ketentuan" updatedAt="10 September 2026">
+    <LegalPageLayout title="Syarat & Ketentuan" updatedAt={TERMS_UPDATED_AT}>
       <p>
         Dengan mendaftar dan menggunakan aplikasi pemesanan dan manajemen les
         renang Swim Private Hub (&ldquo;Aplikasi&rdquo;), Pengguna menyatakan setuju

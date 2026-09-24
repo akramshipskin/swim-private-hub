@@ -3,7 +3,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { toProperCase } from "@/lib/format";
+import { identityTakenWhere, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { createSelfDependent, createDependent } from "@/lib/dependents";
 import bcrypt from "bcryptjs";
 import { randomInt } from "crypto";
@@ -18,8 +18,8 @@ export async function createUser(
   await requireRole("ADMIN");
 
   const rawName = formData.get("name") as string;
-  const phone = formData.get("phone") as string;
-  const email = (formData.get("email") as string) || null;
+  const phone = normalizePhone((formData.get("phone") as string | null) ?? "");
+  const email = normalizeEmail(formData.get("email") as string | null);
   const password = formData.get("password") as string;
   const role = formData.get("role") as "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
 
@@ -58,9 +58,7 @@ export async function createUser(
     }
   }
 
-  const existing = await prisma.user.findFirst({
-    where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
-  });
+  const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
     return { error: "No HP atau email sudah terdaftar" };
   }
@@ -111,11 +109,13 @@ export async function createUser(
   return null;
 }
 
-const IMPORT_DEFAULT_PASSWORD = "renang2026";
 const IMPORT_DEFAULT_JATAH_CANCEL = 2;
 const IMPORT_DEFAULT_DURATION_DAYS = 60;
 
-export type ImportState = { error?: string; result?: string } | null;
+// credentials: password sementara tiap member baru, HANYA dikembalikan sekali
+// ke layar admin (untuk dikirim lewat WA), tidak disimpan di mana pun.
+export type ImportCredential = { name: string; phone: string; password: string };
+export type ImportState = { error?: string; result?: string; credentials?: ImportCredential[] } | null;
 
 type ImportRow = {
   name: string | null;
@@ -191,7 +191,7 @@ export async function importMembersXlsx(
       skipped.push(row.name ? `${row.name} — No HP kosong` : "Baris tanpa No HP dilewati");
       continue;
     }
-    const phone = row.phone.replace(/[^\d+]/g, "");
+    const phone = normalizePhone(row.phone.replace(/[^\d+\s\-]/g, ""));
     const existingGroup = groups.get(phone);
     if (existingGroup) {
       existingGroup.push(row);
@@ -201,7 +201,7 @@ export async function importMembersXlsx(
   }
 
   const templates = await prisma.packageTemplate.findMany({ where: { poolId } });
-  const passwordHash = await bcrypt.hash(IMPORT_DEFAULT_PASSWORD, 12);
+  const credentials: ImportCredential[] = [];
 
   let membersCreated = 0;
   let pesertaCreated = 0;
@@ -215,11 +215,9 @@ export async function importMembersXlsx(
       continue;
     }
     const name = toProperCase(rawName);
-    const email = groupRows.find((r) => r.email)?.email ?? null;
+    const email = normalizeEmail(groupRows.find((r) => r.email)?.email);
 
-    const existing = await prisma.user.findFirst({
-      where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
-    });
+    const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
     if (existing) {
       skipped.push(`${name} (${phone}) — HP atau email sudah terdaftar`);
       continue;
@@ -234,6 +232,12 @@ export async function importMembersXlsx(
     let groupPesertaCreated = 0;
     let groupPaketCreated = 0;
     const groupSkipped: string[] = [];
+    // Password acak per member (dulu satu password sama untuk semua import --
+    // siapa pun yang tahu No HP member baru bisa masuk ke akunnya). Cost 10,
+    // bukan 12: password ini wajib diganti saat login pertama, dan import
+    // ratusan baris harus selesai sebelum batas waktu server.
+    const tempPassword = newTempPassword();
+    const passwordHash = await bcrypt.hash(tempPassword, 10);
 
     try {
       await prisma.$transaction(async (tx) => {
@@ -294,6 +298,7 @@ export async function importMembersXlsx(
       });
 
       membersCreated += groupMembersCreated;
+      credentials.push({ name, phone, password: tempPassword });
       pesertaCreated += groupPesertaCreated;
       paketCreated += groupPaketCreated;
       skipped.push(...groupSkipped);
@@ -317,10 +322,10 @@ export async function importMembersXlsx(
     parts.push(`${skipped.length} dilewati: ${skipped.slice(0, 5).join("; ")}${skipped.length > 5 ? "..." : ""}`);
   }
   if (membersCreated > 0) {
-    parts.push(`Password default member baru: "${IMPORT_DEFAULT_PASSWORD}" — kasih tahu mereka, wajib ganti saat pertama masuk.`);
+    parts.push("Password sementara tiap member ada di tabel di bawah — kirim ke masing-masing, wajib ganti saat pertama masuk.");
   }
 
-  return { result: parts.join(" ") };
+  return { result: parts.join(" "), credentials };
 }
 
 export async function toggleUserActive(userId: string, nextActive: boolean) {
@@ -340,6 +345,10 @@ export async function toggleUserActive(userId: string, nextActive: boolean) {
 // dari chat WA (0/O, 1/l/I).
 const TEMP_PASSWORD_ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
 
+function newTempPassword() {
+  return Array.from({ length: 10 }, () => TEMP_PASSWORD_ALPHABET[randomInt(TEMP_PASSWORD_ALPHABET.length)]).join("");
+}
+
 // Admin reset password user yang lupa -- gak ada "lupa password" mandiri.
 // Password sementara acak dibalikin ke admin (buat dikirim lewat WA), dan
 // mustChangePassword dipaksa true: user wajib bikin password baru pas login
@@ -352,10 +361,7 @@ export async function resetUserPassword(
     return { error: "Ganti password akunmu sendiri lewat halaman Profil." };
   }
 
-  const tempPassword = Array.from(
-    { length: 10 },
-    () => TEMP_PASSWORD_ALPHABET[randomInt(TEMP_PASSWORD_ALPHABET.length)]
-  ).join("");
+  const tempPassword = newTempPassword();
   const passwordHash = await bcrypt.hash(tempPassword, 12);
 
   const updated = await prisma.user.updateMany({

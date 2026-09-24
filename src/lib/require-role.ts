@@ -13,6 +13,11 @@ export async function requireRole(role: "ADMIN" | "COACH" | "MEMBER" | "POOL_OWN
   if (session.user.mustChangePassword) {
     redirect("/ganti-password");
   }
+  // Dicek di sini juga (bukan cuma proxy.ts): server action bisa dipanggil
+  // lewat path yang tidak lewat proxy.
+  if (session.user.needsTotpSetup) {
+    redirect("/keamanan");
+  }
 
   return {
     user: {

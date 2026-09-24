@@ -13,7 +13,7 @@ export async function reset() {
   // yang panjang slot "3 jam lalu" lama-lama bergeser jadi "belum selesai" dan
   // absensi ditolak (tes gagal karena fixture, bukan karena aplikasi).
   slotSeq = 0;
-  await prisma.$executeRawUnsafe(`TRUNCATE "PlatformWithdrawal","WalletTransaction","WithdrawalRequest","Booking","Payment","Package","PackageTemplate","Availability","PoolAffiliation","PoolOwnership","Pool","Dependent","CoachProfile","PushSubscription","User" CASCADE`);
+  await prisma.$executeRawUnsafe(`TRUNCATE "PlatformWithdrawal","WalletTransaction","WithdrawalRequest","Booking","Payment","Package","PackageTemplate","Availability","PoolAffiliation","PoolOwnership","Pool","Dependent","CoachProfile","PushSubscription","RateLimitHit","User" CASCADE`);
 }
 
 let n = 0;

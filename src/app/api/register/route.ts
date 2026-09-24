@@ -1,18 +1,21 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { createSelfDependent } from "@/lib/dependents";
-import { isValidIndonesianPhone, toProperCase } from "@/lib/format";
+import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
+import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
+import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   const body = await request.json();
   const registeredIp =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  const { name, phone, email, password, childNames, wantsSelf, entryReferrer, website, formRenderedAt } =
+  const { name, phone: rawPhone, email: rawEmail, password, acceptedTerms, childNames, wantsSelf, entryReferrer, website, formRenderedAt } =
     body as {
       name?: string;
       phone?: string;
       email?: string;
       password?: string;
+      acceptedTerms?: boolean;
       childNames?: string[];
       wantsSelf?: boolean;
       entryReferrer?: string | null;
@@ -38,14 +41,14 @@ export async function POST(request: Request) {
   // bukan "gak ada data" -- cuma null/undefined yang jadi null.
   const registeredReferer = entryReferrer ?? null;
 
-  if (!name || !phone || !password) {
+  if (!name || !rawPhone || !password) {
     return Response.json(
       { error: "Nama, No HP, dan password wajib diisi" },
       { status: 400 }
     );
   }
 
-  if (!isValidIndonesianPhone(phone)) {
+  if (!isValidIndonesianPhone(rawPhone)) {
     return Response.json(
       { error: "Format No HP tidak valid (contoh: 0812xxxxxxx)" },
       { status: 400 }
@@ -68,14 +71,27 @@ export async function POST(request: Request) {
     );
   }
 
-  const existing = await prisma.user.findFirst({
-    where: { OR: [{ phone }, ...(email ? [{ email }] : [])] },
-  });
+  const consent = consentData(acceptedTerms);
+  if (!consent) {
+    return Response.json({ error: CONSENT_REQUIRED_ERROR }, { status: 400 });
+  }
+
+  // Disimpan dalam bentuk baku (08xxxxxxxxxx, email huruf kecil) supaya
+  // format ketik yang beda tidak jadi akun ganda.
+  const phone = normalizePhone(rawPhone);
+  const email = normalizeEmail(rawEmail);
+
+  const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
     return Response.json(
       { error: "No HP atau email sudah terdaftar" },
       { status: 409 }
     );
+  }
+
+  const registerHit = await takeAttempt(`register:${clientIp(request.headers)}`, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS);
+  if (!registerHit) {
+    return Response.json({ error: RATE_LIMIT_REGISTER_ERROR }, { status: 429 });
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -86,9 +102,10 @@ export async function POST(request: Request) {
         data: {
           name: properName,
           phone,
-          email: email || null,
+          email,
           passwordHash,
           role: "MEMBER",
+          ...consent,
           registeredReferer,
           registeredIp,
         },

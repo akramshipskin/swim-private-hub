@@ -58,6 +58,7 @@ export default function RegisterForm() {
         phone,
         email: email || undefined,
         password,
+        acceptedTerms: agreed,
         childNames: participants.filter((p) => p.type === "child").map((p) => p.name),
         wantsSelf: participants.some((p) => p.type === "self"),
         entryReferrer,
