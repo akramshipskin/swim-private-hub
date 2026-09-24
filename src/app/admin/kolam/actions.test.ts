@@ -67,6 +67,14 @@ describe("updatePoolShares", () => {
     expect(poolUpdate).not.toHaveBeenCalled();
   });
 
+  // Number("") = 0: tanpa penjagaan, kolom kosong/tidak terkirim tersimpan
+  // sebagai komisi platform 0% tanpa ada yang sadar.
+  it("rejects a blank or missing percent instead of saving 0%", async () => {
+    expect(await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "", coachSharePercent: "55" }))).toEqual({ error: "Persentase harus angka 0-100." });
+    expect(await updatePoolShares(null, formData({ poolId: "pool-1", coachSharePercent: "55" }))).toEqual({ error: "Persentase harus angka 0-100." });
+    expect(poolUpdate).not.toHaveBeenCalled();
+  });
+
   it("rejects a percent over 100", async () => {
     const result = await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "15", coachSharePercent: "101" }));
     expect(result).toEqual({ error: "Persentase harus angka 0-100." });

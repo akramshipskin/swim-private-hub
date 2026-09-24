@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { removeOpenSlots } from "@/lib/availability";
+import { formNumber } from "@/lib/format";
 
 export type ActionState = { error?: string } | null;
 
@@ -77,8 +78,8 @@ export async function updatePoolShares(
   await requireRole("ADMIN");
 
   const poolId = formData.get("poolId") as string;
-  const commissionPercent = Number(formData.get("commissionPercent"));
-  const coachSharePercent = Number(formData.get("coachSharePercent"));
+  const commissionPercent = formNumber(formData, "commissionPercent");
+  const coachSharePercent = formNumber(formData, "coachSharePercent");
 
   if (
     !Number.isInteger(commissionPercent) ||

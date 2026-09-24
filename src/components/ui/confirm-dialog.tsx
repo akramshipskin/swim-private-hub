@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 export function ConfirmDialog({
@@ -23,6 +24,16 @@ export function ConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  // Esc = Batal (kecuali sedang memproses), sama seperti tombol Batal.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !loading) onCancel();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, loading, onCancel]);
+
   if (!open) return null;
 
   return (
@@ -38,7 +49,7 @@ export function ConfirmDialog({
         </h2>
         <p className="mt-1.5 text-sm text-text-muted">{description}</p>
         <div className="mt-5 flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={onCancel} disabled={loading}>
+          <Button variant="secondary" size="sm" onClick={onCancel} disabled={loading} autoFocus>
             {cancelLabel}
           </Button>
           <Button variant={confirmVariant} size="sm" onClick={onConfirm} loading={loading}>

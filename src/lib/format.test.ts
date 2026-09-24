@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants, toProperCase } from "./format";
+import { formNumber, identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants, toProperCase } from "./format";
 
 describe("toProperCase", () => {
   it("capitalizes the first letter of an all-lowercase name", () => {
@@ -99,5 +99,22 @@ describe("identityTakenWhere", () => {
 
   it("omits the email condition when there is no email", () => {
     expect(identityTakenWhere("081234567890", null).OR).toHaveLength(1);
+  });
+});
+
+describe("formNumber", () => {
+  const fd = (e: Record<string, string>) => {
+    const f = new FormData();
+    for (const [k, v] of Object.entries(e)) f.set(k, v);
+    return f;
+  };
+  it("parses a filled number", () => {
+    expect(formNumber(fd({ n: "12" }), "n")).toBe(12);
+    expect(formNumber(fd({ n: "0" }), "n")).toBe(0);
+  });
+  it("treats blank or missing as NaN, not 0", () => {
+    expect(formNumber(fd({ n: "" }), "n")).toBeNaN();
+    expect(formNumber(fd({ n: "   " }), "n")).toBeNaN();
+    expect(formNumber(fd({}), "n")).toBeNaN();
   });
 });

@@ -8,12 +8,15 @@ function formatThousands(digits: string) {
 }
 
 export function PriceInput({
+  id,
   name,
   defaultValue,
   disabled,
   required,
   className,
 }: {
+  // Diisi otomatis oleh <Field> supaya label tersambung ke kolom yang terlihat.
+  id?: string;
   name: string;
   defaultValue?: number | string;
   disabled?: boolean;
@@ -28,6 +31,7 @@ export function PriceInput({
   return (
     <>
       <Input
+        id={id}
         type="text"
         inputMode="numeric"
         placeholder="0"

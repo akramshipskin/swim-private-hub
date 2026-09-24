@@ -28,6 +28,7 @@ export default function CopyLinkButton({ link }: { link: string }) {
       <input
         type="text"
         readOnly
+        aria-label="Link profil publik"
         value={link}
         onFocus={(e) => e.currentTarget.select()}
         className="min-w-0 flex-1 rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm text-text-muted max-sm:min-h-[44px]"

@@ -183,6 +183,7 @@ export default function RegisterForm() {
                 return (
                 <div key={i} className="flex gap-2">
                   <Select
+                    aria-label={`Peserta ${i + 1}: siapa`}
                     value={p.type}
                     onChange={(e) =>
                       updateParticipant(i, { type: e.target.value as Participant["type"] })
@@ -201,6 +202,7 @@ export default function RegisterForm() {
                       value={p.name}
                       onChange={(e) => updateParticipant(i, { name: e.target.value })}
                       placeholder="Nama anak"
+                      aria-label={`Peserta ${i + 1}: nama anak`}
                       required
                       className="min-w-0 flex-1"
                     />
@@ -211,19 +213,19 @@ export default function RegisterForm() {
               <button
                 type="button"
                 onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "" }])}
-                className="self-start text-sm font-medium text-brand-600 hover:underline"
+                className="self-start text-sm font-medium text-brand-600 hover:underline max-sm:min-h-[44px]"
               >
                 + Tambah peserta lain
               </button>
             </div>
 
-            <label className="flex items-start gap-2 text-xs text-text-muted">
+            <label className="flex items-start gap-2 text-xs text-text-muted max-sm:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
                 required
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500 max-sm:h-5 max-sm:w-5"
               />
               <span>
                 Saya setuju dengan{" "}
@@ -251,7 +253,7 @@ export default function RegisterForm() {
 
           <p className="mt-5 text-center text-sm text-text-muted">
             Sudah punya akun?{" "}
-            <a href="/login" className="font-medium text-brand-600 hover:underline">
+            <a href="/login" className="font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Login
             </a>
           </p>

@@ -103,6 +103,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
                   <div key={i} className="flex gap-2">
                     <Select
                       name="participantType"
+                      aria-label={`Peserta ${i + 1}: siapa`}
                       value={p.type}
                       onChange={(e) => updateParticipant(i, { type: e.target.value as Participant["type"] })}
                       className="w-32 shrink-0"
@@ -123,6 +124,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
                         value={p.name}
                         onChange={(e) => updateParticipant(i, { name: e.target.value })}
                         placeholder="Nama anak"
+                        aria-label={`Peserta ${i + 1}: nama anak`}
                         required
                         className="min-w-0 flex-1"
                       />

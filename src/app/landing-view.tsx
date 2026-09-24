@@ -208,7 +208,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
         </div>
 
         <header className="absolute inset-x-0 top-0 mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-5 sm:gap-4">
-          <Link href="/" className="flex shrink-0 items-center gap-2 text-white">
+          <Link href="/" className="flex shrink-0 items-center gap-2 text-white max-sm:min-h-[44px]">
             <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
             <Logotype className="text-sm sm:text-xl" />
           </Link>
@@ -219,8 +219,8 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             <a href="#faq" className="hover:underline">FAQ</a>
           </nav>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4">Masuk</Link>
-            <Link href="/register" className="rounded-full bg-white px-2.5 py-2 text-sm font-semibold text-[#14140F] hover:bg-[#E3F5B0] sm:px-4">Daftar</Link>
+            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Masuk</Link>
+            <Link href="/register" className="rounded-full bg-white px-2.5 py-2 text-sm font-semibold text-[#14140F] hover:bg-[#E3F5B0] sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar</Link>
           </div>
         </header>
 
@@ -248,9 +248,9 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           </div>
           <p className="mt-4 text-sm text-white/75">
             Coach?{" "}
-            <Link href="/daftar-coach" className="font-semibold text-white underline">Daftar jadi coach</Link>
+            <Link href="/daftar-coach" className="font-semibold text-white underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar jadi coach</Link>
             {" · "}Punya kolam?{" "}
-            <Link href="/daftar-kolam" className="font-semibold text-white underline">Daftarkan kolam</Link>
+            <Link href="/daftar-kolam" className="font-semibold text-white underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftarkan kolam</Link>
           </p>
         </div>
 
@@ -273,7 +273,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             ["#cara-kerja", "Cara Kerja"],
             ["#faq", "Pertanyaan Umum"],
           ].map(([href, label]) => (
-            <a key={href} href={href} className="shrink-0 rounded-full border border-[#14140F]/15 bg-white px-4 py-2 text-sm font-semibold hover:bg-[#ECE9DC]">
+            <a key={href} href={href} className="shrink-0 rounded-full border border-[#14140F]/15 bg-white px-4 py-2 text-sm font-semibold hover:bg-[#ECE9DC] max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               {label}
             </a>
           ))}
@@ -488,10 +488,10 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Hubungi kami</p>
-            <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline">
+            <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               WhatsApp +62 821-1717-3124
             </a>
-            <a href="mailto:hello@swimprivatehub.biz.id" className="hover:text-white hover:underline">
+            <a href="mailto:hello@swimprivatehub.biz.id" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               hello@swimprivatehub.biz.id
             </a>
             <p>{BUSINESS_ADDRESS}</p>
@@ -499,18 +499,18 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Gabung</p>
-            <Link href="/register" className="hover:text-white hover:underline">Daftar sebagai member</Link>
-            <Link href="/daftar-coach" className="hover:text-white hover:underline">Daftar jadi coach</Link>
-            <Link href="/daftar-kolam" className="hover:text-white hover:underline">Daftarkan kolam</Link>
-            <Link href="/panduan" className="hover:text-white hover:underline">Panduan pemakaian</Link>
+            <Link href="/register" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar sebagai member</Link>
+            <Link href="/daftar-coach" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar jadi coach</Link>
+            <Link href="/daftar-kolam" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftarkan kolam</Link>
+            <Link href="/panduan" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Panduan pemakaian</Link>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Ketentuan</p>
-            <Link href="/syarat-ketentuan" className="hover:text-white hover:underline">Syarat &amp; Ketentuan</Link>
-            <Link href="/kebijakan-privasi" className="hover:text-white hover:underline">Kebijakan Privasi</Link>
-            <Link href="/kebijakan-pengembalian" className="hover:text-white hover:underline">Kebijakan Pengembalian</Link>
-            <Link href="/kebijakan-cookie" className="hover:text-white hover:underline">Kebijakan Cookie</Link>
+            <Link href="/syarat-ketentuan" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Syarat &amp; Ketentuan</Link>
+            <Link href="/kebijakan-privasi" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Privasi</Link>
+            <Link href="/kebijakan-pengembalian" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Pengembalian</Link>
+            <Link href="/kebijakan-cookie" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Cookie</Link>
           </div>
         </div>
 

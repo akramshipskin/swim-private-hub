@@ -358,7 +358,7 @@ export default function BookingBoard({
                 udah ada -- lebih pas buat lompat jauh ke depan, dan pill
                 8-lebar bakal ganggu alignment sejajar sama field lain. */}
             <div className="sm:hidden">
-              <div className="mb-1.5 flex items-center justify-between text-[11px] text-text-subtle">
+              <div className="mb-1.5 flex items-center justify-between text-xs text-text-subtle">
                 <span className="flex items-center gap-1">
                   <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot kosong
                 </span>

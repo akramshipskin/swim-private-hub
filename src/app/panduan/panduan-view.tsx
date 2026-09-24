@@ -279,15 +279,15 @@ export default function PanduanView() {
     <main className="flex min-h-screen flex-col bg-[#F3F2EC] text-[#14140F]" style={{ colorScheme: "light" }}>
       <header className="border-b border-[#14140F]/10">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-4">
-          <Link href="/" className="flex shrink-0 items-center gap-2">
+          <Link href="/" className="flex shrink-0 items-center gap-2 max-sm:min-h-[44px]">
             <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
             <Logotype className="text-sm sm:text-xl" />
           </Link>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-[#ECE9DC] sm:px-4">
+            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-[#ECE9DC] sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Masuk
             </Link>
-            <Link href="/register" className="rounded-full bg-[#14140F] px-2.5 py-2 text-sm font-semibold text-white hover:bg-black sm:px-4">
+            <Link href="/register" className="rounded-full bg-[#14140F] px-2.5 py-2 text-sm font-semibold text-white hover:bg-black sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Daftar
             </Link>
           </div>
@@ -305,7 +305,7 @@ export default function PanduanView() {
                 window.scrollTo({ top: 0 });
               }}
               aria-current={t.key === tab}
-              className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
                 t.key === tab ? "bg-[#14140F] text-white" : "border border-[#14140F]/15 bg-white hover:bg-[#ECE9DC]"
               }`}
             >
@@ -439,16 +439,16 @@ export default function PanduanView() {
             <p className="mt-1 text-sm text-white/70">Sistem booking & manajemen les renang privat.</p>
           </div>
           <div className="flex flex-wrap gap-4 text-sm text-white/70">
-            <Link href="/" className="hover:text-white hover:underline">
+            <Link href="/" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Beranda
             </Link>
-            <Link href="/daftar-coach" className="hover:text-white hover:underline">
+            <Link href="/daftar-coach" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Daftar jadi coach
             </Link>
-            <Link href="/daftar-kolam" className="hover:text-white hover:underline">
+            <Link href="/daftar-kolam" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Daftarkan kolam
             </Link>
-            <Link href="/syarat-ketentuan" className="hover:text-white hover:underline">
+            <Link href="/syarat-ketentuan" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Syarat &amp; Ketentuan
             </Link>
           </div>

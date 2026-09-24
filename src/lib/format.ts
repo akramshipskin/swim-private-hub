@@ -61,3 +61,11 @@ export function formatRupiah(n: number): string {
     maximumFractionDigits: 0,
   }).format(n);
 }
+
+// Angka dari form. Kosong / tidak terkirim = NaN (bukan 0): Number("") = 0,
+// jadi tanpa ini kolom yang dikosongkan tersimpan diam-diam sebagai 0
+// (sisa sesi 0, komisi 0%). Pemanggil tetap memvalidasi rentangnya.
+export function formNumber(formData: FormData, key: string): number {
+  const raw = formData.get(key);
+  return typeof raw === "string" && raw.trim() !== "" ? Number(raw) : NaN;
+}

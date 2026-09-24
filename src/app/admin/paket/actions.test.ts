@@ -230,6 +230,22 @@ describe("updatePackage", () => {
     expect(packageUpdate).not.toHaveBeenCalled();
   });
 
+  // Kolom dikosongkan dulu tersimpan sebagai sisa sesi 0 (Number("") = 0):
+  // member kehilangan semua sesinya tanpa admin sadar.
+  it("rejects a blank sisaSesi or jatahCancel instead of saving 0", async () => {
+    const blankSisa = await updatePackage(
+      null,
+      formData({ packageId: "pkg-1", sisaSesi: "", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
+    );
+    expect(blankSisa?.error).toBe("Sisa sesi wajib diisi (0 atau lebih)");
+    const blankJatah = await updatePackage(
+      null,
+      formData({ packageId: "pkg-1", sisaSesi: "3", jatahCancel: "", status: "ACTIVE", expiredDate: "" })
+    );
+    expect(blankJatah?.error).toBe("Jatah batal wajib diisi (0 atau lebih)");
+    expect(packageUpdate).not.toHaveBeenCalled();
+  });
+
   it("rejects a negative jatahCancel", async () => {
     const result = await updatePackage(
       null,

@@ -128,7 +128,7 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
                 <div className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto">
                   {selected.messages.map((m) => (
                     <div key={m.id} className={m.direction === "INBOUND" ? "self-start" : "self-end text-right"}>
-                      <p className="text-[11px] text-text-subtle">{m.direction === "INBOUND" ? m.fromAddress : `Admin (${m.fromAddress})`} · {time(m.createdAt)}</p>
+                      <p className="text-xs text-text-subtle">{m.direction === "INBOUND" ? m.fromAddress : `Admin (${m.fromAddress})`} · {time(m.createdAt)}</p>
                       <p className={`inline-block max-w-[85%] rounded-xl px-3 py-2 text-left text-sm whitespace-pre-wrap ${m.direction === "INBOUND" ? "bg-surface-muted text-text" : "bg-brand-50 text-text"}`}>
                         {m.textBody}
                       </p>

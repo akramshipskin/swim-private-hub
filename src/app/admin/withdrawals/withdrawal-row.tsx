@@ -67,7 +67,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
                   setTimeout(() => setAccountCopied(false), 2000);
                 });
               }}
-              className="ml-1 rounded-md border border-border px-2 py-0.5 text-xs text-text-muted hover:bg-surface-muted"
+              className="ml-1 rounded-md border border-border px-2 py-0.5 text-xs text-text-muted hover:bg-surface-muted max-sm:mt-1 max-sm:min-h-[44px] max-sm:px-3"
             >
               {accountCopied ? "Disalin" : "Salin no. rekening"}
             </button>
@@ -101,7 +101,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
                 required
                 minLength={4}
                 maxLength={100}
-                className="min-h-0 w-52 py-1.5"
+                className="min-h-0 w-52 py-1.5 max-sm:min-h-[44px]"
               />
               <Button
                 type="button"

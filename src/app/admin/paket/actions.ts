@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { withDedupeLock } from "@/lib/dedupe-lock";
 import { createTemplateRecord, updateTemplateRecord, reviewTemplateChange } from "@/lib/package-template";
 import { createDependent, createSelfDependent } from "@/lib/dependents";
-import { toProperCase } from "@/lib/format";
+import { formNumber, toProperCase } from "@/lib/format";
 import { resolveExpiredDate } from "@/lib/datetime";
 import { revalidatePath } from "next/cache";
 
@@ -187,16 +187,16 @@ export async function updatePackage(
   await requireRole("ADMIN");
 
   const packageId = formData.get("packageId") as string;
-  const sisaSesiRaw = Number(formData.get("sisaSesi"));
-  const jatahCancelRaw = Number(formData.get("jatahCancel"));
+  const sisaSesiRaw = formNumber(formData, "sisaSesi");
+  const jatahCancelRaw = formNumber(formData, "jatahCancel");
   const status = formData.get("status") as "PENDING_PAYMENT" | "ACTIVE" | "EXPIRED";
   const expiredDateRaw = formData.get("expiredDate") as string;
 
   if (!packageId || !Number.isInteger(sisaSesiRaw) || sisaSesiRaw < 0) {
-    return { error: "Sisa sesi tidak boleh negatif" };
+    return { error: "Sisa sesi wajib diisi (0 atau lebih)" };
   }
   if (!Number.isInteger(jatahCancelRaw) || jatahCancelRaw < 0) {
-    return { error: "Jatah batal tidak boleh negatif" };
+    return { error: "Jatah batal wajib diisi (0 atau lebih)" };
   }
 
   const pkg = await prisma.package.findUnique({ where: { id: packageId } });

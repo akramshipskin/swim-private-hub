@@ -180,7 +180,7 @@ export default async function CoachShortcutPage({
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/" className="inline-flex items-center gap-2">
+          <Link href="/" className="inline-flex items-center gap-2 max-sm:min-h-[44px]">
             <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-contain" />
             <Logotype className="text-lg" />
           </Link>

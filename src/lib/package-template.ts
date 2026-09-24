@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { withDedupeLock } from "@/lib/dedupe-lock";
-import { toProperCase } from "@/lib/format";
+import { formNumber, toProperCase } from "@/lib/format";
 import { Prisma } from "@/generated/prisma/client";
 
 export type TemplateFields = {
@@ -19,10 +19,10 @@ const INVALID = "Nama wajib diisi, total sesi/durasi minimal 1, harga minimal Rp
 
 export function parseTemplateFields(formData: FormData, defaultActive: boolean): TemplateFields | { error: string } {
   const name = toProperCase(formData.get("name")?.toString().trim() ?? "");
-  const totalSesi = Number(formData.get("totalSesi"));
-  const price = Number(formData.get("price"));
-  const durationDays = Number(formData.get("durationDays"));
-  const jatahCancel = Number(formData.get("jatahCancel"));
+  const totalSesi = formNumber(formData, "totalSesi");
+  const price = formNumber(formData, "price");
+  const durationDays = formNumber(formData, "durationDays");
+  const jatahCancel = formNumber(formData, "jatahCancel");
   const isActive = formData.has("isActive") ? formData.get("isActive") === "on" : defaultActive;
   if (
     !name ||

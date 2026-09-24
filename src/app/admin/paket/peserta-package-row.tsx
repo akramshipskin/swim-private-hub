@@ -78,6 +78,7 @@ export default function PesertaPackageRow({
                     type="number"
                     name="sisaSesi"
                     defaultValue={pkg.sisaSesi}
+                    required
                     min={0}
                     max={pkg.totalSesi}
                     className="w-full sm:w-20"
@@ -102,6 +103,7 @@ export default function PesertaPackageRow({
                     type="number"
                     name="jatahCancel"
                     defaultValue={pkg.jatahCancel}
+                    required
                     min={0}
                     className="w-full sm:w-20"
                   />

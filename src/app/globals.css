@@ -232,8 +232,12 @@ h6 {
   font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
   letter-spacing: -0.017em;
   /* Judul 2-3 baris dibagi rata, gak nyisain 1 kata sendirian di baris
-     terakhir. Kalau browser gak dukung, jatuhnya wrapping biasa. */
-  text-wrap: balance;
+     terakhir. Kalau browser gak dukung, jatuhnya wrapping biasa.
+     Longhand `text-wrap-style`, BUKAN shorthand `text-wrap`: shorthand ikut
+     mereset text-wrap-mode ke wrap, dan karena aturan ini di luar @layer ia
+     mengalahkan utilitas Tailwind -- `truncate`/`whitespace-nowrap` jadi
+     tidak jalan (nama panjang turun baris, bukan dipotong "..."). */
+  text-wrap-style: balance;
 }
 
 h1 {
@@ -248,7 +252,7 @@ h2 {
    nyentuh panjang baris. `pretty` cuma ngatur titik potong, gak ngubah
    lebar/ukuran, jadi aman dipasang global. */
 p {
-  text-wrap: pretty;
+  text-wrap-style: pretty; /* longhand -- lihat catatan di h1-h6 */
 }
 
 /* Smooth anchor/CTA scroll app-wide -- guarded biar gak jalan pas user

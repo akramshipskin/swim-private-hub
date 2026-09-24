@@ -24,7 +24,7 @@ export function LegalPageLayout({
     <main className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 max-sm:min-h-[44px]">
             <Image
               src="/logo.png"
               alt="Swim Private Hub"
@@ -34,7 +34,7 @@ export function LegalPageLayout({
             />
             <Logotype className="text-sm" />
           </Link>
-          <Link href="/" className="text-sm font-medium text-brand-600 hover:underline">
+          <Link href="/" className="text-sm font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
             ← Beranda
           </Link>
         </div>
@@ -53,7 +53,7 @@ export function LegalPageLayout({
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-3xl flex-wrap gap-x-6 gap-y-2 px-4 text-xs text-text-subtle">
           {LEGAL_LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="hover:text-brand-600 hover:underline">
+            <Link key={l.href} href={l.href} className="hover:text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               {l.label}
             </Link>
           ))}

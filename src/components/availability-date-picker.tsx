@@ -189,7 +189,7 @@ export function AvailabilityDatePicker({
             })}
           </div>
 
-          <p className="mt-2 flex items-center gap-1.5 text-[11px] text-text-subtle">
+          <p className="mt-2 flex items-center gap-1.5 text-xs text-text-subtle">
             <span className="h-1 w-1 rounded-full bg-brand-500" /> {legendLabel}
           </p>
         </div>

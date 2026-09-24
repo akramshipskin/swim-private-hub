@@ -156,7 +156,7 @@ export default function RegisterCoachForm() {
                       key={s}
                       type="button"
                       onClick={() => toggleSpecialty(s)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium max-sm:min-h-[44px] transition-colors ${
                         active
                           ? "border-brand-600 bg-brand-50 text-brand-700"
                           : "border-border bg-surface text-text-muted"
@@ -169,12 +169,12 @@ export default function RegisterCoachForm() {
               </div>
             </div>
 
-            <label className="flex items-start gap-2 text-sm text-text">
+            <label className="flex items-start gap-2 text-sm text-text max-sm:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
                 checked={hasCertification}
                 onChange={(e) => setHasCertification(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500 max-sm:h-5 max-sm:w-5"
               />
               <span>
                 Saya punya sertifikasi renang/lifeguard resmi
@@ -194,13 +194,13 @@ export default function RegisterCoachForm() {
               </Field>
             )}
 
-            <label className="flex items-start gap-2 text-xs text-text-muted">
+            <label className="flex items-start gap-2 text-xs text-text-muted max-sm:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
                 required
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500 max-sm:h-5 max-sm:w-5"
               />
               <span>
                 Saya setuju dengan{" "}
@@ -228,7 +228,7 @@ export default function RegisterCoachForm() {
 
           <p className="mt-5 text-center text-sm text-text-muted">
             Sudah punya akun?{" "}
-            <a href="/login" className="font-medium text-brand-600 hover:underline">
+            <a href="/login" className="font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Login
             </a>
           </p>

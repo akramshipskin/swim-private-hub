@@ -129,7 +129,7 @@ export function PushMenuItem({
         type="button"
         onClick={enable}
         disabled={status === "loading"}
-        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-text hover:bg-surface-muted disabled:opacity-50"
+        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-text hover:bg-surface-muted disabled:opacity-50 max-sm:min-h-[44px]"
       >
         <BellIcon className="h-4 w-4 shrink-0 text-text-muted" />
         {status === "loading" ? "Mengaktifkan..." : "Aktifkan Notifikasi"}

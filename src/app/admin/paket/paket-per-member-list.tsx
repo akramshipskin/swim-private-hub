@@ -46,6 +46,7 @@ export default function PaketPerMemberList({ rows }: { rows: Row[] }) {
       <Input
         type="search"
         placeholder="Cari nama akun, peserta, atau kolam..."
+        aria-label="Cari paket per member"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="mb-3 max-w-sm"

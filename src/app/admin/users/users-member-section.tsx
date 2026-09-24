@@ -39,6 +39,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
       <Input
         type="search"
         placeholder="Cari nama, email, No HP, atau nama anak..."
+        aria-label="Cari member"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="mb-3 max-w-sm"

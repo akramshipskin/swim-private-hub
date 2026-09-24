@@ -25,26 +25,29 @@ export default function CheckoutButton({
     setLoading(true);
     setError(null);
 
-    const res = await fetch("/api/payment/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ templateId, dependentId }),
-    });
-
-    const data = await res.json();
-    setLoading(false);
-
-    if (!res.ok) {
-      setError(data.error ?? "Gagal memulai pembayaran");
-      return;
+    try {
+      const res = await fetch("/api/payment/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ templateId, dependentId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.redirectUrl) {
+        setError(data.error ?? "Gagal memulai pembayaran. Coba lagi.");
+        setLoading(false);
+        return;
+      }
+      window.location.href = data.redirectUrl;
+    } catch {
+      // Koneksi putus: jangan biarkan tombol berputar terus.
+      setError("Koneksi terputus. Periksa internet, lalu coba lagi.");
+      setLoading(false);
     }
-
-    window.location.href = data.redirectUrl;
   }
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <Select value={dependentId} onChange={(e) => setDependentId(e.target.value)} className="w-full">
+      <Select aria-label="Paket ini untuk peserta" value={dependentId} onChange={(e) => setDependentId(e.target.value)} className="w-full">
         {dependents.map((d) => (
           <option key={d.id} value={d.id}>
             Buat {d.name}

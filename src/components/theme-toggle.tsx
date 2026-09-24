@@ -48,7 +48,7 @@ export function ThemeMenu() {
             setMode(opt.value);
             applyMode(opt.value);
           }}
-          className={`rounded-md py-1.5 text-xs font-medium transition-colors ${
+          className={`rounded-md py-1.5 text-xs font-medium transition-colors max-sm:min-h-[44px] ${
             mode === opt.value
               ? "bg-brand-600 text-white"
               : "text-text-muted hover:text-text"

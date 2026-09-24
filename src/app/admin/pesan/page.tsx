@@ -91,7 +91,7 @@ export default async function AdminPesanPage({ searchParams }: { searchParams: P
                 <div className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto">
                   {selected.messages.map((m) => (
                     <div key={m.id} className={m.sender === "USER" ? "self-start" : "self-end text-right"}>
-                      <p className="text-[11px] text-text-subtle">{senderLabel[m.sender]} · {time(m.createdAt)}</p>
+                      <p className="text-xs text-text-subtle">{senderLabel[m.sender]} · {time(m.createdAt)}</p>
                       <p className={`inline-block max-w-[85%] rounded-xl px-3 py-2 text-left text-sm whitespace-pre-wrap ${m.sender === "USER" ? "bg-surface-muted text-text" : "bg-brand-50 text-text"}`}>
                         {m.content}
                       </p>

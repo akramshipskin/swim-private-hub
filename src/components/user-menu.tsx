@@ -74,7 +74,7 @@ export function UserMenu({
           <Link
             href="/profil"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-text hover:bg-surface-muted"
+            className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-text hover:bg-surface-muted max-sm:min-h-[44px]"
           >
             <UserEditIcon className="h-4 w-4 text-text-muted" />
             Edit Profil
@@ -82,7 +82,7 @@ export function UserMenu({
           <form action={handleLogout}>
             <button
               type="submit"
-              className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-danger-text hover:bg-danger-bg"
+              className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-danger-text hover:bg-danger-bg max-sm:min-h-[44px]"
             >
               <LogoutIcon className="h-4 w-4" />
               Logout

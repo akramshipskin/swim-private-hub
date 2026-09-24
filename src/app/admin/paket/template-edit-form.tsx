@@ -118,6 +118,7 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
                 type="number"
                 name="jatahCancel"
                 defaultValue={template.jatahCancel}
+                required
                 min={0}
                
                 className="w-full sm:w-24"

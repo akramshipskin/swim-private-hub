@@ -60,8 +60,10 @@ export default async function AdminDashboardPage() {
     prisma.user.count({ where: { role: "MEMBER", isActive: true } }),
     prisma.user.count({ where: { role: "COACH", isActive: true } }),
     prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, isActive: true, walletBalance: true } }),
-    prisma.package.count({ where: usablePackageConditions() }),
-    prisma.dependent.count({ where: { isActive: true, packages: { some: usablePackageConditions() } } }),
+    // Sama dengan "Member punya paket aktif": hanya akun member yang masih
+    // aktif (akun nonaktif tidak bisa login/booking, paketnya tidak terpakai).
+    prisma.package.count({ where: { ...usablePackageConditions(), member: { isActive: true } } }),
+    prisma.dependent.count({ where: { isActive: true, member: { isActive: true }, packages: { some: usablePackageConditions() } } }),
     prisma.chatThread.count({ where: { needsAdmin: true } }),
     prisma.withdrawalRequest.aggregate({ where: { status: { in: ["PENDING", "PROCESSING"] } }, _count: true, _sum: { amount: true } }),
     prisma.coachProfile.count({ where: { certificateStatus: "PENDING" } }),

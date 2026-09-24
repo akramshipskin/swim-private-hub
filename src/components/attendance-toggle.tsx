@@ -68,7 +68,7 @@ export default function AttendanceToggle({
             if (v) requestAnimationFrame(() => formRef.current?.requestSubmit());
           }}
           aria-label="Status kehadiran"
-          className={`appearance-none rounded-lg border py-1 pl-2 pr-6 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 ${toneClass}`}
+          className={`appearance-none rounded-lg border py-1 pl-2 pr-6 text-xs font-medium max-sm:min-h-[44px] max-sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 ${toneClass}`}
         >
           <option value="" disabled>
             Belum ditandai

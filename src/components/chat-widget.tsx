@@ -66,12 +66,12 @@ export function ChatWidget() {
             <div>
               <p className="text-sm font-semibold text-text">Bantuan</p>
               <p className="text-xs text-text-subtle">Dijawab asisten, diteruskan ke admin bila perlu</p>
-              <p className="text-[11px] text-text-subtle">
+              <p className="text-xs text-text-subtle">
                 Riwayat yang tampil 90 hari terakhir. Arsip disimpan untuk penyelesaian masalah, sesuai{" "}
                 <a href="/kebijakan-privasi" target="_blank" className="underline">Kebijakan Privasi</a>.
               </p>
             </div>
-            <button type="button" onClick={() => setOpen(false)} aria-label="Tutup chat" className="rounded-md px-2 py-1 text-text-muted hover:bg-surface-muted">
+            <button type="button" onClick={() => setOpen(false)} aria-label="Tutup chat" className="rounded-md px-2 py-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]">
               ✕
             </button>
           </div>
@@ -81,7 +81,7 @@ export function ChatWidget() {
             )}
             {messages.map((m) => (
               <div key={m.id} className={m.sender === "USER" ? "self-end text-right" : "self-start"}>
-                <p className="mb-0.5 text-[11px] text-text-subtle">{senderLabel[m.sender]}</p>
+                <p className="mb-0.5 text-xs text-text-subtle">{senderLabel[m.sender]}</p>
                 <p
                   className={`inline-block max-w-[85%] rounded-xl px-3 py-2 text-left text-sm whitespace-pre-wrap ${
                     m.sender === "USER" ? "bg-brand-600 text-white" : m.sender === "SYSTEM" ? "bg-warning-bg text-warning-text" : "bg-surface-muted text-text"
