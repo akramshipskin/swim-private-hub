@@ -31,11 +31,20 @@ export async function POST(request: Request) {
     return Response.json({ error: `Pesan maksimal ${MAX_CHAT_LENGTH} karakter.` }, { status: 400 });
   }
 
-  const thread = await prisma.chatThread.upsert({
-    where: { userId: user.id },
-    update: {},
-    create: { userId: user.id },
-  });
+  // upsert Prisma bukan atomic di DB: pesan pertama yang terkirim 2x hampir
+  // bersamaan (klik ganda) bikin dua-duanya nyoba create, yang kalah kena
+  // unique constraint (P2002) dan dulu jadi error 500. Threadnya sudah ada =
+  // tujuan tercapai, ambil saja.
+  const thread = await prisma.chatThread
+    .upsert({
+      where: { userId: user.id },
+      update: {},
+      create: { userId: user.id },
+    })
+    .catch((err: { code?: string }) => {
+      if (err?.code !== "P2002") throw err;
+      return prisma.chatThread.findUniqueOrThrow({ where: { userId: user.id } });
+    });
 
   // Batas wajar biar biaya AI gak bisa dihabisin 1 akun: 20 pesan per jam.
   // Hitung + simpan di bawah kunci per-user: tanpa kunci, burst request

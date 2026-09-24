@@ -21,7 +21,7 @@ vi.mock("@/lib/dedupe-lock", () => ({
 }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    chatThread: { upsert: vi.fn().mockResolvedValue({ id: "t1" }), findUnique: vi.fn().mockResolvedValue({ messages: [] }), update: vi.fn() },
+    chatThread: { upsert: vi.fn().mockResolvedValue({ id: "t1" }), findUniqueOrThrow: vi.fn().mockResolvedValue({ id: "t1" }), findUnique: vi.fn().mockResolvedValue({ messages: [] }), update: vi.fn() },
     chatMessage: { findMany: vi.fn().mockResolvedValue([]), create: vi.fn() },
     $transaction: vi.fn().mockResolvedValue([]),
   },
@@ -51,5 +51,26 @@ describe("POST /api/chat rate limit", () => {
     const res = await send("halo lagi");
     expect(res.status).toBe(429);
     expect(txCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe("POST /api/chat first message from a user without a thread", () => {
+  // Bug sweep 24 Sep (tes race E11): pesan pertama terkirim 2x hampir bersamaan,
+  // upsert bentrok (P2002) dan endpoint melempar error 500.
+  it("recovers when the thread was created by a simultaneous request (P2002)", async () => {
+    const { prisma } = await import("@/lib/prisma");
+    vi.mocked(prisma.chatThread.upsert).mockRejectedValueOnce({ code: "P2002" });
+    txCount.mockResolvedValue(0);
+    const res = await send("halo");
+    expect(res.status).toBe(200);
+    expect(prisma.chatThread.findUniqueOrThrow).toHaveBeenCalledWith({ where: { userId: "m1" } });
+    expect(txCreate).toHaveBeenCalledWith({ data: { threadId: "t1", sender: "USER", content: "halo" } });
+  });
+
+  it("still surfaces any other database error", async () => {
+    const { prisma } = await import("@/lib/prisma");
+    vi.mocked(prisma.chatThread.upsert).mockRejectedValueOnce(new Error("db down"));
+    await expect(send("halo")).rejects.toThrow("db down");
+    expect(prisma.chatThread.findUniqueOrThrow).not.toHaveBeenCalled();
   });
 });
