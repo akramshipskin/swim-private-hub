@@ -86,7 +86,7 @@ export async function addAvailability(
       date: dateLabel(date),
       startTime: { in: chunks.map((c) => c.startTime) },
     },
-    select: { id: true, startTime: true, endTime: true, status: true, poolId: true },
+    select: { id: true, startTime: true, endTime: true, status: true, poolId: true, pool: { select: { name: true } } },
     orderBy: { startTime: "asc" },
   });
 
@@ -103,6 +103,17 @@ export async function addAvailability(
   }
   const blocked = conflicts.filter((c) => !reopen.includes(c));
 
+  // Slot tertutup di kolam LAIN tidak kelihatan di daftar coach, jadi pesan
+  // "hapus slot lamanya dulu" menyesatkan -- sebut kolamnya.
+  const range = (c: { startTime: Date; endTime: Date }) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`;
+  const closedElsewhere = blocked.filter((c) => c.status === "CLOSED");
+  const visibleBlocked = blocked.filter((c) => c.status !== "CLOSED");
+  const blockedNote = [
+    visibleBlocked.length > 0 && `Jam ${visibleBlocked.map(range).join(", ")} sudah pernah dibuka sebelumnya.`,
+    closedElsewhere.length > 0 &&
+      `Jam ${closedElsewhere.map(range).join(", ")} sebelumnya dipakai di kolam ${[...new Set(closedElsewhere.map((c) => c.pool.name))].join(", ")} dan sudah ditutup; jam itu tidak bisa dipindah ke kolam lain (buka di kolam yang sama, atau pilih jam lain).`,
+  ].filter(Boolean).join(" ");
+
   // Jam yang beneran bebas -- cuma ini yang boleh dibuat. Sebelumnya kalau
   // ADA satu jam aja yang bentrok, seluruh request diblokir total (termasuk
   // jam yang sebenernya bebas), jadi coach yang buka ulang rentang lebar
@@ -115,11 +126,8 @@ export async function addAvailability(
   const openedChunks = chunks.filter((c) => !blockedTimes.has(c.startTime.getTime()));
 
   if (blocked.length > 0 && openedChunks.length === 0) {
-    const times = blocked
-      .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
-      .join(", ");
     return {
-      error: `Slot jam ${times} di tanggal ini sudah pernah dibuka sebelumnya. Pilih jam lain atau hapus slot lamanya dulu.`,
+      error: `${blockedNote}${visibleBlocked.length > 0 ? " Pilih jam lain atau hapus slot lamanya dulu." : ""}`,
     };
   }
 
@@ -166,12 +174,7 @@ export async function addAvailability(
   revalidatePath("/coach/jadwal");
 
   if (blocked.length > 0) {
-    const times = blocked
-      .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
-      .join(", ");
-    return {
-      warning: `Jam ${times} sudah pernah dibuka sebelumnya, jadi dilewati. Jam lainnya berhasil ditambahkan.`,
-    };
+    return { warning: `${blockedNote} Jam itu dilewati, jam lainnya berhasil ditambahkan.` };
   }
 
   return null;

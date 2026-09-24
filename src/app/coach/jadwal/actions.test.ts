@@ -24,11 +24,12 @@ vi.mock("@/lib/cancel-booking", () => ({
 const affiliationFindUnique = vi.fn();
 const availabilityCreateMany = vi.fn();
 const availabilityFindMany = vi.fn();
+const availabilityUpdateMany = vi.fn();
 const userFindMany = vi.fn();
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     poolAffiliation: { findUnique: (...a: unknown[]) => affiliationFindUnique(...a) },
-    availability: { createMany: (...a: unknown[]) => availabilityCreateMany(...a), findMany: (...a: unknown[]) => availabilityFindMany(...a) },
+    availability: { createMany: (...a: unknown[]) => availabilityCreateMany(...a), findMany: (...a: unknown[]) => availabilityFindMany(...a), updateMany: (...a: unknown[]) => availabilityUpdateMany(...a) },
     user: { findMany: (...a: unknown[]) => userFindMany(...a) },
   },
 }));
@@ -148,6 +149,38 @@ describe("addAvailability new-slot notification", () => {
     expect(res?.error).toContain("sudah pernah dibuka");
     expect(availabilityCreateMany).not.toHaveBeenCalled();
     expect(sendPushToUsers).not.toHaveBeenCalled();
+  });
+
+  // Slot yang dulu "dihapus" tapi ditutup (punya riwayat booking) tidak kelihatan
+  // di daftar coach -- pesannya tidak boleh menyuruh "hapus slot lamanya".
+  const closed = (h: number, poolId: string, poolName: string, id = `s${h}`) => ({
+    id, status: "CLOSED", poolId, pool: { name: poolName },
+    startTime: new Date(`2099-01-05T0${h}:00:00Z`), endTime: new Date(`2099-01-05T0${h + 1}:00:00Z`),
+  });
+
+  it("names the other pool when every hour is closed there, without telling the coach to delete anything", async () => {
+    availabilityFindMany.mockResolvedValue([closed(1, "pool-2", "Kolam Mawar"), closed(2, "pool-2", "Kolam Mawar")]);
+    const res = await addAvailability(null, slotForm({}));
+    expect(res?.error).toContain("Kolam Mawar");
+    expect(res?.error).toContain("tidak bisa dipindah");
+    expect(res?.error).not.toContain("hapus slot lamanya");
+    expect(availabilityCreateMany).not.toHaveBeenCalled();
+    expect(availabilityUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("reopens hours closed in the SAME pool instead of treating them as conflicts", async () => {
+    availabilityFindMany.mockResolvedValue([closed(1, "pool-1", "Kolam Melati", "old-1")]);
+    const res = await addAvailability(null, slotForm({}));
+    expect(res).toBeNull();
+    expect(availabilityUpdateMany).toHaveBeenCalledWith({ where: { id: { in: ["old-1"] }, status: "CLOSED" }, data: { status: "AVAILABLE" } });
+    expect(availabilityCreateMany).toHaveBeenCalledWith(expect.objectContaining({ data: [expect.objectContaining({ startTime: new Date("2099-01-05T02:00:00Z") })] }));
+  });
+
+  it("warns (not errors) when only some hours are blocked by a slot closed in another pool", async () => {
+    availabilityFindMany.mockResolvedValue([closed(1, "pool-2", "Kolam Mawar")]);
+    const res = await addAvailability(null, slotForm({}));
+    expect(res).toEqual({ warning: expect.stringContaining("Kolam Mawar") });
+    expect(availabilityCreateMany).toHaveBeenCalledTimes(1);
   });
 
   it("refuses a pool the coach is not affiliated with, without notifying anyone", async () => {
