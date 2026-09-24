@@ -120,6 +120,15 @@ export default async function KomisiPage() {
             ...(e.legacy.sessions > 0 ? [{ label: "Paket kolam lain (sebelum 17 Sep)", p: e.legacy }] : []),
           ];
           const all = [e.own, e.single, e.legacy];
+          // Tampilan HP: tabel 7 kolom tidak muat, jadi tiap baris jadi kartu.
+          const cards = [
+            ...parts.map(({ label, p }) => ({ label, total: false, p })),
+            {
+              label: "Total",
+              total: true,
+              p: { sessions: sum(all, "sessions"), gross: sum(all, "gross"), platform: sum(all, "platform"), pool: sum(all, "pool"), coach: sum(all, "coach") },
+            },
+          ];
           const paid = paidOut.find((x) => x.poolId === pool.id)?._sum.amount ?? 0;
           return (
             <Card key={pool.id}>
@@ -135,7 +144,26 @@ export default async function KomisiPage() {
                     Riwayat pencairan &rarr;
                   </Link>
                 </div>
-                <div className="overflow-x-auto">
+                <ul className="flex flex-col gap-2 sm:hidden">
+                  {cards.map(({ label, total, p }) => (
+                    <li key={label} className={`rounded-lg border border-border px-3 py-2 ${total ? "bg-surface-muted" : ""}`}>
+                      <p className={`text-sm text-text ${total ? "font-semibold" : "font-medium"}`}>
+                        {label} <span className="font-normal text-text-muted">· {p.sessions} sesi · nilai {formatRupiah(p.gross)}</span>
+                      </p>
+                      <dl className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-sm tabular-nums">
+                        <dt className="text-text-muted">Platform bersih</dt>
+                        <dd className="text-right text-text">{formatRupiah(splitPlatformTax(p.platform).net)}</dd>
+                        <dt className="text-text-muted">PPN 12%</dt>
+                        <dd className="text-right text-text">{formatRupiah(splitPlatformTax(p.platform).tax)}</dd>
+                        <dt className="text-text-muted">Kolam</dt>
+                        <dd className="text-right text-text">{formatRupiah(p.pool)}</dd>
+                        <dt className="text-text-muted">Coach</dt>
+                        <dd className="text-right text-text">{formatRupiah(p.coach)}</dd>
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+                <div className="hidden overflow-x-auto sm:block">
                   <table className="w-full min-w-[620px] text-sm">
                     <thead>
                       <tr className="text-left text-xs text-text-subtle">
