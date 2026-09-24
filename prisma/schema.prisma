@@ -117,6 +117,11 @@ model User {
   totpSecret         String?
   totpEnabledAt      DateTime?
   totpLastStep       Int?
+  // Hapus akun (keputusan Hadi 25 Sep): member mengajukan, admin menyetujui.
+  // Disetujui = data identitas dianonimkan (anonymizedAt), riwayat transaksi &
+  // arsip chat tetap tersimpan tanpa identitas.
+  deletionRequestedAt DateTime?
+  anonymizedAt        DateTime?
 
   coachProfile        CoachProfile?
   dependents          Dependent[]

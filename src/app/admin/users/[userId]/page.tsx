@@ -10,6 +10,8 @@ import { formatRupiah } from "@/lib/format";
 import { formatDateLabel, formatTimeWib, todayWibDateString, wibDateTime } from "@/lib/datetime";
 import { coachBioLine } from "@/lib/coach-bio";
 import { roleLabel } from "@/lib/nav-links";
+import { deletionImpact } from "@/lib/account-deletion";
+import AnonymizeCard from "./anonymize-card";
 
 export const metadata = { title: "Detail User | Swim Private Hub" };
 
@@ -46,6 +48,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
     },
   });
   if (!user) notFound();
+  const deletion = user.deletionRequestedAt && !user.anonymizedAt ? await deletionImpact(user.id) : null;
 
   const startMonth = wibDateTime(`${todayWibDateString().slice(0, 7)}-01`, "00:00");
   const [bookings, payments, withdrawals, coachSessions] = await Promise.all([
@@ -100,12 +103,26 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge tone={user.isActive ? "success" : "neutral"}>{user.isActive ? "Aktif" : "Nonaktif"}</Badge>
-          <UserActions user={user} isSelf={user.id === session.user.id} />
+          {user.anonymizedAt ? (
+            <Badge tone="neutral">Akun dihapus</Badge>
+          ) : (
+            <Badge tone={user.isActive ? "success" : "neutral"}>{user.isActive ? "Aktif" : "Nonaktif"}</Badge>
+          )}
+          {/* Akun yang sudah dihapus tidak punya HP/email untuk masuk -- tombol
+              aktifkan/reset password tidak ada gunanya dan membingungkan. */}
+          {!user.anonymizedAt && <UserActions user={user} isSelf={user.id === session.user.id} />}
         </div>
       </div>
 
       <div className="mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+        {deletion && user.deletionRequestedAt && (
+          <AnonymizeCard
+            userId={user.id}
+            requestedAt={user.deletionRequestedAt.toISOString()}
+            upcomingBookings={deletion.upcomingBookings}
+            remainingSessions={deletion.remainingSessions}
+          />
+        )}
         <Card>
           <CardBody>
             <h2 className="mb-2 text-lg font-semibold text-text">Data akun</h2>
@@ -143,8 +160,10 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               <Row
                 label="Rekening"
                 value={
+                  // Disamarkan (keputusan Hadi 25 Sep): nomor lengkap hanya di
+                  // halaman proses pencairan, tempat admin benar-benar transfer.
                   user.coachProfile.bankAccountNumber
-                    ? `${user.coachProfile.bankName ?? "-"} · ${user.coachProfile.bankAccountNumber} a.n. ${user.coachProfile.bankAccountName ?? "-"}`
+                    ? `${user.coachProfile.bankName ?? "-"} · •••• ${user.coachProfile.bankAccountNumber.slice(-4)} a.n. ${user.coachProfile.bankAccountName ?? "-"}`
                     : "Belum diisi"
                 }
               />

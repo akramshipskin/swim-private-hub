@@ -67,6 +67,13 @@ export async function POST(request: Request) {
       if (!coach?.isActive) {
         throw new BookingError("Coach ini sedang tidak aktif, slotnya belum bisa dibooking. Pilih coach lain.", 409);
       }
+      // Sama untuk akun member: akun yang sedang dihapus/dinonaktifkan admin
+      // (src/lib/account-deletion.ts) menunggu booking ini selesai lalu ikut
+      // membatalkannya; booking setelahnya ditolak.
+      const [member] = await tx.$queryRaw<{ isActive: boolean }[]>`SELECT "isActive" FROM "User" WHERE id = ${session.user.id} FOR SHARE`;
+      if (!member?.isActive) {
+        throw new BookingError("Akun ini sudah tidak aktif.", 403);
+      }
       // Kolam dinonaktifin admin: booking BARU ditolak. Booking yang udah
       // ada gak disentuh (keputusan default, bisa diubah Hadi).
       if (!slot.pool.isActive) {

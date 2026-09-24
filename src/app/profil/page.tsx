@@ -11,6 +11,7 @@ import CopyLinkButton from "./copy-link-button";
 import EditCoachProfileForm from "./edit-coach-profile-form";
 import CoachMediaForm from "./coach-media-form";
 import { isStorageConfigured } from "@/lib/storage";
+import DeleteAccountCard from "./delete-account-card";
 
 export const metadata: Metadata = {
   title: "Profil | Swim Private Hub",
@@ -38,6 +39,13 @@ export default async function ProfilPage() {
           where: { userId: session.user.id },
           select: { bio: true, specialties: true, certificationNote: true, photoUrl: true, certificateStatus: true, birthDate: true, gender: true },
         })
+      : null;
+
+  // Hapus akun mandiri: khusus member (coach/pemilik kolam punya saldo & jadwal
+  // yang diurus lewat admin).
+  const deletionAccount =
+    session.user.role === "MEMBER"
+      ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { deletionRequestedAt: true } })
       : null;
 
   return (
@@ -109,6 +117,10 @@ export default async function ProfilPage() {
                   <CopyLinkButton link={publicProfileLink} />
                 </CardBody>
               </Card>
+            )}
+
+            {deletionAccount && (
+              <DeleteAccountCard requestedAt={deletionAccount.deletionRequestedAt?.toISOString() ?? null} />
             )}
 
             {session.user.role === "MEMBER" && (

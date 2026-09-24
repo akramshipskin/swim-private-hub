@@ -18,6 +18,11 @@ export default async function AdminDashboardPage() {
   const startToday = wibDateTime(todayStr, "00:00");
   const startMonth = wibDateTime(`${todayStr.slice(0, 7)}-01`, "00:00");
   const now = new Date();
+  const deletionRequests = await prisma.user.findMany({
+    where: { deletionRequestedAt: { not: null }, anonymizedAt: null },
+    orderBy: { deletionRequestedAt: "asc" },
+    select: { id: true },
+  });
 
   const [
     bookings,
@@ -112,6 +117,11 @@ export default async function AdminDashboardPage() {
         <BentoCard title="Perlu tindakan" className="md:col-span-2 md:row-span-2">
           <div className="flex flex-col">
             <ActionRow label="Pesan perlu dibalas" count={waitingChats} href="/admin/pesan" />
+            <ActionRow
+              label="Permintaan hapus akun"
+              count={deletionRequests.length}
+              href={deletionRequests[0] ? `/admin/users/${deletionRequests[0].id}` : "/admin/users"}
+            />
             <ActionRow
               label="Pencairan menunggu"
               count={pendingWithdrawals._count}
