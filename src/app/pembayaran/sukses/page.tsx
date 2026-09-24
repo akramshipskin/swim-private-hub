@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonClass } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Status Pembayaran | Swim Private Hub",
@@ -83,13 +83,11 @@ export default async function PembayaranSuksesPage({
                 : "Terima kasih! Paketmu sedang diproses otomatis dan akan aktif dalam beberapa saat."}
           </p>
           <div className="flex w-full flex-col gap-2">
-            <Link href="/member/paket" className="w-full">
-              <Button className="w-full">{isFailed ? "Coba Lagi" : "Lihat Paket Saya"}</Button>
+            <Link href="/member/paket" className={buttonClass({ className: "w-full" })}>
+              {isFailed ? "Coba Lagi" : "Lihat Paket Saya"}
             </Link>
-            <Link href="/member/booking" className="w-full">
-              <Button variant="secondary" className="w-full">
-                {isFailed ? "Kembali ke Booking" : "Booking Sekarang"}
-              </Button>
+            <Link href="/member/booking" className={buttonClass({ variant: "secondary", className: "w-full" })}>
+              {isFailed ? "Kembali ke Booking" : "Booking Sekarang"}
             </Link>
           </div>
         </CardBody>

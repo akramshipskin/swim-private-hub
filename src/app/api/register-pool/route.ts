@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       });
       const pool = await tx.pool.create({
         data: {
-          name: poolName.trim(),
+          name: toProperCase(poolName.trim()),
           address: address.trim(),
           contactPhone: phone,
           openTime,

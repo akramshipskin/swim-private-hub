@@ -100,8 +100,14 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
       {byDate.size === 0 ? (
         <Card>
           <CardBody className="py-10 text-center">
-            <p className="text-sm font-medium text-text">Belum ada slot terjadwal</p>
-            <p className="mt-1 text-sm text-text-muted">Tambah slot pertamamu di atas.</p>
+            <p className="text-sm font-medium text-text">{q ? "Tidak ada slot yang cocok" : "Belum ada slot terjadwal"}</p>
+            <p className="mt-1 text-sm text-text-muted">
+              {q
+                ? "Coba kata lain, atau tekan Reset untuk melihat semua slot."
+                : myPools.length === 0
+                  ? "Slot bisa ditambahkan setelah admin memasukkan kamu ke kolam."
+                  : "Tambah slot pertamamu di atas."}
+            </p>
           </CardBody>
         </Card>
       ) : (

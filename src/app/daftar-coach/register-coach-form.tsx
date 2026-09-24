@@ -155,6 +155,7 @@ export default function RegisterCoachForm() {
                     <button
                       key={s}
                       type="button"
+                      aria-pressed={active}
                       onClick={() => toggleSpecialty(s)}
                       className={`rounded-full border px-3 py-1.5 text-xs font-medium max-sm:min-h-[44px] transition-colors ${
                         active

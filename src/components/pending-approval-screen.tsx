@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Logotype } from "@/components/ui/logotype";
 import { Card, CardBody } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonClass } from "@/components/ui/button";
 import { buildAdminWaLink } from "@/lib/whatsapp";
 
 // Coach & pemilik kolam yang daftar sendiri akunnya nonaktif sampai admin
@@ -35,11 +35,11 @@ export function PendingApprovalScreen({ roleLabel }: { roleLabel: string }) {
             href={buildAdminWaLink(`Halo admin, saya baru daftar sebagai ${roleLabel} di Swim Private Hub. Mohon dicek ya.`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full"
+            className={buttonClass({ className: "w-full" })}
           >
-            <Button className="w-full">Kabari Admin via WhatsApp</Button>
+            Kabari Admin via WhatsApp
           </a>
-          <Link href="/" className="text-sm font-medium text-brand-600 hover:underline">
+          <Link href="/" className="text-sm font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
             Kembali ke Beranda
           </Link>
         </CardBody>

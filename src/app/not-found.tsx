@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonClass } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -27,8 +27,8 @@ export default function NotFound() {
             Halaman yang kamu cari tidak ada atau sudah dipindah. Cek lagi alamatnya,
             atau balik ke beranda.
           </p>
-          <Link href="/" className="w-full">
-            <Button className="w-full">Kembali ke Beranda</Button>
+          <Link href="/" className={buttonClass({ className: "w-full" })}>
+            Kembali ke Beranda
           </Link>
         </CardBody>
       </Card>

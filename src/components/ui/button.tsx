@@ -33,6 +33,16 @@ const sizeClasses: Record<Size, string> = {
   md: "min-h-[44px] px-4 py-2.5 text-sm rounded-xl",
 };
 
+const baseClasses =
+  "inline-flex items-center justify-center gap-2 font-medium transition-all duration-150 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2";
+
+// Kelas tombol untuk <Link>/<a> yang tampil seperti tombol. Jangan bungkus
+// <Button> di dalam <a>: HTML tidak valid (elemen interaktif bertumpuk) dan
+// pembaca layar/tab keyboard berhenti dua kali di tombol yang sama.
+export function buttonClass({ variant = "primary", size = "md", className }: { variant?: Variant; size?: Size; className?: string } = {}) {
+  return cn(baseClasses, variantClasses[variant], sizeClasses[size], className);
+}
+
 export function Button({
   variant = "primary",
   size = "md",
@@ -45,13 +55,7 @@ export function Button({
   return (
     <button
       disabled={disabled || loading}
-      className={cn(
-        "inline-flex items-center justify-center gap-2 font-medium transition-all duration-150 disabled:cursor-not-allowed",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
-        variantClasses[variant],
-        sizeClasses[size],
-        className
-      )}
+      className={buttonClass({ variant, size, className })}
       {...props}
     >
       {loading && <Loader size={20} label="Menyimpan" />}

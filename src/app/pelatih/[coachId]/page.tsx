@@ -7,7 +7,7 @@ import { signedObjectUrl, CERT_BUCKET } from "@/lib/storage";
 import { roleNavLinks, roleLabel } from "@/lib/nav-links";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonClass } from "@/components/ui/button";
 import { Logotype } from "@/components/ui/logotype";
 import { NavBar } from "@/components/nav-bar";
 import BackButton from "./back-button";
@@ -147,8 +147,8 @@ export default async function CoachShortcutPage({
             : "Mau les dengan coach ini? Daftar sebagai member untuk melihat jadwal, fasilitas kolam, dan sertifikat lengkap."}
       </p>
       {!session && (
-        <Link href="/register" className="mt-3 inline-block">
-          <Button>Daftar sekarang</Button>
+        <Link href="/register" className={buttonClass({ className: "mt-3" })}>
+          Daftar sekarang
         </Link>
       )}
     </main>
@@ -185,13 +185,11 @@ export default async function CoachShortcutPage({
             <Logotype className="text-lg" />
           </Link>
           <div className="flex items-center gap-2">
-            <Link href="/login">
-              <Button variant="ghost" size="sm">
+            <Link href="/login" className={buttonClass({ variant: "ghost", size: "sm" })}>
                 Masuk
-              </Button>
             </Link>
-            <Link href="/register">
-              <Button size="sm">Daftar</Button>
+            <Link href="/register" className={buttonClass({ size: "sm" })}>
+              Daftar
             </Link>
           </div>
         </div>

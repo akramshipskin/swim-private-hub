@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonClass } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Pembayaran Belum Selesai | Swim Private Hub",
@@ -46,13 +46,11 @@ export default function PembayaranGagalPage() {
             terpotong — kamu bisa coba lagi kapan saja.
           </p>
           <div className="flex w-full flex-col gap-2">
-            <Link href="/member/paket" className="w-full">
-              <Button className="w-full">Coba Lagi</Button>
+            <Link href="/member/paket" className={buttonClass({ className: "w-full" })}>
+              Coba Lagi
             </Link>
-            <Link href="/member/booking" className="w-full">
-              <Button variant="secondary" className="w-full">
-                Kembali ke Booking
-              </Button>
+            <Link href="/member/booking" className={buttonClass({ variant: "secondary", className: "w-full" })}>
+              Kembali ke Booking
             </Link>
           </div>
         </CardBody>
