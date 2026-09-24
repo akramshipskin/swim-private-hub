@@ -87,7 +87,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <Link href="/admin/users" className="text-sm font-medium text-brand-700 hover:underline">
+      <Link href="/admin/users" className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
         ← Kembali ke Kelola User
       </Link>
 
@@ -170,7 +170,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               {user.coachProfile.bio && <p className="mt-3 text-sm text-text-muted">{user.coachProfile.bio}</p>}
               <Link
                 href={`/pelatih/${user.id}`}
-                className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline"
+                className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
               >
                 Lihat profil publik →
               </Link>

@@ -25,7 +25,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
         </p>
         <a
           href="/api/admin/import-template"
-          className="mb-4 inline-block text-xs font-medium text-brand-600 hover:underline"
+          className="mb-4 inline-block text-xs font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
         >
           Download Template
         </a>
@@ -45,7 +45,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
             accept=".xlsx,.xls"
             required
             onChange={(e) => setHasFile((e.target.files?.length ?? 0) > 0)}
-            className="w-full min-w-0 max-w-full text-sm text-text sm:w-auto file:mr-3 file:rounded-lg file:border-0 file:bg-brand-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#0a0a08]"
+            className="w-full min-w-0 max-w-full text-sm text-text max-sm:min-h-[44px] sm:w-auto file:mr-3 file:rounded-lg file:border-0 file:bg-brand-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#0a0a08]"
           />
           <Button type="submit" disabled={!hasFile} loading={pending}>
             Import

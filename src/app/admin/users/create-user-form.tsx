@@ -143,7 +143,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
               <button
                 type="button"
                 onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "" }])}
-                className="self-start text-sm font-medium text-brand-600 hover:underline"
+                className="self-start text-sm font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
               >
                 + Tambah peserta lain
               </button>

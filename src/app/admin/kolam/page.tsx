@@ -181,7 +181,7 @@ export default async function AdminKolamPage() {
                   </div>
                 </div>
                 <details className="rounded-lg border border-border px-3 py-2">
-                  <summary className="cursor-pointer text-sm font-medium text-text">
+                  <summary className="cursor-pointer text-sm font-medium text-text max-sm:py-3">
                     Info &amp; fasilitas kolam ({p.facilities.length} fasilitas)
                   </summary>
                   <div className="mt-3 flex flex-col gap-6">

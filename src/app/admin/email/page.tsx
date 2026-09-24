@@ -78,7 +78,7 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
           <Link
             key={tab}
             href={tab === "Semua" ? "/admin/email" : `/admin/email?box=${tab}`}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium max-sm:min-h-[44px] ${
               activeBox === tab ? "border-brand-500 bg-brand-50 text-brand-700" : "border-border bg-surface text-text-muted hover:bg-surface-muted"
             }`}
           >

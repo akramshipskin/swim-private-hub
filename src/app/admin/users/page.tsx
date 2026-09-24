@@ -68,7 +68,7 @@ export default async function AdminUsersPage() {
         <CreateUserForm pools={pools} />
         <div className="flex flex-col gap-4">
           <details className="rounded-2xl border border-border bg-surface p-4">
-            <summary className="cursor-pointer text-sm font-semibold text-text">
+            <summary className="cursor-pointer text-sm font-semibold text-text max-sm:py-3">
               Migrasi data: import member dari Excel (.xlsx)
             </summary>
             <p className="mt-2 text-sm text-text-muted">Dipakai saat kolam baru bergabung dan membawa data member lama.</p>
@@ -120,7 +120,7 @@ export default async function AdminUsersPage() {
                         {role === "COACH" && <Avatar src={u.coachProfile?.photoUrl} className="h-12 w-12" />}
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <Link href={`/admin/users/${u.id}`} className="font-semibold text-text hover:underline">
+                            <Link href={`/admin/users/${u.id}`} className="font-semibold text-text hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                               {u.name}
                             </Link>
                             <Badge tone={u.isActive ? "success" : "neutral"}>{u.isActive ? "Aktif" : "Nonaktif"}</Badge>
@@ -157,7 +157,7 @@ export default async function AdminUsersPage() {
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <Link
                           href={`/admin/users/${u.id}`}
-                          className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-muted"
+                          className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-muted max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
                         >
                           Info detail
                         </Link>

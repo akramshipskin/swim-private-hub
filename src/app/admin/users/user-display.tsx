@@ -92,7 +92,7 @@ export function UserActions({
           href={buildContactWaLink(user.phone, user.name)}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-md px-2 py-1.5 text-sm font-medium text-whatsapp hover:bg-whatsapp/10"
+          className="rounded-md px-2 py-1.5 text-sm font-medium text-whatsapp hover:bg-whatsapp/10 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
         >
           Hubungi
         </a>

@@ -66,7 +66,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                   {filtered.map((u) => (
                     <tr key={u.id} className="border-b border-border last:border-0">
                       <td className="px-5 py-4">
-                        <Link href={`/admin/users/${u.id}`} className="font-medium text-text hover:underline">
+                        <Link href={`/admin/users/${u.id}`} className="font-medium text-text hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                           {u.name}
                         </Link>
                         {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
@@ -84,7 +84,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/admin/users/${u.id}`}
-                            className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-text hover:bg-surface-muted"
+                            className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-text hover:bg-surface-muted max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
                           >
                             Info detail
                           </Link>
@@ -105,7 +105,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
               <Card key={u.id}>
                 <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <Link href={`/admin/users/${u.id}`} className="min-w-0 truncate text-sm font-medium text-text underline-offset-2 hover:underline">
+                    <Link href={`/admin/users/${u.id}`} className="min-w-0 truncate text-sm font-medium text-text underline-offset-2 hover:underline max-sm:py-3">
                       {u.name}
                     </Link>
                     <Badge tone={u.isActive ? "success" : "neutral"}>
