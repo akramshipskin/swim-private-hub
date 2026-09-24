@@ -2,10 +2,11 @@
 
 import { useActionState } from "react";
 import { Card, CardBody } from "@/components/ui/card";
-import { Field, Input } from "@/components/ui/input";
+import { Field, Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
+import { BANKS, matchBankLabel } from "@/lib/banks";
 import { MIN_WITHDRAWAL } from "@/lib/policy";
 import { useEditLock } from "@/hooks/use-edit-lock";
 import { PriceInput } from "@/components/ui/price-input";
@@ -71,6 +72,9 @@ export default function SaldoView({
   const [cairState, cairAction, cairPending] = useActionState(requestWithdrawalAction, null);
 
   const hasBankInfo = !!(bankName && bankAccountNumber && bankAccountName);
+  // Nama bank lama yang diketik bebas dan tidak cocok persis dengan daftar
+  // tetap ditampilkan, tapi pemiliknya wajib memilih ulang dari daftar.
+  const matchedBank = matchBankLabel(bankName);
   // Rekening yang sudah tersimpan terkunci; ubah lewat tombol Edit.
   const edit = useEditLock(bankPending, bankState?.error);
   const bankLocked = hasBankInfo && edit.locked;
@@ -129,7 +133,15 @@ export default function SaldoView({
           </div>
           <form key={edit.formKey} action={bankAction} className="flex flex-col gap-3">
             <Field label="Nama Bank">
-              <Input name="bankName" defaultValue={bankName ?? ""} disabled={bankLocked} required />
+              {/* key = nilai tersimpan: setelah simpan, opsi placeholder hilang dan browser
+                  diam-diam melompat ke opsi pertama (tampil "BCA" padahal tersimpan bank
+                  lain) kalau select tidak di-remount. */}
+              <Select key={bankName ?? ""} name="bankName" defaultValue={matchedBank ?? ""} disabled={bankLocked} required>
+                {!matchedBank && <option value="">{bankName ? `${bankName} (pilih bank dari daftar)` : "Pilih bank"}</option>}
+                {BANKS.map((b) => (
+                  <option key={b.code} value={b.label}>{b.label}</option>
+                ))}
+              </Select>
             </Field>
             <Field label="Nomor Rekening">
               <Input name="bankAccountNumber" defaultValue={bankAccountNumber ?? ""} disabled={bankLocked} required />

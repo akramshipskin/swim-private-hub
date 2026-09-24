@@ -1,5 +1,6 @@
 "use server";
 
+import { validateBankName } from "@/lib/banks";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { requestCoachWithdrawal, WithdrawalError } from "@/lib/withdrawal";
@@ -27,6 +28,8 @@ export async function updateBankInfo(
   if (!bankName || !bankAccountNumber || !bankAccountName) {
     return { error: "Semua field rekening wajib diisi." };
   }
+  const bankError = validateBankName(bankName);
+  if (bankError) return { error: bankError };
 
   try {
     const profile = await getOwnCoachProfile(session.user.id);
