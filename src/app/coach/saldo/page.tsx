@@ -15,7 +15,7 @@ export default async function CoachSaldoPage() {
       bankAccountName: true,
       withdrawalRequests: {
         orderBy: { requestedAt: "desc" },
-        select: { id: true, amount: true, status: true, requestedAt: true, processedAt: true, failureReason: true, bankName: true, bankAccountNumber: true, bankAccountName: true, midtransReferenceId: true },
+        select: { id: true, amount: true, status: true, requestedAt: true, processedAt: true, failureReason: true, bankName: true, bankAccountNumber: true, bankAccountName: true, midtransReferenceId: true, transferReference: true },
       },
     },
   });

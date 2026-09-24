@@ -21,6 +21,7 @@ type Withdrawal = {
   bankAccountNumber: string;
   bankAccountName: string;
   midtransReferenceId: string | null;
+  transferReference?: string | null;
 };
 
 export type SaldoActionState = { error?: string; ok?: boolean } | null;
@@ -186,10 +187,10 @@ export default function SaldoView({
                     <dd className="text-text">
                       {w.bankName} {maskAccount(w.bankAccountNumber)} a.n. {w.bankAccountName}
                     </dd>
-                    {w.midtransReferenceId && (
+                    {(w.midtransReferenceId || w.transferReference) && (
                       <>
                         <dt className="text-text-subtle">No. referensi</dt>
-                        <dd className="text-text">{w.midtransReferenceId}</dd>
+                        <dd className="text-text">{w.midtransReferenceId ?? w.transferReference}</dd>
                       </>
                     )}
                     {w.failureReason && (

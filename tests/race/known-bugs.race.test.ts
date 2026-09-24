@@ -9,7 +9,8 @@
 //   RACE_KNOWN_BUGS=run npx vitest run -c vitest.race.config.ts known-bugs
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, jitter } from "./fx";
+import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, jitter, spread, tally } from "./fx";
+import { checkInvariants } from "./invariants";
 import { POST as bookPOST } from "@/app/api/booking/route";
 import { POST as register } from "@/app/api/register/route";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
@@ -111,12 +112,39 @@ describe("S3 / D3: saldo yang sudah dicairkan tidak boleh jadi minus", () => {
   }
 
   // Bug: status Hadir bisa dibatalkan setelah saldonya dicairkan -> saldo -55.000.
-  known("K3a: Hadir sudah dicairkan, lalu diubah jadi Tidak Hadir -> DITOLAK dengan pesan, status tetap Hadir, saldo tetap 0", async () => {
+  it("K3a: Hadir sudah dicairkan, lalu diubah jadi Tidak Hadir -> DITOLAK dengan pesan, status tetap Hadir, saldo tetap 0", async () => {
     const x = await creditedThenWithdrawn();
     const res = await as({ id: x.admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: x.b.id, attended: "false" })));
     expect(res?.error).toBeTruthy();
     expect((await prisma.booking.findUniqueOrThrow({ where: { id: x.b.id } })).attended).toBe(true);
     expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: x.coach.id } })).walletBalance).toBe(0);
+  });
+
+  it("K3c: coach mencairkan saldo BERSAMAAN admin membatalkan Hadir (15 putaran) -> tepat satu yang berhasil, saldo tidak pernah minus, catatan uang cocok", async () => {
+    const sebaran: Record<string, number> = {};
+    for (let i = 0; i < 15; i++) {
+      await reset();
+      const w = i * 3;
+      const pool = await mkPool(); const coach = await mkUser("COACH", { bank: true }); const admin = await mkUser("ADMIN");
+      const slot = await mkSlot(coach.id, pool.id, -3);
+      const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+      const b = await book(m.id, slot.id, pkg.id);
+      await as({ id: coach.id, role: "COACH" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" })));
+      const rs = await settle([
+        (async () => { await jitter(w); return as({ id: coach.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "55000" }))); })(),
+        (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "false" }))); })(),
+      ]);
+      expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
+      const cp = await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } });
+      expect(cp.walletBalance).toBeGreaterThanOrEqual(0);
+      expect(await checkInvariants()).toEqual([]);
+      const attended = (await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).attended;
+      const withdrawn = await prisma.withdrawalRequest.count();
+      // Tepat satu jalan: cair (Hadir tetap) ATAU batal Hadir (tidak ada pencairan).
+      expect((attended === true && withdrawn === 1) || (attended === false && withdrawn === 0)).toBe(true);
+      tally(sebaran, attended ? "cair menang" : "batal Hadir menang");
+    }
+    spread("K3c", sebaran);
   });
 
   // Pengaman: mengubah Hadir -> Tidak Hadir SEBELUM dicairkan harus tetap boleh.
@@ -180,7 +208,7 @@ describe("S4 / D4: nomor HP dan email dibakukan", () => {
 });
 
 describe("Kehilangan usulan harga (lost update)", () => {
-  known("K5: pemilik kolam mengusulkan perubahan harga pas admin menyetujui usulan sebelumnya (200 putaran, jeda acak) -> usulan baru tidak boleh hilang diam-diam", async () => {
+  it("K5: pemilik kolam mengusulkan perubahan harga pas admin menyetujui usulan sebelumnya (200 putaran, jeda acak) -> usulan baru tidak boleh hilang diam-diam", async () => {
     // BUG TERBUKTI (24 Sep, ~5 dari 120 putaran): reviewTemplateChange membaca usulan lalu menulis
     // tanpa mengunci baris. Pemilik menimpa usulan di antaranya -> admin menerapkan usulan LAMA
     // dan menghapus usulan BARU. Perbaikan (Claude): kunci baris (FOR UPDATE) SEBELUM membaca.

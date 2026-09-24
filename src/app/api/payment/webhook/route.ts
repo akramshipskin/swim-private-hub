@@ -119,6 +119,16 @@ export async function POST(request: Request) {
     paymentStatus = "PENDING";
   }
 
+  // Lapisan cadangan: jumlah yang dibayar harus sama dengan tagihan kita.
+  // Tanda tangan Midtrans sudah mengunci gross_amount, jadi beda jumlah
+  // berarti ada salah di sisi kita (harga berubah di tengah checkout, dsb) --
+  // paket JANGAN diaktifkan otomatis; biarkan PENDING untuk dicek admin.
+  if (paymentStatus === "SUCCESS" && Math.round(Number(grossAmount)) !== payment.amount) {
+    console.error(`[webhook] jumlah tidak cocok order ${orderId}: dibayar ${grossAmount}, tagihan ${payment.amount}`);
+    paymentStatus = "PENDING";
+    packageStatus = null;
+  }
+
   const durationDays = payment.package.isSingleSession
     ? DROP_IN_DURATION_DAYS
     : (payment.package.template?.durationDays ?? 60);
@@ -138,7 +148,12 @@ export async function POST(request: Request) {
     // nyampe barengan juga aman. Kebukti di tes race lokal 2026-09-17.
     const claim = await tx.payment.updateMany({
       where: { id: payment.id, status: { not: "SUCCESS" } },
-      data: { status: paymentStatus, rawWebhookPayload: body as Prisma.InputJsonValue },
+      data: {
+        status: paymentStatus,
+        rawWebhookPayload: body as Prisma.InputJsonValue,
+        // Waktu uang benar-benar masuk (dasar "uang masuk hari ini/bulan ini").
+        ...(paymentStatus === "SUCCESS" ? { paidAt: now } : {}),
+      },
     });
     if (claim.count === 0) return;
 

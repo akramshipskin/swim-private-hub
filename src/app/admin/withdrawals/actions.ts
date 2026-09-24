@@ -77,15 +77,21 @@ export async function markPaidManually(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  await requireRole("ADMIN");
+  const session = await requireRole("ADMIN");
 
   const withdrawalId = formData.get("withdrawalId") as string;
+  // Bukti transfer wajib (keputusan Hadi 25 Sep): nomor referensi dari
+  // m-banking, supaya tiap pencairan manual bisa dicocokkan ke mutasi bank.
+  const transferReference = (formData.get("transferReference") as string | null)?.trim() ?? "";
+  if (transferReference.length < 4 || transferReference.length > 100) {
+    return { error: "Isi nomor referensi transfer dari m-banking (minimal 4 karakter)." };
+  }
   const request = await prisma.withdrawalRequest.findUnique({ where: { id: withdrawalId } });
   if (!request || (request.status !== "PENDING" && request.status !== "PROCESSING")) {
     return { error: "Pengajuan tidak ditemukan atau sudah diproses." };
   }
 
-  const claimed = await markWithdrawalPaid(withdrawalId);
+  const claimed = await markWithdrawalPaid(withdrawalId, undefined, { transferReference, processedById: session.user.id });
   revalidatePath("/admin/withdrawals");
   if (!claimed) {
     return { error: "Pengajuan ini baru saja diproses (dibayar/ditolak). Muat ulang halaman dulu." };
@@ -98,7 +104,7 @@ export async function rejectWithdrawal(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  await requireRole("ADMIN");
+  const session = await requireRole("ADMIN");
 
   const withdrawalId = formData.get("withdrawalId") as string;
   const confirmedFailed = formData.get("confirmedFailed") === "true";
@@ -115,7 +121,8 @@ export async function rejectWithdrawal(
 
   const claimed = await markWithdrawalFailed(
     withdrawalId,
-    request.status === "PROCESSING" ? "Gagal di Iris (dicek admin)" : "Ditolak admin"
+    request.status === "PROCESSING" ? "Gagal di Iris (dicek admin)" : "Ditolak admin",
+    session.user.id
   );
   revalidatePath("/admin/withdrawals");
   if (!claimed) {

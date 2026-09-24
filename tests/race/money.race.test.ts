@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize } from "./fx";
+import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize, jitter } from "./fx";
 import { requestWithdrawal as coachWithdraw } from "@/app/coach/saldo/actions";
 import { requestWithdrawal as poolWithdraw } from "@/app/pool/saldo/actions";
 import { rejectWithdrawal, markPaidManually } from "@/app/admin/withdrawals/actions";
@@ -70,7 +70,9 @@ describe("WITHDRAWAL races", () => {
       await as({ id: c.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "100000" })));
       const w = await prisma.withdrawalRequest.findFirstOrThrow();
       const order = i % 2 ? [markPaidManually, rejectWithdrawal] : [rejectWithdrawal, markPaidManually];
-      const rs = await settle(order.map((fn) => as({ id: admin.id, role: "ADMIN" }, () => fn(null, fd({ withdrawalId: w.id })))));
+      // transferReference wajib sejak 25 Sep (tanpa ini "Tandai Dibayar" selalu
+      // ditolak dan tes ini diam-diam tidak menguji balapan lagi).
+      const rs = await settle(order.map((fn) => (async () => { await jitter(i * 2); return as({ id: admin.id, role: "ADMIN" }, () => fn(null, fd({ withdrawalId: w.id, transferReference: "TRF-W4" }))); })()));
       const w2 = await prisma.withdrawalRequest.findFirstOrThrow();
       const bal = (await prisma.coachProfile.findUniqueOrThrow({ where: { id: c.coachProfile!.id } })).walletBalance;
       if (w2.status === "PAID" && bal === 100000) bad++;
@@ -78,6 +80,9 @@ describe("WITHDRAWAL races", () => {
     }
     console.log("W4", out);
     expect(bad).toBe(0);
+    // Pastikan balapannya benar-benar terjadi: kedua hasil harus pernah menang.
+    expect(out.some((o) => o.includes("-> PAID"))).toBe(true);
+    expect(out.some((o) => o.includes("-> FAILED"))).toBe(true);
   });
 
   it("W5: kredit Hadir masuk pas coach lagi Cairkan -> saldo & ledger konsisten, gak ada saldo ilang", async () => {
@@ -225,5 +230,35 @@ describe("REGISTRATION / ACCOUNT races", () => {
     const sum = (await prisma.walletTransaction.aggregate({ _sum: { amount: true } }))._sum.amount ?? 0;
     console.log("A8", summarize(rs), { credited: sum });
     expect(sum).toBeLessThanOrEqual(100000);
+  });
+});
+
+// Sweep keamanan 25 Sep: pagar database (CHECK) untuk pemilik baris saldo.
+describe("DATABASE guard: pemilik baris saldo", () => {
+  it("I1: DB menolak baris saldo yang pemiliknya tidak cocok dengan jenisnya; baris sah tetap diterima", async () => {
+    const pool = await mkPool(); const coach = await mkUser("COACH");
+    const cpId = coach.coachProfile!.id;
+    const bad = [
+      { type: "SESSION_REVENUE" as const, amount: 1 },
+      { type: "SESSION_REVENUE" as const, amount: 1, poolId: pool.id, coachProfileId: cpId },
+      { type: "SESSION_PAYOUT" as const, amount: 1, poolId: pool.id },
+      { type: "PLATFORM_REVENUE" as const, amount: 1, poolId: pool.id },
+      { type: "WITHDRAWAL" as const, amount: -1 },
+    ];
+    for (const data of bad) await expect(prisma.walletTransaction.create({ data })).rejects.toThrow();
+    await prisma.walletTransaction.createMany({
+      data: [
+        { type: "SESSION_REVENUE", amount: 1, poolId: pool.id },
+        { type: "SESSION_PAYOUT", amount: 1, coachProfileId: cpId },
+        { type: "PLATFORM_TAX", amount: 1 },
+        { type: "WITHDRAWAL", amount: -1, coachProfileId: cpId },
+      ],
+    });
+    await expect(
+      prisma.withdrawalRequest.create({ data: { amount: 1, bankName: "B", bankAccountNumber: "1", bankAccountName: "X" } })
+    ).rejects.toThrow();
+    await expect(
+      prisma.withdrawalRequest.create({ data: { amount: 1, poolId: pool.id, coachProfileId: cpId, bankName: "B", bankAccountNumber: "1", bankAccountName: "X" } })
+    ).rejects.toThrow();
   });
 });

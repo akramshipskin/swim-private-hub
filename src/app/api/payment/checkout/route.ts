@@ -182,6 +182,13 @@ export async function POST(request: Request) {
       },
     });
 
+    // Disimpan untuk tombol "Lanjut bayar" (member menutup halaman Midtrans
+    // sebelum selesai). Gagal simpan tidak boleh menggagalkan checkout --
+    // transaksinya sudah ada dan bisa dibayar lewat link yang dikirim sekarang.
+    await prisma.payment
+      .update({ where: { midtransOrderId: orderId }, data: { snapRedirectUrl: transaction.redirect_url } })
+      .catch((e) => console.error("simpan snapRedirectUrl gagal", e));
+
     return Response.json({ redirectUrl: transaction.redirect_url });
   } catch (err) {
     // Snap gagal = belum ada transaksi yang bisa dibayar, aman dibersihin.

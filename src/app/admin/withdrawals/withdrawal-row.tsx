@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Input } from "@/components/ui/input";
 
 export type WithdrawalRowData = {
   id: string;
@@ -76,9 +77,27 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
                 </Button>
               </form>
             )}
-            <form ref={paidForm} action={paidAction}>
+            <form ref={paidForm} action={paidAction} className="flex flex-wrap items-center gap-2">
               <input type="hidden" name="withdrawalId" value={w.id} />
-              <Button type="button" size="sm" variant="secondary" loading={paidPending} onClick={() => setConfirming("paid")}>
+              <Input
+                name="transferReference"
+                aria-label="No. referensi transfer"
+                placeholder="No. referensi transfer"
+                required
+                minLength={4}
+                maxLength={100}
+                className="min-h-0 w-52 py-1.5"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                loading={paidPending}
+                onClick={() => {
+                  // Cek kolom referensi dulu (pesan bawaan browser) sebelum dialog konfirmasi.
+                  if (paidForm.current?.reportValidity()) setConfirming("paid");
+                }}
+              >
                 Tandai Dibayar (Manual)
               </Button>
             </form>

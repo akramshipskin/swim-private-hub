@@ -39,6 +39,7 @@ describe("webhook package validity", () => {
     paymentFindUnique.mockResolvedValue({
       id: "pay-1",
       status: "PENDING",
+      amount: 135000,
       packageId: "pkg-1",
       package: { isSingleSession: true, template: null },
     });
@@ -52,6 +53,7 @@ describe("webhook package validity", () => {
     paymentFindUnique.mockResolvedValue({
       id: "pay-2",
       status: "PENDING",
+      amount: 135000,
       packageId: "pkg-2",
       package: { isSingleSession: false, template: { durationDays: 60 } },
     });
@@ -75,6 +77,7 @@ describe("webhook fraud_status on card capture", () => {
     paymentFindUnique.mockResolvedValue({
       id: "pay-3",
       status: "PENDING",
+      amount: 135000,
       packageId: "pkg-3",
       package: { isSingleSession: false, template: { durationDays: 60 } },
     });
@@ -120,6 +123,7 @@ describe("webhook push notification", () => {
     return {
       id: "pay-9",
       status: "PENDING",
+      amount: 135000,
       packageId: "pkg-9",
       package: { memberId: "member-9", isSingleSession: false, template: { name: "Private 4x", durationDays: 30 } },
       ...over,
@@ -161,5 +165,40 @@ describe("webhook push notification", () => {
     sendPushToUser.mockRejectedValueOnce(new Error("push down"));
     const res = await POST(settlement());
     expect((await res.json()).ok).toBe(true);
+  });
+});
+
+// Sweep keamanan 25 Sep (defense-in-depth): jumlah yang dibayar harus sama
+// dengan tagihan kita, walau tanda tangan Midtrans sudah valid.
+describe("webhook amount check", () => {
+  it("keeps the payment PENDING (package not activated) when the paid amount differs from the bill", async () => {
+    paymentFindUnique.mockResolvedValue({
+      id: "pay-7",
+      status: "PENDING",
+      amount: 150000,
+      packageId: "pkg-7",
+      package: { memberId: "m-7", isSingleSession: false, template: { durationDays: 60 } },
+    });
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    await POST(settlement());
+    expect(tx.payment.updateMany.mock.calls.at(-1)![0].data.status).toBe("PENDING");
+    expect(packageUpdate).not.toHaveBeenCalled();
+    expect(sendPushToUser).not.toHaveBeenCalled();
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  it("records paidAt when the payment turns SUCCESS", async () => {
+    paymentFindUnique.mockResolvedValue({
+      id: "pay-8",
+      status: "PENDING",
+      amount: 135000,
+      packageId: "pkg-8",
+      package: { memberId: "m-8", isSingleSession: false, template: { durationDays: 60 } },
+    });
+    await POST(settlement());
+    const data = tx.payment.updateMany.mock.calls.at(-1)![0].data;
+    expect(data.status).toBe("SUCCESS");
+    expect(data.paidAt).toBeInstanceOf(Date);
   });
 });

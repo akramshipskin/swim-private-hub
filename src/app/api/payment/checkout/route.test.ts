@@ -12,13 +12,14 @@ const poolFindFirst = vi.fn();
 const templateFindFirst = vi.fn();
 const paymentCreate = vi.fn().mockResolvedValue({});
 const paymentDeleteMany = vi.fn().mockResolvedValue({ count: 1 });
+const paymentUpdate = vi.fn().mockResolvedValue({});
 const packageDelete = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     package: { count: packageCount, findFirst: packageFindFirst, create: packageCreate, delete: (...a: unknown[]) => packageDelete(...a) },
     pool: { findFirst: poolFindFirst },
     packageTemplate: { findFirst: templateFindFirst },
-    payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a) },
+    payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a), update: (...a: unknown[]) => paymentUpdate(...a) },
     $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
   },
 }));
@@ -72,6 +73,25 @@ describe("checkout 1 sesi", () => {
     poolFindFirst.mockResolvedValue({ id: "pool-B", name: "Kolam B", packageTemplates: [{ price: 200_000, totalSesi: 4 }] });
     await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
     expect(paymentCreate.mock.invocationCallOrder[0]).toBeLessThan(createTransaction.mock.invocationCallOrder[0]);
+  });
+
+  // Tombol "Lanjut bayar" (member menutup halaman Midtrans sebelum selesai).
+  it("stores the Midtrans payment link on the Payment, and still succeeds if that save fails", async () => {
+    packageCount.mockResolvedValue(1);
+    poolFindFirst.mockResolvedValue({ id: "pool-B", name: "Kolam B", packageTemplates: [{ price: 200_000, totalSesi: 4 }] });
+    let res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    expect(res.status).toBe(200);
+    expect(paymentUpdate).toHaveBeenCalledWith({
+      where: { midtransOrderId: expect.stringMatching(/^PKG-pkg-new-/) },
+      data: { snapRedirectUrl: "https://pay" },
+    });
+
+    paymentUpdate.mockRejectedValueOnce(new Error("db down"));
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ redirectUrl: "https://pay" });
+    errSpy.mockRestore();
   });
 
   it("cleans up package+payment and hides Midtrans details when Snap fails", async () => {

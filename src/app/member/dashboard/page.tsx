@@ -46,7 +46,7 @@ export default async function MemberDashboardPage() {
     }),
     prisma.dependent.count({ where: { memberId: session.user.id, isActive: true } }),
     prisma.payment.aggregate({
-      where: { status: "SUCCESS", createdAt: { gte: startMonth }, package: { memberId: session.user.id } },
+      where: { status: "SUCCESS", paidAt: { gte: startMonth }, package: { memberId: session.user.id } },
       _sum: { amount: true },
     }),
     // Coach yang paling sering mengajar peserta member ini -- info kecil

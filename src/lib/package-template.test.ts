@@ -5,7 +5,9 @@ const update = vi.fn().mockResolvedValue({});
 const updateMany = vi.fn().mockResolvedValue({ count: 1 });
 const count = vi.fn().mockResolvedValue(0);
 const create = vi.fn().mockResolvedValue({});
-const db = { packageTemplate: { findUnique, update, updateMany, count, create } };
+// $executeRaw = kunci baris (SELECT ... FOR UPDATE); perilakunya diuji di tes race K5.
+const $executeRaw = vi.fn().mockResolvedValue(1);
+const db = { packageTemplate: { findUnique, update, updateMany, count, create }, $executeRaw };
 vi.mock("@/lib/prisma", () => ({ prisma: { ...db, $transaction: (fn: (t: typeof db) => unknown) => fn(db) } }));
 vi.mock("@/lib/dedupe-lock", () => ({ withDedupeLock: (_k: string, fn: (t: typeof db) => unknown) => fn(db) }));
 

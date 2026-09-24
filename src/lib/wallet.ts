@@ -80,6 +80,16 @@ export async function creditSessionRevenue(
 // perSessionValue) -- kalau commissionPercent/coachSharePercent berubah di
 // antara kredit awal dan reversal ini, reversal HARUS balikin jumlah yang
 // beneran dikredit dulu, bukan jumlah baru yang dihitung ulang.
+// Keputusan Hadi 24 Sep (D3): Hadir tidak boleh dibatalkan kalau uang sesi itu
+// sudah keluar dari saldo (dicairkan / sedang diajukan cair). Ledger tidak
+// mencatat sesi mana yang ikut sebuah pencairan, jadi aturannya: saldo
+// sekarang harus masih cukup untuk ditarik balik -- saldo tidak pernah minus.
+export class ReversalBlockedError extends Error {
+  constructor() {
+    super("Uang sesi ini sudah dicairkan dari saldo coach/kolam, jadi status Hadir tidak bisa dibatalkan lagi. Hubungi admin untuk koreksi manual.");
+  }
+}
+
 export async function reverseSessionRevenue(
   tx: Prisma.TransactionClient,
   { bookingId }: { bookingId: string }
@@ -97,7 +107,13 @@ export async function reverseSessionRevenue(
   });
   const poolNet = await net("SESSION_REVENUE");
   if (poolTxn?.poolId && poolNet > 0) {
-    await tx.pool.update({ where: { id: poolTxn.poolId }, data: { walletBalance: { decrement: poolNet } } });
+    // Kurangi HANYA kalau saldo masih cukup (atomic -- aman walau pencairan
+    // berjalan bersamaan; baris terkunci sampai transaksi selesai).
+    const res = await tx.pool.updateMany({
+      where: { id: poolTxn.poolId, walletBalance: { gte: poolNet } },
+      data: { walletBalance: { decrement: poolNet } },
+    });
+    if (res.count === 0) throw new ReversalBlockedError();
     reversals.push({ type: "SESSION_REVENUE", poolId: poolTxn.poolId, amount: -poolNet, bookingId });
   }
 
@@ -106,10 +122,11 @@ export async function reverseSessionRevenue(
   });
   const coachNet = await net("SESSION_PAYOUT");
   if (coachTxn?.coachProfileId && coachNet > 0) {
-    await tx.coachProfile.update({
-      where: { id: coachTxn.coachProfileId },
+    const res = await tx.coachProfile.updateMany({
+      where: { id: coachTxn.coachProfileId, walletBalance: { gte: coachNet } },
       data: { walletBalance: { decrement: coachNet } },
     });
+    if (res.count === 0) throw new ReversalBlockedError();
     reversals.push({ type: "SESSION_PAYOUT", coachProfileId: coachTxn.coachProfileId, amount: -coachNet, bookingId });
   }
 

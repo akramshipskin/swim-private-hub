@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { creditSessionRevenue, reverseSessionRevenue } from "@/lib/wallet";
+import { creditSessionRevenue, reverseSessionRevenue, ReversalBlockedError } from "@/lib/wallet";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -100,6 +100,7 @@ export async function markAttendance(
       }
     });
   } catch (err) {
+    if (err instanceof ReversalBlockedError) return { error: err.message };
     if (err instanceof Error && err.message.includes("baru saja diubah")) {
       return { error: err.message };
     }

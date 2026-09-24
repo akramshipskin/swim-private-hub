@@ -35,9 +35,10 @@ vi.mock("@/lib/disbursement", () => ({
 
 const { processWithdrawal, markPaidManually, rejectWithdrawal } = await import("./actions");
 
-function formData(withdrawalId: string) {
+function formData(withdrawalId: string, transferReference = "TRF-20260925-01") {
   const fd = new FormData();
   fd.set("withdrawalId", withdrawalId);
+  fd.set("transferReference", transferReference);
   return fd;
 }
 
@@ -121,7 +122,15 @@ describe("markPaidManually", () => {
     findUnique.mockResolvedValue({ id: "wd-1", status: "PROCESSING" });
     const result = await markPaidManually(null, formData("wd-1"));
     expect(result).toBeNull();
-    expect(markWithdrawalPaid).toHaveBeenCalledWith("wd-1");
+    expect(markWithdrawalPaid).toHaveBeenCalledWith("wd-1", undefined, { transferReference: "TRF-20260925-01", processedById: "admin-1" });
+  });
+
+  // Keputusan Hadi 25 Sep: bukti transfer wajib saat Tandai Dibayar.
+  it.each(["", "   ", "12"])("refuses without a transfer reference (%j)", async (ref) => {
+    findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
+    const result = await markPaidManually(null, formData("wd-1", ref));
+    expect(result?.error).toContain("referensi");
+    expect(markWithdrawalPaid).not.toHaveBeenCalled();
   });
 
   it("refuses when already PAID (no double-processing)", async () => {
@@ -137,7 +146,7 @@ describe("rejectWithdrawal", () => {
     findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
     const result = await rejectWithdrawal(null, formData("wd-1"));
     expect(result).toBeNull();
-    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Ditolak admin");
+    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Ditolak admin", "admin-1");
   });
 
   it("refuses when the request is already FAILED", async () => {
@@ -161,7 +170,7 @@ describe("rejectWithdrawal", () => {
     const fd = formData("wd-1");
     fd.set("confirmedFailed", "true");
     await rejectWithdrawal(null, fd);
-    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Gagal di Iris (dicek admin)");
+    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Gagal di Iris (dicek admin)", "admin-1");
   });
 });
 

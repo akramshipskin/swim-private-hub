@@ -82,16 +82,30 @@ export async function updateTemplateRecord(formData: FormData): Promise<{ error:
 export async function proposeTemplateUpdate(templateId: string, formData: FormData): Promise<{ error: string } | null> {
   const fields = parseTemplateFields(formData, false);
   if ("error" in fields) return fields;
-  const current = await prisma.packageTemplate.findUnique({ where: { id: templateId }, select: { pendingChanges: true } });
-  const wasNew = (current?.pendingChanges as PendingTemplateChange | null)?.isNew ?? false;
-  const pending: PendingTemplateChange = { ...fields, isNew: wasNew, submittedAt: new Date().toISOString() };
-  await prisma.packageTemplate.update({ where: { id: templateId }, data: { pendingChanges: pending } });
+  // Baca "masih usulan paket baru?" dan tulis usulan dalam 1 transaksi dengan
+  // baris terkunci -- tanpa kunci, admin bisa menyetujui di antaranya dan
+  // usulan ini tersimpan dengan isNew lama (ditolak = paket aktif ikut mati).
+  await prisma.$transaction(async (tx) => {
+    await lockTemplate(tx, templateId);
+    const current = await tx.packageTemplate.findUnique({ where: { id: templateId }, select: { pendingChanges: true } });
+    const wasNew = (current?.pendingChanges as PendingTemplateChange | null)?.isNew ?? false;
+    const pending: PendingTemplateChange = { ...fields, isNew: wasNew, submittedAt: new Date().toISOString() };
+    await tx.packageTemplate.update({ where: { id: templateId }, data: { pendingChanges: pending } });
+  });
   return null;
+}
+
+function lockTemplate(tx: Prisma.TransactionClient, templateId: string) {
+  return tx.$executeRaw`SELECT 1 FROM "PackageTemplate" WHERE id = ${templateId} FOR UPDATE`;
 }
 
 // Admin menyetujui/menolak usulan. CAS: hanya kalau usulan masih ada.
 export async function reviewTemplateChange(templateId: string, approve: boolean) {
   return prisma.$transaction(async (tx) => {
+    // Kunci baris SEBELUM membaca usulan (bug K5, terbukti tes race 24 Sep):
+    // tanpa kunci, pemilik kolam bisa mengganti usulan di antara baca & tulis,
+    // lalu admin menerapkan usulan LAMA dan menghapus usulan BARU diam-diam.
+    await lockTemplate(tx, templateId);
     const t = await tx.packageTemplate.findUnique({ where: { id: templateId }, select: { pendingChanges: true } });
     const pending = t?.pendingChanges as PendingTemplateChange | null;
     if (!pending) return false;

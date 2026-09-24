@@ -142,11 +142,11 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
 // update), bukan cuma di caller.
 // Balikin true kalau request ini beneran diklaim (diubah ke FAILED) oleh
 // panggilan ini, false kalau udah keburu diproses duluan (PAID/FAILED).
-export async function markWithdrawalFailed(withdrawalRequestId: string, reason: string) {
+export async function markWithdrawalFailed(withdrawalRequestId: string, reason: string, processedById?: string) {
   return prisma.$transaction(async (tx) => {
     const claim = await tx.withdrawalRequest.updateMany({
       where: { id: withdrawalRequestId, status: { in: ["PENDING", "PROCESSING"] } },
-      data: { status: "FAILED", failureReason: reason, processedAt: new Date() },
+      data: { status: "FAILED", failureReason: reason, processedAt: new Date(), processedById },
     });
     if (claim.count === 0) return false;
 
@@ -184,10 +184,14 @@ export async function markWithdrawalFailed(withdrawalRequestId: string, reason: 
 // yang saldonya UDAH dibalikin (FAILED) ketiban jadi PAID: duit ditransfer
 // manual DAN saldo balik ke wallet = keluar 2x. Kebukti di tes race lokal
 // 2026-09-17 (1 dari 10 percobaan).
-export async function markWithdrawalPaid(withdrawalRequestId: string, midtransReferenceId?: string) {
+export async function markWithdrawalPaid(
+  withdrawalRequestId: string,
+  midtransReferenceId?: string,
+  manual?: { transferReference: string; processedById: string }
+) {
   const claim = await prisma.withdrawalRequest.updateMany({
     where: { id: withdrawalRequestId, status: { in: ["PENDING", "PROCESSING"] } },
-    data: { status: "PAID", processedAt: new Date(), midtransReferenceId },
+    data: { status: "PAID", processedAt: new Date(), midtransReferenceId, ...manual },
   });
   return claim.count > 0;
 }

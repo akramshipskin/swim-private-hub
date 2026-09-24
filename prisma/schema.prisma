@@ -261,6 +261,11 @@ model WithdrawalRequest {
   bankAccountNumber String
   bankAccountName   String
   midtransReferenceId String?
+  // Bukti transfer manual (nomor referensi dari m-banking), wajib saat admin
+  // klik "Tandai Dibayar" -- keputusan Hadi 25 Sep.
+  transferReference   String?
+  // Admin yang menandai dibayar / menolak (jejak audit).
+  processedById       String?
   failureReason       String?
   requestedAt DateTime  @default(now())
   processedAt DateTime?
@@ -377,10 +382,18 @@ model Payment {
   amount            Int
   status            PaymentStatus @default(PENDING)
   rawWebhookPayload Json?
+  // Waktu pembayaran jadi SUCCESS (diisi webhook). Dasar laporan "uang masuk"
+  // -- bukan createdAt (waktu checkout) atau updatedAt (berubah tiap
+  // notifikasi duplikat dari Midtrans).
+  paidAt            DateTime?
+  // Link halaman bayar Midtrans (berlaku ~24 jam) -- tombol "Lanjut bayar"
+  // untuk paket yang masih menunggu pembayaran.
+  snapRedirectUrl   String?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
   @@index([packageId])
+  @@index([status, paidAt])
 }
 
 model Availability {

@@ -27,9 +27,11 @@ vi.mock("@/lib/prisma", () => ({
 
 const creditSessionRevenue = vi.fn().mockResolvedValue(undefined);
 const reverseSessionRevenue = vi.fn().mockResolvedValue(undefined);
+class ReversalBlockedError extends Error {}
 vi.mock("@/lib/wallet", () => ({
   creditSessionRevenue: (...args: unknown[]) => creditSessionRevenue(...args),
   reverseSessionRevenue: (...args: unknown[]) => reverseSessionRevenue(...args),
+  ReversalBlockedError,
 }));
 
 const { markAttendance } = await import("./actions");
@@ -147,6 +149,13 @@ describe("markAttendance", () => {
     expect(result).toBeNull();
     expect(reverseSessionRevenue).toHaveBeenCalledWith(expect.anything(), { bookingId: "booking-1" });
     expect(creditSessionRevenue).not.toHaveBeenCalled();
+  });
+
+  it("returns the blocked-reversal message instead of crashing when the money was already withdrawn", async () => {
+    bookingFindUnique.mockResolvedValue(baseBooking({ attended: true }));
+    reverseSessionRevenue.mockRejectedValueOnce(new ReversalBlockedError("Uang sesi ini sudah dicairkan"));
+    const result = await markAttendance(null, formData("booking-1", "false"));
+    expect(result?.error).toContain("sudah dicairkan");
   });
 
   it("does not touch the wallet when re-submitting the same attendance value (no actual change)", async () => {

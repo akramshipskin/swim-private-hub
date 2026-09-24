@@ -52,6 +52,8 @@ export default async function MemberPaketPage() {
       include: {
         dependent: { select: { name: true, isSelf: true } },
         pool: { select: { id: true, name: true } },
+        // Link bayar Midtrans terakhir yang masih menunggu (tombol "Lanjut bayar").
+        payments: { where: { status: "PENDING", snapRedirectUrl: { not: null } }, orderBy: { createdAt: "desc" }, take: 1, select: { snapRedirectUrl: true } },
       },
     }),
     prisma.packageTemplate.findMany({
@@ -140,6 +142,16 @@ export default async function MemberPaketPage() {
                             <Badge tone="neutral">Sesi habis</Badge>
                           ) : expired ? (
                             <Badge tone="neutral">Kedaluwarsa</Badge>
+                          ) : p.status === "PENDING_PAYMENT" && p.payments[0]?.snapRedirectUrl ? (
+                            <div className="flex shrink-0 flex-col items-end gap-2">
+                              <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
+                              <a
+                                href={p.payments[0].snapRedirectUrl}
+                                className="inline-flex min-h-[44px] items-center rounded-xl bg-brand-600 px-4 text-sm font-medium text-white hover:bg-[#0a0a08]"
+                              >
+                                Lanjut bayar
+                              </a>
+                            </div>
                           ) : (
                             <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
                           )}

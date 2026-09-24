@@ -210,7 +210,7 @@ describe("SALDO PLATFORM & PENCAIRAN", () => {
     const { coach, cp } = await coachWithBalance();
     await as({ id: coach.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "60000" })));
     const r1 = await prisma.withdrawalRequest.findFirstOrThrow({ where: { coachProfileId: cp.id } });
-    const rs = await settle(Array.from({ length: 6 }, () => as({ id: admin.id, role: "ADMIN" }, () => markPaidManually(null, fd({ withdrawalId: r1.id })))));
+    const rs = await settle(Array.from({ length: 6 }, () => as({ id: admin.id, role: "ADMIN" }, () => markPaidManually(null, fd({ withdrawalId: r1.id, transferReference: "TRF-E6" })))));
     expect(thrownOf(rs)).toEqual([]);
     const values = valuesOf(rs) as ({ error?: string } | null)[];
     expect(values.filter((v) => v === null).length).toBe(1);

@@ -153,7 +153,7 @@ export default async function AdminWithdrawalsPage({
                 requestedAt: w.requestedAt.toISOString(),
                 processedAt: w.processedAt?.toISOString() ?? null,
                 failureReason: w.failureReason,
-                referenceId: w.midtransReferenceId,
+                referenceId: w.midtransReferenceId ?? w.transferReference,
                 bankName: w.bankName,
                 bankAccountNumber: w.bankAccountNumber,
                 bankAccountName: w.bankAccountName,
