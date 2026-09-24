@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default async function KomisiPage() {
   await requireRole("ADMIN");
 
-  const [attendedBookings, pools, paidOut] = await Promise.all([
+  const [attendedBookings, pools, paidOut, manualPool] = await Promise.all([
     prisma.booking.findMany({
       where: { attended: true },
       select: {
@@ -47,6 +47,10 @@ export default async function KomisiPage() {
     }),
     prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, commissionPercent: true, coachSharePercent: true, walletBalance: true } }),
     prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { not: null }, status: "PAID" }, _sum: { amount: true } }),
+    // Koreksi manual saldo kolam (baris tanpa sesi, dibuat langsung di DB):
+    // tidak masuk tabel sesi di bawah, tapi ikut di "Saldo kolam". Ditampilkan
+    // terpisah supaya angka kartu bisa dicocokkan. Hanya dibaca.
+    prisma.walletTransaction.groupBy({ by: ["poolId"], where: { type: "SESSION_REVENUE", poolId: { not: null }, bookingId: null }, _sum: { amount: true } }),
   ]);
 
   // Nominal kolam & coach diambil dari ledger (yang benar-benar dikredit,
@@ -201,6 +205,14 @@ export default async function KomisiPage() {
                   </table>
                 </div>
                 {e.free > 0 && <p className="text-xs text-text-subtle">{e.free} sesi dari paket gratis/assign manual (tanpa uang) tidak dihitung.</p>}
+                {(() => {
+                  const manual = manualPool.find((x) => x.poolId === pool.id)?._sum.amount ?? 0;
+                  return manual !== 0 ? (
+                    <p className="text-xs text-text-subtle">
+                      Koreksi manual saldo kolam (tanpa sesi): {manual < 0 ? "−" : ""}{formatRupiah(Math.abs(manual))} — tidak termasuk tabel di atas, tapi ikut di saldo kolam.
+                    </p>
+                  ) : null;
+                })()}
                 <div className="grid grid-cols-2 gap-3 rounded-xl bg-surface-muted p-3">
                   <div>
                     <p className="text-sm text-text-muted">Saldo kolam belum dicairkan</p>

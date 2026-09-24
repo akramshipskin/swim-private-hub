@@ -81,13 +81,18 @@ export default async function AdminKolamPage() {
     select: { id: true, package: { select: { poolId: true, isSingleSession: true } } },
   });
   const pkgByBooking = new Map(bookingPkgs.map((b) => [b.id, b.package]));
+  // Baris tanpa sesi (bookingId kosong / sesinya tidak ada lagi) = koreksi
+  // manual langsung di DB -- aplikasi sendiri selalu mencatat bookingId.
+  // Dulu ikut masuk "Dari paket kolam ini" dan membingungkan; sekarang baris
+  // tersendiri. Hanya pelabelan: jumlah semua baris tetap sama.
   function revenueBreakdown(poolId: string) {
-    const out = { own: 0, single: 0, legacy: 0 };
+    const out = { own: 0, single: 0, legacy: 0, manual: 0 };
     for (const t of revenueTxns) {
       if (t.poolId !== poolId) continue;
       const pkg = t.bookingId ? pkgByBooking.get(t.bookingId) : undefined;
-      if (pkg?.isSingleSession) out.single += t.amount;
-      else if (pkg && pkg.poolId !== poolId) out.legacy += t.amount;
+      if (!pkg) out.manual += t.amount;
+      else if (pkg.isSingleSession) out.single += t.amount;
+      else if (pkg.poolId !== poolId) out.legacy += t.amount;
       else out.own += t.amount;
     }
     return out;
@@ -166,6 +171,7 @@ export default async function AdminKolamPage() {
                           <dt className="text-text-muted">Dari paket kolam ini</dt><dd className="text-right text-text">{formatRupiah(r.own)}</dd>
                           <dt className="text-text-muted">Dari beli 1 sesi (member kolam lain)</dt><dd className="text-right text-text">{formatRupiah(r.single)}</dd>
                           {r.legacy > 0 && (<><dt className="text-text-muted">Paket kolam lain (sebelum 17 Sep)</dt><dd className="text-right text-text">{formatRupiah(r.legacy)}</dd></>)}
+                          {r.manual !== 0 && (<><dt className="text-text-muted">Koreksi manual (tanpa sesi)</dt><dd className="text-right text-text">{r.manual < 0 ? "−" : ""}{formatRupiah(Math.abs(r.manual))}</dd></>)}
                           <dt className="text-text-muted">Sudah dicairkan</dt><dd className="text-right text-text">−{formatRupiah(paid)}</dd>
                         </dl>
                       </div>
