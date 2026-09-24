@@ -1,7 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { activePackageWhere } from "@/lib/active-package";
-import { todayWibDateString, dateLabel, formatDateLabel, formatTimeLeft, formatTimeWib } from "@/lib/datetime";
+import { todayWibDateString, dateLabel, formatDateLabel, formatTimeLeft, formatTimeWib, wibDateTime } from "@/lib/datetime";
 import { BentoCard, Stat, SessionList } from "@/components/dashboard";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
@@ -11,8 +11,8 @@ export default async function MemberDashboardPage() {
   const today = dateLabel(todayWibDateString());
   const now = new Date();
 
-  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const [packages, upcoming, attendedCount, attendedThisMonth, pesertaCount, spentThisMonth, favCoach] = await Promise.all([
+  const startMonth = wibDateTime(`${todayWibDateString().slice(0, 7)}-01`, "00:00");
+  const [packages, upcoming, upcomingCount, attendedCount, attendedThisMonth, pesertaCount, spentThisMonth, favCoach] = await Promise.all([
     prisma.package.findMany({
       where: activePackageWhere(session.user.id),
       orderBy: { expiredDate: "asc" },
@@ -39,6 +39,7 @@ export default async function MemberDashboardPage() {
         package: { select: { dependent: { select: { name: true } } } },
       },
     }),
+    prisma.booking.count({ where: { memberId: session.user.id, status: "BOOKED", availability: { startTime: { gt: now } } } }),
     prisma.booking.count({ where: { memberId: session.user.id, attended: true } }),
     prisma.booking.count({
       where: { memberId: session.user.id, attended: true, availability: { startTime: { gte: startMonth } } },
@@ -78,7 +79,7 @@ export default async function MemberDashboardPage() {
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Paket aktif" value={packages.length} hint={`${pesertaCount} peserta terdaftar`} />
             <Stat label="Total sisa sesi" value={totalSisa} />
-            <Stat label="Sesi terjadwal" value={upcoming.length} />
+            <Stat label="Sesi terjadwal" value={upcomingCount} />
             <Stat label="Sesi dihadiri" value={attendedCount} hint={`${attendedThisMonth} bulan ini`} />
           </div>
           <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-border pt-4 xl:grid-cols-4">

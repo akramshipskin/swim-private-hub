@@ -14,6 +14,7 @@ const statusLabel: Record<string, string> = {
   SUCCESS: "Berhasil",
   PENDING: "Menunggu pembayaran",
   FAILED: "Gagal / dibatalkan",
+  EXPIRED: "Kedaluwarsa",
 };
 
 const statusTone = { SUCCESS: "success", PENDING: "warning", FAILED: "danger" } as const;

@@ -163,7 +163,7 @@ export default async function AdminDashboardPage() {
             {pools.map((p) => (
               <li key={p.id} className="rounded-lg border border-border px-3 py-2">
                 <p className="text-sm font-semibold text-text">
-                  {p.name} {!p.isActive && <span className="text-xs font-normal text-warning-text">(belum disetujui)</span>}
+                  {p.name} {!p.isActive && <span className="text-xs font-normal text-warning-text">(nonaktif)</span>}
                 </p>
                 <p className="text-sm text-text-muted">
                   {todayItems.filter((i) => i.poolName === p.name).length} sesi hari ini ·{" "}
