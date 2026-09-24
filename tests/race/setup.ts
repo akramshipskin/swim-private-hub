@@ -35,7 +35,11 @@ vi.mock("next/navigation", () => ({
   redirect: (url: string) => { throw new Error("REDIRECT:" + url); },
   notFound: () => { throw new Error("NOT_FOUND"); },
 }));
-vi.mock("@/lib/push", () => ({ sendPushToUser: async () => {} }));
+vi.mock("@/lib/push", () => ({
+  sendPushToUser: async () => {},
+  sendPushToUsers: async () => {},
+  sendPushToRole: async () => {},
+}));
 vi.mock("@/lib/midtrans", () => ({
   platformServerKey: () => "SB-test-server-key",
   snap: { createTransaction: async () => ({ redirect_url: "https://example.test/snap", token: "t" }) },

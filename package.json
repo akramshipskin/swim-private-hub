@@ -10,6 +10,7 @@
     "test": "vitest run",
     "postinstall": "prisma generate",
     "test:race": "vitest run -c vitest.race.config.ts",
+    "db:race": "node scripts/race-db.mjs",
     "db:dev": "node scripts/dev-db.mjs",
     "db:dev:sync": "node scripts/dev-db-sync.mjs"
   },
