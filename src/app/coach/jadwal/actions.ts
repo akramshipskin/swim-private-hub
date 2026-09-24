@@ -4,7 +4,8 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { wibDateTime, dateLabel, formatDateLabel, formatTimeWib } from "@/lib/datetime";
-import { sendPushToUser } from "@/lib/push";
+import { sendPushToUsers } from "@/lib/push";
+import { usablePackageConditions } from "@/lib/active-package";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 
 export type ActionState = { error?: string; warning?: string } | null;
@@ -34,6 +35,7 @@ export async function addAvailability(
   // sini (bukan cuma dropdown UI) karena formData bisa dipalsu.
   const affiliated = await prisma.poolAffiliation.findUnique({
     where: { poolId_coachId: { poolId, coachId: session.user.id } },
+    select: { pool: { select: { name: true } } },
   });
   if (!affiliated) {
     return { error: "Kamu tidak terafiliasi ke kolam ini." };
@@ -115,8 +117,10 @@ export async function addAvailability(
 
     // Broadcast 1 notif per aksi "Tambah Slot" (bukan per slot per jam)
     // biar member gak kebanjiran notif kalau coach buka rentang jam
-    // panjang sekaligus. Best-effort, gak boleh gagalin slot yang udah
-    // sukses tersimpan.
+    // panjang sekaligus. Cuma ke member yang punya paket aktif DI KOLAM
+    // INI (paket cuma berlaku di kolam tempat dibeli) -- dulu ke semua
+    // member di semua kolam. Best-effort: gagal kirim gak boleh gagalin slot
+    // yang udah sukses tersimpan.
     const first = freeChunks[0];
     const last = freeChunks[freeChunks.length - 1];
     const rangeLabel =
@@ -124,20 +128,22 @@ export async function addAvailability(
         ? `${formatTimeWib(first.startTime)}–${formatTimeWib(first.endTime)}`
         : `${formatTimeWib(first.startTime)}–${formatTimeWib(last.endTime)}`;
 
-    prisma.user
-      .findMany({ where: { role: "MEMBER", isActive: true }, select: { id: true } })
-      .then((members) =>
-        Promise.allSettled(
-          members.map((m) =>
-            sendPushToUser(m.id, {
-              title: "Slot jadwal baru",
-              body: `${session.user.name}, ${formatDateLabel(first.date)} ${rangeLabel}`,
-              url: "/member/booking",
-            })
-          )
-        )
-      )
-      .catch(() => {});
+    try {
+      const members = await prisma.user.findMany({
+        where: { role: "MEMBER", isActive: true, packages: { some: { ...usablePackageConditions(), poolId } } },
+        select: { id: true },
+      });
+      await sendPushToUsers(
+        members.map((m) => m.id),
+        {
+          title: "Slot jadwal baru",
+          body: `${session.user.name}, ${affiliated.pool.name}, ${formatDateLabel(first.date)} ${rangeLabel}`,
+          url: "/member/booking",
+        }
+      );
+    } catch {
+      // notifikasi bukan bagian dari penyimpanan slot
+    }
   }
 
   revalidatePath("/coach/jadwal");

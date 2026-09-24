@@ -20,13 +20,17 @@ function ensureVapid() {
   return true;
 }
 
-async function deliver(userId: string, payload: Payload) {
-  if (!ensureVapid()) return;
+async function deliver(userIds: string[], payload: Payload) {
+  if (!ensureVapid() || userIds.length === 0) return;
 
+  // 1 query buat semua penerima (bukan 1 per orang) -- siaran ke banyak member
+  // dulu jadi ratusan query.
   const subscriptions = await prisma.pushSubscription.findMany({
-    where: { userId },
+    where: { userId: { in: userIds } },
   });
 
+  // ponytail: dikirim serentak tanpa batas -- cukup buat ratusan penerima;
+  // kalau sudah ribuan, pecah per 50 langganan.
   await Promise.allSettled(
     subscriptions.map(async (sub) => {
       try {
@@ -52,8 +56,8 @@ async function deliver(userId: string, payload: Payload) {
 // Dijadwalkan lewat after(): di serverless (Vercel) promise yang dilempar
 // begitu saja bisa terputus saat fungsi selesai membalas, jadi push gak
 // sampai. Di luar request (tes/skrip) after() melempar error -> jalan langsung.
-export async function sendPushToUser(userId: string, payload: Payload) {
-  const job = () => deliver(userId, payload).catch(() => {});
+async function schedule(userIds: string[], payload: Payload) {
+  const job = () => deliver(userIds, payload).catch(() => {});
   try {
     after(job);
   } catch {
@@ -61,7 +65,16 @@ export async function sendPushToUser(userId: string, payload: Payload) {
   }
 }
 
+export async function sendPushToUser(userId: string, payload: Payload) {
+  await schedule([userId], payload);
+}
+
+// Banyak penerima sekaligus, 1 jadwal after() dan 1 query langganan.
+export async function sendPushToUsers(userIds: string[], payload: Payload) {
+  await schedule(userIds, payload);
+}
+
 export async function sendPushToRole(role: "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", payload: Payload) {
   const users = await prisma.user.findMany({ where: { role, isActive: true }, select: { id: true } });
-  await Promise.all(users.map((u) => sendPushToUser(u.id, payload)));
+  await sendPushToUsers(users.map((u) => u.id), payload);
 }

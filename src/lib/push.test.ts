@@ -22,7 +22,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-const { sendPushToUser, sendPushToRole } = await import("./push");
+const { sendPushToUser, sendPushToUsers, sendPushToRole } = await import("./push");
 
 const sub = { id: "s1", endpoint: "https://push/1", p256dh: "p", auth: "a" };
 
@@ -85,6 +85,31 @@ describe("sendPushToRole", () => {
     userFindMany.mockResolvedValue([{ id: "a1" }, { id: "a2" }]);
     await sendPushToRole("ADMIN", { title: "t", body: "b" });
     expect(userFindMany).toHaveBeenCalledWith({ where: { role: "ADMIN", isActive: true }, select: { id: true } });
-    expect(after).toHaveBeenCalledTimes(2);
+    expect(after).toHaveBeenCalledTimes(1);
+    expect(subFindMany).toHaveBeenCalledWith({ where: { userId: { in: ["a1", "a2"] } } });
+  });
+});
+
+describe("sendPushToUsers", () => {
+  it("delivers to everyone with ONE after() job and ONE subscription query", async () => {
+    subFindMany.mockResolvedValue([sub, { ...sub, id: "s2", endpoint: "https://push/2" }]);
+    await sendPushToUsers(["u1", "u2", "u3"], { title: "t", body: "b" });
+    expect(after).toHaveBeenCalledTimes(1);
+    expect(subFindMany).toHaveBeenCalledTimes(1);
+    expect(subFindMany).toHaveBeenCalledWith({ where: { userId: { in: ["u1", "u2", "u3"] } } });
+    await vi.waitFor(() => expect(sendNotification).toHaveBeenCalledTimes(2));
+  });
+
+  it("does nothing, and queries nothing, for an empty recipient list", async () => {
+    await sendPushToUsers([], { title: "t", body: "b" });
+    expect(subFindMany).not.toHaveBeenCalled();
+    expect(sendNotification).not.toHaveBeenCalled();
+  });
+
+  it("keeps sending to the rest when one subscription fails", async () => {
+    subFindMany.mockResolvedValue([sub, { ...sub, id: "s2", endpoint: "https://push/2" }]);
+    sendNotification.mockRejectedValueOnce({ statusCode: 500 }).mockResolvedValueOnce({});
+    await sendPushToUsers(["u1", "u2"], { title: "t", body: "b" });
+    await vi.waitFor(() => expect(sendNotification).toHaveBeenCalledTimes(2));
   });
 });

@@ -143,21 +143,29 @@ export async function cancelBooking({
     );
 
     // Best-effort -- gagal ngirim gak boleh gagalin pembatalan yang udah
-    // sukses tersimpan. Coach yang cancel sendiri gak perlu dikabarin
-    // soal aksinya sendiri -- yang perlu tau itu MEMBER-nya (sesi mereka
-    // ilang), makanya arah notifnya kebalik dari cancel oleh member/admin.
+    // sukses tersimpan. Yang dikabarin selalu pihak LAIN dari yang
+    // membatalkan: coach batal -> member; member batal -> coach; admin batal
+    // -> keduanya (sebelumnya member gak tau sesinya dibatalin admin).
+    const sessionLabel = `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.date)} ${formatTimeWib(booking.availability.startTime)}`;
     if (actor.role === "COACH") {
       sendPushToUser(booking.memberId, {
         title: "Booking dibatalkan coach",
-        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.date)} ${formatTimeWib(booking.availability.startTime)} dibatalkan coach. Sisa sesi sudah kembali.`,
+        body: `${sessionLabel} dibatalkan coach. Sisa sesi sudah kembali.`,
         url: "/member/riwayat",
       }).catch(() => {});
     } else {
       sendPushToUser(booking.availability.coachId, {
         title: "Booking dibatalkan",
-        body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.date)} ${formatTimeWib(booking.availability.startTime)} sudah kosong lagi`,
+        body: `${sessionLabel} sudah kosong lagi`,
         url: "/coach/jadwal",
       }).catch(() => {});
+      if (actor.role === "ADMIN") {
+        sendPushToUser(booking.memberId, {
+          title: "Booking dibatalkan admin",
+          body: `${sessionLabel} dibatalkan admin. Sisa sesi sudah kembali.`,
+          url: "/member/riwayat",
+        }).catch(() => {});
+      }
     }
   } catch (err) {
     if (err instanceof CancelError) throw err;

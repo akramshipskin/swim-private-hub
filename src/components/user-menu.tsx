@@ -6,7 +6,7 @@ import { signOutAction } from "@/lib/auth-actions";
 import { MenuIcon, UserEditIcon, LogoutIcon } from "@/components/icons";
 import { ThemeMenu } from "@/components/theme-toggle";
 import { Avatar } from "@/components/ui/avatar";
-import { PushMenuItem, usePushSubscription } from "@/components/push-subscription";
+import { PushMenuItem, releasePushSubscription, usePushSubscription } from "@/components/push-subscription";
 
 export function UserMenu({
   userName,
@@ -20,6 +20,13 @@ export function UserMenu({
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const push = usePushSubscription();
+
+  // Lepas langganan notifikasi browser ini SEBELUM sesi dihapus (endpoint
+  // unsubscribe butuh sesi yang masih hidup).
+  async function handleLogout() {
+    await releasePushSubscription();
+    await signOutAction();
+  }
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -72,7 +79,7 @@ export function UserMenu({
             <UserEditIcon className="h-4 w-4 text-text-muted" />
             Edit Profil
           </Link>
-          <form action={signOutAction}>
+          <form action={handleLogout}>
             <button
               type="submit"
               className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-danger-text hover:bg-danger-bg"

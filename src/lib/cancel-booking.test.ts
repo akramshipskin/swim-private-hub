@@ -59,6 +59,43 @@ describe("cancelBooking notification date", () => {
   });
 });
 
+describe("cancelBooking notification recipients", () => {
+  async function pushed() {
+    const { sendPushToUser } = await import("@/lib/push");
+    return vi.mocked(sendPushToUser).mock.calls.map(([to, payload]) => ({ to, title: payload.title, body: payload.body }));
+  }
+
+  // Bug sweep 24 Sep: admin membatalkan booking, member gak dikabari sama
+  // sekali (cuma coach yang dapat push).
+  it("tells both the coach and the member when an admin cancels", async () => {
+    findUnique.mockResolvedValue(booking());
+    await cancelBooking({ bookingId: "b-1", actor: { role: "ADMIN" } });
+    const calls = await pushed();
+    expect(calls.map((c) => c.to).sort()).toEqual(["c-1", "m-1"]);
+    const member = calls.find((c) => c.to === "m-1")!;
+    expect(member.title).toBe("Booking dibatalkan admin");
+    expect(member.body).toContain("Sisa sesi sudah kembali");
+  });
+
+  it("tells only the coach when the member cancels themselves", async () => {
+    findUnique.mockResolvedValue(booking());
+    await cancelBooking({ bookingId: "b-1", actor: { role: "MEMBER", memberId: "m-1" } });
+    expect((await pushed()).map((c) => c.to)).toEqual(["c-1"]);
+  });
+
+  it("tells only the member when the coach cancels", async () => {
+    findUnique.mockResolvedValue(booking());
+    await cancelBooking({ bookingId: "b-1", actor: { role: "COACH", coachId: "c-1" } });
+    expect((await pushed()).map((c) => c.to)).toEqual(["m-1"]);
+  });
+
+  it("sends no push when the cancel is refused", async () => {
+    findUnique.mockResolvedValue(booking({ attended: true }));
+    await expect(cancelBooking({ bookingId: "b-1", actor: { role: "ADMIN" } })).rejects.toThrow();
+    expect(await pushed()).toEqual([]);
+  });
+});
+
 describe("cancelBooking", () => {
   // Regression (tes race lokal 2026-09-17): sesi yang udah ditandai Hadir
   // dibatalin -> sisa sesi member balik, tapi kredit wallet coach/kolam gak

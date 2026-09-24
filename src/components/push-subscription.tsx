@@ -13,6 +13,31 @@ function urlBase64ToUint8Array(base64String: string) {
   return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
 }
 
+// Dipanggil tepat SEBELUM logout: lepas baris langganan browser ini dari akun
+// yang sedang login, supaya HP/komputer yang dipakai bergantian tidak terus
+// menerima notifikasi akun sebelumnya. Langganan di sisi browser sengaja
+// TIDAK dibatalkan -- begitu ada yang login lagi, usePushSubscription di
+// bawah menyambungkannya ke akun baru tanpa minta izin ulang. Tidak boleh
+// menahan logout: gagal atau lambat (offline) dilewati, maksimal 3 detik.
+export async function releasePushSubscription() {
+  try {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    const release = (async () => {
+      const reg = await navigator.serviceWorker.getRegistration();
+      const sub = await reg?.pushManager.getSubscription();
+      if (!sub) return;
+      await fetch("/api/push/unsubscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: sub.endpoint }),
+      });
+    })();
+    await Promise.race([release, new Promise((resolve) => setTimeout(resolve, 3000))]);
+  } catch {
+    // logout tetap lanjut
+  }
+}
+
 // Dipanggil dari UserMenu (selalu ter-mount di semua halaman & role), bukan
 // dari dalam dropdown -- sinkronisasi kepemilikan langganan di bawah harus
 // jalan di setiap halaman, tidak cuma saat menu dibuka.
