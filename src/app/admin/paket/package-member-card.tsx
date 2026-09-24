@@ -54,7 +54,7 @@ export default function MemberCard({
               {memberName} <span className="text-text-subtle">({memberContact})</span>
             </p>
             <p className="text-xs text-text-subtle">
-              Member sejak {memberSinceLabel} · {peserta.length} peserta
+              Member sejak {memberSinceLabel} · {new Set(peserta.map((p) => p.dependentId)).size} peserta
             </p>
           </div>
           {isEditing ? (

@@ -4,6 +4,7 @@ import CreateTemplateForm from "./create-template-form";
 import TemplateEditForm from "./template-edit-form";
 import PaketPerMemberList from "./paket-per-member-list";
 import PendingTemplateChanges from "./pending-template-changes";
+import { packagesToShow } from "@/lib/active-package";
 
 function toInputDate(d: Date | null) {
   if (!d) return "";
@@ -21,6 +22,7 @@ function memberSince(d: Date) {
 
 export default async function AdminPaketPage() {
   await requireRole("ADMIN");
+  const now = new Date();
 
   const [templates, members, pools] = await Promise.all([
     prisma.packageTemplate.findMany({
@@ -125,17 +127,17 @@ export default async function AdminPaketPage() {
           memberName: m.name,
           memberContact: m.email ?? m.phone ?? "-",
           memberSinceLabel: memberSince(m.createdAt),
-          // 1 baris per (peserta, kolam): paket sekarang per kolam, jadi 1 peserta
-          // bisa punya paket di beberapa kolam. Ambil paket terbaru per kolam.
+          // Paket per kolam: 1 peserta bisa punya paket di beberapa kolam. Per
+          // kolam tampil semua paket yang masih bisa dipakai (kalau tidak ada,
+          // yang terbaru) -- lihat packagesToShow.
           peserta: m.dependents.flatMap((d): Parameters<typeof PaketPerMemberList>[0]["rows"][number]["peserta"] => {
-            const latestPerPool = [
-              ...new Map(
-                m.packages.filter((p) => p.dependentId === d.id).reverse().map((p) => [p.poolId, p])
-              ).values(),
-            ];
+            const mine = m.packages.filter((p) => p.dependentId === d.id);
+            const shownPerPool = [...new Set(mine.map((p) => p.poolId))].flatMap((poolId) =>
+              packagesToShow(mine.filter((p) => p.poolId === poolId), now)
+            );
             const label = d.isSelf ? "Diri sendiri" : d.name;
-            if (latestPerPool.length === 0) return [{ dependentId: d.id, label, pkg: null }];
-            return latestPerPool.map((pkg) => ({
+            if (shownPerPool.length === 0) return [{ dependentId: d.id, label, pkg: null }];
+            return shownPerPool.map((pkg) => ({
               dependentId: d.id,
               label,
               pkg: {

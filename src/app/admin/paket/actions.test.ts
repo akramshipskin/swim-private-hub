@@ -282,4 +282,34 @@ describe("updatePackage", () => {
     expect(packageUpdate).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "pkg-1", sisaSesi: 5 } }));
     expect(result?.error).toContain("baru saja berubah");
   });
+
+  // Bug sweep 24 Sep: koreksi sisa sesi tanpa ubah tanggal menggeser jam
+  // kedaluwarsa ke 23.59.
+  it("keeps the exact stored expiry instant when the date in the form is unchanged", async () => {
+    const stored = new Date("2026-09-25T07:32:00Z");
+    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8, expiredDate: stored });
+    await updatePackage(
+      null,
+      formData({ packageId: "pkg-1", sisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "2026-09-25" })
+    );
+    expect(packageUpdate.mock.calls[0][0].data.expiredDate).toBe(stored);
+  });
+
+  it("sets 23.59.59 WIB of the chosen date when the admin picks a different date", async () => {
+    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8, expiredDate: new Date("2026-09-25T07:32:00Z") });
+    await updatePackage(
+      null,
+      formData({ packageId: "pkg-1", sisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "2026-10-02" })
+    );
+    expect(packageUpdate.mock.calls[0][0].data.expiredDate.toISOString()).toBe("2026-10-02T16:59:59.000Z");
+  });
+
+  it("clears the expiry when the admin empties the date field", async () => {
+    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8, expiredDate: new Date("2026-09-25T07:32:00Z") });
+    await updatePackage(
+      null,
+      formData({ packageId: "pkg-1", sisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
+    );
+    expect(packageUpdate.mock.calls[0][0].data.expiredDate).toBeNull();
+  });
 });

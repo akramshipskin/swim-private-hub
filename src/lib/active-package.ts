@@ -22,3 +22,24 @@ export function usablePackageConditions(): Prisma.PackageWhereInput {
 export function activePackageWhere(memberId: string): Prisma.PackageWhereInput {
   return { memberId, ...usablePackageConditions() };
 }
+
+type PackageLike = { status: string; sisaSesi: number; expiredDate: Date | null };
+
+// Versi in-memory dari usablePackageConditions (aturan yang sama persis) buat
+// data yang sudah terlanjur diambil dari DB. Kalau aturan di atas berubah,
+// ubah di sini juga -- dijaga tes yang membandingkan keduanya.
+export function isUsablePackage(p: PackageLike, now: Date = new Date()): boolean {
+  return p.status === "ACTIVE" && p.sisaSesi > 0 && (p.expiredDate === null || p.expiredDate >= now);
+}
+
+// Paket yang ditampilkan admin untuk 1 peserta di 1 kolam. Semua paket yang
+// masih bisa dipakai (bisa lebih dari satu); kalau tidak ada satu pun, yang
+// terbaru saja. `newestFirst` HARUS berurutan dari yang paling baru dibuat.
+// Bug sweep 24 Sep: dulu cuma "yang terbaru" -- member yang klik Beli lalu tidak
+// jadi bayar bikin paket menunggu-bayar menutupi paket aktifnya, dan admin
+// tidak bisa lagi menyunting paket aktif itu.
+export function packagesToShow<T extends PackageLike>(newestFirst: T[], now: Date = new Date()): T[] {
+  const usable = newestFirst.filter((p) => isUsablePackage(p, now));
+  if (usable.length > 0) return usable;
+  return newestFirst.length > 0 ? [newestFirst[0]] : [];
+}

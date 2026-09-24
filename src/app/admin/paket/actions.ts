@@ -6,6 +6,7 @@ import { withDedupeLock } from "@/lib/dedupe-lock";
 import { createTemplateRecord, updateTemplateRecord, reviewTemplateChange } from "@/lib/package-template";
 import { createDependent, createSelfDependent } from "@/lib/dependents";
 import { toProperCase } from "@/lib/format";
+import { resolveExpiredDate } from "@/lib/datetime";
 import { revalidatePath } from "next/cache";
 
 export type ActionState = { error?: string } | null;
@@ -219,7 +220,7 @@ export async function updatePackage(
       sisaSesi,
       jatahCancel: jatahCancelRaw,
       status,
-      expiredDate: expiredDateRaw ? new Date(`${expiredDateRaw}T23:59:59+07:00`) : null,
+      expiredDate: resolveExpiredDate(expiredDateRaw, pkg.expiredDate),
     },
   });
   if (result.count === 0) {

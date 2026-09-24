@@ -42,6 +42,18 @@ export function formatTimeLeft(ms: number): string {
   return `${Math.floor(ms / (24 * HOUR))} hari`;
 }
 
+// Tanggal kedaluwarsa dari form admin (hanya tanggal, YYYY-MM-DD, WIB). Kalau
+// tanggalnya sama dengan tanggal WIB kedaluwarsa yang sudah tersimpan, nilai
+// lama dibiarkan apa adanya -- form cuma membawa tanggal, jadi menyimpan ulang
+// tanpa perubahan (misal cuma koreksi sisa sesi) dulu diam-diam menggeser jam
+// kedaluwarsa paket (14.32 jadi 23.59, atau sebaliknya). Tanggal baru berlaku
+// sampai 23.59.59 WIB hari itu; kosong = tanpa batas.
+export function resolveExpiredDate(raw: string, current: Date | null | undefined): Date | null {
+  if (!raw) return null;
+  if (current && current.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }) === raw) return current;
+  return new Date(`${raw}T23:59:59+07:00`);
+}
+
 export function formatTimeWib(d: Date): string {
   return d.toLocaleTimeString("id-ID", {
     hour: "2-digit",

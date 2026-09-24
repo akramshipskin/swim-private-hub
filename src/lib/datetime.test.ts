@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
-import { resolveDateRange, formatTimeLeft } from "./datetime";
+import { resolveDateRange, formatTimeLeft, resolveExpiredDate } from "./datetime";
 
 afterEach(() => vi.useRealTimers());
 
@@ -36,5 +36,38 @@ describe("formatTimeLeft", () => {
   it("uses days from one day up, rounding down", () => {
     expect(formatTimeLeft(24 * H)).toBe("1 hari");
     expect(formatTimeLeft(6.9 * 24 * H)).toBe("6 hari");
+  });
+});
+
+describe("resolveExpiredDate", () => {
+  // Bug sweep 24 Sep: paket dibayar jam 14.32 berlaku 1 hari -> kedaluwarsa
+  // besok 14.32. Admin cuma koreksi sisa sesi, simpan -> jam kedaluwarsa
+  // diam-diam jadi 23.59.
+  it("keeps the stored instant when the WIB date was not changed", () => {
+    const stored = new Date("2026-09-25T07:32:00Z"); // 25 Sep 14.32 WIB
+    expect(resolveExpiredDate("2026-09-25", stored)).toBe(stored);
+  });
+
+  // 25 Sep 17.30 UTC sudah 26 Sep
+  // 00.30 WIB: tanggal yang dibandingkan harus tanggal WIB (26), bukan UTC (25).
+  it("compares the WIB calendar date, not the UTC one", () => {
+    const stored = new Date("2026-09-25T17:30:00Z"); // 26 Sep 00.30 WIB
+    expect(resolveExpiredDate("2026-09-26", stored)).toBe(stored);
+    expect(resolveExpiredDate("2026-09-25", stored)?.toISOString()).toBe("2026-09-25T16:59:59.000Z");
+  });
+
+  it("moves to 23.59.59 WIB of the new date when the date was changed", () => {
+    const stored = new Date("2026-09-25T07:32:00Z");
+    expect(resolveExpiredDate("2026-10-02", stored)?.toISOString()).toBe("2026-10-02T16:59:59.000Z");
+  });
+
+  it("sets 23.59.59 WIB when there was no expiry before", () => {
+    expect(resolveExpiredDate("2026-10-02", null)?.toISOString()).toBe("2026-10-02T16:59:59.000Z");
+    expect(resolveExpiredDate("2026-10-02", undefined)?.toISOString()).toBe("2026-10-02T16:59:59.000Z");
+  });
+
+  it("clears the expiry when the field is emptied", () => {
+    expect(resolveExpiredDate("", new Date("2026-09-25T07:32:00Z"))).toBeNull();
+    expect(resolveExpiredDate("", null)).toBeNull();
   });
 });
