@@ -9,9 +9,14 @@ export function ageFromBirthDate(birthDate: Date | string | null | undefined, no
   if (!birthDate) return null;
   const d = typeof birthDate === "string" ? new Date(birthDate) : birthDate;
   if (Number.isNaN(d.getTime())) return null;
-  let age = now.getFullYear() - d.getFullYear();
+  // Tanggal lahir tersimpan sebagai tanggal (tengah malam UTC); "hari ini"
+  // dihitung di WIB. Dulu pakai zona waktu server -- di Vercel (UTC) umur baru
+  // bertambah jam 07.00 WIB di hari ulang tahunnya.
+  const today = new Date(now.getTime() + 7 * 3600e3);
+  let age = today.getUTCFullYear() - d.getUTCFullYear();
   const beforeBirthdayThisYear =
-    now.getMonth() < d.getMonth() || (now.getMonth() === d.getMonth() && now.getDate() < d.getDate());
+    today.getUTCMonth() < d.getUTCMonth() ||
+    (today.getUTCMonth() === d.getUTCMonth() && today.getUTCDate() < d.getUTCDate());
   if (beforeBirthdayThisYear) age -= 1;
   return age >= 0 && age < 120 ? age : null;
 }
