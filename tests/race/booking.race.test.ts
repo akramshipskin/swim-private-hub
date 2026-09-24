@@ -1,12 +1,16 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize } from "./fx";
+import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize, jitter, tally, spread } from "./fx";
 import { POST as bookPOST } from "@/app/api/booking/route";
 import { DELETE as cancelDELETE } from "@/app/api/booking/[id]/route";
 import { cancelBookingAsCoach, addAvailability, deleteAvailability } from "@/app/coach/jadwal/actions";
 import { adminCancelBooking } from "@/app/admin/booking-overview/actions";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 import { updatePackage } from "@/app/admin/paket/actions";
+import { removeAffiliation } from "@/app/admin/kolam/actions";
+import { GET as availabilityGET } from "@/app/api/availability/route";
+import { cancelBooking } from "@/lib/cancel-booking";
+import { checkInvariants } from "./invariants";
 
 const req = (body: unknown) => new Request("http://x/api/booking", { method: "POST", body: JSON.stringify(body) });
 const N = 12;
@@ -222,5 +226,71 @@ describe("ATTENDANCE / WALLET races", () => {
     const booked = await prisma.booking.count({ where: { packageId: pkg.id, status: "BOOKED" } });
     console.log("R14", summarize(rs), { sisa: p.sisaSesi, booked });
     expect(p.sisaSesi + booked).toBe(5);
+  });
+
+  it("R15: slot yang pernah dibooking lalu batal -> 'Hapus' cuma menutup (riwayat tetap), tidak bisa dibooking, bisa dibuka ulang di kolam yang sama", async () => {
+    const [p1, p2] = [await mkPool(), await mkPool()]; const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
+    await prisma.poolAffiliation.createMany({ data: [{ poolId: p1.id, coachId: coach.id }, { poolId: p2.id, coachId: coach.id }] });
+    const day = new Date(Date.now() + 2 * 86400e3).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+    const add = (poolId: string) => as({ id: coach.id, role: "COACH", name: "C" }, () => addAvailability(null, fd({ date: day, startTime: "08:00", endTime: "10:00", poolId })));
+    await add(p1.id);
+    const [s8, s9] = await prisma.availability.findMany({ where: { coachId: coach.id }, orderBy: { startTime: "asc" } });
+    const { m, pkg } = await mkMemberWithPackage(p1.id);
+    const b = await book(m.id, s8.id, pkg.id);
+    await cancelBooking({ bookingId: b.id, actor: { role: "ADMIN" } });
+
+    await as({ id: coach.id, role: "COACH" }, () => deleteAvailability(s8.id));
+    await as({ id: coach.id, role: "COACH" }, () => deleteAvailability(s9.id));
+    expect((await prisma.availability.findUniqueOrThrow({ where: { id: s8.id } })).status).toBe("CLOSED");
+    expect(await prisma.availability.findUnique({ where: { id: s9.id } })).toBeNull(); // tanpa riwayat -> benar-benar hapus
+    expect(await prisma.booking.count({ where: { id: b.id, status: "CANCELLED" } })).toBe(1);
+
+    const list = await as({ id: m.id, role: "MEMBER" }, () => availabilityGET(new Request(`http://x/api/availability?date=${day}&poolId=${p1.id}`)));
+    expect((await list.json()).availabilities).toEqual([]);
+    const res = await as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: s8.id, packageId: pkg.id })));
+    expect(res.status).toBe(409);
+
+    // Kolam lain di jam yang sama: tetap bentrok (slot lama tidak dipindah kolam).
+    const other = await as({ id: coach.id, role: "COACH", name: "C" }, () => addAvailability(null, fd({ date: day, startTime: "08:00", endTime: "09:00", poolId: p2.id })));
+    expect(other).toMatchObject({ error: expect.any(String) });
+    // Kolam yang sama: slot lama dibuka ulang (id sama), jam 9 dibuat baru.
+    expect(await add(p1.id)).toBeNull();
+    const again = await prisma.availability.findMany({ where: { coachId: coach.id }, orderBy: { startTime: "asc" } });
+    expect(again.map((a) => a.status)).toEqual(["AVAILABLE", "AVAILABLE"]);
+    expect(again[0].id).toBe(s8.id);
+    expect((await as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: s8.id, packageId: pkg.id })))).status).toBe(201);
+
+    // Admin mencopot coach dari kolam: slot kosong ber-riwayat ikut ditutup, bukan dihapus.
+    await cancelBooking({ bookingId: (await prisma.booking.findFirstOrThrow({ where: { status: "BOOKED" } })).id, actor: { role: "ADMIN" } });
+    const aff = await prisma.poolAffiliation.findFirstOrThrow({ where: { poolId: p1.id } });
+    await as({ id: admin.id, role: "ADMIN" }, () => removeAffiliation(fd({ affiliationId: aff.id })));
+    expect((await prisma.availability.findUniqueOrThrow({ where: { id: s8.id } })).status).toBe("CLOSED");
+    expect(await prisma.availability.count({ where: { coachId: coach.id } })).toBe(1);
+    expect(await prisma.booking.count({ where: { availabilityId: s8.id } })).toBe(2);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("R16: coach menghapus slot ber-riwayat pas member booking slot itu (15 putaran) -> slot BOOKED atau CLOSED, tidak pernah dua-duanya", async () => {
+    const sebaran: Record<string, number> = {};
+    for (let i = 0; i < 15; i++) {
+      await reset();
+      const pool = await mkPool(); const coach = await mkUser("COACH");
+      const slot = await mkSlot(coach.id, pool.id, 48);
+      const old = await mkMemberWithPackage(pool.id);
+      await cancelBooking({ bookingId: (await book(old.m.id, slot.id, old.pkg.id)).id, actor: { role: "ADMIN" } });
+      const { m, pkg } = await mkMemberWithPackage(pool.id);
+      const w = i * 0.8;
+      const rs = await settle([
+        as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: slot.id, packageId: pkg.id }))),
+        (async () => { await jitter(w); return as({ id: coach.id, role: "COACH" }, () => deleteAvailability(slot.id)); })(),
+      ]);
+      expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
+      const s = await prisma.availability.findUniqueOrThrow({ where: { id: slot.id } });
+      const active = await prisma.booking.count({ where: { availabilityId: slot.id, status: "BOOKED" } });
+      expect(s.status === "BOOKED" ? active === 1 : s.status === "CLOSED" && active === 0).toBe(true);
+      expect(await checkInvariants()).toEqual([]);
+      tally(sebaran, s.status);
+    }
+    spread("R16", sebaran);
   });
 });

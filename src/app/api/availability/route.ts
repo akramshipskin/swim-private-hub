@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { NOT_CLOSED } from "@/lib/availability";
 import { dateLabel, todayWibDateString } from "@/lib/datetime";
 import { checkCancelEligibility } from "@/lib/cancel-eligibility";
 
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
 
   const availabilities = await prisma.availability.findMany({
     // Slot coach yang dinonaktifkan admin tidak ditampilkan (tidak bisa dibooking).
-    where: { date: dateLabel(date), coach: { isActive: true }, ...(poolId ? { poolId } : {}) },
+    where: { date: dateLabel(date), coach: { isActive: true }, ...NOT_CLOSED, ...(poolId ? { poolId } : {}) },
     orderBy: [{ startTime: "asc" }],
     select: {
       id: true,

@@ -7,6 +7,7 @@ import { wibDateTime, dateLabel, formatDateLabel, formatTimeWib } from "@/lib/da
 import { sendPushToUsers } from "@/lib/push";
 import { usablePackageConditions } from "@/lib/active-package";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
+import { removeOpenSlots } from "@/lib/availability";
 
 export type ActionState = { error?: string; warning?: string } | null;
 
@@ -85,9 +86,22 @@ export async function addAvailability(
       date: dateLabel(date),
       startTime: { in: chunks.map((c) => c.startTime) },
     },
-    select: { startTime: true, endTime: true },
+    select: { id: true, startTime: true, endTime: true, status: true, poolId: true },
     orderBy: { startTime: "asc" },
   });
+
+  // Slot yang dulu "dihapus" tapi cuma ditutup (punya riwayat booking, lihat
+  // removeOpenSlots) di kolam yang sama -> dibuka ulang, bukan dianggap bentrok.
+  // ponytail: yang tertutup di kolam LAIN tetap bentrok -- slotnya tidak bisa
+  // dipindah kolam tanpa mengubah kolam di riwayat booking lamanya.
+  const reopen = conflicts.filter((c) => c.status === "CLOSED" && c.poolId === poolId);
+  if (reopen.length > 0) {
+    await prisma.availability.updateMany({
+      where: { id: { in: reopen.map((c) => c.id) }, status: "CLOSED" },
+      data: { status: "AVAILABLE" },
+    });
+  }
+  const blocked = conflicts.filter((c) => !reopen.includes(c));
 
   // Jam yang beneran bebas -- cuma ini yang boleh dibuat. Sebelumnya kalau
   // ADA satu jam aja yang bentrok, seluruh request diblokir total (termasuk
@@ -95,10 +109,13 @@ export async function addAvailability(
   // abis hapus 1-2 jam di tengahnya, kehilangan jam-jam yang harusnya
   // aman -- bug nyata yang ketauan pas dipake.
   const conflictTimes = new Set(conflicts.map((c) => c.startTime.getTime()));
+  const blockedTimes = new Set(blocked.map((c) => c.startTime.getTime()));
   const freeChunks = chunks.filter((c) => !conflictTimes.has(c.startTime.getTime()));
+  // Yang benar-benar jadi terbuka: dibuat baru + dibuka ulang.
+  const openedChunks = chunks.filter((c) => !blockedTimes.has(c.startTime.getTime()));
 
-  if (conflicts.length > 0 && freeChunks.length === 0) {
-    const times = conflicts
+  if (blocked.length > 0 && openedChunks.length === 0) {
+    const times = blocked
       .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
       .join(", ");
     return {
@@ -106,14 +123,14 @@ export async function addAvailability(
     };
   }
 
-  if (freeChunks.length > 0) {
+  if (openedChunks.length > 0) {
     // skipDuplicates cuma jaring pengaman buat double-submit BENERAN
     // bersamaan (2 request keduanya lolos pre-check di atas sebelum
     // salah satu commit) -- pesan conflict yang udah ramah di atas
     // tetep jalan normal buat kasus biasa (submit ulang beberapa detik
     // kemudian), ini cuma nyegah 500 mentah (unique constraint violation)
     // buat sliver TOCTOU yang sangat jarang.
-    await prisma.availability.createMany({ data: freeChunks, skipDuplicates: true });
+    if (freeChunks.length > 0) await prisma.availability.createMany({ data: freeChunks, skipDuplicates: true });
 
     // Broadcast 1 notif per aksi "Tambah Slot" (bukan per slot per jam)
     // biar member gak kebanjiran notif kalau coach buka rentang jam
@@ -121,10 +138,10 @@ export async function addAvailability(
     // INI (paket cuma berlaku di kolam tempat dibeli) -- dulu ke semua
     // member di semua kolam. Best-effort: gagal kirim gak boleh gagalin slot
     // yang udah sukses tersimpan.
-    const first = freeChunks[0];
-    const last = freeChunks[freeChunks.length - 1];
+    const first = openedChunks[0];
+    const last = openedChunks[openedChunks.length - 1];
     const rangeLabel =
-      freeChunks.length === 1
+      openedChunks.length === 1
         ? `${formatTimeWib(first.startTime)}–${formatTimeWib(first.endTime)}`
         : `${formatTimeWib(first.startTime)}–${formatTimeWib(last.endTime)}`;
 
@@ -148,8 +165,8 @@ export async function addAvailability(
 
   revalidatePath("/coach/jadwal");
 
-  if (conflicts.length > 0) {
-    const times = conflicts
+  if (blocked.length > 0) {
+    const times = blocked
       .map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`)
       .join(", ");
     return {
@@ -163,20 +180,10 @@ export async function addAvailability(
 export async function deleteAvailability(availabilityId: string) {
   const session = await requireRole("COACH");
 
-  // Slot boleh dihapus asal LAGI gak ada booking aktif (status
-  // AVAILABLE) -- gak peduli riwayat booking/cancel sebelumnya (member
-  // batal mandiri ataupun admin). Catatan: ini ngapus juga riwayat
-  // Booking yang nempel di slot ini (Availability->Booking cascade),
-  // jadi hitungan jatah cancel mandiri buat paket terkait bisa
-  // kepengaruh sedikit -- trade-off yang disengaja biar coach bisa
-  // beres-beres jadwal tanpa keganjel slot lama.
-  await prisma.availability.deleteMany({
-    where: {
-      id: availabilityId,
-      coachId: session.user.id,
-      status: "AVAILABLE",
-    },
-  });
+  // Slot boleh "dihapus" asal LAGI gak ada booking aktif. Yang pernah
+  // dibooking (lalu batal) cuma ditutup, biar riwayat booking-nya tetap ada
+  // (lihat removeOpenSlots).
+  await removeOpenSlots({ id: availabilityId, coachId: session.user.id });
 
   revalidatePath("/coach/jadwal");
 }

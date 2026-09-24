@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
+import { NOT_CLOSED } from "@/lib/availability";
 import { todayWibDateString, dateLabel, addDaysToDateString, formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { groupByHour } from "@/lib/pool-occupancy";
 import { Card, CardBody } from "@/components/ui/card";
@@ -25,7 +26,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
       openTime: true,
       closeTime: true,
       availabilities: {
-        where: { date: dateLabel(dateStr) },
+        where: { date: dateLabel(dateStr), ...NOT_CLOSED },
         orderBy: { startTime: "asc" },
         select: {
           startTime: true,

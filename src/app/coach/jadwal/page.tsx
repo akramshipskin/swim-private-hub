@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { SearchForm, matchesQuery } from "@/components/search-form";
 import { prisma } from "@/lib/prisma";
+import { NOT_CLOSED } from "@/lib/availability";
 import AddSlotForm from "./add-slot-form";
 import DeleteSlotButton from "./delete-slot-button";
 import CancelBookingButton from "./cancel-booking-button";
@@ -20,6 +21,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
       where: {
         coachId: session.user.id,
         date: { gte: dateLabel(todayWibDateString()) },
+        ...NOT_CLOSED,
       },
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
       include: {
@@ -38,6 +40,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
       where: {
         coachId: { not: session.user.id },
         date: { gte: dateLabel(todayWibDateString()) },
+        ...NOT_CLOSED,
       },
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
       include: {

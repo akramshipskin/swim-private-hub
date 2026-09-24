@@ -7,7 +7,8 @@ const poolUpdate = vi.fn().mockResolvedValue({});
 const affiliationUpsert = vi.fn().mockResolvedValue({});
 const affiliationDelete = vi.fn().mockResolvedValue({ count: 1 });
 const affiliationFindUnique = vi.fn();
-const availabilityDeleteMany = vi.fn().mockResolvedValue({ count: 0 });
+const removeOpenSlots = vi.fn().mockResolvedValue({ deleted: 0, closed: 0 });
+vi.mock("@/lib/availability", () => ({ removeOpenSlots: (...args: unknown[]) => removeOpenSlots(...args) }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     pool: { update: (...args: unknown[]) => poolUpdate(...args) },
@@ -16,10 +17,11 @@ vi.mock("@/lib/prisma", () => ({
       deleteMany: (...args: unknown[]) => affiliationDelete(...args),
       findUnique: (...args: unknown[]) => affiliationFindUnique(...args),
     },
-    availability: { deleteMany: (...args: unknown[]) => availabilityDeleteMany(...args) },
-    $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
+    $transaction: async (fn: (tx: unknown) => Promise<unknown>) => fn(txMock),
   },
 }));
+
+const txMock = { poolAffiliation: { deleteMany: (...args: unknown[]) => affiliationDelete(...args) } };
 
 const { updatePoolShares, affiliateCoach, removeAffiliation, togglePoolActive } = await import("./actions");
 
@@ -116,15 +118,13 @@ describe("removeAffiliation", () => {
   it("does nothing when the affiliation is already gone (double-click safe)", async () => {
     affiliationFindUnique.mockResolvedValueOnce(null);
     await expect(removeAffiliation(formData({ affiliationId: "aff-1" }))).resolves.toBeUndefined();
-    expect(availabilityDeleteMany).not.toHaveBeenCalled();
+    expect(removeOpenSlots).not.toHaveBeenCalled();
   });
 
   it("closes only the coach's future open slots at that pool", async () => {
     affiliationFindUnique.mockResolvedValueOnce({ id: "aff-1", coachId: "c1", poolId: "p1" });
     await removeAffiliation(formData({ affiliationId: "aff-1" }));
     expect(affiliationDelete).toHaveBeenCalledWith({ where: { id: "aff-1" } });
-    expect(availabilityDeleteMany).toHaveBeenCalledWith({
-      where: expect.objectContaining({ coachId: "c1", poolId: "p1", status: "AVAILABLE", startTime: { gt: expect.any(Date) } }),
-    });
+    expect(removeOpenSlots).toHaveBeenCalledWith({ coachId: "c1", poolId: "p1", startTime: { gt: expect.any(Date) } }, txMock);
   });
 });

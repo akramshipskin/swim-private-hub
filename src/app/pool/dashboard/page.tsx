@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
+import { NOT_CLOSED } from "@/lib/availability";
 import { formatRupiah } from "@/lib/format";
 import { todayWibDateString, dateLabel, wibDateTime, formatDateLabel } from "@/lib/datetime";
 import { groupByHour } from "@/lib/pool-occupancy";
@@ -24,7 +25,7 @@ export default async function PoolDashboardPage() {
       description: true,
       _count: { select: { affiliations: true } },
       availabilities: {
-        where: { date: today },
+        where: { date: today, ...NOT_CLOSED },
         orderBy: { startTime: "asc" },
         select: {
           startTime: true,

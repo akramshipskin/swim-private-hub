@@ -3,6 +3,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { removeOpenSlots } from "@/lib/availability";
 
 export type ActionState = { error?: string } | null;
 
@@ -46,17 +47,11 @@ export async function removeAffiliation(formData: FormData) {
   // Coach yang dicopot dari kolam dulu slot kosongnya ke depan di kolam itu
   // tetep kebuka & bisa dibooking member. Slot yang udah dibooking
   // dibiarin -- itu janji ke member, dibatalin manual kalau perlu.
-  await prisma.$transaction([
-    prisma.poolAffiliation.deleteMany({ where: { id: affiliationId } }),
-    prisma.availability.deleteMany({
-      where: {
-        coachId: affiliation.coachId,
-        poolId: affiliation.poolId,
-        status: "AVAILABLE",
-        startTime: { gt: new Date() },
-      },
-    }),
-  ]);
+  // Slot kosong yang pernah dibooking ditutup, bukan dihapus (riwayat tetap).
+  await prisma.$transaction(async (tx) => {
+    await tx.poolAffiliation.deleteMany({ where: { id: affiliationId } });
+    await removeOpenSlots({ coachId: affiliation.coachId, poolId: affiliation.poolId, startTime: { gt: new Date() } }, tx);
+  });
   revalidatePath("/admin/kolam");
 }
 

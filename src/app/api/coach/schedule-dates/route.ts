@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { NOT_CLOSED } from "@/lib/availability";
 
 // Tanggal mana yang UDAH ada slot dibuka -- coach manapun, bukan cuma
 // yang lagi login (biar keliatan juga kalau coach lain udah isi jadwal
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
   const to = new Date(Date.UTC(year, month, 1));
 
   const rows = await prisma.availability.findMany({
-    where: { date: { gte: from, lt: to } },
+    where: { date: { gte: from, lt: to }, ...NOT_CLOSED },
     select: { date: true },
     distinct: ["date"],
   });

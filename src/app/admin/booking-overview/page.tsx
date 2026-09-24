@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
+import { NOT_CLOSED } from "@/lib/availability";
 import BookingOverviewBoard from "./booking-overview-board";
 
 export default async function AdminBookingOverviewPage() {
@@ -15,6 +16,7 @@ export default async function AdminBookingOverviewPage() {
   // server/DB.
   const [availabilities, allCoaches] = await Promise.all([
     prisma.availability.findMany({
+      where: NOT_CLOSED,
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
       include: {
         coach: { select: { id: true, name: true } },

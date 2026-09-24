@@ -29,6 +29,7 @@ export async function checkInvariants(opts: { packages?: boolean; ledger?: boole
     const n = s.bookings.length;
     if (s.status === "BOOKED" && n !== 1) bad.push(`slot ${s.id} berstatus BOOKED tapi punya ${n} booking aktif`);
     if (s.status === "AVAILABLE" && n !== 0) bad.push(`slot ${s.id} berstatus AVAILABLE tapi punya ${n} booking aktif`);
+    if (s.status === "CLOSED" && n !== 0) bad.push(`slot ${s.id} ditutup tapi punya ${n} booking aktif`);
   }
 
   // 2. Paket: sisa sesi tidak pernah negatif atau melebihi total; dan (opsional)

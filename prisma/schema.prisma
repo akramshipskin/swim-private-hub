@@ -73,6 +73,11 @@ enum PaymentStatus {
 enum AvailabilityStatus {
   AVAILABLE
   BOOKED
+  // Slot yang "dihapus" coach/admin padahal pernah dibooking (lalu batal):
+  // disembunyikan dari semua daftar & tidak bisa dibooking, tapi barisnya
+  // tetap ada supaya riwayat booking-nya tidak ikut terhapus (keputusan
+  // Hadi 25 Sep). Slot tanpa riwayat tetap benar-benar dihapus.
+  CLOSED
 }
 
 enum BookingStatus {

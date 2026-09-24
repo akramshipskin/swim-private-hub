@@ -89,7 +89,10 @@ describe("BOOKING vs aksi admin/coach", () => {
       expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).sisaSesi).toBe(8);
       expect(await prisma.booking.count({ where: { status: "BOOKED" } })).toBe(0);
       expect(await checkInvariants()).toEqual([]);
-      tally(sebaran, (await prisma.availability.findUnique({ where: { id: slot.id } })) ? "slot masih ada" : "slot terhapus");
+      // Slot pernah dibooking -> tidak pernah benar-benar terhapus, riwayat batalnya tetap ada.
+      const after = await prisma.availability.findUniqueOrThrow({ where: { id: slot.id } });
+      expect(await prisma.booking.count({ where: { id: b.id, status: "CANCELLED" } })).toBe(1);
+      tally(sebaran, after.status === "CLOSED" ? "slot ditutup" : "slot masih terbuka (hapus kalah duluan)");
     }
     spread("E2", sebaran);
   });

@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
+import { NOT_CLOSED } from "@/lib/availability";
 import { todayWibDateString, wibDateTime } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +29,7 @@ export default async function PoolCoachPage() {
               coachProfile: { select: { photoUrl: true, specialties: true, certificateStatus: true, certificationNote: true, birthDate: true, gender: true } },
               availabilities: {
                 select: { status: true, startTime: true, poolId: true, bookings: { where: { attended: true }, select: { id: true } } },
-                where: { startTime: { gte: startMonth } },
+                where: { startTime: { gte: startMonth }, ...NOT_CLOSED },
               },
             },
           },
