@@ -12,7 +12,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm ci
+      # ponytail: npm install, bukan npm ci -- lock buatan macOS tidak mencatat
+      # @emnapi/* yang dibutuhkan @img/sharp-wasm32 di Linux, jadi npm ci menolak.
+      # Sama dengan cara Vercel memasang dependensi. Ganti ke npm ci kalau lock
+      # sudah dibuat ulang dan npm ci lolos di Linux.
+      - run: npm install --no-audit --no-fund
       - run: npm run lint
       - run: npx tsc --noEmit
       - run: npm test
