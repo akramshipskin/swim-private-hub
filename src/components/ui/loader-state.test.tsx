@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 
-const orb = vi.fn((_props: unknown) => null);
+const orb = vi.fn<(props: unknown) => null>(() => null);
 vi.mock("thinking-orbs", () => ({ ThinkingOrb: (props: unknown) => orb(props) }));
 
 const { Loader } = await import("./loader");
