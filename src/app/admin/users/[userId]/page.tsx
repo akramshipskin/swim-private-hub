@@ -52,7 +52,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
   const deletion = user.deletionRequestedAt && !user.anonymizedAt ? await deletionImpact(user.id) : null;
 
   const startMonth = wibDateTime(`${todayWibDateString().slice(0, 7)}-01`, "00:00");
-  const [bookings, payments, withdrawals, coachSessions] = await Promise.all([
+  const [bookings, payments, withdrawals, coachSessions, coachManual] = await Promise.all([
     user.role === "MEMBER"
       ? prisma.booking.findMany({
           where: { memberId: user.id },
@@ -82,7 +82,16 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           select: { attended: true, status: true },
         })
       : Promise.resolve([]),
+    // Koreksi manual saldo coach (baris tanpa sesi, dicatat langsung di
+    // database): ikut di saldo tapi tidak berasal dari sesi mana pun.
+    user.role === "COACH" && user.coachProfile
+      ? prisma.walletTransaction.aggregate({
+          where: { coachProfileId: user.coachProfile.id, type: "SESSION_PAYOUT", bookingId: null },
+          _sum: { amount: true },
+        })
+      : Promise.resolve(null),
   ]);
+  const manualAmount = coachManual?._sum.amount ?? 0;
 
   const activePackages = user.packages.filter((p) => p.status === "ACTIVE" && p.sisaSesi > 0);
 
@@ -167,6 +176,9 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                 }
               />
               <Row label="Saldo" value={formatRupiah(user.coachProfile.walletBalance)} />
+              {manualAmount !== 0 && (
+                <Row label="Termasuk koreksi manual (tanpa sesi)" value={`${manualAmount < 0 ? "−" : ""}${formatRupiah(Math.abs(manualAmount))}`} />
+              )}
               <Row
                 label="Sesi bulan ini"
                 value={`${coachSessions.filter((b) => b.attended === true).length} hadir · ${coachSessions.filter((b) => b.status === "BOOKED" && b.attended === null).length} terjadwal`}

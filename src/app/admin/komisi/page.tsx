@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 export default async function KomisiPage() {
   await requireRole("ADMIN");
 
-  const [attendedBookings, pools, paidOut, manualPool] = await Promise.all([
+  const [attendedBookings, pools, paidOut, manualPool, processing, manualOther] = await Promise.all([
     prisma.booking.findMany({
       where: { attended: true },
       select: {
@@ -51,7 +51,21 @@ export default async function KomisiPage() {
     // tidak masuk tabel sesi di bawah, tapi ikut di "Saldo kolam". Ditampilkan
     // terpisah supaya angka kartu bisa dicocokkan. Hanya dibaca.
     prisma.walletTransaction.groupBy({ by: ["poolId"], where: { type: "SESSION_REVENUE", poolId: { not: null }, bookingId: null }, _sum: { amount: true } }),
+    // Pencairan belum selesai: saldo sudah terpotong sejak diajukan.
+    prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { not: null }, status: { in: ["PENDING", "PROCESSING"] } }, _sum: { amount: true } }),
+    // Koreksi manual saldo coach & pendapatan platform (baris tanpa sesi).
+    // Tidak masuk hitungan sesi di halaman ini, tapi ikut di saldo mereka.
+    prisma.walletTransaction.groupBy({
+      by: ["type"],
+      where: { type: { in: ["SESSION_PAYOUT", "PLATFORM_REVENUE", "PLATFORM_TAX"] }, bookingId: null },
+      _sum: { amount: true },
+    }),
   ]);
+  const manualOf = (t: string) => manualOther.find((x) => x.type === t)?._sum.amount ?? 0;
+  const manualCoach = manualOf("SESSION_PAYOUT");
+  const manualPlatformNet = manualOf("PLATFORM_REVENUE");
+  const manualPlatformTax = manualOf("PLATFORM_TAX");
+  const signed = (n: number) => `${n < 0 ? "−" : ""}${formatRupiah(Math.abs(n))}`;
 
   // Nominal kolam & coach diambil dari ledger (yang benar-benar dikredit,
   // termasuk koreksi), komisi platform = nilai sesi - bagian kolam - coach.
@@ -112,6 +126,15 @@ export default async function KomisiPage() {
               bersih {formatRupiah(splitPlatformTax(totalPlatform).net)} · PPN {formatRupiah(splitPlatformTax(totalPlatform).tax)}
             </span>
           </p>
+          {(manualPlatformNet !== 0 || manualPlatformTax !== 0 || manualCoach !== 0) && (
+            <div className="order-4 w-full space-y-0.5 border-t border-border pt-2 text-xs text-text-subtle sm:order-none">
+              <p className="font-medium text-text-muted">Koreksi manual (dicatat langsung di database, bukan dari sesi) — ikut di saldo, tidak masuk hitungan di halaman ini:</p>
+              {(manualPlatformNet !== 0 || manualPlatformTax !== 0) && (
+                <p>Platform: bersih {signed(manualPlatformNet)} · PPN {signed(manualPlatformTax)}</p>
+              )}
+              {manualCoach !== 0 && <p>Semua coach: {signed(manualCoach)}</p>}
+            </div>
+          )}
         </CardBody>
       </Card>
 
@@ -222,6 +245,16 @@ export default async function KomisiPage() {
                     <p className="text-sm text-text-muted">Sudah dicairkan</p>
                     <p className="text-lg font-semibold text-text-muted">{formatRupiah(paid)}</p>
                   </div>
+                  {(() => {
+                    const inProgress = processing.find((x) => x.poolId === pool.id)?._sum.amount ?? 0;
+                    return inProgress > 0 ? (
+                      <div className="col-span-2">
+                        <p className="text-sm text-text-muted">Pencairan sedang diproses</p>
+                        <p className="text-lg font-semibold text-text-muted">{formatRupiah(inProgress)}</p>
+                        <p className="text-xs text-text-subtle">Sudah dipotong dari saldo di atas; kembali kalau ditolak.</p>
+                      </div>
+                    ) : null;
+                  })()}
                 </div>
               </CardBody>
             </Card>
