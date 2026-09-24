@@ -38,10 +38,22 @@ export async function startTotpSetup(): Promise<void> {
 export async function confirmTotpSetup(_prev: TotpState, formData: FormData): Promise<TotpState> {
   const { id, role } = await currentUser();
   const code = (formData.get("code") as string | null) ?? "";
+  const password = (formData.get("password") as string | null) ?? "";
+  if (!password) return { error: "Isi password akunmu." };
 
-  const user = await prisma.user.findUnique({ where: { id }, select: { totpSecret: true, totpEnabledAt: true } });
+  const user = await prisma.user.findUnique({ where: { id }, select: { passwordHash: true, totpSecret: true, totpEnabledAt: true } });
   if (user?.totpEnabledAt) redirect(doneUrl(role));
   if (!user?.totpSecret) return { error: "Buat kunci dulu." };
+
+  // Password wajib (keputusan Hadi 25 Sep): tanpa ini, orang yang memegang
+  // sesi yang tertinggal terbuka (HP dipinjam) bisa memasang 2FA miliknya
+  // sendiri dan pemilik akun terkunci di luar. Hanya password SALAH yang
+  // dihitung (3x / 15 menit, sama dengan login); kode salah tidak.
+  const key = `totp-on:${id}`;
+  const hit = await takeAttempt(key, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS);
+  if (!hit) return { error: "Terlalu banyak password salah. Tunggu 15 menit, lalu coba lagi." };
+  if (!(await bcrypt.compare(password, user.passwordHash))) return { error: "Password salah." };
+  await forgetAttempts({ ids: [hit] });
 
   const step = verifyTotp(user.totpSecret, code);
   if (step === null) {

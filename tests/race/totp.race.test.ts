@@ -81,7 +81,7 @@ describe("2FA opsional (coach/member/pemilik kolam)", () => {
       const code = totpAt(secret, currentStep());
       const rs = await as(coachSession(u), () =>
         settle([
-          ...Array.from({ length: 3 }, () => jitter(15).then(() => act(confirmTotpSetup(null, fd({ code }))))),
+          ...Array.from({ length: 3 }, () => jitter(15).then(() => act(confirmTotpSetup(null, fd({ code, password: PASSWORD }))))),
           jitter(15).then(() => act(startTotpSetup())),
         ]),
       );
@@ -230,8 +230,26 @@ describe("2FA opsional (coach/member/pemilik kolam)", () => {
     const s = { id: u.id, role: "MEMBER" as const };
     await as(s, () => startTotpSetup());
     const { totpSecret } = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
-    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: totpAt(totpSecret!, currentStep()) }))))).toBe("redirect:/profil");
+    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: totpAt(totpSecret!, currentStep()), password: PASSWORD }))))).toBe("redirect:/profil");
     expect((await login(u.phone!, "", "8.8.8.2")).r).toBe("otp_required");
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("A8: memasang 2FA butuh password yang benar; hanya password salah yang dihitung (3x -> terkunci 15 menit), kode salah tidak", async () => {
+    const u = await mkUser("COACH");
+    const s = coachSession(u);
+    await as(s, () => startTotpSetup());
+    const { totpSecret } = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
+    const code = () => totpAt(totpSecret!, currentStep());
+    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: code() }))))).toBe("err:Isi password akunmu.");
+    for (let i = 0; i < 5; i++) {
+      expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: "000000", password: PASSWORD }))))).toMatch(/^err:Kode salah/);
+    }
+    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: code(), password: "salah1" }))))).toBe("err:Password salah.");
+    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: code(), password: "salah2" }))))).toBe("err:Password salah.");
+    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: code(), password: "salah3" }))))).toBe("err:Password salah.");
+    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: code(), password: PASSWORD }))))).toMatch(/^err:Terlalu banyak/);
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: u.id } })).totpEnabledAt).toBeNull();
     expect(await checkInvariants()).toEqual([]);
   });
 });
