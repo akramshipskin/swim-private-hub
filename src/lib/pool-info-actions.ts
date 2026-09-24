@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
-import { PHOTO_BUCKET, extensionFor, isStorageConfigured, publicObjectUrl, uploadObject, validateUpload } from "@/lib/storage";
+import { PHOTO_BUCKET, extensionFor, isStorageConfigured, publicObjectUrl, uploadObject, validateUpload, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR } from "@/lib/storage";
 
 export type PoolInfoState = { error?: string; ok?: boolean } | null;
 
@@ -83,6 +83,7 @@ export async function uploadPoolPhoto(_prev: PoolInfoState, formData: FormData):
   const file = formData.get("photo") as File | null;
   const invalid = validateUpload(file, "photo");
   if (invalid) return { error: invalid };
+  if (!(await hasMatchingSignature(file!))) return { error: SIGNATURE_MISMATCH_ERROR };
 
   const pool = await prisma.pool.findUnique({ where: { id: poolId }, select: { photos: true } });
   if (!pool) return { error: "Kolam tidak ditemukan." };

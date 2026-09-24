@@ -111,6 +111,10 @@ export async function createUser(
 }
 
 const IMPORT_DEFAULT_JATAH_CANCEL = 2;
+// Batas import (sweep keamanan 25 Sep): tiap member baru butuh hash password
+// (±70 md), jadi 500 baris ≈ <1 menit -- masih di bawah batas waktu server.
+const MAX_IMPORT_BYTES = 2 * 1024 * 1024;
+const MAX_IMPORT_ROWS = 500;
 const IMPORT_DEFAULT_DURATION_DAYS = 60;
 
 // credentials: password sementara tiap member baru, HANYA dikembalikan sekali
@@ -159,10 +163,15 @@ export async function importMembersXlsx(
     return { error: "Pilih file xlsx dulu" };
   }
 
+  if (file.size > MAX_IMPORT_BYTES) {
+    return { error: "File terlalu besar (maksimal 2MB). Pecah jadi beberapa file." };
+  }
+
   const buffer = Buffer.from(await file.arrayBuffer());
   let rawRows: Record<string, unknown>[];
   try {
-    const workbook = XLSX.read(buffer, { type: "buffer" });
+    // sheetRows: parser berhenti membaca setelah baris ke-(batas + judul + 1).
+    const workbook = XLSX.read(buffer, { type: "buffer", sheetRows: MAX_IMPORT_ROWS + 2 });
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     rawRows = XLSX.utils.sheet_to_json(firstSheet);
   } catch {
@@ -171,6 +180,9 @@ export async function importMembersXlsx(
 
   if (rawRows.length === 0) {
     return { error: "File kosong atau tidak ada data di sheet pertama." };
+  }
+  if (rawRows.length > MAX_IMPORT_ROWS) {
+    return { error: `Maksimal ${MAX_IMPORT_ROWS} baris per file. Pecah jadi beberapa file.` };
   }
 
   const rows: ImportRow[] = rawRows.map((row) => ({

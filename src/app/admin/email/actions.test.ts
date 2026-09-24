@@ -36,6 +36,9 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+const takeAttempt = vi.fn().mockResolvedValue("hit-1");
+vi.mock("@/lib/rate-limit", () => ({ takeAttempt: (...a: unknown[]) => takeAttempt(...a) }));
+
 const { replyToEmailThread, composeEmail } = await import("./actions");
 
 function formData(entries: Record<string, string>) {

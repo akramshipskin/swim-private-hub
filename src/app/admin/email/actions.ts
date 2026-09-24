@@ -5,6 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { INBOX_ADDRESSES, INBOX_FROM_ADDRESS, sendReplyEmail } from "@/lib/email";
+import { takeAttempt } from "@/lib/rate-limit";
+
+// Sweep keamanan 25 Sep: batas email keluar supaya akun admin yang dibobol
+// tidak bisa dipakai kirim spam dari domain kita.
+const MAX_OUTBOUND_EMAILS_PER_HOUR = 30;
+const EMAIL_LIMIT_ERROR = `Batas kirim email tercapai (${MAX_OUTBOUND_EMAILS_PER_HOUR} per jam). Coba lagi nanti.`;
 
 export type ReplyState = { error?: string } | null;
 const MAX_EMAIL_BODY_LENGTH = 4000;
@@ -42,6 +48,9 @@ export async function replyToEmailThread(_prev: ReplyState, formData: FormData):
 
   const replySubject = thread.subject.startsWith("Re: ") ? thread.subject : `Re: ${thread.subject}`;
   const replyFrom = thread.messages[0]?.toAddress || INBOX_FROM_ADDRESS;
+  if (!(await takeAttempt("email-keluar", MAX_OUTBOUND_EMAILS_PER_HOUR, 3_600_000))) {
+    return { error: EMAIL_LIMIT_ERROR };
+  }
 
   let sent: { id: string };
   try {
@@ -90,6 +99,9 @@ export async function composeEmail(_prev: ReplyState, formData: FormData): Promi
   if (!content) return { error: "Isi email tidak boleh kosong." };
   if (content.length > MAX_EMAIL_BODY_LENGTH) {
     return { error: `Isi email maksimal ${MAX_EMAIL_BODY_LENGTH} karakter.` };
+  }
+  if (!(await takeAttempt("email-keluar", MAX_OUTBOUND_EMAILS_PER_HOUR, 3_600_000))) {
+    return { error: EMAIL_LIMIT_ERROR };
   }
 
   let sent: { id: string };

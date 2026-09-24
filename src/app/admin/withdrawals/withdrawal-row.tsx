@@ -36,6 +36,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
   const [rejectState, rejectAction, rejectPending] = useActionState(rejectWithdrawal, null);
   // Aksi uang (tandai dibayar / tolak) gak bisa dibatalin -- konfirmasi dulu.
   const [confirming, setConfirming] = useState<"paid" | "reject" | null>(null);
+  const [accountCopied, setAccountCopied] = useState(false);
   const paidForm = useRef<HTMLFormElement>(null);
   const rejectForm = useRef<HTMLFormElement>(null);
 
@@ -56,7 +57,21 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
         </div>
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm">
           <dt className="text-text-subtle">Rekening</dt>
-          <dd className="text-text">{w.bankName} · {w.bankAccountNumber} a.n. {w.bankAccountName}</dd>
+          <dd className="text-text">
+            {w.bankName} · {w.bankAccountNumber} a.n. {w.bankAccountName}{" "}
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard?.writeText(w.bankAccountNumber).then(() => {
+                  setAccountCopied(true);
+                  setTimeout(() => setAccountCopied(false), 2000);
+                });
+              }}
+              className="ml-1 rounded-md border border-border px-2 py-0.5 text-xs text-text-muted hover:bg-surface-muted"
+            >
+              {accountCopied ? "Disalin" : "Salin no. rekening"}
+            </button>
+          </dd>
           <dt className="text-text-subtle">Diajukan</dt>
           <dd className="text-text">{dateTime(w.requestedAt)}</dd>
           {w.processedAt && (<><dt className="text-text-subtle">Diproses</dt><dd className="text-text">{dateTime(w.processedAt)}</dd></>)}

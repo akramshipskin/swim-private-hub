@@ -26,6 +26,27 @@ export function validateUpload(file: File | null, kind: "photo" | "certificate")
   return null;
 }
 
+// Label jenis file (file.type) dikirim browser dan bisa dipalsukan -- cek juga
+// "tanda tangan" di byte awal isi file (sweep keamanan 25 Sep).
+export async function hasMatchingSignature(file: File): Promise<boolean> {
+  const b = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+  const ascii = (from: number, to: number) => String.fromCharCode(...b.slice(from, to));
+  switch (file.type) {
+    case "image/jpeg":
+      return b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
+    case "image/png":
+      return b[0] === 0x89 && ascii(1, 4) === "PNG";
+    case "image/webp":
+      return ascii(0, 4) === "RIFF" && ascii(8, 12) === "WEBP";
+    case "application/pdf":
+      return ascii(0, 4) === "%PDF";
+    default:
+      return false;
+  }
+}
+
+export const SIGNATURE_MISMATCH_ERROR = "Isi file tidak cocok dengan jenisnya. Unggah ulang foto/dokumen aslinya.";
+
 export function extensionFor(file: File) {
   return CERT_TYPES[file.type];
 }

@@ -35,7 +35,10 @@ export default function KebijakanPrivasiPage() {
           rekening yang diisi sendiri sebagai tujuan pencairan saldo, beserta riwayat
           saldo dan pencairannya.
         </li>
-        <li>Alamat IP saat pendaftaran akun, untuk keamanan dan pencegahan pendaftaran palsu.</li>
+        <li>Alamat IP saat pendaftaran akun dan saat percobaan masuk, untuk keamanan dan pencegahan penyalahgunaan.</li>
+        <li>Waktu dan versi persetujuan atas Syarat &amp; Ketentuan serta Kebijakan Privasi saat mendaftar.</li>
+        <li>Isi percakapan pada fitur chat bantuan (lihat bagian 4).</li>
+        <li>Foto profil dan file sertifikat yang diunggah pelatih, serta foto kolam yang diunggah pemilik kolam.</li>
         <li>Sumber rujukan pendaftaran (misalnya tautan WhatsApp/Instagram) untuk kebutuhan internal, dan tidak dibagikan kepada pihak ketiga untuk tujuan komersial.</li>
       </ul>
 
@@ -63,10 +66,39 @@ export default function KebijakanPrivasiPage() {
           <strong>Vercel Analytics</strong> — layanan analitik kunjungan halaman
           yang bersifat <em>cookieless</em> dan tidak melacak individu pengguna.
         </li>
+        <li>
+          <strong>Supabase</strong> — penyedia basis data dan penyimpanan file
+          (foto dan sertifikat) tempat data Aplikasi disimpan.
+        </li>
+        <li>
+          <strong>Google (Gemini) dan Anthropic (Claude)</strong> — penyedia
+          kecerdasan buatan yang membantu menjawab chat bantuan. Keduanya menerima
+          isi pesan chat, riwayat singkat percakapan, serta nama dan peran akun
+          Pengguna, hanya untuk menyusun jawaban.
+        </li>
+        <li>
+          <strong>Resend</strong> — layanan pengiriman dan penerimaan email untuk
+          korespondensi antara Pengguna dan kami.
+        </li>
+        <li>
+          <strong>Layanan notifikasi peramban</strong> (misalnya Google, Apple,
+          Mozilla) — meneruskan isi notifikasi ke perangkat Pengguna, bila fitur
+          notifikasi diaktifkan.
+        </li>
       </ul>
       <p>Kami tidak menjual maupun menyewakan data pribadi Pengguna kepada pihak manapun.</p>
 
-      <h2>4. Cookie dan Penyimpanan Lokal</h2>
+      <h2>4. Chat Bantuan dan Masa Penyimpanan</h2>
+      <p>
+        Pesan pada fitur chat bantuan dijawab oleh asisten berbasis kecerdasan
+        buatan dan, bila perlu, oleh administrator. Riwayat chat yang tampil bagi
+        Pengguna adalah 90 hari terakhir. Arsip percakapan tetap kami simpan untuk
+        keperluan penanganan keluhan dan penyelesaian masalah, dan hanya dapat
+        diakses administrator. Mohon tidak mengirim kata sandi, nomor kartu, atau
+        data sensitif lain melalui chat.
+      </p>
+
+      <h2>5. Cookie dan Penyimpanan Lokal</h2>
       <p>
         Aplikasi menggunakan sesi masuk (cookie) serta penyimpanan lokal/sesi
         peramban untuk mendukung fungsi tertentu, termasuk preferensi tampilan.
@@ -77,15 +109,17 @@ export default function KebijakanPrivasiPage() {
         .
       </p>
 
-      <h2>5. Keamanan Data</h2>
+      <h2>6. Keamanan Data</h2>
       <p>
         Kata sandi disimpan dalam bentuk terenkripsi (hash), bukan sebagai teks
-        biasa. Akses terhadap data dibatasi sesuai peran pengguna — member hanya
-        dapat mengakses data anaknya sendiri, pelatih hanya dapat mengakses
-        jadwalnya sendiri, dan seterusnya.
+        biasa. Percobaan masuk yang salah berulang kali akan dikunci sementara,
+        dan akun administrator dilindungi verifikasi dua langkah. Akses terhadap
+        data dibatasi sesuai peran pengguna — member hanya dapat mengakses data
+        anaknya sendiri, pelatih hanya dapat mengakses jadwalnya sendiri, dan
+        seterusnya.
       </p>
 
-      <h2>6. Hak Pengguna atas Data Pribadi</h2>
+      <h2>7. Hak Pengguna atas Data Pribadi</h2>
       <p>
         Sesuai dengan Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data
         Pribadi, Pengguna berhak untuk:
@@ -93,18 +127,24 @@ export default function KebijakanPrivasiPage() {
       <ul>
         <li>Memperoleh salinan data pribadi yang kami simpan.</li>
         <li>Meminta perbaikan atas data yang tidak akurat.</li>
-        <li>Meminta penghapusan akun dan data pribadi, dengan catatan bahwa riwayat transaksi yang wajib disimpan sesuai ketentuan perundang-undangan tetap dipertahankan.</li>
+        <li>
+          Meminta penghapusan akun melalui menu Profil (member) atau kontak di
+          bawah. Setelah disetujui administrator, nama, nomor telepon, email, dan
+          nama peserta dihapus dari akun. Riwayat transaksi dan arsip percakapan
+          tetap disimpan tanpa identitas tersebut, sesuai ketentuan
+          perundang-undangan dan keperluan penyelesaian masalah.
+        </li>
         <li>Menarik persetujuan atas penggunaan data untuk tujuan yang bersifat non-esensial (misalnya notifikasi).</li>
       </ul>
       <p>Untuk menggunakan hak-hak tersebut, Pengguna dapat menghubungi kami melalui kontak di bawah ini.</p>
 
-      <h2>7. Perubahan Kebijakan</h2>
+      <h2>8. Perubahan Kebijakan</h2>
       <p>
         Kebijakan ini dapat diperbarui sewaktu-waktu. Perubahan yang bersifat
         signifikan akan diinformasikan melalui Aplikasi.
       </p>
 
-      <h2>8. Kontak</h2>
+      <h2>9. Kontak</h2>
       <p>
         Pertanyaan mengenai privasi atau data pribadi dapat disampaikan melalui
         WhatsApp{" "}

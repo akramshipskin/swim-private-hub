@@ -7,7 +7,7 @@ import { toProperCase } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties";
-import { isStorageConfigured, validateUpload, extensionFor, uploadObject, publicObjectUrl, PHOTO_BUCKET, CERT_BUCKET } from "@/lib/storage";
+import { isStorageConfigured, validateUpload, extensionFor, uploadObject, publicObjectUrl, PHOTO_BUCKET, CERT_BUCKET, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR } from "@/lib/storage";
 import { ageFromBirthDate } from "@/lib/coach-bio";
 
 export type ActionState = { error?: string; success?: boolean } | null;
@@ -179,6 +179,7 @@ export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): 
   const file = formData.get("photo") as File | null;
   const invalid = validateUpload(file, "photo");
   if (invalid) return { error: invalid };
+  if (!(await hasMatchingSignature(file!))) return { error: SIGNATURE_MISMATCH_ERROR };
 
   const path = `${session.user.id}/photo.${extensionFor(file!)}`;
   try {
@@ -206,6 +207,7 @@ export async function uploadCoachCertificate(_prev: ActionState, formData: FormD
   if (!note) return { error: "Isi nama sertifikat/lembaga." };
   const invalid = validateUpload(file, "certificate");
   if (invalid) return { error: invalid };
+  if (!(await hasMatchingSignature(file!))) return { error: SIGNATURE_MISMATCH_ERROR };
 
   const path = `${session.user.id}/certificate-${Date.now()}.${extensionFor(file!)}`;
   try {

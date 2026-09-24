@@ -18,15 +18,6 @@ type Step = { title: string; body: string };
 type Section = { heading: string; intro?: string; steps: Step[]; note?: string };
 type Guide = { key: string; label: string; title: string; lead: string; sections: Section[] };
 
-const DEMO_ACCOUNTS = [
-  { name: "Dedi Kurniawan", role: "Member (orang tua)", login: "dedi.member@example.com" },
-  { name: "Rina Marlina", role: "Member (orang tua)", login: "rina.member@example.com" },
-  { name: "Ayu Lestari", role: "Coach", login: "ayu.coach@example.com" },
-  { name: "Fajar Nugroho", role: "Coach", login: "fajar.coach@example.com" },
-  { name: "Sari Wulandari", role: "Pemilik kolam (Melati)", login: "sari.melati@example.com" },
-  { name: "Budi Santoso", role: "Pemilik kolam (Tirta Asri)", login: "budi.tirta@example.com" },
-];
-
 const HIGHLIGHTS = [
   {
     title: "Satu akun, banyak peserta",
@@ -388,35 +379,6 @@ export default function PanduanView() {
                 </li>
               ))}
             </ul>
-          </section>
-
-          <section className="mt-14">
-            <h2 className="text-3xl font-semibold tracking-tight">Akun demo</h2>
-            <p className="mt-2 max-w-2xl text-base text-[#5C5945]">
-              Semua password sama: <b className="text-[#14140F]">qwertyuiop</b>. Masuk dengan email di bawah untuk
-              mencoba tiap peran. Akun admin tidak dibagikan di sini; hubungi kami kalau perlu akses admin untuk
-              evaluasi.
-            </p>
-            <div className="mt-6 overflow-x-auto rounded-2xl bg-white">
-              <table className="w-full min-w-[520px] text-sm">
-                <thead>
-                  <tr className="border-b border-[#14140F]/10 text-left text-xs uppercase tracking-wide text-[#5C5945]">
-                    <th className="px-5 py-3 font-medium">Nama</th>
-                    <th className="px-5 py-3 font-medium">Peran</th>
-                    <th className="px-5 py-3 font-medium">Masuk pakai email</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {DEMO_ACCOUNTS.map((a) => (
-                    <tr key={a.login} className="border-b border-[#14140F]/10 last:border-0">
-                      <td className="px-5 py-3 font-medium">{a.name}</td>
-                      <td className="px-5 py-3 text-[#5C5945]">{a.role}</td>
-                      <td className="px-5 py-3 font-mono text-[#14140F]">{a.login}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </section>
         </div>
       )}

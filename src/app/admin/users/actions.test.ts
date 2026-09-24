@@ -301,6 +301,23 @@ describe("importMembersXlsx", () => {
     expect(result?.credentials).toEqual([]);
   });
 
+  // Sweep keamanan 25 Sep: batas ukuran file & jumlah baris import.
+  it("refuses a file bigger than 2MB before parsing it", async () => {
+    const fd = new FormData();
+    fd.set("poolId", "pool-1");
+    fd.set("file", new File([new Uint8Array(2 * 1024 * 1024 + 1)], "besar.xlsx"));
+    const result = await importMembersXlsx(null, fd);
+    expect(result?.error).toContain("2MB");
+    expect(userCreate).not.toHaveBeenCalled();
+  });
+
+  it("refuses more than 500 rows", async () => {
+    const rows = Array.from({ length: 501 }, (_, i) => ({ "Nama Member": `M${i}`, "No HP": `0812${String(i).padStart(8, "0")}` }));
+    const result = await importMembersXlsx(null, importFormData(rows));
+    expect(result?.error).toContain("500");
+    expect(userCreate).not.toHaveBeenCalled();
+  });
+
   it("skips a row with no phone number instead of failing the whole import", async () => {
     const result = await importMembersXlsx(null, importFormData([{ "Nama Member": "Tanpa HP" }]));
     expect(userCreate).not.toHaveBeenCalled();

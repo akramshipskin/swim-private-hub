@@ -34,7 +34,8 @@ export default async function CoachShortcutPage({
   const session = await auth();
 
   const coach = await prisma.user.findUnique({
-    where: { id: coachId, role: "COACH" },
+    // Coach nonaktif (belum disetujui / dinonaktifkan admin) tidak dipublikasikan.
+    where: { id: coachId, role: "COACH", isActive: true },
     select: {
       id: true,
       name: true,

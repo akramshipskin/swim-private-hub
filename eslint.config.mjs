@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Kode otomatis Prisma & database lokal -- bukan kode kita, dan besar.
+    "src/generated/**",
+    ".dev-db/**",
   ]),
 ]);
 
