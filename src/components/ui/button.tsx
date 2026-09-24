@@ -28,7 +28,8 @@ const variantClasses: Record<Variant, string> = {
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-sm rounded-lg",
+  // max-sm:min-h-[44px] = area sentuh 44px di HP; di desktop tetap ringkas.
+  sm: "px-3 py-1.5 text-sm rounded-lg max-sm:min-h-[44px]",
   md: "min-h-[44px] px-4 py-2.5 text-sm rounded-xl",
 };
 

@@ -87,7 +87,7 @@ export default async function CariCoachPage() {
                       </ul>
                     )}
                   </div>
-                  <Link href={`/pelatih/${coach.id}`} className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline">
+                  <Link href={`/pelatih/${coach.id}`} className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                     Lihat profil lengkap &rarr;
                   </Link>
                 </div>

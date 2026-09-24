@@ -19,7 +19,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
           <Input name="note" maxLength={200} placeholder="Misal: transfer ke rekening perusahaan" />
         </Field>
       </div>
-      <label className="flex items-center gap-2 text-sm text-text">
+      <label className="flex items-center gap-2 text-sm text-text max-sm:min-h-[44px]">
         <input type="checkbox" name="includeTax" className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-500" />
         Tarik juga saldo pajak (PPN) sekaligus — {formatRupiah(Math.max(0, tax))}
       </label>

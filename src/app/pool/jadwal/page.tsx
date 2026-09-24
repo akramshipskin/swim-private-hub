@@ -59,7 +59,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
       <p className="mt-1 text-sm text-text-muted">Pemakaian kolam untuk les privat per jam.</p>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, -1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted">&larr; Sebelumnya</Link>
+        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, -1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">&larr; Sebelumnya</Link>
         {/* Di HP form-nya ambil satu baris penuh dan tanggalnya yang melar
             (flex-1), bukan dipatok w-72 -- lebar tetap bikin tombol Lihat
             kedorong keluar layar. Di layar >=sm baru dipatok 72 supaya
@@ -69,7 +69,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
           <DatePicker name="date" defaultValue={dateStr} className="min-w-0 flex-1 sm:w-72 sm:flex-none" />
           <button type="submit" className="min-h-[44px] shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-[#0a0a08]">Lihat</button>
         </form>
-        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, 1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted">Berikutnya &rarr;</Link>
+        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, 1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Berikutnya &rarr;</Link>
       </div>
       <p className="mt-3 text-base font-semibold text-text">{formatDateLabel(dateLabel(dateStr))}</p>
 

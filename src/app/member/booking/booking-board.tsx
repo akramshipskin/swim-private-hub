@@ -303,7 +303,7 @@ export default function BookingBoard({
                 key={pool.id}
                 type="button"
                 onClick={() => setPoolId(pool.id)}
-                className={`rounded-full border px-3 py-1 text-sm font-semibold ${pool.id === poolId ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border text-text hover:bg-surface-muted"}`}
+                className={`rounded-full border px-3 py-1 text-sm font-semibold max-sm:min-h-[44px] ${pool.id === poolId ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border text-text hover:bg-surface-muted"}`}
               >
                 {pool.name} · sisa {sisa} sesi
               </button>
@@ -365,7 +365,7 @@ export default function BookingBoard({
                 <button
                   type="button"
                   onClick={() => setShowFullCalendar((v) => !v)}
-                  className="font-medium text-brand-700 underline underline-offset-2"
+                  className="font-medium text-brand-700 underline underline-offset-2 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
                 >
                   {showFullCalendar ? "Tutup kalender" : "Pilih tanggal lain"}
                 </button>

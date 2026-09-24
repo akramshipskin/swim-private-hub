@@ -55,7 +55,7 @@ export default async function AdminWithdrawalsPage({
     return `/admin/withdrawals?${q.toString()}`;
   };
   const chip = (active: boolean) =>
-    `rounded-full border px-3 py-1 text-sm ${active ? "border-brand-600 bg-brand-50 font-semibold text-brand-700" : "border-border text-text hover:bg-surface-muted"}`;
+    `inline-flex items-center rounded-full border px-3 py-1 text-sm max-sm:min-h-[44px] ${active ? "border-brand-600 bg-brand-50 font-semibold text-brand-700" : "border-border text-text hover:bg-surface-muted"}`;
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">

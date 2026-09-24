@@ -80,7 +80,7 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                   <button
                     type="button"
                     onClick={() => setConfirming(c)}
-                    className="mt-auto self-start text-sm font-medium text-danger-text hover:underline"
+                    className="mt-auto self-start text-sm font-medium text-danger-text hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
                   >
                     Nonaktifkan peserta
                   </button>
@@ -103,11 +103,11 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                 <form action={formAction} className="flex flex-col gap-4">
                   <fieldset className="flex flex-col gap-2">
                     <legend className="mb-1 text-sm font-medium text-text">Peserta ini siapa?</legend>
-                    <label className="flex items-center gap-2 text-sm text-text">
+                    <label className="flex items-center gap-2 text-sm text-text max-sm:min-h-[44px]">
                       <input type="radio" name="type" value="child" checked={type === "child"} onChange={() => setType("child")} />
                       Anak saya
                     </label>
-                    <label className="flex items-center gap-2 text-sm text-text">
+                    <label className="flex items-center gap-2 text-sm text-text max-sm:min-h-[44px]">
                       <input
                         type="radio"
                         name="type"

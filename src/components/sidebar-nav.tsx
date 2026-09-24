@@ -99,7 +99,7 @@ export function MobileNavStrip({ links, activePath }: { links: BottomNavLink[]; 
             key={link.href}
             href={link.href}
             prefetch={active ? false : undefined}
-            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+            className={`inline-flex min-h-[44px] shrink-0 items-center rounded-full px-4 text-xs font-semibold transition-colors ${
               active ? "bg-brand-600 text-white" : "bg-surface-muted text-text-muted"
             }`}
           >

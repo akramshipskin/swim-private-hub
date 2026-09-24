@@ -23,7 +23,7 @@ export function BentoCard({
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-base font-semibold text-text">{title}</h2>
           {href && (
-            <Link href={href} className="shrink-0 text-sm font-medium text-brand-700 hover:underline">
+            <Link href={href} className="shrink-0 text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               {linkLabel} &rarr;
             </Link>
           )}
@@ -57,7 +57,7 @@ export function Stat({ label, value, hint, tone }: { label: string; value: React
 // Baris "perlu tindakan": angka + label, disorot kalau > 0.
 export function ActionRow({ label, count, href, detail }: { label: string; count: number; href: string; detail?: string }) {
   return (
-    <Link href={href} className="flex items-center justify-between gap-3 rounded-lg px-2 py-2 hover:bg-surface-muted">
+    <Link href={href} className="flex min-h-[44px] items-center justify-between gap-3 rounded-lg px-2 py-2 hover:bg-surface-muted">
       <div className="min-w-0">
         <p className="text-sm font-medium text-text">{label}</p>
         {detail && <p className="text-xs text-text-subtle">{detail}</p>}

@@ -109,7 +109,7 @@ export default async function MemberBookingPage() {
           wajib kebaca tiap buka halaman, tinggal tap kalau perlu.
           Desktop: tetep full text, ruang gak jadi masalah di layar lebar. */}
       <details className="mb-6 rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:hidden">
-        <summary className="flex cursor-pointer list-none items-center justify-between font-medium text-text marker:content-none [&::-webkit-details-marker]:hidden">
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-medium text-text marker:content-none [&::-webkit-details-marker]:hidden">
           KEBIJAKAN PEMBATALAN
           <svg
             viewBox="0 0 20 20"

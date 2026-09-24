@@ -97,7 +97,7 @@ export default async function MemberPembayaranPage() {
                       {expired ? (
                         <>
                           <Badge tone="neutral">Kedaluwarsa</Badge>
-                          <Link href="/member/paket" className="text-sm font-medium text-brand-700 hover:underline">
+                          <Link href="/member/paket" className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                             Beli lagi &rarr;
                           </Link>
                         </>

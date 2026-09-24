@@ -72,7 +72,7 @@ export default function EditCoachProfileForm({
                 defaultChecked={profile.specialties.includes(s)}
                 className="peer sr-only"
               />
-              <span className="inline-block rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-muted transition-colors peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-700 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500">
+              <span className="inline-flex items-center max-sm:min-h-[44px] rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-muted transition-colors peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-700 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500">
                 {s}
               </span>
             </label>

@@ -47,7 +47,7 @@ export function NavBar({
           <Link
             href="/"
             prefetch={false}
-            className="flex shrink-0 items-center gap-2 text-sm font-semibold text-text"
+            className="flex min-h-[44px] shrink-0 items-center gap-2 text-sm font-semibold text-text"
           >
             <Image src="/logo.png" alt="" width={44} height={44} className="h-9 w-9 rounded-xl object-contain sm:h-11 sm:w-11" />
             <Logotype className="text-base sm:text-lg" />
