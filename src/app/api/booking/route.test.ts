@@ -10,10 +10,14 @@ const bookingCreate = vi.fn().mockResolvedValue({
   availability: { coach: { name: "Coach" }, coachId: "c1", date: new Date(), startTime: new Date() },
   package: { dependent: { name: "Anak" } },
 });
+// $queryRaw = kunci baris coach (FOR SHARE) + status aktifnya.
+const coachLock = vi.fn().mockResolvedValue([{ isActive: true }]);
+const packageFindUnique = vi.fn().mockResolvedValue(null);
 const tx = {
   availability: { findUnique: availabilityFindUnique, updateMany: availabilityUpdateMany },
-  package: { updateMany: packageUpdateMany },
+  package: { updateMany: packageUpdateMany, findUnique: packageFindUnique },
   booking: { create: bookingCreate },
+  $queryRaw: (...a: unknown[]) => coachLock(...a),
 };
 vi.mock("@/lib/prisma", () => ({
   prisma: { $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) },
@@ -28,7 +32,11 @@ function req() {
   });
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  coachLock.mockResolvedValue([{ isActive: true }]);
+  packageFindUnique.mockResolvedValue(null);
+});
 
 describe("POST /api/booking pool lock", () => {
   it("only claims the package when it belongs to the slot's pool", async () => {
@@ -36,9 +44,8 @@ describe("POST /api/booking pool lock", () => {
     packageUpdateMany.mockResolvedValue({ count: 1 });
     const res = await POST(req());
     expect(res.status).toBe(201);
-    expect(packageUpdateMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ id: "pkg-1", poolId: "pool-B" }) })
-    );
+    const where = packageUpdateMany.mock.calls[0][0].where;
+    expect(where.AND).toContainEqual({ id: "pkg-1", poolId: "pool-B" });
   });
 
   it("rejects without touching the slot when the package is for another pool", async () => {
@@ -85,5 +92,37 @@ describe("POST /api/booking guards", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const res = await POST(req());
     expect(res.status).toBe(500);
+  });
+});
+
+describe("POST /api/booking coach & masa berlaku paket", () => {
+  const SLOT_START = new Date("2026-10-20T01:00:00Z");
+
+  // Keputusan Hadi D2: slot coach yang dinonaktifkan tidak bisa dibooking.
+  it("rejects a slot whose coach was deactivated, without claiming the package", async () => {
+    availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", coachId: "c1", startTime: SLOT_START, pool: { isActive: true } });
+    coachLock.mockResolvedValue([{ isActive: false }]);
+    const res = await POST(req());
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toMatch(/tidak aktif/);
+    expect(packageUpdateMany).not.toHaveBeenCalled();
+  });
+
+  // Keputusan Hadi D1: paket harus masih berlaku saat sesinya.
+  it("only claims a package still valid at the session start", async () => {
+    availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", coachId: "c1", startTime: SLOT_START, pool: { isActive: true } });
+    packageUpdateMany.mockResolvedValue({ count: 1 });
+    await POST(req());
+    const where = packageUpdateMany.mock.calls[0][0].where;
+    expect(where.AND).toContainEqual({ OR: [{ expiredDate: null }, { expiredDate: { gt: SLOT_START } }] });
+  });
+
+  it("explains that the package ends before the session when that is why the claim failed", async () => {
+    availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", coachId: "c1", startTime: SLOT_START, pool: { isActive: true } });
+    packageUpdateMany.mockResolvedValue({ count: 0 });
+    packageFindUnique.mockResolvedValue({ memberId: "m1", expiredDate: new Date(Date.now() + 86_400_000) });
+    const res = await POST(req());
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toMatch(/berlaku sampai/);
   });
 });

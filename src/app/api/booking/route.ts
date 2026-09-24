@@ -54,10 +54,18 @@ export async function POST(request: Request) {
       // gak pernah berubah, jadi baca-dulu di sini aman dari race.
       const slot = await tx.availability.findUnique({
         where: { id: availabilityId },
-        select: { poolId: true, pool: { select: { isActive: true } } },
+        select: { poolId: true, coachId: true, startTime: true, pool: { select: { isActive: true } } },
       });
       if (!slot) {
         throw new BookingError("Slot tidak ditemukan.", 404);
+      }
+      // Coach yang dinonaktifkan admin: slotnya tidak bisa dibooking (keputusan
+      // Hadi D2). Baris coach dikunci FOR SHARE sampai transaksi selesai --
+      // menonaktifkan coach (UPDATE baris yang sama) jadi menunggu booking ini
+      // selesai, lalu ikut membatalkannya; tidak ada booking yang menyelip.
+      const [coach] = await tx.$queryRaw<{ isActive: boolean }[]>`SELECT "isActive" FROM "User" WHERE id = ${slot.coachId} FOR SHARE`;
+      if (!coach?.isActive) {
+        throw new BookingError("Coach ini sedang tidak aktif, slotnya belum bisa dibooking. Pilih coach lain.", 409);
       }
       // Kolam dinonaktifin admin: booking BARU ditolak. Booking yang udah
       // ada gak disentuh (keputusan default, bisa diubah Hadi).
@@ -65,12 +73,27 @@ export async function POST(request: Request) {
         throw new BookingError("Kolam ini sedang tidak aktif, belum bisa dibooking.", 409);
       }
 
+      // Paket harus masih berlaku SAAT SESINYA, bukan cuma hari ini (keputusan
+      // Hadi D1): paket habis besok tidak boleh dipakai untuk jadwal bulan depan.
       const claimPkg = await tx.package.updateMany({
-        where: { ...activePackageWhere(session.user.id), id: packageId, poolId: slot.poolId },
+        where: {
+          AND: [
+            activePackageWhere(session.user.id),
+            { id: packageId, poolId: slot.poolId },
+            { OR: [{ expiredDate: null }, { expiredDate: { gt: slot.startTime } }] },
+          ],
+        },
         data: { sisaSesi: { decrement: 1 } },
       });
 
       if (claimPkg.count === 0) {
+        const pkg = await tx.package.findUnique({ where: { id: packageId }, select: { memberId: true, expiredDate: true } });
+        if (pkg?.memberId === session.user.id && pkg.expiredDate && pkg.expiredDate <= slot.startTime && pkg.expiredDate >= new Date()) {
+          throw new BookingError(
+            `Paket ini berlaku sampai ${formatDateLabel(pkg.expiredDate)}, sedangkan jadwal ini setelahnya. Pilih jadwal sebelum paket berakhir.`,
+            409
+          );
+        }
         throw new BookingError(
           "Paket ini tidak bisa dipakai untuk slot ini: paketnya untuk kolam lain, kuota sesi habis, belum aktif, atau sudah kedaluwarsa.",
           409

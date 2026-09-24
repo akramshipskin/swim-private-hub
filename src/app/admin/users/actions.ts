@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { identityTakenWhere, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { createSelfDependent, createDependent } from "@/lib/dependents";
+import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 import bcrypt from "bcryptjs";
 import { randomInt } from "crypto";
 import * as XLSX from "xlsx";
@@ -333,10 +334,33 @@ export async function toggleUserActive(userId: string, nextActive: boolean) {
   // Guard server-side juga (tombolnya udah disembunyiin buat diri sendiri).
   if (userId === session.user.id && !nextActive) return;
 
-  await prisma.user.update({
+  const user = await prisma.user.update({
     where: { id: userId },
     data: { isActive: nextActive },
+    select: { role: true },
   });
+
+  // Coach dinonaktifkan: booking yang BELUM dimulai dibatalkan otomatis
+  // sebagai pembatalan admin (keputusan Hadi D2) -- sesi member kembali dan
+  // member dapat notifikasi. Sesi yang sudah lewat tidak disentuh (urusan
+  // absensi). Aman dari booking yang menyelip: booking mengunci baris coach
+  // (FOR SHARE) dan update di atas menunggunya, jadi daftar di bawah sudah
+  // mencakup booking itu; booking setelahnya ditolak karena coach nonaktif.
+  if (!nextActive && user.role === "COACH") {
+    const upcoming = await prisma.booking.findMany({
+      where: { status: "BOOKED", attended: null, availability: { coachId: userId, startTime: { gt: new Date() } } },
+      select: { id: true },
+    });
+    for (const b of upcoming) {
+      try {
+        await cancelBooking({ bookingId: b.id, actor: { role: "ADMIN" } });
+      } catch (err) {
+        // Sudah dibatalkan/ditandai di tempat lain di antaranya -- lewati.
+        if (!(err instanceof CancelError)) throw err;
+      }
+    }
+    revalidatePath("/admin/booking-overview");
+  }
 
   revalidatePath("/admin/users");
 }

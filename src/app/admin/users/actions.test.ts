@@ -142,7 +142,7 @@ describe("toggleUserActive", () => {
 
   it("updates isActive to the given value", async () => {
     await toggleUserActive("user-1", false);
-    expect(userUpdate).toHaveBeenCalledWith({ where: { id: "user-1" }, data: { isActive: false } });
+    expect(userUpdate).toHaveBeenCalledWith({ where: { id: "user-1" }, data: { isActive: false }, select: { role: true } });
   });
 });
 

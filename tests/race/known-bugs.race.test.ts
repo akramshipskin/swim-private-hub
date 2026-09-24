@@ -27,7 +27,7 @@ beforeEach(reset);
 
 describe("S1 / D1: jadwal harus ada sebelum paket kedaluwarsa", () => {
   // Bug: sistem cuma cek paket masih aktif HARI INI, bukan di hari sesinya.
-  known("K1: paket berlaku sampai besok, slot 30 hari lagi -> booking ditolak 409, sesi tidak terpotong", async () => {
+  it("K1: paket berlaku sampai besok, slot 30 hari lagi -> booking ditolak 409, sesi tidak terpotong", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 30 * 24);
     const { m, pkg } = await mkMemberWithPackage(pool.id, { expired: new Date(Date.now() + 24 * HOUR) });
@@ -57,7 +57,7 @@ describe("S1 / D1: jadwal harus ada sebelum paket kedaluwarsa", () => {
 
 describe("S2 / D2: coach yang dinonaktifkan", () => {
   // Bug: slot kosong milik coach nonaktif masih bisa dibooking member.
-  known("K2a: coach nonaktif -> slot kosongnya tidak bisa dibooking (409)", async () => {
+  it("K2a: coach nonaktif -> slot kosongnya tidak bisa dibooking (409)", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     await prisma.user.update({ where: { id: coach.id }, data: { isActive: false } });
     const slot = await mkSlot(coach.id, pool.id, 48);
@@ -68,7 +68,7 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
   });
 
   // Keputusan D2: booking yang sudah terjadwal dibatalkan OTOMATIS.
-  known("K2b: admin menonaktifkan coach -> booking masa depan dibatalkan otomatis (oleh ADMIN), sesi member kembali; sesi yang sudah lewat tidak disentuh", async () => {
+  it("K2b: admin menonaktifkan coach -> booking masa depan dibatalkan otomatis (oleh ADMIN), sesi member kembali; sesi yang sudah lewat tidak disentuh", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const future = await mkSlot(coach.id, pool.id, 48);
     const past = await mkSlot(coach.id, pool.id, -5);
@@ -84,6 +84,28 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
     const pb = await prisma.booking.findUniqueOrThrow({ where: { id: pastBooking.id } });
     expect(pb.status).toBe("BOOKED");
     expect((await prisma.package.findUniqueOrThrow({ where: { id: b.pkg.id } })).sisaSesi).toBe(7);
+  });
+
+  it("K2d: admin menonaktifkan coach BERSAMAAN 10 member booking slotnya (12 putaran) -> tidak ada booking aktif yang tersisa, sesi member utuh", async () => {
+    const sebaran: Record<string, number> = {};
+    for (let i = 0; i < 12; i++) {
+      await reset();
+      const w = i * 2;
+      const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
+      const slots = await Promise.all(Array.from({ length: 10 }, () => mkSlot(coach.id, pool.id, 48)));
+      const members = await Promise.all(slots.map(() => mkMemberWithPackage(pool.id)));
+      const rs = await settle([
+        (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => toggleUserActive(coach.id, false)); })(),
+        ...members.map(({ m, pkg }, k) => (async () => { await jitter(w); return as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slots[k].id, packageId: pkg.id }))); })()),
+      ]);
+      expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
+      expect(await prisma.booking.count({ where: { status: "BOOKED" } })).toBe(0);
+      for (const { pkg } of members) expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).sisaSesi).toBe(8);
+      expect(await checkInvariants()).toEqual([]);
+      const made = await prisma.booking.count();
+      tally(sebaran, `${made} sempat dibooking lalu dibatalkan`);
+    }
+    spread("K2d", sebaran);
   });
 
   // Pengaman: mengaktifkan kembali / menonaktifkan tidak boleh merusak coach lain.
