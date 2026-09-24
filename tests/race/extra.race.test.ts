@@ -47,18 +47,21 @@ describe("BOOKING vs aksi admin/coach", () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 12; i++) {
       await reset();
+      const w = i * 0.7; // sapuan lebar jeda (0-8 ms): kedua urutan aksi muncul; batas peralihan ada di bawah 3 ms
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
       const aff = await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
       const slots = await Promise.all(Array.from({ length: 20 }, () => mkSlot(coach.id, pool.id, 48)));
       const members = await Promise.all(slots.map(() => mkMemberWithPackage(pool.id)));
       const rs = await settle([
         as({ id: admin.id, role: "ADMIN" }, () => removeAffiliation(fd({ affiliationId: aff.id }))),
-        ...members.map(({ m, pkg }, k) => as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slots[k].id, packageId: pkg.id })))),
+        ...members.map(({ m, pkg }, k) => (async () => { await jitter(w); return as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slots[k].id, packageId: pkg.id }))); })()),
       ]);
       expect(thrownOf(rs)).toEqual([]);
       const codes = codesOf(rs);
       expect(codes.length).toBe(20);
-      expect(codes.every((c) => c === 201 || c === 409)).toBe(true);
+      // 404 sah: slot kosong ikut terhapus admin sebelum booking member sampai.
+      if (!codes.every((c) => c === 201 || c === 409 || c === 404)) console.log("E1 KODE ANEH", JSON.stringify(codes));
+      expect(codes.every((c) => c === 201 || c === 409 || c === 404)).toBe(true);
       const ok = codes.filter((c) => c === 201).length;
       expect(await prisma.availability.count({ where: { status: "BOOKED" } })).toBe(ok);
       expect(await prisma.availability.count()).toBe(ok); // yang kosong terhapus, yang dibooking selamat
@@ -73,13 +76,14 @@ describe("BOOKING vs aksi admin/coach", () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 15; i++) {
       await reset();
+      const w = 5 + i * 15; // sapuan lebar (5-215 ms): waktu batal admin beda tiap mesin
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
       const slot = await mkSlot(coach.id, pool.id, 48);
       const { m, pkg } = await mkMemberWithPackage(pool.id);
       const b = await book(m.id, slot.id, pkg.id);
       const rs = await settle([
         as({ id: admin.id, role: "ADMIN" }, () => adminCancelBooking(null, fd({ bookingId: b.id }))),
-        (async () => { await jitter(10); return as({ id: coach.id, role: "COACH" }, () => deleteAvailability(slot.id)); })(),
+        (async () => { await jitter(w); return as({ id: coach.id, role: "COACH" }, () => deleteAvailability(slot.id)); })(),
       ]);
       expect(thrownOf(rs)).toEqual([]);
       expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).sisaSesi).toBe(8);
@@ -94,12 +98,13 @@ describe("BOOKING vs aksi admin/coach", () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 15; i++) {
       await reset();
+      const w = 2 + i * 0.6; // jeda acak di kedua sisi (2-10 ms)
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
       const slots = await Promise.all(Array.from({ length: 3 }, () => mkSlot(coach.id, pool.id, 48)));
       const { m, pkg } = await mkMemberWithPackage(pool.id);
       const rs = await settle([
-        as({ id: admin.id, role: "ADMIN" }, () => updatePackage(null, fd({ packageId: pkg.id, sisaSesi: "8", expectedSisaSesi: "8", jatahCancel: "2", status: "EXPIRED", expiredDate: "" }))),
-        ...slots.map((s) => as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: s.id, packageId: pkg.id })))),
+        (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => updatePackage(null, fd({ packageId: pkg.id, sisaSesi: "8", expectedSisaSesi: "8", jatahCancel: "2", status: "EXPIRED", expiredDate: "" }))); })(),
+        ...slots.map((s) => (async () => { await jitter(w); return as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: s.id, packageId: pkg.id }))); })()),
       ]);
       expect(thrownOf(rs)).toEqual([]);
       const after = await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } });
@@ -152,6 +157,7 @@ describe("SALDO PLATFORM & PENCAIRAN", () => {
     const { net } = splitPlatformTax(15000); // komisi 15% dari Rp100.000 per sesi
     for (let i = 0; i < 10; i++) {
       await reset();
+      const w = 3 + i * 4;
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
       await prisma.walletTransaction.create({ data: { type: "PLATFORM_REVENUE", amount: 100000 } });
       const bookings = [];
@@ -161,7 +167,7 @@ describe("SALDO PLATFORM & PENCAIRAN", () => {
         bookings.push(await book(m.id, slot.id, pkg.id));
       }
       const rs = await settle([
-        ...Array.from({ length: 4 }, () => (async () => { await jitter(10); return as({ id: admin.id, role: "ADMIN" }, () => withdrawPlatform(null, fd({ revenueAmount: "30000" }))); })()),
+        ...Array.from({ length: 4 }, () => (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => withdrawPlatform(null, fd({ revenueAmount: "30000" }))); })()),
         ...bookings.map((b) => (async () => { await jitter(30); return as({ id: coach.id, role: "COACH" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" }))); })()),
       ]);
       expect(thrownOf(rs)).toEqual([]);
