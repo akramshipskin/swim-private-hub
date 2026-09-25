@@ -17,7 +17,7 @@ function Swatch({ hex }: { hex: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
       <i aria-hidden className="inline-block h-3.5 w-3.5 rounded-full border border-border/60" style={{ background: hex }} />
-      <span className="font-mono text-[11px] uppercase text-text-subtle">{hex}</span>
+      <span className="font-mono text-xs uppercase text-text-subtle">{hex}</span>
     </span>
   );
 }

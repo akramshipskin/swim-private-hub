@@ -103,7 +103,7 @@ export function ThemeScope({
       className={cn("rounded-2xl border border-border bg-background p-4 text-foreground", className)}
       style={THEME_VARS[theme]}
     >
-      <span className="mb-3 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-text-subtle">
+      <span className="mb-3 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-text-subtle">
         {THEME_LABEL[theme]}
       </span>
       <div className="flex flex-col gap-3">{children}</div>

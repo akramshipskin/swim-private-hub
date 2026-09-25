@@ -75,7 +75,7 @@ function TokenSwatch({ name, hex, use }: { name: string; hex: string; use: strin
       <span aria-hidden className="h-10 w-10 shrink-0 rounded-lg border border-border/60" style={{ background: hex }} />
       <div className="min-w-0">
         <div className="font-mono text-xs font-medium text-text">{name}</div>
-        <div className="font-mono text-[11px] uppercase text-text-subtle">{hex}</div>
+        <div className="font-mono text-xs uppercase text-text-subtle">{hex}</div>
         <div className="mt-0.5 text-xs text-text-muted">{use}</div>
       </div>
     </div>
@@ -218,7 +218,7 @@ export default function BrandGuidelineView() {
                 />
                 <p className="mt-2 text-xs text-text-subtle">lockup-on-light — latar terang/cream</p>
               </div>
-              <div className="rounded-xl border border-border bg-[#14140f] p-4">
+              <div className="rounded-xl border border-border bg-fixed-ink p-4">
                 <Image
                   src="/brand-kit/logo/png/lockup-on-dark-1040x240.png"
                   alt="Lockup swim.privatehub di latar gelap"
@@ -236,13 +236,13 @@ export default function BrandGuidelineView() {
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { src: "/brand-kit/logo/svg/mark-lime.svg", label: "mark-lime", bg: "bg-surface" },
-                { src: "/brand-kit/logo/svg/mark-cream.svg", label: "mark-cream", bg: "bg-[#c6ff3d]" },
-                { src: "/brand-kit/logo/svg/mark-white-mono.svg", label: "mark-white-mono", bg: "bg-[#14140f]" },
+                { src: "/brand-kit/logo/svg/mark-cream.svg", label: "mark-cream", bg: "bg-fixed-lime" },
+                { src: "/brand-kit/logo/svg/mark-white-mono.svg", label: "mark-white-mono", bg: "bg-fixed-ink" },
                 { src: "/brand-kit/logo/png/mark-lime-512.png", label: "mark-lime (PNG)", bg: "bg-surface" },
               ].map((m) => (
                 <div key={m.label} className={`flex flex-col items-center gap-2 rounded-xl border border-border ${m.bg} p-3`}>
                   <Image src={m.src} alt="" width={40} height={40} className="h-10 w-10" />
-                  <span className="text-center text-[11px] font-mono text-text-subtle">{m.label}</span>
+                  <span className="text-center text-xs font-mono text-text-subtle">{m.label}</span>
                 </div>
               ))}
             </div>
@@ -360,7 +360,7 @@ export default function BrandGuidelineView() {
               ].map((row) => (
                 <div key={row.meta} className="flex flex-col gap-1 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className={`${row.cls} text-text`}>{row.sample}</span>
-                  <span className="shrink-0 font-mono text-[11px] text-text-subtle">{row.meta}</span>
+                  <span className="shrink-0 font-mono text-xs text-text-subtle">{row.meta}</span>
                 </div>
               ))}
             </div>
@@ -520,14 +520,14 @@ export default function BrandGuidelineView() {
             <SubHeading>Kartu — src/components/ui/card.tsx</SubHeading>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <ThemeScope theme="light" bare className="rounded-2xl border border-border p-4">
-                <span className="mb-3 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-text-subtle">Terang</span>
+                <span className="mb-3 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-text-subtle">Terang</span>
                 <Card><CardBody>
                   <h4 className="font-semibold text-text">Kolam Renang Melati</h4>
                   <p className="mt-0.5 text-xs text-text-muted">Sisa sesi: 6 · Jatah batal: 0</p>
                 </CardBody></Card>
               </ThemeScope>
               <ThemeScope theme="dark" bare className="rounded-2xl border border-border p-4">
-                <span className="mb-3 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-text-subtle">Gelap</span>
+                <span className="mb-3 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium uppercase tracking-wide text-text-subtle">Gelap</span>
                 <Card><CardBody>
                   <h4 className="font-semibold text-text">Kolam Renang Melati</h4>
                   <p className="mt-0.5 text-xs text-text-muted">Sisa sesi: 6 · Jatah batal: 0</p>
@@ -572,7 +572,7 @@ export default function BrandGuidelineView() {
             {Object.entries(ICONS).map(([name, Icon]) => (
               <div key={name} className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface p-3">
                 <Icon className="h-6 w-6 text-text" />
-                <span className="text-center font-mono text-[10px] text-text-subtle">{name}</span>
+                <span className="text-center font-mono text-xs text-text-subtle">{name}</span>
               </div>
             ))}
           </div>
@@ -586,19 +586,19 @@ export default function BrandGuidelineView() {
               <div className="flex flex-col items-center gap-1.5">
                 {/* eslint-disable-next-line @next/next/no-img-element -- favicon.ico bukan format yang didukung next/image */}
                 <img src="/favicon.ico" alt="" width={32} height={32} className="h-8 w-8" />
-                <span className="text-[11px] text-text-subtle">favicon.ico</span>
+                <span className="text-xs text-text-subtle">favicon.ico</span>
               </div>
               <div className="flex flex-col items-center gap-1.5">
                 <Image src="/icon-192.png" alt="" width={40} height={40} className="h-10 w-10 rounded-xl" />
-                <span className="text-[11px] text-text-subtle">icon-192.png</span>
+                <span className="text-xs text-text-subtle">icon-192.png</span>
               </div>
               <div className="flex flex-col items-center gap-1.5">
                 <Image src="/apple-icon.png" alt="" width={40} height={40} className="h-10 w-10 rounded-xl" />
-                <span className="text-[11px] text-text-subtle">apple-icon.png</span>
+                <span className="text-xs text-text-subtle">apple-icon.png</span>
               </div>
               <div className="flex flex-col items-center gap-1.5">
                 <Image src="/logo.png" alt="" width={40} height={40} className="h-10 w-10 rounded-xl" />
-                <span className="text-[11px] text-text-subtle">logo.png</span>
+                <span className="text-xs text-text-subtle">logo.png</span>
               </div>
             </div>
           </div>
