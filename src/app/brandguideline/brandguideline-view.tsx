@@ -210,23 +210,23 @@ export default function BrandGuidelineView() {
             <div className="grid gap-3">
               <div className="rounded-xl border border-border bg-surface p-4">
                 <Image
-                  src="/brand-kit/logo/png/lockup-on-light-4160x960.png"
+                  src="/brand-kit/logo/png/lockup-on-light-8320x1920.png"
                   alt="Lockup swim.privatehub di latar terang"
-                  width={4160}
-                  height={960}
+                  width={8320}
+                  height={1920}
                   className="h-auto w-full max-w-[280px]"
                 />
-                <p className="mt-2 text-xs text-text-subtle">lockup-on-light — latar terang/cream (hi-res, 4160×960)</p>
+                <p className="mt-2 text-xs text-text-subtle">lockup-on-light — latar terang/cream (hi-res, 8320×1920)</p>
               </div>
               <div className="rounded-xl border border-border bg-[#14140f] p-4">
                 <Image
-                  src="/brand-kit/logo/png/lockup-on-dark-4160x960.png"
+                  src="/brand-kit/logo/png/lockup-on-dark-8320x1920.png"
                   alt="Lockup swim.privatehub di latar gelap"
-                  width={4160}
-                  height={960}
+                  width={8320}
+                  height={1920}
                   className="h-auto w-full max-w-[280px]"
                 />
-                <p className="mt-2 text-xs text-white/60">lockup-on-dark — latar charcoal (hi-res, 4160×960)</p>
+                <p className="mt-2 text-xs text-white/60">lockup-on-dark — latar charcoal (hi-res, 8320×1920)</p>
               </div>
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function BrandGuidelineView() {
                 { src: "/brand-kit/logo/svg/mark-lime.svg", label: "mark-lime (SVG)", bg: "bg-surface" },
                 { src: "/brand-kit/logo/svg/mark-cream.svg", label: "mark-cream (SVG)", bg: "bg-[#c6ff3d]" },
                 { src: "/brand-kit/logo/svg/mark-white-mono.svg", label: "mark-white-mono (SVG)", bg: "bg-[#14140f]" },
-                { src: "/brand-kit/logo/png/mark-lime-2048.png", label: "mark-lime (PNG, 2048px)", bg: "bg-surface" },
+                { src: "/brand-kit/logo/png/mark-lime-4096.png", label: "mark-lime (PNG, 4096px)", bg: "bg-surface" },
               ].map((m) => (
                 <div key={m.label} className={`flex flex-col items-center gap-2 rounded-xl border border-border ${m.bg} p-3`}>
                   <Image src={m.src} alt="" width={40} height={40} className="h-10 w-10" />
@@ -614,39 +614,39 @@ export default function BrandGuidelineView() {
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
               <Image
-                src="/brand-kit/social/profile-picture-1000.png"
+                src="/brand-kit/social/profile-picture-2000.png"
                 alt="Foto profil sosial Swim Private Hub"
-                width={1000}
-                height={1000}
+                width={2000}
+                height={2000}
                 className="h-auto w-full rounded-full border border-border"
               />
-              <p className="mt-2 text-xs text-text-subtle">profile-picture-1000.png (hi-res, 1000×1000)</p>
+              <p className="mt-2 text-xs text-text-subtle">profile-picture-2000.png (hi-res, 2000×2000)</p>
             </div>
             <div className="sm:col-span-2">
               <Image
-                src="/brand-kit/social/banner-linkedin-3168x792.png"
+                src="/brand-kit/social/banner-linkedin-6336x1584.png"
                 alt="Banner LinkedIn Swim Private Hub"
-                width={3168}
-                height={792}
+                width={6336}
+                height={1584}
                 className="h-auto w-full rounded-lg border border-border"
               />
-              <p className="mt-2 text-xs text-text-subtle">banner-linkedin-3168x792.png (hi-res, 2×)</p>
+              <p className="mt-2 text-xs text-text-subtle">banner-linkedin-6336x1584.png (hi-res, 4×)</p>
             </div>
           </div>
           <div>
             <Image
-              src="/brand-kit/social/banner-square-3000x1000.png"
+              src="/brand-kit/social/banner-square-6000x2000.png"
               alt="Banner persegi Swim Private Hub"
-              width={3000}
-              height={1000}
+              width={6000}
+              height={2000}
               className="h-auto w-full rounded-lg border border-border"
             />
-            <p className="mt-2 text-xs text-text-subtle">banner-square-3000x1000.png (hi-res, 2×) — untuk Instagram/Twitter/X</p>
+            <p className="mt-2 text-xs text-text-subtle">banner-square-6000x2000.png (hi-res, 4×) — untuk Instagram/Twitter/X</p>
           </div>
           <Note title="Riwayat produksi">
             Sebelumnya (sesi lalu) wordmark pada banner memakai fallback Helvetica/Arial bold karena font Sora tidak
             terpasang di mesin yang merender gambar. Diperbaiki di sesi ini: ketiga aset sosial di atas dirender ulang
-            hi-res (2×) dengan Sora Bold asli (diambil dari Google Fonts saat build, bukan fallback).
+            hi-res (4×) dengan Sora Bold asli (diambil dari Google Fonts saat build, bukan fallback).
           </Note>
           <p className="text-sm text-text-muted">
             Gambar bagikan (Open Graph) dibuat otomatis oleh kode lewat <code>src/app/opengraph-image.tsx</code> —
@@ -864,7 +864,7 @@ export default function BrandGuidelineView() {
                   {
                     t: "Aset logo & sosial resolusi rendah",
                     d: "Mark 512px, lockup 1040×240, aset sosial pas ukuran platform (500–1584px) — cukup untuk in-app, kurang untuk cetak/signage/posting sosial media resolusi tinggi.",
-                    s: "Selesai (sesi ini): mark & lockup dirender ulang 4× dari SVG asli (mark 2048px, lockup 4160×960), aset sosial 2× (profile 1000×1000, banner 3168×792 & 3000×1000). Sekaligus memperbaiki wordmark banner yang sebelumnya fallback font (sekarang Sora Bold asli).",
+                    s: "Selesai (sesi ini): mark & lockup dirender ulang 8× dari SVG asli (mark 4096px, lockup 8320×1920), aset sosial 4× (profile 2000×2000, banner 6336×1584 & 6000×2000). Sekaligus memperbaiki wordmark banner yang sebelumnya fallback font (sekarang Sora Bold asli).",
                   },
                 ].map((row) => (
                   <tr key={row.t} className="border-t border-border align-top">

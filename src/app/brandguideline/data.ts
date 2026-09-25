@@ -73,11 +73,11 @@ export const ASSET_INVENTORY = [
   { asset: "Ikon PWA", file: "icon-192.png, icon-512.png", size: "192/512", status: "Selesai, dipakai kode & manifest" },
   { asset: "Logo di header aplikasi", file: "logo.png", size: "512 (dirender kecil)", status: "Selesai, dipakai kode" },
   { asset: "Gambar bagikan (OG)", file: "Dibuat otomatis oleh kode (opengraph-image.tsx)", size: "1200×630", status: "Selesai, bukan file statis" },
-  { asset: "Lockup SVG/PNG", file: "brand-kit/logo/svg, logo/png", size: "4160×960 (hi-res, 4×)", status: "Selesai, untuk materi luar" },
-  { asset: "Mark SVG/PNG (3 varian)", file: "brand-kit/logo/svg, logo/png", size: "2048 (hi-res, 4×)", status: "Selesai" },
+  { asset: "Lockup SVG/PNG", file: "brand-kit/logo/svg, logo/png", size: "8320×1920 (hi-res, 8×)", status: "Selesai, untuk materi luar" },
+  { asset: "Mark SVG/PNG (3 varian)", file: "brand-kit/logo/svg, logo/png", size: "2048 (hi-res, 8×)", status: "Selesai" },
   { asset: "Token warna", file: "globals.css, colors/palette.json + palette.css", size: "—", status: "Selesai, kode menang kalau beda" },
-  { asset: "Foto profil sosial", file: "social/profile-picture-1000.png", size: "1000×1000 (hi-res, 2×)", status: "Selesai" },
-  { asset: "Banner sosial", file: "social/banner-*.png", size: "3168×792, 3000×1000 (hi-res, 2×)", status: "Selesai" },
+  { asset: "Foto profil sosial", file: "social/profile-picture-2000.png", size: "2000×2000 (hi-res, 4×)", status: "Selesai" },
+  { asset: "Banner sosial", file: "social/banner-*.png", size: "6336×1584, 6000×2000 (hi-res, 4×)", status: "Selesai" },
 ];
 
 export const CHANGELOG_ROWS = [
