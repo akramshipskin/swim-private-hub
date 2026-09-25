@@ -230,8 +230,10 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           <p className="rounded-full border border-white/30 px-4 py-1.5 text-sm">
             Les renang privat · {stats.poolCount} kolam mitra · {stats.coachCount} coach
           </p>
-          <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.08] tracking-tight text-balance drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)] sm:text-6xl">
-            Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya.
+          <h1 className="mt-5 max-w-3xl text-[length:min(7vw,3.75rem)] font-semibold leading-[1.08] tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
+            <span className="block">Aplikasi les renang privat.</span>
+            <span className="block">Pilih coach, pilih kolam,</span>
+            <span className="block">dan pilih jamnya.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-white/85">
             Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi.
