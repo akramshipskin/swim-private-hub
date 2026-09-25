@@ -51,5 +51,5 @@
     "danger": "#F29191",
     "_note": "Tema gelap TIDAK ada di versi palet sebelumnya. Ditambahkan 25 September 2026, sumber src/app/globals.css :root[data-theme=\"dark\"]."
   },
-  "_source": "Disinkronkan dengan src/app/globals.css dan brand-kit/brand-guideline-v2.html pada 25 September 2026. Kalau berbeda dari kode aplikasi, kode yang menang."
+  "_source": "Disinkronkan dengan src/app/globals.css dan halaman /brandguideline pada 25 September 2026. Kalau berbeda dari kode aplikasi, kode yang menang."
 }

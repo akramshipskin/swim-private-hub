@@ -2,13 +2,29 @@
   --brand-charcoal: #14140F;
   --brand-cream: #F6F6EE;
   --brand-lime: #C6FF3D;
-  --brand-limeDark: #6F8F1E;
-  --success: #1E8E5A;
-  --warning: #B4770E;
-  --danger: #C23B3B;
-  --info: #3D6BFF;
+  --brand-limeDark: #6F8F1E; /* Titik logotype di materi cetak/luar (file SVG lockup) -- KEPUTUSAN SENGAJA, kode aplikasi pakai --brand-500 di bawah. Lihat README.md */
+  --brand-500: #9FCC1F; /* Titik logotype di dalam aplikasi (tema terang), cincin fokus, garis aksen */
+  --success: #047857;
+  --warning: #A8480A;
+  --danger: #B91C1C;
   --textMuted: #5C5945;
-  --textSubtle: #8B8770;
+  --textSubtle: #6C6957;
   --border: #DEDACA;
   --surfaceMuted: #ECE9DC;
+}
+
+/* Tema gelap -- src/app/globals.css :root[data-theme="dark"] / prefers-color-scheme.
+   Ditambahkan 25 September 2026: tidak ada di versi kit sebelumnya. Referensi statis
+   saja (file ini tidak switch otomatis seperti aplikasi) -- pakai class .dark di
+   materi desain kalau perlu menunjukkan versi gelap. */
+.dark {
+  --brand-limeDark: #BDE85A;
+  --brand-500: #BDE85A;
+  --success: #6FD6A8;
+  --warning: #F2C14E;
+  --danger: #F29191;
+  --textMuted: #B6B3A5;
+  --textSubtle: #A09D8F;
+  --border: #4A4C44;
+  --surfaceMuted: #32342E;
 }

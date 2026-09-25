@@ -1,6 +1,8 @@
 # Brand Kit — Swim Private Hub
 
-Paket aset identitas "Lime Pulse". Panduan lengkap (visual, contoh pemakaian, gaya bahasa): buka `guideline.html` di browser.
+Paket aset identitas "Lime Pulse". Panduan lengkap (visual, contoh pemakaian, gaya bahasa,
+dibangun dari komponen & token aplikasi yang sungguhan): buka halaman **`/brandguideline`**
+di situs (rute Next.js, `src/app/brandguideline/`) — bukan file HTML statis lagi.
 
 ## Isi
 | Folder | Isi |
@@ -30,10 +32,22 @@ Paket aset identitas "Lime Pulse". Panduan lengkap (visual, contoh pemakaian, ga
 - **Logotype saja** hanya untuk ruang sangat sempit (misal tulisan di dalam
   kartu) — jangan pernah ikon saja tanpa nama, kecuali favicon dan ikon aplikasi.
 - Jangan mengganti warna, rasio, atau jarak huruf.
+- **Titik logotype (warna dot setelah "swim"): KEPUTUSAN SENGAJA, bukan
+  ketidakcocokan.** File SVG lockup di kit ini (`logo/svg/lockup-on-light.svg`)
+  memakai `#6F8F1E` (Lime Dark, enak dilihat di cetak/materi luar tanpa
+  latar). Di dalam aplikasi, titik memakai token `brand-500` (`#9FCC1F` tema
+  terang / `#BDE85A` tema gelap) karena itu yang sungguh dipakai dan sudah
+  diukur kontrasnya. **Kode yang menang untuk tampilan di dalam aplikasi**;
+  file kit boleh beda untuk keperluan cetak/luar, dan itu disengaja.
 
 ## Aturan singkat
 - Pakai `lockup-on-light` di latar terang, `lockup-on-dark` di latar gelap. Jangan ubah warna, rasio, atau jarak huruf.
-- Beri ruang kosong di sekeliling logo minimal setengah lebar tanda logo.
+- **Ruang aman (safe space):** minimal **½ lebar tanda logo** di materi luar
+  (banner, dokumen cetak, media sosial); minimal **¼ lebar tanda logo** di
+  bilah UI aplikasi (header) karena header nyatanya lebih rapat. Ini
+  keputusan final (sebelumnya README ini dan `guideline.html` versi 1.0
+  saling bertentangan: ½ vs ⅓) — beda angka per konteks di atas memang disengaja,
+  bukan galat.
 - Ukuran minimum tanda logo: 16 px (favicon); lockup: lebar 120 px.
 - Tulisan logo selalu huruf kecil: `swim.privatehub` (titik berwarna lime).
 - File PNG (lockup & social) sudah dirender memakai font Sora asli (diperbarui 18 Sep 2026).
