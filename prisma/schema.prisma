@@ -127,6 +127,10 @@ model User {
   // arsip chat tetap tersimpan tanpa identitas.
   deletionRequestedAt DateTime?
   anonymizedAt        DateTime?
+  // Kapan admin menyetujui akun ini (tombol Aktifkan, atau admin yang membuat
+  // akunnya). Null + nonaktif + COACH/POOL_OWNER = pendaftar mandiri yang
+  // MENUNGGU persetujuan -- beda dari akun yang sengaja dinonaktifkan.
+  approvedAt          DateTime?
 
   coachProfile        CoachProfile?
   dependents          Dependent[]

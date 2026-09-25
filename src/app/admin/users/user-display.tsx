@@ -53,7 +53,7 @@ export function PesertaList({ items }: { items: PesertaRow[] }) {
   const activeCount = items.filter((p) => p.pkg).length;
   return (
     <details>
-      <summary className="cursor-pointer list-none text-text marker:content-none [&::-webkit-details-marker]:hidden">
+      <summary className="cursor-pointer list-none text-text marker:content-none [&::-webkit-details-marker]:hidden max-sm:flex max-sm:min-h-[44px] max-sm:items-center">
         <span className="inline-flex items-center gap-1">
           {items.length} peserta · {activeCount} aktif
           <svg

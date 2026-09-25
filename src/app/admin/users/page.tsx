@@ -1,3 +1,4 @@
+import { isPendingApproval } from "@/lib/pending-approval";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { usablePackageConditions } from "@/lib/active-package";
@@ -104,7 +105,10 @@ export default async function AdminUsersPage() {
       <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua User</h2>
 
       {roleSections.map(({ role, label }) => {
-        const rows = users.filter((u) => u.role === role);
+        // Pendaftar baru yang menunggu persetujuan tampil paling atas.
+        const rows = users
+          .filter((u) => u.role === role)
+          .sort((a, b) => Number(isPendingApproval(b)) - Number(isPendingApproval(a)));
         if (rows.length === 0) return null;
 
         return (
@@ -126,7 +130,11 @@ export default async function AdminUsersPage() {
                             <Link href={`/admin/users/${u.id}`} className="font-semibold text-text hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                               {u.name}
                             </Link>
-                            <Badge tone={u.isActive ? "success" : "neutral"}>{u.isActive ? "Aktif" : "Nonaktif"}</Badge>
+                            {isPendingApproval(u) ? (
+                              <Badge tone="warning">Menunggu persetujuan</Badge>
+                            ) : (
+                              <Badge tone={u.isActive ? "success" : "neutral"}>{u.isActive ? "Aktif" : "Nonaktif"}</Badge>
+                            )}
                             {role === "COACH" && u.coachProfile?.certificateStatus === "APPROVED" && (
                               <Badge tone="brand">Bersertifikat</Badge>
                             )}

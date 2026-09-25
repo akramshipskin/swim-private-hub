@@ -7,11 +7,13 @@ const poolUpdate = vi.fn().mockResolvedValue({});
 const affiliationUpsert = vi.fn().mockResolvedValue({});
 const affiliationDelete = vi.fn().mockResolvedValue({ count: 1 });
 const affiliationFindUnique = vi.fn();
+const userFindFirst = vi.fn().mockResolvedValue({ id: "coach-1" });
 const removeOpenSlots = vi.fn().mockResolvedValue({ deleted: 0, closed: 0 });
 vi.mock("@/lib/availability", () => ({ removeOpenSlots: (...args: unknown[]) => removeOpenSlots(...args) }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     pool: { update: (...args: unknown[]) => poolUpdate(...args) },
+    user: { findFirst: (...args: unknown[]) => userFindFirst(...args) },
     poolAffiliation: {
       upsert: (...args: unknown[]) => affiliationUpsert(...args),
       deleteMany: (...args: unknown[]) => affiliationDelete(...args),
@@ -105,6 +107,15 @@ describe("affiliateCoach", () => {
       update: {},
       create: { poolId: "pool-1", coachId: "coach-1" },
     });
+  });
+
+  // Keputusan Hadi 25 Sep: coach nonaktif/belum disetujui tidak bisa ditambahkan.
+  it("rejects an inactive or unknown coach without creating the affiliation", async () => {
+    userFindFirst.mockResolvedValueOnce(null);
+    const result = await affiliateCoach(null, formData({ poolId: "pool-1", coachId: "coach-off" }));
+    expect(result?.error).toMatch(/belum aktif/);
+    expect(affiliationUpsert).not.toHaveBeenCalled();
+    expect(userFindFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "coach-off", role: "COACH", isActive: true } }));
   });
 });
 

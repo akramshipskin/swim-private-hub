@@ -75,6 +75,8 @@ export async function createUser(
           phone,
           passwordHash,
           role,
+          // Dibuat admin = sudah disetujui (tidak masuk daftar "menunggu").
+          approvedAt: new Date(),
           // MEMBER wajib ganti password pas login pertama -- samain kayak
           // jalur import xlsx.
           ...(role === "MEMBER" ? { mustChangePassword: true } : {}),
@@ -353,6 +355,11 @@ export async function toggleUserActive(userId: string, nextActive: boolean) {
     data: { isActive: nextActive },
     select: { role: true },
   });
+  // Aktifkan pertama kali = persetujuan pendaftaran (penanda "menunggu
+  // persetujuan" di dashboard hilang). Tidak menimpa tanggal lama.
+  if (nextActive) {
+    await prisma.user.updateMany({ where: { id: userId, approvedAt: null }, data: { approvedAt: new Date() } });
+  }
 
   // Coach dinonaktifkan: booking yang BELUM dimulai dibatalkan otomatis
   // sebagai pembatalan admin (keputusan Hadi D2) -- sesi member kembali dan

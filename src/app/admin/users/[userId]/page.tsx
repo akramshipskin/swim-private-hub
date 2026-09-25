@@ -1,3 +1,4 @@
+import { isPendingApproval } from "@/lib/pending-approval";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/require-role";
@@ -116,7 +117,11 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           {user.anonymizedAt ? (
             <Badge tone="neutral">Akun dihapus</Badge>
           ) : (
-            <Badge tone={user.isActive ? "success" : "neutral"}>{user.isActive ? "Aktif" : "Nonaktif"}</Badge>
+            isPendingApproval(user) ? (
+              <Badge tone="warning">Menunggu persetujuan</Badge>
+            ) : (
+              <Badge tone={user.isActive ? "success" : "neutral"}>{user.isActive ? "Aktif" : "Nonaktif"}</Badge>
+            )
           )}
           {/* Akun yang sudah dihapus tidak punya HP/email untuk masuk -- tombol
               aktifkan/reset password tidak ada gunanya dan membingungkan. */}

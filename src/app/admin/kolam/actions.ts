@@ -19,6 +19,10 @@ export async function affiliateCoach(
   if (!poolId || !coachId) {
     return { error: "Pilih coach dulu." };
   }
+  const coach = await prisma.user.findFirst({ where: { id: coachId, role: "COACH", isActive: true }, select: { id: true } });
+  if (!coach) {
+    return { error: "Coach tidak ditemukan atau belum aktif. Aktifkan dulu di Kelola User." };
+  }
 
   // upsert Prisma bukan atomic di DB -- 2 submit barengan bisa dua-duanya
   // nyoba create dan yang kalah kena unique constraint (P2002), yang dulu

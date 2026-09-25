@@ -144,6 +144,21 @@ describe("toggleUserActive", () => {
     await toggleUserActive("user-1", false);
     expect(userUpdate).toHaveBeenCalledWith({ where: { id: "user-1" }, data: { isActive: false }, select: { role: true } });
   });
+
+  // Penanda "menunggu persetujuan": Aktifkan pertama kali mengisi approvedAt,
+  // tanpa menimpa tanggal persetujuan lama; menonaktifkan tidak menyentuhnya.
+  it("records approval on activation only when not approved before", async () => {
+    userUpdate.mockResolvedValueOnce({ role: "COACH" });
+    await toggleUserActive("user-2", true);
+    expect(userUpdateMany).toHaveBeenCalledWith({ where: { id: "user-2", approvedAt: null }, data: { approvedAt: expect.any(Date) } });
+  });
+
+  it("does not touch approval when deactivating", async () => {
+    userUpdate.mockResolvedValueOnce({ role: "MEMBER" });
+    userUpdateMany.mockClear();
+    await toggleUserActive("user-3", false);
+    expect(userUpdateMany).not.toHaveBeenCalled();
+  });
 });
 
 describe("createUser POOL_OWNER", () => {

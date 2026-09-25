@@ -45,8 +45,10 @@ export default async function AdminKolamPage() {
         },
       },
     }),
+    // Hanya coach aktif (keputusan Hadi 25 Sep): coach nonaktif / belum
+    // disetujui tidak bisa login, jadi tidak ada gunanya ditambahkan ke kolam.
     prisma.user.findMany({
-      where: { role: "COACH" },
+      where: { role: "COACH", isActive: true },
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),
