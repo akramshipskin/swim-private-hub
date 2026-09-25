@@ -2,51 +2,54 @@
   "brand": {
     "charcoal": {
       "hex": "#14140F",
-      "rgb": [
-        20,
-        20,
-        15
-      ],
+      "rgb": [20, 20, 15],
       "use": "Warna dominan: teks utama, latar gelap, header/footer (~60%)"
     },
     "cream": {
       "hex": "#F6F6EE",
-      "rgb": [
-        246,
-        246,
-        238
-      ],
+      "rgb": [246, 246, 238],
       "use": "Latar terang, kartu, section (~30%)"
     },
     "lime": {
       "hex": "#C6FF3D",
-      "rgb": [
-        198,
-        255,
-        61
-      ],
-      "use": "Aksen & CTA saja (maks ~10% layar)"
+      "rgb": [198, 255, 61],
+      "use": "Aksen & CTA saja (maks ~10% layar). Tanda logo. Tidak pernah dipakai sebagai warna teks"
     },
     "limeDark": {
       "hex": "#6F8F1E",
-      "rgb": [
-        111,
-        143,
-        30
-      ],
-      "use": "Versi lime kontras AA untuk teks/link di latar terang"
+      "rgb": [111, 143, 30],
+      "use": "Titik logotype pada materi cetak/luar (file lockup). Di dalam aplikasi titik logotype memakai brand-500 (lihat neutral)"
     }
   },
   "semantic": {
-    "success": "#1E8E5A",
-    "warning": "#B4770E",
-    "danger": "#C23B3B",
-    "info": "#3D6BFF"
+    "success": "#047857",
+    "warning": "#A8480A",
+    "danger": "#B91C1C",
+    "_supersedes": "Versi sebelumnya (success #1E8E5A, warning #B4770E, danger #C23B3B) gagal syarat kontras 4.5:1 sebagai teks di latar putih (3.6-4.1:1). Nilai di atas = yang sungguh dipakai aplikasi (src/app/globals.css, --color-*-text), diukur 5.5-6.5:1."
   },
   "neutral": {
     "textMuted": "#5C5945",
-    "textSubtle": "#8B8770",
+    "textSubtle": "#6C6957",
     "border": "#DEDACA",
-    "surfaceMuted": "#ECE9DC"
-  }
+    "surfaceMuted": "#ECE9DC",
+    "_textSubtleNote": "Sebelumnya #8B8770 (3.6:1, gagal AA). Nilai baru 5.5:1 di latar putih."
+  },
+  "brand500": {
+    "hex": "#9FCC1F",
+    "use": "Cincin fokus, garis aksen, titik logotype di dalam aplikasi (tema terang)"
+  },
+  "dark": {
+    "background": "#191A17",
+    "surface": "#282A25",
+    "text": "#E8E6DC",
+    "textMuted": "#B6B3A5",
+    "textSubtle": "#A09D8F",
+    "brand600": "#5A7A12",
+    "brand500": "#BDE85A",
+    "success": "#6FD6A8",
+    "warning": "#F2C14E",
+    "danger": "#F29191",
+    "_note": "Tema gelap TIDAK ada di versi palet sebelumnya. Ditambahkan 25 September 2026, sumber src/app/globals.css :root[data-theme=\"dark\"]."
+  },
+  "_source": "Disinkronkan dengan src/app/globals.css dan brand-kit/brand-guideline-v2.html pada 25 September 2026. Kalau berbeda dari kode aplikasi, kode yang menang."
 }
