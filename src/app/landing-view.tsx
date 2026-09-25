@@ -7,6 +7,7 @@ import { formatRupiah } from "@/lib/format";
 import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT, MIN_WITHDRAWAL } from "@/lib/policy";
 import { AudienceTabs, FaqTabs, type AudienceSteps, type FaqGroup } from "./landing-tabs";
 import { CoachLeaders } from "./coach-leaders";
+import { LandingHeader } from "./landing-header";
 import { Reveal } from "@/components/ui/reveal";
 import { PAYMENT_METHODS } from "./landing-payments";
 
@@ -206,22 +207,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           <div className="absolute inset-x-0 bottom-0 h-[15%] bg-gradient-to-b from-transparent to-fixed-night" />
         </div>
 
-        <header className="absolute inset-x-0 top-0 mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-5 sm:gap-4">
-          <Link href="/" className="flex shrink-0 items-center gap-2 text-white max-sm:min-h-[44px]">
-            <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
-            <Logotype className="text-sm sm:text-xl" />
-          </Link>
-          <nav aria-label="Navigasi utama" className="hidden items-center gap-7 text-sm font-medium md:flex">
-            <a href="#kolam" className="hover:underline">Kolam</a>
-            <a href="#coach" className="hover:underline">Coach</a>
-            <a href="#cara-kerja" className="hover:underline">Cara Kerja</a>
-            <a href="#faq" className="hover:underline">FAQ</a>
-          </nav>
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Masuk</Link>
-            <Link href="/register" className="rounded-full bg-white px-2.5 py-2 text-sm font-semibold text-fixed-ink hover:bg-fixed-lime-100 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar</Link>
-          </div>
-        </header>
+        <LandingHeader />
 
         {/* -mt-10svh: konten ketarik naik numpang 10svh ke atas foto, jadi
             headline balik ke posisi semula sementara BG foto manjang sampai
@@ -265,7 +251,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       </section>
 
       {/* Sub-navigasi tab: lompat ke info kolam / coach */}
-      <nav aria-label="Lompat ke bagian" className="sticky top-0 z-30 border-b border-fixed-ink/10 bg-fixed-cream/95 backdrop-blur">
+      <nav aria-label="Lompat ke bagian" className="sticky top-[61px] z-30 md:hidden border-b border-fixed-ink/10 bg-fixed-cream/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3">
           {[
             ["#kolam", "Info Kolam"],
@@ -282,7 +268,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
 
       {/* Kolam: maksimal 5 kolam paling laris, lengkap dengan foto, fasilitas,
           dan jumlah member yang les di situ. */}
-      <section id="kolam" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-20">
+      <section id="kolam" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-20">
         <div className="mb-10 text-center">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kolam mitra</h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
@@ -393,7 +379,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       {/* Coach: maksimal 5 coach gaya referensi Stride "meet the leaders" --
           kartu polaroid agak miring, nyebar kiri-kanan, muncul satu per satu
           saat scroll vertikal. Info lengkap tiap coach ada di /pelatih/[id]. */}
-      <section id="coach" className="scroll-mt-20 overflow-x-clip bg-fixed-sand py-20">
+      <section id="coach" className="scroll-mt-36 md:scroll-mt-20 overflow-x-clip bg-fixed-sand py-20">
         <div className="mx-auto w-full max-w-6xl px-4">
           <div className="mb-14 text-center">
             <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
@@ -411,7 +397,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       </section>
 
       {/* Cara kerja */}
-      <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-20">
+      <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-20">
         <div className="mb-8 text-center">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Cara kerjanya</h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">Pilih peranmu untuk melihat langkahnya.</p>
@@ -429,7 +415,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       </section>
 
       {/* FAQ per peran */}
-      <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-20 px-4 pb-20">
+      <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-36 md:scroll-mt-20 px-4 pb-20">
         <h2 className="mb-3 text-center text-4xl font-semibold tracking-tight">Pertanyaan umum</h2>
         <p className="mb-8 text-center text-base text-fixed-muted">Pilih peranmu, pertanyaannya beda-beda.</p>
         <FaqTabs groups={FAQ_GROUPS} />
