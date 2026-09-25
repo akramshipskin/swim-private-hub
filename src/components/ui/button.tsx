@@ -12,13 +12,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  // hover:bg-[#0a0a08] (bukan hover:bg-brand-700) SENGAJA hex literal --
+  // hover:bg-fixed-ink-deep (bukan hover:bg-brand-700) SENGAJA warna tetap (token fixed-*, tidak ikut tema) --
   // brand-700 dibalik jadi lime TERANG di dark mode (buat teks di atas
   // surface gelap), jadi kalau dipake sebagai background hover di sini,
   // tombol malah nyala terang bukannya gelap dikit. Fixed 1 warna di kedua
   // tema, sama pola kayak CTA band di landing-view.tsx.
   primary:
-    "bg-brand-600 text-white shadow-sm hover:bg-[#0a0a08] hover:-translate-y-px active:translate-y-0 disabled:bg-disabled-bg disabled:text-disabled-text disabled:shadow-none disabled:translate-y-0",
+    "bg-brand-600 text-white shadow-sm hover:bg-fixed-ink-deep hover:-translate-y-px active:translate-y-0 disabled:bg-disabled-bg disabled:text-disabled-text disabled:shadow-none disabled:translate-y-0",
   secondary:
     "bg-surface text-text border border-border hover:bg-surface-muted active:bg-surface-muted disabled:text-disabled-text",
   danger:

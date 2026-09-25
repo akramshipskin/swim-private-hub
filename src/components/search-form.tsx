@@ -12,7 +12,7 @@ export function SearchForm({ q, placeholder }: { q: string; placeholder: string 
         placeholder={placeholder}
         className="min-w-0 flex-1"
       />
-      <button type="submit" className="min-h-[44px] rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-[#0a0a08]">Cari</button>
+      <button type="submit" className="min-h-[44px] rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-fixed-ink-deep">Cari</button>
       {q && (
         <a href="?" className="inline-flex min-h-[44px] items-center rounded-lg border border-border px-3 py-2 text-sm text-text hover:bg-surface-muted">Reset</a>
       )}

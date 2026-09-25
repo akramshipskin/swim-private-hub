@@ -117,7 +117,7 @@ export function ChatWidget() {
         }}
         aria-expanded={open}
         aria-label={open ? "Tutup chat bantuan" : "Buka chat bantuan"}
-        className="ml-auto flex h-12 min-w-12 items-center justify-center gap-2 rounded-full bg-brand-600 px-3 text-sm font-semibold text-white shadow-lg hover:bg-[#0a0a08] sm:px-4"
+        className="ml-auto flex h-12 min-w-12 items-center justify-center gap-2 rounded-full bg-brand-600 px-3 text-sm font-semibold text-white shadow-lg hover:bg-fixed-ink-deep sm:px-4"
       >
         {/* HP: ikon bulat kecil biar tidak menutupi isi halaman; layar lebar: dengan label. */}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5 shrink-0" aria-hidden="true">

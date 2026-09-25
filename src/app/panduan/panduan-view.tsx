@@ -257,12 +257,12 @@ function StepList({ steps }: { steps: Step[] }) {
     <ol className="flex flex-col gap-3">
       {steps.map((s, i) => (
         <li key={s.title} className="flex gap-3 rounded-2xl bg-white p-4">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#9FCC1F] text-sm font-bold text-[#14140F]">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-fixed-lime-500 text-sm font-bold text-fixed-ink">
             {i + 1}
           </span>
           <div className="min-w-0">
-            <p className="font-semibold text-[#14140F]">{s.title}</p>
-            <p className="mt-0.5 text-sm text-[#3D3B2E]">{s.body}</p>
+            <p className="font-semibold text-fixed-ink">{s.title}</p>
+            <p className="mt-0.5 text-sm text-fixed-ink-soft">{s.body}</p>
           </div>
         </li>
       ))}
@@ -276,25 +276,25 @@ export default function PanduanView() {
 
   return (
     // Panduan mengikuti landing: selalu tampilan terang, lebar maksimal sama.
-    <main className="flex min-h-screen flex-col bg-[#F3F2EC] text-[#14140F]" style={{ colorScheme: "light" }}>
-      <header className="border-b border-[#14140F]/10">
+    <main className="flex min-h-screen flex-col bg-fixed-cream text-fixed-ink" style={{ colorScheme: "light" }}>
+      <header className="border-b border-fixed-ink/10">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-4">
           <Link href="/" className="flex shrink-0 items-center gap-2 max-sm:min-h-[44px]">
             <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
             <Logotype className="text-sm sm:text-xl" />
           </Link>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-[#ECE9DC] sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-fixed-sand sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Masuk
             </Link>
-            <Link href="/register" className="rounded-full bg-[#14140F] px-2.5 py-2 text-sm font-semibold text-white hover:bg-black sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <Link href="/register" className="rounded-full bg-fixed-ink px-2.5 py-2 text-sm font-semibold text-white hover:bg-fixed-ink-deep sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Daftar
             </Link>
           </div>
         </div>
       </header>
 
-      <nav aria-label="Bagian panduan" className="sticky top-0 z-30 border-b border-[#14140F]/10 bg-[#F3F2EC]/95 backdrop-blur">
+      <nav aria-label="Bagian panduan" className="sticky top-0 z-30 border-b border-fixed-ink/10 bg-fixed-cream/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl gap-2 overflow-x-auto px-4 py-3">
           {TABS.map((t) => (
             <button
@@ -306,7 +306,7 @@ export default function PanduanView() {
               }}
               aria-current={t.key === tab}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
-                t.key === tab ? "bg-[#14140F] text-white" : "border border-[#14140F]/15 bg-white hover:bg-[#ECE9DC]"
+                t.key === tab ? "bg-fixed-ink text-white" : "border border-fixed-ink/15 bg-white hover:bg-fixed-sand"
               }`}
             >
               {t.label}
@@ -321,20 +321,20 @@ export default function PanduanView() {
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
               Satu aplikasi untuk orang tua, coach, dan kolam renang.
             </h1>
-            <p className="mt-5 max-w-2xl text-lg text-[#3D3B2E]">
+            <p className="mt-5 max-w-2xl text-lg text-fixed-ink-soft">
               Tidak ada lagi jadwal yang diatur lewat chat, sisa sesi yang dihitung manual, atau bagi hasil yang direkap
               di akhir bulan. Member booking sendiri, coach mengatur jadwalnya per kolam, pemilik kolam memantau
               pemakaian kolamnya, dan admin melihat semuanya dari satu dashboard.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/register" className="rounded-full bg-[#9FCC1F] px-6 py-3 text-base font-semibold hover:bg-[#E3F5B0]">
+              <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold hover:bg-fixed-lime-100">
                 Coba jadi member
               </Link>
               <a
                 href={OWNER_WA_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-[#14140F]/20 px-6 py-3 text-base font-semibold hover:bg-[#ECE9DC]"
+                className="rounded-full border border-fixed-ink/20 px-6 py-3 text-base font-semibold hover:bg-fixed-sand"
               >
                 Punya kolam renang? Hubungi kami
               </a>
@@ -343,14 +343,14 @@ export default function PanduanView() {
 
           <section className="mt-14">
             <h2 className="text-3xl font-semibold tracking-tight">Kenapa ini beda</h2>
-            <p className="mt-2 max-w-2xl text-base text-[#5C5945]">
+            <p className="mt-2 max-w-2xl text-base text-fixed-muted">
               Bukan aplikasi booking umum: setiap bagian mengikuti cara kerja les renang privat.
             </p>
             <ul className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {HIGHLIGHTS.map((h) => (
                 <li key={h.title} className="rounded-2xl bg-white p-6">
                   <h3 className="text-lg font-semibold">{h.title}</h3>
-                  <p className="mt-2 text-sm text-[#3D3B2E]">{h.body}</p>
+                  <p className="mt-2 text-sm text-fixed-ink-soft">{h.body}</p>
                 </li>
               ))}
             </ul>
@@ -358,7 +358,7 @@ export default function PanduanView() {
 
           <section className="mt-14">
             <h2 className="text-3xl font-semibold tracking-tight">Empat peran, empat tampilan</h2>
-            <p className="mt-2 max-w-2xl text-base text-[#5C5945]">
+            <p className="mt-2 max-w-2xl text-base text-fixed-muted">
               Setiap orang hanya melihat yang relevan untuknya. Klik salah satu untuk membuka panduan lengkapnya.
             </p>
             <ul className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -370,10 +370,10 @@ export default function PanduanView() {
                       setTab(g.key);
                       window.scrollTo({ top: 0 });
                     }}
-                    className="h-full w-full rounded-2xl bg-white p-6 text-left transition-colors hover:bg-[#ECE9DC]"
+                    className="h-full w-full rounded-2xl bg-white p-6 text-left transition-colors hover:bg-fixed-sand"
                   >
                     <h3 className="text-xl font-semibold">{g.title}</h3>
-                    <p className="mt-2 text-sm text-[#3D3B2E]">{g.lead}</p>
+                    <p className="mt-2 text-sm text-fixed-ink-soft">{g.lead}</p>
                     <span className="mt-3 inline-block text-sm font-semibold underline">Lihat panduan →</span>
                   </button>
                 </li>
@@ -386,18 +386,18 @@ export default function PanduanView() {
       {guide && (
         <div className="mx-auto w-full max-w-6xl px-4 py-12">
           <h1 className="text-4xl font-semibold tracking-tight">{guide.title}</h1>
-          <p className="mt-2 max-w-2xl text-base text-[#5C5945]">{guide.lead}</p>
+          <p className="mt-2 max-w-2xl text-base text-fixed-muted">{guide.lead}</p>
 
           <div className="mt-8 flex flex-col gap-10">
             {guide.sections.map((s) => (
               <section key={s.heading}>
                 <h2 className="text-2xl font-semibold tracking-tight">{s.heading}</h2>
-                {s.intro && <p className="mt-2 max-w-2xl text-base text-[#5C5945]">{s.intro}</p>}
+                {s.intro && <p className="mt-2 max-w-2xl text-base text-fixed-muted">{s.intro}</p>}
                 <div className="mt-4">
                   <StepList steps={s.steps} />
                 </div>
                 {s.note && (
-                  <p className="mt-3 rounded-2xl border border-[#9FCC1F] bg-[#F1FBDD] px-4 py-3 text-sm text-[#3D3B2E]">
+                  <p className="mt-3 rounded-2xl border border-fixed-lime-500 bg-fixed-lime-50 px-4 py-3 text-sm text-fixed-ink-soft">
                     {s.note}
                   </p>
                 )}
@@ -410,7 +410,7 @@ export default function PanduanView() {
       {tab === "install" && (
         <div className="mx-auto w-full max-w-6xl px-4 py-12">
           <h1 className="text-4xl font-semibold tracking-tight">Install ke HP</h1>
-          <p className="mt-2 max-w-2xl text-base text-[#5C5945]">
+          <p className="mt-2 max-w-2xl text-base text-fixed-muted">
             Tidak perlu Play Store atau App Store. Swim Private Hub adalah website yang bisa &ldquo;dipasang&rdquo; ke
             layar utama HP, supaya terbuka seperti aplikasi biasa tanpa mengetik alamatnya lagi.
           </p>
@@ -418,10 +418,10 @@ export default function PanduanView() {
             {INSTALL_STEPS.map((p) => (
               <li key={p.platform} className="rounded-2xl bg-white p-6">
                 <h2 className="text-lg font-semibold">{p.platform}</h2>
-                <ol className="mt-3 flex flex-col gap-2 text-sm text-[#3D3B2E]">
+                <ol className="mt-3 flex flex-col gap-2 text-sm text-fixed-ink-soft">
                   {p.steps.map((s, i) => (
                     <li key={s} className="flex gap-2">
-                      <span className="font-semibold text-[#14140F]">{i + 1}.</span>
+                      <span className="font-semibold text-fixed-ink">{i + 1}.</span>
                       <span>{s}</span>
                     </li>
                   ))}
@@ -432,7 +432,7 @@ export default function PanduanView() {
         </div>
       )}
 
-      <footer className="mt-auto bg-[#14140F] text-white">
+      <footer className="mt-auto bg-fixed-ink text-white">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Logotype className="text-lg text-white" />

@@ -147,7 +147,7 @@ export default async function MemberPaketPage() {
                               <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
                               <a
                                 href={p.payments[0].snapRedirectUrl}
-                                className="inline-flex min-h-[44px] items-center rounded-xl bg-brand-600 px-4 text-sm font-medium text-white hover:bg-[#0a0a08]"
+                                className="inline-flex min-h-[44px] items-center rounded-xl bg-brand-600 px-4 text-sm font-medium text-white hover:bg-fixed-ink-deep"
                               >
                                 Lanjut bayar
                               </a>

@@ -67,7 +67,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
             tombol sebelahnya. */}
         <form className="flex w-full items-center gap-2 sm:w-auto">
           <DatePicker name="date" defaultValue={dateStr} className="min-w-0 flex-1 sm:w-72 sm:flex-none" />
-          <button type="submit" className="min-h-[44px] shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-[#0a0a08]">Lihat</button>
+          <button type="submit" className="min-h-[44px] shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-fixed-ink-deep">Lihat</button>
         </form>
         <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, 1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Berikutnya &rarr;</Link>
       </div>

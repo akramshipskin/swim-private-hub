@@ -19,7 +19,7 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
             aria-selected={a.key === active}
             onClick={() => setActive(a.key)}
             className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
-              a.key === active ? "bg-[#14140F] text-white" : "border border-[#14140F]/15 bg-white text-[#14140F] hover:bg-[#ECE9DC]"
+              a.key === active ? "bg-fixed-ink text-white" : "border border-fixed-ink/15 bg-white text-fixed-ink hover:bg-fixed-sand"
             }`}
           >
             {a.label}
@@ -29,11 +29,11 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
       <ol role="tabpanel" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {current.steps.map((s, i) => (
           <li key={s.title} className="rounded-2xl bg-white p-6">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#9FCC1F] text-sm font-bold text-[#14140F]">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-fixed-lime-500 text-sm font-bold text-fixed-ink">
               {i + 1}
             </span>
-            <h3 className="mt-4 text-lg font-semibold text-[#14140F]">{s.title}</h3>
-            <p className="mt-2 text-sm text-[#5C5945]">{s.body}</p>
+            <h3 className="mt-4 text-lg font-semibold text-fixed-ink">{s.title}</h3>
+            <p className="mt-2 text-sm text-fixed-muted">{s.body}</p>
           </li>
         ))}
       </ol>
@@ -60,15 +60,15 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
             onClick={() => setActive(g.key)}
             className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
               g.key === active
-                ? "bg-[#14140F] text-white"
-                : "border border-[#14140F]/15 bg-white text-[#14140F] hover:bg-[#ECE9DC]"
+                ? "bg-fixed-ink text-white"
+                : "border border-fixed-ink/15 bg-white text-fixed-ink hover:bg-fixed-sand"
             }`}
           >
             {g.label}
           </button>
         ))}
       </div>
-      <div role="tabpanel" className="flex flex-col divide-y divide-[#14140F]/10 border-y border-[#14140F]/10">
+      <div role="tabpanel" className="flex flex-col divide-y divide-fixed-ink/10 border-y border-fixed-ink/10">
         {current.items.map((item) => (
           <details key={item.q} className="group py-5">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold marker:content-none max-sm:min-h-[44px]">
@@ -77,7 +77,7 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
                 +
               </span>
             </summary>
-            <p className="mt-3 text-base text-[#3D3B2E]">{item.a}</p>
+            <p className="mt-3 text-base text-fixed-ink-soft">{item.a}</p>
           </details>
         ))}
       </div>

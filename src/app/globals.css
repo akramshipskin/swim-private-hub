@@ -187,6 +187,25 @@
   --color-whatsapp-text: var(--color-whatsapp-text);
 }
 
+/* Warna TETAP (tidak ikut tema terang/gelap), dipakai halaman yang memang
+   dipaku terang: landing, panduan, halaman legal, dan tombol yang harus sama
+   di dua tema. Nilainya mengikuti palet brand-kit / token tema terang di atas.
+   Dulu ditulis sebagai hex di tiap file (text-[#14140F] dst); sekarang satu
+   sumber: ganti di sini, semua ikut. */
+@theme {
+  --color-fixed-ink: #14140f; /* charcoal brand */
+  --color-fixed-ink-soft: #3d3b2e;
+  --color-fixed-ink-deep: #0a0a08; /* hover tombol utama */
+  --color-fixed-muted: #5c5945; /* = text-muted terang */
+  --color-fixed-sand: #ece9dc; /* = surface-muted terang */
+  --color-fixed-cream: #f3f2ec; /* latar landing */
+  --color-fixed-night: #0b0c0a; /* hero landing */
+  --color-fixed-lime: #c6ff3d; /* lime brand penuh (CTA/aksen) */
+  --color-fixed-lime-500: #9fcc1f;
+  --color-fixed-lime-100: #e3f5b0;
+  --color-fixed-lime-50: #f1fbdd;
+}
+
 /* Matikan pantulan/tarik-refresh bawaan browser HP: header sticky ikut
    tertarik saat halaman ditarik dari atas. Tarik-refresh sendiri tetap ada
    lewat komponen PullToRefresh (hanya isi halaman yang bergeser). */

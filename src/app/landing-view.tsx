@@ -39,7 +39,6 @@ export type LandingCoach = {
   pools: string[];
 };
 
-const INK = "#14140F";
 const OWNER_WA_LINK = buildOwnerInquiryWaLink();
 
 const AUDIENCES: AudienceSteps[] = [
@@ -184,13 +183,13 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
 
   return (
     // Landing selalu tampilan terang (warna dipaku), tidak ikut dark mode.
-    <main className="flex min-h-screen flex-col bg-[#F3F2EC] text-[#14140F]" style={{ colorScheme: "light" }}>
+    <main className="flex min-h-screen flex-col bg-fixed-cream text-fixed-ink" style={{ colorScheme: "light" }}>
       {/* Hero setinggi layar ala Stride: foto perenang jadi BLOK ATAS
           (42svh) — bukan full-bleed — supaya posisi perenang bisa dipaku
           presisi (container pendek = object-position punya ruang gerak
           penuh). Headline + CTA di bawah foto, nyambung seamless via fade
           gelap ke bg konten. */}
-      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-[#0b0c0a] text-white">
+      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-fixed-night text-white">
         <div className="relative h-[52svh] min-h-[320px] overflow-hidden">
           <Image
             src="/images/landing/hero-swim-v2.jpg"
@@ -204,7 +203,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
               (30% terbawah, buat nyambung ke konten) + shade tipis di atas
               buat nav. 70% tengah = foto murni tanpa overlay. */}
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-[15%] bg-gradient-to-b from-transparent to-[#0b0c0a]" />
+          <div className="absolute inset-x-0 bottom-0 h-[15%] bg-gradient-to-b from-transparent to-fixed-night" />
         </div>
 
         <header className="absolute inset-x-0 top-0 mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-5 sm:gap-4">
@@ -220,7 +219,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           </nav>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Masuk</Link>
-            <Link href="/register" className="rounded-full bg-white px-2.5 py-2 text-sm font-semibold text-[#14140F] hover:bg-[#E3F5B0] sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar</Link>
+            <Link href="/register" className="rounded-full bg-white px-2.5 py-2 text-sm font-semibold text-fixed-ink hover:bg-fixed-lime-100 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar</Link>
           </div>
         </header>
 
@@ -239,7 +238,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             hariannya. Setiap sesi yang benar-benar terlaksana langsung dibagi ke kolam dan coach.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/register" className="rounded-full bg-[#9FCC1F] px-6 py-3 text-base font-semibold text-[#14140F] hover:bg-[#E3F5B0]">
+            <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold text-fixed-ink hover:bg-fixed-lime-100">
               Daftar sebagai member
             </Link>
             <a href="#kolam" className="rounded-full border border-white/40 px-6 py-3 text-base font-semibold hover:bg-white/10">
@@ -265,7 +264,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       </section>
 
       {/* Sub-navigasi tab: lompat ke info kolam / coach */}
-      <nav aria-label="Lompat ke bagian" className="sticky top-0 z-30 border-b border-[#14140F]/10 bg-[#F3F2EC]/95 backdrop-blur">
+      <nav aria-label="Lompat ke bagian" className="sticky top-0 z-30 border-b border-fixed-ink/10 bg-fixed-cream/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3">
           {[
             ["#kolam", "Info Kolam"],
@@ -273,7 +272,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             ["#cara-kerja", "Cara Kerja"],
             ["#faq", "Pertanyaan Umum"],
           ].map(([href, label]) => (
-            <a key={href} href={href} className="shrink-0 rounded-full border border-[#14140F]/15 bg-white px-4 py-2 text-sm font-semibold hover:bg-[#ECE9DC] max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <a key={href} href={href} className="shrink-0 rounded-full border border-fixed-ink/15 bg-white px-4 py-2 text-sm font-semibold hover:bg-fixed-sand max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               {label}
             </a>
           ))}
@@ -285,19 +284,19 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       <section id="kolam" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-20">
         <div className="mb-10 text-center">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kolam mitra</h2>
-          <p className="mx-auto mt-3 max-w-xl text-base text-[#5C5945]">
+          <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
             Setiap kolam punya jadwal coach, harga paket, dan fasilitasnya sendiri. Info di bawah ini langsung diambil
             dari data kolam, bukan brosur lama.
           </p>
         </div>
         {pools.length === 0 ? (
-          <p className="text-center text-[#5C5945]">Kolam mitra segera hadir.</p>
+          <p className="text-center text-fixed-muted">Kolam mitra segera hadir.</p>
         ) : (
           <div className="flex flex-col gap-6">
             {pools.map((p, i) => (
               <Reveal key={p.id} delay={i * 60}>
                 <article className="grid overflow-hidden rounded-3xl bg-white md:grid-cols-2">
-                  <div className={`relative flex min-h-64 items-end bg-[#E3F5B0] p-8 ${i % 2 === 1 ? "md:order-2" : ""}`}>
+                  <div className={`relative flex min-h-64 items-end bg-fixed-lime-100 p-8 ${i % 2 === 1 ? "md:order-2" : ""}`}>
                     {p.photos[0] && (
                       <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -306,45 +305,45 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
                       </>
                     )}
                     <div className={`relative ${p.photos[0] ? "text-white" : ""}`}>
-                      <p className={`text-sm font-medium ${p.photos[0] ? "text-white/80" : "text-[#14140F]/70"}`}>
+                      <p className={`text-sm font-medium ${p.photos[0] ? "text-white/80" : "text-fixed-ink/70"}`}>
                         Kolam mitra
                       </p>
                       <p className="text-3xl font-semibold leading-tight">{p.name}</p>
-                      <p className={`mt-1 text-sm ${p.photos[0] ? "text-white/85" : "text-[#5C5945]"}`}>
+                      <p className={`mt-1 text-sm ${p.photos[0] ? "text-white/85" : "text-fixed-muted"}`}>
                         {p.memberCount > 0 ? `${p.memberCount} member les di sini` : "Kolam baru bergabung"}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-4 p-8">
                     {p.description ? (
-                      <p className="text-base text-[#14140F]">{p.description}</p>
+                      <p className="text-base text-fixed-ink">{p.description}</p>
                     ) : (
-                      <p className="text-base text-[#5C5945]">Les renang privat dengan coach pilihan di {p.name}.</p>
+                      <p className="text-base text-fixed-muted">Les renang privat dengan coach pilihan di {p.name}.</p>
                     )}
-                    <dl className="grid grid-cols-2 gap-4 border-t border-[#14140F]/10 pt-4 text-sm">
+                    <dl className="grid grid-cols-2 gap-4 border-t border-fixed-ink/10 pt-4 text-sm">
                       <div>
-                        <dt className="text-[#5C5945]">Lokasi</dt>
+                        <dt className="text-fixed-muted">Lokasi</dt>
                         <dd className="font-semibold">{p.address ?? "Segera diinformasikan"}</dd>
                       </div>
                       <div>
-                        <dt className="text-[#5C5945]">Jam buka</dt>
+                        <dt className="text-fixed-muted">Jam buka</dt>
                         <dd className="font-semibold">{p.hours ?? "Hubungi admin"}</dd>
                       </div>
                       <div>
-                        <dt className="text-[#5C5945]">Harga mulai</dt>
+                        <dt className="text-fixed-muted">Harga mulai</dt>
                         <dd className="font-semibold">{p.fromPerSession ? `${formatRupiah(p.fromPerSession)}/sesi` : "Segera hadir"}</dd>
                       </div>
                       <div>
-                        <dt className="text-[#5C5945]">Coach</dt>
+                        <dt className="text-fixed-muted">Coach</dt>
                         <dd className="font-semibold">{p.coachCount} coach</dd>
                       </div>
                     </dl>
                     {p.facilities.length > 0 && (
                       <div>
-                        <p className="mb-2 text-sm text-[#5C5945]">Fasilitas</p>
+                        <p className="mb-2 text-sm text-fixed-muted">Fasilitas</p>
                         <ul className="flex flex-wrap gap-1.5">
                           {p.facilities.map((f) => (
-                            <li key={f} className="rounded-full bg-[#F3F2EC] px-3 py-1 text-sm">{f}</li>
+                            <li key={f} className="rounded-full bg-fixed-cream px-3 py-1 text-sm">{f}</li>
                           ))}
                         </ul>
                       </div>
@@ -373,11 +372,11 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           <h2 className="text-4xl font-semibold leading-tight tracking-tight">
             Semua pihak melihat angka yang sama.
           </h2>
-          <Link href="/register" className="mt-6 inline-block rounded-full bg-[#14140F] px-6 py-3 text-base font-semibold text-white hover:bg-black">
+          <Link href="/register" className="mt-6 inline-block rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white hover:bg-fixed-ink-deep">
             Mulai sekarang
           </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base text-[#3D3B2E]">
+        <div className="flex flex-col gap-4 text-base text-fixed-ink-soft">
           <p>
             Dulu jadwal les diatur lewat chat, sisa sesi dicatat manual, dan pembayaran dicek satu per satu. Di Swim Private
             Hub, orang tua booking sendiri jam yang masih kosong, coach melihat jadwalnya per kolam, dan kolam memantau jam
@@ -393,17 +392,17 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       {/* Coach: maksimal 5 coach gaya referensi Stride "meet the leaders" --
           kartu polaroid agak miring, nyebar kiri-kanan, muncul satu per satu
           saat scroll vertikal. Info lengkap tiap coach ada di /pelatih/[id]. */}
-      <section id="coach" className="scroll-mt-20 overflow-x-clip bg-[#ECE9DC] py-20">
+      <section id="coach" className="scroll-mt-20 overflow-x-clip bg-fixed-sand py-20">
         <div className="mx-auto w-full max-w-6xl px-4">
           <div className="mb-14 text-center">
             <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
-            <p className="mx-auto mt-3 max-w-xl text-base text-[#5C5945]">
+            <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
               Umur, jenis kelamin, keahlian, dan kolam tempat mengajar. Jadwal dan sertifikat lengkapnya bisa dilihat
               setelah kamu mendaftar.
             </p>
           </div>
           {coaches.length === 0 ? (
-            <p className="text-center text-[#5C5945]">Coach segera hadir.</p>
+            <p className="text-center text-fixed-muted">Coach segera hadir.</p>
           ) : (
             <CoachLeaders coaches={coaches} />
           )}
@@ -414,32 +413,32 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-20">
         <div className="mb-8 text-center">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Cara kerjanya</h2>
-          <p className="mx-auto mt-3 max-w-xl text-base text-[#5C5945]">Pilih peranmu untuk melihat langkahnya.</p>
+          <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">Pilih peranmu untuk melihat langkahnya.</p>
         </div>
         <AudienceTabs audiences={AUDIENCES} />
-        <p className="mt-8 text-center text-sm text-[#5C5945]">
+        <p className="mt-8 text-center text-sm text-fixed-muted">
           Punya kolam renang?{" "}
-          <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#14140F] underline">
+          <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="font-semibold text-fixed-ink underline">
             Tanya soal kemitraan
           </a>{" "}
           atau{" "}
-          <Link href="/daftar-kolam" className="font-semibold text-[#14140F] underline">daftarkan kolam</Link>. Coach bisa{" "}
-          <Link href="/daftar-coach" className="font-semibold text-[#14140F] underline">daftar di sini</Link>.
+          <Link href="/daftar-kolam" className="font-semibold text-fixed-ink underline">daftarkan kolam</Link>. Coach bisa{" "}
+          <Link href="/daftar-coach" className="font-semibold text-fixed-ink underline">daftar di sini</Link>.
         </p>
       </section>
 
       {/* FAQ per peran */}
       <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-20 px-4 pb-20">
         <h2 className="mb-3 text-center text-4xl font-semibold tracking-tight">Pertanyaan umum</h2>
-        <p className="mb-8 text-center text-base text-[#5C5945]">Pilih peranmu, pertanyaannya beda-beda.</p>
+        <p className="mb-8 text-center text-base text-fixed-muted">Pilih peranmu, pertanyaannya beda-beda.</p>
         <FaqTabs groups={FAQ_GROUPS} />
       </section>
 
       {/* CTA + footer gelap */}
-      <footer style={{ backgroundColor: INK }} className="mt-auto text-white">
+      <footer className="mt-auto bg-fixed-ink text-white">
         <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-20 text-center">
           <h2 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">Mulai les renang minggu ini</h2>
-          <Link href="/register" className="mt-8 rounded-full bg-[#9FCC1F] px-7 py-3.5 text-base font-semibold text-[#14140F] hover:bg-[#E3F5B0]">
+          <Link href="/register" className="mt-8 rounded-full bg-fixed-lime-500 px-7 py-3.5 text-base font-semibold text-fixed-ink hover:bg-fixed-lime-100">
             Daftar gratis
           </Link>
         </div>
@@ -455,7 +454,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
                   <span
                     role="img"
                     aria-label={m.label}
-                    className="block h-5 w-16 bg-[#C6FF3D]"
+                    className="block h-5 w-16 bg-fixed-lime"
                     style={{
                       WebkitMaskImage: `url(${m.logo})`,
                       maskImage: `url(${m.logo})`,
@@ -469,7 +468,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
                   />
                 </li>
               ) : (
-                <li key={m.label} className="flex h-5 w-16 items-center justify-center text-sm font-semibold tracking-wide text-[#C6FF3D]">
+                <li key={m.label} className="flex h-5 w-16 items-center justify-center text-sm font-semibold tracking-wide text-fixed-lime">
                   {m.label}
                 </li>
               ),

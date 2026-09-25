@@ -45,7 +45,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
             accept=".xlsx,.xls"
             required
             onChange={(e) => setHasFile((e.target.files?.length ?? 0) > 0)}
-            className="w-full min-w-0 max-w-full text-sm text-text max-sm:min-h-[44px] sm:w-auto file:mr-3 file:rounded-lg file:border-0 file:bg-brand-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#0a0a08]"
+            className="w-full min-w-0 max-w-full text-sm text-text max-sm:min-h-[44px] sm:w-auto file:mr-3 file:rounded-lg file:border-0 file:bg-brand-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-fixed-ink-deep"
           />
           <Button type="submit" disabled={!hasFile} loading={pending}>
             Import

@@ -33,13 +33,13 @@ function CoachHeading({ c }: { c: LandingCoach }) {
   return (
     <>
       {c.specialties[0] && (
-        <p className="text-sm font-semibold text-[#5C5945]">{c.specialties[0]}</p>
+        <p className="text-sm font-semibold text-fixed-muted">{c.specialties[0]}</p>
       )}
-      <h3 className="mt-0.5 text-2xl font-semibold leading-tight text-[#14140F]">{c.name}</h3>
-      {c.bioLine && <p className="mt-0.5 text-sm text-[#5C5945]">{c.bioLine}</p>}
+      <h3 className="mt-0.5 text-2xl font-semibold leading-tight text-fixed-ink">{c.name}</h3>
+      {c.bioLine && <p className="mt-0.5 text-sm text-fixed-muted">{c.bioLine}</p>}
       {c.certified && (
         <p className="mt-2">
-          <span className="box-decoration-clone rounded-full bg-[#E3F5B0] px-3 py-1 text-xs font-semibold leading-[1.9] text-[#14140F]">
+          <span className="box-decoration-clone rounded-full bg-fixed-lime-100 px-3 py-1 text-xs font-semibold leading-[1.9] text-fixed-ink">
             Bersertifikat{c.certificationNote ? ` · ${c.certificationNote}` : ""}
           </span>
         </p>
@@ -112,20 +112,20 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
                 diam kanan-kiri-atas simetris; pas kebuka kekunci di angka
                 yang sama dan panel yang ngisi sisanya. */}
             <div className="w-full max-w-[18.5rem] shrink-0">
-              <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-[#E3F5B0]">
+              <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-fixed-lime-100">
                 {c.photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={c.photoUrl} alt={`Foto ${c.name}`} className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
-                    <span className="text-7xl font-semibold tracking-tight text-[#14140F]/60">{initials(c.name)}</span>
+                    <span className="text-7xl font-semibold tracking-tight text-fixed-ink/60">{initials(c.name)}</span>
                   </div>
                 )}
               </div>
               <div className="coach-face">
                 <div className="px-2 pb-2 pt-4">
                   <CoachHeading c={c} />
-                  <Link href={`/pelatih/${c.id}`} className="mt-2 inline-block text-sm font-semibold text-[#14140F] underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                  <Link href={`/pelatih/${c.id}`} className="mt-2 inline-block text-sm font-semibold text-fixed-ink underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                     Lihat profil lengkap
                   </Link>
                 </div>
@@ -136,18 +136,18 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
             <div className="coach-panel">
               <div className="sm:max-h-[22.5rem] sm:w-[22rem] sm:shrink-0 sm:overflow-y-auto sm:pl-6 sm:pr-3 sm:pt-2">
                 <CoachHeading c={c} />
-                {c.bio && <p className="mt-3 text-base leading-relaxed text-[#3D3B2E]">{c.bio}</p>}
+                {c.bio && <p className="mt-3 text-base leading-relaxed text-fixed-ink-soft">{c.bio}</p>}
                 {c.specialties.length > 0 && (
                   <ul className="mt-3 flex flex-wrap gap-1.5">
                     {c.specialties.map((s) => (
-                      <li key={s} className="rounded-full bg-[#E3F5B0] px-3 py-1 text-sm text-[#14140F]">{s}</li>
+                      <li key={s} className="rounded-full bg-fixed-lime-100 px-3 py-1 text-sm text-fixed-ink">{s}</li>
                     ))}
                   </ul>
                 )}
-                <p className="mt-3 text-sm text-[#5C5945]">
-                  Mengajar di: <span className="font-semibold text-[#14140F]">{c.pools.join(", ") || "-"}</span>
+                <p className="mt-3 text-sm text-fixed-muted">
+                  Mengajar di: <span className="font-semibold text-fixed-ink">{c.pools.join(", ") || "-"}</span>
                 </p>
-                <Link href={`/pelatih/${c.id}`} className="mt-2 inline-block text-sm font-semibold text-[#14140F] underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                <Link href={`/pelatih/${c.id}`} className="mt-2 inline-block text-sm font-semibold text-fixed-ink underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                   Lihat profil lengkap
                 </Link>
               </div>
