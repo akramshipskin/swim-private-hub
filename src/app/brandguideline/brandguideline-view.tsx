@@ -238,7 +238,7 @@ export default function BrandGuidelineView() {
                 { src: "/brand-kit/logo/svg/mark-lime.svg", label: "mark-lime", bg: "bg-surface" },
                 { src: "/brand-kit/logo/svg/mark-cream.svg", label: "mark-cream", bg: "bg-fixed-lime" },
                 { src: "/brand-kit/logo/svg/mark-white-mono.svg", label: "mark-white-mono", bg: "bg-fixed-ink" },
-                { src: "/brand-kit/logo/png/mark-lime-512.png", label: "mark-lime (PNG)", bg: "bg-surface" },
+                { src: "/brand-kit/logo/png/mark-lime-512.png", label: "mark-lime (PNG, latar krem bawaan file)", bg: "bg-fixed-cream" },
               ].map((m) => (
                 <div key={m.label} className={`flex flex-col items-center gap-2 rounded-xl border border-border ${m.bg} p-3`}>
                   <Image src={m.src} alt="" width={40} height={40} className="h-10 w-10" />
@@ -258,6 +258,11 @@ export default function BrandGuidelineView() {
                 Ruang aman: <b className="text-text">½ lebar tanda</b> di materi luar (banner, dokumen cetak),{" "}
                 <b className="text-text">¼ lebar tanda</b> di bilah UI (header aplikasi) — lihat keputusan di bagian 15.
               </li>
+              <li>
+                Di latar charcoal, &quot;air&quot; (bagian bawah tanda) berwarna sama dengan latar, jadi tanda tampil sebagai
+                bentuk lime dengan tepi bergelombang. Itu perilaku semua file tanda dan lockup saat ini (termasuk
+                <code>lockup-on-dark</code>), bukan galat render — lihat temuan terbuka di bagian 15.
+              </li>
             </ul>
           </Note>
         </Section>
@@ -272,7 +277,7 @@ export default function BrandGuidelineView() {
           <div>
             <SubHeading>Warna tetap (tidak ikut tema)</SubHeading>
             <p className="mt-1 text-sm text-text-muted">
-              Landing, panduan, dan halaman hukum sengaja selalu tampil terang. Warnanya dikunci lewat token{" "}
+              Landing, panduan, dan halaman hukum tampil sama di tema terang maupun gelap (tidak ikut toggle tema). Warnanya dikunci lewat token{" "}
               <code>fixed-*</code> di <code>src/app/globals.css</code>.
             </p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -351,7 +356,7 @@ export default function BrandGuidelineView() {
             <SubHeading>Skala yang dipakai di aplikasi</SubHeading>
             <div className="mt-3 flex flex-col divide-y divide-border rounded-xl border border-border bg-surface">
               {[
-                { cls: "text-4xl font-semibold", sample: "Aplikasi les renang privat", meta: "text-4xl · 36px · judul halaman depan" },
+                { cls: "text-4xl font-semibold", sample: "Aplikasi les renang privat", meta: "text-4xl · 36px di HP, sm:text-6xl · 60px di layar lebar · judul halaman depan" },
                 { cls: "text-2xl font-semibold", sample: "Booking Coach", meta: "text-2xl · 24px · judul halaman (h1)" },
                 { cls: "text-xl font-semibold", sample: "Daftar Member", meta: "text-xl · 20px · judul kartu auth" },
                 { cls: "text-lg font-semibold", sample: "Riwayat pembayaran", meta: "text-lg · 18px · judul bagian (h2)" },
@@ -633,11 +638,6 @@ export default function BrandGuidelineView() {
               <p className="mt-2 text-xs text-text-subtle">banner-linkedin-1584x396.png</p>
             </div>
           </div>
-          <Note tone="warning" title="Catatan produksi">
-            Wordmark pada banner memakai fallback Helvetica/Arial bold, bukan Sora asli — font Sora tidak terpasang
-            di mesin yang merender gambar ini. Render ulang di komputer dengan Sora terpasang kalau butuh versi
-            dengan font asli (lihat <code>brand-kit/fonts/FONTS.md</code>).
-          </Note>
           <p className="text-sm text-text-muted">
             Gambar bagikan (Open Graph) dibuat otomatis oleh kode lewat <code>src/app/opengraph-image.tsx</code> —
             bukan file statis — muncul saat tautan situs dibagikan di WhatsApp/media sosial.
@@ -656,11 +656,6 @@ export default function BrandGuidelineView() {
             CSS yang di-override lokal (lihat <code>theme-scope.tsx</code>) — bukan mengganti atribut{" "}
             <code>data-theme</code> di <code>&lt;html&gt;</code>, jadi tidak memengaruhi toggle tema situs.
           </p>
-          <Note title="Kurangi gerak">
-            Seluruh transisi dan animasi (termasuk orb pemuatan dan scroll-reveal landing) mati otomatis kalau
-            pengguna mengaktifkan &quot;Kurangi Gerak&quot; di sistem operasinya (<code>prefers-reduced-motion</code>).
-            Konten tetap tampil penuh, hanya tanpa gerak.
-          </Note>
         </Section>
 
         {/* 10 Gerak & A11y */}
@@ -696,6 +691,11 @@ export default function BrandGuidelineView() {
               </tbody>
             </table>
           </div>
+          <Note title="Kurangi gerak">
+            Seluruh transisi dan animasi (termasuk orb pemuatan dan scroll-reveal landing) mati otomatis kalau
+            pengguna mengaktifkan &quot;Kurangi Gerak&quot; di sistem operasinya (<code>prefers-reduced-motion</code>).
+            Konten tetap tampil penuh, hanya tanpa gerak.
+          </Note>
         </Section>
 
         {/* 11 Bahasa */}
@@ -710,11 +710,8 @@ export default function BrandGuidelineView() {
               <h4 className="font-medium text-text">Headline, subheadline &amp; tagline resmi</h4>
               <p className="mt-2 text-lg font-semibold text-text">Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya.</p>
               <p className="mt-1 text-sm text-text-muted">Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi.</p>
-              <p className="mt-3 text-sm text-text-muted">
-                Tagline pendek (banner, halaman masuk/daftar, gambar berbagi): <strong className="text-text">Aplikasi les renang privat: pilih coach, kolam, dan jam.</strong>
-              </p>
               <p className="mt-2 text-xs text-text-subtle">
-                Satu sumber, dipakai identik di landing, panduan, meta, dan banner. &quot;Pilih jam&quot; berarti dari jam
+                Satu sumber, dipakai identik (tidak dipersingkat) di landing, panduan, footer, halaman masuk/daftar, gambar berbagi, dan banner. &quot;Pilih jam&quot; berarti dari jam
                 kosong coach — jangan tulis &quot;bebas pilih jadwal&quot;, dan jangan pakai &quot;pertama/nomor 1&quot;.
               </p>
             </CardBody></Card>
@@ -852,6 +849,11 @@ export default function BrandGuidelineView() {
                     t: "Warna status & teks samar: kit vs kode",
                     d: "palette.json & palette.css versi lama gagal batas kontras teks (3,4–4,1:1); aplikasi memakai versi lebih gelap (5,0–6,5:1).",
                     s: "Selesai: palette.json (25 Sep) dan palette.css (sesi ini) disinkronkan ke nilai aplikasi.",
+                  },
+                  {
+                    t: "Tanda logo di latar gelap",
+                    d: "Semua file tanda memakai air #14140F. Di latar charcoal (banner, foto profil, header gelap) bagian bawah tanda menyatu dengan latar.",
+                    s: "Terbuka: belum ada varian khusus latar gelap (misal air dengan warna lebih terang atau kontur tipis). Perlu keputusan identitas — mengubahnya berarti mengubah logo di seluruh aplikasi, jadi belum dikerjakan.",
                   },
                   {
                     t: "Dokumen guideline lama",

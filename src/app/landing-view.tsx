@@ -481,7 +481,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
               <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-contain" />
               <Logotype className="text-lg text-white" />
             </div>
-            <p>Aplikasi les renang privat: pilih coach, kolam, dan jam.</p>
+            <p>Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya.</p>
           </div>
 
           <div className="flex flex-col gap-1.5">

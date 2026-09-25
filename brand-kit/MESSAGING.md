@@ -37,7 +37,7 @@ Terakhir diperbarui: 25 September 2026 (headline & tagline baru).
 | Subheadline | 1–2 kalimat: untuk siapa + siapa melakukan apa. Sebut "anak atau kamu sendiri" supaya pemula dewasa juga merasa dituju. Jelaskan cara kerjanya, bukan janji | "Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi." |
 | Judul bagian | 2–4 kata, huruf besar hanya di awal | "Kolam mitra", "Kenalan dengan coach" |
 | Judul halaman aplikasi | Kata benda, tanpa basa-basi | "Booking Coach", "Riwayat Bayar" |
-| Tagline pendek (sosmed, banner, halaman masuk/daftar, gambar berbagi) | Maksimal 12 kata; versi ringkas headline | "Aplikasi les renang privat: pilih coach, kolam, dan jam." |
+| Tagline (sosmed, banner, footer, halaman masuk/daftar, gambar berbagi) | **Sama persis dengan headline**, tidak dipersingkat atau diparafrase | "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya." |
 | Deskripsi meta (mesin pencari, manifest PWA) | Headline + kalimat pertama subheadline | "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar." |
 
 **Catatan klaim:** "pilih jam" artinya memilih dari jam yang masih kosong di jadwal coach
