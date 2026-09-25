@@ -8,9 +8,9 @@ di situs (rute Next.js, `src/app/brandguideline/`) — bukan file HTML statis la
 | Folder | Isi |
 |---|---|
 | `logo/svg/` | Logo vektor (bisa diperbesar tanpa pecah, latar transparan): `lockup-on-light`, `lockup-on-dark`, `mark-lime`, `mark-cream`, `mark-white-mono` |
-| `logo/png/` | Logo siap pakai: lockup 1040×240 (latar cream / charcoal), tanda logo 512×512 |
-| `icons/` | favicon.ico, ikon aplikasi (32/180), ikon PWA 192 & 512 — sama persis dengan yang dipakai website |
-| `social/` | Foto profil 500×500, banner 1584×396 (LinkedIn) & 1500×500 |
+| `logo/png/` | Logo siap pakai, hi-res: lockup 4160×960 (latar cream / charcoal), tanda logo 2048×2048 |
+| `icons/` | favicon.ico, ikon aplikasi (32/180), ikon PWA 192 & 512 — sama persis dengan yang dipakai website (ukuran dipatok standar OS/PWA, bukan hi-res) |
+| `social/` | Foto profil 1000×1000, banner 3168×792 (LinkedIn) & 3000×1000 — master hi-res (2×); platform akan resize turun otomatis saat diunggah |
 | `colors/` | `palette.json` & `palette.css` (kode warna) |
 | `fonts/FONTS.md` | Font yang dipakai + link download resmi |
 
@@ -48,9 +48,13 @@ di situs (rute Next.js, `src/app/brandguideline/`) — bukan file HTML statis la
   keputusan final (sebelumnya README ini dan `guideline.html` versi 1.0
   saling bertentangan: ½ vs ⅓) — beda angka per konteks di atas memang disengaja,
   bukan galat.
-- Ukuran minimum tanda logo: 16 px (favicon); lockup: lebar 120 px.
+- Ukuran minimum tanda logo: 16 px (favicon); lockup: lebar 120 px. Ukuran maksimum
+  praktis (master hi-res tersedia): mark 2048×2048, lockup 4160×960 — aman diperbesar
+  lagi karena sumbernya vektor (SVG), tapi PNG di atas ukuran itu tinggal render ulang.
 - Tulisan logo selalu huruf kecil: `swim.privatehub` (titik berwarna lime).
-- File PNG (lockup & social) sudah dirender memakai font Sora asli (diperbarui 18 Sep 2026).
+- File PNG (lockup & social) dirender ulang memakai font Sora Bold asli (25 September
+  2026, hi-res: lockup & mark 4×, aset sosial 2×) — sebelumnya sempat jatuh ke font
+  pengganti (Helvetica/Arial) karena Sora tidak terpasang di mesin perender.
 - Catatan: file SVG lockup memakai `font-family: Sora`. Kalau dibuka di komputer
   yang belum memasang Sora, tulisannya jatuh ke font pengganti — pakai versi PNG
   untuk keperluan cetak/berbagi, atau pasang Sora dulu (lihat `fonts/FONTS.md`).
