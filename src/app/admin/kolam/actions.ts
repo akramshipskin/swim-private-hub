@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { removeOpenSlots } from "@/lib/availability";
 import { formNumber } from "@/lib/format";
+import { PENDING_APPROVAL_WHERE } from "@/lib/pending-approval";
 
 export type ActionState = { error?: string } | null;
 
@@ -67,12 +68,24 @@ export async function removeAffiliation(formData: FormData) {
 export async function togglePoolActive(poolId: string, nextActive: boolean) {
   await requireRole("ADMIN");
 
-  await prisma.pool.update({
-    where: { id: poolId },
-    data: { isActive: nextActive },
+  await prisma.$transaction(async (tx) => {
+    await tx.pool.update({
+      where: { id: poolId },
+      data: { isActive: nextActive },
+    });
+    // Keputusan Hadi 25 Sep (opsi A): menyetujui kolam sekaligus menyetujui
+    // pemiliknya -- HANYA pendaftar baru yang belum pernah disetujui. Pemilik
+    // yang sengaja dinonaktifkan (sudah punya approvedAt) tidak disentuh.
+    if (nextActive) {
+      await tx.user.updateMany({
+        where: { ...PENDING_APPROVAL_WHERE, role: "POOL_OWNER", poolOwnerships: { some: { poolId } } },
+        data: { isActive: true, approvedAt: new Date() },
+      });
+    }
   });
 
   revalidatePath("/admin/kolam");
+  revalidatePath("/admin/users");
 }
 
 export async function updatePoolShares(

@@ -23,7 +23,12 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-const txMock = { poolAffiliation: { deleteMany: (...args: unknown[]) => affiliationDelete(...args) } };
+const userUpdateMany = vi.fn().mockResolvedValue({ count: 1 });
+const txMock = {
+  poolAffiliation: { deleteMany: (...args: unknown[]) => affiliationDelete(...args) },
+  pool: { update: (...args: unknown[]) => poolUpdate(...args) },
+  user: { updateMany: (...args: unknown[]) => userUpdateMany(...args) },
+};
 
 const { updatePoolShares, affiliateCoach, removeAffiliation, togglePoolActive } = await import("./actions");
 
@@ -128,8 +133,21 @@ describe("togglePoolActive", () => {
   });
 
   it("deactivates an active pool", async () => {
+    userUpdateMany.mockClear();
     await togglePoolActive("pool-1", false);
     expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: false } });
+    expect(userUpdateMany).not.toHaveBeenCalled();
+  });
+
+  // Opsi A (Hadi 25 Sep): Setujui kolam = setujui pemiliknya juga, tapi
+  // hanya pemilik yang belum pernah disetujui (bukan yang sengaja dinonaktifkan).
+  it("approving a pool also approves its never-approved owner", async () => {
+    userUpdateMany.mockClear();
+    await togglePoolActive("pool-1", true);
+    expect(userUpdateMany).toHaveBeenCalledWith({
+      where: expect.objectContaining({ role: "POOL_OWNER", isActive: false, approvedAt: null, anonymizedAt: null, poolOwnerships: { some: { poolId: "pool-1" } } }),
+      data: { isActive: true, approvedAt: expect.any(Date) },
+    });
   });
 });
 
