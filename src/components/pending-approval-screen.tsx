@@ -39,7 +39,7 @@ export function PendingApprovalScreen({ roleLabel }: { roleLabel: string }) {
           >
             Kabari Admin via WhatsApp
           </a>
-          <Link href="/" className="text-sm font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+          <Link href="/" className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
             Kembali ke Beranda
           </Link>
         </CardBody>

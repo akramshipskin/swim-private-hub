@@ -57,11 +57,11 @@ export default function KebijakanCookiePage() {
       <p>
         Pertanyaan mengenai penggunaan cookie dapat disampaikan melalui
         WhatsApp{" "}
-        <a href="https://wa.me/6282117173124" className="text-brand-600 hover:underline">
+        <a href="https://wa.me/6282117173124" className="text-brand-700 hover:underline">
           +62 821-1717-3124
         </a>{" "}
         atau email{" "}
-        <a href="mailto:hello@swimprivatehub.biz.id" className="text-brand-600 hover:underline">
+        <a href="mailto:hello@swimprivatehub.biz.id" className="text-brand-700 hover:underline">
           hello@swimprivatehub.biz.id
         </a>
         .

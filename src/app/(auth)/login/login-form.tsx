@@ -149,7 +149,7 @@ export default function LoginForm() {
               href={buildAdminWaLink("Halo Admin Swim Private Hub, saya lupa password akun saya. No HP akun saya: ")}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block -my-3 py-3 font-medium text-brand-600 hover:underline"
+              className="inline-block -my-3 py-3 font-medium text-brand-700 hover:underline"
             >
               Minta reset ke admin
             </a>
@@ -158,7 +158,7 @@ export default function LoginForm() {
             Belum punya akun?{" "}
             <a
               href="/register"
-              className="inline-block -my-3 py-3 font-medium text-brand-600 hover:underline"
+              className="inline-block -my-3 py-3 font-medium text-brand-700 hover:underline"
             >
               Daftar
             </a>

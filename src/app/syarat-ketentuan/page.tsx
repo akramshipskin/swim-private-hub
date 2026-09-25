@@ -44,7 +44,7 @@ export default function SyaratKetentuanPage() {
         Pembayaran diproses melalui Midtrans selaku penyedia gerbang pembayaran
         resmi (virtual account, QRIS, dompet digital, serta kartu debit/kredit).
         Ketentuan mengenai pengembalian dana diatur secara terpisah pada{" "}
-        <a href="/kebijakan-pengembalian" className="text-brand-600 hover:underline">
+        <a href="/kebijakan-pengembalian" className="text-brand-700 hover:underline">
           Kebijakan Pengembalian
         </a>
         .
@@ -80,11 +80,11 @@ export default function SyaratKetentuanPage() {
       <p>
         Pertanyaan mengenai Syarat &amp; Ketentuan dapat disampaikan melalui
         WhatsApp{" "}
-        <a href="https://wa.me/6282117173124" className="text-brand-600 hover:underline">
+        <a href="https://wa.me/6282117173124" className="text-brand-700 hover:underline">
           +62 821-1717-3124
         </a>{" "}
         atau email{" "}
-        <a href="mailto:hello@swimprivatehub.biz.id" className="text-brand-600 hover:underline">
+        <a href="mailto:hello@swimprivatehub.biz.id" className="text-brand-700 hover:underline">
           hello@swimprivatehub.biz.id
         </a>
         .

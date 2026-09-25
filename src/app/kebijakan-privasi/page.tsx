@@ -103,7 +103,7 @@ export default function KebijakanPrivasiPage() {
         Aplikasi menggunakan sesi masuk (cookie) serta penyimpanan lokal/sesi
         peramban untuk mendukung fungsi tertentu, termasuk preferensi tampilan.
         Penjelasan lebih lanjut tersedia pada{" "}
-        <a href="/kebijakan-cookie" className="text-brand-600 hover:underline">
+        <a href="/kebijakan-cookie" className="text-brand-700 hover:underline">
           Kebijakan Cookie
         </a>
         .
@@ -148,11 +148,11 @@ export default function KebijakanPrivasiPage() {
       <p>
         Pertanyaan mengenai privasi atau data pribadi dapat disampaikan melalui
         WhatsApp{" "}
-        <a href="https://wa.me/6282117173124" className="text-brand-600 hover:underline">
+        <a href="https://wa.me/6282117173124" className="text-brand-700 hover:underline">
           +62 821-1717-3124
         </a>{" "}
         atau email{" "}
-        <a href="mailto:hello@swimprivatehub.biz.id" className="text-brand-600 hover:underline">
+        <a href="mailto:hello@swimprivatehub.biz.id" className="text-brand-700 hover:underline">
           hello@swimprivatehub.biz.id
         </a>
         .

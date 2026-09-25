@@ -96,7 +96,7 @@ export default async function KeamananPage() {
                   <div className="rounded-xl border border-border bg-surface-muted px-3 py-3">
                     <p className="text-xs text-text-subtle">Kunci penyiapan ({account})</p>
                     <p className="mt-1 break-all font-mono text-base tracking-wider text-text">{secretGroups}</p>
-                    <a href={otpauthUrl(setupSecret, account)} className="mt-2 inline-block text-sm font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                    <a href={otpauthUrl(setupSecret, account)} className="mt-2 inline-block text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                       Buka di aplikasi authenticator (dari HP)
                     </a>
                   </div>

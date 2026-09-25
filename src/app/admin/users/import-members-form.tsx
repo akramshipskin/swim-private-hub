@@ -25,7 +25,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
         </p>
         <a
           href="/api/admin/import-template"
-          className="mb-4 inline-block text-xs font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+          className="mb-4 inline-block text-xs font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
         >
           Download Template
         </a>

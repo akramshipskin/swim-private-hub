@@ -31,19 +31,21 @@
 
   --color-text: #14140f;
   --color-text-muted: #5c5945;
-  --color-text-subtle: #8b8770;
+  --color-text-subtle: #6c6957; /* >= 4.5:1 di surface, background, surface-muted (WCAG AA) */
 
   --color-success-bg: #ecfdf5;
   --color-success-text: #047857;
   --color-warning-bg: #fffbeb;
-  --color-warning-text: #b45309;
+  --color-warning-text: #a8480a; /* >= 4.5:1 juga di surface-muted */
   --color-danger-bg: #fef2f2;
   --color-danger-text: #b91c1c;
 
-  --color-disabled-bg: #cbd5e1;
-  --color-disabled-text: #94a3b8;
+  --color-disabled-bg: #dedbd0; /* abu hangat, sepalet dengan surface (dulu slate kebiruan) */
+  --color-disabled-text: #8e8a78;
 
-  --color-whatsapp: #25d366;
+  /* Hijau WA versi gelap: teks putih di atasnya 5.4:1 (#25d366 asli cuma 2:1). */
+  --color-whatsapp: #0f7a3c;
+  --color-whatsapp-text: #0f7a3c;
 }
 
 /* Dark mode: ikut OS by default (media query), atau override manual lewat
@@ -82,7 +84,7 @@
 
     --color-text: #e8e6dc;
     --color-text-muted: #b6b3a5;
-    --color-text-subtle: #8f8c80;
+    --color-text-subtle: #a09d8f; /* >= 4.5:1 (WCAG AA) */
 
     --color-success-bg: #1b3a2d;
     --color-success-text: #6fd6a8;
@@ -98,7 +100,8 @@
        atas bg gelap -- "pedes di mata" kalau dipake mentah kayak di
        light mode. Diredupin dikit (deeper + sedikit desaturated),
        teks putih di atasnya masih kontras jelas. */
-    --color-whatsapp: #1d9e56;
+    --color-whatsapp: #0f7a3c;
+    --color-whatsapp-text: #3fcf7c; /* teks hijau di kartu gelap >= 6:1 */
   }
 }
 
@@ -128,7 +131,7 @@
 
   --color-text: #e8e6dc;
   --color-text-muted: #b6b3a5;
-  --color-text-subtle: #8f8c80;
+  --color-text-subtle: #a09d8f; /* >= 4.5:1 (WCAG AA) */
 
   --color-success-bg: #1b3a2d;
   --color-success-text: #6fd6a8;
@@ -140,7 +143,8 @@
   --color-disabled-bg: #3d3f39;
   --color-disabled-text: #7c7e76;
 
-  --color-whatsapp: #1d9e56;
+  --color-whatsapp: #0f7a3c;
+  --color-whatsapp-text: #3fcf7c;
 }
 
 @theme inline {
@@ -180,6 +184,7 @@
   --color-disabled-text: var(--color-disabled-text);
 
   --color-whatsapp: var(--color-whatsapp);
+  --color-whatsapp-text: var(--color-whatsapp-text);
 }
 
 /* Matikan pantulan/tarik-refresh bawaan browser HP: header sticky ikut
@@ -311,5 +316,17 @@ p {
     max-height: none;
     max-width: 22rem;
     opacity: 1;
+  }
+}
+
+/* HP/OS dengan "kurangi gerakan": animasi & transisi dipercepat nyaris nol
+   (spinner, efek muncul, hover) -- konten tetap tampil, hanya tanpa gerak. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

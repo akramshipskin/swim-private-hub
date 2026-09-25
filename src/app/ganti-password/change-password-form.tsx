@@ -80,7 +80,7 @@ export default function ChangePasswordForm({
           <button
             type="button"
             onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "" }])}
-            className="self-start text-sm font-medium text-brand-600 hover:underline max-sm:min-h-[44px]"
+            className="self-start text-sm font-medium text-brand-700 hover:underline max-sm:min-h-[44px]"
           >
             + Tambah peserta lain
           </button>

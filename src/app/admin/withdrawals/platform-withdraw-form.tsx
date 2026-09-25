@@ -20,7 +20,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
         </Field>
       </div>
       <label className="flex items-center gap-2 text-sm text-text max-sm:min-h-[44px]">
-        <input type="checkbox" name="includeTax" className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-500" />
+        <input type="checkbox" name="includeTax" className="h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-500" />
         Tarik juga saldo pajak (PPN) sekaligus — {formatRupiah(Math.max(0, tax))}
       </label>
       <div className="flex flex-wrap items-center gap-3">

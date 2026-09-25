@@ -190,15 +190,15 @@ export default function RegisterPoolForm() {
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
                 required
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-500 max-sm:h-5 max-sm:w-5"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-700 focus:ring-brand-500 max-sm:h-5 max-sm:w-5"
               />
               <span>
                 Saya setuju dengan{" "}
-                <a href="/syarat-ketentuan" target="_blank" className="font-medium text-brand-600 hover:underline">
+                <a href="/syarat-ketentuan" target="_blank" className="font-medium text-brand-700 hover:underline">
                   Syarat &amp; Ketentuan
                 </a>{" "}
                 dan{" "}
-                <a href="/kebijakan-privasi" target="_blank" className="font-medium text-brand-600 hover:underline">
+                <a href="/kebijakan-privasi" target="_blank" className="font-medium text-brand-700 hover:underline">
                   Kebijakan Privasi
                 </a>
                 .
@@ -218,7 +218,7 @@ export default function RegisterPoolForm() {
 
           <p className="mt-5 text-center text-sm text-text-muted">
             Sudah punya akun?{" "}
-            <a href="/login" className="font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <a href="/login" className="font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Masuk
             </a>
           </p>

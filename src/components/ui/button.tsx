@@ -18,13 +18,13 @@ const variantClasses: Record<Variant, string> = {
   // tombol malah nyala terang bukannya gelap dikit. Fixed 1 warna di kedua
   // tema, sama pola kayak CTA band di landing-view.tsx.
   primary:
-    "bg-brand-600 text-white shadow-sm hover:bg-[#0a0a08] hover:-translate-y-px active:translate-y-0 disabled:bg-disabled-bg disabled:shadow-none disabled:translate-y-0",
+    "bg-brand-600 text-white shadow-sm hover:bg-[#0a0a08] hover:-translate-y-px active:translate-y-0 disabled:bg-disabled-bg disabled:text-disabled-text disabled:shadow-none disabled:translate-y-0",
   secondary:
     "bg-surface text-text border border-border hover:bg-surface-muted active:bg-surface-muted disabled:text-disabled-text",
   danger:
     "bg-surface text-danger-text border border-danger-text/25 hover:bg-danger-bg active:bg-danger-bg disabled:text-danger-text/40 disabled:border-danger-text/15",
   ghost:
-    "bg-transparent text-brand-600 hover:bg-brand-50 active:bg-brand-100 disabled:text-disabled-text",
+    "bg-transparent text-brand-700 hover:bg-brand-50 active:bg-brand-100 disabled:text-disabled-text",
 };
 
 const sizeClasses: Record<Size, string> = {

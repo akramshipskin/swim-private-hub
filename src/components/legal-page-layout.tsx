@@ -34,14 +34,14 @@ export function LegalPageLayout({
             />
             <Logotype className="text-sm" />
           </Link>
-          <Link href="/" className="text-sm font-medium text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+          <Link href="/" className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
             ← Beranda
           </Link>
         </div>
       </header>
 
       <article className="mx-auto max-w-3xl px-4 py-10">
-        <span className="text-xs font-bold uppercase tracking-wide text-brand-600">Dokumen Legal</span>
+        <span className="text-xs font-bold uppercase tracking-wide text-brand-700">Dokumen Legal</span>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-text text-wrap-balance">{title}</h1>
         <p className="mt-1 text-sm text-text-subtle">Terakhir diperbarui: {updatedAt}</p>
 
@@ -53,7 +53,7 @@ export function LegalPageLayout({
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-3xl flex-wrap gap-x-6 gap-y-2 px-4 text-xs text-text-subtle">
           {LEGAL_LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="hover:text-brand-600 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <Link key={l.href} href={l.href} className="hover:text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               {l.label}
             </Link>
           ))}

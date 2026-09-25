@@ -33,7 +33,7 @@ export function CookieConsentBanner() {
         <p className="text-xs text-text-muted sm:text-sm">
           Kami pakai cookie login &amp; local storage tema seperlunya agar aplikasi
           ini jalan.{" "}
-          <a href="/kebijakan-cookie" className="font-medium text-brand-600 hover:underline">
+          <a href="/kebijakan-cookie" className="font-medium text-brand-700 hover:underline">
             Kebijakan Cookie
           </a>
         </p>

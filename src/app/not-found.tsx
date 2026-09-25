@@ -21,7 +21,7 @@ export default function NotFound() {
 
       <Card className="w-full max-w-sm">
         <CardBody className="flex flex-col items-center text-center">
-          <span className="mb-2 text-5xl font-bold tracking-tight text-brand-600">404</span>
+          <span className="mb-2 text-5xl font-bold tracking-tight text-brand-700">404</span>
           <h1 className="mb-1 text-xl font-semibold text-text">Halaman Tidak Ditemukan</h1>
           <p className="mb-6 text-sm text-text-muted">
             Halaman yang kamu cari tidak ada atau sudah dipindah. Cek lagi alamatnya,

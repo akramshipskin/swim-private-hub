@@ -14,7 +14,7 @@ export default function ReplyForm({ threadId }: { threadId: string }) {
       <Textarea id="reply-content" name="content" rows={3} maxLength={1000} placeholder="Tulis balasan…" required />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <label className="flex items-center gap-2 text-sm text-text-muted max-sm:min-h-[44px]">
-          <input type="checkbox" name="resolve" defaultChecked className="h-4 w-4 rounded border-border text-brand-600 focus:ring-brand-500" /> Tandai selesai
+          <input type="checkbox" name="resolve" defaultChecked className="h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-500" /> Tandai selesai
         </label>
         <Button type="submit" size="sm" loading={pending}>Kirim balasan</Button>
       </div>
