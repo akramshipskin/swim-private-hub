@@ -38,7 +38,7 @@ export default async function OpengraphImage() {
           Swim Private Hub
         </div>
         <div style={{ display: "flex", marginTop: 16, fontSize: 28, color: "rgba(255,255,255,0.85)" }}>
-          Booking jadwal renang dengan coach favoritmu
+          Aplikasi les renang privat: pilih coach, kolam, dan jam.
         </div>
       </div>
     ),

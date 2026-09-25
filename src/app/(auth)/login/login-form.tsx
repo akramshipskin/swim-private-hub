@@ -83,7 +83,7 @@ export default function LoginForm() {
           priority
         />
         <p className="text-lg text-text"><Logotype /></p>
-        <p className="text-sm text-text-muted">Booking jadwal renang dengan coach favoritmu</p>
+        <p className="text-sm text-text-muted">Aplikasi les renang privat: pilih coach, kolam, dan jam.</p>
       </div>
 
       <Card className="w-full max-w-sm">

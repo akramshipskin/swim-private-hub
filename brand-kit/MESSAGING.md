@@ -4,7 +4,7 @@ Acuan wajib untuk semua tulisan yang dilihat pengguna: landing page, panduan,
 aplikasi (semua peran), notifikasi, pesan WhatsApp, dan materi promosi. Tujuannya
 satu: siapa pun yang menulis, hasilnya terdengar seperti produk yang sama.
 
-Terakhir diperbarui: 18 September 2026.
+Terakhir diperbarui: 25 September 2026 (headline & tagline baru).
 
 ---
 
@@ -33,11 +33,23 @@ Terakhir diperbarui: 18 September 2026.
 
 | Tempat | Aturan | Contoh |
 |---|---|---|
-| Headline utama (landing) | 1 kalimat, maksimal 8 kata, menyebut lebih dari satu peran | "Satu aplikasi untuk orang tua, coach, dan kolam renang." |
-| Subheadline | 1–2 kalimat, jelaskan cara kerjanya, bukan janji | "Orang tua booking jam yang masih kosong, coach mengatur jadwalnya sendiri…" |
+| Headline utama (landing, panduan) | 1 kalimat, maksimal 12 kata. Sebut **apa produknya** (aplikasi les renang privat) dan **apa yang bisa dilakukan** (pilih coach, kolam, jam). Tanpa superlatif ("pertama", "nomor 1", "terbaik") | "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya." |
+| Subheadline | 1–2 kalimat: untuk siapa + siapa melakukan apa. Sebut "anak atau kamu sendiri" supaya pemula dewasa juga merasa dituju. Jelaskan cara kerjanya, bukan janji | "Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi." |
 | Judul bagian | 2–4 kata, huruf besar hanya di awal | "Kolam mitra", "Kenalan dengan coach" |
 | Judul halaman aplikasi | Kata benda, tanpa basa-basi | "Booking Coach", "Riwayat Bayar" |
-| Tagline pendek (sosmed, footer) | Maksimal 12 kata | "Les renang privat: booking, jadwal, dan bagi hasil dalam satu aplikasi." |
+| Tagline pendek (sosmed, banner, halaman masuk/daftar, gambar berbagi) | Maksimal 12 kata; versi ringkas headline | "Aplikasi les renang privat: pilih coach, kolam, dan jam." |
+| Deskripsi meta (mesin pencari, manifest PWA) | Headline + kalimat pertama subheadline | "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar." |
+
+**Catatan klaim:** "pilih jam" artinya memilih dari jam yang masih kosong di jadwal coach
+(bukan jam apa saja). Jangan tulis "bebas pilih jadwal". Riset pasar per 25 Sep 2026:
+belum ditemukan aplikasi les renang privat dengan tiga peran seperti ini (yang ada
+klub/kursus renang biasa), tetapi itu **bukan bukti** — jadi "aplikasi les renang
+privat" dipakai sebagai nama kategori, bukan klaim "pertama/satu-satunya".
+
+**Satu sumber:** headline, subheadline, dan tagline di atas harus identik di
+landing (`landing-view.tsx`), panduan (`panduan-view.tsx`), meta (`layout.tsx`,
+`manifest.json`), gambar berbagi (`opengraph-image.tsx`), halaman masuk/daftar,
+halaman `/brandguideline`, dan banner sosmed di `brand-kit/social/`.
 
 ## 3. Nada bicara
 

@@ -319,12 +319,10 @@ export default function PanduanView() {
         <div className="mx-auto w-full max-w-6xl px-4 py-12">
           <section>
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
-              Satu aplikasi untuk orang tua, coach, dan kolam renang.
+              Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya.
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-fixed-ink-soft">
-              Tidak ada lagi jadwal yang diatur lewat chat, sisa sesi yang dihitung manual, atau bagi hasil yang direkap
-              di akhir bulan. Member booking sendiri, coach mengatur jadwalnya per kolam, pemilik kolam memantau
-              pemakaian kolamnya, dan admin melihat semuanya dari satu dashboard.
+              Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold hover:bg-fixed-lime-100">

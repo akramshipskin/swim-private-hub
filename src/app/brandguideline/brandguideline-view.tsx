@@ -165,7 +165,7 @@ export default function BrandGuidelineView() {
           id="esensi"
           eyebrow="01 · Esensi Brand"
           title="Platform renang privat yang tenang, modern, dan bisa dipercaya"
-          lede="Swim Private Hub mempertemukan member, coach renang privat, dan pemilik kolam dalam satu aplikasi."
+          lede="Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi."
         >
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px] text-sm">
@@ -351,7 +351,7 @@ export default function BrandGuidelineView() {
             <SubHeading>Skala yang dipakai di aplikasi</SubHeading>
             <div className="mt-3 flex flex-col divide-y divide-border rounded-xl border border-border bg-surface">
               {[
-                { cls: "text-4xl font-semibold", sample: "Satu aplikasi untuk semua", meta: "text-4xl · 36px · judul halaman depan" },
+                { cls: "text-4xl font-semibold", sample: "Aplikasi les renang privat", meta: "text-4xl · 36px · judul halaman depan" },
                 { cls: "text-2xl font-semibold", sample: "Booking Coach", meta: "text-2xl · 24px · judul halaman (h1)" },
                 { cls: "text-xl font-semibold", sample: "Daftar Member", meta: "text-xl · 20px · judul kartu auth" },
                 { cls: "text-lg font-semibold", sample: "Riwayat pembayaran", meta: "text-lg · 18px · judul bagian (h2)" },
@@ -706,6 +706,18 @@ export default function BrandGuidelineView() {
           lede='Sapa dengan "kamu", tulis apa adanya, sebut akibatnya untuk pengguna — bukan istilah teknis.'
         >
           <div className="grid gap-3 sm:grid-cols-2">
+            <Card className="sm:col-span-2"><CardBody>
+              <h4 className="font-medium text-text">Headline, subheadline &amp; tagline resmi</h4>
+              <p className="mt-2 text-lg font-semibold text-text">Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya.</p>
+              <p className="mt-1 text-sm text-text-muted">Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi.</p>
+              <p className="mt-3 text-sm text-text-muted">
+                Tagline pendek (banner, halaman masuk/daftar, gambar berbagi): <strong className="text-text">Aplikasi les renang privat: pilih coach, kolam, dan jam.</strong>
+              </p>
+              <p className="mt-2 text-xs text-text-subtle">
+                Satu sumber, dipakai identik di landing, panduan, meta, dan banner. &quot;Pilih jam&quot; berarti dari jam
+                kosong coach — jangan tulis &quot;bebas pilih jadwal&quot;, dan jangan pakai &quot;pertama/nomor 1&quot;.
+              </p>
+            </CardBody></Card>
             <Card><CardBody>
               <h4 className="font-medium text-text">Istilah baku</h4>
               <p className="mt-1 text-sm text-text-muted">

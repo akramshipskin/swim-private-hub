@@ -1,7 +1,7 @@
 {
   "name": "Swim Private Hub",
   "short_name": "SPH Booking",
-  "description": "Booking jadwal renang dengan coach favoritmu.",
+  "description": "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f6f6ee",
