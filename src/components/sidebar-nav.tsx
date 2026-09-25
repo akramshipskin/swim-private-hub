@@ -47,7 +47,7 @@ export function SidebarNav({
       {groups.map(([group, items]) => (
         <div key={group} className="flex flex-col gap-0.5">
           {group && (
-            <p className="mb-1 px-3 text-[11px] font-bold uppercase tracking-wide text-text-muted">
+            <p className="mb-1 px-3 text-xs font-bold uppercase tracking-wide text-text-muted">
               {group}
             </p>
           )}

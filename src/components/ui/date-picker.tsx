@@ -191,7 +191,7 @@ export function DatePicker({
             </button>
           </div>
 
-          <div className="mb-1 grid grid-cols-7 justify-items-center gap-1 text-center text-[11px] font-medium text-text-subtle">
+          <div className="mb-1 grid grid-cols-7 justify-items-center gap-1 text-center text-xs font-medium text-text-subtle">
             {DAY_LABELS.map((d) => (
               <span key={d}>{d}</span>
             ))}

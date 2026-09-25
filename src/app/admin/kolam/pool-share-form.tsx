@@ -22,7 +22,10 @@ export default function PoolShareForm({
   const edit = useEditLock(pending, state?.error);
   const [platform, setPlatform] = useState(commissionPercent);
   const [coach, setCoach] = useState(coachSharePercent);
+  // Kolom kosong = NaN (bukan 0), supaya komisi 0% tidak tersimpan diam-diam.
   const pool = 100 - platform - coach;
+  const blank = !Number.isFinite(platform) || !Number.isFinite(coach);
+  const shown = (v: number) => (Number.isFinite(v) ? v : "");
 
   function reset() {
     setPlatform(commissionPercent);
@@ -30,19 +33,19 @@ export default function PoolShareForm({
     edit.cancel();
   }
 
-  const clamp = (v: number) => Math.min(100, Math.max(0, Number.isFinite(v) ? v : 0));
+  const clamp = (v: number) => (Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : NaN);
 
   return (
     <form key={edit.formKey} action={formAction} className="flex flex-wrap items-end gap-3">
       <input type="hidden" name="poolId" value={poolId} />
-      <input type="hidden" name="commissionPercent" value={platform} />
-      <input type="hidden" name="coachSharePercent" value={coach} />
+      <input type="hidden" name="commissionPercent" value={shown(platform)} />
+      <input type="hidden" name="coachSharePercent" value={shown(coach)} />
       <Field label="Komisi platform (%)">
         <Input
           type="number"
           min={0}
           max={100}
-          value={platform}
+          value={shown(platform)}
           onChange={(e) => setPlatform(clamp(e.target.valueAsNumber))}
           disabled={edit.locked}
           className="w-24"
@@ -53,7 +56,7 @@ export default function PoolShareForm({
           type="number"
           min={0}
           max={100}
-          value={coach}
+          value={shown(coach)}
           onChange={(e) => setCoach(clamp(e.target.valueAsNumber))}
           disabled={edit.locked}
           className="w-24"
@@ -64,7 +67,7 @@ export default function PoolShareForm({
           type="number"
           min={0}
           max={100}
-          value={pool}
+          value={shown(pool)}
           // Mengetik angka kolam = mengubah bagian platform; bagian coach
           // dibiarkan, karena itu yang sudah dijanjikan ke coach.
           onChange={(e) => setPlatform(clamp(100 - coach - clamp(e.target.valueAsNumber)))}
@@ -78,7 +81,7 @@ export default function PoolShareForm({
         </Button>
       ) : (
         <>
-          <Button type="submit" size="sm" loading={pending} disabled={edit.saveDisabled || pool < 0}>
+          <Button type="submit" size="sm" loading={pending} disabled={edit.saveDisabled || blank || pool < 0}>
             Simpan
           </Button>
           <Button type="button" size="sm" variant="ghost" onClick={reset} disabled={pending}>
@@ -86,6 +89,7 @@ export default function PoolShareForm({
           </Button>
         </>
       )}
+      {blank && !edit.locked && <p className="w-full text-xs text-danger-text">Semua kolom komisi wajib diisi (0-100).</p>}
       {pool < 0 && <p className="w-full text-xs text-danger-text">Total ketiganya tidak boleh lebih dari 100%.</p>}
       {state?.error && <p className="w-full text-xs text-danger-text">{state.error}</p>}
     </form>
