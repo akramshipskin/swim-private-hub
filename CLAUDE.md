@@ -898,7 +898,7 @@ Claude cannot switch models itself — only the user can, via the app's model pi
 
 1. After analyzing a request, if the current active model/reasoning level (per section 9-11, 25) does not match what the task needs — too weak for the risk, or overkill for a trivial task — Claude states the recommended gear and why, then **stops**.
 2. Claude does **not** proceed with implementation until the user gives explicit confirmation: "oke", "udah ganti", "lanjut aja", or equivalent.
-3. If the current model/gear already matches what the task needs, Claude proceeds without asking — no gate needed when there's nothing to switch.
+3. If the current model/gear already matches what the task needs, there's no *model* to switch — but per the global "Konfirmasi dulu, baru jalan" rule (`~/.claude/CLAUDE.md`, 2026-09-25), Claude still shows the breakdown and waits for explicit confirmation before starting non-trivial work, model mismatch or not.
 4. This gate is about **cost/model fit**, not business-rule ambiguity. Genuine STOP conditions (section 12 — refund policy, revenue split, permissions, etc.) are separate and always apply regardless of model.
 
 ### Why
@@ -915,23 +915,39 @@ Hadi wants to avoid burning tokens on an oversized model for a small task, and a
 
 ---
 
-# 29. Claude = Otak, OpenCode = Tangan (Hadi, 2026-09-23)
+# 29. Claude = Otak, OpenCode & Cloud session = Tangan (Hadi, 2026-09-23; cloud ditambah 2026-09-25)
 
 Hadi gak perlu tau mana kerjaan berat/ringan -- itu tugas Claude.
 
 1. Tiap Hadi kasih list revisi/fitur: Claude pelajari dulu, lalu kasih
    **menu**: tiap item + berat/ringan + gear/model Claude + boleh lewat
-   OpenCode atau tidak. Hadi pilih urutan & ganti model.
+   OpenCode/Cloud atau tidak. Hadi pilih urutan & ganti model.
 2. Item mekanis (UI, copy, rename, refactor tanpa logika) -> Claude tulis
    dokumen eksekusi di `docs/plans/<nama>.md` (format: lihat
    `docs/plans/ui-consistency-batch-1.md`: snippet LAMA/BARU verbatim,
    scope file, aturan main, verifikasi, format laporan). Semua keputusan
    desain sudah diputuskan Claude di dokumen; OpenCode cuma eksekusi.
-3. **Haram lewat OpenCode:** duit, wallet, booking/CAS, auth, schema,
-   webhook. Selalu Claude langsung.
-4. Sequential, bukan paralel: Claude diam saat OpenCode kerja.
-5. Setelah OpenCode lapor: Claude validasi independen (git diff per hunk,
-   tsc, vitest, build, browser) SEBELUM commit. Laporan OpenCode bukan bukti.
+3. **Haram lewat OpenCode ATAU Cloud session:** duit, wallet, booking/CAS,
+   auth, schema, webhook. Selalu Claude langsung di sesi interaktif ini.
+   Alasan buat Cloud session sama kayak OpenCode: kerjanya sendiri tanpa
+   Hadi mengawasi real-time, walau modelnya Claude juga.
+4. Sequential, bukan paralel: Claude diam saat OpenCode/Cloud session kerja.
+5. Setelah OpenCode ATAU Cloud session lapor: Claude validasi independen
+   (git diff per hunk, tsc, vitest, build, browser) SEBELUM commit/merge.
+   Laporannya sendiri bukan bukti -- termasuk laporan Cloud session, walau
+   sama-sama Claude.
+6. **Cloud session (Hadi, 2026-09-25):** tangan ketiga selain OpenCode,
+   dipakai buat kerjaan yang lebih berat dari yang wajar buat OpenCode
+   (butuh reasoning kuat, bukan cuma eksekusi hunk verbatim) tapi tetap
+   bukan item haram di poin 3 -- misal riset/audit, nulis dokumen besar,
+   kerjaan panjang yang gak perlu diawasi tiap langkah. Dilempar lewat
+   `move_to_cloud` (push branch fitur dulu, JANGAN ke `main`), dikasih
+   instruksi lengkap + link CLAUDE.md/AGENTS.md. Cloud session dilarang
+   push/merge ke `main` atau bikin PR sendiri -- Claude di sesi ini yang
+   validasi & lapor ke Hadi.
+   **SEMENTARA** -- pakai saldo Claude Cloud ($100). Kalau saldo habis,
+   balik jadi 2 tangan (Claude + OpenCode) sampai Hadi isi ulang/putuskan
+   lain.
 
 # 30. Checklist deploy (wajib)
 
