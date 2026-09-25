@@ -8,13 +8,15 @@ vi.mock("next/navigation", () => ({
     throw new Error(`NEXT_REDIRECT:${p}`);
   },
 }));
-vi.mock("bcryptjs", () => ({ default: { hash: vi.fn().mockResolvedValue("hashed") } }));
+const compare = vi.fn().mockResolvedValue(false);
+vi.mock("bcryptjs", () => ({ default: { hash: vi.fn().mockResolvedValue("hashed"), compare: (...a: unknown[]) => compare(...a) } }));
 vi.mock("@/lib/dependents", () => ({ createSelfDependent: vi.fn() }));
 
 const userUpdate = vi.fn().mockResolvedValue({ sessionVersion: 3 });
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     dependent: { count: vi.fn().mockResolvedValue(1) },
+    user: { findUnique: vi.fn().mockResolvedValue({ passwordHash: "temp-hash" }) },
     $transaction: (fn: (tx: unknown) => unknown) =>
       fn({ user: { update: (a: unknown) => userUpdate(a) }, dependent: { createMany: vi.fn() } }),
   },
@@ -28,7 +30,7 @@ function fd(entries: Record<string, string>) {
   return f;
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => { vi.clearAllMocks(); compare.mockResolvedValue(false); });
 
 describe("changePassword (tanpa password lama)", () => {
   it("rejects an account that is not flagged mustChangePassword", async () => {
@@ -47,5 +49,15 @@ describe("changePassword (tanpa password lama)", () => {
       expect.objectContaining({ data: expect.objectContaining({ sessionVersion: { increment: 1 } }) })
     );
     expect(unstableUpdate).toHaveBeenCalledWith(expect.objectContaining({ sessionVersion: 3 }));
+  });
+
+  // Password sementara diketahui admin / tercetak di CSV import: memakainya
+  // lagi membuat wajib-ganti tidak ada gunanya.
+  it("rejects reusing the temporary password", async () => {
+    auth.mockResolvedValue({ user: { id: "u1", role: "MEMBER", mustChangePassword: true } });
+    compare.mockResolvedValueOnce(true);
+    const res = await changePassword(null, fd({ newPassword: "renang2026", confirmPassword: "renang2026" }));
+    expect(res).toEqual({ error: "Password baru harus berbeda dari password sementara." });
+    expect(userUpdate).not.toHaveBeenCalled();
   });
 });

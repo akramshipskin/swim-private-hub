@@ -10,7 +10,7 @@ import bcrypt from "bcryptjs";
 import { randomInt } from "crypto";
 import * as XLSX from "xlsx";
 
-export type ActionState = { error?: string } | null;
+export type ActionState = { error?: string; success?: string } | null;
 
 export async function createUser(
   _prevState: ActionState,
@@ -107,7 +107,9 @@ export async function createUser(
   }
 
   revalidatePath("/admin/users");
-  return null;
+  // Bukan null: null = keadaan awal form, jadi dulu sukses tidak terlihat
+  // (form tetap terisi, admin mengira gagal lalu kirim ulang -> "sudah terdaftar").
+  return { success: `Akun ${name} dibuat.${role === "MEMBER" ? " Wajib ganti password saat login pertama." : ""}` };
 }
 
 const IMPORT_DEFAULT_JATAH_CANCEL = 2;

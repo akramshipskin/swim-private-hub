@@ -31,6 +31,12 @@ export async function changePassword(
   if (newPassword !== confirmPassword) {
     return { error: "Konfirmasi password tidak sama" };
   }
+  // Password sementara diketahui orang lain (admin yang mereset, CSV import):
+  // memakainya lagi = wajib-ganti tidak ada gunanya.
+  const current = await prisma.user.findUnique({ where: { id: session.user.id }, select: { passwordHash: true } });
+  if (current && (await bcrypt.compare(newPassword, current.passwordHash))) {
+    return { error: "Password baru harus berbeda dari password sementara." };
+  }
 
   // Cuma role MEMBER yang punya konsep peserta (diri sendiri/anak) --
   // admin/coach skip step ini. Wajib isi minimal 1 peserta, digabung 1

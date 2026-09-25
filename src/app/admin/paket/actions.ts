@@ -9,7 +9,7 @@ import { formNumber, toProperCase } from "@/lib/format";
 import { resolveExpiredDate } from "@/lib/datetime";
 import { revalidatePath } from "next/cache";
 
-export type ActionState = { error?: string } | null;
+export type ActionState = { error?: string; success?: string } | null;
 
 // --- Katalog paket (PackageTemplate) -- gak nempel ke member manapun ---
 
@@ -76,7 +76,8 @@ export async function addChildForMember(
 
   revalidatePath("/admin/paket");
   revalidatePath("/admin/users");
-  return null;
+  // Bukan null (= keadaan awal form): tanpa pesan, admin tidak tahu berhasil.
+  return { success: "Peserta ditambahkan." };
 }
 
 // --- Assign paket ke member (custom, boleh dari katalog atau bebas) ---
@@ -175,7 +176,7 @@ export async function assignPackageToMember(
 
   revalidatePath("/admin/paket");
   revalidatePath("/admin/users");
-  return null;
+  return { success: `Paket "${name}" (${totalSesi} sesi) di-assign.` };
 }
 
 // --- Edit paket milik member (sisa sesi, status, masa berlaku) ---

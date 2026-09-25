@@ -152,7 +152,7 @@ describe("createUser POOL_OWNER", () => {
   it("creates a new pool and links the owner to it", async () => {
     userCreate.mockResolvedValueOnce({ id: "owner-1" });
     const res = await createUser(null, formData({ ...base, poolMode: "new", newPoolName: "Kolam Baru", newPoolAddress: "Jl. A" }));
-    expect(res).toBeNull();
+    expect(res).toEqual({ success: expect.stringContaining("dibuat") });
     expect(poolCreate).toHaveBeenCalledWith({ data: { name: "Kolam Baru", address: "Jl. A", isActive: true } });
     expect(ownershipCreate).toHaveBeenCalledWith({ data: { poolId: "pool-new", ownerId: "owner-1" } });
   });

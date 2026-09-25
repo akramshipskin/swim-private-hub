@@ -16,6 +16,18 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
   const [participants, setParticipants] = useState<Participant[]>([{ type: "self", name: "" }]);
   const [newUserName, setNewUserName] = useState("");
   const [poolMode, setPoolMode] = useState<"existing" | "new">(pools.length > 0 ? "existing" : "new");
+  // Berhasil -> kosongkan form (key baru = input tak terkontrol ikut kosong).
+  const [formKey, setFormKey] = useState(0);
+  const [seenState, setSeenState] = useState(state);
+  if (state !== seenState) {
+    setSeenState(state);
+    if (state?.success) {
+      setRole("MEMBER");
+      setParticipants([{ type: "self", name: "" }]);
+      setNewUserName("");
+      setFormKey((k) => k + 1);
+    }
+  }
 
   function updateParticipant(i: number, patch: Partial<Participant>) {
     setParticipants((prev) => prev.map((p, idx) => (idx === i ? { ...p, ...patch } : p)));
@@ -25,7 +37,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
     <Card>
       <CardBody>
         <h2 className="mb-4 text-sm font-semibold text-text">Tambah User Baru</h2>
-        <form action={formAction} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <form key={formKey} action={formAction} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Nama">
             <Input
               name="name"
@@ -161,6 +173,11 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
         {state?.error && (
           <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">
             {state.error}
+          </p>
+        )}
+        {state?.success && (
+          <p role="status" className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-sm text-success-text">
+            {state.success}
           </p>
         )}
       </CardBody>

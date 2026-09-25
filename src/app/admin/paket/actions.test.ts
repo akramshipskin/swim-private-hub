@@ -144,14 +144,14 @@ describe("addChildForMember", () => {
 
   it("creates a self dependent when type is self", async () => {
     const result = await addChildForMember(null, formData({ memberId: "member-1", type: "self", name: "" }));
-    expect(result).toBeNull();
+    expect(result).toEqual({ success: "Peserta ditambahkan." });
     expect(createSelfDependent).toHaveBeenCalledWith("member-1");
     expect(createDependent).not.toHaveBeenCalled();
   });
 
   it("creates a named child dependent otherwise", async () => {
     const result = await addChildForMember(null, formData({ memberId: "member-1", type: "child", name: "Budi" }));
-    expect(result).toBeNull();
+    expect(result).toEqual({ success: "Peserta ditambahkan." });
     expect(createDependent).toHaveBeenCalledWith("member-1", "Budi");
   });
 
@@ -198,7 +198,7 @@ describe("assignPackageToMember", () => {
       null,
       formData({ ...base, templateId: "tpl-1", poolId: "pool-from-form" })
     );
-    expect(result).toBeNull();
+    expect(result).toEqual({ success: expect.stringContaining("di-assign") });
     expect(packageCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ poolId: "pool-from-template" }) })
     );

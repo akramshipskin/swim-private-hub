@@ -50,6 +50,11 @@ export default function AddChildForm({ members }: { members: Member[] }) {
             {state.error}
           </p>
         )}
+        {state?.success && (
+          <p role="status" className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-sm text-success-text">
+            {state.success}
+          </p>
+        )}
       </CardBody>
     </Card>
   );
