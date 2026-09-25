@@ -134,9 +134,12 @@ export async function POST(request: Request) {
           packageId,
           status: "BOOKED",
         },
+        // Hanya yang dibutuhkan notifikasi. JANGAN `coach: true`: seluruh baris
+        // User coach (hash password, HP, IP, 2FA) dulu ikut terkirim ke member
+        // di balasan API ini.
         include: {
-          availability: { include: { coach: true } },
-          package: { include: { dependent: true } },
+          availability: { select: { coachId: true, date: true, startTime: true, coach: { select: { name: true } } } },
+          package: { select: { dependent: { select: { name: true } } } },
         },
       });
     });
@@ -155,7 +158,7 @@ export async function POST(request: Request) {
       url: "/coach/jadwal",
     }).catch(() => {});
 
-    return Response.json({ booking }, { status: 201 });
+    return Response.json({ booking: { id: booking.id, status: booking.status } }, { status: 201 });
   } catch (err) {
     if (err instanceof BookingError) {
       return Response.json({ error: err.message }, { status: err.status });

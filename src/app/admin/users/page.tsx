@@ -55,6 +55,9 @@ export default async function AdminUsersPage() {
   ]);
 
   const members = users.filter((u) => u.role === "MEMBER");
+  // Yang dikirim ke komponen client HANYA field ini. Baris User utuh dulu
+  // ikut ter-serialisasi ke browser (hash password & kunci 2FA semua member).
+  const memberOptions = members.map((u) => ({ id: u.id, name: u.name, email: u.email, phone: u.phone }));
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -85,7 +88,7 @@ export default async function AdminUsersPage() {
               1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang belum pernah masuk belum punya
               peserta terdaftar — tambahkan di sini dulu kalau mau langsung assign paket.
             </p>
-            <AddChildForm members={members} />
+            <AddChildForm members={memberOptions} />
           </div>
         </div>
       </div>
@@ -96,7 +99,7 @@ export default async function AdminUsersPage() {
         Buat paket khusus buat 1 anak tertentu (koreksi, promo, atau kasus di luar
         alur beli-online).
       </p>
-      <AssignPackageForm members={members} templates={templates} dependents={dependents} pools={pools} />
+      <AssignPackageForm members={memberOptions} templates={templates.map((t) => ({ id: t.id, name: t.name, totalSesi: t.totalSesi, jatahCancel: t.jatahCancel, poolId: t.poolId }))} dependents={dependents} pools={pools} />
 
       <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua User</h2>
 

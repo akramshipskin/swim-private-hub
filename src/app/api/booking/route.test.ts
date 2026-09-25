@@ -57,6 +57,26 @@ describe("POST /api/booking pool lock", () => {
     expect(availabilityUpdateMany).not.toHaveBeenCalled();
   });
 
+  // Dulu `include: { coach: true }` + balas seluruh booking: hash password,
+  // HP, IP & data 2FA coach terkirim ke member yang booking.
+  it("never sends the coach's account data back to the member", async () => {
+    availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", pool: { isActive: true } });
+    packageUpdateMany.mockResolvedValue({ count: 1 });
+    bookingCreate.mockResolvedValueOnce({
+      id: "b1",
+      status: "BOOKED",
+      availability: { coach: { name: "Coach", passwordHash: "$2b$secret", phone: "0812" }, coachId: "c1", date: new Date(), startTime: new Date() },
+      package: { dependent: { name: "Anak" } },
+    });
+    const res = await POST(req());
+    expect(res.status).toBe(201);
+    const text = await res.text();
+    expect(JSON.parse(text)).toEqual({ booking: { id: "b1", status: "BOOKED" } });
+    expect(text).not.toContain("passwordHash");
+    const include = bookingCreate.mock.calls[0][0].include;
+    expect(JSON.stringify(include)).not.toContain('"coach":true');
+  });
+
   it("returns 404 when the slot doesn't exist", async () => {
     availabilityFindUnique.mockResolvedValue(null);
     const res = await POST(req());
