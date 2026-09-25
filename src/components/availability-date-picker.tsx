@@ -126,7 +126,7 @@ export function AvailabilityDatePicker({
             <button
               type="button"
               onClick={prevMonth}
-              className="rounded-md p-1 text-text-muted hover:bg-surface-muted"
+              className="rounded-md p-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]"
               aria-label="Bulan sebelumnya"
             >
               ‹
@@ -137,7 +137,7 @@ export function AvailabilityDatePicker({
             <button
               type="button"
               onClick={nextMonth}
-              className="rounded-md p-1 text-text-muted hover:bg-surface-muted"
+              className="rounded-md p-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]"
               aria-label="Bulan berikutnya"
             >
               ›
@@ -170,7 +170,7 @@ export function AvailabilityDatePicker({
                     onChange(key);
                     setOpen(false);
                   }}
-                  className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs ${
+                  className={`relative flex h-8 w-8 items-center justify-center rounded-full text-xs max-sm:h-10 max-sm:w-full max-sm:rounded-lg max-sm:text-sm ${
                     isPast
                       ? "cursor-not-allowed text-text-subtle/40"
                       : isSelected

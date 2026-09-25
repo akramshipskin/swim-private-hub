@@ -150,7 +150,7 @@ export function DatePicker({
             <button
               type="button"
               onClick={prevMonth}
-              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted"
+              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]"
               aria-label="Bulan sebelumnya"
             >
               ‹
@@ -184,7 +184,7 @@ export function DatePicker({
             <button
               type="button"
               onClick={nextMonth}
-              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted"
+              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]"
               aria-label="Bulan berikutnya"
             >
               ›
@@ -197,7 +197,7 @@ export function DatePicker({
             ))}
           </div>
 
-          <div className="grid grid-cols-7 justify-items-center gap-1">
+          <div className="grid grid-cols-7 justify-items-center gap-1 max-sm:justify-items-stretch">
             {cells.map((day, i) => {
               if (day === null) return <span key={`empty-${i}`} />;
               const key = toKey(viewY, viewM, day);
@@ -213,7 +213,7 @@ export function DatePicker({
                     setOpen(false);
                   }}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full text-xs",
+                    "flex h-8 w-8 items-center justify-center rounded-full text-xs max-sm:h-10 max-sm:w-full max-sm:rounded-lg max-sm:text-sm",
                     isSelected
                       ? "bg-brand-600 font-semibold text-white"
                       : isToday

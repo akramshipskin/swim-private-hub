@@ -78,7 +78,7 @@ export default function ResetPasswordButton({
                   href={buildWaLinkTo(phone, waMessage)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-md bg-whatsapp px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
+                  className="inline-flex items-center rounded-md bg-whatsapp px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 max-sm:min-h-[44px]"
                 >
                   Kirim via WA
                 </a>
