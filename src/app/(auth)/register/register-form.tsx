@@ -102,7 +102,7 @@ export default function RegisterForm() {
           priority
         />
         <p className="text-lg text-text"><Logotype /></p>
-        <p className="text-sm text-text-muted">Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya.</p>
+        <p className="text-sm text-text-muted">Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya.</p>
       </div>
 
       <Card className="w-full max-w-sm">

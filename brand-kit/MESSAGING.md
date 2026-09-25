@@ -33,12 +33,12 @@ Terakhir diperbarui: 25 September 2026 (headline & tagline baru).
 
 | Tempat | Aturan | Contoh |
 |---|---|---|
-| Headline utama (landing, panduan) | 1 kalimat, maksimal 12 kata. Sebut **apa produknya** (aplikasi les renang privat) dan **apa yang bisa dilakukan** (pilih coach, kolam, jam). Tanpa superlatif ("pertama", "nomor 1", "terbaik") | "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya." |
+| Headline utama (landing, panduan) | 2 kalimat pendek, maksimal 12 kata total. Sebut **apa produknya** (aplikasi les renang privat) dan **apa yang bisa dilakukan** (pilih coach, kolam, jam). Tanpa superlatif ("pertama", "nomor 1", "terbaik"). Sebagai judul (`<h1>`), dipecah 3 baris: `Aplikasi les renang privat.` / `Pilih coach, pilih kolam,` / `dan pilih jamnya.` — lihat `landing-view.tsx`/`panduan-view.tsx` | "Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya." |
 | Subheadline | 1–2 kalimat: untuk siapa + siapa melakukan apa. Sebut "anak atau kamu sendiri" supaya pemula dewasa juga merasa dituju. Jelaskan cara kerjanya, bukan janji | "Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi." |
 | Judul bagian | 2–4 kata, huruf besar hanya di awal | "Kolam mitra", "Kenalan dengan coach" |
 | Judul halaman aplikasi | Kata benda, tanpa basa-basi | "Booking Coach", "Riwayat Bayar" |
-| Tagline (sosmed, banner, footer, halaman masuk/daftar, gambar berbagi) | **Sama persis dengan headline**, tidak dipersingkat atau diparafrase | "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya." |
-| Deskripsi meta (mesin pencari, manifest PWA) | Headline + kalimat pertama subheadline | "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar." |
+| Tagline (sosmed, banner, footer, halaman masuk/daftar, gambar berbagi) | **Sama persis dengan headline**, tidak dipersingkat atau diparafrase — sebagai teks satu baris (bukan judul), pakai versi kalimat, bukan versi 3 baris | "Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya." |
+| Deskripsi meta (mesin pencari, manifest PWA) | Headline + kalimat pertama subheadline | "Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar." |
 
 **Catatan klaim:** "pilih jam" artinya memilih dari jam yang masih kosong di jadwal coach
 (bukan jam apa saja). Jangan tulis "bebas pilih jadwal". Riset pasar per 25 Sep 2026:

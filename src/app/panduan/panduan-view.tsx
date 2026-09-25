@@ -318,8 +318,10 @@ export default function PanduanView() {
       {tab === "presentasi" && (
         <div className="mx-auto w-full max-w-6xl px-4 py-12">
           <section>
-            <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">
-              Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya.
+            <h1 className="max-w-3xl text-[length:min(7vw,3.75rem)] font-semibold leading-[1.08] tracking-tight">
+              <span className="block">Aplikasi les renang privat.</span>
+              <span className="block">Pilih coach, pilih kolam,</span>
+              <span className="block">dan pilih jamnya.</span>
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-fixed-ink-soft">
               Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi.

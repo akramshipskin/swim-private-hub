@@ -190,6 +190,8 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           presisi (container pendek = object-position punya ruang gerak
           penuh). Headline + CTA di bawah foto, nyambung seamless via fade
           gelap ke bg konten. */}
+      <LandingHeader />
+
       <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-fixed-night text-white">
         <div className="relative h-[52svh] min-h-[320px] overflow-hidden">
           <Image
@@ -206,8 +208,6 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/40 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 h-[15%] bg-gradient-to-b from-transparent to-fixed-night" />
         </div>
-
-        <LandingHeader />
 
         {/* -mt-10svh: konten ketarik naik numpang 10svh ke atas foto, jadi
             headline balik ke posisi semula sementara BG foto manjang sampai
@@ -469,7 +469,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
               <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-contain" />
               <Logotype className="text-lg text-white" />
             </div>
-            <p>Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya.</p>
+            <p>Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya.</p>
           </div>
 
           <div className="flex flex-col gap-1.5">

@@ -27,7 +27,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.swimprivatehub.biz.id"),
   title: "Swim Private Hub",
-  description: "Aplikasi les renang privat: pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar.",
+  description: "Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar.",
   manifest: "/manifest.json",
   openGraph: {
     siteName: "Swim Private Hub",
