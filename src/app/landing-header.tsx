@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import { Logotype } from "@/components/ui/logotype";
 
 // Header landing nempel di atas (sticky). Di puncak halaman transparan supaya
-// foto hero kelihatan; begitu discroll jadi gelap solid supaya teks putihnya
-// tetap terbaca di atas section krem/pasir di bawahnya.
+// foto hero kelihatan; begitu discroll TETAP transparan -- bukan blok solid --
+// cuma gradasi gelap tipis + blur kaca (backdrop-blur) supaya teks putihnya
+// tetap terbaca di atas section krem/pasir di bawahnya tanpa jadi bilah pekat.
 export function LandingHeader() {
   const [scrolled, setScrolled] = useState(false);
 
@@ -20,8 +21,8 @@ export function LandingHeader() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 text-white transition-colors duration-200 ${
-        scrolled ? "border-b border-white/10 bg-fixed-night/90 backdrop-blur-md" : "border-b border-transparent"
+      className={`fixed inset-x-0 top-0 z-50 text-white backdrop-blur-md transition-[background,padding] duration-200 ${
+        scrolled ? "bg-gradient-to-b from-fixed-night/70 via-fixed-night/35 to-transparent" : "bg-gradient-to-b from-black/25 to-transparent"
       }`}
     >
       <div className={`mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 transition-[padding] duration-200 sm:gap-4 ${scrolled ? "py-2 sm:py-3" : "py-5"}`}>
