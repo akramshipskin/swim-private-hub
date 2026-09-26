@@ -3,7 +3,8 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { identityTakenWhere, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
+import { formNumber, identityTakenWhere, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
+import { AdjustmentError, createWalletAdjustment } from "@/lib/wallet-adjustment";
 import { createSelfDependent, createDependent } from "@/lib/dependents";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 import bcrypt from "bcryptjs";
@@ -432,4 +433,46 @@ export async function resetUserTotp(userId: string): Promise<{ error?: string }>
   if (res.count === 0) return { error: "User tidak ditemukan, atau akun admin (reset admin lewat skrip server)." };
   revalidatePath(`/admin/users/${userId}`);
   return {};
+}
+
+// id = kunci kiriman: berubah tiap koreksi berhasil, dipakai formulir untuk
+// mengosongkan isiannya.
+export type WalletAdjustState = { error?: string; ok?: boolean; id?: string } | null;
+
+// Koreksi saldo coach/kolam (lihat src/lib/wallet-adjustment.ts). Arah dipilih
+// terpisah dari nominal supaya admin tidak perlu mengetik tanda minus.
+export async function adjustWallet(_state: WalletAdjustState, formData: FormData): Promise<WalletAdjustState> {
+  const session = await requireRole("ADMIN");
+  const targetType = formData.get("targetType");
+  const targetId = String(formData.get("targetId") ?? "");
+  const userId = String(formData.get("userId") ?? "");
+  const direction = formData.get("direction");
+  const source = formData.get("source");
+  const nominal = formNumber(formData, "amount");
+
+  if ((targetType !== "pool" && targetType !== "coach") || !targetId) return { error: "Formulir tidak lengkap, muat ulang halaman." };
+  if (direction !== "credit" && direction !== "debit") return { error: "Pilih tambah atau kurangi saldo." };
+  if (source !== "platform" && source !== "none") return { error: "Pilih sumber dana koreksi." };
+  if (!Number.isInteger(nominal) || nominal <= 0) return { error: "Isi nominal koreksi." };
+
+  const idempotencyKey = String(formData.get("idempotencyKey") ?? "");
+  try {
+    await createWalletAdjustment({
+      target: targetType === "pool" ? { poolId: targetId } : { coachProfileId: targetId },
+      amount: direction === "credit" ? nominal : -nominal,
+      reason: String(formData.get("reason") ?? ""),
+      fromPlatform: source === "platform",
+      adminId: session.user.id,
+      idempotencyKey,
+    });
+  } catch (err) {
+    if (err instanceof AdjustmentError) return { error: err.message };
+    throw err;
+  }
+  if (userId) revalidatePath(`/admin/users/${userId}`);
+  revalidatePath(targetType === "pool" ? "/pool/saldo" : "/coach/saldo");
+  revalidatePath("/admin/komisi");
+  revalidatePath("/admin/kolam");
+  revalidatePath("/admin");
+  return { ok: true, id: idempotencyKey };
 }

@@ -25,6 +25,9 @@ type Withdrawal = {
   transferReference?: string | null;
 };
 
+// Koreksi saldo dari admin (lihat src/lib/wallet-adjustment.ts).
+export type Adjustment = { id: string; amount: number; note: string | null; createdAt: string };
+
 export type SaldoActionState = { error?: string; ok?: boolean } | null;
 
 const statusInfo = {
@@ -57,6 +60,7 @@ export default function SaldoView({
   bankAccountNumber,
   bankAccountName,
   withdrawals,
+  adjustments = [],
   updateBankInfoAction,
   requestWithdrawalAction,
 }: {
@@ -65,6 +69,7 @@ export default function SaldoView({
   bankAccountNumber: string | null;
   bankAccountName: string | null;
   withdrawals: Withdrawal[];
+  adjustments?: Adjustment[];
   updateBankInfoAction: (state: SaldoActionState, formData: FormData) => Promise<SaldoActionState>;
   requestWithdrawalAction: (state: SaldoActionState, formData: FormData) => Promise<SaldoActionState>;
 }) {
@@ -91,7 +96,7 @@ export default function SaldoView({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-sm text-text-muted">Saldo bisa dicairkan</p>
-              <p className="mt-1 text-3xl font-semibold text-text">{formatRupiah(walletBalance)}</p>
+              <p className={`mt-1 text-3xl font-semibold ${walletBalance < 0 ? "text-danger-text" : "text-text"}`}>{formatRupiah(walletBalance)}</p>
             </div>
             <div>
               <p className="text-sm text-text-muted">Dalam proses pencairan</p>
@@ -113,10 +118,17 @@ export default function SaldoView({
               Cairkan
             </Button>
           </form>
+          {walletBalance < 0 && (
+            <p className="rounded-xl bg-danger-bg p-3 text-sm text-danger-text">
+              Saldo kamu minus {formatRupiah(-walletBalance)} karena koreksi admin (lihat Riwayat Koreksi Saldo). Kekurangan ini
+              otomatis tertutup dari bagian sesi berikutnya yang ditandai Hadir; pencairan bisa lagi setelah saldo kembali
+              mencapai minimal {formatRupiah(MIN_WITHDRAWAL)}.
+            </p>
+          )}
           {!hasBankInfo ? (
             <p className="text-sm text-warning-text">Isi rekening tujuan pencairan dulu.</p>
           ) : (
-            walletBalance < MIN_WITHDRAWAL && (
+            walletBalance >= 0 && walletBalance < MIN_WITHDRAWAL && (
               <p className="text-sm text-text-subtle">Saldo belum mencapai minimal pencairan {formatRupiah(MIN_WITHDRAWAL)}.</p>
             )
           )}
@@ -171,6 +183,35 @@ export default function SaldoView({
       </Card>
       </div>
 
+      <div className="flex flex-col gap-6">
+      {adjustments.length > 0 && (
+        <div>
+          <h2 className="mb-3 text-base font-semibold text-text">Riwayat Koreksi Saldo</h2>
+          <div className="flex flex-col gap-2">
+            {adjustments.map((a) => (
+              <Card key={a.id}>
+                <CardBody className="flex flex-col gap-2 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className={`text-lg font-semibold ${a.amount < 0 ? "text-danger-text" : "text-success-text"}`}>
+                      {a.amount < 0 ? "−" : "+"}
+                      {formatRupiah(Math.abs(a.amount))}
+                    </p>
+                    <Badge tone={a.amount < 0 ? "danger" : "success"}>{a.amount < 0 ? "Saldo dikurangi" : "Saldo ditambah"}</Badge>
+                  </div>
+                  <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                    <dt className="text-text-subtle">Tanggal</dt>
+                    <dd className="text-text">{dateTime(a.createdAt)}</dd>
+                    <dt className="text-text-subtle">Alasan</dt>
+                    <dd className="text-text">{a.note ?? "Koreksi manual oleh admin (tanpa keterangan)"}</dd>
+                    <dt className="text-text-subtle">Oleh</dt>
+                    <dd className="text-text">Admin Swim Private Hub</dd>
+                  </dl>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
       <div>
         <h2 className="mb-3 text-base font-semibold text-text">Riwayat Pencairan</h2>
         {withdrawals.length === 0 ? (
@@ -220,6 +261,7 @@ export default function SaldoView({
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

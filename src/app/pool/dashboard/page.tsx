@@ -51,7 +51,7 @@ export default async function PoolDashboardPage() {
     }).then(async (rows) =>
       prisma.availability.groupBy({ by: ["poolId"], where: { id: { in: rows.map((r) => r.availabilityId) } }, _count: true })
     ),
-    prisma.walletTransaction.groupBy({ by: ["poolId"], where: { poolId: { in: ids }, type: "SESSION_REVENUE", createdAt: { gte: startMonth } }, _sum: { amount: true } }),
+    prisma.walletTransaction.groupBy({ by: ["poolId"], where: { poolId: { in: ids }, type: "SESSION_REVENUE", bookingId: { not: null }, createdAt: { gte: startMonth } }, _sum: { amount: true } }),
     prisma.package.groupBy({ by: ["poolId"], where: { poolId: { in: ids }, startDate: { gte: startMonth } }, _count: true }),
     prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { in: ids }, status: { in: ["PENDING", "PROCESSING"] } }, _sum: { amount: true } }),
   ]);

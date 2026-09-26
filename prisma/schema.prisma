@@ -248,6 +248,15 @@ model WalletTransaction {
   paymentId          String?
   bookingId          String?
   withdrawalRequestId String?
+  // Koreksi saldo oleh admin (baris SESSION_REVENUE/SESSION_PAYOUT tanpa
+  // bookingId, plus pasangannya PLATFORM_REVENUE kalau dananya dari/ke
+  // platform): alasan wajib + admin yang mencatat, ditampilkan ke coach/kolam
+  // di halaman Saldo. Kosong untuk baris otomatis (sesi, pencairan) dan
+  // koreksi lama yang dulu dicatat langsung di database.
+  note           String?
+  createdById    String?
+  // Satu kiriman formulir koreksi = satu koreksi, walau terkirim dua kali.
+  idempotencyKey String?  @unique
   createdAt      DateTime              @default(now())
 
   @@index([poolId])

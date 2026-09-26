@@ -13,6 +13,12 @@ export default async function CoachSaldoPage() {
       bankName: true,
       bankAccountNumber: true,
       bankAccountName: true,
+      // Koreksi saldo dari admin (baris tanpa sesi).
+      walletTransactions: {
+        where: { type: "SESSION_PAYOUT", bookingId: null },
+        orderBy: { createdAt: "desc" },
+        select: { id: true, amount: true, note: true, createdAt: true },
+      },
       withdrawalRequests: {
         orderBy: { requestedAt: "desc" },
         select: { id: true, amount: true, status: true, requestedAt: true, processedAt: true, failureReason: true, bankName: true, bankAccountNumber: true, bankAccountName: true, midtransReferenceId: true, transferReference: true },
@@ -44,6 +50,7 @@ export default async function CoachSaldoPage() {
           requestedAt: w.requestedAt.toISOString(),
           processedAt: w.processedAt?.toISOString() ?? null,
         }))}
+        adjustments={profile.walletTransactions.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() }))}
         updateBankInfoAction={updateBankInfo}
         requestWithdrawalAction={requestWithdrawal}
       />
