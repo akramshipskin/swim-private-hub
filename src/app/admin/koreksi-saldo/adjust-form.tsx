@@ -6,40 +6,23 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Field, Textarea } from "@/components/ui/input";
 import { PriceInput } from "@/components/ui/price-input";
 import { formatRupiah } from "@/lib/format";
-import { adjustWallet } from "../actions";
-
-export type AdjustmentRow = { id: string; amount: number; note: string | null; createdAt: string; createdByName: string | null };
+import { adjustWallet } from "./actions";
 
 function signed(n: number) {
   return `${n < 0 ? "−" : "+"}${formatRupiah(Math.abs(n))}`;
 }
 
-function dateTime(iso: string) {
-  return new Date(iso).toLocaleString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Jakarta",
-  });
-}
-
-// Koreksi saldo 1 coach / 1 kolam: formulir + riwayat koreksinya.
-export default function WalletAdjustCard({
-  userId,
+// Formulir koreksi saldo untuk 1 coach / 1 kolam yang sudah dipilih.
+export default function AdjustForm({
   targetType,
   targetId,
   targetName,
   balance,
-  history,
 }: {
-  userId: string;
   targetType: "pool" | "coach";
   targetId: string;
   targetName: string;
   balance: number;
-  history: AdjustmentRow[];
 }) {
   const [state, action, pending] = useActionState(adjustWallet, null);
   const form = useRef<HTMLFormElement>(null);
@@ -59,14 +42,8 @@ export default function WalletAdjustCard({
   }
 
   return (
-    <div className="mt-4 border-t border-border pt-4">
-      <h3 className="text-sm font-semibold text-text">Koreksi saldo</h3>
-      <p className="mt-0.5 text-xs text-text-subtle">
-        Dicatat sebagai baris baru di riwayat saldo (tidak mengubah angka lama) dan tampil ke {targetType === "pool" ? "pemilik kolam" : "coach"} beserta alasannya.
-      </p>
-
-      <form key={state?.ok ? state.id : "form"} ref={form} action={action} className="mt-3 flex flex-col gap-3">
-        <input type="hidden" name="userId" value={userId} />
+    <>
+      <form key={state?.ok ? state.id : "form"} ref={form} action={action} className="flex flex-col gap-3">
         <input type="hidden" name="targetType" value={targetType} />
         <input type="hidden" name="targetId" value={targetId} />
         <input type="hidden" name="idempotencyKey" value={submitKey} readOnly />
@@ -105,7 +82,7 @@ export default function WalletAdjustCard({
           Simpan koreksi
         </Button>
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
-        {state?.ok && <p role="status" className="text-sm text-success-text">Koreksi tersimpan.</p>}
+        {state?.ok && <p role="status" className="text-sm text-success-text">Koreksi tersimpan. Notifikasi dikirim ke {targetType === "pool" ? "pemilik kolam" : "coach"} (sampai kalau notifikasi aktif di HP-nya).</p>}
       </form>
 
       <ConfirmDialog
@@ -126,24 +103,6 @@ export default function WalletAdjustCard({
           form.current?.requestSubmit();
         }}
       />
-
-      {history.length > 0 && (
-        <div className="mt-4">
-          <p className="text-sm font-medium text-text">Riwayat koreksi</p>
-          <ul className="mt-2 flex flex-col gap-2">
-            {history.map((h) => (
-              <li key={h.id} className="rounded-xl bg-surface-muted p-3 text-sm">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span className={`font-semibold ${h.amount < 0 ? "text-danger-text" : "text-success-text"}`}>{signed(h.amount)}</span>
-                  <span className="text-xs text-text-subtle">{dateTime(h.createdAt)}</span>
-                </div>
-                <p className="mt-1 text-text">{h.note ?? "Koreksi lama (dicatat langsung di database, tanpa alasan)"}</p>
-                {h.createdByName && <p className="mt-0.5 text-xs text-text-subtle">oleh {h.createdByName}</p>}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+    </>
   );
 }

@@ -14,7 +14,6 @@ import { roleLabel } from "@/lib/nav-links";
 import { deletionImpact } from "@/lib/account-deletion";
 import AnonymizeCard from "./anonymize-card";
 import ResetTotpButton from "./reset-totp-button";
-import WalletAdjustCard, { type AdjustmentRow } from "./wallet-adjust-card";
 
 export const metadata = { title: "Detail User | Swim Private Hub" };
 
@@ -94,34 +93,6 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
       : Promise.resolve(null),
   ]);
   const manualAmount = coachManual?._sum.amount ?? 0;
-
-  // Riwayat koreksi saldo (baris tanpa sesi) untuk coach ini / kolam-kolamnya.
-  const poolIds = user.poolOwnerships.map((o) => o.pool.id);
-  const adjustmentRows =
-    user.role === "COACH" && user.coachProfile
-      ? await prisma.walletTransaction.findMany({
-          where: { coachProfileId: user.coachProfile.id, type: "SESSION_PAYOUT", bookingId: null },
-          orderBy: { createdAt: "desc" },
-          take: 20,
-        })
-      : user.role === "POOL_OWNER" && poolIds.length > 0
-        ? await prisma.walletTransaction.findMany({
-            where: { poolId: { in: poolIds }, type: "SESSION_REVENUE", bookingId: null },
-            orderBy: { createdAt: "desc" },
-            take: 50,
-          })
-        : [];
-  const adminIds = [...new Set(adjustmentRows.map((r) => r.createdById).filter((id): id is string => !!id))];
-  const adminNames = new Map(
-    (adminIds.length ? await prisma.user.findMany({ where: { id: { in: adminIds } }, select: { id: true, name: true } }) : []).map((u) => [u.id, u.name])
-  );
-  const toRow = (r: (typeof adjustmentRows)[number]): AdjustmentRow => ({
-    id: r.id,
-    amount: r.amount,
-    note: r.note,
-    createdAt: r.createdAt.toISOString(),
-    createdByName: r.createdById ? (adminNames.get(r.createdById) ?? "Admin") : null,
-  });
 
   const activePackages = user.packages.filter((p) => p.status === "ACTIVE" && p.sisaSesi > 0);
 
@@ -209,7 +180,17 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                         : "Belum ada"
                 }
               />
-              <Row label="Saldo" value={formatRupiah(user.coachProfile.walletBalance)} />
+              <Row
+                label="Saldo"
+                value={
+                  <>
+                    {formatRupiah(user.coachProfile.walletBalance)}{" "}
+                    <Link href={`/admin/koreksi-saldo?target=coach:${user.coachProfile.id}`} className="font-medium text-brand-700 hover:underline">
+                      Koreksi →
+                    </Link>
+                  </>
+                }
+              />
               {manualAmount !== 0 && (
                 <Row label="Termasuk koreksi manual (tanpa sesi)" value={`${manualAmount < 0 ? "−" : ""}${formatRupiah(Math.abs(manualAmount))}`} />
               )}
@@ -234,14 +215,6 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               >
                 Lihat profil publik →
               </Link>
-              <WalletAdjustCard
-                userId={user.id}
-                targetType="coach"
-                targetId={user.coachProfile.id}
-                targetName={user.name}
-                balance={user.coachProfile.walletBalance}
-                history={adjustmentRows.map(toRow)}
-              />
             </CardBody>
           </Card>
         )}
@@ -281,14 +254,12 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                       </p>
                       <p className="text-sm text-text-muted">{pool.address ?? "Alamat belum diisi"}</p>
                       <p className="text-sm text-text">Saldo kolam: {formatRupiah(pool.walletBalance)}</p>
-                      <WalletAdjustCard
-                        userId={user.id}
-                        targetType="pool"
-                        targetId={pool.id}
-                        targetName={pool.name}
-                        balance={pool.walletBalance}
-                        history={adjustmentRows.filter((r) => r.poolId === pool.id).map(toRow)}
-                      />
+                      <Link
+                        href={`/admin/koreksi-saldo?target=pool:${pool.id}`}
+                        className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+                      >
+                        Koreksi saldo →
+                      </Link>
                     </li>
                   ))}
                 </ul>

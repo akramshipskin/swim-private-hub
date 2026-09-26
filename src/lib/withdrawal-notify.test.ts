@@ -1,18 +1,27 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { formatRupiah } from "@/lib/format";
 
 const sendPushToUser = vi.fn().mockResolvedValue(undefined);
 const sendPushToRole = vi.fn().mockResolvedValue(undefined);
+const sendPushToUsers = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/lib/push", () => ({
   sendPushToUser: (...a: unknown[]) => sendPushToUser(...a),
   sendPushToRole: (...a: unknown[]) => sendPushToRole(...a),
+  sendPushToUsers: (...a: unknown[]) => sendPushToUsers(...a),
 }));
 
 const findUnique = vi.fn();
+const coachFindUnique = vi.fn();
+const ownershipFindMany = vi.fn();
 vi.mock("@/lib/prisma", () => ({
-  prisma: { withdrawalRequest: { findUnique: (...a: unknown[]) => findUnique(...a) } },
+  prisma: {
+    withdrawalRequest: { findUnique: (...a: unknown[]) => findUnique(...a) },
+    coachProfile: { findUnique: (...a: unknown[]) => coachFindUnique(...a) },
+    poolOwnership: { findMany: (...a: unknown[]) => ownershipFindMany(...a) },
+  },
 }));
 
-const { notifyAdminsWithdrawalRequested, notifyWithdrawalOutcome } = await import("./withdrawal-notify");
+const { notifyAdminsWithdrawalRequested, notifyWithdrawalOutcome, notifyWalletAdjustment } = await import("./withdrawal-notify");
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -66,5 +75,34 @@ describe("notifyWithdrawalOutcome", () => {
   it("swallows lookup errors", async () => {
     findUnique.mockRejectedValue(new Error("db down"));
     await expect(notifyWithdrawalOutcome("w3", "PAID")).resolves.toBeUndefined();
+  });
+});
+
+describe("notifyWalletAdjustment", () => {
+  it("tells the coach, with signed amount + reason, linking to their saldo page", async () => {
+    coachFindUnique.mockResolvedValue({ userId: "coach-1" });
+    await notifyWalletAdjustment({ coachProfileId: "cp1" }, -80000, "Sesi 12 Sep salah tercatat Hadir");
+    expect(sendPushToUsers).toHaveBeenCalledWith(["coach-1"], {
+      title: "Saldo kamu dikurangi admin",
+      body: `−${formatRupiah(80000)} · Sesi 12 Sep salah tercatat Hadir`,
+      url: "/coach/saldo",
+    });
+  });
+
+  it("tells every owner of the pool", async () => {
+    ownershipFindMany.mockResolvedValue([{ ownerId: "o1" }, { ownerId: "o2" }]);
+    await notifyWalletAdjustment({ poolId: "p1" }, 125000, "Bagian kolam belum tercatat");
+    expect(sendPushToUsers).toHaveBeenCalledWith(["o1", "o2"], expect.objectContaining({ title: "Saldo kamu ditambah admin", url: "/pool/saldo" }));
+  });
+
+  it("shortens a long reason", async () => {
+    coachFindUnique.mockResolvedValue({ userId: "coach-1" });
+    await notifyWalletAdjustment({ coachProfileId: "cp1" }, 1000, "x".repeat(300));
+    expect(sendPushToUsers.mock.calls[0][1].body.length).toBeLessThan(130);
+  });
+
+  it("never throws (the correction is already saved)", async () => {
+    coachFindUnique.mockRejectedValue(new Error("db down"));
+    await expect(notifyWalletAdjustment({ coachProfileId: "cp1" }, 1000, "alasan")).resolves.toBeUndefined();
   });
 });

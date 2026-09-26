@@ -96,7 +96,9 @@ export default function SaldoView({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-sm text-text-muted">Saldo bisa dicairkan</p>
-              <p className={`mt-1 text-3xl font-semibold ${walletBalance < 0 ? "text-danger-text" : "text-text"}`}>{formatRupiah(walletBalance)}</p>
+              <p className={`mt-1 whitespace-nowrap text-3xl font-semibold ${walletBalance < 0 ? "text-danger-text" : "text-text"}`}>
+                {walletBalance < 0 ? `−${formatRupiah(-walletBalance)}` : formatRupiah(walletBalance)}
+              </p>
             </div>
             <div>
               <p className="text-sm text-text-muted">Dalam proses pencairan</p>
