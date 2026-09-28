@@ -54,6 +54,7 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 | 5.1 | Backup DB gagal tiap malam (secret R2 belum diisi); file storage gak ikut backup | TERBUKA, masalah lama | Hadi isi secret R2. File storage butuh mekanisme terpisah | Hadi (secret), lalu Opus (desain backup storage) |
 | 5.2 | CI gak jalanin build & race test | TERBUKA | Tambah step build ke `.github/workflows/test.yml` | Sonnet (mekanis) |
 | 5.3 | Rate limit cuma 1 lapis (level app) | TERBUKA, saran infra jangka panjang | Gak mendesak untuk tahap validasi permintaan | Nanti |
+| 5.4 | Satu alamat email = satu thread (`EmailThread.externalEmail @unique`), padahal topik beda-beda dari waktu ke waktu | TERBUKA, dampak kecil di volume sekarang | Kelompokkan berdasarkan Message-ID/subjek kalau volume email makin banyak | Nanti, gak mendesak |
 | 5.5 | CSP belum aktif (nunggu daftar domain Midtrans+Vercel) | TERBUKA | Kumpulin daftar domain, aktifkan CSP | Sonnet, setelah daftar domain siap |
 
 ## 6. Hukum & Model Bisnis — DIPUTUSKAN office hours 29 Sep
@@ -74,10 +75,10 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 |---|---|---|
 | Tiket masuk kolam sudah termasuk paket? | TERBUKA | Gak ada di sistem juga — perlu diputuskan dulu sebagai aturan bisnis sebelum ditulis di landing |
 | Durasi 1 sesi | TERBUKA | Sama, perlu angka pasti |
-| 1 coach : 1 anak atau bisa grup? | DIPUTUSKAN | **1:1** (didukung bukti: kolam Cianjur tolak club, terima satuan) → tegaskan di landing (Sonnet) |
+| 1 coach : 1 anak atau bisa grup? | SELESAI (commit 6db51ac) | FAQ baru "Ini les privat satu lawan satu?" ditambahkan |
 | Perlengkapan renang | TERBUKA | Belum dibahas |
 | Target belajar per paket | TERBUKA | Belum dibahas |
-| Social proof angka kecil | DIPUTUSKAN | Sembunyikan angka kecil sampai lewat ambang tertentu (Sonnet) |
+| Social proof angka kecil | SELESAI (commit 6db51ac) | Badge hero & strip statistik disembunyikan sampai member ≥ 20 (`MIN_MEMBERS_TO_SHOW_STATS`) |
 | Narasi sebelum/sesudah | SEBAGIAN ADA | Landing baris 368 udah ada narasinya, tinggal dirapikan jadi perbandingan eksplisit kalau mau (opsional, rendah) |
 | Badge "Bersertifikat" disalahpahami | SEBAGIAN USANG | FAQ udah presisi ("diperiksa admin"); badge sendiri masih bisa disalahpahami tapi ini polish, bukan urgent |
 | Trial / beli 1 sesi pertama | TERBUKA | Keputusan bisnis: ada trial atau enggak |
@@ -93,8 +94,8 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 | Biaya masuk kolam buat coach | TERBUKA | Belum ada di sistem, perlu diputuskan |
 | Murid bawaan sendiri | TERBUKA | Belum dibahas |
 | Waktu pencairan | TERBUKA | FAQ masih general ("admin memproses") |
-| **FAQ salah: "kolam mitra bisa menambahkanmu"** | DIPUTUSKAN, ini bug teks | Kenyataan: cuma **admin** yang bisa nambah coach ke kolam. Ubah teks (Sonnet) |
-| Siapa nentuin harga | SEBAGIAN | FAQ kolam jelas (kolam usul, admin setuju); FAQ coach gak bilang dia gak bisa nentuin tarif sendiri → tambahkan (Sonnet) |
+| **FAQ salah: "kolam mitra bisa menambahkanmu"** | SELESAI (commit 6db51ac) | Diubah jadi "admin yang mengafiliasikanmu" |
+| Siapa nentuin harga | SELESAI (commit 6db51ac) | FAQ coach baru: "Saya bisa menentukan tarif saya sendiri? Tidak..." |
 | Risiko transaksi di luar platform | DIPUTUSKAN | Lihat §7 #12 di atas — MOU kolam |
 
 ### Pemilik Kolam
@@ -104,11 +105,11 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 | "SPH bawa pelanggan atau cuma software?" | DIPUTUSKAN | Marketplace penuh, tapi permintaan belum terbukti — landing gak boleh janji "jam sepi pasti terisi" sampai ada bukti |
 | "Saya dapat berapa?" | DIPUTUSKAN | Per MOU, belum final — sama kayak coach |
 | Simulasi pendapatan vs tiket reguler | TERBUKA | Belum ada datanya |
-| Monopoli lintasan / gangguan pengunjung reguler | SEBAGIAN DIJAWAB | Les satuan (bukan club) → dampak ke lintasan lebih kecil, tapi belum ditulis eksplisit di landing |
+| Monopoli lintasan / gangguan pengunjung reguler | SELESAI (commit 6db51ac) | FAQ "Apa untungnya buat kolam saya?" sekarang sebut eksplisit "les privat satuan (1 coach, 1 peserta — bukan sewa club)" |
 | Tanggung jawab keselamatan/insiden | TERBUKA | Keputusan hukum, masuk draft MOU |
 | Prosedur loket/kasir | DITUNDA | Bagian dari fitur "daftar hadir loket" yang ditunda sampai ada MOU kolam pertama |
 | Wajib pakai coach dari platform? Boleh nolak coach? | TERBUKA | Sistem sekarang: kolam gak bisa tambah/tolak coach sendiri, semua lewat admin — perlu diputuskan apakah ini tetap begitu |
-| **FAQ salah: "kolam langsung tampil di halaman ini"** | DIPUTUSKAN, ini bug teks | Kenyataan: landing cuma nampilin **5 kolam paling laris**. Jadi salah begitu kolam > 5. Ubah teks (Sonnet) |
+| **FAQ salah: "kolam langsung tampil di halaman ini"** | SELESAI (commit 6db51ac) | Diubah: landing nampilin kolam paling aktif, kemunculan mengikuti aktivitas kolam |
 | Berapa lama proses persetujuan admin | TERBUKA | Belum dibahas |
 | Gabung gratis atau ada biaya? | TERBUKA | Belum dibahas |
 | Studi kasus / bukti dari kolam lain | TERBUKA | Belum ada pengguna asli buat bukti ini |
