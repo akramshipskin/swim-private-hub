@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
-import { splitPlatformTax } from "@/lib/policy";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -71,14 +70,17 @@ export default async function KomisiPage() {
   // termasuk koreksi), komisi platform = nilai sesi - bagian kolam - coach.
   const ledger = await prisma.walletTransaction.groupBy({
     by: ["bookingId", "type"],
-    where: { bookingId: { in: attendedBookings.map((b) => b.id) }, type: { in: ["SESSION_REVENUE", "SESSION_PAYOUT"] } },
+    where: { bookingId: { in: attendedBookings.map((b) => b.id) }, type: { in: ["SESSION_REVENUE", "SESSION_PAYOUT", "PLATFORM_TAX"] } },
     _sum: { amount: true },
   });
-  const credited = (bookingId: string, type: "SESSION_REVENUE" | "SESSION_PAYOUT") =>
+  const credited = (bookingId: string, type: "SESSION_REVENUE" | "SESSION_PAYOUT" | "PLATFORM_TAX") =>
     ledger.find((l) => l.bookingId === bookingId && l.type === type)?._sum.amount ?? 0;
 
-  type Part = { sessions: number; gross: number; platform: number; pool: number; coach: number };
-  const zero = (): Part => ({ sessions: 0, gross: 0, platform: 0, pool: 0, coach: 0 });
+  // tax = PPN yang benar-benar dicatat ledger per sesi. Jangan hitung ulang
+  // dari total gabungan: pembulatan sekali di total bisa beda Rp1 dengan
+  // jumlah pembulatan per sesi (angka Dashboard & Pencairan pakai ledger).
+  type Part = { sessions: number; gross: number; platform: number; tax: number; pool: number; coach: number };
+  const zero = (): Part => ({ sessions: 0, gross: 0, platform: 0, tax: 0, pool: 0, coach: 0 });
   const byPool = new Map<string, { own: Part; single: Part; legacy: Part; free: number }>();
 
   for (const b of attendedBookings) {
@@ -99,10 +101,13 @@ export default async function KomisiPage() {
     part.pool += pool;
     part.coach += coach;
     part.platform += gross - pool - coach;
+    part.tax += credited(b.id, "PLATFORM_TAX");
   }
 
   const sum = (parts: Part[], k: keyof Part) => parts.reduce((n, p) => n + p[k], 0);
-  const totalPlatform = [...byPool.values()].reduce((n, e) => n + sum([e.own, e.single, e.legacy], "platform"), 0);
+  const allParts = [...byPool.values()].flatMap((e) => [e.own, e.single, e.legacy]);
+  const totalPlatform = sum(allParts, "platform");
+  const totalTax = sum(allParts, "tax");
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -123,7 +128,7 @@ export default async function KomisiPage() {
           <p className="text-right text-xl font-bold text-text">
             {formatRupiah(totalPlatform)}
             <span className="block text-sm font-normal text-text-muted">
-              bersih {formatRupiah(splitPlatformTax(totalPlatform).net)} · PPN {formatRupiah(splitPlatformTax(totalPlatform).tax)}
+              bersih {formatRupiah(totalPlatform - totalTax)} · PPN {formatRupiah(totalTax)}
             </span>
           </p>
           {(manualPlatformNet !== 0 || manualPlatformTax !== 0 || manualCoach !== 0) && (
@@ -153,7 +158,7 @@ export default async function KomisiPage() {
             {
               label: "Total",
               total: true,
-              p: { sessions: sum(all, "sessions"), gross: sum(all, "gross"), platform: sum(all, "platform"), pool: sum(all, "pool"), coach: sum(all, "coach") },
+              p: { sessions: sum(all, "sessions"), gross: sum(all, "gross"), platform: sum(all, "platform"), tax: sum(all, "tax"), pool: sum(all, "pool"), coach: sum(all, "coach") },
             },
           ];
           const paid = paidOut.find((x) => x.poolId === pool.id)?._sum.amount ?? 0;
@@ -179,9 +184,9 @@ export default async function KomisiPage() {
                       </p>
                       <dl className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-sm tabular-nums">
                         <dt className="text-text-muted">Platform bersih</dt>
-                        <dd className="text-right text-text">{formatRupiah(splitPlatformTax(p.platform).net)}</dd>
+                        <dd className="text-right text-text">{formatRupiah(p.platform - p.tax)}</dd>
                         <dt className="text-text-muted">PPN 12%</dt>
-                        <dd className="text-right text-text">{formatRupiah(splitPlatformTax(p.platform).tax)}</dd>
+                        <dd className="text-right text-text">{formatRupiah(p.tax)}</dd>
                         <dt className="text-text-muted">Kolam</dt>
                         <dd className="text-right text-text">{formatRupiah(p.pool)}</dd>
                         <dt className="text-text-muted">Coach</dt>
@@ -209,8 +214,8 @@ export default async function KomisiPage() {
                           <td className="py-1.5 text-text">{label}</td>
                           <td className="py-1.5 text-right">{p.sessions}</td>
                           <td className="py-1.5 text-right">{formatRupiah(p.gross)}</td>
-                          <td className="py-1.5 text-right">{formatRupiah(splitPlatformTax(p.platform).net)}</td>
-                          <td className="py-1.5 text-right">{formatRupiah(splitPlatformTax(p.platform).tax)}</td>
+                          <td className="py-1.5 text-right">{formatRupiah(p.platform - p.tax)}</td>
+                          <td className="py-1.5 text-right">{formatRupiah(p.tax)}</td>
                           <td className="py-1.5 text-right">{formatRupiah(p.pool)}</td>
                           <td className="py-1.5 text-right">{formatRupiah(p.coach)}</td>
                         </tr>
@@ -219,8 +224,8 @@ export default async function KomisiPage() {
                         <td className="py-1.5 text-text">Total</td>
                         <td className="py-1.5 text-right">{sum(all, "sessions")}</td>
                         <td className="py-1.5 text-right">{formatRupiah(sum(all, "gross"))}</td>
-                        <td className="py-1.5 text-right">{formatRupiah(splitPlatformTax(sum(all, "platform")).net)}</td>
-                        <td className="py-1.5 text-right">{formatRupiah(splitPlatformTax(sum(all, "platform")).tax)}</td>
+                        <td className="py-1.5 text-right">{formatRupiah(sum(all, "platform") - sum(all, "tax"))}</td>
+                        <td className="py-1.5 text-right">{formatRupiah(sum(all, "tax"))}</td>
                         <td className="py-1.5 text-right">{formatRupiah(sum(all, "pool"))}</td>
                         <td className="py-1.5 text-right">{formatRupiah(sum(all, "coach"))}</td>
                       </tr>

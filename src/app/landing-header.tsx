@@ -22,7 +22,7 @@ export function LandingHeader() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 text-white backdrop-blur-md transition-[background,padding] duration-200 ${
-        scrolled ? "bg-gradient-to-b from-fixed-night/70 via-fixed-night/35 to-transparent" : "bg-gradient-to-b from-black/25 to-transparent"
+        scrolled ? "bg-gradient-to-b from-fixed-night/85 via-fixed-night/75 to-fixed-night/65" : "bg-gradient-to-b from-black/25 to-transparent"
       }`}
     >
       <div className={`mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 transition-[padding] duration-200 sm:gap-4 ${scrolled ? "py-2 sm:py-3" : "py-5"}`}>

@@ -27,10 +27,10 @@ export default function ChangePasswordForm({
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <Field label="Password Baru">
-        <PasswordInput name="newPassword" placeholder="••••••••" required autoComplete="new-password" />
+        <PasswordInput name="newPassword" placeholder="Minimal 8 karakter" required autoComplete="new-password" />
       </Field>
       <Field label="Konfirmasi Password Baru">
-        <PasswordInput name="confirmPassword" placeholder="••••••••" required autoComplete="new-password" />
+        <PasswordInput name="confirmPassword" placeholder="Ulangi password baru" required autoComplete="new-password" />
       </Field>
 
       {isMember && (

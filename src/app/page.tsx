@@ -8,7 +8,7 @@ export default async function Home() {
   const session = await auth();
 
   if (!session) {
-    const [pools, coaches, memberCount, attendedCount, packagesPerPool] = await Promise.all([
+    const [pools, coaches, memberCount, attendedCount, packagesPerPool, sessionsPerCoach] = await Promise.all([
       prisma.pool.findMany({
         where: { isActive: true },
         orderBy: { name: "asc" },
@@ -43,6 +43,13 @@ export default async function Home() {
         where: { startDate: { not: null } },
         select: { poolId: true, memberId: true },
       }),
+      // Sesi Hadir per coach (slot yang punya booking attended) -> urutan
+      // coach di landing: paling banyak mengajar dulu.
+      prisma.availability.groupBy({
+        by: ["coachId"],
+        where: { bookings: { some: { attended: true } } },
+        _count: { _all: true },
+      }),
     ]);
 
     const poolStats = new Map<string, { sold: number; members: Set<string> }>();
@@ -55,6 +62,12 @@ export default async function Home() {
     // Landing menampilkan maksimal 5 kolam paling laris, bukan semuanya.
     const topPools = [...pools]
       .sort((a, b) => (poolStats.get(b.id)?.sold ?? 0) - (poolStats.get(a.id)?.sold ?? 0) || a.name.localeCompare(b.name))
+      .slice(0, 5);
+
+    const coachSessions = new Map(sessionsPerCoach.map((r) => [r.coachId, r._count._all]));
+    // Landing menampilkan maksimal 5 coach dengan sesi Hadir terbanyak.
+    const topCoaches = [...coaches]
+      .sort((a, b) => (coachSessions.get(b.id) ?? 0) - (coachSessions.get(a.id) ?? 0) || a.name.localeCompare(b.name))
       .slice(0, 5);
 
     return (
@@ -75,7 +88,7 @@ export default async function Home() {
             ? Math.min(...p.packageTemplates.map((t) => Math.round(t.price / t.totalSesi)))
             : null,
         }))}
-        coaches={coaches.slice(0, 5).map((c) => ({
+        coaches={topCoaches.map((c) => ({
           id: c.id,
           name: c.name,
           bio: c.coachProfile?.bio ?? null,

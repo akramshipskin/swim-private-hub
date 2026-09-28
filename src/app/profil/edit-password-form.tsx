@@ -21,13 +21,13 @@ export default function EditPasswordForm() {
   return (
     <form key={formKey} action={formAction} className="flex flex-col gap-4">
       <Field label="Password Saat Ini">
-        <PasswordInput name="currentPassword" placeholder="••••••••" required autoComplete="current-password" />
+        <PasswordInput name="currentPassword" placeholder="Password saat ini" required autoComplete="current-password" />
       </Field>
       <Field label="Password Baru">
-        <PasswordInput name="newPassword" placeholder="••••••••" required autoComplete="new-password" />
+        <PasswordInput name="newPassword" placeholder="Minimal 8 karakter" required autoComplete="new-password" />
       </Field>
       <Field label="Konfirmasi Password Baru">
-        <PasswordInput name="confirmPassword" placeholder="••••••••" required autoComplete="new-password" />
+        <PasswordInput name="confirmPassword" placeholder="Ulangi password baru" required autoComplete="new-password" />
       </Field>
 
       {state?.error && (

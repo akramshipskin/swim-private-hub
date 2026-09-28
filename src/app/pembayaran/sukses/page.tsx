@@ -4,6 +4,9 @@ import { Logotype } from "@/components/ui/logotype";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
 import { buttonClass } from "@/components/ui/button";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { resolveFinishStatus } from "@/lib/payment-finish-status";
 
 export const metadata: Metadata = {
   title: "Status Pembayaran | Swim Private Hub",
@@ -18,12 +21,23 @@ export const metadata: Metadata = {
 export default async function PembayaranSuksesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ transaction_status?: string }>;
+  searchParams: Promise<{ transaction_status?: string; order_id?: string }>;
 }) {
-  const { transaction_status } = await searchParams;
-  const isPending = transaction_status === "pending";
-  const isSuccess = transaction_status === "capture" || transaction_status === "settlement";
-  const isFailed = !isPending && !isSuccess;
+  const { transaction_status, order_id } = await searchParams;
+  // Status asli dari DB, hanya untuk order milik member yang sedang login
+  // (order orang lain tidak dibocorkan: dianggap tidak ketemu).
+  const session = await auth();
+  const payment =
+    order_id && session?.user?.id
+      ? await prisma.payment.findFirst({
+          where: { midtransOrderId: order_id, package: { memberId: session.user.id } },
+          select: { status: true },
+        })
+      : null;
+  const status = resolveFinishStatus(payment?.status ?? null, transaction_status);
+  const isPending = status === "pending";
+  const isFailed = status === "failed";
+  const isUnknown = status === "unknown";
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 py-12">
@@ -45,12 +59,14 @@ export default async function PembayaranSuksesPage({
             className={`mb-4 flex h-16 w-16 items-center justify-center rounded-full ${
               isFailed
                 ? "bg-danger-bg text-danger-text"
-                : isPending
+                : isPending || isUnknown
                   ? "bg-warning-bg text-warning-text"
                   : "bg-success-bg text-success-text"
             }`}
           >
-            {isFailed ? (
+            {isUnknown ? (
+              <span className="text-3xl font-bold" aria-hidden="true">?</span>
+            ) : isFailed ? (
               <svg viewBox="0 0 24 24" fill="none" className="h-9 w-9" aria-hidden="true">
                 <path
                   d="M18 6 6 18M6 6l12 12"
@@ -73,12 +89,14 @@ export default async function PembayaranSuksesPage({
             )}
           </span>
           <h1 className="mb-1 text-xl font-semibold text-text">
-            {isFailed ? "Pembayaran Belum Selesai" : isPending ? "Menunggu Pembayaran" : "Pembayaran Berhasil"}
+            {isFailed ? "Pembayaran Belum Selesai" : isUnknown ? "Cek Status Pembayaran" : isPending ? "Menunggu Pembayaran" : "Pembayaran Berhasil"}
           </h1>
           <p className="mb-6 text-sm text-text-muted">
             {isFailed
               ? "Pembayaran dibatalkan atau gagal diproses. Belum ada saldo yang terpotong — kamu bisa coba lagi kapan saja."
-              : isPending
+              : isUnknown
+                ? "Status pembayaranmu bisa dilihat di halaman Paket Saya. Paket aktif otomatis begitu pembayaran masuk."
+                : isPending
                 ? "Selesaikan pembayaran sesuai instruksi (VA/QRIS/dll) sebelum batas waktunya. Paket aktif otomatis begitu pembayaran masuk."
                 : "Terima kasih! Paketmu sedang diproses otomatis dan akan aktif dalam beberapa saat."}
           </p>

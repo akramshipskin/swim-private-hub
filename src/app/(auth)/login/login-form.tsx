@@ -107,7 +107,7 @@ export default function LoginForm() {
               <PasswordInput
                 name="password"
                 id="login-password"
-                placeholder="••••••••"
+                placeholder="Masukkan password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
