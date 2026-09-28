@@ -1,0 +1,140 @@
+# Backlog Gabungan SPH — 29 Sep 2026
+
+Gabungan dari dua dokumen:
+- Verifikasi ke kode (28 Sep): [docs/reviews/2026-09-28-verifikasi-blindspot.md](../reviews/2026-09-28-verifikasi-blindspot.md) — cek klaim ChatGPT+Antigravity ke kode asli.
+- Office hours (29 Sep): [docs/designs/validasi-permintaan-dan-kejujuran-landing.md](../designs/validasi-permintaan-dan-kejujuran-landing.md) — keputusan model bisnis Hadi.
+
+Tujuan file ini: satu daftar kerja, bukan dua dokumen terpisah. Tiap baris = satu item, dengan status akhir setelah office hours dan siapa yang ngerjain apa.
+
+Status:
+- **SELESAI** — udah difix & commit.
+- **DIPUTUSKAN** — office hours udah jawab, tinggal dieksekusi.
+- **DITUNDA** — sengaja ditunda, ada syarat pemicunya.
+- **TERBUKA** — belum dibahas sama sekali, masih nunggu keputusan Hadi.
+
+---
+
+## 1. Uang & Integritas Keuangan — semua TERBUKA (paling berisiko)
+
+Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing). Ini masih murni dari verifikasi 28 Sep.
+
+| # | Item | Status | Kerjaan berikutnya | Owner / Gear |
+|---|---|---|---|---|
+| 1.1 | Pembalikan pendapatan platform gak dicek saldo (beda dari pool/coach yang dicek) | TERBUKA | Hadi putusin: platform boleh saldo minus sementara (mirip koreksi saldo 26 Sep) atau harus dikunci kayak pool/coach? PPN yang udah disetor lalu dibalik = isu nyata | Hadi jawab dulu, baru Opus (area uang) |
+| 1.2 | Penarikan platform gak ada bukti transfer/status/konfirmator | TERBUKA | Samain standar sama penarikan coach/pool (udah wajib bukti transfer) | Opus (area uang) |
+| 1.3 | Rekening bank polos di DB, enkripsi belum dibahas | TERBUKA (sebagian, 25 Sep: nomor disamarkan setelah pencairan otomatis) | Enkripsi level aplikasi: perlu diputuskan | Hadi, lalu Opus |
+
+## 2. Privasi & Data
+
+| # | Item | Status | Kerjaan berikutnya | Owner / Gear |
+|---|---|---|---|---|
+| 2.1 | `totpSecret` disimpan polos | TERBUKA | Enkripsi AES-256-GCM sebelum simpan | Opus (area auth/keamanan) |
+| 2.2 | `dev-db-sync.mjs` nyalin data asli prod TERMASUK totpSecret admin | TERBUKA, **lebih genting dari yang ditulis dokumen asli** | Tambah anonimisasi/redaksi sebelum masuk DB dev, minimal totpSecret & data anak | Opus |
+| 2.3 | Data ke AI tanpa filter | SEBAGIAN DIPUTUSKAN (retensi chat 90 hari + arsip, 25 Sep) | Belum ada aturan "data apa yang boleh diproses AI" secara eksplisit — saat ini cuma nama+peran+ketikan user, gak baca DB | Hadi putusin kalau mau diperketat lagi |
+| 2.4 | Pemilik kolam bisa liat nama anak | TERBUKA | Hadi putusin: perlu atau cukup jumlah peserta | Hadi jawab dulu |
+| 2.5 | Sertifikat coach bisa dibuka semua yang login (bukan cuma member) | SEBAGIAN DIPUTUSKAN (25 Sep: member boleh) | Coach lain & pemilik kolam masih ikut kebuka — perlu diputuskan dibatasi atau dibiarkan | Hadi jawab dulu, lalu Sonnet |
+
+## 3. Kredensial
+
+| # | Item | Status | Kerjaan berikutnya | Owner / Gear |
+|---|---|---|---|---|
+| 3.1 | Password demo `qwertyuiop` di `seed-prod-demo.mts` | TERBUKA — status akun Nadia di prod belum dipastikan | Hadi konfirmasi: akun demo di prod udah dihapus atau masih ada? | Hadi cek, lalu Sonnet kalau perlu hapus dari skrip |
+
+## 4. Aturan Tampil Publik
+
+| # | Item | Status | Kerjaan berikutnya | Owner / Gear |
+|---|---|---|---|---|
+| 4.1 | `/pelatih` gak cek profil aktif | DAMPAK NOL saat ini (kolom `CoachProfile.isActive` gak pernah ditulis) | Gak mendesak. Bisa dirapikan sekalian saat ngerjain item lain di file yang sama | Sonnet, prioritas rendah |
+| 4.2 | Slot kolam nonaktif masih tampil di `/api/availability` (booking-nya tetap ditolak) | TERBUKA, dampak UX doang | Filter `pool.isActive` di query availability | Sonnet |
+
+## 5. Infrastruktur
+
+| # | Item | Status | Kerjaan berikutnya | Owner / Gear |
+|---|---|---|---|---|
+| 5.1 | Backup DB gagal tiap malam (secret R2 belum diisi); file storage gak ikut backup | TERBUKA, masalah lama | Hadi isi secret R2. File storage butuh mekanisme terpisah | Hadi (secret), lalu Opus (desain backup storage) |
+| 5.2 | CI gak jalanin build & race test | TERBUKA | Tambah step build ke `.github/workflows/test.yml` | Sonnet (mekanis) |
+| 5.3 | Rate limit cuma 1 lapis (level app) | TERBUKA, saran infra jangka panjang | Gak mendesak untuk tahap validasi permintaan | Nanti |
+| 5.5 | CSP belum aktif (nunggu daftar domain Midtrans+Vercel) | TERBUKA | Kumpulin daftar domain, aktifkan CSP | Sonnet, setelah daftar domain siap |
+
+## 6. Hukum & Model Bisnis — DIPUTUSKAN office hours 29 Sep
+
+| # | Item | Status | Keputusan | Kerjaan berikutnya |
+|---|---|---|---|---|
+| 6.1 | S&K bilang "sarana bantu administrasi" tapi SPH pegang dana Midtrans dulu | DIPUTUSKAN | SPH = marketplace penuh, pegang dana & hubungan pelanggan. S&K harus diubah sesuai kenyataan ini | Draft revisi S&K (Opus) + **wajib review orang hukum** sebelum live |
+| §7 #8 | Marketplace / software / hybrid? | DIPUTUSKAN | **Marketplace penuh** | — |
+| §7 #9-10 | SPH bawa demand ke coach/kolam? | DIPUTUSKAN | Ya, itu tujuannya, tapi **belum terbukti** — landing gak boleh janji sebelum ada member asli | Lunakkan klaim di landing (lihat §7) |
+| §7 #11 | Siapa pegang hubungan pelanggan? | DIPUTUSKAN | SPH | — |
+| §7 #12 | Transaksi di luar platform (kabur ke WA)? | DIPUTUSKAN | Dicegah lewat MOU kolam ("les privat di kolam ini cuma lewat SPH") + fitur yang WA gak punya | Draft template MOU (Opus) + **wajib review orang hukum**; Hadi tanya 3 kolam dulu (The Assignment) |
+
+## 7. Landing — per role
+
+### Member
+
+| Item | Status | Keputusan / Kerjaan |
+|---|---|---|
+| Tiket masuk kolam sudah termasuk paket? | TERBUKA | Gak ada di sistem juga — perlu diputuskan dulu sebagai aturan bisnis sebelum ditulis di landing |
+| Durasi 1 sesi | TERBUKA | Sama, perlu angka pasti |
+| 1 coach : 1 anak atau bisa grup? | DIPUTUSKAN | **1:1** (didukung bukti: kolam Cianjur tolak club, terima satuan) → tegaskan di landing (Sonnet) |
+| Perlengkapan renang | TERBUKA | Belum dibahas |
+| Target belajar per paket | TERBUKA | Belum dibahas |
+| Social proof angka kecil | DIPUTUSKAN | Sembunyikan angka kecil sampai lewat ambang tertentu (Sonnet) |
+| Narasi sebelum/sesudah | SEBAGIAN ADA | Landing baris 368 udah ada narasinya, tinggal dirapikan jadi perbandingan eksplisit kalau mau (opsional, rendah) |
+| Badge "Bersertifikat" disalahpahami | SEBAGIAN USANG | FAQ udah presisi ("diperiksa admin"); badge sendiri masih bisa disalahpahami tapi ini polish, bukan urgent |
+| Trial / beli 1 sesi pertama | TERBUKA | Keputusan bisnis: ada trial atau enggak |
+| Testimoni, screenshot produk, info keselamatan | TERBUKA | Belum dibahas, prioritas rendah sampai ada pengguna asli buat testimoni |
+
+### Coach
+
+| Item | Status | Keputusan / Kerjaan |
+|---|---|---|
+| Persentase komisi gak disebut | DIPUTUSKAN | Komisi per MOU per kolam, **angka belum final** → landing TETAP gak boleh sebut angka sampai MOU pertama jalan |
+| "Kenapa dipotong komisi dibanding cari sendiri" | DIPUTUSKAN (arah) | Dijawab lewat fitur yang WA gak punya (riwayat, progres, jaminan sesi pengganti) — bukan lewat teks landing doang |
+| "Murid saya datang dari mana?" | DIPUTUSKAN | SPH janji bawa demand, tapi **belum terbukti** — jangan janji di landing sebelum ada member asli |
+| Biaya masuk kolam buat coach | TERBUKA | Belum ada di sistem, perlu diputuskan |
+| Murid bawaan sendiri | TERBUKA | Belum dibahas |
+| Waktu pencairan | TERBUKA | FAQ masih general ("admin memproses") |
+| **FAQ salah: "kolam mitra bisa menambahkanmu"** | DIPUTUSKAN, ini bug teks | Kenyataan: cuma **admin** yang bisa nambah coach ke kolam. Ubah teks (Sonnet) |
+| Siapa nentuin harga | SEBAGIAN | FAQ kolam jelas (kolam usul, admin setuju); FAQ coach gak bilang dia gak bisa nentuin tarif sendiri → tambahkan (Sonnet) |
+| Risiko transaksi di luar platform | DIPUTUSKAN | Lihat §7 #12 di atas — MOU kolam |
+
+### Pemilik Kolam
+
+| Item | Status | Keputusan / Kerjaan |
+|---|---|---|
+| "SPH bawa pelanggan atau cuma software?" | DIPUTUSKAN | Marketplace penuh, tapi permintaan belum terbukti — landing gak boleh janji "jam sepi pasti terisi" sampai ada bukti |
+| "Saya dapat berapa?" | DIPUTUSKAN | Per MOU, belum final — sama kayak coach |
+| Simulasi pendapatan vs tiket reguler | TERBUKA | Belum ada datanya |
+| Monopoli lintasan / gangguan pengunjung reguler | SEBAGIAN DIJAWAB | Les satuan (bukan club) → dampak ke lintasan lebih kecil, tapi belum ditulis eksplisit di landing |
+| Tanggung jawab keselamatan/insiden | TERBUKA | Keputusan hukum, masuk draft MOU |
+| Prosedur loket/kasir | DITUNDA | Bagian dari fitur "daftar hadir loket" yang ditunda sampai ada MOU kolam pertama |
+| Wajib pakai coach dari platform? Boleh nolak coach? | TERBUKA | Sistem sekarang: kolam gak bisa tambah/tolak coach sendiri, semua lewat admin — perlu diputuskan apakah ini tetap begitu |
+| **FAQ salah: "kolam langsung tampil di halaman ini"** | DIPUTUSKAN, ini bug teks | Kenyataan: landing cuma nampilin **5 kolam paling laris**. Jadi salah begitu kolam > 5. Ubah teks (Sonnet) |
+| Berapa lama proses persetujuan admin | TERBUKA | Belum dibahas |
+| Gabung gratis atau ada biaya? | TERBUKA | Belum dibahas |
+| Studi kasus / bukti dari kolam lain | TERBUKA | Belum ada pengguna asli buat bukti ini |
+
+### Lintas peran
+
+| Item | Status | Keputusan / Kerjaan |
+|---|---|---|
+| Satu hero buat 3 audiens, gak ada pemilihan peran | TERBUKA, tapi rendah prioritas sampai ada traffic buat diuji | Bisa ditambah setelah tes Meta Ads jalan |
+
+## 8. Sisa Sweep 28 Sep (belum sempat, di luar topik landing/bisnis)
+
+| Item | Status | Kerjaan berikutnya |
+|---|---|---|
+| Sweep role member & pemilik kolam | BELUM DIKERJAKAN | Butuh password akun QA dari Hadi |
+| Alur tulis-data (submit form, koreksi saldo, dll) belum diuji | BELUM DIKERJAKAN | Lanjutan /qa-only |
+| Fix `/pembayaran/sukses` belum diuji order asli | BELUM DIVERIFIKASI | Checkout lokal = key Midtrans production, dilarang tes langsung |
+| `.qa-otp.mts` masih nangkring di root repo | BELUM DIBERESIN | Hapus setelah sweep kelar |
+
+---
+
+## Ringkasan prioritas (urutan kerja yang disarankan)
+
+1. **The Assignment Hadi** (di luar kode): tanya 3 kolam soal klausul "privat hanya lewat SPH" — ini nentuin apakah premis #4 (pelindung utama) beneran jalan.
+2. **Bug teks FAQ (Sonnet, cepat, gak berisiko):** "kolam bisa tambah coach" (salah) dan "kolam langsung tampil" (salah) — ini murni kesalahan fakta di landing yang aktif sekarang, gak nunggu apa pun.
+3. **Perbaikan landing lain dari daftar A** (Sonnet): 1:1, social proof, harga dari kolam, lunakkan janji "dapat murid"/"jam sepi terisi".
+4. **Draft S&K + MOU** (Opus, lalu wajib ke orang hukum) — jalan paralel sama Hadi ngerjain tes lapangan.
+5. **Item uang (Bagian 1)** — TERBUKA, perlu Hadi putusin dulu sebelum dikerjakan, paling berisiko kalau dikerjakan asal.
+6. Sisanya (privasi, infra, sisa sweep) — gak mendesak untuk tes permintaan, bisa nyusul.
