@@ -95,6 +95,10 @@ const FAQ_GROUPS: FaqGroup[] = [
         a: "Satu akun orang tua bisa punya banyak peserta: kamu sendiri dan/atau beberapa anak. Paket dan sisa sesi dihitung per peserta, jadi tidak tercampur.",
       },
       {
+        q: "Ini les privat satu lawan satu?",
+        a: "Ya. Setiap sesi adalah 1 coach untuk 1 peserta, dijadwalkan khusus untuk peserta itu — bukan kelas gabungan atau grup.",
+      },
+      {
         q: "Bagaimana kalau batal mendadak?",
         a: `Setiap paket punya jatah pembatalan mandiri, paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal. Di luar itu bisa menghubungi admin lewat tombol bantuan di aplikasi. Tidak hadir tanpa membatalkan berarti sesi tetap terpakai.`,
       },
@@ -122,7 +126,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: "Bagaimana cara gabung jadi coach?",
-        a: "Daftar lewat halaman Daftar Coach, isi profil dan keahlian. Akun aktif setelah disetujui admin, lalu kolam mitra bisa menambahkanmu sebagai coach di kolam mereka.",
+        a: "Daftar lewat halaman Daftar Coach, isi profil dan keahlian. Setelah akun disetujui admin, admin yang akan mengafiliasikanmu ke kolam mitra yang sesuai.",
       },
       {
         q: "Bisa mengajar di lebih dari satu kolam?",
@@ -141,6 +145,10 @@ const FAQ_GROUPS: FaqGroup[] = [
         a: "Batalkan sesinya dari menu Jadwal. Sisa sesi member otomatis kembali dan member mendapat notifikasi, jadi tidak ada yang dirugikan diam-diam.",
       },
       {
+        q: "Saya bisa menentukan tarif saya sendiri?",
+        a: "Tidak. Harga paket ditentukan per kolam — diusulkan pemilik kolam, disetujui admin. Bagianmu dihitung dari persentase komisi coach yang berlaku di kolam itu.",
+      },
+      {
         q: "Apa untungnya dibanding cari murid sendiri?",
         a: "Jadwal, absensi, dan pembayaran diurus sistem. Kamu tinggal membuka jam kosong, mengajar, dan menandai kehadiran.",
       },
@@ -152,7 +160,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: "Apa untungnya buat kolam saya?",
-        a: "Jam sepi bisa terisi les privat, dan setiap sesi yang terlaksana memberi bagian ke kolam secara otomatis. Kamu juga bisa melihat jam ramai kolam setiap hari.",
+        a: "Kamu bisa membuka jam kosong untuk les privat satuan (1 coach, 1 peserta — bukan sewa club), dan setiap sesi yang terlaksana memberi bagian ke kolam secara otomatis. Kamu juga bisa melihat jam ramai kolam setiap hari.",
       },
       {
         q: "Siapa yang menentukan harga paket?",
@@ -168,13 +176,21 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Cara gabung jadi mitra?",
-        a: "Daftar lewat halaman Daftarkan Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin, kolam kamu langsung tampil di halaman ini.",
+        a: "Daftar lewat halaman Daftarkan Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin, kolam kamu langsung bisa menerima booking. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
       },
     ],
   },
 ];
 
+// Angka social proof (badge hero + strip statistik) baru ditampilkan setelah
+// jumlah member beneran lewat ambang ini -- sebelum ada pengguna asli,
+// angka kecil ("5 kolam", "10 member") terkesan sepi/karangan alih-alih
+// meyakinkan (temuan sweep 28 Sep). Sesuaikan begitu pertumbuhan asli mulai
+// kelihatan; nilainya keputusan tampilan, bukan aturan bisnis.
+const MIN_MEMBERS_TO_SHOW_STATS = 20;
+
 export default function LandingView({ stats, pools, coaches }: { stats: LandingStats; pools: LandingPool[]; coaches: LandingCoach[] }) {
+  const showStats = stats.memberCount >= MIN_MEMBERS_TO_SHOW_STATS;
   const STATS = [
     { value: stats.poolCount, label: "Kolam mitra" },
     { value: stats.coachCount, label: "Coach aktif" },
@@ -214,7 +230,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             garis ijo. relative+z-10 biar teks di atas foto. */}
         <div className="relative z-10 mx-auto -mt-[10svh] flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 py-10 text-center">
           <p className="rounded-full border border-white/30 px-4 py-1.5 text-sm">
-            Les renang privat · {stats.poolCount} kolam mitra · {stats.coachCount} coach
+            {showStats ? `Les renang privat · ${stats.poolCount} kolam mitra · ${stats.coachCount} coach` : "Les renang privat"}
           </p>
           <h1 className="mt-5 max-w-3xl text-[length:min(7vw,3.75rem)] font-semibold leading-[1.08] tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
             <span className="block">Aplikasi les renang privat.</span>
@@ -240,14 +256,16 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           </p>
         </div>
 
-        <dl className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-6 border-t border-white/20 px-4 py-6 text-center sm:grid-cols-4">
-          {STATS.map((s) => (
-            <div key={s.label}>
-              <dd className="text-3xl font-semibold tabular-nums sm:text-4xl">{s.value.toLocaleString("id-ID")}</dd>
-              <dt className="text-sm text-white/75">{s.label}</dt>
-            </div>
-          ))}
-        </dl>
+        {showStats && (
+          <dl className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-6 border-t border-white/20 px-4 py-6 text-center sm:grid-cols-4">
+            {STATS.map((s) => (
+              <div key={s.label}>
+                <dd className="text-3xl font-semibold tabular-nums sm:text-4xl">{s.value.toLocaleString("id-ID")}</dd>
+                <dt className="text-sm text-white/75">{s.label}</dt>
+              </div>
+            ))}
+          </dl>
+        )}
       </section>
 
       {/* Sub-navigasi tab: lompat ke info kolam / coach */}
