@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Logotype } from "@/components/ui/logotype";
 import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
-import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT, MIN_WITHDRAWAL } from "@/lib/policy";
+import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, MIN_WITHDRAWAL } from "@/lib/policy";
 import { formatRupiah } from "@/lib/format";
 
 // Panduan ditulis ulang 18 Sep 2026: dulu berupa blob HTML dengan font dan
@@ -76,7 +76,7 @@ const GUIDES: Guide[] = [
           { title: "Pilih coach & jam", body: "Slot kosong ada tombol Booking. Slot yang sudah diambil member lain otomatis terkunci." },
           { title: "Selesai", body: "Sisa sesi berkurang 1, dan coach mendapat notifikasi kalau notifikasinya sudah aktif." },
         ],
-        note: `Belum punya paket di kolam itu tapi masih punya paket aktif di kolam lain? Ada tombol beli 1 sesi (harga per sesi termahal di kolam itu + ${DROP_IN_MARKUP_PERCENT}%, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
+        note: `Belum punya paket di kolam itu tapi masih punya paket aktif di kolam lain? Ada tombol beli 1 sesi (harga khusus 1 sesi yang tertera saat pembelian, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
       },
       {
         heading: "4. Riwayat & pembatalan",

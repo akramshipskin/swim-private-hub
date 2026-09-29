@@ -67,10 +67,6 @@ export default async function MemberBookingPage() {
     photos: p.photos,
     hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
     singleSessionPrice: dropInPrice(p.packageTemplates),
-    // Harga per sesi termahal tanpa markup, buat pembanding di konfirmasi.
-    packagePerSession: p.packageTemplates.length
-      ? Math.max(...p.packageTemplates.map((t) => Math.round(t.price / t.totalSesi)))
-      : null,
   }));
 
   return (

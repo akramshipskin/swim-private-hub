@@ -4,7 +4,7 @@ import { Logotype } from "@/components/ui/logotype";
 import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
 import { BUSINESS_ADDRESS } from "@/lib/business";
 import { formatRupiah } from "@/lib/format";
-import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT, MIN_WITHDRAWAL } from "@/lib/policy";
+import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, MIN_WITHDRAWAL } from "@/lib/policy";
 import { AudienceTabs, FaqTabs, type AudienceSteps, type FaqGroup } from "./landing-tabs";
 import { CoachLeaders } from "./coach-leaders";
 import { LandingHeader } from "./landing-header";
@@ -26,7 +26,7 @@ type LandingPool = {
   memberCount: number;
   hours: string | null;
   coachCount: number;
-  fromPerSession: number | null;
+  fromPackagePrice: number | null;
 };
 export type LandingCoach = {
   id: string;
@@ -88,7 +88,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Paket bisa dipakai di kolam mana saja?",
-        a: `Paket berlaku di kolam tempat paket dibeli. Kalau sesekali ingin les di kolam mitra lain, member yang masih punya paket aktif bisa beli 1 sesi di kolam tersebut (harga per sesi termahal di kolam itu + ${DROP_IN_MARKUP_PERCENT}%, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
+        a: `Paket berlaku di kolam tempat paket dibeli. Kalau sesekali ingin les di kolam mitra lain, member yang masih punya paket aktif bisa beli 1 sesi di kolam tersebut (harga khusus 1 sesi yang tertera saat pembelian, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
       },
       {
         q: "Satu akun untuk berapa anak?",
@@ -336,7 +336,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
                       </div>
                       <div>
                         <dt className="text-fixed-muted">Harga mulai</dt>
-                        <dd className="font-semibold">{p.fromPerSession ? `${formatRupiah(p.fromPerSession)}/sesi` : "Segera hadir"}</dd>
+                        <dd className="font-semibold">{p.fromPackagePrice ? `${formatRupiah(p.fromPackagePrice)}/paket` : "Segera hadir"}</dd>
                       </div>
                       <div>
                         <dt className="text-fixed-muted">Coach</dt>

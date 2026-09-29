@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
-import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT } from "@/lib/policy";
+import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS } from "@/lib/policy";
 import { useSession } from "next-auth/react";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,6 @@ type PoolOption = {
   photos: string[];
   hours: string | null;
   singleSessionPrice: number | null;
-  packagePerSession: number | null;
 };
 
 type Slot = {
@@ -585,12 +584,7 @@ export default function BookingBoard({
               <li>Hanya berlaku di <b>{selectedPool.name}</b>, tidak bisa dipakai di kolam lain.</li>
               <li>Berlaku {DROP_IN_DURATION_DAYS} hari sejak pembayaran berhasil.</li>
               <li>Jatah batal 1x (paling lambat {CANCEL_WINDOW_HOURS} jam sebelum jadwal); sesinya kembali dan bisa dibooking ulang.</li>
-              {selectedPool.packagePerSession != null && (
-                <li>
-                  Lebih mahal {DROP_IN_MARKUP_PERCENT}% dari harga per sesi paket di kolam ini ({formatRupiah(selectedPool.packagePerSession)}). Kalau
-                  sering ke sini, beli paket lebih hemat.
-                </li>
-              )}
+              <li>Kalau sering ke sini, beli paket lebih hemat.</li>
             </ul>
             <div className="mt-4 rounded-lg bg-surface-muted px-3 py-2 text-sm">
               <p className="font-semibold text-text">Tentang {selectedPool.name}</p>

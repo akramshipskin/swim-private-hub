@@ -236,7 +236,6 @@ export default async function MemberPaketPage() {
                         </div>
                         <div>
                           <p className="text-2xl font-bold leading-tight text-text">{formatRupiah(t.price)}</p>
-                          <p className="text-sm text-text-muted">{formatRupiah(Math.round(t.price / t.totalSesi))} per sesi</p>
                         </div>
                         <ul className="flex flex-wrap gap-1.5">
                           <li><Badge tone="brand">{t.totalSesi} sesi les</Badge></li>

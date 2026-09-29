@@ -83,9 +83,9 @@ export default async function Home() {
           memberCount: poolStats.get(p.id)?.members.size ?? 0,
           hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
           coachCount: p._count.affiliations,
-          // Harga per sesi termurah dari katalog kolam itu.
-          fromPerSession: p.packageTemplates.length
-            ? Math.min(...p.packageTemplates.map((t) => Math.round(t.price / t.totalSesi)))
+          // Harga paket termurah dari katalog kolam itu (harga per sesi tidak ditampilkan ke publik).
+          fromPackagePrice: p.packageTemplates.length
+            ? Math.min(...p.packageTemplates.map((t) => t.price))
             : null,
         }))}
         coaches={topCoaches.map((c) => ({
