@@ -1,0 +1,122 @@
+// Penyamaran data production sebelum masuk database dev lokal (dipakai
+// dev-db-sync.mjs). Tujuan: laptop developer tidak menyimpan data pribadi
+// asli (nama member/anak, HP, email, rekening, isi chat/email) maupun
+// rahasia login (hash password, kunci 2FA) dari production.
+//
+// Fail closed: SETIAP kolom setiap tabel harus diklasifikasi di POLICY
+// (disalin apa adanya, atau diganti). Tabel/kolom baru di skema yang belum
+// diklasifikasi membuat sinkronisasi berhenti, bukan diam-diam tersalin mentah.
+//
+// Yang sengaja DISALIN apa adanya: data yang memang sudah publik di landing
+// (nama/alamat/foto kolam, profil coach selain rekening) dan angka transaksi
+// (harga, saldo, ledger) supaya bug uang tetap bisa direproduksi. Catatan
+// admin (WalletTransaction.note, PlatformWithdrawal.note, failureReason) juga
+// disalin: teks operasional buatan admin, dibutuhkan untuk menelusuri koreksi.
+
+const KEEP = Symbol("keep");
+const keep = (...cols) => Object.fromEntries(cols.map((c) => [c, KEEP]));
+const pad = (n, width) => String(n).padStart(width, "0");
+
+const ROLE_LABEL = { ADMIN: "Admin", COACH: "Coach", MEMBER: "Member", POOL_OWNER: "Pemilik Kolam" };
+const BANK = { bankName: () => "BCA", bankAccountNumber: (r, i) => `9${pad(i, 9)}`, bankAccountName: (r, i) => `Rekening Dev ${i}` };
+
+// null = tabel tidak disalin sama sekali (isinya tidak berguna di lokal dan
+// berisiko): langganan push = alamat notifikasi HP asli (kalau disalin, uji
+// lokal bisa mengirim notifikasi ke HP orang sungguhan); RateLimitHit = key
+// berisi IP/HP, cuma data sementara.
+export const POLICY = {
+  PushSubscription: null,
+  RateLimitHit: null,
+
+  User: {
+    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt"),
+    name: (r, i) => `${ROLE_LABEL[r.role] ?? "User"} ${i}`,
+    phone: (r, i) => `0899${pad(i, 8)}`,
+    email: (r, i) => (r.email == null ? null : `user${i}@dev.invalid`),
+    passwordHash: (r, i, ctx) => ctx.devPasswordHash,
+    registeredIp: () => null,
+    registeredReferer: () => null,
+    // Admin wajib pasang 2FA lagi di lokal (halaman /keamanan) -- kunci asli tidak ikut.
+    totpSecret: () => null,
+    totpEnabledAt: () => null,
+    totpLastStep: () => null,
+  },
+  Dependent: {
+    ...keep("id", "memberId", "isSelf", "isActive", "createdAt"),
+    name: (r, i) => `Peserta ${i}`,
+  },
+  CoachProfile: {
+    ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "certificateUrl", "certificateStatus", "birthDate", "gender", "walletBalance"),
+    ...BANK,
+  },
+  Pool: {
+    ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "walletBalance", "isActive", "createdAt"),
+    contactPhone: (r, i) => (r.contactPhone == null ? null : `0898${pad(i, 8)}`),
+    ...BANK,
+  },
+  WithdrawalRequest: {
+    ...keep("id", "poolId", "coachProfileId", "amount", "status", "processedById", "failureReason", "requestedAt", "processedAt"),
+    ...BANK,
+    midtransReferenceId: (r, i) => (r.midtransReferenceId == null ? null : `DEV-MT-${i}`),
+    transferReference: (r, i) => (r.transferReference == null ? null : `DEV-TRF-${i}`),
+  },
+  Payment: {
+    ...keep("id", "packageId", "midtransOrderId", "amount", "status", "paidAt", "createdAt", "updatedAt"),
+    // Payload webhook Midtrans memuat data pembayar; link Snap = token bayar asli.
+    rawWebhookPayload: () => null,
+    snapRedirectUrl: () => null,
+  },
+  ChatThread: keep("id", "userId", "needsAdmin", "updatedAt", "createdAt"),
+  ChatMessage: {
+    ...keep("id", "threadId", "sender", "createdAt"),
+    content: (r, i) => `[isi chat disamarkan #${i}]`,
+  },
+  EmailThread: {
+    ...keep("id", "needsAdmin", "updatedAt", "createdAt"),
+    externalEmail: (r, i) => `kontak${i}@dev.invalid`,
+    subject: (r, i) => `Email disamarkan #${i}`,
+  },
+  EmailMessage: {
+    ...keep("id", "threadId", "direction", "createdAt"),
+    fromAddress: (r) => (r.direction === "OUTBOUND" ? "hello@dev.invalid" : `pengirim-${r.threadId}@dev.invalid`),
+    toAddress: (r) => (r.direction === "OUTBOUND" ? `pengirim-${r.threadId}@dev.invalid` : "hello@dev.invalid"),
+    subject: (r, i) => `Email disamarkan #${i}`,
+    textBody: (r, i) => `[isi email disamarkan #${i}]`,
+    htmlBody: () => null,
+    // resendId asli bisa dipakai membalas/menarik email sungguhan.
+    resendId: () => null,
+  },
+
+  // Tanpa data pribadi: salin apa adanya.
+  PlatformWithdrawal: keep("id", "revenueAmount", "taxAmount", "note", "createdById", "createdAt"),
+  WalletTransaction: keep("id", "type", "poolId", "coachProfileId", "amount", "paymentId", "bookingId", "withdrawalRequestId", "note", "createdById", "idempotencyKey", "createdAt"),
+  PackageTemplate: keep("id", "poolId", "name", "totalSesi", "price", "durationDays", "jatahCancel", "isActive", "pendingChanges", "createdAt"),
+  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "status", "startDate", "expiredDate", "createdAt"),
+  Availability: keep("id", "coachId", "poolId", "date", "startTime", "endTime", "kapasitas", "status", "recurrenceRule", "createdAt"),
+  PoolOwnership: keep("id", "poolId", "ownerId", "createdAt"),
+  PoolAffiliation: keep("id", "poolId", "coachId", "createdAt"),
+  Booking: keep("id", "memberId", "availabilityId", "packageId", "status", "cancelledBy", "cancelledAt", "attended", "attendedBy", "attendedAt", "createdAt"),
+};
+
+// Kembalikan true kalau tabel disalin, false kalau sengaja dilewati.
+// Lempar error kalau tabel belum diklasifikasi.
+export function shouldCopyTable(table) {
+  if (!(table in POLICY)) {
+    throw new Error(`Tabel "${table}" belum diklasifikasi di scripts/dev-db-sanitize.mjs. Tambahkan aturannya dulu.`);
+  }
+  return POLICY[table] !== null;
+}
+
+// i = nomor urut baris di tabel itu (mulai 1), dipakai untuk nilai palsu yang unik.
+export function sanitizeRow(table, row, i, ctx) {
+  const rules = POLICY[table];
+  const out = {};
+  for (const col of Object.keys(row)) {
+    const rule = rules[col];
+    if (rule === undefined) {
+      throw new Error(`Kolom "${table}.${col}" belum diklasifikasi di scripts/dev-db-sanitize.mjs. Tambahkan aturannya dulu.`);
+    }
+    out[col] = rule === KEEP ? row[col] : rule(row, i, ctx);
+  }
+  return out;
+}
