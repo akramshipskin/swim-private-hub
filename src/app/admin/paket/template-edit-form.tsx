@@ -17,6 +17,7 @@ type Template = {
   durationDays: number;
   jatahCancel: number;
   isActive: boolean;
+  isTrial?: boolean;
 };
 
 type TemplateAction = (state: { error?: string } | null, formData: FormData) => Promise<{ error?: string } | null>;
@@ -81,6 +82,7 @@ export default function TemplateEditForm({ template, action = updateTemplate, su
               <li><Badge tone="brand">{template.totalSesi} sesi</Badge></li>
               <li><Badge tone="neutral">Berlaku {template.durationDays} hari</Badge></li>
               <li><Badge tone="neutral">Jatah batal {template.jatahCancel}×</Badge></li>
+              {template.isTrial && <li><Badge tone="accent">Trial</Badge></li>}
               {!template.isActive && <li><Badge tone="warning">Tidak dijual</Badge></li>}
             </ul>
           </div>

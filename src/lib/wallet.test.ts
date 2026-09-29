@@ -1,5 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
-import { creditSessionRevenue, reverseSessionRevenue } from "./wallet";
+
+const onSessionAttended = vi.fn();
+const onSessionUnattended = vi.fn();
+vi.mock("@/lib/affiliate", () => ({
+  onSessionAttended: (...a: unknown[]) => onSessionAttended(...a),
+  onSessionUnattended: (...a: unknown[]) => onSessionUnattended(...a),
+}));
+
+const { creditSessionRevenue, reverseSessionRevenue } = await import("./wallet");
 import type { Prisma } from "@/generated/prisma/client";
 
 // Mock minimal buat tx.pool/tx.coachProfile/tx.walletTransaction -- cuma
@@ -334,5 +342,24 @@ describe("creditSessionRevenue: peserta tidak datang (attended=false)", () => {
         { type: "PLATFORM_TAX", amount: 120, bookingId: "b" },
       ],
     });
+  });
+});
+
+describe("hook afiliasi", () => {
+  it("sesi Hadir memicu hitungan komisi; Tidak Hadir tidak", async () => {
+    onSessionAttended.mockClear();
+    const tx = createMockTx();
+    await creditSessionRevenue(tx as unknown as Prisma.TransactionClient, { poolId: "p", coachProfileId: "c", bookingId: "b1", perSessionValue: 100000 });
+    expect(onSessionAttended).toHaveBeenCalledWith(tx, "b1");
+    onSessionAttended.mockClear();
+    await creditSessionRevenue(tx as unknown as Prisma.TransactionClient, { poolId: "p", coachProfileId: "c", bookingId: "b2", perSessionValue: 100000, attended: false });
+    expect(onSessionAttended).not.toHaveBeenCalled();
+  });
+
+  it("pembalikan sesi memberi tahu afiliasi", async () => {
+    onSessionUnattended.mockClear();
+    const tx = createMockTx();
+    await reverseSessionRevenue(tx as unknown as Prisma.TransactionClient, { bookingId: "b1" });
+    expect(onSessionUnattended).toHaveBeenCalledWith(tx, "b1");
   });
 });

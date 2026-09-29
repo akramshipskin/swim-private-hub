@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import CheckoutButton from "./checkout-button";
+import { trialBlockingPackageWhere } from "@/lib/trial";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDateLabel } from "@/lib/datetime";
@@ -71,13 +72,16 @@ export default async function MemberPaketPage() {
     prisma.dependent.findMany({
       where: { memberId: session.user.id, isActive: true },
       orderBy: { name: "asc" },
-      select: { id: true, name: true },
+      select: { id: true, name: true, _count: { select: { packages: { where: trialBlockingPackageWhere(now) } } } },
     }),
   ]);
+  // Peserta yang masih boleh beli trial (belum pernah punya paket).
+  const trialChildren = children.filter((c) => c._count.packages === 0);
 
-  const maxSold = Math.max(0, ...templates.map((t) => t._count.packages));
+  // Trial tidak ikut dinilai "Populer" (paket percobaan, bukan pilihan paket).
+  const maxSold = Math.max(0, ...templates.filter((t) => !t.isTrial).map((t) => t._count.packages));
   // Seri = gak ada yang beneran paling laku, jangan pilih salah satu asal.
-  const topSellers = templates.filter((t) => t._count.packages === maxSold);
+  const topSellers = templates.filter((t) => !t.isTrial && t._count.packages === maxSold);
   const popularTemplateId = maxSold > 0 && topSellers.length === 1 ? topSellers[0].id : undefined;
 
   // "Member" cuma valid begitu paket pernah aktif (beli/diassign) --
@@ -218,7 +222,7 @@ export default async function MemberPaketPage() {
 
                 <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {templates
-                    .filter((t) => t.pool.id === pool.id)
+                    .filter((t) => t.pool.id === pool.id && (!t.isTrial || trialChildren.length > 0))
                     .map((t) => (
                       <li
                         key={t.id}
@@ -230,8 +234,10 @@ export default async function MemberPaketPage() {
                       >
                         <div className="flex items-start justify-between gap-2">
                           <h4 className="text-base font-semibold leading-snug text-text">{t.name}</h4>
-                          {t.id === popularTemplateId && (
-                            <Badge tone="accent" className="shrink-0">Populer</Badge>
+                          {t.isTrial ? (
+                            <Badge tone="accent" className="shrink-0">Trial</Badge>
+                          ) : (
+                            t.id === popularTemplateId && <Badge tone="accent" className="shrink-0">Populer</Badge>
                           )}
                         </div>
                         <div>
@@ -243,7 +249,12 @@ export default async function MemberPaketPage() {
                           <li><Badge tone="neutral">Jatah batal {t.jatahCancel}×</Badge></li>
                         </ul>
                         <div className="mt-auto pt-1">
-                          <CheckoutButton templateId={t.id} dependents={children} />
+                          {t.isTrial && (
+                            <p className="mb-2 text-xs text-text-muted">
+                              Sekali per peserta, untuk peserta yang belum pernah punya paket.
+                            </p>
+                          )}
+                          <CheckoutButton templateId={t.id} dependents={t.isTrial ? trialChildren : children} />
                         </div>
                       </li>
                     ))}

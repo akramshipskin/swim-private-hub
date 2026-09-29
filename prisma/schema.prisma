@@ -37,6 +37,10 @@ enum WalletTransactionType {
   // coachProfileId kosong = milik platform). Lihat splitPlatformTax.
   PLATFORM_REVENUE
   PLATFORM_TAX
+  // Komisi afiliasi 5% ke coach ATAU kolam pemilik kode (tepat 1 terisi).
+  // Dicatat bareng baris PLATFORM_REVENUE negatif senilai sama: komisi
+  // dibayar dari bagian SPH (pajaknya ditanggung SPH). Lihat src/lib/affiliate.ts.
+  AFFILIATE_COMMISSION
 }
 
 // Penarikan saldo platform oleh admin (transfer manual dari akun Midtrans).
@@ -158,6 +162,11 @@ model User {
   // akunnya). Null + nonaktif + COACH/POOL_OWNER = pendaftar mandiri yang
   // MENUNGGU persetujuan -- beda dari akun yang sengaja dinonaktifkan.
   approvedAt          DateTime?
+  // Kode afiliasi yang diisi member saat mendaftar (opsional). Komisi dibayar
+  // sekali per member -- lihat AffiliateCommission.
+  referralCodeId      String?
+  referralCode        AffiliateCode? @relation(fields: [referralCodeId], references: [id], onDelete: SetNull)
+  affiliateCommission AffiliateCommission?
 
   coachProfile        CoachProfile?
   dependents          Dependent[]
@@ -260,6 +269,8 @@ model CoachProfile {
   walletTransactions WalletTransaction[]
   withdrawalRequests WithdrawalRequest[]
   certificates       CoachCertificate[]
+  affiliateCode      AffiliateCode?
+  affiliateCommissions AffiliateCommission[]
   // Gambar tanda tangan coach (path di bucket privat coach-certificates),
   // diunggah sekali, dipasang di sertifikat level milestone.
   signaturePath      String?
@@ -414,6 +425,10 @@ model PackageTemplate {
   // pas paket dibuat, BUKAN dibaca ulang dari template tiap kali cek
   // kuota (biar paket lama gak ikut berubah kalau template diedit).
   jatahCancel  Int      @default(2)
+  // Paket trial (Hadi 29 Sep): 1 sesi, harga ditentukan SPH per kolam --
+  // hanya admin yang membuat/mengubah. Hanya untuk peserta yang belum pernah
+  // punya paket (1x per anak). Tidak ikut harga "mulai dari" & harga 1 sesi.
+  isTrial      Boolean  @default(false)
   isActive     Boolean  @default(true)
   // Usulan perubahan dari pemilik kolam yang menunggu persetujuan admin
   // (lihat src/lib/package-template.ts). Nilai di atas = yang sedang dijual.
@@ -458,6 +473,8 @@ model Package {
   // Cuma bisa dibeli member yang masih punya paket biasa (bukan 1 sesi)
   // yang aktif -- dan paket 1 sesi sendiri gak ngitung sebagai syarat itu.
   isSingleSession Boolean      @default(false)
+  // Disalin dari PackageTemplate.isTrial saat dibeli.
+  isTrial     Boolean          @default(false)
   status      PackageStatus    @default(PENDING_PAYMENT)
   startDate   DateTime?
   expiredDate DateTime?
@@ -583,6 +600,8 @@ model Pool {
   walletTransactions WalletTransaction[]
   withdrawalRequests WithdrawalRequest[]
   ownerships         PoolOwnership[]
+  affiliateCode      AffiliateCode?
+  affiliateCommissions AffiliateCommission[]
 }
 
 // Many-to-many User(role=POOL_OWNER) <-> Pool -- gantiin Pool.ownerUserId
@@ -803,4 +822,56 @@ model MilestoneLevelCompletion {
   completedAt     DateTime       @default(now())
 
   @@unique([dependentId, group, level])
+}
+
+// ---------------------------------------------------------------------------
+// Afiliasi (Hadi 29 Sep): kode singkat per coach dan per kolam, diisi member
+// di form daftar. Komisi 5% dari pembayaran paket pertama member, sekali per
+// member, cair ke saldo pemilik kode 3 hari setelah sesi pertama Hadir.
+
+model AffiliateCode {
+  id             String        @id @default(cuid())
+  // Huruf besar + angka, unik (misal NADIA7).
+  code           String        @unique
+  // Tepat 1 terisi (CHECK AffiliateCode_exactly_one_owner).
+  coachProfileId String?       @unique
+  coachProfile   CoachProfile? @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
+  poolId         String?       @unique
+  pool           Pool?         @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now())
+
+  referredUsers User[]
+}
+
+enum AffiliateCommissionStatus {
+  // Sesi Hadir yang memenuhi syarat belum ada / dibatalkan koreksi.
+  WAITING
+  // Menunggu masa tahan (releaseAt).
+  PENDING
+  // Sudah masuk saldo pemilik kode (tidak ditarik balik).
+  RELEASED
+}
+
+model AffiliateCommission {
+  id             String                    @id @default(cuid())
+  // Sekali per member.
+  memberId       String                    @unique
+  member         User                      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  coachProfileId String?
+  coachProfile   CoachProfile?             @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
+  poolId         String?
+  pool           Pool?                     @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  // Pembayaran paket pertama member (dasar 5%).
+  paymentId      String
+  amount         Int
+  status         AffiliateCommissionStatus @default(WAITING)
+  // Sesi Hadir yang memicu hitungan 3 hari (null saat WAITING).
+  bookingId      String?
+  releaseAt      DateTime?
+  releasedAt     DateTime?
+  createdAt      DateTime                  @default(now())
+
+  @@index([status, releaseAt])
+  @@index([coachProfileId])
+  @@index([poolId])
 }

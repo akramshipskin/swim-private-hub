@@ -68,7 +68,12 @@ export async function checkInvariants(opts: { packages?: boolean; ledger?: boole
   const wd = await prisma.platformWithdrawal.aggregate({ _sum: { revenueAmount: true, taxAmount: true } });
   const revenue = (plat.find((x) => x.type === "PLATFORM_REVENUE")?._sum.amount ?? 0) - (wd._sum.revenueAmount ?? 0);
   const tax = (plat.find((x) => x.type === "PLATFORM_TAX")?._sum.amount ?? 0) - (wd._sum.taxAmount ?? 0);
-  if (revenue < 0) bad.push(`saldo pendapatan platform negatif (${revenue})`);
+  // Komisi afiliasi dibayar di muka dari bagian SPH (5% harga paket, cair
+  // setelah sesi pertama), sementara bagian SPH diakui per sesi -- jadi
+  // pendapatan boleh minus SEBESAR komisi yang sudah dibayar, tidak lebih.
+  // Penarikan platform tetap dibatasi saldo yang tersedia (platform-wallet.ts).
+  const affiliatePaid = (await prisma.walletTransaction.aggregate({ where: { type: "AFFILIATE_COMMISSION" }, _sum: { amount: true } }))._sum.amount ?? 0;
+  if (revenue + affiliatePaid < 0) bad.push(`saldo pendapatan platform negatif di luar komisi afiliasi (${revenue} + komisi ${affiliatePaid})`);
   if (tax < 0) bad.push(`saldo pajak platform negatif (${tax})`);
 
   return bad;

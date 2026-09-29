@@ -58,3 +58,10 @@ export function memberCanReportAttendance(endTime: Date, now: Date = new Date())
 // masuk tetap diproses. Hanya sesi mulai MILESTONE_HOLD_START yang dihitung.
 export const MILESTONE_NOTE_EVERY_SESSIONS = 2;
 export const MILESTONE_HOLD_START = new Date("2026-10-01T00:00:00+07:00");
+
+// Afiliasi (Hadi 29 Sep): pemilik kode (coach atau kolam) dapat sekian persen
+// dari pembayaran paket PERTAMA member yang mendaftar dengan kodenya, sekali
+// per member, dibayar dari bagian SPH. Cair ke saldo setelah sesi pertama
+// member Hadir + sekian hari (sama dengan jendela laporan member).
+export const AFFILIATE_COMMISSION_PERCENT = 5;
+export const AFFILIATE_HOLD_DAYS = 3;

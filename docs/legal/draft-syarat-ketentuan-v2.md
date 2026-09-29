@@ -7,8 +7,10 @@
 > DIHAPUS dari S&K member (dipindah ke perjanjian coach/MOU kolam, 12 bulan,
 > nonaktif + daftar hitam); batas tanggung jawab SPH 100% nilai paket (rev 3; semula 50%); tanpa
 > asuransi; sengketa lewat musyawarah kekeluargaan; pasal 7 diubah jadi
-> "berlaku sejak diumumkan". Pasal 1.4 (afiliasi) dan 2.9 (trial) DITAHAN
-> sampai fiturnya dibangun (Batch 4).
+> "berlaku sejak diumumkan". Pasal 1.4 (afiliasi) dan 2.9 (trial) dipasang
+> bareng fiturnya (Batch 4, rev 4); 2.9 disesuaikan: "hanya untuk Peserta
+> yang belum pernah memiliki paket, satu kali per Peserta" (keputusan Hadi
+> per anak).
 
 > **Status: DRAFT, BELUM BERLAKU.** Ditulis Claude (Opus) 29 Sep 2026 dari
 > keputusan office hours (`docs/designs/validasi-permintaan-dan-kejujuran-landing.md`).

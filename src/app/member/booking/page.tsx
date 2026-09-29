@@ -4,6 +4,7 @@ import BookingBoard from "./booking-board";
 import Link from "next/link";
 import { activePackageWhere } from "@/lib/active-package";
 import { dropInPrice } from "@/lib/drop-in";
+import { REGULAR_TEMPLATE_WHERE } from "@/lib/trial";
 import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
 
 export default async function MemberBookingPage() {
@@ -55,7 +56,7 @@ export default async function MemberBookingPage() {
         photos: true,
         openTime: true,
         closeTime: true,
-        packageTemplates: { where: { isActive: true }, select: { price: true, totalSesi: true } },
+        packageTemplates: { where: REGULAR_TEMPLATE_WHERE, select: { price: true, totalSesi: true } },
       },
     })
   ).map((p) => ({

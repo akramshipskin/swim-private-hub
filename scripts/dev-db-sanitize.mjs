@@ -29,7 +29,7 @@ export const POLICY = {
   RateLimitHit: null,
 
   User: {
-    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt"),
+    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId"),
     name: (r, i) => `${ROLE_LABEL[r.role] ?? "User"} ${i}`,
     phone: (r, i) => `0899${pad(i, 8)}`,
     email: (r, i) => (r.email == null ? null : `user${i}@dev.invalid`),
@@ -64,6 +64,10 @@ export const POLICY = {
     note: (r, i) => `Catatan dev ${i}`,
   },
   MilestoneLevelCompletion: keep("id", "dependentId", "group", "level", "coachId", "withCertificate", "completedAt"),
+  // Afiliasi: kode & komisi tidak berisi data pribadi (angka uang disalin
+  // supaya bug komisi bisa direproduksi).
+  AffiliateCode: keep("id", "code", "coachProfileId", "poolId", "createdAt"),
+  AffiliateCommission: keep("id", "memberId", "coachProfileId", "poolId", "paymentId", "amount", "status", "bookingId", "releaseAt", "releasedAt", "createdAt"),
   CoachCertificate: keep("id", "coachProfileId", "name", "filePath", "status", "reviewedAt", "createdAt"),
   Pool: {
     ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "walletBalance", "isActive", "createdAt"),
@@ -115,8 +119,8 @@ export const POLICY = {
     note: (r) => (r.note == null ? null : "Keterangan laporan (disamarkan)"),
   },
   WalletTransaction: keep("id", "type", "poolId", "coachProfileId", "amount", "paymentId", "bookingId", "withdrawalRequestId", "note", "createdById", "idempotencyKey", "createdAt"),
-  PackageTemplate: keep("id", "poolId", "name", "totalSesi", "price", "durationDays", "jatahCancel", "isActive", "pendingChanges", "createdAt"),
-  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "status", "startDate", "expiredDate", "createdAt"),
+  PackageTemplate: keep("id", "poolId", "name", "totalSesi", "price", "durationDays", "jatahCancel", "isTrial", "isActive", "pendingChanges", "createdAt"),
+  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt"),
   Availability: keep("id", "coachId", "poolId", "date", "startTime", "endTime", "kapasitas", "status", "recurrenceRule", "createdAt"),
   PoolOwnership: keep("id", "poolId", "ownerId", "createdAt"),
   PoolAffiliation: keep("id", "poolId", "coachId", "createdAt"),

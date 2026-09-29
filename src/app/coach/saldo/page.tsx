@@ -6,9 +6,12 @@ import { openNullable, openSecret } from "@/lib/secret-box";
 import Link from "next/link";
 import { getOverdueParticipants } from "@/lib/milestone-hold";
 import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
+import { releaseDueCommissions } from "@/lib/affiliate";
 
 export default async function CoachSaldoPage() {
   const session = await requireRole("COACH");
+  // Komisi afiliasi yang jatuh tempo masuk saldo sebelum saldo dibaca.
+  await releaseDueCommissions();
 
   const profile = await prisma.coachProfile.findUnique({
     where: { userId: session.user.id },

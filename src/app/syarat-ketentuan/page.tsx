@@ -9,8 +9,9 @@ export const metadata: Metadata = {
 };
 
 // Teks = docs/legal/draft-syarat-ketentuan-v2.md yang disetujui reviewer
-// hukum (29 Sep), dengan isian Hadi. Pasal afiliasi (1.4) dan paket trial
-// (2.9) sengaja BELUM dipasang: fiturnya belum dibangun (Batch 4).
+// hukum (29 Sep), dengan isian Hadi. Pasal afiliasi (1.4) dan trial (2.9)
+// dipasang bareng fiturnya (Batch 4); kalimat trial disesuaikan dengan
+// keputusan Hadi "per anak" (bukan "Member baru").
 export default function SyaratKetentuanPage() {
   return (
     <LegalPageLayout title="Syarat & Ketentuan" updatedAt={TERMS_UPDATED_AT}>
@@ -40,6 +41,11 @@ export default function SyaratKetentuanPage() {
           anak menyatakan dirinya orang tua/wali yang berwenang.
         </li>
         <li>Pengguna bertanggung jawab atas kerahasiaan kata sandi dan tidak boleh meminjamkan akunnya kepada orang lain.</li>
+        <li>
+          Saat mendaftar, Pengguna dapat memasukkan kode afiliasi milik Coach atau Kolam Mitra (opsional). Kode tidak
+          mengubah harga yang dibayar Member; komisi afiliasi dibayarkan SPH kepada pemilik kode dari bagian SPH, bukan
+          dari Member. Ketentuan komisi bagi Coach dan Kolam Mitra diatur dalam perjanjian kemitraan masing-masing.
+        </li>
       </ol>
 
       <h2>2. Paket dan Sesi</h2>
@@ -64,6 +70,10 @@ export default function SyaratKetentuanPage() {
           Harga paket sudah termasuk tiket masuk kolam untuk Peserta. Pendamping yang tidak berenang (1 orang pada
           satu waktu, boleh bergantian) tidak dikenakan tiket. Perlengkapan renang (misalnya pelampung dan papan)
           dibawa sendiri oleh Peserta.
+        </li>
+        <li>
+          Paket trial: paket 1 Sesi dengan harga khusus yang ditetapkan SPH per kolam, hanya untuk Peserta yang belum
+          pernah memiliki paket, satu kali per Peserta.
         </li>
         <li>
           Coach mencatat perkembangan Peserta (milestone) di Aplikasi dan Member dapat melihatnya di menu Peserta.

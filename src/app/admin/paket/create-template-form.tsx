@@ -11,7 +11,18 @@ type PoolOption = { id: string; name: string };
 
 type TemplateAction = (state: { error?: string } | null, formData: FormData) => Promise<{ error?: string } | null>;
 
-export default function CreateTemplateForm({ pools, action = createTemplate, submitLabel = "Tambah Katalog" }: { pools: PoolOption[]; action?: TemplateAction; submitLabel?: string }) {
+export default function CreateTemplateForm({
+  pools,
+  action = createTemplate,
+  submitLabel = "Tambah Katalog",
+  allowTrial = false,
+}: {
+  pools: PoolOption[];
+  action?: TemplateAction;
+  submitLabel?: string;
+  // Hanya admin: paket trial (1 sesi, harga ditentukan SPH).
+  allowTrial?: boolean;
+}) {
   const [state, formAction, pending] = useActionState(action, null);
 
   return (
@@ -46,6 +57,12 @@ export default function CreateTemplateForm({ pools, action = createTemplate, sub
             </Field>
           </div>
           <div className="grid grid-cols-2 items-end gap-3 sm:contents">
+            {allowTrial && (
+              <label className="col-span-2 flex items-center gap-2 text-sm text-text sm:col-span-1 max-sm:min-h-[44px]">
+                <input type="checkbox" name="isTrial" className="h-4 w-4 rounded border-border text-brand-700" />
+                Paket trial (1 sesi, sekali per peserta yang belum pernah punya paket)
+              </label>
+            )}
             <Field label="Berlaku (hari)">
               <Input type="number" name="durationDays" required min={1} defaultValue={60} className="w-full sm:w-24" />
             </Field>

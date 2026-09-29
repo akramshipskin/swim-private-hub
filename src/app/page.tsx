@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import LandingView from "./landing-view";
 import { coachBioLine } from "@/lib/coach-bio";
+import { REGULAR_TEMPLATE_WHERE } from "@/lib/trial";
 import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
 export default async function Home() {
@@ -22,7 +23,7 @@ export default async function Home() {
           photos: true,
           openTime: true,
           closeTime: true,
-          packageTemplates: { where: { isActive: true }, select: { price: true, totalSesi: true } },
+          packageTemplates: { where: REGULAR_TEMPLATE_WHERE, select: { price: true, totalSesi: true } },
           _count: { select: { affiliations: true } },
         },
       }),

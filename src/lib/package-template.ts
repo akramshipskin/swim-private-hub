@@ -37,13 +37,18 @@ export function parseTemplateFields(formData: FormData, defaultActive: boolean):
 }
 
 // Admin: langsung dibuat & dijual.
+// isTrial hanya bisa dipilih admin (harga trial ditentukan SPH per kolam).
 export async function createTemplateRecord(formData: FormData): Promise<{ error: string } | null> {
   const poolId = formData.get("poolId")?.toString() ?? "";
   const fields = parseTemplateFields(formData, true);
   if (!poolId) return { error: "Kolam wajib dipilih." };
   if ("error" in fields) return fields;
-  return createTemplate(poolId, fields, null);
+  const isTrial = formData.get("isTrial") === "on";
+  if (isTrial && fields.totalSesi !== 1) return { error: TRIAL_ONE_SESSION };
+  return createTemplate(poolId, fields, null, isTrial);
 }
+
+const TRIAL_ONE_SESSION = "Paket trial harus 1 sesi.";
 
 // Pemilik kolam: paket baru dibuat nonaktif (tidak dijual) sampai admin menyetujui.
 export async function proposeNewTemplate(poolId: string, formData: FormData): Promise<{ error: string } | null> {
@@ -53,13 +58,13 @@ export async function proposeNewTemplate(poolId: string, formData: FormData): Pr
   return createTemplate(poolId, { ...fields, isActive: false }, pending);
 }
 
-async function createTemplate(poolId: string, fields: TemplateFields, pending: PendingTemplateChange | null) {
+async function createTemplate(poolId: string, fields: TemplateFields, pending: PendingTemplateChange | null, isTrial = false) {
   // Nama paket unik per kolam; dicek di dalam lock biar klik ganda tidak bikin kembar.
   const created = await withDedupeLock(`template:${poolId}`, async (tx) => {
     const exists = await tx.packageTemplate.count({ where: { poolId, name: fields.name } });
     if (exists > 0) return false;
     await tx.packageTemplate.create({
-      data: { poolId, ...fields, pendingChanges: pending ?? undefined },
+      data: { poolId, ...fields, isTrial, pendingChanges: pending ?? undefined },
     });
     return true;
   });
@@ -71,6 +76,8 @@ export async function updateTemplateRecord(formData: FormData): Promise<{ error:
   const templateId = formData.get("templateId")?.toString() ?? "";
   const fields = parseTemplateFields(formData, false);
   if ("error" in fields) return fields;
+  const current = await prisma.packageTemplate.findUnique({ where: { id: templateId }, select: { isTrial: true } });
+  if (current?.isTrial && fields.totalSesi !== 1) return { error: TRIAL_ONE_SESSION };
   await prisma.packageTemplate.update({
     where: { id: templateId },
     data: { ...fields, pendingChanges: Prisma.DbNull },
@@ -82,6 +89,8 @@ export async function updateTemplateRecord(formData: FormData): Promise<{ error:
 export async function proposeTemplateUpdate(templateId: string, formData: FormData): Promise<{ error: string } | null> {
   const fields = parseTemplateFields(formData, false);
   if ("error" in fields) return fields;
+  const trial = await prisma.packageTemplate.findUnique({ where: { id: templateId }, select: { isTrial: true } });
+  if (trial?.isTrial) return { error: "Paket trial diatur SPH. Hubungi admin untuk mengubahnya." };
   // Baca "masih usulan paket baru?" dan tulis usulan dalam 1 transaksi dengan
   // baris terkunci -- tanpa kunci, admin bisa menyetujui di antaranya dan
   // usulan ini tersimpan dengan isNew lama (ditolak = paket aktif ikut mati).

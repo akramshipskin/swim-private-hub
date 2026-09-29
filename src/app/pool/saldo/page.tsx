@@ -3,9 +3,12 @@ import { prisma } from "@/lib/prisma";
 import SaldoView from "@/components/saldo-view";
 import { updateBankInfo, requestWithdrawal } from "./actions";
 import { openNullable, openSecret } from "@/lib/secret-box";
+import { releaseDueCommissions } from "@/lib/affiliate";
 
 export default async function PoolSaldoPage() {
   const session = await requireRole("POOL_OWNER");
+  // Komisi afiliasi yang jatuh tempo masuk saldo sebelum saldo dibaca.
+  await releaseDueCommissions();
 
   // 1 user sekarang bisa punya banyak kolam (PoolOwnership, many-to-many)
   // -- render tiap kolam sebagai section sendiri, bukan pilih 1 kolam

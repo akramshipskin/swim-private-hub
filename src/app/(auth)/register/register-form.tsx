@@ -12,7 +12,7 @@ import { isValidIndonesianPhone } from "@/lib/format";
 
 type Participant = { type: "self" | "child"; name: string };
 
-export default function RegisterForm() {
+export default function RegisterForm({ initialReferralCode = "" }: { initialReferralCode?: string }) {
   const router = useRouter();
   const [formRenderedAt] = useState(() => Date.now());
   const [website, setWebsite] = useState("");
@@ -24,6 +24,7 @@ export default function RegisterForm() {
     { type: "self", name: "" },
   ]);
   const [agreed, setAgreed] = useState(false);
+  const [referralCode, setReferralCode] = useState(initialReferralCode);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -62,6 +63,7 @@ export default function RegisterForm() {
         childNames: participants.filter((p) => p.type === "child").map((p) => p.name),
         wantsSelf: participants.some((p) => p.type === "self"),
         entryReferrer,
+        referralCode: referralCode.trim() || undefined,
         website,
         formRenderedAt,
       }),
@@ -165,6 +167,16 @@ export default function RegisterForm() {
                 required
                 minLength={8}
                 autoComplete="new-password"
+              />
+            </Field>
+
+            <Field label="Kode afiliasi coach/kolam (opsional)">
+              <Input
+                placeholder="Misal: NADIA27"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                maxLength={20}
+                autoCapitalize="characters"
               />
             </Field>
 

@@ -4,6 +4,7 @@ import { snap } from "@/lib/midtrans";
 import { assertDependentOwnedByMember } from "@/lib/dependents";
 import { dropInPrice, dropInEligibilityWhere } from "@/lib/drop-in";
 import { withDedupeLock } from "@/lib/dedupe-lock";
+import { REGULAR_TEMPLATE_WHERE, trialBlockingPackageWhere } from "@/lib/trial";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -45,6 +46,7 @@ export async function POST(request: Request) {
     jatahCancel: number;
     price: number;
     isSingleSession: boolean;
+    isTrial: boolean;
   };
 
   if (singleSessionPoolId) {
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
       select: {
         id: true,
         name: true,
-        packageTemplates: { where: { isActive: true }, select: { price: true, totalSesi: true } },
+        packageTemplates: { where: REGULAR_TEMPLATE_WHERE, select: { price: true, totalSesi: true } },
       },
     });
     const price = pool ? dropInPrice(pool.packageTemplates) : null;
@@ -77,6 +79,7 @@ export async function POST(request: Request) {
       jatahCancel: 1,
       price,
       isSingleSession: true,
+      isTrial: false,
     };
   } else {
     const template = templateId
@@ -95,6 +98,7 @@ export async function POST(request: Request) {
       jatahCancel: template.jatahCancel,
       price: template.price,
       isSingleSession: false,
+      isTrial: template.isTrial,
     };
   }
 
@@ -121,6 +125,11 @@ export async function POST(request: Request) {
       select: { id: true },
     });
     if (recentDuplicate) return null;
+    // Trial 1x per peserta, dicek di dalam kunci yang sama supaya klik beli
+    // barengan tidak menghasilkan dua trial.
+    if (item.isTrial && (await tx.package.count({ where: { dependentId, ...trialBlockingPackageWhere() } })) > 0) {
+      return "TRIAL_USED" as const;
+    }
     return tx.package.create({
       data: {
         memberId: session.user.id,
@@ -132,10 +141,17 @@ export async function POST(request: Request) {
         sisaSesi: item.totalSesi,
         jatahCancel: item.jatahCancel,
         isSingleSession: item.isSingleSession,
+        isTrial: item.isTrial,
         status: "PENDING_PAYMENT",
       },
     });
   });
+  if (pkg === "TRIAL_USED") {
+    return Response.json(
+      { error: "Paket trial hanya untuk peserta yang belum pernah punya paket, satu kali per peserta." },
+      { status: 403 }
+    );
+  }
   if (!pkg) {
     return Response.json(
       { error: "Pembayaran untuk paket ini baru saja dibuat. Tunggu 1 menit sebelum coba lagi." },

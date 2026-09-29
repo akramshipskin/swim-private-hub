@@ -28,6 +28,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/admin/users", label: "Users", icon: "users", group: "User" },
     { href: "/admin/pembayaran", label: "Uang Masuk", icon: "credit-card", group: "Keuangan" },
     { href: "/admin/komisi", label: "Bagi Hasil", icon: "credit-card", group: "Keuangan" },
+    { href: "/admin/afiliasi", label: "Afiliasi", icon: "credit-card", group: "Keuangan" },
     { href: "/admin/withdrawals", label: "Pencairan Saldo", icon: "credit-card", group: "Keuangan" },
     { href: "/admin/koreksi-saldo", label: "Koreksi Saldo", icon: "credit-card", group: "Keuangan" },
     { href: "/admin/pesan", label: "Pesan", icon: "users", group: "Bantuan" },

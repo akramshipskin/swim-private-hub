@@ -1,5 +1,6 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { NO_SHOW_COACH_SHARE_PERCENT, splitPlatformTax } from "@/lib/policy";
+import { onSessionAttended, onSessionUnattended } from "@/lib/affiliate";
 
 // Semua fungsi di sini WAJIB dipanggil dalam prisma.$transaction (tx) yang
 // sama dengan perubahan lain (Booking) yang men-trigger-nya -- kredit/debit
@@ -96,6 +97,8 @@ export async function creditSessionRevenue(
       ...(tax > 0 ? [{ type: "PLATFORM_TAX" as const, amount: tax, bookingId }] : []),
     ],
   });
+  // Sesi berbayar pertama yang Hadir memicu hitungan komisi afiliasi.
+  await onSessionAttended(tx, bookingId);
 }
 
 // Kebalikan creditSessionRevenue -- dipanggil kalau attendance yang tadinya
@@ -150,4 +153,5 @@ export async function reverseSessionRevenue(
   }
 
   if (reversals.length > 0) await tx.walletTransaction.createMany({ data: reversals });
+  await onSessionUnattended(tx, bookingId);
 }

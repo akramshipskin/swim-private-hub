@@ -5,6 +5,8 @@ import { formatRupiah } from "@/lib/format";
 import { todayWibDateString, dateLabel, wibDateTime, formatDateLabel } from "@/lib/datetime";
 import { groupByHour } from "@/lib/pool-occupancy";
 import { BentoCard, Stat } from "@/components/dashboard";
+import { AffiliateCard } from "@/components/affiliate-card";
+import { releaseDueCommissions } from "@/lib/affiliate";
 
 export default async function PoolDashboardPage() {
   const session = await requireRole("POOL_OWNER");
@@ -12,6 +14,7 @@ export default async function PoolDashboardPage() {
   const today = dateLabel(todayStr);
   const startMonth = wibDateTime(`${todayStr.slice(0, 7)}-01`, "00:00");
 
+  await releaseDueCommissions();
   const pools = await prisma.pool.findMany({
     where: { ownerships: { some: { ownerId: session.user.id } } },
     orderBy: { name: "asc" },
@@ -91,6 +94,8 @@ export default async function PoolDashboardPage() {
                   Dalam proses pencairan: {formatRupiah(pick(pendingWithdrawals, p.id)?._sum.amount ?? 0)}
                 </p>
               </BentoCard>
+
+              <AffiliateCard owner={{ poolId: p.id }} name={p.name.replace(/^kolam( renang)?\s+/i, "")} className="md:col-span-6" />
 
               <BentoCard title={`Jam ramai hari ini · ${bookedToday} sesi les`} href="/pool/jadwal" linkLabel="Lihat jadwal" className="md:col-span-4">
                 <ul className="flex flex-col gap-1">

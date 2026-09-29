@@ -3,13 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { createSelfDependent } from "@/lib/dependents";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
+import { normalizeAffiliateCode } from "@/lib/affiliate";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   const body = await request.json();
   const registeredIp =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  const { name, phone: rawPhone, email: rawEmail, password, acceptedTerms, childNames, wantsSelf, entryReferrer, website, formRenderedAt } =
+  const { name, phone: rawPhone, email: rawEmail, password, acceptedTerms, childNames, wantsSelf, entryReferrer, referralCode, website, formRenderedAt } =
     body as {
       name?: string;
       phone?: string;
@@ -19,6 +20,7 @@ export async function POST(request: Request) {
       childNames?: string[];
       wantsSelf?: boolean;
       entryReferrer?: string | null;
+      referralCode?: string;
       website?: string;
       formRenderedAt?: number;
     };
@@ -76,6 +78,20 @@ export async function POST(request: Request) {
     return Response.json({ error: CONSENT_REQUIRED_ERROR }, { status: 400 });
   }
 
+  // Kode afiliasi opsional; kode yang diisi tapi tidak ada = ditolak (bukan
+  // diam-diam diabaikan), supaya member tahu kodenya salah ketik.
+  let referralCodeId: string | null = null;
+  if (typeof referralCode === "string" && referralCode.trim()) {
+    const found = await prisma.affiliateCode.findUnique({
+      where: { code: normalizeAffiliateCode(referralCode) },
+      select: { id: true },
+    });
+    if (!found) {
+      return Response.json({ error: "Kode afiliasi tidak ditemukan. Cek lagi atau kosongkan." }, { status: 400 });
+    }
+    referralCodeId = found.id;
+  }
+
   // Disimpan dalam bentuk baku (08xxxxxxxxxx, email huruf kecil) supaya
   // format ketik yang beda tidak jadi akun ganda.
   const phone = normalizePhone(rawPhone);
@@ -108,6 +124,7 @@ export async function POST(request: Request) {
           ...consent,
           registeredReferer,
           registeredIp,
+          referralCodeId,
         },
         select: { id: true, name: true, email: true, phone: true, role: true },
       });

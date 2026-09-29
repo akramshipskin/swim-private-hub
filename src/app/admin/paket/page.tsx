@@ -93,7 +93,7 @@ export default async function AdminPaketPage() {
         &ldquo;Beli Paket&rdquo; member.
       </p>
 
-      <CreateTemplateForm pools={pools} />
+      <CreateTemplateForm pools={pools} allowTrial />
 
       {/* 2 kolom = 2 KOLAM sejajar, paketnya numpuk ke bawah di dalam
           kolomnya masing-masing (Hadi 18 Sep v3). Sebelumnya kebalik:

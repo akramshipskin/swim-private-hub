@@ -4,6 +4,8 @@ import { formatRupiah } from "@/lib/format";
 import { todayWibDateString, dateLabel, addDaysToDateString, formatDateLabel } from "@/lib/datetime";
 import { BentoCard, Stat, SessionList } from "@/components/dashboard";
 import { getOverdueParticipants } from "@/lib/milestone-hold";
+import { releaseDueCommissions } from "@/lib/affiliate";
+import { AffiliateCard } from "@/components/affiliate-card";
 import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
 
 export default async function CoachDashboardPage() {
@@ -14,9 +16,10 @@ export default async function CoachDashboardPage() {
   const weekEnd = dateLabel(addDaysToDateString(todayStr, 7));
   const now = new Date();
 
+  await releaseDueCommissions();
   const overdue = await getOverdueParticipants(session.user.id);
   const [profile, slots, unmarked, openThisWeek, pools] = await Promise.all([
-    prisma.coachProfile.findUnique({ where: { userId: session.user.id }, select: { walletBalance: true, certificates: { where: { status: "APPROVED" }, select: { id: true }, take: 1 } } }),
+    prisma.coachProfile.findUnique({ where: { userId: session.user.id }, select: { id: true, walletBalance: true, certificates: { where: { status: "APPROVED" }, select: { id: true }, take: 1 } } }),
     prisma.availability.findMany({
       where: { coachId: session.user.id, date: { in: [today, tomorrow] }, status: "BOOKED" },
       orderBy: { startTime: "asc" },
@@ -94,6 +97,10 @@ export default async function CoachDashboardPage() {
         <BentoCard title="Jadwal besok" href="/coach/jadwal" className="md:col-span-2">
           <SessionList items={slots.filter((s) => s.date.getTime() === tomorrow.getTime()).map(toItem)} empty="Belum ada sesi yang dibooking besok." />
         </BentoCard>
+
+        {profile && (
+          <AffiliateCard owner={{ coachProfileId: profile.id }} name={session.user.name ?? "Coach"} className="md:col-span-6" />
+        )}
 
         {!profile?.certificates.length && (
           <BentoCard title="Lengkapi profil" href="/profil" linkLabel="Buka profil" className="md:col-span-6">

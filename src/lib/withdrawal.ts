@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { MIN_WITHDRAWAL } from "@/lib/policy";
 import { getOverdueParticipants } from "@/lib/milestone-hold";
+import { releaseDueCommissions } from "@/lib/affiliate";
 
 export class WithdrawalError extends Error {
   constructor(message: string) {
@@ -89,6 +90,8 @@ function parseAmount(amount: number | undefined, balance: number) {
 }
 
 export async function requestPoolWithdrawal(poolId: string, amount?: number) {
+  // Komisi afiliasi yang sudah jatuh tempo masuk saldo dulu.
+  await releaseDueCommissions();
   const pool = await prisma.pool.findUniqueOrThrow({
     where: { id: poolId },
     select: {
@@ -111,6 +114,7 @@ export async function requestPoolWithdrawal(poolId: string, amount?: number) {
 }
 
 export async function requestCoachWithdrawal(coachProfileId: string, amount?: number) {
+  await releaseDueCommissions();
   const coach = await prisma.coachProfile.findUniqueOrThrow({
     where: { id: coachProfileId },
     select: {

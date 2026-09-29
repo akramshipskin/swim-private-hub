@@ -18,5 +18,6 @@ export function dropInPrice(templates: { price: number; totalSesi: number }[]): 
 // belum kedaluwarsa). Paket 1 sesi sendiri gak ngitung -- kalau ngitung,
 // beli 1 sesi sekali bisa dipake buat beli 1 sesi terus tanpa paket.
 export function dropInEligibilityWhere(memberId: string): Prisma.PackageWhereInput {
-  return { ...activePackageWhere(memberId), isSingleSession: false };
+  // Paket trial juga tidak dihitung (percobaan 1 sesi, bukan paket biasa).
+  return { ...activePackageWhere(memberId), isSingleSession: false, isTrial: false };
 }

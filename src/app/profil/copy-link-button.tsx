@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 // bisa nempel di elemen yang dirender langsung dari Server Component
 // (RSC nolak function props kayak gitu), jadi bukan cuma tombolnya doang
 // yang harus "use client", inputnya juga.
-export default function CopyLinkButton({ link }: { link: string }) {
+export default function CopyLinkButton({ link, id = "public-profile-link" }: { link: string; id?: string }) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -17,14 +17,14 @@ export default function CopyLinkButton({ link }: { link: string }) {
       // Fallback buat browser/context yang blokir Clipboard API (misal
       // gak di HTTPS) -- select teks di readonly input biar user masih
       // bisa copy manual (Ctrl/Cmd+C) walau tombol gagal.
-      document.getElementById("public-profile-link")?.querySelector("input")?.select();
+      document.getElementById(id)?.querySelector("input")?.select();
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row" id="public-profile-link">
+    <div className="flex flex-col gap-2 sm:flex-row" id={id}>
       <input
         type="text"
         readOnly

@@ -36,6 +36,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+vi.mock("@/lib/affiliate", () => ({ releaseDueCommissions: async () => 0 }));
 const getOverdueParticipants = vi.fn();
 vi.mock("@/lib/milestone-hold", () => ({ getOverdueParticipants: (...a: unknown[]) => getOverdueParticipants(...a) }));
 
