@@ -2,7 +2,7 @@
 
 > **DIPASANG LIVE 29 Sep 2026 (rev 2)** setelah disetujui reviewer hukum.
 > Teks live ada di `src/app/syarat-ketentuan/page.tsx` dan itulah acuannya.
-> Isian Hadi: penyelenggara PT Mecca Loka Hastakarya; sisa sesi hangus;
+> Isian Hadi: penyelenggara PT Makna Krabat Indonesia; sisa sesi hangus;
 > laporan lewat 3 hari diperiksa kasus per kasus; larangan transaksi luar
 > DIHAPUS dari S&K member (dipindah ke perjanjian coach/MOU kolam, 12 bulan,
 > nonaktif + daftar hitam); batas tanggung jawab SPH 50% nilai paket; tanpa

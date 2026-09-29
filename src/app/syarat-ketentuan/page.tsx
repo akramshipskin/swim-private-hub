@@ -15,7 +15,7 @@ export default function SyaratKetentuanPage() {
   return (
     <LegalPageLayout title="Syarat & Ketentuan" updatedAt={TERMS_UPDATED_AT}>
       <p>
-        Swim Private Hub (&ldquo;SPH&rdquo;, &ldquo;kami&rdquo;) diselenggarakan oleh PT Mecca Loka Hastakarya yang
+        Swim Private Hub (&ldquo;SPH&rdquo;, &ldquo;kami&rdquo;) diselenggarakan oleh PT Makna Krabat Indonesia yang
         beralamat di {BUSINESS_ADDRESS}. Dengan mendaftar dan menggunakan aplikasi Swim Private Hub
         (&ldquo;Aplikasi&rdquo;), Pengguna menyatakan telah membaca dan menyetujui Syarat &amp; Ketentuan ini.
       </p>
