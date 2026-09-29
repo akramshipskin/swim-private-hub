@@ -321,3 +321,27 @@ Migrasi baru = Hadi jalankan di prod DULU, baru push.
 4. Q-f → P1; P2.
 5. H8 → I3; I1, I2.
 6. P3, P4, P5 menyusul.
+
+### 11.7 Jawaban Hadi & hasil kerja Sonnet — 29 Sep malam (setelah 11.6)
+
+Jawaban Q-a..Q-f (Hadi, 29 Sep malam):
+| # | Jawaban | Akibat |
+|---|---|---|
+| Q-a | Larangan transaksi di luar aplikasi TIDAK disebut di landing | L1 tidak memuatnya |
+| Q-b | "N member les di sini" tampil kalau kolam sudah punya 15 member | KODE SELESAI (di bawah 15 baris dikosongkan) |
+| Q-c | Coach demo dibiarkan; kalau coach asli ada, otomatis menggantikan satu per satu | KODE SELESAI: akun @example.com hanya mengisi slot kosong (`src/lib/landing-rank.ts`) |
+| Q-d | Saldo SPH boleh minus sementara karena komisi afiliasi | U2 TIDAK perlu (tidak ada perubahan) |
+| Q-e | Platform boleh minus setelah pembalikan Hadir | Keputusan tercatat; U1 (Opus Medium) masih menunggu dikerjakan kalau mau perilaku pembalikannya dibuat eksplisit |
+| Q-f | Tanggal lahir wajib di form daftar | KODE SELESAI (P1) |
+
+Status kerja:
+| # | Status |
+|---|---|
+| P1 | SELESAI (2bebd3d): tanggal lahir wajib untuk diri sendiri & tiap anak di form daftar + API. Jalur lain (admin buat akun member, pilih peserta saat ganti password pertama) belum meminta tanggal lahir; prompt "Lengkapi tanggal lahir" di menu Peserta yang menutupinya |
+| P2 | SELESAI (2bebd3d): dugaan TERBUKTI (coach lahir 15 Jan 2000: umur naik 14 Jan). Diperbaiki di `ageFromBirthDate` (baca tanggal di WIB, cocok untuk data coach lama & peserta, tanpa migrasi data) + tes regresi |
+| L2 | SELESAI lewat keputusan Q-c (lihat di atas). Kolam demo (Melati, Tirta Asri) TIDAK disentuh: belum ditanya |
+| L1 | DOKUMEN SIAP (95abcc3): `docs/plans/landing-revisi-batch-9.md`, 6 hunk, dicoba dulu & dikembalikan (tsc 0, vitest 519, lint bersih). Tinggal dijalankan OpenCode, lalu Claude validasi |
+| I1 | KODE DITULIS: job `race` di `.github/workflows/test.yml` (Postgres 17 service, migrasi asli, `npm run test:race`). BELUM diuji di GitHub (tidak ada runner lokal); cek tab Actions setelah push |
+| I2 | DITUNDA: CSP butuh diuji dengan checkout sungguhan (Midtrans Snap), dan itu menunggu P5 (key sandbox). Salah satu domain terlewat = pembayaran macet di production |
+| P5, X-L | Menunggu Hadi (key sandbox / testimoni) |
+| P3, P4, U1, I3 | Opus, tidak dikerjakan di sesi Sonnet ini |
