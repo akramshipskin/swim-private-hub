@@ -36,7 +36,7 @@ export default function SyaratKetentuanPage() {
       <ul>
         <li>Pemesanan jadwal tunduk pada ketersediaan slot pelatih (coach) yang dipilih.</li>
         <li>Pembatalan pemesanan akan mengurangi jatah pembatalan yang tersedia pada paket Pengguna.</li>
-        <li>Kehadiran ditandai oleh pelatih setelah sesi selesai; hanya sesi berstatus Hadir yang dihitung sebagai terpakai.</li>
+        <li>Sesi yang sudah dipesan langsung mengurangi sisa sesi pada paket dan hanya kembali apabila pemesanan dibatalkan. Kehadiran ditandai oleh pelatih setelah sesi selesai; sesi yang ditandai Tidak Hadir tetap dihitung terpakai.</li>
       </ul>
 
       <h2>4. Pembayaran</h2>

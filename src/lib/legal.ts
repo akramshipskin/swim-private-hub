@@ -1,7 +1,7 @@
 // Tanggal "Terakhir diperbarui" dokumen hukum. Satu sumber: halaman dokumen
 // menampilkannya, dan pendaftaran mencatatnya sebagai versi yang disetujui
 // (User.termsVersion). Ubah dokumen = ubah tanggal di sini.
-export const TERMS_UPDATED_AT = "10 September 2026";
+export const TERMS_UPDATED_AT = "29 September 2026";
 export const PRIVACY_UPDATED_AT = "25 September 2026";
 
 export const LEGAL_CONSENT_VERSION = `S&K ${TERMS_UPDATED_AT}; Privasi ${PRIVACY_UPDATED_AT}`;
