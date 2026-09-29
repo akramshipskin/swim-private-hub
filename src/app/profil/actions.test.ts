@@ -6,11 +6,18 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/dependents", () => ({}));
 
 const coachProfileUpdateMany = vi.fn();
+const userUpdate = vi.fn();
+const dependentUpdateMany = vi.fn();
 vi.mock("@/lib/prisma", () => ({
-  prisma: { coachProfile: { updateMany: (...a: unknown[]) => coachProfileUpdateMany(...a) } },
+  prisma: {
+    coachProfile: { updateMany: (...a: unknown[]) => coachProfileUpdateMany(...a) },
+    user: { update: (...a: unknown[]) => userUpdate(...a) },
+    dependent: { updateMany: (...a: unknown[]) => dependentUpdateMany(...a) },
+    $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
+  },
 }));
 
-const { updateCoachProfile } = await import("./actions");
+const { updateCoachProfile, updateName } = await import("./actions");
 
 function fd(entries: [string, string][]) {
   const f = new FormData();
@@ -92,5 +99,41 @@ describe("updateCoachProfile", () => {
       ])
     );
     expect(badGender).toEqual({ error: "Jenis kelamin tidak valid." });
+  });
+});
+
+describe("updateName", () => {
+  beforeEach(() => {
+    auth.mockResolvedValue({ user: { id: "m1", role: "MEMBER" } });
+    userUpdate.mockResolvedValue({});
+    dependentUpdateMany.mockResolvedValue({ count: 1 });
+  });
+
+  it("menolak kalau belum login", async () => {
+    auth.mockResolvedValue(null);
+    const res = await updateName(null, fd([["name", "Budi"]]));
+    expect(res?.error).toBeTruthy();
+    expect(userUpdate).not.toHaveBeenCalled();
+    expect(dependentUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("menolak nama kosong", async () => {
+    const res = await updateName(null, fd([["name", "   "]]));
+    expect(res).toEqual({ error: "Nama tidak boleh kosong" });
+    expect(userUpdate).not.toHaveBeenCalled();
+    expect(dependentUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("mengganti nama akun DAN nama peserta diri sendiri milik akun itu saja", async () => {
+    const res = await updateName(null, fd([["name", "  budi santoso "]]));
+    expect(res).toEqual({ success: true });
+    expect(userUpdate).toHaveBeenCalledWith({
+      where: { id: "m1" },
+      data: { name: "Budi Santoso" },
+    });
+    expect(dependentUpdateMany).toHaveBeenCalledWith({
+      where: { memberId: "m1", isSelf: true },
+      data: { name: "Budi Santoso" },
+    });
   });
 });

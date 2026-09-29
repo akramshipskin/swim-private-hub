@@ -25,10 +25,19 @@ export async function updateName(
   }
   const name = toProperCase(rawName);
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { name },
-  });
+  // Peserta "diri sendiri" (Dependent.isSelf) menyalin nama akun saat dibuat;
+  // ikut diperbarui supaya dropdown booking & dashboard tidak menampilkan
+  // nama lama. Role selain MEMBER tidak punya Dependent (updateMany = 0 baris).
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: session.user.id },
+      data: { name },
+    }),
+    prisma.dependent.updateMany({
+      where: { memberId: session.user.id, isSelf: true },
+      data: { name },
+    }),
+  ]);
 
   await unstable_update({ user: { name } });
   revalidatePath("/profil");
