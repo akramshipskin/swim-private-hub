@@ -58,9 +58,9 @@ const AUDIENCES: AudienceSteps[] = [
     key: "coach",
     label: "Coach",
     steps: [
-      { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, upload foto dan sertifikat untuk badge Bersertifikat." },
+      { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, upload foto dan sertifikat (boleh lebih dari satu) untuk badge Bersertifikat." },
       { title: "Buka jadwal per kolam", body: "Tentukan tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
-      { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi." },
+      { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi, lalu isi catatan perkembangan (milestone) peserta." },
       { title: "Cairkan saldo", body: "Komisimu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening." },
     ],
   },
@@ -117,11 +117,31 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Apakah coach-nya bersertifikat?",
-        a: 'Coach bisa mengunggah sertifikat renang/lifeguard. Badge "Bersertifikat" hanya tampil setelah sertifikat diperiksa dan disetujui admin.',
+        a: 'Coach bisa mengunggah satu atau beberapa sertifikat renang/lifeguard. Badge "Bersertifikat" hanya tampil setelah sertifikat diperiksa dan disetujui admin.',
       },
       {
         q: "Umur berapa yang bisa ikut?",
         a: "Tergantung coach dan kolamnya. Di profil setiap coach ada keahliannya, misalnya renang bayi & balita, anak usia dini, atau persiapan kompetisi.",
+      },
+      {
+        q: "Tiket masuk kolam sudah termasuk?",
+        a: "Ya. Harga paket sudah termasuk tiket masuk kolam untuk peserta. Pendamping yang tidak berenang (1 orang pada satu waktu, boleh bergantian) tidak dikenakan tiket.",
+      },
+      {
+        q: "Bagaimana perkembangan anak dicatat?",
+        a: "Setelah sesi, coach mencatat butir kemampuan yang sudah dikuasai peserta (milestone), dan kamu bisa melihatnya di menu Peserta. Catatan melekat pada peserta, jadi tetap berlanjut kalau ganti coach. Saat satu level selesai, aplikasi menerbitkan sertifikat level bertanda tangan coach. Sertifikat itu catatan perkembangan belajar di SPH, bukan sertifikasi resmi lembaga renang.",
+      },
+      {
+        q: "Ada paket trial untuk coba dulu?",
+        a: "Kolam bisa menyediakan paket trial: 1 sesi dengan harga khusus yang ditetapkan SPH, hanya untuk peserta yang belum pernah punya paket, satu kali per peserta. Kalau kolam pilihanmu punya paket trial, paketnya tampil di katalog untuk peserta yang memenuhi syarat.",
+      },
+      {
+        q: "Bagaimana kalau sisa sesi belum habis saat masa berlaku paket berakhir?",
+        a: "Sisa sesi yang tidak dipakai sampai masa berlaku paket berakhir dinyatakan hangus dan tidak dikembalikan dalam bentuk uang. Masa berlaku tertera saat pembelian, jadi atur jadwal sebelum masa berlaku habis.",
+      },
+      {
+        q: "Bagaimana soal keselamatan di kolam?",
+        a: "Pengajaran dilakukan coach di fasilitas kolam mitra. Kolam mitra bertanggung jawab atas kelayakan dan keselamatan fasilitas: petugas penyelamat selama jam operasional, perlengkapan dan petugas P3K, rambu kedalaman air, kebersihan air, serta keamanan lantai dan area kolam. Coach bertanggung jawab atas pelaksanaan dan kualitas pengajaran. Orang tua mengawasi anak di luar waktu sesi. SPH adalah penyedia platform dan tidak menyediakan asuransi, jadi disarankan punya asuransi kesehatan atau kecelakaan sendiri.",
       },
     ],
   },
@@ -161,6 +181,22 @@ const FAQ_GROUPS: FaqGroup[] = [
         q: "Apa untungnya dibanding cari murid sendiri?",
         a: "Jadwal, absensi, dan pembayaran diurus sistem. Kamu tinggal membuka jam kosong, mengajar, dan menandai kehadiran.",
       },
+      {
+        q: "Apa yang saya dapat dari komisi platform?",
+        a: "Jadwal, absensi, dan pembayaran diurus sistem. Kamu juga mendapat catatan perkembangan peserta (milestone) dan sertifikat level bertanda tanganmu untuk peserta yang menyelesaikan level, serta kode afiliasi untuk murid yang kamu bawa sendiri. Kalau peserta sudah booking tapi tidak datang, kamu tetap dapat 50% dari bagianmu.",
+      },
+      {
+        q: "Bagaimana kalau saya membawa murid sendiri?",
+        a: "Setiap coach punya kode afiliasi di dashboard. Murid yang mendaftar memakai kodemu tercatat sebagai rujukanmu, dan setelah sesi pertamanya ditandai Hadir kamu mendapat komisi afiliasi dari bagian SPH, bukan dipotong dari harga yang dibayar member. Ketentuannya diatur di perjanjian kemitraan. SPH tidak menjanjikan jumlah murid dari platform.",
+      },
+      {
+        q: "Ada biaya masuk kolam untuk coach?",
+        a: "Tidak. Tiket masuk kolam untuk mengajar tidak ditagihkan ke coach.",
+      },
+      {
+        q: "Apa aturan catatan milestone dan pencairan?",
+        a: "Mulai 1 Oktober 2026, coach wajib mengisi catatan perkembangan (milestone) untuk peserta setelah setiap 2 sesi Hadir. Kalau catatannya belum diisi, pengajuan pencairan saldo yang baru ditahan sampai catatan dilengkapi. Pengajuan yang sudah masuk sebelumnya tetap diproses.",
+      },
     ],
   },
   {
@@ -190,6 +226,22 @@ const FAQ_GROUPS: FaqGroup[] = [
       {
         q: "Cara gabung jadi mitra?",
         a: "Daftar lewat halaman Daftarkan Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin (diperiksa paling lambat 1×24 jam), kolam kamu langsung bisa menerima booking. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
+      },
+      {
+        q: "Bagaimana dengan tiket masuk peserta?",
+        a: "Tiket masuk peserta tercakup di bagian kolam dari harga paket, jadi member tidak ditagih tiket terpisah di loket. Pendamping yang tidak berenang tidak dikenakan tiket.",
+      },
+      {
+        q: "Siapa yang bertanggung jawab atas keselamatan?",
+        a: "Kolam mitra bertanggung jawab atas kelayakan dan keselamatan fasilitas: petugas penyelamat selama jam operasional, perlengkapan dan petugas P3K, rambu kedalaman air, kebersihan air, serta keamanan lantai dan area kolam. Coach bertanggung jawab atas pengajaran. SPH adalah penyedia platform dan tidak mengelola fasilitas kolam.",
+      },
+      {
+        q: "Apakah kolam punya kode afiliasi?",
+        a: "Ya. Member yang mendaftar memakai kode kolammu tercatat sebagai rujukan kolam, dan kolam mendapat komisi afiliasi dari bagian SPH setelah sesi pertama member itu ditandai Hadir. Ketentuannya diatur di perjanjian kemitraan.",
+      },
+      {
+        q: "Bagaimana kalau ada paket trial?",
+        a: "Paket trial (1 sesi, harga khusus) ditetapkan SPH per kolam. Pembagian hasil sesi trial dihitung dari harga trial itu, sehingga bagian kolam untuk sesi trial mengikuti harga yang lebih rendah.",
       },
     ],
   },
