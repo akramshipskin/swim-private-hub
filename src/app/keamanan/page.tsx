@@ -11,6 +11,7 @@ import { otpauthUrl } from "@/lib/totp";
 import { startTotpSetup } from "./actions";
 import TotpConfirmForm from "./totp-confirm-form";
 import TotpDisableForm from "./totp-disable-form";
+import { openSecret } from "@/lib/secret-box";
 
 export const metadata: Metadata = {
   title: "Keamanan Akun | Swim Private Hub",
@@ -35,7 +36,7 @@ export default async function KeamananPage() {
 
   const account = user.email ?? user.phone ?? "akun";
   // Kunci rahasia hanya ditampilkan selama proses pasang (belum aktif).
-  const setupSecret = user.totpEnabledAt ? null : user.totpSecret;
+  const setupSecret = user.totpEnabledAt || !user.totpSecret ? null : openSecret(user.totpSecret);
   const secretGroups = setupSecret?.match(/.{1,4}/g)?.join(" ");
 
   return (

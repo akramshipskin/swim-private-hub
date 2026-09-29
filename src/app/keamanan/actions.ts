@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { newTotpSecret, verifyTotp } from "@/lib/totp";
+import { openSecret, sealSecret } from "@/lib/secret-box";
 import { forgetAttempts, takeAttempt, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS } from "@/lib/rate-limit";
 
 export type TotpState = { error?: string } | null;
@@ -30,7 +31,7 @@ export async function startTotpSetup(): Promise<void> {
   // mungkin dicuri).
   await prisma.user.updateMany({
     where: { id, totpEnabledAt: null },
-    data: { totpSecret: newTotpSecret() },
+    data: { totpSecret: sealSecret(newTotpSecret()) },
   });
   revalidatePath("/keamanan");
 }
@@ -55,7 +56,7 @@ export async function confirmTotpSetup(_prev: TotpState, formData: FormData): Pr
   if (!(await bcrypt.compare(password, user.passwordHash))) return { error: "Password salah." };
   await forgetAttempts({ ids: [hit] });
 
-  const step = verifyTotp(user.totpSecret, code);
+  const step = verifyTotp(openSecret(user.totpSecret), code);
   if (step === null) {
     return { error: "Kode salah. Pastikan jam HP otomatis, lalu ketik 6 digit yang sedang tampil." };
   }
@@ -98,7 +99,7 @@ export async function disableTotp(_prev: TotpState, formData: FormData): Promise
   });
   if (!user.totpEnabledAt || !user.totpSecret) redirect("/profil");
   if (!(await bcrypt.compare(password, user.passwordHash))) return { error: "Password salah." };
-  const step = verifyTotp(user.totpSecret, code);
+  const step = verifyTotp(openSecret(user.totpSecret), code);
   if (step === null) return { error: "Kode salah atau sudah kedaluwarsa. Ketik kode yang sedang tampil." };
 
   // Satu UPDATE atomik: kunci masih yang dicek tadi, dan kodenya belum pernah
