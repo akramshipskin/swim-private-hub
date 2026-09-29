@@ -294,3 +294,27 @@ export async function deleteCoachCertificate(certificateId: string): Promise<voi
   if (cert.filePath) await removeObject(CERT_BUCKET, cert.filePath);
   revalidatePath("/", "layout");
 }
+
+// Gambar tanda tangan coach untuk sertifikat level milestone. Diunggah sekali
+// (unggah ulang = mengganti). Bucket privat; dibuka lewat signed URL.
+export async function uploadCoachSignature(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const session = await auth();
+  if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
+  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
+  const file = formData.get("signature") as File | null;
+  const invalid = validateUpload(file, "photo");
+  if (invalid) return { error: invalid.replace("Foto", "Tanda tangan") };
+  if (!(await hasMatchingSignature(file!))) return { error: SIGNATURE_MISMATCH_ERROR };
+
+  const path = `${session.user.id}/signature-${Date.now()}.${extensionFor(file!)}`;
+  try {
+    await uploadObject(CERT_BUCKET, path, file!);
+  } catch {
+    return { error: "Upload tanda tangan gagal, coba lagi." };
+  }
+  const old = await prisma.coachProfile.findUnique({ where: { userId: session.user.id }, select: { signaturePath: true } });
+  await prisma.coachProfile.updateMany({ where: { userId: session.user.id }, data: { signaturePath: path } });
+  if (old?.signaturePath) await removeObject(CERT_BUCKET, old.signaturePath);
+  revalidatePath("/profil");
+  return { success: true };
+}

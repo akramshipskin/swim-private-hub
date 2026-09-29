@@ -50,3 +50,11 @@ export function coachCanMarkAttendance(endTime: Date, now: Date = new Date()) {
 export function memberCanReportAttendance(endTime: Date, now: Date = new Date()) {
   return now.getTime() <= endTime.getTime() + ATTENDANCE_REPORT_WINDOW_DAYS * 24 * HOUR_MS;
 }
+
+// Penahanan pencairan coach (Hadi 29 Sep, opsi B): tiap peserta wajib dapat
+// catatan milestone dari coach-nya minimal sekali per sekian sesi Hadir.
+// Kalau ada peserta yang sudah sekian sesi Hadir (dengan coach itu) tanpa
+// catatan, coach tidak bisa mengajukan pencairan baru. Pengajuan yang sudah
+// masuk tetap diproses. Hanya sesi mulai MILESTONE_HOLD_START yang dihitung.
+export const MILESTONE_NOTE_EVERY_SESSIONS = 2;
+export const MILESTONE_HOLD_START = new Date("2026-10-01T00:00:00+07:00");

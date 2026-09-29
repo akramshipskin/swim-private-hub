@@ -68,6 +68,21 @@ sepakat sebagai berikut.
    [ISI HADI].
 6. Tiket masuk kolam untuk Coach dalam sesi aplikasi tidak ditagihkan kepada
    Coach (sudah tercakup dalam bagian Kolam Mitra dari nilai sesi).
+7. **Catatan perkembangan (milestone).** Coach wajib mengisi catatan
+   perkembangan setiap Peserta yang diajarnya melalui menu "Update
+   milestone" di aplikasi, **minimal satu kali untuk setiap 2 (dua) sesi
+   yang ditandai Hadir** bersama Coach tersebut. Satu catatan terdiri atas
+   catatan tertulis singkat dan, bila ada, butir keterampilan yang tercapai
+   atau sedang dilatih; catatan tetap sah walaupun belum ada butir baru yang
+   tercapai. Hitungan dilakukan per Coach per Peserta dan hanya untuk sesi
+   sejak 1 Oktober 2026. Akibat bila tidak dipenuhi diatur dalam Pasal 5.5.
+   Coach dilarang mencentang butir yang belum benar-benar dikuasai Peserta.
+8. **Sertifikat level.** Bila seluruh butir satu level tercapai, aplikasi
+   menerbitkan sertifikat level dengan template SPH yang memuat nama dan
+   gambar tanda tangan Coach yang menyelesaikan level itu bersama Peserta.
+   Coach mengunggah gambar tanda tangannya sendiri satu kali dan menyetujui
+   penggunaannya untuk sertifikat tersebut. Sertifikat level adalah catatan
+   perkembangan belajar di SPH, bukan sertifikasi resmi lembaga renang.
 
 ## Pasal 4 — Bagi Hasil
 
@@ -119,6 +134,15 @@ sepakat sebagai berikut.
    sampai pencairan otomatis Midtrans disetujui.]
 4. Pajak penghasilan atas bagi hasil Coach: [ISI HADI + reviewer: dipotong
    SPH atau dilaporkan Coach sendiri].
+5. **Penahanan pencairan.** Selama ada Peserta yang sudah 2 (dua) sesi
+   Hadir atau lebih bersama Coach tanpa catatan perkembangan dari Coach
+   (Pasal 3.7), Coach tidak dapat mengajukan pencairan baru atas **seluruh**
+   saldonya. Saldo tetap menjadi hak Coach dan terus bertambah dari sesi
+   berikutnya; penahanan berakhir otomatis begitu catatan untuk Peserta
+   tersebut diisi. Pengajuan pencairan yang sudah masuk sebelum penahanan
+   tetap diproses. Contoh: saldo Rp600.000, Peserta A sudah 2 sesi Hadir
+   tanpa catatan → pengajuan pencairan ditolak aplikasi sampai Coach mengisi
+   catatan Peserta A, lalu Rp600.000 dapat diajukan seperti biasa.
 
 ## Pasal 6 — Larangan Transaksi di Luar Aplikasi
 
@@ -217,6 +241,11 @@ Tunduk pada hukum Republik Indonesia; sengketa melalui [ISI HADI + reviewer].
   (Pasal 4.6).
 - SPH = penyedia platform; SPH tanggung jawab keuangan, jadwal, booking
   (Pasal 7.4).
+- Catatan milestone minimal sekali tiap 2 sesi Hadir per peserta (dihitung
+  per coach, mulai 1 Okt 2026); kalau lewat, seluruh saldo coach tidak bisa
+  dicairkan sampai catatan diisi; pengajuan yang sudah masuk tetap diproses
+  (Pasal 3.7, 5.5). Sertifikat level bertanda tangan coach (Pasal 3.8).
+  Sudah ada di sistem (Batch 3, 29 Sep).
 
 ### Masih kosong
 1. Nama penyelenggara SPH (PT Perorangan, proses pendirian) dan siapa yang

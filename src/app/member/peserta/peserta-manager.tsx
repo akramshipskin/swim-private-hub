@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import { addChild, setDependentBirthDate, toggleChildActive } from "@/app/profil/actions";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
@@ -66,6 +67,10 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                   </div>
 
                   {c.birthDate === null && <BirthDateForm dependentId={c.id} />}
+
+                  <Link href={`/milestone/${c.id}`} className="text-sm font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                    Lihat perkembangan (milestone)
+                  </Link>
 
                   {c.paket.length === 0 ? (
                     <p className="text-sm text-text-muted">Belum punya paket aktif.</p>

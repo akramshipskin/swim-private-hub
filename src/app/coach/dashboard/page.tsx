@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import { todayWibDateString, dateLabel, addDaysToDateString, formatDateLabel } from "@/lib/datetime";
 import { BentoCard, Stat, SessionList } from "@/components/dashboard";
+import { getOverdueParticipants } from "@/lib/milestone-hold";
+import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
 
 export default async function CoachDashboardPage() {
   const session = await requireRole("COACH");
@@ -12,6 +14,7 @@ export default async function CoachDashboardPage() {
   const weekEnd = dateLabel(addDaysToDateString(todayStr, 7));
   const now = new Date();
 
+  const overdue = await getOverdueParticipants(session.user.id);
   const [profile, slots, unmarked, openThisWeek, pools] = await Promise.all([
     prisma.coachProfile.findUnique({ where: { userId: session.user.id }, select: { walletBalance: true, certificates: { where: { status: "APPROVED" }, select: { id: true }, take: 1 } } }),
     prisma.availability.findMany({
@@ -55,6 +58,14 @@ export default async function CoachDashboardPage() {
       <p className="mt-1 text-sm text-text-muted">{formatDateLabel(today)}</p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
+        {overdue.length > 0 && (
+          <BentoCard title="Pencairan ditahan" href="/coach/peserta" linkLabel="Isi catatan milestone" className="md:col-span-6">
+            <p className="text-sm text-warning-text">
+              {overdue.map((o) => o.name).join(", ")} sudah {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir atau lebih tanpa catatan
+              milestone darimu. Isi catatannya supaya saldo bisa dicairkan lagi.
+            </p>
+          </BentoCard>
+        )}
         <BentoCard title="Ringkasan" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Saldo bisa dicairkan" value={formatRupiah(profile?.walletBalance ?? 0)} />

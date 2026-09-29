@@ -36,6 +36,9 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+const getOverdueParticipants = vi.fn();
+vi.mock("@/lib/milestone-hold", () => ({ getOverdueParticipants: (...a: unknown[]) => getOverdueParticipants(...a) }));
+
 const {
   requestPoolWithdrawal,
   requestCoachWithdrawal,
@@ -49,6 +52,7 @@ beforeEach(() => {
   poolUpdateMany.mockResolvedValue({ count: 1 });
   coachUpdateMany.mockResolvedValue({ count: 1 });
   withdrawalCreate.mockResolvedValue({ id: "wd-1" });
+  getOverdueParticipants.mockResolvedValue([]);
 });
 
 describe("requestPoolWithdrawal", () => {
@@ -113,6 +117,24 @@ describe("requestCoachWithdrawal", () => {
       data: { walletBalance: { decrement: 60_000 } },
     });
     expect(poolUpdateMany).not.toHaveBeenCalled();
+  });
+
+  it("menolak pengajuan baru kalau ada peserta yang catatan milestone-nya telat, saldo tidak disentuh", async () => {
+    coachFindUniqueOrThrow.mockResolvedValue({ userId: "u-coach", walletBalance: 60_000, bankName: "BCA", bankAccountNumber: "1", bankAccountName: "Ayu" });
+    getOverdueParticipants.mockResolvedValue([
+      { dependentId: "d1", name: "Budi", sessionsWithoutNote: 3 },
+      { dependentId: "d2", name: "Sari", sessionsWithoutNote: 2 },
+    ]);
+    await expect(requestCoachWithdrawal("coach-1")).rejects.toThrow("Pencairan ditahan: isi dulu catatan milestone untuk Budi, Sari.");
+    expect(getOverdueParticipants).toHaveBeenCalledWith("u-coach");
+    expect(coachUpdateMany).not.toHaveBeenCalled();
+    expect(withdrawalCreate).not.toHaveBeenCalled();
+  });
+
+  it("pencairan kolam tidak kena aturan milestone", async () => {
+    poolFindUniqueOrThrow.mockResolvedValue({ walletBalance: 100_000, bankName: "BCA", bankAccountNumber: "123", bankAccountName: "Budi" });
+    await requestPoolWithdrawal("pool-1");
+    expect(getOverdueParticipants).not.toHaveBeenCalled();
   });
 });
 

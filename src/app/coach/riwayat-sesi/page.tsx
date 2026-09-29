@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/require-role";
 import { SearchForm, matchesQuery } from "@/components/search-form";
 import { prisma } from "@/lib/prisma";
@@ -17,7 +18,7 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
     },
     orderBy: { availability: { startTime: "desc" } },
     include: {
-      package: { select: { name: true, dependent: { select: { name: true } } } },
+      package: { select: { name: true, dependent: { select: { id: true, name: true } } } },
       member: { select: { name: true } },
       availability: { include: { pool: { select: { name: true } } } },
     },
@@ -83,7 +84,12 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
                         <p className="text-base font-semibold text-text tabular-nums">
                           {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}
                         </p>
-                        <p className="text-sm text-text">Peserta: {b.package.dependent.name}</p>
+                        <p className="text-sm text-text">
+                          Peserta: {b.package.dependent.name}{" "}
+                          <Link href={`/milestone/${b.package.dependent.id}`} className="font-medium text-brand-700 underline">
+                            Update milestone
+                          </Link>
+                        </p>
                         <p className="text-sm text-text-muted">
                           Akun {b.member.name} · {b.package.name}
                         </p>

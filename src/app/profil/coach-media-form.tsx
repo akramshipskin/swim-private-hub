@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { uploadCoachPhoto, uploadCoachCertificate, deleteCoachCertificate } from "./actions";
+import { uploadCoachPhoto, uploadCoachCertificate, deleteCoachCertificate, uploadCoachSignature } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Field, Input } from "@/components/ui/input";
@@ -15,6 +15,8 @@ export default function CoachMediaForm({
   photoUrl,
   certificates,
   defaultCertificateName,
+  signatureUrl,
+  hasSignature,
   storageReady,
 }: {
   photoUrl: string | null;
@@ -22,10 +24,14 @@ export default function CoachMediaForm({
   // Nama sertifikat yang diisi saat daftar coach -- isian awal kalau belum
   // pernah mengunggah sertifikat.
   defaultCertificateName: string | null;
+  // Signed URL gambar tanda tangan (null = belum diunggah / storage mati).
+  signatureUrl: string | null;
+  hasSignature: boolean;
   storageReady: boolean;
 }) {
   const [photoState, photoAction, photoPending] = useActionState(uploadCoachPhoto, null);
   const [certState, certAction, certPending] = useActionState(uploadCoachCertificate, null);
+  const [sigState, sigAction, sigPending] = useActionState(uploadCoachSignature, null);
   const certForm = useRef<HTMLFormElement>(null);
   const full = certificates.length >= MAX_CERTIFICATES_PER_COACH;
 
@@ -52,6 +58,26 @@ export default function CoachMediaForm({
             {photoState?.error && <p role="alert" className="text-sm text-danger-text">{photoState.error}</p>}
             {photoState?.success && <p role="status" className="text-sm text-success-text">Foto tersimpan.</p>}
           </div>
+        </div>
+      </form>
+
+      <form action={sigAction} className="flex flex-col gap-3 border-t border-border pt-5">
+        <p className="text-sm font-medium text-text">Tanda tangan untuk sertifikat level peserta</p>
+        <p className="text-sm text-text-muted">
+          Foto tanda tanganmu di kertas putih (JPG/PNG, maks 3MB). Dipasang di sertifikat saat peserta menyelesaikan level
+          bersamamu. {hasSignature ? "Unggah ulang untuk mengganti." : "Belum diunggah."}
+        </p>
+        {signatureUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={signatureUrl} alt="Tanda tangan tersimpan" className="h-16 w-auto self-start rounded border border-border bg-white p-1" />
+        )}
+        <Field label="File tanda tangan">
+          <Input type="file" name="signature" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />
+        </Field>
+        <div className="flex items-center gap-3">
+          <Button type="submit" size="sm" loading={sigPending} disabled={!storageReady}>Simpan Tanda Tangan</Button>
+          {sigState?.error && <p role="alert" className="text-sm text-danger-text">{sigState.error}</p>}
+          {sigState?.success && <p role="status" className="text-sm text-success-text">Tanda tangan tersimpan.</p>}
         </div>
       </form>
 

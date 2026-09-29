@@ -10,7 +10,7 @@ import EditPasswordForm from "./edit-password-form";
 import CopyLinkButton from "./copy-link-button";
 import EditCoachProfileForm from "./edit-coach-profile-form";
 import CoachMediaForm from "./coach-media-form";
-import { isStorageConfigured } from "@/lib/storage";
+import { isStorageConfigured, signedObjectUrl, CERT_BUCKET } from "@/lib/storage";
 import DeleteAccountCard from "./delete-account-card";
 
 export const metadata: Metadata = {
@@ -45,6 +45,7 @@ export default async function ProfilPage() {
             birthDate: true,
             gender: true,
             certificates: { select: { id: true, name: true, status: true }, orderBy: { createdAt: "asc" } },
+            signaturePath: true,
           },
         })
       : null;
@@ -96,6 +97,8 @@ export default async function ProfilPage() {
                     photoUrl={coachProfile.photoUrl}
                     certificates={coachProfile.certificates}
                     defaultCertificateName={coachProfile.certificationNote}
+                    signatureUrl={coachProfile.signaturePath ? await signedObjectUrl(CERT_BUCKET, coachProfile.signaturePath) : null}
+                    hasSignature={!!coachProfile.signaturePath}
                     storageReady={isStorageConfigured()}
                   />
                 </CardBody>

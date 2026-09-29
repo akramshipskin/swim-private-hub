@@ -168,6 +168,11 @@ model User {
   poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
   poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
   chatThread          ChatThread?
+
+  milestoneItemsCreated     MilestoneItem[]            @relation("MilestoneItemCreator")
+  milestoneAchievements     MilestoneAchievement[]     @relation("MilestoneAchievementCoach")
+  milestoneNotes            MilestoneNote[]            @relation("MilestoneNoteCoach")
+  milestoneLevelCompletions MilestoneLevelCompletion[] @relation("MilestoneCompletionCoach")
 }
 
 // Chat bantuan (tombol mengambang) buat member/coach/pemilik kolam. 1 user =
@@ -255,6 +260,9 @@ model CoachProfile {
   walletTransactions WalletTransaction[]
   withdrawalRequests WithdrawalRequest[]
   certificates       CoachCertificate[]
+  // Gambar tanda tangan coach (path di bucket privat coach-certificates),
+  // diunggah sekali, dipasang di sertifikat level milestone.
+  signaturePath      String?
 }
 
 // Sertifikat coach (bisa banyak, Hadi 29 Sep). Tiap sertifikat diperiksa admin
@@ -369,10 +377,19 @@ model Dependent {
   // Tanggal lahir peserta (anak atau dewasa), untuk level milestone per umur.
   // Wajib diisi saat menambah peserta baru; kosong untuk peserta lama.
   birthDate DateTime?
+  // Kelompok milestone yang sedang dijalani. Diisi saat catatan milestone
+  // pertama (dari umur, atau dipilih coach kalau tanggal lahir kosong). Tidak
+  // ikut berganti otomatis saat umur naik di tengah level -- lihat
+  // src/lib/milestone.ts (nextGroup).
+  milestoneGroup MilestoneGroup?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
   packages Package[]
+  milestoneItems            MilestoneItem[]
+  milestoneAchievements     MilestoneAchievement[]
+  milestoneNotes            MilestoneNote[]
+  milestoneLevelCompletions MilestoneLevelCompletion[]
 
   @@index([memberId])
 }
@@ -688,4 +705,102 @@ model RateLimitHit {
   createdAt DateTime @default(now())
 
   @@index([key, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Milestone perkembangan peserta (Hadi 29 Sep). Catatan melekat ke PESERTA
+// (Dependent), bukan ke coach: coach baru melanjutkan dari butir berikutnya.
+// Daftar butir standar: docs/designs/milestone-daftar-keterampilan-draf.md,
+// diisi oleh migrasi milestone. Logika level/kelompok: src/lib/milestone.ts.
+
+// A = 6 bln-3 th (bersama orang tua), B = 4-6, C = 7-12, D = 13+.
+enum MilestoneGroup {
+  A
+  B
+  C
+  D
+}
+
+enum MilestoneProposalStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model MilestoneItem {
+  id          String                  @id @default(cuid())
+  group       MilestoneGroup
+  level       Int
+  sortOrder   Int                     @default(0)
+  text        String
+  // null = butir standar SPH (berlaku untuk semua peserta di kelompok itu).
+  // Terisi = butir tambahan coach khusus peserta ini. Usulan yang disetujui
+  // admin dijadikan standar dengan mengosongkan kolom ini.
+  dependentId String?
+  dependent   Dependent?              @relation(fields: [dependentId], references: [id], onDelete: Cascade)
+  createdById String?
+  createdBy   User?                   @relation("MilestoneItemCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  proposalStatus MilestoneProposalStatus @default(NONE)
+  isActive    Boolean                 @default(true)
+  createdAt   DateTime                @default(now())
+
+  achievements MilestoneAchievement[]
+  focusNotes   MilestoneNote[]
+
+  @@index([group, level])
+  @@index([dependentId])
+  @@index([proposalStatus])
+}
+
+// Butir yang sudah tercapai peserta. priorSkill = dicentang saat penilaian
+// awal ("sudah bisa sebelumnya"), tidak dihitung untuk sertifikat.
+model MilestoneAchievement {
+  id          String        @id @default(cuid())
+  dependentId String
+  dependent   Dependent     @relation(fields: [dependentId], references: [id], onDelete: Cascade)
+  itemId      String
+  item        MilestoneItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  coachId     String?
+  coach       User?         @relation("MilestoneAchievementCoach", fields: [coachId], references: [id], onDelete: SetNull)
+  priorSkill  Boolean       @default(false)
+  achievedAt  DateTime      @default(now())
+
+  @@unique([dependentId, itemId])
+}
+
+// Satu kali "Update milestone" oleh coach. Inilah yang dihitung untuk
+// penahanan pencairan coach (lihat src/lib/milestone-hold.ts): tiap peserta
+// wajib dapat catatan dari coach-nya minimal sekali tiap 2 sesi Hadir.
+model MilestoneNote {
+  id          String         @id @default(cuid())
+  dependentId String
+  dependent   Dependent      @relation(fields: [dependentId], references: [id], onDelete: Cascade)
+  coachId     String
+  coach       User           @relation("MilestoneNoteCoach", fields: [coachId], references: [id], onDelete: Cascade)
+  // Butir yang sedang dilatih (opsional).
+  focusItemId String?
+  focusItem   MilestoneItem? @relation(fields: [focusItemId], references: [id], onDelete: SetNull)
+  note        String
+  createdAt   DateTime       @default(now())
+
+  @@index([coachId, dependentId, createdAt])
+  @@index([dependentId, createdAt])
+}
+
+// Level yang sudah selesai. Dicatat sekali saat butir terakhirnya tercapai;
+// butir standar yang ditambah belakangan tidak membuka ulang level ini.
+// withCertificate = false kalau seluruh butirnya dari penilaian awal.
+model MilestoneLevelCompletion {
+  id              String         @id @default(cuid())
+  dependentId     String
+  dependent       Dependent      @relation(fields: [dependentId], references: [id], onDelete: Cascade)
+  group           MilestoneGroup
+  level           Int
+  coachId         String?
+  coach           User?          @relation("MilestoneCompletionCoach", fields: [coachId], references: [id], onDelete: SetNull)
+  withCertificate Boolean
+  completedAt     DateTime       @default(now())
+
+  @@unique([dependentId, group, level])
 }

@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import SaldoView from "@/components/saldo-view";
 import { updateBankInfo, requestWithdrawal } from "./actions";
 import { openNullable, openSecret } from "@/lib/secret-box";
+import Link from "next/link";
+import { getOverdueParticipants } from "@/lib/milestone-hold";
+import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
 
 export default async function CoachSaldoPage() {
   const session = await requireRole("COACH");
@@ -27,6 +30,8 @@ export default async function CoachSaldoPage() {
     },
   });
 
+  const overdue = await getOverdueParticipants(session.user.id);
+
   if (!profile) {
     return (
       <main className="mx-auto max-w-lg px-4 py-8 text-center text-sm text-text-muted">
@@ -41,6 +46,25 @@ export default async function CoachSaldoPage() {
       <p className="mb-6 text-sm text-text-muted">
         Bagian kamu dari tiap sesi yang ditandai Hadir (penuh) atau Tidak Hadir karena peserta tidak datang (50%).
       </p>
+      {overdue.length > 0 && (
+        <div role="alert" className="mb-6 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+          <p className="font-semibold">Pencairan ditahan sampai catatan milestone diisi</p>
+          <p className="mt-1">
+            Peserta berikut sudah {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir atau lebih tanpa catatan darimu. Saldo tetap
+            tersimpan, hanya belum bisa dicairkan. Pengajuan yang sudah masuk tetap diproses.
+          </p>
+          <ul className="mt-2 flex flex-col gap-1">
+            {overdue.map((o) => (
+              <li key={o.dependentId}>
+                <Link href={`/milestone/${o.dependentId}`} className="font-medium underline">
+                  {o.name}
+                </Link>{" "}
+                · {o.sessionsWithoutNote} sesi tanpa catatan
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <SaldoView
         walletBalance={profile.walletBalance}
         bankName={profile.bankName}

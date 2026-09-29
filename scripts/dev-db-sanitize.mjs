@@ -42,18 +42,28 @@ export const POLICY = {
     totpLastStep: () => null,
   },
   Dependent: {
-    ...keep("id", "memberId", "isSelf", "isActive", "createdAt"),
+    ...keep("id", "memberId", "isSelf", "isActive", "createdAt", "milestoneGroup"),
     name: (r, i) => `Peserta ${i}`,
     // Tanggal lahir asli anak disamarkan jadi 1 Januari tahun yang sama:
     // kelompok umur (untuk level milestone) tetap benar.
     birthDate: (r) => (r.birthDate == null ? null : new Date(Date.UTC(new Date(r.birthDate).getUTCFullYear(), 0, 1))),
   },
   CoachProfile: {
-    ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "certificateUrl", "certificateStatus", "birthDate", "gender", "walletBalance"),
+    ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "certificateUrl", "certificateStatus", "birthDate", "gender", "walletBalance", "signaturePath"),
     ...BANK,
   },
   // Nama sertifikat tampil publik di profil coach; filePath menunjuk bucket
   // privat production (sama seperti CoachProfile.certificateUrl).
+  // Milestone: butir & pencapaian disalin (tidak berisi data pribadi, perlu
+  // untuk mereproduksi hitungan level/penahanan). Isi catatan coach = teks
+  // bebas tentang anak, diganti.
+  MilestoneItem: keep("id", "group", "level", "sortOrder", "text", "dependentId", "createdById", "proposalStatus", "isActive", "createdAt"),
+  MilestoneAchievement: keep("id", "dependentId", "itemId", "coachId", "priorSkill", "achievedAt"),
+  MilestoneNote: {
+    ...keep("id", "dependentId", "coachId", "focusItemId", "createdAt"),
+    note: (r, i) => `Catatan dev ${i}`,
+  },
+  MilestoneLevelCompletion: keep("id", "dependentId", "group", "level", "coachId", "withCertificate", "completedAt"),
   CoachCertificate: keep("id", "coachProfileId", "name", "filePath", "status", "reviewedAt", "createdAt"),
   Pool: {
     ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "walletBalance", "isActive", "createdAt"),

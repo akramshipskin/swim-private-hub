@@ -38,6 +38,7 @@ export default async function AdminDashboardPage() {
     waitingChats,
     pendingWithdrawals,
     pendingCerts,
+    pendingMilestoneProposals,
     unmarked,
     coachWallets,
     platformMonth,
@@ -69,6 +70,7 @@ export default async function AdminDashboardPage() {
     prisma.chatThread.count({ where: { needsAdmin: true } }),
     prisma.withdrawalRequest.aggregate({ where: { status: { in: ["PENDING", "PROCESSING"] } }, _count: true, _sum: { amount: true } }),
     prisma.coachCertificate.count({ where: { status: "PENDING" } }),
+    prisma.milestoneItem.count({ where: { proposalStatus: "PENDING" } }),
     prisma.booking.count({ where: { status: "BOOKED", attended: null, availability: { endTime: { lt: now } } } }),
     prisma.coachProfile.aggregate({ _sum: { walletBalance: true } }),
     prisma.walletTransaction.groupBy({
@@ -134,6 +136,7 @@ export default async function AdminDashboardPage() {
               detail={formatRupiah(pendingWithdrawals._sum.amount ?? 0)}
             />
             <ActionRow label="Sertifikat coach menunggu" count={pendingCerts} href="/admin/users" />
+            <ActionRow label="Usulan butir milestone" count={pendingMilestoneProposals} href="/admin/milestone" />
             <ActionRow label="Usulan paket/harga kolam" count={pendingTemplates} href="/admin/paket" />
             <ActionRow label="Coach/pemilik kolam baru menunggu persetujuan" count={pendingAccounts} href="/admin/users" />
             <ActionRow label="Kolam belum disetujui" count={pools.length - activePools.length} href="/admin/kolam" />

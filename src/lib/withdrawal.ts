@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { MIN_WITHDRAWAL } from "@/lib/policy";
+import { getOverdueParticipants } from "@/lib/milestone-hold";
 
 export class WithdrawalError extends Error {
   constructor(message: string) {
@@ -113,6 +114,7 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
   const coach = await prisma.coachProfile.findUniqueOrThrow({
     where: { id: coachProfileId },
     select: {
+      userId: true,
       walletBalance: true,
       bankName: true,
       bankAccountNumber: true,
@@ -121,6 +123,15 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
   });
   if (!coach.bankName || !coach.bankAccountNumber || !coach.bankAccountName) {
     throw new WithdrawalError("Isi rekening tujuan dulu sebelum cairkan saldo.");
+  }
+  // Penahanan milestone: dicek sebelum saldo dipotong. Sengaja tidak dikunci
+  // bareng tandai hadir -- kalau keduanya pas bersamaan, urutan mana pun
+  // tetap benar menurut aturan (sesi yang belum tercatat Hadir belum dihitung).
+  const overdue = await getOverdueParticipants(coach.userId);
+  if (overdue.length > 0) {
+    throw new WithdrawalError(
+      `Pencairan ditahan: isi dulu catatan milestone untuk ${overdue.map((o) => o.name).join(", ")}.`
+    );
   }
   return createWithdrawalRequest({
     coachProfileId,

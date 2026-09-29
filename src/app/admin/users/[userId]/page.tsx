@@ -300,7 +300,12 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                     const pkgs = activePackages.filter((p) => p.dependentId === d.id);
                     return (
                       <li key={d.id} className="rounded-xl bg-surface-muted p-3">
-                        <p className="text-sm font-semibold text-text">{d.isSelf ? `${user.name} (diri sendiri)` : d.name}</p>
+                        <p className="text-sm font-semibold text-text">
+                          {d.isSelf ? `${user.name} (diri sendiri)` : d.name}{" "}
+                          <Link href={`/milestone/${d.id}`} className="text-xs font-medium text-brand-700 hover:underline">
+                            Milestone →
+                          </Link>
+                        </p>
                         {pkgs.length === 0 ? (
                           <p className="text-sm text-text-subtle">Belum ada paket aktif.</p>
                         ) : (
