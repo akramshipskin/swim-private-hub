@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import AttendanceToggle from "@/components/attendance-toggle";
+import { ATTENDANCE_MARK_WINDOW_HOURS, NO_SHOW_COACH_SHARE_PERCENT, coachCanMarkAttendance } from "@/lib/policy";
 
 export default async function CoachRiwayatSesiPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = (await searchParams).q ?? "";
@@ -41,7 +42,7 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Riwayat Sesi</h1>
       <SearchForm q={q} placeholder="Cari peserta, nama akun, atau kolam" />
-      <p className="mb-4 text-sm text-text-muted">Tandai kehadiran setelah sesi selesai. Saldo kamu dan saldo kolam bertambah setelah sesi ditandai Hadir.</p>
+      <p className="mb-4 text-sm text-text-muted">Tandai kehadiran paling lambat {ATTENDANCE_MARK_WINDOW_HOURS} jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai. Hadir: kamu dan kolam dapat bagian penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu dapat {NO_SHOW_COACH_SHARE_PERCENT}% dari bagianmu.</p>
       <div className="mb-6 grid grid-cols-3 gap-3">
         <Card><CardBody className="py-3"><p className="text-sm text-text-muted">Belum ditandai</p><p className={`text-2xl font-bold ${unmarkedCount > 0 ? "text-warning-text" : "text-text"}`}>{unmarkedCount}</p></CardBody></Card>
         <Card><CardBody className="py-3"><p className="text-sm text-text-muted">Hadir</p><p className="text-2xl font-bold text-success-text">{validSessionCount}</p></CardBody></Card>
@@ -92,7 +93,15 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
                           </p>
                         )}
                       </div>
-                      <AttendanceToggle bookingId={b.id} attended={b.attended} />
+                      <AttendanceToggle
+                        bookingId={b.id}
+                        attended={b.attended}
+                        lockedReason={
+                          coachCanMarkAttendance(b.availability.endTime)
+                            ? undefined
+                            : `Lewat ${ATTENDANCE_MARK_WINDOW_HOURS} jam, hubungi admin`
+                        }
+                      />
                     </CardBody>
                   </Card>
                 ))}

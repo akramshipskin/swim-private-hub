@@ -45,19 +45,18 @@ export async function checkInvariants(opts: { packages?: boolean; ledger?: boole
     }
   }
 
-  // 3. Saldo kolam & coach: tidak pernah negatif; dan (opsional) sama dengan
-  //    jumlah pembukuan (WalletTransaction).
+  // 3. Saldo kolam & coach sama dengan jumlah pembukuan (WalletTransaction).
+  //    Saldo BOLEH negatif sejak keputusan Hadi 29 Sep (Hadir dibatalkan
+  //    setelah dicairkan); yang dijaga pencairan tidak melebihi saldo.
   const sumFor = async (where: { poolId: string } | { coachProfileId: string }) =>
     (await prisma.walletTransaction.aggregate({ where, _sum: { amount: true } }))._sum.amount ?? 0;
   for (const pool of await prisma.pool.findMany({ select: { id: true, walletBalance: true } })) {
-    if (pool.walletBalance < 0) bad.push(`saldo kolam ${pool.id} negatif (${pool.walletBalance})`);
     if (ledger) {
       const l = await sumFor({ poolId: pool.id });
       if (l !== pool.walletBalance) bad.push(`saldo kolam ${pool.id} ${pool.walletBalance} != pembukuan ${l}`);
     }
   }
   for (const c of await prisma.coachProfile.findMany({ select: { id: true, walletBalance: true } })) {
-    if (c.walletBalance < 0) bad.push(`saldo coach ${c.id} negatif (${c.walletBalance})`);
     if (ledger) {
       const l = await sumFor({ coachProfileId: c.id });
       if (l !== c.walletBalance) bad.push(`saldo coach ${c.id} ${c.walletBalance} != pembukuan ${l}`);

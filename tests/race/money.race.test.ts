@@ -179,9 +179,10 @@ describe("REGISTRATION / ACCOUNT races", () => {
   });
   it("A3: member klik 'Tambah Diri sendiri' 6x barengan -> cuma 1 peserta diri sendiri", async () => {
     const m = await mkUser("MEMBER");
-    const rs = await settle(Array.from({ length: 6 }, () => as({ id: m.id, role: "MEMBER" }, () => addChild(null, fd({ type: "self" })))));
+    const rs = await settle(Array.from({ length: 6 }, () => as({ id: m.id, role: "MEMBER" }, () => addChild(null, fd({ type: "self", birthDate: "1990-01-01" })))));
     console.log("A3", summarize(rs));
     expect(await prisma.dependent.count({ where: { memberId: m.id, isSelf: true } })).toBe(1);
+    expect((await prisma.dependent.findFirstOrThrow({ where: { memberId: m.id, isSelf: true } })).birthDate?.toISOString()).toBe("1990-01-01T00:00:00.000Z");
   });
   it("A4: admin Tambah User No HP sama 4x barengan -> 1 akun, gak crash", async () => {
     const admin = await mkUser("ADMIN");

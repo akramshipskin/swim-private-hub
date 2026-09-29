@@ -46,8 +46,35 @@ model PlatformWithdrawal {
   revenueAmount Int
   taxAmount     Int
   note          String?
+  // Bukti transfer (nomor referensi m-banking), wajib untuk penarikan baru
+  // (keputusan Hadi 29 Sep). Kosong hanya untuk baris lama sebelum aturan ini.
+  transferReference String?
   createdById   String
   createdAt     DateTime @default(now())
+}
+
+enum AttendanceReportStatus {
+  OPEN
+  RESOLVED
+}
+
+// Laporan member atas status "Tidak Hadir" yang menurutnya salah (keputusan
+// Hadi 29 Sep): maksimal 3 hari setelah sesi selesai, 1 laporan per booking.
+// Admin memeriksa, mengoreksi kehadiran lewat toggle biasa bila perlu, lalu
+// menutup laporan dengan catatan.
+model AttendanceReport {
+  id           String                 @id @default(cuid())
+  bookingId    String                 @unique
+  booking      Booking                @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  memberId     String
+  note         String?
+  status       AttendanceReportStatus @default(OPEN)
+  resolution   String?
+  resolvedById String?
+  resolvedAt   DateTime?
+  createdAt    DateTime               @default(now())
+
+  @@index([status, createdAt])
 }
 
 enum WithdrawalStatus {
@@ -312,6 +339,9 @@ model Dependent {
   // dicopy dari User.name pas dibuat). Paling banyak 1 entry isSelf per
   // member, dicek di action layer (bukan constraint DB).
   isSelf    Boolean  @default(false)
+  // Tanggal lahir peserta (anak atau dewasa), untuk level milestone per umur.
+  // Wajib diisi saat menambah peserta baru; kosong untuk peserta lama.
+  birthDate DateTime?
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
@@ -576,6 +606,7 @@ model Booking {
   attended       Boolean?
   attendedBy     MarkedBy?
   attendedAt     DateTime?
+  attendanceReport AttendanceReport?
   createdAt      DateTime      @default(now())
 
   @@index([memberId])

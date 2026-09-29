@@ -19,6 +19,8 @@ export default defineConfig({
       MIDTRANS_SERVER_KEY: "SB-test-server-key",
       MIDTRANS_CLIENT_KEY: "SB-test-client-key",
       AUTH_SECRET: "race-test-secret",
+      // Kunci enkripsi KHUSUS tes (sama dengan vitest.setup.ts), bukan kunci dev/prod.
+      SECRET_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString("base64"),
     },
   },
   resolve: { alias: { "@": path.resolve(__dirname, "./src") } },

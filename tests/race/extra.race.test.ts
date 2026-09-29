@@ -18,6 +18,7 @@ import { deleteAvailability, addAvailability } from "@/app/coach/jadwal/actions"
 import { reviewTemplate, updatePackage } from "@/app/admin/paket/actions";
 import { withdrawPlatform } from "@/app/admin/withdrawals/platform-actions";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
+import { reportAttendance } from "@/app/member/riwayat/actions";
 import { rejectWithdrawal, markPaidManually } from "@/app/admin/withdrawals/actions";
 import { requestWithdrawal as coachWithdraw } from "@/app/coach/saldo/actions";
 import { updatePasswordProfil } from "@/app/profil/actions";
@@ -162,7 +163,8 @@ describe("SALDO PLATFORM & PENCAIRAN", () => {
       await reset();
       const w = 3 + i * 4;
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
-      await prisma.walletTransaction.create({ data: { type: "PLATFORM_REVENUE", amount: 100000 } });
+      // Saldo lama (lewat masa tahan); kredit sesi baru di tes ini masih ditahan.
+      await prisma.walletTransaction.create({ data: { type: "PLATFORM_REVENUE", amount: 100000, createdAt: new Date(Date.now() - 4 * 86400000) } });
       const bookings = [];
       for (let k = 0; k < 3; k++) {
         const slot = await mkSlot(coach.id, pool.id, -3);
@@ -170,7 +172,7 @@ describe("SALDO PLATFORM & PENCAIRAN", () => {
         bookings.push(await book(m.id, slot.id, pkg.id));
       }
       const rs = await settle([
-        ...Array.from({ length: 4 }, () => (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => withdrawPlatform(null, fd({ revenueAmount: "30000" }))); })()),
+        ...Array.from({ length: 4 }, () => (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => withdrawPlatform(null, fd({ revenueAmount: "30000", transferReference: "REF-E4" }))); })()),
         ...bookings.map((b) => (async () => { await jitter(30); return as({ id: coach.id, role: "COACH" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" }))); })()),
       ]);
       expect(thrownOf(rs)).toEqual([]);
@@ -178,7 +180,8 @@ describe("SALDO PLATFORM & PENCAIRAN", () => {
       if (JSON.stringify(valuesOf(rs).slice(4)) !== "[null,null,null]") console.log("E4 ABSENSI DITOLAK", JSON.stringify(valuesOf(rs).slice(4)));
       expect(valuesOf(rs).slice(4)).toEqual([null, null, null]);
       const ok = rs.slice(0, 4).filter((r) => r.status === "fulfilled" && (r.value as { ok?: boolean } | null)?.ok === true).length;
-      expect(ok).toBeGreaterThanOrEqual(3);
+      // Hanya 100.000 yang lewat masa tahan -> tepat 3 x 30.000; kredit sesi baru tidak ikut.
+      expect(ok).toBe(3);
       expect((await getPlatformBalance()).revenue).toBe(100000 + 3 * net - 30000 * ok);
       expect(await checkInvariants()).toEqual([]);
       tally(sebaran, `${ok} dari 4 penarikan berhasil`);
@@ -319,5 +322,22 @@ describe("JADWAL, NOTIFIKASI, CHAT", () => {
     expect(codes.every((c) => c === 200 || c === 429)).toBe(true);
     expect(await prisma.chatMessage.count({ where: { sender: "USER" } })).toBe(20);
     expect(codes.filter((c) => c === 200).length).toBe(20);
+  });
+});
+
+describe("LAPORAN KEHADIRAN (29 Sep)", () => {
+  it("E9: member menekan Kirim laporan 5x barengan -> tepat 1 laporan, sisanya pesan 'sudah dilaporkan'", async () => {
+    const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
+    const slot = await mkSlot(coach.id, pool.id, -3);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const b = await book(m.id, slot.id, pkg.id);
+    await as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "false" })));
+    const rs = await settle(Array.from({ length: 5 }, () => as({ id: m.id, role: "MEMBER" }, () => reportAttendance(null, fd({ bookingId: b.id, note: "hadir kok" })))));
+    expect(thrownOf(rs)).toEqual([]);
+    const vals = valuesOf(rs) as ({ ok?: boolean; error?: string } | null)[];
+    expect(vals.filter((v) => v?.ok).length).toBe(1);
+    expect(vals.filter((v) => v?.error?.includes("sudah dilaporkan")).length).toBe(4);
+    expect(await prisma.attendanceReport.count()).toBe(1);
+    expect(await checkInvariants()).toEqual([]);
   });
 });

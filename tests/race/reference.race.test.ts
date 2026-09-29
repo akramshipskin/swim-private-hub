@@ -41,8 +41,9 @@ describe("REFERENSI", () => {
 
   it("N7: 6 admin menarik saldo platform Rp40.000 barengan padahal saldo Rp100.000 -> tepat 2 berhasil, saldo tidak minus", async () => {
     const admin = await mkUser("ADMIN");
-    await prisma.walletTransaction.create({ data: { type: "PLATFORM_REVENUE", amount: 100000 } });
-    const rs = await settle(Array.from({ length: 6 }, () => as({ id: admin.id, role: "ADMIN" }, () => withdrawPlatform(null, fd({ revenueAmount: "40000" })))));
+    // Saldo lama (lewat masa tahan 3 hari) supaya boleh ditarik.
+    await prisma.walletTransaction.create({ data: { type: "PLATFORM_REVENUE", amount: 100000, createdAt: new Date(Date.now() - 4 * 86400000) } });
+    const rs = await settle(Array.from({ length: 6 }, () => as({ id: admin.id, role: "ADMIN" }, () => withdrawPlatform(null, fd({ revenueAmount: "40000", transferReference: "REF-N7" })))));
     const results = rs.map((r) => (r.status === "fulfilled" ? r.value : { error: "THROW " + String((r as PromiseRejectedResult).reason?.message) }));
     console.log("N7", results);
     expect(rs.every((r) => r.status === "fulfilled")).toBe(true);

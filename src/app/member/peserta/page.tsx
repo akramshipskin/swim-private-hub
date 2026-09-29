@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { usablePackageConditions } from "@/lib/active-package";
 import PesertaManager, { type PesertaItem } from "./peserta-manager";
+import { ageFromBirthDate } from "@/lib/coach-bio";
 
 export const metadata = { title: "Peserta | Swim Private Hub" };
 
@@ -15,6 +16,7 @@ export default async function MemberPesertaPage() {
       name: true,
       isActive: true,
       isSelf: true,
+      birthDate: true,
       packages: {
         where: usablePackageConditions(),
         orderBy: { createdAt: "desc" },
@@ -28,6 +30,8 @@ export default async function MemberPesertaPage() {
     name: c.isSelf ? `${session.user.name ?? c.name} (kamu)` : c.name,
     isActive: c.isActive,
     isSelf: c.isSelf,
+    birthDate: c.birthDate ? c.birthDate.toISOString().slice(0, 10) : null,
+    age: ageFromBirthDate(c.birthDate),
     paket: c.packages.map((p) => ({
       poolName: p.pool?.name ?? "Kolam tidak diketahui",
       packageName: p.name,

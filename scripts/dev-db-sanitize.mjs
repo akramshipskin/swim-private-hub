@@ -44,6 +44,9 @@ export const POLICY = {
   Dependent: {
     ...keep("id", "memberId", "isSelf", "isActive", "createdAt"),
     name: (r, i) => `Peserta ${i}`,
+    // Tanggal lahir asli anak disamarkan jadi 1 Januari tahun yang sama:
+    // kelompok umur (untuk level milestone) tetap benar.
+    birthDate: (r) => (r.birthDate == null ? null : new Date(Date.UTC(new Date(r.birthDate).getUTCFullYear(), 0, 1))),
   },
   CoachProfile: {
     ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "certificateUrl", "certificateStatus", "birthDate", "gender", "walletBalance"),
@@ -88,7 +91,16 @@ export const POLICY = {
   },
 
   // Tanpa data pribadi: salin apa adanya.
-  PlatformWithdrawal: keep("id", "revenueAmount", "taxAmount", "note", "createdById", "createdAt"),
+  PlatformWithdrawal: {
+    ...keep("id", "revenueAmount", "taxAmount", "note", "createdById", "createdAt"),
+    transferReference: (r, i) => (r.transferReference == null ? null : `DEV-PLAT-${i}`),
+  },
+  // Keterangan laporan ditulis member (teks bebas, bisa berisi data pribadi).
+  // Catatan hasil pemeriksaan ditulis admin: disalin, seperti note ledger.
+  AttendanceReport: {
+    ...keep("id", "bookingId", "memberId", "status", "resolution", "resolvedById", "resolvedAt", "createdAt"),
+    note: (r) => (r.note == null ? null : "Keterangan laporan (disamarkan)"),
+  },
   WalletTransaction: keep("id", "type", "poolId", "coachProfileId", "amount", "paymentId", "bookingId", "withdrawalRequestId", "note", "createdById", "idempotencyKey", "createdAt"),
   PackageTemplate: keep("id", "poolId", "name", "totalSesi", "price", "durationDays", "jatahCancel", "isActive", "pendingChanges", "createdAt"),
   Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "status", "startDate", "expiredDate", "createdAt"),

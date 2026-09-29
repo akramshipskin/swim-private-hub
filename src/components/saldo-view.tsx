@@ -122,9 +122,9 @@ export default function SaldoView({
           </form>
           {walletBalance < 0 && (
             <p className="rounded-xl bg-danger-bg p-3 text-sm text-danger-text">
-              Saldo kamu minus {formatRupiah(-walletBalance)} karena koreksi admin (lihat Riwayat Koreksi Saldo). Kekurangan ini
-              otomatis tertutup dari bagian sesi berikutnya yang ditandai Hadir; pencairan bisa lagi setelah saldo kembali
-              mencapai minimal {formatRupiah(MIN_WITHDRAWAL)}.
+              Saldo kamu minus {formatRupiah(-walletBalance)} karena koreksi admin atau status kehadiran sesi yang diubah setelah
+              uangnya dicairkan. Kekurangan ini otomatis tertutup dari bagian sesi berikutnya; pencairan bisa lagi setelah saldo
+              kembali mencapai minimal {formatRupiah(MIN_WITHDRAWAL)}.
             </p>
           )}
           {!hasBankInfo ? (

@@ -5,6 +5,8 @@ import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { getCancelQuotaUsage, evaluateCancelEligibility } from "@/lib/cancel-eligibility";
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import CancelButton from "./cancel-button";
+import ReportButton from "./report-button";
+import { ATTENDANCE_REPORT_WINDOW_DAYS, memberCanReportAttendance } from "@/lib/policy";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
@@ -31,6 +33,7 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
     include: {
       availability: { include: { coach: { select: { name: true, coachProfile: { select: { photoUrl: true } } } }, pool: { select: { name: true } } } },
       package: { include: { dependent: { select: { name: true, isSelf: true } } } },
+      attendanceReport: { select: { status: true, resolution: true } },
     },
   });
 
@@ -114,6 +117,12 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                   const eligibility = eligibilityByBooking.get(b.id);
                   const remaining = eligibility ? Math.max(0, eligibility.quota - eligibility.used) : 0;
                   const showActions = b.status === "BOOKED" && b.availability.startTime > now;
+                  const canReport =
+                    b.status === "BOOKED" &&
+                    b.attended === false &&
+                    !b.attendanceReport &&
+                    memberCanReportAttendance(b.availability.endTime, now);
+                  const reportDeadline = new Date(b.availability.endTime.getTime() + ATTENDANCE_REPORT_WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
                   return (
                     <Card key={b.id}>
@@ -157,9 +166,24 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                               {b.status === "BOOKED" && b.attended === false && (
                                 <Badge tone="danger">Tidak Hadir</Badge>
                               )}
+                              {b.attendanceReport?.status === "OPEN" && (
+                                <Badge tone="warning">Dilaporkan, diperiksa admin</Badge>
+                              )}
                             </div>
+                            {b.attendanceReport?.status === "RESOLVED" && (
+                              <p className="mt-1 text-xs text-text-muted">
+                                Laporan selesai diperiksa{b.attendanceReport.resolution ? `: ${b.attendanceReport.resolution}` : "."}
+                              </p>
+                            )}
                           </div>
                         </div>
+
+                        {canReport && (
+                          <ReportButton
+                            bookingId={b.id}
+                            deadlineLabel={reportDeadline.toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" })}
+                          />
+                        )}
 
                         {showActions && (
                           <div className="flex w-28 shrink-0 flex-col items-end gap-1.5 text-right sm:w-auto">

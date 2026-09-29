@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import WithdrawalRow from "./withdrawal-row";
 import PlatformWithdrawForm from "./platform-withdraw-form";
 import { getPlatformBalance } from "@/lib/platform-wallet";
+import { PLATFORM_HOLD_DAYS } from "@/lib/policy";
 import { isIrisConfigured } from "@/lib/disbursement";
 import { openSecret } from "@/lib/secret-box";
 
@@ -71,21 +72,26 @@ export default async function AdminWithdrawalsPage({
           <div>
             <h2 className="text-lg font-semibold text-text">Saldo Platform</h2>
             <p className="text-sm text-text-muted">
-              Komisi platform dari setiap sesi Hadir, sudah dipisah dari PPN 12%. Catat di sini setiap kali saldo ditarik dari
-              akun Midtrans.
+              Komisi platform dari setiap sesi, sudah dipisah dari PPN 12%. Dana sesi baru bisa ditarik setelah ditahan{" "}
+              {PLATFORM_HOLD_DAYS} hari (masa member melapor). Catat di sini setiap kali saldo ditarik dari akun Midtrans, lengkap
+              dengan bukti transfer.
             </p>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="rounded-xl bg-surface-muted p-3">
               <p className="text-sm text-text-muted">Pendapatan bersih bisa ditarik</p>
-              <p className="text-2xl font-bold text-text">{formatRupiah(platform.revenue)}</p>
+              <p className="text-2xl font-bold text-text">{formatRupiah(Math.max(0, platform.availableRevenue))}</p>
+              <p className="text-xs text-text-subtle">Total termasuk yang masih ditahan: {formatRupiah(platform.revenue)}</p>
             </div>
             <div className="rounded-xl bg-surface-muted p-3">
-              <p className="text-sm text-text-muted">Saldo pajak (PPN 12%)</p>
-              <p className="text-2xl font-bold text-text">{formatRupiah(platform.tax)}</p>
+              <p className="text-sm text-text-muted">Saldo PPN 12% (untuk disetor ke negara)</p>
+              <p className="text-2xl font-bold text-text">{formatRupiah(Math.max(0, platform.availableTax))}</p>
+              <p className="text-xs text-text-subtle">Total termasuk yang masih ditahan: {formatRupiah(platform.tax)}</p>
             </div>
           </div>
-          <PlatformWithdrawForm revenue={platform.revenue} tax={platform.tax} />
+          {/* Pembalikan (sesi Hadir yang dikoreksi) langsung mengurangi, kredit baru ditahan dulu --
+              jadi angka "bisa ditarik" bisa sementara di bawah nol dan ditampilkan Rp0. */}
+          <PlatformWithdrawForm revenue={platform.availableRevenue} tax={platform.availableTax} />
           {platformHistory.length > 0 && (
             <div>
               <p className="mb-1 text-sm font-semibold text-text">Penarikan terakhir</p>
@@ -94,6 +100,7 @@ export default async function AdminWithdrawalsPage({
                   <li key={h.id} className="flex flex-wrap justify-between gap-2 py-1.5">
                     <span className="text-text-muted">
                       {h.createdAt.toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" })}
+                      {h.transferReference ? ` · Ref ${h.transferReference}` : ""}
                       {h.note ? ` · ${h.note}` : ""}
                     </span>
                     <span className="text-text">

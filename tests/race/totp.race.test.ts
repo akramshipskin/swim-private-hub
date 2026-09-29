@@ -5,6 +5,7 @@ import { as, fd, jitter, reset, settle, spread, tally } from "./fx";
 import { checkInvariants } from "./invariants";
 import { authorizeCredentials } from "@/lib/authorize";
 import { newTotpSecret, totpAt, currentStep } from "@/lib/totp";
+import { openNullable } from "@/lib/secret-box";
 import { confirmTotpSetup, disableTotp, startTotpSetup } from "@/app/keamanan/actions";
 import { resetUserTotp } from "@/app/admin/users/actions";
 
@@ -89,11 +90,11 @@ describe("2FA opsional (coach/member/pemilik kolam)", () => {
       const db = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
       expect(vals.some((v) => v.startsWith("THROW") || v === "REJECT")).toBe(false);
       if (db.totpEnabledAt) {
-        expect(db.totpSecret).toBe(secret);
+        expect(openNullable(db.totpSecret)).toBe(secret);
         expect(vals.slice(0, 3).some((v) => v === "redirect:/profil")).toBe(true);
       } else {
         // Kunci diganti sebelum ada konfirmasi yang menang: semua konfirmasi ditolak.
-        expect(db.totpSecret).not.toBe(secret);
+        expect(openNullable(db.totpSecret)).not.toBe(secret);
         expect(vals.slice(0, 3).every((v) => v.startsWith("err:"))).toBe(true);
       }
       tally(sebaran, db.totpEnabledAt ? "aktif" : "kunci-diganti");
@@ -230,7 +231,7 @@ describe("2FA opsional (coach/member/pemilik kolam)", () => {
     const s = { id: u.id, role: "MEMBER" as const };
     await as(s, () => startTotpSetup());
     const { totpSecret } = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
-    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: totpAt(totpSecret!, currentStep()), password: PASSWORD }))))).toBe("redirect:/profil");
+    expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: totpAt(openNullable(totpSecret)!, currentStep()), password: PASSWORD }))))).toBe("redirect:/profil");
     expect((await login(u.phone!, "", "8.8.8.2")).r).toBe("otp_required");
     expect(await checkInvariants()).toEqual([]);
   });
@@ -240,7 +241,7 @@ describe("2FA opsional (coach/member/pemilik kolam)", () => {
     const s = coachSession(u);
     await as(s, () => startTotpSetup());
     const { totpSecret } = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
-    const code = () => totpAt(totpSecret!, currentStep());
+    const code = () => totpAt(openNullable(totpSecret)!, currentStep());
     expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: code() }))))).toBe("err:Isi password akunmu.");
     for (let i = 0; i < 5; i++) {
       expect(await as(s, () => act(confirmTotpSetup(null, fd({ code: "000000", password: PASSWORD }))))).toMatch(/^err:Kode salah/);

@@ -105,7 +105,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Bagaimana kalau batal mendadak?",
-        a: `Setiap paket punya jatah pembatalan mandiri, paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal. Di luar itu bisa menghubungi admin lewat tombol bantuan di aplikasi. Tidak hadir tanpa membatalkan berarti sesi tetap terpakai.`,
+        a: `Setiap paket punya jatah pembatalan mandiri, paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal. Di luar itu bisa menghubungi admin lewat tombol bantuan di aplikasi. Tidak hadir tanpa membatalkan berarti sesi tetap terpakai. Kalau ditandai Tidak Hadir padahal hadir, laporkan dari menu Riwayat paling lambat 3 hari setelah sesi.`,
       },
       {
         q: "Kalau coach berhalangan, sesinya hangus?",
@@ -139,7 +139,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kapan bagian saya masuk?",
-        a: "Setiap sesi yang kamu tandai Hadir langsung menambah saldo kamu, sesuai persentase komisi coach yang berlaku di kolam tersebut.",
+        a: "Tandai kehadiran paling lambat 24 jam setelah sesi selesai. Sesi Hadir langsung menambah saldo kamu sesuai persentase komisi coach di kolam tersebut. Kalau peserta sudah booking tapi tidak datang, tandai Tidak Hadir: kamu tetap dapat 50% dari bagianmu.",
       },
       {
         q: "Cara mencairkan saldo?",

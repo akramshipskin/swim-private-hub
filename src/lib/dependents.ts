@@ -7,10 +7,10 @@ import type { Prisma } from "@/generated/prisma/client";
 // default ke client global kalau berdiri sendiri.
 type Db = typeof prisma | Prisma.TransactionClient;
 
-export async function createDependent(memberId: string, name: string, db: Db = prisma) {
+export async function createDependent(memberId: string, name: string, db: Db = prisma, birthDate: Date | null = null) {
   const trimmed = toProperCase(name.trim());
   if (!trimmed) throw new Error("Nama anak tidak boleh kosong");
-  return db.dependent.create({ data: { memberId, name: trimmed } });
+  return db.dependent.create({ data: { memberId, name: trimmed, birthDate } });
 }
 
 // Peserta = "diri sendiri" (akun MEMBER-nya sendiri yang les, bukan anak).
@@ -65,4 +65,16 @@ export async function assertDependentOwnedByMember(dependentId: string, memberId
   if (!dep || dep.memberId !== memberId) {
     throw new Error("Anak tidak ditemukan atau bukan milik kamu");
   }
+}
+
+// Tanggal lahir peserta dari input form (YYYY-MM-DD). Disimpan tengah malam
+// UTC -- konvensi yang dibaca ageFromBirthDate. Peserta bisa bayi sampai
+// dewasa, jadi batasnya longgar: tidak di masa depan, umur maksimal 100.
+export function parseParticipantBirthDate(raw: string, now: Date = new Date()): Date {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) throw new Error("Isi tanggal lahir peserta.");
+  const d = new Date(`${raw}T00:00:00Z`);
+  if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== raw) throw new Error("Tanggal lahir tidak valid.");
+  if (d.getTime() > now.getTime()) throw new Error("Tanggal lahir tidak boleh di masa depan.");
+  if (now.getUTCFullYear() - d.getUTCFullYear() > 100) throw new Error("Tanggal lahir tidak masuk akal.");
+  return d;
 }

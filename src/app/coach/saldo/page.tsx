@@ -39,7 +39,7 @@ export default async function CoachSaldoPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Saldo Saya</h1>
       <p className="mb-6 text-sm text-text-muted">
-        Bagian kamu dari tiap sesi yang ditandai Hadir.
+        Bagian kamu dari tiap sesi yang ditandai Hadir (penuh) atau Tidak Hadir karena peserta tidak datang (50%).
       </p>
       <SaldoView
         walletBalance={profile.walletBalance}

@@ -2,7 +2,8 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { creditSessionRevenue, reverseSessionRevenue, ReversalBlockedError } from "@/lib/wallet";
+import { creditSessionRevenue, reverseSessionRevenue } from "@/lib/wallet";
+import { ATTENDANCE_MARK_WINDOW_HOURS, coachCanMarkAttendance } from "@/lib/policy";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -42,8 +43,11 @@ export async function markAttendance(
   if (booking.availability.endTime > new Date()) {
     return { error: "Belum waktunya, sesi ini belum selesai." };
   }
-
-  const wasAttended = booking.attended === true;
+  // Keputusan Hadi 29 Sep: coach wajib menandai paling lambat 24 jam setelah
+  // sesi selesai (termasuk mengubah tanda). Lewat itu hanya admin.
+  if (session.user.role === "COACH" && !coachCanMarkAttendance(booking.availability.endTime)) {
+    return { error: `Sudah lewat ${ATTENDANCE_MARK_WINDOW_HOURS} jam sejak sesi selesai. Hubungi admin untuk menandai kehadiran.` };
+  }
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -88,19 +92,21 @@ export async function markAttendance(
       // per paket) tetap di platform, sesuai aturan sisa pembulatan.
       const perSessionValue = Math.floor(successPayment.amount / booking.package.totalSesi);
 
-      if (!wasAttended && attended) {
-        await creditSessionRevenue(tx, {
-          poolId: booking.availability.poolId,
-          coachProfileId: coachProfile.id,
-          bookingId,
-          perSessionValue,
-        });
-      } else if (wasAttended && !attended) {
-        await reverseSessionRevenue(tx, { bookingId });
-      }
+      // Bagi hasil mengikuti tanda terbaru: Hadir = pembagian normal, Tidak
+      // Hadir = bagian coach 50% (kolam Rp0). Ganti tanda = balik yang lama
+      // (jumlah persis yang dulu dicatat) lalu catat yang baru. Tanda sama
+      // dikirim ulang = tidak ada perubahan uang.
+      if (booking.attended === attended) return;
+      if (booking.attended !== null) await reverseSessionRevenue(tx, { bookingId });
+      await creditSessionRevenue(tx, {
+        poolId: booking.availability.poolId,
+        coachProfileId: coachProfile.id,
+        bookingId,
+        perSessionValue,
+        attended,
+      });
     });
   } catch (err) {
-    if (err instanceof ReversalBlockedError) return { error: err.message };
     if (err instanceof Error && err.message.includes("baru saja diubah")) {
       return { error: err.message };
     }

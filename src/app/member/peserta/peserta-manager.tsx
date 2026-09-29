@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { addChild, toggleChildActive } from "@/app/profil/actions";
+import { addChild, setDependentBirthDate, toggleChildActive } from "@/app/profil/actions";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,8 @@ export type PesertaItem = {
   name: string;
   isActive: boolean;
   isSelf: boolean;
+  birthDate: string | null;
+  age: number | null;
   // Ringkasan paket aktif peserta ini, sudah dirangkai di server.
   paket: { poolName: string; packageName: string; sisaSesi: number; totalSesi: number }[];
 };
@@ -55,10 +57,15 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-base font-semibold text-text">{c.name}</p>
-                      <p className="text-xs text-text-subtle">{c.isSelf ? "Kamu sendiri" : "Anak"}</p>
+                      <p className="text-xs text-text-subtle">
+                        {c.isSelf ? "Kamu sendiri" : "Anak"}
+                        {c.age !== null && ` · ${c.age} tahun`}
+                      </p>
                     </div>
                     <Badge tone="success">Aktif</Badge>
                   </div>
+
+                  {c.birthDate === null && <BirthDateForm dependentId={c.id} />}
 
                   {c.paket.length === 0 ? (
                     <p className="text-sm text-text-muted">Belum punya paket aktif.</p>
@@ -126,6 +133,10 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                     </Field>
                   )}
 
+                  <Field label="Tanggal lahir">
+                    <Input name="birthDate" type="date" required max={new Date().toISOString().slice(0, 10)} />
+                  </Field>
+
                   <Button type="submit" loading={pending} className="mt-auto w-full sm:w-auto sm:self-start">
                     Tambah peserta
                   </Button>
@@ -177,5 +188,24 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
         onCancel={() => setConfirming(null)}
       />
     </div>
+  );
+}
+
+// Peserta lama (dibuat sebelum tanggal lahir wajib) diminta melengkapi,
+// supaya coach bisa melihat level perkembangan sesuai umurnya.
+function BirthDateForm({ dependentId }: { dependentId: string }) {
+  const [state, action, pending] = useActionState(setDependentBirthDate, null);
+  return (
+    <form action={action} className="flex flex-col gap-2 rounded-lg bg-warning-bg px-3 py-2">
+      <input type="hidden" name="dependentId" value={dependentId} />
+      <label className="text-sm text-warning-text" htmlFor={`bd-${dependentId}`}>
+        Lengkapi tanggal lahir peserta ini
+      </label>
+      <div className="flex flex-wrap items-center gap-2">
+        <Input id={`bd-${dependentId}`} name="birthDate" type="date" required max={new Date().toISOString().slice(0, 10)} className="w-auto" />
+        <Button type="submit" size="sm" loading={pending}>Simpan</Button>
+      </div>
+      {state?.error && <p role="alert" className="text-xs text-danger-text">{state.error}</p>}
+    </form>
   );
 }

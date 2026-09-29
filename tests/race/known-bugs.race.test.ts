@@ -121,7 +121,9 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
   });
 });
 
-describe("S3 / D3: saldo yang sudah dicairkan tidak boleh jadi minus", () => {
+describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairkan, saldo boleh minus", () => {
+  // Nilai sesi 100.000; bagian normal: coach 55% = 55.000, kolam 30% = 30.000.
+  // Tidak datang: coach 50% dari 55.000 = 27.500, kolam 0.
   async function creditedThenWithdrawn() {
     const pool = await mkPool(); const coach = await mkUser("COACH", { bank: true }); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, -3);
@@ -129,22 +131,23 @@ describe("S3 / D3: saldo yang sudah dicairkan tidak boleh jadi minus", () => {
     const b = await book(m.id, slot.id, pkg.id);
     await as({ id: coach.id, role: "COACH" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" })));
     const cp = await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } });
-    expect(cp.walletBalance).toBe(55000); // 800000 / 8 = 100000 per sesi, bagian coach 55%
+    expect(cp.walletBalance).toBe(55000);
     await as({ id: coach.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "55000" })));
     expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance).toBe(0);
     return { pool, coach, admin, b };
   }
 
-  // Bug: status Hadir bisa dibatalkan setelah saldonya dicairkan -> saldo -55.000.
-  it("K3a: Hadir sudah dicairkan, lalu diubah jadi Tidak Hadir -> DITOLAK dengan pesan, status tetap Hadir, saldo tetap 0", async () => {
+  it("K3a: Hadir sudah dicairkan, lalu diubah jadi Tidak Hadir -> BERHASIL, saldo coach -27.500, catatan uang cocok", async () => {
     const x = await creditedThenWithdrawn();
     const res = await as({ id: x.admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: x.b.id, attended: "false" })));
-    expect(res?.error).toBeTruthy();
-    expect((await prisma.booking.findUniqueOrThrow({ where: { id: x.b.id } })).attended).toBe(true);
-    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: x.coach.id } })).walletBalance).toBe(0);
+    expect(res).toBeNull();
+    expect((await prisma.booking.findUniqueOrThrow({ where: { id: x.b.id } })).attended).toBe(false);
+    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: x.coach.id } })).walletBalance).toBe(-27500);
+    expect((await prisma.pool.findUniqueOrThrow({ where: { id: x.pool.id } })).walletBalance).toBe(0);
+    expect(await checkInvariants()).toEqual([]);
   });
 
-  it("K3c: coach mencairkan saldo BERSAMAAN admin membatalkan Hadir (15 putaran) -> tepat satu yang berhasil, saldo tidak pernah minus, catatan uang cocok", async () => {
+  it("K3c: coach mencairkan saldo BERSAMAAN admin mengubah Hadir jadi Tidak Hadir (15 putaran) -> selalu salah satu dari 2 hasil sah, catatan uang cocok", async () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 15; i++) {
       await reset();
@@ -159,20 +162,18 @@ describe("S3 / D3: saldo yang sudah dicairkan tidak boleh jadi minus", () => {
         (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "false" }))); })(),
       ]);
       expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
-      const cp = await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } });
-      expect(cp.walletBalance).toBeGreaterThanOrEqual(0);
       expect(await checkInvariants()).toEqual([]);
-      const attended = (await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).attended;
+      expect((await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).attended).toBe(false);
+      const bal = (await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance;
       const withdrawn = await prisma.withdrawalRequest.count();
-      // Tepat satu jalan: cair (Hadir tetap) ATAU batal Hadir (tidak ada pencairan).
-      expect((attended === true && withdrawn === 1) || (attended === false && withdrawn === 0)).toBe(true);
-      tally(sebaran, attended ? "cair menang" : "batal Hadir menang");
+      // Cair duluan: saldo 0 lalu dibalik -> -27.500. Ubah duluan: saldo 27.500, cair 55.000 ditolak.
+      expect((withdrawn === 1 && bal === -27500) || (withdrawn === 0 && bal === 27500)).toBe(true);
+      tally(sebaran, withdrawn ? "cair duluan (saldo minus)" : "ubah duluan (cair ditolak)");
     }
     spread("K3c", sebaran);
   });
 
-  // Pengaman: mengubah Hadir -> Tidak Hadir SEBELUM dicairkan harus tetap boleh.
-  it("K3b: Hadir belum dicairkan, diubah jadi Tidak Hadir -> tetap boleh, saldo balik 0", async () => {
+  it("K3b: Hadir belum dicairkan, diubah jadi Tidak Hadir -> saldo coach 27.500 (50%), kolam 0", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, -3);
     const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
@@ -181,7 +182,25 @@ describe("S3 / D3: saldo yang sudah dicairkan tidak boleh jadi minus", () => {
     const res = await as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "false" })));
     expect(res).toBeNull();
     expect((await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).attended).toBe(false);
-    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance).toBe(0);
+    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance).toBe(27500);
+    expect((await prisma.pool.findUniqueOrThrow({ where: { id: pool.id } })).walletBalance).toBe(0);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("K3d: 8 toggle Hadir/Tidak Hadir barengan -> bagi hasil akhir cocok dengan tanda terakhir, tidak dobel", async () => {
+    const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
+    const slot = await mkSlot(coach.id, pool.id, -3);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const b = await book(m.id, slot.id, pkg.id);
+    await settle(Array.from({ length: 8 }, (_, i) => (async () => {
+      await jitter(i * 2);
+      return as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: i % 2 ? "true" : "false" })));
+    })()));
+    expect(await checkInvariants()).toEqual([]);
+    const att = (await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).attended;
+    const bal = (await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance;
+    const poolBal = (await prisma.pool.findUniqueOrThrow({ where: { id: pool.id } })).walletBalance;
+    expect([bal, poolBal]).toEqual(att === true ? [55000, 30000] : [27500, 0]);
   });
 });
 

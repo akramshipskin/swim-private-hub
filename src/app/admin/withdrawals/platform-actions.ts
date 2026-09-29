@@ -14,6 +14,7 @@ export async function withdrawPlatform(_prev: PlatformWithdrawState, formData: F
       revenueAmount: Number(formData.get("revenueAmount") || 0),
       includeTax: formData.get("includeTax") === "on",
       note: formData.get("note")?.toString().trim() || null,
+      transferReference: formData.get("transferReference")?.toString() ?? "",
     });
   } catch (err) {
     if (err instanceof PlatformWithdrawalError) return { error: err.message };

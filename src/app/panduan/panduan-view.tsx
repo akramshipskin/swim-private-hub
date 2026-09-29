@@ -33,7 +33,7 @@ const HIGHLIGHTS = [
   },
   {
     title: "Bagi hasil otomatis",
-    body: "Setiap sesi yang ditandai Hadir langsung dibagi ke saldo kolam, coach, dan komisi platform (termasuk PPN 12%). Kolam dan coach mencairkan saldonya sendiri.",
+    body: "Setiap sesi yang ditandai Hadir langsung dibagi ke saldo kolam, coach, dan komisi platform (termasuk PPN 12%). Kalau peserta sudah booking tapi tidak datang, coach dapat 50% dari bagiannya dan kolam tidak dapat bagian. Kolam dan coach mencairkan saldonya sendiri.",
   },
   {
     title: "Harga per kolam",
@@ -84,12 +84,13 @@ const GUIDES: Guide[] = [
           { title: "Semua booking ada di menu Riwayat", body: "Dikelompokkan per tanggal dan per kolam, lengkap dengan statusnya." },
           { title: "Batalkan sendiri", body: `Tombol Batalkan muncul kalau masih ${CANCEL_WINDOW_HOURS} jam sebelum jadwal dan jatah batal paket itu masih ada. Sisa sesi otomatis kembali.` },
           { title: "Kalau tidak memenuhi syarat", body: "Muncul tombol WhatsApp ke admin dengan pesan yang sudah terisi otomatis." },
+          { title: "Ditandai Tidak Hadir padahal hadir?", body: "Tekan Laporkan di sesi itu paling lambat 3 hari setelah sesi selesai. Admin memeriksa dan mengoreksi kalau memang salah." },
         ],
       },
       {
         heading: "5. Peserta, profil, dan bantuan",
         steps: [
-          { title: "Menu Peserta", body: "Tambah peserta baru, lihat paket aktif tiap peserta, atau nonaktifkan peserta yang sudah tidak les." },
+          { title: "Menu Peserta", body: "Tambah peserta baru (dengan tanggal lahirnya), lihat paket aktif tiap peserta, atau nonaktifkan peserta yang sudah tidak les." },
           { title: "Menu Profil Saya", body: "Ubah nama dan password. Klik Edit dulu, baru bisa mengubah isinya." },
           { title: "Tombol bantuan", body: "Ada di pojok kanan bawah setelah masuk. Pertanyaan umum dijawab asisten; yang perlu dicek admin diteruskan, balasannya muncul di jendela chat yang sama." },
         ],
@@ -122,9 +123,9 @@ const GUIDES: Guide[] = [
       {
         heading: "3. Tandai kehadiran",
         steps: [
-          { title: "Buka menu Riwayat Sesi", body: "Semua sesi yang sudah lewat waktunya menunggu ditandai." },
+          { title: "Buka menu Riwayat Sesi", body: "Semua sesi yang sudah lewat waktunya menunggu ditandai. Batasnya 24 jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai." },
           { title: "Pilih Hadir atau Tidak Hadir", body: "Langsung tersimpan begitu dipilih, tidak perlu tombol Simpan." },
-          { title: "Saldo masuk", body: "Komisimu masuk ke saldo hanya untuk sesi yang ditandai Hadir." },
+          { title: "Saldo masuk", body: "Hadir: komisimu masuk penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu dapat 50% dari komisimu." },
         ],
         note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum ditandai — pastikan pilihannya benar.",
       },

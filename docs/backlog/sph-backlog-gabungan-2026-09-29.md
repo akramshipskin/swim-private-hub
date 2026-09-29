@@ -173,18 +173,18 @@ dan tabel baru = Opus + konfirmasi; migrasi production dijalankan Hadi sebelum p
 ### 10.2 Diputuskan, belum dikerjakan
 | # | Item | Keputusan | Owner / Gear | Syarat |
 |---|---|---|---|---|
-| A | Coach tandai hadir maksimal 24 jam setelah sesi; admin bebas | Diputuskan lengkap (dikonfirmasi Hadi 29 Sep): 24 jam dari jam sesi selesai; lewat batas hanya admin; coach tidak dibayar sampai admin menandai | Opus | — |
-| B | Saldo platform "aman ditarik" H+3 | Diputuskan lengkap: hanya uang dari sesi yang sudah lewat 3 hari; hanya saldo platform (coach/kolam tetap); PPN dipisah dan mengendap di saldo, tidak ikut bisa ditarik, baru ditarik saat dibayar ke negara (penarikan bertanda setor pajak + bukti transfer) | Opus | — |
-| C | Penarikan platform wajib bukti transfer (1.2) | Diputuskan (A) | Opus | — |
-| D | Peserta booking tidak datang | Coach 50% dari bagian coach masuk saldo LANGSUNG seperti sesi Hadir (dikonfirmasi); kolam Rp0; sisanya SPH; sesi hangus tidak dibayar | Opus | Perlu ubah aturan uang; PPN atas selisih → akuntan |
-| E | Tombol Laporkan (member, hanya status Tidak Hadir, maks 3 hari) | Diputuskan; S&K ikut (draft v2 sudah memuat) | Opus (booking/uang) + Sonnet (teks) | Bareng A dan D |
+| A | Coach tandai hadir maksimal 24 jam setelah sesi; admin bebas | **SELESAI di kode (branch feat/opus-batch-1), belum live.** Diputuskan lengkap (dikonfirmasi Hadi 29 Sep): 24 jam dari jam sesi selesai; lewat batas hanya admin; coach tidak dibayar sampai admin menandai | Opus | — |
+| B | Saldo platform "aman ditarik" H+3 | **SELESAI di kode, belum live.** Diputuskan lengkap: hanya uang dari sesi yang sudah lewat 3 hari; hanya saldo platform (coach/kolam tetap); PPN dipisah dan mengendap di saldo, tidak ikut bisa ditarik, baru ditarik saat dibayar ke negara (penarikan bertanda setor pajak + bukti transfer) | Opus | — |
+| C | Penarikan platform wajib bukti transfer (1.2) | **SELESAI di kode, belum live.** Diputuskan (A) | Opus | — |
+| D | Peserta booking tidak datang | **SELESAI di kode, belum live.** Coach 50% dari bagian coach masuk saldo LANGSUNG seperti sesi Hadir (dikonfirmasi); kolam Rp0; sisanya SPH; sesi hangus tidak dibayar | Opus | Perlu ubah aturan uang; PPN atas selisih → akuntan |
+| E | Tombol Laporkan (member, hanya status Tidak Hadir, maks 3 hari) | **SELESAI di kode, belum live; S&K live pasal 3 ikut diperbarui.** Diputuskan; S&K ikut (draft v2 sudah memuat) | Opus (booking/uang) + Sonnet (teks) | Bareng A dan D |
 | F | Komisi afiliasi | Diputuskan lengkap: kode singkat per coach dan per kolam (diisi di form daftar member); satu kali per member baru; 5% dari harga paket pertama apa pun (reguler atau trial); coach = kolam; cair setelah sesi pertama Hadir + 3 hari; pajak ditanggung SPH (besar pajak: akuntan, tidak menghalangi pembangunan) | Opus (tabel + uang) | — |
 | G | Trial: paket trial berbayar (opsi B) | Diputuskan lengkap: penanda di template paket, member baru, 1 kali per anak; harga diatur SPH per kolam; bagi hasil persen normal dari harga trial (selisih ditanggung bersama); tertulis di S&K member, MOU, perjanjian coach | Opus (tabel) | — |
 | H | Milestone/checklist perkembangan anak | Masuk rencana; diisi coach per anak, dilihat member; daftar keterampilan Claude drafkan lalu Hadi edit | Opus (tabel) + Sonnet (draf daftar) | Desain dulu |
 | I | Sembunyikan harga per sesi dari member | SELESAI (6151032, OpenCode batch-8, divalidasi: byte-identik dengan dokumen, tes, lint, build, dicek di browser lokal kecuali jendela konfirmasi beli 1 sesi) | — | — |
 | J | Bagian testimoni di landing, tersembunyi sampai ada testimoni asli | Diputuskan | Sonnet | Hadi mengirim teks testimoni 30 Sep; Claude memasang |
 | K | Landing: tiket sudah termasuk, durasi 60 menit, perlengkapan bawa sendiri, gabung gratis, kolam tidak menolak coach, persetujuan 1×24 jam, pencairan manual secepatnya, murid bawaan + afiliasi | Diputuskan | Sonnet | Tiket dan penolakan coach menunggu konfirmasi 3 kolam; afiliasi menunggu fitur jadi |
-| L | Saldo coach/kolam boleh minus saat koreksi Hadir ke Tidak Hadir; dipotong otomatis dari bagi hasil berikutnya; saldo negatif tidak bisa dicairkan | Diputuskan (coach dan kolam) | Opus | Bareng A dan D; MOU/perjanjian sudah memuat. Risiko: coach/kolam yang berhenti dengan saldo minus tidak melunasi |
+| L | Saldo coach/kolam boleh minus saat koreksi Hadir ke Tidak Hadir; dipotong otomatis dari bagi hasil berikutnya; saldo negatif tidak bisa dicairkan | **SELESAI di kode, belum live.** Diputuskan (coach dan kolam) | Opus | Bareng A dan D; MOU/perjanjian sudah memuat. Risiko: coach/kolam yang berhenti dengan saldo minus tidak melunasi |
 | M | Halaman admin untuk mengisi testimoni sendiri | Opsional, nanti | Opus (tabel) | Setelah ada testimoni asli |
 | N | Batas les barengan per kolam di sistem (kolom "maks sesi barengan", kosong = tanpa batas) | Ditunda: angka per kolam dicatat di MOU dari jawaban kolam; admin menyesuaikan jadwal manual | Opus (booking) | Sampai ada kolam yang keberatan atau volume naik |
 
@@ -204,3 +204,23 @@ dan tabel baru = Opus + konfirmasi; migrasi production dijalankan Hadi sebelum p
 4. Siapkan tes Meta Ads. Kumpulkan testimoni asli.
 5. Simpan kunci enkripsi production di pengelola password.
 6. Tanya akuntan: PPN atas uang sesi tidak hadir, pajak komisi afiliasi.
+
+### 10.5 Opus batch 1 (29 Sep malam) — di kode, BELUM LIVE
+Isi: batas 24 jam coach, bayaran Tidak Hadir (coach 50%, kolam 0), saldo coach/kolam
+boleh minus, saldo platform ditahan 3 hari + bukti transfer wajib, tombol Laporkan
+(member) + halaman admin Laporan Kehadiran, tanggal lahir peserta (wajib untuk
+peserta baru, peserta lama diminta melengkapi), halaman Bagi Hasil admin ikut
+menghitung sesi Tidak Hadir, S&K live pasal 3 + FAQ + panduan.
+Migrasi baru: `20260929080637_attendance_report_platform_proof_birthdate`
+(WAJIB dijalankan Hadi ke prod SEBELUM push).
+Verifikasi: tsc 0, vitest 485 lulus / 61 file, tes race 104 lulus / 10 file
+(termasuk tes baru: saldo minus, toggle berulang, laporan dobel), lint, build;
+browser lokal: laporan member -> admin -> ubah Hadir/Tidak Hadir (angka ledger dicek
+di DB), kunci 24 jam coach, tanggal lahir peserta.
+Tidak diuji: halaman /admin/withdrawals mencatat penarikan sungguhan (hanya tampilan);
+notifikasi push ke admin (VAPID tidak aktif di lokal).
+Sekalian: tes race 2FA yang rusak sejak enkripsi 29 Sep diperbaiki (config race belum
+diberi kunci tes).
+Catatan teknis: migrasi otomatis sempat menyelipkan DROP INDEX EmailThread_externalEmail_idx
+(index dobel, tidak berbahaya) — dibuang dari migrasi supaya scope bersih.
+

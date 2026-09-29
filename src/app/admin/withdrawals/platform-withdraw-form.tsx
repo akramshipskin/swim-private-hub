@@ -8,6 +8,7 @@ import { formatRupiah } from "@/lib/format";
 import { PriceInput } from "@/components/ui/price-input";
 
 export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number; tax: number }) {
+  // revenue/tax di sini = yang SUDAH boleh ditarik (lewat masa tahan).
   const [state, action, pending] = useActionState(withdrawPlatform, null);
   return (
     <form action={action} className="flex flex-col gap-3">
@@ -15,13 +16,16 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
         <Field label={`Tarik pendapatan (maks. ${formatRupiah(Math.max(0, revenue))})`}>
           <PriceInput name="revenueAmount" defaultValue={Math.max(0, revenue)} required />
         </Field>
+        <Field label="Nomor referensi / bukti transfer">
+          <Input name="transferReference" required minLength={3} maxLength={100} placeholder="Nomor referensi dari m-banking" />
+        </Field>
         <Field label="Catatan (opsional)">
           <Input name="note" maxLength={200} placeholder="Misal: transfer ke rekening perusahaan" />
         </Field>
       </div>
       <label className="flex items-center gap-2 text-sm text-text max-sm:min-h-[44px]">
         <input type="checkbox" name="includeTax" className="h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-500" />
-        Tarik juga saldo pajak (PPN) sekaligus — {formatRupiah(Math.max(0, tax))}
+        Tarik juga saldo PPN untuk disetor ke negara — {formatRupiah(Math.max(0, tax))}
       </label>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" loading={pending}>Catat Penarikan</Button>

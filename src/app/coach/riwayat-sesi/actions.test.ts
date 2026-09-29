@@ -27,11 +27,9 @@ vi.mock("@/lib/prisma", () => ({
 
 const creditSessionRevenue = vi.fn().mockResolvedValue(undefined);
 const reverseSessionRevenue = vi.fn().mockResolvedValue(undefined);
-class ReversalBlockedError extends Error {}
 vi.mock("@/lib/wallet", () => ({
   creditSessionRevenue: (...args: unknown[]) => creditSessionRevenue(...args),
   reverseSessionRevenue: (...args: unknown[]) => reverseSessionRevenue(...args),
-  ReversalBlockedError,
 }));
 
 const { markAttendance } = await import("./actions");
@@ -128,6 +126,7 @@ describe("markAttendance", () => {
       coachProfileId: "coachprofile-1",
       bookingId: "booking-1",
       perSessionValue: 93_750, // 750000 / 8
+      attended: true,
     });
     expect(reverseSessionRevenue).not.toHaveBeenCalled();
   });
@@ -143,19 +142,57 @@ describe("markAttendance", () => {
     expect(perSessionValue * 6).toBeLessThanOrEqual(100_000);
   });
 
-  it("reverses the wallet credit when toggled from Hadir back to Tidak Hadir", async () => {
+  it("Hadir -> Tidak Hadir: balik bagi hasil Hadir, lalu catat bagi hasil tidak datang", async () => {
     bookingFindUnique.mockResolvedValue(baseBooking({ attended: true }));
     const result = await markAttendance(null, formData("booking-1", "false"));
     expect(result).toBeNull();
     expect(reverseSessionRevenue).toHaveBeenCalledWith(expect.anything(), { bookingId: "booking-1" });
+    expect(creditSessionRevenue).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ attended: false }));
+    expect(reverseSessionRevenue.mock.invocationCallOrder[0]).toBeLessThan(creditSessionRevenue.mock.invocationCallOrder[0]);
+  });
+
+  it("belum ditandai -> Tidak Hadir: catat bagi hasil tidak datang tanpa pembalikan", async () => {
+    bookingFindUnique.mockResolvedValue(baseBooking({ attended: null }));
+    const result = await markAttendance(null, formData("booking-1", "false"));
+    expect(result).toBeNull();
+    expect(reverseSessionRevenue).not.toHaveBeenCalled();
+    expect(creditSessionRevenue).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ attended: false, perSessionValue: 93_750 }));
+  });
+
+  it("Tidak Hadir -> Hadir (misal setelah laporan member): balik yang lama, catat pembagian normal", async () => {
+    bookingFindUnique.mockResolvedValue(baseBooking({ attended: false }));
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    const result = await markAttendance(null, formData("booking-1", "true"));
+    expect(result).toBeNull();
+    expect(reverseSessionRevenue).toHaveBeenCalled();
+    expect(creditSessionRevenue).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ attended: true }));
+  });
+
+  it("coach ditolak kalau sudah lewat 24 jam sejak sesi selesai; tidak ada perubahan", async () => {
+    bookingFindUnique.mockResolvedValue(
+      baseBooking({ availability: { ...baseBooking().availability, endTime: new Date(Date.now() - 25 * 60 * 60 * 1000) } })
+    );
+    const result = await markAttendance(null, formData("booking-1", "true"));
+    expect(result?.error).toContain("24 jam");
+    expect(bookingUpdateMany).not.toHaveBeenCalled();
     expect(creditSessionRevenue).not.toHaveBeenCalled();
   });
 
-  it("returns the blocked-reversal message instead of crashing when the money was already withdrawn", async () => {
-    bookingFindUnique.mockResolvedValue(baseBooking({ attended: true }));
-    reverseSessionRevenue.mockRejectedValueOnce(new ReversalBlockedError("Uang sesi ini sudah dicairkan"));
-    const result = await markAttendance(null, formData("booking-1", "false"));
-    expect(result?.error).toContain("sudah dicairkan");
+  it("coach masih boleh tepat sebelum batas 24 jam", async () => {
+    bookingFindUnique.mockResolvedValue(
+      baseBooking({ availability: { ...baseBooking().availability, endTime: new Date(Date.now() - 23 * 60 * 60 * 1000) } })
+    );
+    expect(await markAttendance(null, formData("booking-1", "true"))).toBeNull();
+    expect(creditSessionRevenue).toHaveBeenCalled();
+  });
+
+  it("admin tetap boleh menandai walau sudah lewat 24 jam", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    bookingFindUnique.mockResolvedValue(
+      baseBooking({ availability: { ...baseBooking().availability, endTime: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) } })
+    );
+    expect(await markAttendance(null, formData("booking-1", "true"))).toBeNull();
+    expect(creditSessionRevenue).toHaveBeenCalled();
   });
 
   it("does not touch the wallet when re-submitting the same attendance value (no actual change)", async () => {

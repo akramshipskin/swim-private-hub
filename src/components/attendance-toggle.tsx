@@ -18,9 +18,13 @@ import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 export default function AttendanceToggle({
   bookingId,
   attended,
+  lockedReason,
 }: {
   bookingId: string;
   attended: boolean | null;
+  // Diisi kalau pengguna ini sudah tidak boleh mengubah (coach lewat batas
+  // 24 jam). Server tetap menolak; ini supaya coach tahu sebelum mencoba.
+  lockedReason?: string;
 }) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(markAttendance, null);
@@ -50,6 +54,16 @@ export default function AttendanceToggle({
       : shown === false
         ? "border-danger-text/25 bg-danger-bg text-danger-text"
         : "border-border bg-surface text-text-muted";
+
+  if (lockedReason) {
+    const label = attended === true ? "Hadir" : attended === false ? "Tidak Hadir" : "Belum ditandai";
+    return (
+      <div className="flex flex-col items-end gap-1">
+        <span className={`rounded-lg border px-2 py-1 text-xs font-medium ${toneClass}`}>{label}</span>
+        <p className="max-w-[140px] text-right text-xs text-text-subtle">{lockedReason}</p>
+      </div>
+    );
+  }
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col items-end gap-1">

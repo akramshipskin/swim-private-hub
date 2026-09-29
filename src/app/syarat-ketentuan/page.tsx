@@ -36,7 +36,8 @@ export default function SyaratKetentuanPage() {
       <ul>
         <li>Pemesanan jadwal tunduk pada ketersediaan slot pelatih (coach) yang dipilih.</li>
         <li>Pembatalan pemesanan akan mengurangi jatah pembatalan yang tersedia pada paket Pengguna.</li>
-        <li>Sesi yang sudah dipesan langsung mengurangi sisa sesi pada paket dan hanya kembali apabila pemesanan dibatalkan. Kehadiran ditandai oleh pelatih setelah sesi selesai; sesi yang ditandai Tidak Hadir tetap dihitung terpakai.</li>
+        <li>Sesi yang sudah dipesan langsung mengurangi sisa sesi pada paket dan hanya kembali apabila pemesanan dibatalkan. Kehadiran ditandai oleh pelatih paling lambat 24 jam setelah sesi selesai (setelah itu oleh administrator); sesi yang ditandai Tidak Hadir tetap dihitung terpakai.</li>
+        <li>Apabila Pengguna menilai status Tidak Hadir tidak sesuai, Pengguna dapat melaporkannya melalui tombol Laporkan di menu Riwayat paling lambat 3 (tiga) hari setelah sesi selesai. Administrator memeriksa laporan dan dapat mengoreksi status kehadiran.</li>
       </ul>
 
       <h2>4. Pembayaran</h2>

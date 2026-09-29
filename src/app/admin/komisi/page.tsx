@@ -30,9 +30,11 @@ export default async function KomisiPage() {
 
   const [attendedBookings, pools, paidOut, manualPool, processing, manualOther] = await Promise.all([
     prisma.booking.findMany({
-      where: { attended: true },
+      // Tidak Hadir ikut dihitung sejak 29 Sep: coach dapat 50%, sisanya platform.
+      where: { attended: { not: null } },
       select: {
         id: true,
+        attended: true,
         availability: { select: { poolId: true } },
         package: {
           select: {
@@ -81,18 +83,19 @@ export default async function KomisiPage() {
   // jumlah pembulatan per sesi (angka Dashboard & Pencairan pakai ledger).
   type Part = { sessions: number; gross: number; platform: number; tax: number; pool: number; coach: number };
   const zero = (): Part => ({ sessions: 0, gross: 0, platform: 0, tax: 0, pool: 0, coach: 0 });
-  const byPool = new Map<string, { own: Part; single: Part; legacy: Part; free: number }>();
+  const byPool = new Map<string, { own: Part; single: Part; legacy: Part; noShow: Part; free: number }>();
 
   for (const b of attendedBookings) {
     const poolId = b.availability.poolId;
-    if (!byPool.has(poolId)) byPool.set(poolId, { own: zero(), single: zero(), legacy: zero(), free: 0 });
+    if (!byPool.has(poolId)) byPool.set(poolId, { own: zero(), single: zero(), legacy: zero(), noShow: zero(), free: 0 });
     const entry = byPool.get(poolId)!;
     const payment = b.package.payments[0];
     if (!payment) {
       entry.free += 1; // paket assign manual/gratis: tidak ada uang
       continue;
     }
-    const part = b.package.isSingleSession ? entry.single : b.package.poolId !== poolId ? entry.legacy : entry.own;
+    const part =
+      b.attended === false ? entry.noShow : b.package.isSingleSession ? entry.single : b.package.poolId !== poolId ? entry.legacy : entry.own;
     const gross = Math.round(payment.amount / b.package.totalSesi);
     const pool = credited(b.id, "SESSION_REVENUE");
     const coach = credited(b.id, "SESSION_PAYOUT");
@@ -105,7 +108,7 @@ export default async function KomisiPage() {
   }
 
   const sum = (parts: Part[], k: keyof Part) => parts.reduce((n, p) => n + p[k], 0);
-  const allParts = [...byPool.values()].flatMap((e) => [e.own, e.single, e.legacy]);
+  const allParts = [...byPool.values()].flatMap((e) => [e.own, e.single, e.legacy, e.noShow]);
   const totalPlatform = sum(allParts, "platform");
   const totalTax = sum(allParts, "tax");
 
@@ -113,7 +116,8 @@ export default async function KomisiPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Bagi Hasil</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Pembagian uang dari setiap sesi yang ditandai Hadir: komisi platform, komisi kolam, dan komisi coach.
+        Pembagian uang dari setiap sesi yang sudah ditandai: komisi platform, komisi kolam, dan komisi coach. Sesi
+        Tidak Hadir (peserta sudah booking tapi tidak datang): coach dapat 50% dari bagiannya, kolam tidak dapat bagian.
         Sesi yang belum ditandai belum dihitung. Nilai sesi = harga paket ÷ jumlah sesi.
       </p>
       <Card className="mt-4">
@@ -145,13 +149,14 @@ export default async function KomisiPage() {
 
       <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
         {pools.map((pool) => {
-          const e = byPool.get(pool.id) ?? { own: zero(), single: zero(), legacy: zero(), free: 0 };
+          const e = byPool.get(pool.id) ?? { own: zero(), single: zero(), legacy: zero(), noShow: zero(), free: 0 };
           const parts = [
             { label: "Paket kolam ini", p: e.own },
             { label: "Beli 1 sesi", p: e.single },
             ...(e.legacy.sessions > 0 ? [{ label: "Paket kolam lain (sebelum 17 Sep)", p: e.legacy }] : []),
+            ...(e.noShow.sessions > 0 ? [{ label: "Peserta tidak datang", p: e.noShow }] : []),
           ];
-          const all = [e.own, e.single, e.legacy];
+          const all = [e.own, e.single, e.legacy, e.noShow];
           // Tampilan HP: tabel 7 kolom tidak muat, jadi tiap baris jadi kartu.
           const cards = [
             ...parts.map(({ label, p }) => ({ label, total: false, p })),

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { creditSessionRevenue, reverseSessionRevenue, ReversalBlockedError } from "./wallet";
+import { creditSessionRevenue, reverseSessionRevenue } from "./wallet";
 import type { Prisma } from "@/generated/prisma/client";
 
 // Mock minimal buat tx.pool/tx.coachProfile/tx.walletTransaction -- cuma
@@ -178,12 +178,12 @@ describe("reverseSessionRevenue", () => {
 
     await reverseSessionRevenue(tx, { bookingId: "booking-1" });
 
-    expect(tx.pool.updateMany).toHaveBeenCalledWith({
-      where: { id: "pool-1", walletBalance: { gte: 28125 } },
+    expect(tx.pool.update).toHaveBeenCalledWith({
+      where: { id: "pool-1" },
       data: { walletBalance: { decrement: 28125 } },
     });
-    expect(tx.coachProfile.updateMany).toHaveBeenCalledWith({
-      where: { id: "coach-1", walletBalance: { gte: 51563 } },
+    expect(tx.coachProfile.update).toHaveBeenCalledWith({
+      where: { id: "coach-1" },
       data: { walletBalance: { decrement: 51563 } },
     });
     expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
@@ -210,12 +210,12 @@ describe("reverseSessionRevenue", () => {
 
     await reverseSessionRevenue(tx, { bookingId: "booking-1" });
 
-    expect(tx.pool.updateMany).toHaveBeenCalledWith({
-      where: { id: "pool-1", walletBalance: { gte: 999 } },
+    expect(tx.pool.update).toHaveBeenCalledWith({
+      where: { id: "pool-1" },
       data: { walletBalance: { decrement: 999 } },
     });
-    expect(tx.coachProfile.updateMany).toHaveBeenCalledWith({
-      where: { id: "coach-1", walletBalance: { gte: 111 } },
+    expect(tx.coachProfile.update).toHaveBeenCalledWith({
+      where: { id: "coach-1" },
       data: { walletBalance: { decrement: 111 } },
     });
   });
@@ -225,8 +225,8 @@ describe("reverseSessionRevenue", () => {
 
     await reverseSessionRevenue(tx, { bookingId: "booking-1" });
 
-    expect(tx.pool.updateMany).not.toHaveBeenCalled();
-    expect(tx.coachProfile.updateMany).not.toHaveBeenCalled();
+    expect(tx.pool.update).not.toHaveBeenCalled();
+    expect(tx.coachProfile.update).not.toHaveBeenCalled();
     expect(tx.walletTransaction.createMany).not.toHaveBeenCalled();
   });
 
@@ -237,11 +237,11 @@ describe("reverseSessionRevenue", () => {
 
     await reverseSessionRevenue(tx, { bookingId: "booking-1" });
 
-    expect(tx.pool.updateMany).toHaveBeenCalledWith({
-      where: { id: "pool-1", walletBalance: { gte: 85000 } },
+    expect(tx.pool.update).toHaveBeenCalledWith({
+      where: { id: "pool-1" },
       data: { walletBalance: { decrement: 85000 } },
     });
-    expect(tx.coachProfile.updateMany).not.toHaveBeenCalled();
+    expect(tx.coachProfile.update).not.toHaveBeenCalled();
     expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
       data: [{ type: "SESSION_REVENUE", poolId: "pool-1", amount: -85000, bookingId: "booking-1" }],
     });
@@ -256,8 +256,8 @@ describe("reverseSessionRevenue", () => {
       platformSums: { SESSION_REVENUE: 28125, SESSION_PAYOUT: 51563 },
     });
     await reverseSessionRevenue(tx, { bookingId: "booking-1" });
-    expect(tx.pool.updateMany).toHaveBeenCalledWith({
-      where: { id: "pool-1", walletBalance: { gte: 28125 } },
+    expect(tx.pool.update).toHaveBeenCalledWith({
+      where: { id: "pool-1" },
       data: { walletBalance: { decrement: 28125 } },
     });
   });
@@ -265,26 +265,74 @@ describe("reverseSessionRevenue", () => {
   it("does nothing when the booking has no net credit left", async () => {
     const tx = createMockTx({ walletTxns: [{ type: "SESSION_REVENUE", poolId: "pool-1", amount: 0 }] });
     await reverseSessionRevenue(tx, { bookingId: "booking-1" });
-    expect(tx.pool.updateMany).not.toHaveBeenCalled();
+    expect(tx.pool.update).not.toHaveBeenCalled();
     expect(tx.walletTransaction.createMany).not.toHaveBeenCalled();
   });
 
-  // D3 (keputusan Hadi 24 Sep): saldo tidak boleh minus karena Hadir dibatalkan
-  // setelah uangnya dicairkan.
-  it("refuses (and writes no ledger rows) when the coach balance no longer covers the reversal", async () => {
+  // Keputusan Hadi 29 Sep (menggantikan D3): pembalikan tidak ditolak walau
+  // uangnya sudah dicairkan -- saldo boleh minus. Pengurangan tanpa syarat
+  // saldo (update biasa, bukan updateMany dengan walletBalance >= nominal).
+  it("reverses even when the balance was already withdrawn (balance may go negative)", async () => {
     const tx = createMockTx({
       walletTxns: [
         { type: "SESSION_REVENUE", poolId: "pool-1", amount: 28125 },
         { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: 51563 },
       ],
-      coachReversible: 0,
     });
-    await expect(reverseSessionRevenue(tx, { bookingId: "booking-1" })).rejects.toBeInstanceOf(ReversalBlockedError);
-    expect(tx.walletTransaction.createMany).not.toHaveBeenCalled();
+    await reverseSessionRevenue(tx, { bookingId: "booking-1" });
+    expect(tx.pool.updateMany).not.toHaveBeenCalled();
+    expect(tx.coachProfile.updateMany).not.toHaveBeenCalled();
+    expect(tx.coachProfile.update).toHaveBeenCalledWith({
+      where: { id: "coach-1" },
+      data: { walletBalance: { decrement: 51563 } },
+    });
+  });
+});
+
+describe("creditSessionRevenue: peserta tidak datang (attended=false)", () => {
+  it("coach dapat 50% dari bagian normal, kolam Rp0, sisanya platform (PPN dipisah)", async () => {
+    // Nilai sesi 100.000, coach 40% (normal 40.000) -> tidak datang 20.000.
+    const tx = createMockTx({ pool: { commissionPercent: 10, coachSharePercent: 40 } });
+    await creditSessionRevenue(tx, {
+      poolId: "pool-1",
+      coachProfileId: "coach-1",
+      bookingId: "booking-1",
+      perSessionValue: 100000,
+      attended: false,
+    });
+    expect(tx.pool.update).not.toHaveBeenCalled();
+    expect(tx.coachProfile.update).toHaveBeenCalledWith({
+      where: { id: "coach-1" },
+      data: { walletBalance: { increment: 20000 } },
+    });
+    // 80.000 ke platform: PPN 12% di dalamnya = round(80000*12/112) = 8571.
+    expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
+      data: [
+        { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: 20000, bookingId: "booking-1" },
+        { type: "PLATFORM_REVENUE", amount: 71429, bookingId: "booking-1" },
+        { type: "PLATFORM_TAX", amount: 8571, bookingId: "booking-1" },
+      ],
+    });
   });
 
-  it("refuses when the pool balance no longer covers the reversal", async () => {
-    const tx = createMockTx({ walletTxns: [{ type: "SESSION_REVENUE", poolId: "pool-1", amount: 85000 }], poolReversible: 0 });
-    await expect(reverseSessionRevenue(tx, { bookingId: "booking-1" })).rejects.toBeInstanceOf(ReversalBlockedError);
+  it("membulatkan ke bawah bagian coach yang ganjil (tidak pernah melebihi 50%)", async () => {
+    const tx = createMockTx({ pool: { commissionPercent: 15, coachSharePercent: 55 } });
+    // normal = round(93750*55/100) = 51563 -> 50% = floor(25781.5) = 25781
+    await creditSessionRevenue(tx, { poolId: "pool-1", coachProfileId: "coach-1", bookingId: "b", perSessionValue: 93750, attended: false });
+    expect(tx.coachProfile.update).toHaveBeenCalledWith({ where: { id: "coach-1" }, data: { walletBalance: { increment: 25781 } } });
+    const rows = (vi.mocked(tx.walletTransaction.createMany).mock.calls[0][0] as { data: { amount: number }[] }).data;
+    expect(rows.reduce((n, r) => n + r.amount, 0)).toBe(93750);
+  });
+
+  it("tanpa bagian coach (0%) semua ke platform, tidak ada baris coach", async () => {
+    const tx = createMockTx({ pool: { commissionPercent: 100, coachSharePercent: 0 } });
+    await creditSessionRevenue(tx, { poolId: "pool-1", coachProfileId: "coach-1", bookingId: "b", perSessionValue: 1120, attended: false });
+    expect(tx.coachProfile.update).not.toHaveBeenCalled();
+    expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
+      data: [
+        { type: "PLATFORM_REVENUE", amount: 1000, bookingId: "b" },
+        { type: "PLATFORM_TAX", amount: 120, bookingId: "b" },
+      ],
+    });
   });
 });

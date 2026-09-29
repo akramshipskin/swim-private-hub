@@ -2,7 +2,7 @@
 
 import { auth, unstable_update } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { createDependent, createSelfDependent, assertDependentOwnedByMember } from "@/lib/dependents";
+import { createDependent, createSelfDependent, assertDependentOwnedByMember, parseParticipantBirthDate } from "@/lib/dependents";
 import { toProperCase } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
@@ -103,16 +103,41 @@ export async function addChild(
   const name = formData.get("name")?.toString() ?? "";
 
   try {
+    // Tanggal lahir wajib untuk peserta baru (keputusan Hadi 29 Sep: level
+    // milestone per umur, anak maupun dewasa).
+    const birthDate = parseParticipantBirthDate(formData.get("birthDate")?.toString().trim() ?? "");
     if (type === "self") {
-      await createSelfDependent(session.user.id);
+      const self = await createSelfDependent(session.user.id);
+      await prisma.dependent.update({ where: { id: self.id }, data: { birthDate } });
     } else {
-      await createDependent(session.user.id, name);
+      await createDependent(session.user.id, name, prisma, birthDate);
     }
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Gagal menambah peserta" };
   }
 
   revalidatePath("/profil");
+  revalidatePath("/member/peserta");
+  return { success: true };
+}
+
+// Isi/ubah tanggal lahir peserta yang sudah ada (peserta lama dibuat sebelum
+// tanggal lahir wajib, termasuk yang dibuat otomatis saat daftar).
+export async function setDependentBirthDate(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session) return { error: "Sesi habis, silakan masuk lagi." };
+  if (session.user.role !== "MEMBER") return { error: "Hanya member yang bisa mengubah data peserta." };
+  const dependentId = formData.get("dependentId")?.toString() ?? "";
+  try {
+    await assertDependentOwnedByMember(dependentId, session.user.id);
+    const birthDate = parseParticipantBirthDate(formData.get("birthDate")?.toString().trim() ?? "");
+    await prisma.dependent.update({ where: { id: dependentId }, data: { birthDate } });
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Gagal menyimpan tanggal lahir" };
+  }
   revalidatePath("/member/peserta");
   return { success: true };
 }

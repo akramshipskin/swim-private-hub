@@ -179,7 +179,8 @@ describe("ATTENDANCE / WALLET races", () => {
     const b = await prisma.booking.findUniqueOrThrow({ where: { id: x.b.id } });
     const w = await wallet(x.pool.id, x.coach.coachProfile!.id);
     console.log("R11 final attended", b.attended, w);
-    expect(w.coach).toBe(b.attended ? 55000 : 0);
+    // Sejak 29 Sep: Tidak Hadir = coach 50% dari 55.000, kolam 0.
+    expect([w.coach, w.pool]).toEqual(b.attended === true ? [55000, 30000] : b.attended === false ? [27500, 0] : [0, 0]);
     expect(w.ledgerCoach).toBe(w.coach); expect(w.ledgerPool).toBe(w.pool);
   });
 
