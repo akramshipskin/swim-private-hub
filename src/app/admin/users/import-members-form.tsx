@@ -42,6 +42,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
           <input
             type="file"
             name="file"
+            aria-label="Berkas Excel data member (.xlsx)"
             accept=".xlsx,.xls"
             required
             onChange={(e) => setHasFile((e.target.files?.length ?? 0) > 0)}

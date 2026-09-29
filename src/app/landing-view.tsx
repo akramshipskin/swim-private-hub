@@ -274,11 +274,11 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             </a>
           </div>
           <p className="mt-1 flex flex-wrap justify-center gap-x-6 text-sm text-white/75 sm:mt-3">
-            <span className="inline-flex min-h-[44px] items-center gap-1.5">
-              Coach? <Link href="/daftar-coach" className="font-semibold text-white underline">Daftar jadi coach</Link>
+            <span className="inline-flex items-center gap-1.5">
+              Coach? <Link href="/daftar-coach" className="inline-flex min-h-[44px] items-center font-semibold text-white underline">Daftar jadi coach</Link>
             </span>
-            <span className="inline-flex min-h-[44px] items-center gap-1.5">
-              Punya kolam? <Link href="/daftar-kolam" className="font-semibold text-white underline">Daftarkan kolam</Link>
+            <span className="inline-flex items-center gap-1.5">
+              Punya kolam? <Link href="/daftar-kolam" className="inline-flex min-h-[44px] items-center font-semibold text-white underline">Daftarkan kolam</Link>
             </span>
           </p>
         </div>
@@ -336,6 +336,10 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
               <Reveal key={p.id} delay={i * 60}>
                 <article className="grid overflow-hidden rounded-3xl bg-white md:grid-cols-2">
                   <div className={`relative flex items-end bg-fixed-lime-100 p-8 ${p.photos[0] ? "min-h-64" : "min-h-36 md:min-h-64"} ${i % 2 === 1 ? "md:order-2" : ""}`}>
+                    {!p.photos[0] && (
+                      // Belum ada foto: gradien lime brand (bukan blok polos) supaya kartu tidak terlihat bolong.
+                      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(159,204,31,0.45),transparent_55%),radial-gradient(circle_at_10%_90%,rgba(198,255,61,0.35),transparent_50%)]" />
+                    )}
                     {p.photos[0] && (
                       <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}

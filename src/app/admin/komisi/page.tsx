@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
 
 export const metadata: Metadata = {
+  title: "Bagi Hasil | Swim Private Hub",
   robots: { index: false, follow: false },
 };
 

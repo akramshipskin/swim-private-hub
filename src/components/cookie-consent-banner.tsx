@@ -36,7 +36,7 @@ export function CookieConsentBanner() {
         <p className="text-xs text-text-muted sm:text-sm">
           Kami pakai cookie sesi masuk dan penyimpanan tema seperlunya agar aplikasi
           ini jalan.{" "}
-          <a href="/kebijakan-cookie" className="-my-3 inline-block py-3 font-medium text-brand-700 hover:underline">
+          <a href="/kebijakan-cookie" className="-my-3.5 inline-block py-3.5 font-medium text-brand-700 hover:underline">
             Kebijakan Cookie
           </a>
         </p>
