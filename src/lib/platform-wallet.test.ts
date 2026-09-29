@@ -1,10 +1,12 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 const groupBy = vi.fn();
+const queryRaw = vi.fn();
 const aggregate = vi.fn();
 const create = vi.fn().mockResolvedValue({ id: "pw-1" });
 const tx = {
   $executeRaw: vi.fn(),
+  $queryRaw: queryRaw,
   walletTransaction: { groupBy },
   platformWithdrawal: { aggregate, create },
 };
@@ -12,18 +14,17 @@ vi.mock("@/lib/prisma", () => ({ prisma: { ...tx, $transaction: (fn: (t: typeof 
 
 const { getPlatformBalance, withdrawPlatformBalance } = await import("./platform-wallet");
 
-// groupBy dipanggil 2x: [0] semua baris, [1] hanya yang sudah matang
-// (lewat masa tahan) atau negatif.
+// groupBy = total semua baris; $queryRaw = yang sudah boleh ditarik (matang,
+// dihitung per sesi di SQL -- logika FIFO-nya diuji di tests/race/platform).
 function ledger(all: [number, number], matured: [number, number]) {
-  groupBy
-    .mockResolvedValueOnce([
-      { type: "PLATFORM_REVENUE", _sum: { amount: all[0] } },
-      { type: "PLATFORM_TAX", _sum: { amount: all[1] } },
-    ])
-    .mockResolvedValueOnce([
-      { type: "PLATFORM_REVENUE", _sum: { amount: matured[0] } },
-      { type: "PLATFORM_TAX", _sum: { amount: matured[1] } },
-    ]);
+  groupBy.mockResolvedValueOnce([
+    { type: "PLATFORM_REVENUE", _sum: { amount: all[0] } },
+    { type: "PLATFORM_TAX", _sum: { amount: all[1] } },
+  ]);
+  queryRaw.mockResolvedValueOnce([
+    { type: "PLATFORM_REVENUE", total: matured[0] },
+    { type: "PLATFORM_TAX", total: matured[1] },
+  ]);
 }
 
 const base = { adminId: "a1", note: null, transferReference: "REF123" };
@@ -31,6 +32,7 @@ const base = { adminId: "a1", note: null, transferReference: "REF123" };
 beforeEach(() => {
   vi.clearAllMocks();
   groupBy.mockReset();
+  queryRaw.mockReset();
   ledger([100_000, 12_000], [100_000, 12_000]);
   aggregate.mockResolvedValue({ _sum: { revenueAmount: 30_000, taxAmount: 2_000 } });
 });
@@ -38,15 +40,25 @@ beforeEach(() => {
 describe("platform wallet", () => {
   it("balance = ledger credits minus withdrawals, per bucket, total dan yang boleh ditarik", async () => {
     groupBy.mockReset();
+    queryRaw.mockReset();
     ledger([100_000, 12_000], [60_000, 7_000]);
     expect(await getPlatformBalance()).toEqual({ revenue: 70_000, tax: 10_000, availableRevenue: 30_000, availableTax: 5_000 });
   });
 
-  it("filter 'matang' = baris negatif ATAU lebih tua dari 3 hari", async () => {
+  it("batas 'matang' = sekarang dikurangi 3 hari, dikirim sebagai parameter SQL", async () => {
     const now = new Date("2026-10-10T00:00:00Z");
     await getPlatformBalance(undefined, now);
-    const where = groupBy.mock.calls[1][0].where;
-    expect(where.OR).toEqual([{ amount: { lt: 0 } }, { createdAt: { lte: new Date("2026-10-07T00:00:00Z") } }]);
+    const [, ...params] = queryRaw.mock.calls[0];
+    expect(params.length).toBeGreaterThan(0);
+    for (const p of params) expect(p).toEqual(new Date("2026-10-07T00:00:00Z"));
+  });
+
+  it("bucket tanpa baris matang dihitung 0, dan penarikan lama tetap mengurangi", async () => {
+    groupBy.mockReset();
+    queryRaw.mockReset();
+    groupBy.mockResolvedValueOnce([]);
+    queryRaw.mockResolvedValueOnce([]);
+    expect(await getPlatformBalance()).toEqual({ revenue: -30_000, tax: -2_000, availableRevenue: -30_000, availableTax: -2_000 });
   });
 
   it("withdraws revenue only when tax is not included, with transfer reference", async () => {
@@ -65,6 +77,7 @@ describe("platform wallet", () => {
 
   it("refuses more than the available (matured) revenue, even if the total is enough", async () => {
     groupBy.mockReset();
+    queryRaw.mockReset();
     ledger([100_000, 12_000], [60_000, 12_000]); // tersedia 30.000, total 70.000
     await expect(withdrawPlatformBalance({ ...base, revenueAmount: 30_001, includeTax: false })).rejects.toThrow("ditahan 3 hari");
     expect(create).not.toHaveBeenCalled();

@@ -12,26 +12,45 @@ type Db = Prisma.TransactionClient | typeof prisma;
 // hari (sama dengan jendela laporan member), sedangkan pengurangan (baris
 // negatif: pembalikan, koreksi) langsung dihitung -- jadi angka "boleh
 // ditarik" tidak pernah lebih besar dari yang sudah aman.
+//
+// Pembalikan yang terikat ke sebuah sesi (bookingId) dihitung per sesi dengan
+// asumsi FIFO: pengurangan menghabiskan kredit tertua dulu. Jadi kredit yang
+// masih ditahan lalu dibalik (tanda Hadir dikoreksi dalam 3 hari) tidak lagi
+// memotong uang lama yang sudah matang (bug 30 Sep: angka "boleh ditarik"
+// bisa jatuh ke Rp0 padahal ada dana matang). Per sesi hasilnya tidak
+// pernah negatif; kekurangan dari uang yang sudah ditarik tetap muncul
+// lewat pengurangan `withdrawn` di bawah.
 export async function getPlatformBalance(db: Db = prisma, now: Date = new Date()) {
   const cutoff = new Date(now.getTime() - PLATFORM_HOLD_DAYS * 24 * 60 * 60 * 1000);
   const types = { in: ["PLATFORM_REVENUE", "PLATFORM_TAX"] as ("PLATFORM_REVENUE" | "PLATFORM_TAX")[] };
   const [ledger, matured, withdrawn] = await Promise.all([
     db.walletTransaction.groupBy({ by: ["type"], where: { type: types }, _sum: { amount: true } }),
-    db.walletTransaction.groupBy({
-      by: ["type"],
-      where: { type: types, OR: [{ amount: { lt: 0 } }, { createdAt: { lte: cutoff } }] },
-      _sum: { amount: true },
-    }),
+    db.$queryRaw<{ type: string; total: number | null }[]>`
+      SELECT type::text AS type, SUM(c)::int AS total FROM (
+        SELECT type,
+          GREATEST(0,
+            SUM(CASE WHEN amount > 0 AND "createdAt" <= ${cutoff} THEN amount ELSE 0 END)
+            + SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END)) AS c
+        FROM "WalletTransaction"
+        WHERE type IN ('PLATFORM_REVENUE', 'PLATFORM_TAX') AND "bookingId" IS NOT NULL
+        GROUP BY type, "bookingId"
+        UNION ALL
+        SELECT type, SUM(CASE WHEN amount < 0 OR "createdAt" <= ${cutoff} THEN amount ELSE 0 END) AS c
+        FROM "WalletTransaction"
+        WHERE type IN ('PLATFORM_REVENUE', 'PLATFORM_TAX') AND "bookingId" IS NULL
+        GROUP BY type
+      ) t GROUP BY type`,
     db.platformWithdrawal.aggregate({ _sum: { revenueAmount: true, taxAmount: true } }),
   ]);
   const sum = (rows: typeof ledger, t: string) => rows.find((l) => l.type === t)?._sum.amount ?? 0;
+  const maturedSum = (t: string) => matured.find((m) => m.type === t)?.total ?? 0;
   const wRevenue = withdrawn._sum.revenueAmount ?? 0;
   const wTax = withdrawn._sum.taxAmount ?? 0;
   return {
     revenue: sum(ledger, "PLATFORM_REVENUE") - wRevenue,
     tax: sum(ledger, "PLATFORM_TAX") - wTax,
-    availableRevenue: sum(matured, "PLATFORM_REVENUE") - wRevenue,
-    availableTax: sum(matured, "PLATFORM_TAX") - wTax,
+    availableRevenue: maturedSum("PLATFORM_REVENUE") - wRevenue,
+    availableTax: maturedSum("PLATFORM_TAX") - wTax,
   };
 }
 

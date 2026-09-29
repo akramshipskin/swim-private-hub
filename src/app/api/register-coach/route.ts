@@ -4,9 +4,22 @@ import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePh
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
+import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, isStringArrayOrMissing, MAX_BIO, MAX_EMAIL, MAX_NAME, MAX_NOTE, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = await readJsonObject(request);
+  if (!body) return Response.json({ error: INVALID_BODY_ERROR }, { status: 400 });
+  const shapeError = checkTextFields(body, {
+    name: { max: MAX_NAME, label: "Nama" },
+    phone: { max: 20, label: "No HP" },
+    email: { max: MAX_EMAIL, label: "Email" },
+    password: { max: MAX_PASSWORD, label: "Password" },
+    bio: { max: MAX_BIO, label: "Bio" },
+    certificationNote: { max: MAX_NOTE, label: "Catatan sertifikasi" },
+  });
+  if (shapeError || !isStringArrayOrMissing(body.specialties)) {
+    return Response.json({ error: shapeError ?? INVALID_BODY_ERROR }, { status: 400 });
+  }
   const {
     name,
     phone: rawPhone,
@@ -66,6 +79,9 @@ export async function POST(request: Request) {
   // Bentuk baku (08xxxxxxxxxx, email huruf kecil) -- lihat /api/register.
   const phone = normalizePhone(rawPhone);
   const email = normalizeEmail(rawEmail);
+  if (email && !isPlausibleEmail(email)) {
+    return Response.json({ error: "Format email tidak valid" }, { status: 400 });
+  }
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {

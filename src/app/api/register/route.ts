@@ -5,9 +5,34 @@ import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePh
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { normalizeAffiliateCode } from "@/lib/affiliate";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
+import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, MAX_EMAIL, MAX_NAME, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
+
+// Batas jumlah anak per pendaftaran (wajar untuk satu keluarga; mencegah body raksasa).
+const MAX_CHILDREN = 10;
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = await readJsonObject(request);
+  if (!body) return Response.json({ error: INVALID_BODY_ERROR }, { status: 400 });
+  const shapeError = checkTextFields(body, {
+    name: { max: MAX_NAME, label: "Nama" },
+    phone: { max: 20, label: "No HP" },
+    email: { max: MAX_EMAIL, label: "Email" },
+    password: { max: MAX_PASSWORD, label: "Password" },
+    referralCode: { max: 30, label: "Kode afiliasi" },
+    selfBirthDate: { max: 10, label: "Tanggal lahir" },
+    entryReferrer: { max: 500, label: "Sumber pendaftaran" },
+  });
+  if (shapeError) return Response.json({ error: shapeError }, { status: 400 });
+  if (body.children !== undefined && body.children !== null) {
+    if (!Array.isArray(body.children) || body.children.length > MAX_CHILDREN) {
+      return Response.json({ error: INVALID_BODY_ERROR }, { status: 400 });
+    }
+    for (const c of body.children) {
+      if (c === null || typeof c !== "object") return Response.json({ error: INVALID_BODY_ERROR }, { status: 400 });
+      const childError = checkTextFields(c as Record<string, unknown>, { name: { max: MAX_NAME, label: "Nama peserta" }, birthDate: { max: 10, label: "Tanggal lahir" } });
+      if (childError) return Response.json({ error: childError }, { status: 400 });
+    }
+  }
   const registeredIp =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
   const { name, phone: rawPhone, email: rawEmail, password, acceptedTerms, children, wantsSelf, selfBirthDate, entryReferrer, referralCode, website, formRenderedAt } =
@@ -110,6 +135,9 @@ export async function POST(request: Request) {
   // format ketik yang beda tidak jadi akun ganda.
   const phone = normalizePhone(rawPhone);
   const email = normalizeEmail(rawEmail);
+  if (email && !isPlausibleEmail(email)) {
+    return Response.json({ error: "Format email tidak valid" }, { status: 400 });
+  }
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {

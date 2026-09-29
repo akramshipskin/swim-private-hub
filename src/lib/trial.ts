@@ -7,11 +7,15 @@ import type { Prisma } from "@/generated/prisma/client";
 // dibayar ikut menghalangi trial kedua (klik beli dua kali).
 export const TRIAL_PENDING_WINDOW_MS = 24 * 60 * 60 * 1000;
 
-// Paket yang membuat peserta TIDAK lagi berhak trial.
+// Paket yang membuat peserta TIDAK lagi berhak trial. EXPIRED hanya dihitung
+// kalau paketnya pernah aktif (startDate terisi): webhook Midtrans juga
+// menandai paket EXPIRED saat pembayaran gagal/dibatalkan/kedaluwarsa, dan
+// paket yang tidak pernah dibayar bukan "paket".
 export function trialBlockingPackageWhere(now: Date = new Date()): Prisma.PackageWhereInput {
   return {
     OR: [
-      { status: { in: ["ACTIVE", "EXPIRED"] } },
+      { status: "ACTIVE" },
+      { status: "EXPIRED", startDate: { not: null } },
       { status: "PENDING_PAYMENT", isTrial: true, createdAt: { gte: new Date(now.getTime() - TRIAL_PENDING_WINDOW_MS) } },
     ],
   };

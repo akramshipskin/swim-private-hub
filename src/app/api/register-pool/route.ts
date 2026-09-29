@@ -4,9 +4,24 @@ import { prisma } from "@/lib/prisma";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
+import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, isStringArrayOrMissing, MAX_ADDRESS, MAX_EMAIL, MAX_NAME, MAX_PASSWORD, MAX_POOL_NAME, readJsonObject } from "@/lib/register-input";
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = await readJsonObject(request);
+  if (!body) return Response.json({ error: INVALID_BODY_ERROR }, { status: 400 });
+  const shapeError = checkTextFields(body, {
+    ownerName: { max: MAX_NAME, label: "Nama pemilik" },
+    phone: { max: 20, label: "No HP" },
+    email: { max: MAX_EMAIL, label: "Email" },
+    password: { max: MAX_PASSWORD, label: "Password" },
+    poolName: { max: MAX_POOL_NAME, label: "Nama kolam" },
+    address: { max: MAX_ADDRESS, label: "Alamat" },
+    openTime: { max: 5, label: "Jam buka" },
+    closeTime: { max: 5, label: "Jam tutup" },
+  });
+  if (shapeError || !isStringArrayOrMissing(body.facilities) || (body.description != null && typeof body.description !== "string")) {
+    return Response.json({ error: shapeError ?? INVALID_BODY_ERROR }, { status: 400 });
+  }
   const {
     ownerName,
     phone: rawPhone,
@@ -75,6 +90,9 @@ export async function POST(request: Request) {
   // Bentuk baku (08xxxxxxxxxx, email huruf kecil) -- lihat /api/register.
   const phone = normalizePhone(rawPhone);
   const email = normalizeEmail(rawEmail);
+  if (email && !isPlausibleEmail(email)) {
+    return Response.json({ error: "Format email tidak valid" }, { status: 400 });
+  }
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {

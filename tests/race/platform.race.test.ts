@@ -62,3 +62,65 @@ describe("PLATFORM: pembalikan setelah saldo ditarik", () => {
     }
   });
 });
+
+// Koreksi tanda Hadir DALAM masa tahan 3 hari: baris pembalikan (negatif) yang
+// membalik kredit yang belum matang tidak boleh memotong uang lama yang sudah
+// matang (bug 30 Sep: "boleh ditarik" jatuh ke Rp0 padahal ada dana matang).
+describe("PLATFORM: angka 'boleh ditarik' saat koreksi dalam masa tahan", () => {
+  const platformRows = (bookingId: string) => prisma.walletTransaction.findMany({ where: { bookingId, type: { in: ["PLATFORM_REVENUE", "PLATFORM_TAX"] } } });
+  const matureBooking = (bookingId: string) =>
+    prisma.walletTransaction.updateMany({ where: { bookingId, type: { in: ["PLATFORM_REVENUE", "PLATFORM_TAX"] }, amount: { gt: 0 } }, data: { createdAt: new Date(Date.now() - 10 * 86400e3) } });
+
+  it("P3: sesi baru (masih ditahan) dikoreksi Hadir -> Tidak Hadir: dana matang sesi lama tidak berkurang", async () => {
+    const pool = await mkPool();
+    const coach = await mkUser("COACH");
+    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const old = await book(m.id, (await mkSlot(coach.id, pool.id, -8)).id, pkg.id);
+    const fresh = await book(m.id, (await mkSlot(coach.id, pool.id, -5)).id, pkg.id);
+
+    await mark(coach, old.id, true);
+    await matureBooking(old.id);
+    const maturedOnly = await getPlatformBalance();
+    expect(maturedOnly.availableRevenue).toBeGreaterThan(0);
+
+    await mark(coach, fresh.id, true); // kredit baru, masih ditahan
+    await mark(coach, fresh.id, false); // koreksi dalam 3 hari: dibalik + kredit tidak-hadir (juga ditahan)
+    const after = await getPlatformBalance();
+    expect(after.availableRevenue).toBe(maturedOnly.availableRevenue);
+    expect(after.availableTax).toBe(maturedOnly.availableTax);
+    // Total (termasuk yang ditahan) tetap naik karena kredit tidak-hadir.
+    expect(after.revenue).toBeGreaterThan(maturedOnly.revenue);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("P4: kredit yang SUDAH matang dikoreksi -> dana matang itu memang berkurang penuh (tidak melebihi yang aman)", async () => {
+    const pool = await mkPool();
+    const coach = await mkUser("COACH");
+    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const b = await book(m.id, (await mkSlot(coach.id, pool.id, -8)).id, pkg.id);
+
+    await mark(coach, b.id, true);
+    await matureBooking(b.id);
+    const credited = (await platformRows(b.id)).filter((r) => r.type === "PLATFORM_REVENUE").reduce((a, r) => a + r.amount, 0);
+    expect((await getPlatformBalance()).availableRevenue).toBe(credited);
+
+    await mark(coach, b.id, false); // membalik kredit matang; kredit tidak-hadir baru masih ditahan
+    const after = await getPlatformBalance();
+    expect(after.availableRevenue).toBe(0);
+    expect(after.revenue).toBeGreaterThan(0);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("P5: koreksi manual (tanpa bookingId) bernilai negatif langsung memotong yang boleh ditarik", async () => {
+    const pool = await mkPool();
+    const coach = await mkUser("COACH");
+    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const b = await book(m.id, (await mkSlot(coach.id, pool.id, -8)).id, pkg.id);
+    await mark(coach, b.id, true);
+    await matureBooking(b.id);
+    const before = (await getPlatformBalance()).availableRevenue;
+    await prisma.walletTransaction.create({ data: { type: "PLATFORM_REVENUE", amount: -1000, note: "koreksi uji" } });
+    expect((await getPlatformBalance()).availableRevenue).toBe(before - 1000);
+  });
+});
+
