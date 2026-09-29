@@ -1,5 +1,7 @@
 # Backlog Gabungan SPH — 29 Sep 2026
 
+> **Bagian 10 (paling bawah) adalah yang terbaru (29 Sep malam).** Bila status di bagian lain masih TERBUKA tetapi bagian 10 menyebut sudah diputuskan, bagian 10 yang berlaku.
+
 Gabungan dari dua dokumen:
 - Verifikasi ke kode (28 Sep): [docs/reviews/2026-09-28-verifikasi-blindspot.md](../reviews/2026-09-28-verifikasi-blindspot.md) — cek klaim ChatGPT+Antigravity ke kode asli.
 - Office hours (29 Sep): [docs/designs/validasi-permintaan-dan-kejujuran-landing.md](../designs/validasi-permintaan-dan-kejujuran-landing.md) — keputusan model bisnis Hadi.
@@ -151,3 +153,50 @@ Update 29 Sep: sweep member (089900000009) & pemilik kolam (089900000003) SELESA
 4. **Draft S&K + MOU** (Opus, lalu wajib ke orang hukum) — jalan paralel sama Hadi ngerjain tes lapangan.
 5. **Item uang (Bagian 1)** — TERBUKA, perlu Hadi putusin dulu sebelum dikerjakan, paling berisiko kalau dikerjakan asal.
 6. Sisanya (privasi, infra, sisa sweep) — gak mendesak untuk tes permintaan, bisa nyusul.
+
+---
+
+## 10. Keputusan Hadi 29 Sep malam + antrean kerja
+
+Sumber: jawaban Hadi atas 19 pertanyaan dan klarifikasi lanjutan. Pekerjaan uang
+dan tabel baru = Opus + konfirmasi; migrasi production dijalankan Hadi sebelum push.
+
+### 10.1 Sudah selesai hari ini
+| Item | Status |
+|---|---|
+| S&K live pasal 3 salah | SELESAI (c525c9f), sudah di-push Hadi |
+| Bug ganti nama Profil tidak ikut nama peserta diri sendiri (OpenCode batch-7) | SELESAI (0711906), divalidasi, sudah di-push Hadi |
+| Draft MOU, perjanjian coach, S&K v2, dokumen desain | DIPERBARUI 29 Sep malam sesuai keputusan di bawah |
+| Simulasi pendapatan kolam | DOKUMEN JADI: `docs/designs/simulasi-pendapatan-kolam.md` |
+
+### 10.2 Diputuskan, belum dikerjakan
+| # | Item | Keputusan | Owner / Gear | Syarat |
+|---|---|---|---|---|
+| A | Coach tandai hadir maksimal 24 jam setelah sesi; admin bebas | Diputuskan. Detail menunggu konfirmasi: 24 jam dihitung dari jam sesi selesai; lewat batas hanya admin, coach tidak dibayar sampai admin menandai | Opus | Konfirmasi detail |
+| B | Saldo platform "aman ditarik" H+3 | Hanya uang dari sesi yang sudah lewat 3 hari yang boleh ditarik; berlaku untuk saldo platform saja (usulan); PPN ditahan (usulan) | Opus | Konfirmasi 2 usulan |
+| C | Penarikan platform wajib bukti transfer (1.2) | Diputuskan (A) | Opus | — |
+| D | Peserta booking tidak datang | Coach 50% dari bagian coach; kolam Rp0; sisanya SPH; sesi hangus tidak dibayar | Opus | Perlu ubah aturan uang + PPN cek akuntan |
+| E | Tombol Laporkan (member, hanya status Tidak Hadir, maks 3 hari) | Diputuskan; S&K ikut (draft v2 sudah memuat) | Opus (booking/uang) + Sonnet (teks) | Bareng A dan D |
+| F | Komisi afiliasi: kode singkat per coach dan per kolam, satu kali per member baru | Diputuskan sebagian | Opus (tabel + uang) | Dasar hitung (10% paket pertama atau nilai satu sesi) dan waktu kredit |
+| G | Trial: paket trial berbayar (opsi B) | Diputuskan; penanda di template paket, member baru, 1 kali per anak | Opus (tabel) | Harga trial dan siapa menanggung diskon |
+| H | Milestone/checklist perkembangan anak | Masuk rencana; diisi coach per anak, dilihat member; daftar keterampilan Claude drafkan lalu Hadi edit | Opus (tabel) + Sonnet (draf daftar) | Desain dulu |
+| I | Sembunyikan harga per sesi dari member | Diputuskan ("per paket semua") | OpenCode (dokumen batch-8) | Dokumen batch-8 |
+| J | Bagian testimoni di landing, tersembunyi sampai ada testimoni asli | Diputuskan | Sonnet | Cara Hadi mengisi testimoni (kirim ke Claude, atau halaman admin) |
+| K | Landing: tiket sudah termasuk, durasi 60 menit, perlengkapan bawa sendiri, gabung gratis, kolam tidak menolak coach, persetujuan 1×24 jam, pencairan manual secepatnya, murid bawaan + afiliasi | Diputuskan | Sonnet | Tiket dan penolakan coach menunggu konfirmasi 3 kolam; afiliasi menunggu fitur jadi |
+
+### 10.3 Keputusan yang hanya dicatat (tanpa kerja kode)
+- 2.3 data ke AI: dibiarkan (A). 2.4 kolam melihat nama peserta: tetap (A).
+- 2.5 sertifikat: bisa dilihat semua yang login (sudah begitu; link sementara).
+- 3.1 akun demo Nadia: dibiarkan, dicatat sebagai kerjaan nanti.
+- 3 B: tidak ada batas les barengan per kolam per jam.
+- Kolam tidak eksklusif atas pengunjung; privat = 1:1 di kolam umum.
+- SPH = penyedia platform (keuangan, jadwal, booking); keselamatan = kolam dan coach.
+- Penyelenggara: PT Perorangan, proses pendirian.
+
+### 10.4 Tugas Hadi (di luar aplikasi)
+1. Isi secret R2 (backup database gagal tiap malam sejak awal).
+2. Tanya 3 kolam dengan 6 pertanyaan di bagian "The Assignment" dokumen desain.
+3. Isi titik `[ISI HADI]` di draft hukum (MOU 21, coach 20, S&K 10), lalu ke orang hukum.
+4. Siapkan tes Meta Ads. Kumpulkan testimoni asli.
+5. Simpan kunci enkripsi production di pengelola password.
+6. Tanya akuntan: PPN atas uang sesi tidak hadir, pajak komisi afiliasi.

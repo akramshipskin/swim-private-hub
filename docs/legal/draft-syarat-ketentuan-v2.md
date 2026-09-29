@@ -9,6 +9,11 @@
 >
 > Tanda `[ISI HADI: ...]` = keputusan bisnis yang belum diambil. Jangan
 > dipasang selama masih ada tanda ini.
+>
+> **Update 29 Sep malam:** memuat keputusan Hadi. Pasal bertanda
+> **[BELUM ADA DI SISTEM]** menjanjikan perilaku yang BELUM dikode (batas 24
+> jam coach, tombol Laporkan member, kode afiliasi). Teks live baru boleh
+> memuatnya bersamaan dengan kodenya jalan.
 
 ## A. Kenapa S&K perlu diubah (ringkasan untuk reviewer)
 
@@ -24,7 +29,8 @@
    sesi dipotong saat booking dan hanya kembali bila booking dibatalkan
    (oleh member sesuai ketentuan, oleh coach, atau oleh admin). Peserta yang
    tidak datang tanpa membatalkan tetap terpotong sesinya. FAQ landing sudah
-   menulis yang benar; S&K yang salah.
+   menulis yang benar; S&K yang salah. **Sudah diperbaiki di S&K live pada
+   29 Sep (commit c525c9f)**; draft v2 tetap memuat versi lengkapnya.
 3. **Les privat 1:1** belum tertulis di S&K.
 
 ## B. Ringkasan perubahan per pasal
@@ -32,9 +38,9 @@
 | Pasal | Live | Draft v2 |
 |---|---|---|
 | Pembuka | "aplikasi pemesanan dan manajemen" | Menjelaskan SPH sebagai penyelenggara platform yang menghubungkan member, coach, kolam, dan menerima pembayaran |
-| 1 Akun | tetap | + satu akun satu orang/wali, larangan berbagi akun |
+| 1 Akun | tetap | + satu akun satu orang/wali, larangan berbagi akun, kode afiliasi opsional |
 | 2 Paket | tetap | + les privat 1 coach : 1 peserta; + masa berlaku paket; + sisa sesi saat paket berakhir |
-| 3 Pemesanan & Pembatalan | kalimat "hanya Hadir dihitung terpakai" (salah) | Diganti dengan aturan yang sesuai sistem (batas 2 jam, jatah batal, tidak hadir = terpakai, coach batal = sesi kembali) |
+| 3 Pemesanan & Pembatalan | kalimat "hanya Hadir dihitung terpakai" (salah) | Diganti dengan aturan yang sesuai sistem (batas 2 jam, jatah batal, tidak hadir = terpakai, coach batal = sesi kembali, coach tandai hadir maks 24 jam, member lapor Tidak Hadir maks 3 hari) |
 | 4 Pembayaran | Midtrans + link refund | + pembayaran diterima penyelenggara SPH, dibagikan ke mitra per sesi Hadir |
 | 5 Kewajiban | tetap | + larangan transaksi di luar aplikasi dengan coach/kolam yang dikenal lewat aplikasi |
 | 6 Tanggung jawab | "sarana bantu administrasi", semua ke penyelenggara les | Dipisah per pihak; batas tanggung jawab SPH; keselamatan di kolam — **[ISI HADI + reviewer]** |
@@ -46,9 +52,9 @@
 **Syarat & Ketentuan Swim Private Hub**
 Terakhir diperbarui: [ISI TANGGAL SAAT DIPASANG]
 
-Swim Private Hub ("SPH", "kami") diselenggarakan oleh [ISI HADI: nama
-penyelenggara — perorangan atas nama siapa, atau badan usaha (CV/PT) dengan
-nama lengkap] yang beralamat di [alamat sesuai `BUSINESS_ADDRESS`]. Dengan
+Swim Private Hub ("SPH", "kami") diselenggarakan oleh [ISI HADI: nama PT
+Perorangan (sedang proses pendirian; tanyakan reviewer siapa yang
+menandatangani sebelum akta/NIB terbit)] yang beralamat di [alamat sesuai `BUSINESS_ADDRESS`]. Dengan
 mendaftar dan menggunakan aplikasi Swim Private Hub ("Aplikasi"), Pengguna
 menyatakan telah membaca dan menyetujui Syarat & Ketentuan ini.
 
@@ -74,6 +80,11 @@ tanggung jawab, dan kewajiban perizinan.]
    yang berwenang.
 3. Pengguna bertanggung jawab atas kerahasiaan kata sandi dan tidak boleh
    meminjamkan akunnya kepada orang lain.
+4. Saat mendaftar, Pengguna dapat memasukkan kode afiliasi milik Coach atau
+   Kolam Mitra (opsional). Kode tidak mengubah harga yang dibayar Member;
+   komisi afiliasi dibayarkan SPH kepada pemilik kode dari bagian SPH, bukan
+   dari Member. Ketentuan komisi bagi Coach dan Kolam Mitra diatur dalam
+   perjanjian kemitraan masing-masing. **[BELUM ADA DI SISTEM]**
 
 **2. Paket dan Sesi**
 1. Les di SPH adalah les privat: setiap Sesi adalah satu Coach untuk satu
@@ -81,19 +92,21 @@ tanggung jawab, dan kewajiban perizinan.]
 2. Paket terdiri atas sejumlah Sesi dan berlaku di kolam tempat paket dibeli,
    selama masa berlaku yang tertera saat pembelian.
 3. Member yang masih memiliki paket aktif dapat membeli paket 1 Sesi di Kolam
-   Mitra lain dengan harga per sesi termahal kolam tersebut ditambah 20%, berlaku
+   Mitra lain dengan harga khusus 1 Sesi yang tertera saat pembelian, berlaku
    14 hari sejak pembayaran berhasil.
 4. Paket aktif otomatis setelah pembayaran berhasil dikonfirmasi sistem.
 5. Sisa Sesi dan jatah pembatalan berlaku per Peserta dan tidak dapat
    dipindahkan ke Peserta lain kecuali melalui administrator.
-6. Durasi satu Sesi: [ISI HADI: misalnya 60 menit, atau "sesuai ketentuan
-   Kolam Mitra yang tertera di aplikasi"].
+6. Durasi satu Sesi: 60 (enam puluh) menit.
 7. Sisa Sesi yang tidak dipakai sampai masa berlaku paket berakhir:
-   [ISI HADI: hangus tanpa pengembalian dana / dapat diperpanjang dengan
-   syarat tertentu]. [CATATAN: saat ini sistem tidak memindahkan uang sesi
+   [KONFIRMASI HADI + reviewer: hangus tanpa pengembalian dana? Hadi
+   memutuskan sesi hangus tidak dibayarkan ke Coach maupun Kolam Mitra, jadi
+   uangnya tetap di SPH; kepatutan bagi konsumen perlu dicek reviewer]. [CATATAN: saat ini sistem tidak memindahkan uang sesi
    yang hangus ke Coach atau Kolam Mitra; uang tersebut tetap di SPH.]
-8. Harga paket sudah/belum termasuk tiket masuk kolam untuk Peserta:
-   [ISI HADI].
+8. Harga paket sudah termasuk tiket masuk kolam untuk Peserta. Pendamping
+   yang tidak berenang ([ISI HADI: 1 atau 2 orang, mengikuti ketentuan
+   kolam]) tidak dikenakan tiket. Perlengkapan renang (misalnya pelampung
+   dan papan) dibawa sendiri oleh Peserta.
 
 **3. Pemesanan dan Pembatalan**
 1. Pemesanan tunduk pada ketersediaan jadwal Coach di kolam yang dipilih.
@@ -107,7 +120,14 @@ tanggung jawab, dan kewajiban perizinan.]
    dihitung terpakai.
 5. Apabila Coach atau administrator membatalkan jadwal, Sesi kembali ke paket
    tanpa mengurangi jatah pembatalan Member.
-6. Kehadiran ditandai oleh Coach atau administrator setelah Sesi selesai.
+6. Kehadiran ditandai oleh Coach paling lambat 24 jam setelah Sesi selesai;
+   setelah batas itu hanya administrator yang dapat menandai.
+   **[BELUM ADA DI SISTEM]**
+7. Member dapat melaporkan status Tidak Hadir yang tidak sesuai melalui
+   tombol Laporkan di Aplikasi paling lambat 3 (tiga) hari sejak Sesi
+   selesai. SPH memeriksa laporan dan dapat mengoreksi status. Laporan
+   setelah batas itu: [ISI HADI + reviewer: tidak diproses / diproses kasus
+   per kasus]. **[BELUM ADA DI SISTEM]**
 
 **4. Pembayaran**
 1. Pembayaran diproses melalui Midtrans (virtual account, QRIS, dompet
@@ -139,11 +159,14 @@ tanggung jawab, dan kewajiban perizinan.]
    P3K].
 3. Member/orang tua/wali bertanggung jawab atas pengawasan Peserta anak di
    luar waktu Sesi dan atas kondisi kesehatan Peserta yang diketahuinya.
-4. SPH bertanggung jawab atas pemesanan, pencatatan, penerimaan pembayaran,
+4. SPH bertanggung jawab atas pemesanan, jadwal, pencatatan, penerimaan pembayaran,
    dan pembagian dana sesuai Syarat & Ketentuan ini. Tanggung jawab SPH
    atas kerugian yang timbul dari penggunaan Aplikasi dibatasi sampai
    [ISI HADI + reviewer: misalnya nilai paket yang dibayarkan].
-5. Penanganan insiden/kecelakaan di kolam dan asuransi: [ISI HADI + reviewer].
+5. Keselamatan dan penanganan insiden selama Sesi berada dalam tanggung
+   jawab Coach dan Kolam Mitra sesuai perannya; SPH adalah penyedia platform
+   dan tidak mengajar maupun mengelola fasilitas kolam. Asuransi:
+   [ISI HADI + reviewer].
 
 **7. Perubahan Layanan**
 Fitur, harga paket, dan ketentuan ini dapat berubah. Perubahan ketentuan
@@ -162,20 +185,23 @@ Alamat: [BUSINESS_ADDRESS].
 **10. Data Pribadi**
 Pengolahan data pribadi, termasuk data anak, diatur dalam Kebijakan Privasi.
 Coach dan Kolam Mitra hanya menerima data Peserta yang diperlukan untuk
-melaksanakan Sesi. [ISI HADI: apakah Kolam Mitra melihat nama Peserta —
-backlog item 2.4.]
+melaksanakan Sesi. Kolam Mitra melihat nama dan jumlah Peserta pada
+jadwal kolamnya.
 
-## D. Daftar keputusan yang masih kosong (untuk Hadi)
+## D. Daftar keputusan untuk Hadi
 
-1. Nama penyelenggara (perorangan/CV/PT).
-2. Durasi satu Sesi.
-3. Nasib sisa Sesi saat paket berakhir (dan uangnya).
-4. Tiket masuk kolam untuk Peserta: termasuk harga paket atau tidak.
-5. Larangan transaksi di luar Aplikasi untuk Member: jangka waktu & akibat.
-6. Tanggung jawab keselamatan, lifeguard, insiden, asuransi.
-7. Batas tanggung jawab SPH.
-8. Forum sengketa.
-9. Kolam Mitra boleh melihat nama Peserta atau tidak.
+Sudah diputuskan 29 Sep dan masuk teks: durasi sesi 60 menit; tiket masuk
+peserta sudah termasuk; perlengkapan bawa sendiri; kolam melihat nama
+peserta; batas 24 jam coach; laporan member 3 hari; kode afiliasi opsional.
+
+Masih kosong:
+1. Nama penyelenggara (PT Perorangan, proses pendirian) dan penandatangan.
+2. Nasib sisa Sesi saat paket berakhir: konfirmasi hangus tanpa refund.
+3. Jumlah pendamping gratis (1 atau 2).
+4. Larangan transaksi di luar Aplikasi untuk Member: jangka waktu & akibat.
+5. Asuransi dan batas tanggung jawab SPH.
+6. Perlakuan laporan Tidak Hadir setelah 3 hari.
+7. Forum sengketa.
 
 ## E. Untuk reviewer hukum (pertanyaan terbuka)
 
@@ -187,3 +213,9 @@ backlog item 2.4.]
 3. Kesesuaian dengan UU Perlindungan Konsumen (klausula baku, batas tanggung
    jawab) dan UU Pelindungan Data Pribadi (data anak).
 4. Keberlakuan klausul anti-transaksi-luar terhadap konsumen.
+5. Kepatutan sesi hangus tanpa pengembalian dana bagi konsumen.
+6. Batas 3 hari untuk laporan Tidak Hadir dan penolakan laporan lewat batas.
+7. Komisi afiliasi: perlakuan pajak bagi penerima (Hadi berpendapat tidak
+   kena pajak; belum diverifikasi) dan kewajiban pemotongan oleh SPH.
+8. Batas pelepasan tanggung jawab SPH sebagai "penyedia platform" padahal
+   SPH memegang dana dan mempertemukan para pihak.

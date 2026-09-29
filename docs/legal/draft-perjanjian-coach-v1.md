@@ -10,6 +10,12 @@
 > [CATATAN REVIEWER: status coach adalah mitra independen, bukan karyawan.
 > Pastikan isi perjanjian (kendali jadwal oleh coach sendiri, tidak ada gaji
 > tetap) konsisten dengan status itu.]
+>
+> **Update 29 Sep malam:** memuat keputusan Hadi (batas 24 jam tandai
+> hadir, bayaran 50% saat peserta tidak datang, tombol Laporkan member,
+> murid bawaan lewat kode afiliasi, gabung gratis). Pasal bertanda
+> **[BELUM ADA DI SISTEM]** menjanjikan perilaku yang BELUM dikode; draft
+> tidak boleh ditandatangani sebelum kodenya jalan atau pasalnya disesuaikan.
 
 ---
 
@@ -18,7 +24,7 @@ Nomor: [ISI SAAT TTD]
 
 Pada tanggal [ISI SAAT TTD], antara:
 
-1. **[ISI HADI: nama penyelenggara SPH]**, selanjutnya disebut **"SPH"**; dan
+1. **[ISI HADI: nama PT Perorangan — sedang proses pendirian; tanyakan reviewer siapa yang menandatangani sebelum akta/NIB terbit]**, selanjutnya disebut **"SPH"**; dan
 2. **[ISI SAAT TTD: nama coach]**, NIK [ISI SAAT TTD], beralamat di
    [ISI SAAT TTD], selanjutnya disebut **"Coach"**,
 
@@ -30,6 +36,9 @@ sepakat sebagai berikut.
    aplikasi Swim Private Hub. Perjanjian ini bukan perjanjian kerja.
 2. Coach menentukan sendiri jadwal yang dibuka di aplikasi, per kolam mitra
    tempat Coach diafiliasikan oleh SPH.
+3. Bergabung sebagai Coach tidak dikenakan biaya pendaftaran maupun
+   langganan. Imbalan SPH hanya komisi platform (bagian SPH dari nilai sesi,
+   Pasal 4).
 
 ## Pasal 2 — Syarat Coach
 
@@ -44,14 +53,21 @@ sepakat sebagai berikut.
 
 1. Setiap sesi adalah les privat satu coach untuk satu peserta.
 2. Coach wajib hadir tepat waktu dan menandai kehadiran peserta (Hadir /
-   Tidak Hadir) di aplikasi setelah sesi selesai, paling lambat
-   [ISI HADI: misalnya 1×24 jam].
+   Tidak Hadir) di aplikasi paling lambat 24 jam setelah sesi selesai. Lewat
+   batas itu hanya administrator SPH yang dapat menandai, dan sesi yang
+   belum ditandai tidak menghasilkan bagi hasil sampai ditandai.
+   **[BELUM ADA DI SISTEM]** [CATATAN: Hadi menyebut alasannya supaya coach
+   disiplin.]
 3. Bila berhalangan, Coach membatalkan sesi melalui aplikasi selambatnya
    [ISI HADI] jam sebelum jadwal. Sesi peserta otomatis kembali ke paketnya
    dan peserta mendapat notifikasi.
 4. Pembatalan oleh Coach yang berulang: [ISI HADI: batas & akibatnya].
-5. Coach dilarang menandai Hadir untuk sesi yang tidak terlaksana.
-   Pelanggaran: [ISI HADI].
+5. Coach dilarang menandai Hadir untuk sesi yang tidak terlaksana, dan
+   dilarang menandai peserta Tidak Hadir bila peserta sebenarnya hadir atau
+   bila Coach sendiri yang tidak hadir/tidak mengajar. Pelanggaran:
+   [ISI HADI].
+6. Tiket masuk kolam untuk Coach dalam sesi aplikasi tidak ditagihkan kepada
+   Coach (sudah tercakup dalam bagian Kolam Mitra dari nilai sesi).
 
 ## Pasal 4 — Bagi Hasil
 
@@ -64,13 +80,24 @@ sepakat sebagai berikut.
    perjanjian SPH dengan kolam tersebut. Persentase per kolam dapat dilihat
    Coach di aplikasi: [ISI HADI: pastikan ini benar-benar tampil untuk
    coach, atau cantumkan di lampiran perjanjian].
-4. Sesi yang tidak ditandai Hadir (termasuk peserta tidak datang) tidak
-   menghasilkan bagi hasil untuk Coach: [ISI HADI: tetap seperti perilaku
-   sistem saat ini, atau Coach tetap dibayar bila peserta tidak datang
-   (butuh perubahan sistem)].
+4. Sesi yang tidak ditandai Hadir tidak menghasilkan bagi hasil, dengan
+   pengecualian: bila peserta **sudah memesan tetapi tidak datang** (tanpa
+   membatalkan sesuai S&K) dan Coach menandainya Tidak Hadir dalam batas
+   waktu, Coach menerima **50% dari bagian coach yang normal** untuk sesi
+   itu (contoh: nilai sesi Rp100.000, coach 40% = Rp40.000 → Rp20.000
+   bila peserta tidak datang). Kolam Mitra menerima Rp0; sisanya menjadi
+   milik SPH. Sisa sesi paket yang hangus karena masa berlaku habis tidak
+   menghasilkan bagi hasil apa pun. **[BELUM ADA DI SISTEM]**
 5. Paket gratis/manual dari admin tidak menghasilkan bagi hasil.
 6. Bila status Hadir dikoreksi menjadi tidak Hadir, bagi hasil sesi itu
    dibatalkan; koreksi ditolak bila saldo Coach sudah tidak mencukupi.
+7. Member dapat melaporkan status Tidak Hadir yang tidak sesuai (tombol
+   Laporkan) paling lambat 3 hari sejak sesi selesai. SPH memeriksa dan
+   dapat mengoreksi status. Bila terbukti Coach yang tidak hadir atau
+   menandai tidak sesuai, bagi hasil sesi itu dibatalkan dan Pasal 3.5
+   berlaku. **[BELUM ADA DI SISTEM]** [CATATAN: pengaman terhadap coach
+   yang tidak datang lalu menandai peserta Tidak Hadir adalah laporan
+   member ini.]
 
 ## Pasal 5 — Pencairan
 
@@ -78,8 +105,10 @@ sepakat sebagai berikut.
    rekening atas nama Coach sendiri.
 2. Saldo dipotong saat pengajuan; pengajuan gagal/ditolak mengembalikan
    saldo.
-3. SPH memproses transfer dan mencatat bukti transfer paling lambat
-   [ISI HADI] sejak pengajuan. Biaya transfer: [ISI HADI].
+3. SPH memproses transfer secara manual secepatnya dan mencatat bukti
+   transfer paling lambat [ISI HADI: batas maksimum] sejak pengajuan. Biaya
+   transfer: [ISI HADI]. [CATATAN: Hadi tidak mau menjanjikan jumlah hari
+   sampai pencairan otomatis Midtrans disetujui.]
 4. Pajak penghasilan atas bagi hasil Coach: [ISI HADI + reviewer: dipotong
    SPH atau dilaporkan Coach sendiri].
 
@@ -90,9 +119,10 @@ sepakat sebagai berikut.
    langsung dari member yang dikenal melalui aplikasi.
 2. Coach tidak membagikan nomor kontak pribadinya kepada member melalui
    aplikasi untuk tujuan tersebut.
-3. Murid yang sudah menjadi murid Coach sebelum bergabung dengan SPH:
-   [ISI HADI: dikecualikan dari pasal ini, atau boleh didaftarkan ke
-   aplikasi dengan skema tertentu — backlog item "murid bawaan"].
+3. Murid yang sudah menjadi murid Coach sebelum bergabung dengan SPH boleh
+   didaftarkan ke aplikasi menggunakan kode afiliasi Coach, dengan komisi
+   sesuai Pasal 10. Murid bawaan yang tetap dilayani di luar aplikasi:
+   [ISI HADI: dikecualikan dari pasal ini atau tidak].
 4. Akibat pelanggaran: [ISI HADI: misalnya penonaktifan akun dan/atau
    ganti rugi].
 
@@ -103,6 +133,10 @@ sepakat sebagai berikut.
 2. Coach wajib segera melapor ke SPH dan pihak kolam bila terjadi insiden,
    paling lambat [ISI HADI] jam.
 3. Asuransi dan batas tanggung jawab: [ISI HADI + reviewer].
+4. SPH adalah penyedia platform dan bertanggung jawab atas pemesanan,
+   jadwal, pencatatan, penerimaan pembayaran, dan pembagian dana. SPH tidak
+   mengelola fasilitas kolam dan tidak mengajar. [CATATAN REVIEWER: batas
+   pelepasan tanggung jawab SPH terhadap konsumen belum tentu berlaku penuh.]
 
 ## Pasal 8 — Data Pribadi
 
@@ -118,7 +152,39 @@ sepakat sebagai berikut.
 2. Saat berakhir: sesi terjadwal diselesaikan atau dibatalkan dengan sesi
    dikembalikan ke peserta; saldo Coach dicairkan penuh; akun dinonaktifkan.
 
-## Pasal 10 — Lain-lain
+## Pasal 10 — Komisi Afiliasi
+
+**[BELUM ADA DI SISTEM — pasal ini menjanjikan fitur yang belum dibuat.]**
+
+1. SPH memberi Coach satu kode afiliasi singkat yang unik.
+2. Member baru yang saat mendaftar memasukkan kode itu tercatat dibawa oleh
+   Coach. Kode dimasukkan saat pendaftaran dan tidak dapat diubah kemudian
+   kecuali oleh administrator SPH. Coach tidak dapat memakai kodenya untuk
+   dirinya sendiri.
+3. Komisi afiliasi diberikan **satu kali per member baru** (bukan komisi
+   tiap sesi), sebesar [ISI HADI: 10% dari harga paket pertama yang dibeli,
+   atau 10% dari nilai satu sesi — angka rupiahnya sangat berbeda; contoh
+   paket Rp800.000/8 sesi: Rp80.000 vs Rp10.000]. [USULAN CLAUDE, belum
+   diputuskan: dikreditkan setelah member menghadiri sesi pertamanya
+   (ditandai Hadir) dan lewat masa 3 hari laporan, supaya pendaftaran palsu
+   tidak menghasilkan uang.]
+4. Program tidak dibatasi waktu selama perjanjian berlaku; Coach dapat
+   membawa member kapan saja. SPH dapat mengubah ketentuan afiliasi melalui
+   pembaruan perjanjian atau Syarat & Ketentuan, berlaku untuk member yang
+   mendaftar setelah perubahan; komisi yang sudah dikreditkan tidak ditarik
+   kembali.
+5. Komisi afiliasi dibayar SPH dari bagian SPH, bukan dari Member dan bukan
+   dari bagian Coach atau Kolam Mitra lainnya. Harga yang dibayar Member
+   tidak berubah karena kode.
+6. Saldo afiliasi dicairkan mengikuti Pasal 5.
+7. Pajak atas komisi afiliasi: [ISI HADI + reviewer]. [CATATAN: Hadi
+   berpendapat komisi afiliasi tidak kena pajak. Claude tidak dapat
+   memastikan; akuntan/reviewer wajib mengonfirmasi, termasuk apakah SPH
+   wajib memotong. Jangan menulis "bebas pajak" sebelum dikonfirmasi.]
+8. Pendaftaran fiktif atau kecurangan lain: komisi dibatalkan; akibat
+   lainnya [ISI HADI].
+
+## Pasal 11 — Lain-lain
 
 Tunduk pada hukum Republik Indonesia; sengketa melalui [ISI HADI + reviewer].
 
@@ -128,14 +194,29 @@ Tunduk pada hukum Republik Indonesia; sengketa melalui [ISI HADI + reviewer].
 
 ---
 
-## Lampiran untuk Hadi: keputusan yang masih kosong
+## Lampiran untuk Hadi
 
-1. Nama penyelenggara SPH.
+### Sudah diputuskan Hadi (29 Sep) dan sudah masuk pasal
+- Gabung gratis (Pasal 1.3); tiket masuk coach sudah tercakup (Pasal 3.6).
+- Batas 24 jam tandai hadir; admin bebas (Pasal 3.2).
+- Peserta tidak datang: coach 50% dari bagian coach, kolam Rp0, sisanya SPH;
+  sesi hangus tidak dibayar; member 3 hari untuk melaporkan (Pasal 4.4, 4.7).
+- Murid bawaan boleh lewat kode afiliasi (Pasal 6.3); komisi afiliasi satu
+  kali per member baru, kode singkat (Pasal 10).
+- SPH = penyedia platform; SPH tanggung jawab keuangan, jadwal, booking
+  (Pasal 7.4).
+
+### Masih kosong
+1. Nama penyelenggara SPH (PT Perorangan, proses pendirian) dan siapa yang
+   menandatangani sebelum akta terbit.
 2. Syarat sertifikat tambahan (Pasal 2.4).
-3. Batas waktu tandai hadir & batal, sanksi batal berulang/Hadir palsu (Pasal 3).
+3. Batas jam pembatalan coach, sanksi batal berulang dan tanda Hadir palsu
+   (Pasal 3).
 4. Persentase coach tampil di aplikasi atau di lampiran (Pasal 4.3).
-5. **Coach dibayar atau tidak saat peserta tidak datang (Pasal 4.4)**.
-6. SLA, biaya transfer, pajak penghasilan coach (Pasal 5).
-7. **Larangan transaksi luar: durasi, murid bawaan, sanksi (Pasal 6)**.
-8. Insiden & asuransi (Pasal 7).
-9. Jangka waktu & forum sengketa (Pasal 9–10).
+5. Batas maksimum waktu pencairan, biaya transfer, pajak penghasilan coach
+   (Pasal 5).
+6. Larangan transaksi luar: durasi, sanksi, murid bawaan di luar aplikasi
+   (Pasal 6).
+7. Insiden dan asuransi (Pasal 7).
+8. Dasar dan waktu kredit komisi afiliasi, pajak, sanksi (Pasal 10).
+9. Jangka waktu dan forum sengketa (Pasal 9 dan 11).
