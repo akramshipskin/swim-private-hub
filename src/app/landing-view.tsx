@@ -11,6 +11,7 @@ import { LandingHeader } from "./landing-header";
 import { Reveal } from "@/components/ui/reveal";
 import { PAYMENT_METHODS } from "./landing-payments";
 import { TESTIMONIALS, TestimonialsSection } from "./landing-testimonials";
+import { BeforeAfter, CoachSection, ParentSection, PoolSection, RolePicker } from "./landing-sections";
 
 // Struktur mengikuti referensi Stride (hero foto penuh, badan krem, kartu
 // kolam selang-seling, kartu coach, FAQ, CTA gelap). Semua angka & data
@@ -262,11 +263,11 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             <span className="block">dan pilih jamnya.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-white/85">
-            Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi.
+            Anak (atau kamu) belajar berenang dengan coach yang dipilih sendiri, di kolam dekat rumah, di jam yang cocok. Perkembangannya tercatat, pembayarannya jelas, semua dalam satu aplikasi.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold text-fixed-ink hover:bg-fixed-lime-100">
-              Daftar sebagai member
+              Daftar gratis sebagai member
             </Link>
             <a href="#kolam" className="rounded-full border border-white/40 px-6 py-3 text-base font-semibold hover:bg-white/10">
               Lihat kolam
@@ -296,6 +297,9 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       <nav aria-label="Lompat ke bagian" className="sticky top-[61px] z-30 md:hidden border-b border-fixed-ink/10 bg-fixed-cream/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3">
           {[
+            ["#orang-tua", "Orang Tua"],
+            ["#untuk-coach", "Untuk Coach"],
+            ["#untuk-kolam", "Untuk Kolam"],
             ["#kolam", "Info Kolam"],
             ["#coach", "Info Coach"],
             ["#cara-kerja", "Cara Kerja"],
@@ -307,6 +311,10 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           ))}
         </div>
       </nav>
+
+      <RolePicker />
+      <BeforeAfter />
+      <ParentSection />
 
       {/* Kolam: maksimal 5 kolam paling laris, lengkap dengan foto, fasilitas,
           dan jumlah member yang les di situ. */}
@@ -397,28 +405,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
         )}
       </section>
 
-      {/* Pernyataan */}
-      <section className="mx-auto grid w-full max-w-6xl gap-8 px-4 pb-20 md:grid-cols-2">
-        <div>
-          <h2 className="text-4xl font-semibold leading-tight tracking-tight">
-            Semua pihak melihat angka yang sama.
-          </h2>
-          <Link href="/register" className="mt-6 inline-block rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white hover:bg-fixed-ink-deep">
-            Mulai sekarang
-          </Link>
-        </div>
-        <div className="flex flex-col gap-4 text-base text-fixed-ink-soft">
-          <p>
-            Dulu jadwal les diatur lewat chat, sisa sesi dicatat manual, dan pembayaran dicek satu per satu. Di Swim Private
-            Hub, orang tua booking sendiri jam yang masih kosong, coach melihat jadwalnya per kolam, dan kolam memantau jam
-            ramai setiap hari.
-          </p>
-          <p>
-            Pembayaran lewat Midtrans, lalu dibagi otomatis ke kolam dan coach setiap sesi ditandai Hadir. Semua pihak melihat
-            angka yang sama.
-          </p>
-        </div>
-      </section>
+      <CoachSection />
 
       {/* Coach: maksimal 5 coach gaya referensi Stride "meet the leaders" --
           kartu polaroid agak miring, nyebar kiri-kanan, muncul satu per satu
@@ -428,8 +415,8 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           <div className="mb-14 text-center">
             <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
-              Umur, jenis kelamin, keahlian, dan kolam tempat mengajar. Jadwal dan sertifikat lengkapnya bisa dilihat
-              setelah kamu mendaftar.
+              Lihat umur, keahlian, sertifikat yang sudah diperiksa admin, dan kolam tempat mengajar. Jadwal dan profil
+              lengkapnya terbuka setelah kamu mendaftar.
             </p>
           </div>
           {coaches.length === 0 ? (
@@ -439,6 +426,8 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           )}
         </div>
       </section>
+
+      <PoolSection waLink={OWNER_WA_LINK} />
 
       {/* Cara kerja */}
       <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-20">
