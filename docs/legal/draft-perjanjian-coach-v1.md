@@ -146,7 +146,7 @@ sepakat sebagai berikut.
 
 ## Pasal 6 — Larangan Transaksi di Luar Aplikasi
 
-1. Selama perjanjian berlaku dan [ISI HADI: misalnya 6 bulan] setelah
+1. Selama perjanjian berlaku dan 12 (dua belas) bulan setelah
    berakhir, Coach tidak menawarkan atau menerima pembayaran les secara
    langsung dari member yang dikenal melalui aplikasi.
 2. Coach tidak membagikan nomor kontak pribadinya kepada member melalui
@@ -155,8 +155,9 @@ sepakat sebagai berikut.
    didaftarkan ke aplikasi menggunakan kode afiliasi Coach, dengan komisi
    sesuai Pasal 10. Murid bawaan yang tetap dilayani di luar aplikasi:
    [ISI HADI: dikecualikan dari pasal ini atau tidak].
-4. Akibat pelanggaran: [ISI HADI: misalnya penonaktifan akun dan/atau
-   ganti rugi].
+4. Akibat pelanggaran: akun Coach dinonaktifkan dan Coach dimasukkan ke
+   daftar hitam SPH (tidak dapat bergabung kembali). [Hadi 29 Sep; larangan
+   ini hanya mengikat Coach dan Kolam Mitra, tidak dibebankan ke member.]
 
 ## Pasal 7 — Keselamatan dan Tanggung Jawab
 

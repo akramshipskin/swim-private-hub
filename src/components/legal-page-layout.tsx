@@ -45,7 +45,7 @@ export function LegalPageLayout({
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-text text-wrap-balance">{title}</h1>
         <p className="mt-1 text-sm text-text-subtle">Terakhir diperbarui: {updatedAt}</p>
 
-        <div className="prose-legal mt-8 flex flex-col gap-4 text-sm leading-relaxed text-text-muted [&_h2]:mt-5 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-text [&_li]:mt-1 [&_strong]:text-text [&_ul]:list-disc [&_ul]:pl-5">
+        <div className="prose-legal mt-8 flex flex-col gap-4 text-sm leading-relaxed text-text-muted [&_h2]:mt-5 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-text [&_li]:mt-1 [&_strong]:text-text [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5">
           {children}
         </div>
       </article>

@@ -103,7 +103,10 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    dilaksanakan melalui pemesanan di aplikasi. Kewajiban ini mengikat coach
    melalui perjanjian coach; Kolam Mitra tidak memfasilitasi transaksi
    langsung antara coach mitra SPH dan member tersebut.
-4. Akibat pelanggaran oleh Kolam Mitra: [ISI HADI].
+4. Kewajiban pada butir 3 berlaku selama perjanjian dan 12 (dua belas)
+   bulan setelah berakhir. Akibat pelanggaran oleh Kolam Mitra: kerja sama
+   diakhiri, akun Kolam Mitra dinonaktifkan, dan Kolam Mitra dimasukkan ke
+   daftar hitam SPH. [Hadi 29 Sep]
    [CATATAN: opsi lama "eksklusivitas seluruh les privat di kolam" dihapus.
    Alasan: keputusan Hadi 29 Sep (kolam terbuka untuk semua pengunjung) dan
    fakta kolam Cianjur menolak club karena sudah penuh 3 club, bukan karena
