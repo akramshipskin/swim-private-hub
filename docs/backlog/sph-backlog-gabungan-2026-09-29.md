@@ -29,7 +29,7 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 | # | Item | Status | Kerjaan berikutnya | Owner / Gear |
 |---|---|---|---|---|
 | 2.1 | `totpSecret` disimpan polos | TERBUKA | Enkripsi AES-256-GCM sebelum simpan | Opus (area auth/keamanan) |
-| 2.2 | `dev-db-sync.mjs` nyalin data asli prod TERMASUK totpSecret admin | SELESAI di kode (e74df1a, merge d787722) — **belum terbukti ke prod**: sync 29 Sep masih pakai skrip lama | Hadi jalankan ulang `npm run db:dev:sync` dari main, Claude cek DB dev bersih | Opus |
+| 2.2 | `dev-db-sync.mjs` nyalin data asli prod TERMASUK totpSecret admin | SELESAI (e74df1a, merge d787722). Terbukti 29 Sep: sync ulang Hadi dari main -> DB dev 0 email/nama/HP/rekening/chat asli, 0 kunci 2FA, 1 hash password; ledger & pembayaran utuh; login lokal member OK, admin diarahkan pasang 2FA | — | — |
 | 2.3 | Data ke AI tanpa filter | SEBAGIAN DIPUTUSKAN (retensi chat 90 hari + arsip, 25 Sep) | Belum ada aturan "data apa yang boleh diproses AI" secara eksplisit — saat ini cuma nama+peran+ketikan user, gak baca DB | Hadi putusin kalau mau diperketat lagi |
 | 2.4 | Pemilik kolam bisa liat nama anak | TERBUKA | Hadi putusin: perlu atau cukup jumlah peserta | Hadi jawab dulu |
 | 2.5 | Sertifikat coach bisa dibuka semua yang login (bukan cuma member) | SEBAGIAN DIPUTUSKAN (25 Sep: member boleh) | Coach lain & pemilik kolam masih ikut kebuka — perlu diputuskan dibatasi atau dibiarkan | Hadi jawab dulu, lalu Sonnet |
