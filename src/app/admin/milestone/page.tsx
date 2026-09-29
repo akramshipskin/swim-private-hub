@@ -43,6 +43,9 @@ export default async function AdminMilestonePage() {
       <p className="mt-1 text-sm text-text-muted">
         Usulan butir dari coach dan catatan perkembangan terbaru. Detail tiap peserta bisa dibuka dari sini atau dari halaman user member.
       </p>
+      <Link href="/admin/milestone/butir" className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline">
+        Kelola butir standar →
+      </Link>
 
       <Card className="mt-6">
         <CardBody>

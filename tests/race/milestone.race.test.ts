@@ -198,3 +198,41 @@ describe("PENAHANAN PENCAIRAN", () => {
     spread("H3", sebaran);
   });
 });
+
+describe("BUTIR STANDAR (admin)", () => {
+  let adminId = "";
+  beforeEach(async () => { adminId = (await mkUser("ADMIN")).id; });
+  const asAdmin = <T,>(fn: () => Promise<T>) => as({ id: adminId, role: "ADMIN", name: "Admin" }, fn);
+
+  it("M-A1: butir dinonaktifkan tidak dihitung -> peserta yang tinggal kurang butir itu selesai level di catatan berikutnya; level selesai tidak dicabut saat butir diaktifkan lagi", async () => {
+    const { setStandardItemActive } = await import("@/app/admin/milestone/actions");
+    const { coach, dep } = await setup();
+    await asCoach(coach, () => saveMilestoneUpdate(dep.id, null, fd({ note: "Mulai", achieved: "i_c1_1" })));
+    await asAdmin(() => setStandardItemActive("i_c1_2", false));
+    await asCoach(coach, () => saveMilestoneUpdate(dep.id, null, fd({ note: "Lanjut" })));
+    expect(await prisma.milestoneLevelCompletion.findMany({ select: { group: true, level: true } })).toEqual([{ group: "C", level: 1 }]);
+    await asAdmin(() => setStandardItemActive("i_c1_2", true));
+    expect(await prisma.milestoneLevelCompletion.count()).toBe(1);
+  });
+
+  it("M-A2: edit teks/urutan hanya untuk butir standar; butir khusus peserta & input tidak valid ditolak; tambah butir urutannya di belakang", async () => {
+    const { updateStandardItem, addStandardItem } = await import("@/app/admin/milestone/actions");
+    const { dep } = await setup();
+    await prisma.milestoneItem.create({ data: { id: "khusus", group: "C", level: 1, text: "Khusus", dependentId: dep.id } });
+    expect(await asAdmin(() => updateStandardItem("i_c1_1", null, fd({ text: "Mengapung 5 detik", sortOrder: "4" })))).toEqual({ success: true });
+    expect(await prisma.milestoneItem.findUniqueOrThrow({ where: { id: "i_c1_1" } })).toMatchObject({ text: "Mengapung 5 detik", sortOrder: 4, group: "C", level: 1 });
+    expect(await asAdmin(() => updateStandardItem("khusus", null, fd({ text: "Diubah", sortOrder: "1" })))).toEqual({ error: "Butir standar tidak ditemukan." });
+    expect(await asAdmin(() => updateStandardItem("i_c1_1", null, fd({ text: "ab", sortOrder: "1" })))).toMatchObject({ error: expect.any(String) });
+    expect(await asAdmin(() => addStandardItem(null, fd({ group: "Z", level: "1", text: "Apa" })))).toEqual({ error: "Pilih kelompok." });
+    expect(await asAdmin(() => addStandardItem(null, fd({ group: "C", level: "0", text: "Apa" })))).toMatchObject({ error: expect.any(String) });
+    expect(await asAdmin(() => addStandardItem(null, fd({ group: "C", level: "1", text: "Menyelam" })))).toEqual({ success: true });
+    expect(await prisma.milestoneItem.findFirstOrThrow({ where: { text: "Menyelam" } })).toMatchObject({ dependentId: null, sortOrder: 5, isActive: true });
+  });
+
+  it("M-A3: bukan admin (coach) ditolak", async () => {
+    const { addStandardItem } = await import("@/app/admin/milestone/actions");
+    const { coach } = await setup();
+    await expect(asCoach(coach, () => addStandardItem(null, fd({ group: "C", level: "1", text: "Menyelinap" })))).rejects.toThrow();
+    expect(await prisma.milestoneItem.count({ where: { text: "Menyelinap" } })).toBe(0);
+  });
+});
