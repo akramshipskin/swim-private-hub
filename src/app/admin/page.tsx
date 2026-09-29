@@ -155,7 +155,7 @@ export default async function AdminDashboardPage() {
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Pendapatan bersih bulan ini" value={formatRupiah(monthSum("PLATFORM_REVENUE"))} tone="success" />
             <Stat label="PPN 12% bulan ini" value={formatRupiah(monthSum("PLATFORM_TAX"))} />
-            <Stat label="Saldo pendapatan bisa ditarik" value={formatRupiah(platformBalance.revenue)} />
+            <Stat label="Saldo pendapatan bisa ditarik" value={formatRupiah(Math.max(0, platformBalance.availableRevenue))} />
             <Stat label="Saldo pajak belum disetor" value={formatRupiah(platformBalance.tax)} />
           </div>
           <p className="mt-3 text-xs text-text-subtle">Dihitung dari komisi setiap sesi yang ditandai Hadir (komisi sudah termasuk PPN).</p>

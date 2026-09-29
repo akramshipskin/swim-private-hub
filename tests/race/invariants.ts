@@ -63,18 +63,17 @@ export async function checkInvariants(opts: { packages?: boolean; ledger?: boole
     }
   }
 
-  // 4. Saldo platform (pendapatan & PPN) tidak pernah negatif.
-  const plat = await prisma.walletTransaction.groupBy({ by: ["type"], where: { type: { in: ["PLATFORM_REVENUE", "PLATFORM_TAX"] } }, _sum: { amount: true } });
+  // 4. Platform tidak pernah menarik lebih dari pendapatan yang pernah masuk.
+  // Saldonya sendiri BOLEH minus (keputusan Hadi 29 Sep, Q-d & Q-e): komisi
+  // afiliasi dibayar di muka dari bagian SPH, dan pembalikan Hadir tetap
+  // dicatat walau uang sesi itu sudah ditarik. Minus ditutup sesi berikutnya;
+  // selama minus, penarikan ditolak (platform-wallet.ts).
+  const credited = await prisma.walletTransaction.groupBy({ by: ["type"], where: { type: { in: ["PLATFORM_REVENUE", "PLATFORM_TAX"] }, amount: { gt: 0 } }, _sum: { amount: true } });
   const wd = await prisma.platformWithdrawal.aggregate({ _sum: { revenueAmount: true, taxAmount: true } });
-  const revenue = (plat.find((x) => x.type === "PLATFORM_REVENUE")?._sum.amount ?? 0) - (wd._sum.revenueAmount ?? 0);
-  const tax = (plat.find((x) => x.type === "PLATFORM_TAX")?._sum.amount ?? 0) - (wd._sum.taxAmount ?? 0);
-  // Komisi afiliasi dibayar di muka dari bagian SPH (5% harga paket, cair
-  // setelah sesi pertama), sementara bagian SPH diakui per sesi -- jadi
-  // pendapatan boleh minus SEBESAR komisi yang sudah dibayar, tidak lebih.
-  // Penarikan platform tetap dibatasi saldo yang tersedia (platform-wallet.ts).
-  const affiliatePaid = (await prisma.walletTransaction.aggregate({ where: { type: "AFFILIATE_COMMISSION" }, _sum: { amount: true } }))._sum.amount ?? 0;
-  if (revenue + affiliatePaid < 0) bad.push(`saldo pendapatan platform negatif di luar komisi afiliasi (${revenue} + komisi ${affiliatePaid})`);
-  if (tax < 0) bad.push(`saldo pajak platform negatif (${tax})`);
+  const inRevenue = credited.find((x) => x.type === "PLATFORM_REVENUE")?._sum.amount ?? 0;
+  const inTax = credited.find((x) => x.type === "PLATFORM_TAX")?._sum.amount ?? 0;
+  if ((wd._sum.revenueAmount ?? 0) > inRevenue) bad.push(`penarikan pendapatan platform ${wd._sum.revenueAmount} > pendapatan yang pernah masuk ${inRevenue}`);
+  if ((wd._sum.taxAmount ?? 0) > inTax) bad.push(`penarikan pajak platform ${wd._sum.taxAmount} > pajak yang pernah masuk ${inTax}`);
 
   return bad;
 }
