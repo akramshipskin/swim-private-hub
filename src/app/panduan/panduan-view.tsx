@@ -76,7 +76,7 @@ const GUIDES: Guide[] = [
           { title: "Pilih coach & jam", body: "Slot kosong ada tombol Booking. Slot yang sudah diambil member lain otomatis terkunci." },
           { title: "Selesai", body: "Sisa sesi berkurang 1, dan coach mendapat notifikasi kalau notifikasinya sudah aktif." },
         ],
-        note: `Belum punya paket di kolam itu tapi masih punya paket aktif di kolam lain? Ada tombol beli 1 sesi (harga per sesi kolam itu + ${DROP_IN_MARKUP_PERCENT}%, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
+        note: `Belum punya paket di kolam itu tapi masih punya paket aktif di kolam lain? Ada tombol beli 1 sesi (harga per sesi termahal di kolam itu + ${DROP_IN_MARKUP_PERCENT}%, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
       },
       {
         heading: "4. Riwayat & pembatalan",

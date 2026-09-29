@@ -88,7 +88,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Paket bisa dipakai di kolam mana saja?",
-        a: `Paket berlaku di kolam tempat paket dibeli. Kalau sesekali ingin les di kolam mitra lain, member yang masih punya paket aktif bisa beli 1 sesi di kolam tersebut (harga per sesi kolam itu + ${DROP_IN_MARKUP_PERCENT}%, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
+        a: `Paket berlaku di kolam tempat paket dibeli. Kalau sesekali ingin les di kolam mitra lain, member yang masih punya paket aktif bisa beli 1 sesi di kolam tersebut (harga per sesi termahal di kolam itu + ${DROP_IN_MARKUP_PERCENT}%, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
       },
       {
         q: "Satu akun untuk berapa anak?",
