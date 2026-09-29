@@ -24,8 +24,8 @@ export async function GET(request: Request) {
   const poolId = searchParams.get("poolId") ?? undefined;
 
   const availabilities = await prisma.availability.findMany({
-    // Slot coach yang dinonaktifkan admin tidak ditampilkan (tidak bisa dibooking).
-    where: { date: dateLabel(date), coach: { isActive: true }, ...NOT_CLOSED, ...(poolId ? { poolId } : {}) },
+    // Slot coach yang dinonaktifkan admin atau di kolam nonaktif tidak ditampilkan (tidak bisa dibooking).
+    where: { date: dateLabel(date), coach: { isActive: true }, pool: { isActive: true }, ...NOT_CLOSED, ...(poolId ? { poolId } : {}) },
     orderBy: [{ startTime: "asc" }],
     select: {
       id: true,

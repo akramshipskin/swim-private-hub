@@ -35,7 +35,8 @@ export default async function CoachShortcutPage({
 
   const coach = await prisma.user.findUnique({
     // Coach nonaktif (belum disetujui / dinonaktifkan admin) tidak dipublikasikan.
-    where: { id: coachId, role: "COACH", isActive: true },
+    // Aturan sama dengan landing & Cari Coach: akun aktif DAN profil coach aktif.
+    where: { id: coachId, role: "COACH", isActive: true, coachProfile: { isActive: true } },
     select: {
       id: true,
       name: true,

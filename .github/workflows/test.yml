@@ -18,3 +18,5 @@ jobs:
       - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npm test
+      # Build production: menangkap error yang lolos tsc/lint (import rusak, halaman gagal render).
+      - run: npm run build

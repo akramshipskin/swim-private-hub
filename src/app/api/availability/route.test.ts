@@ -20,4 +20,15 @@ describe("GET /api/availability", () => {
     const res = await GET(new Request("http://x/api/availability?date=2099-01-05&poolId=p1"));
     expect(res.status).toBe(200);
   });
+
+  // Regression: slot di kolam nonaktif dulu ikut tampil (booking-nya ditolak
+  // di /api/booking, tapi member tetap melihat slot yang tidak bisa dipakai).
+  it("only queries slots in active pools, with or without a poolId filter", async () => {
+    for (const url of ["http://x/api/availability?date=2099-01-05&poolId=p1", "http://x/api/availability?date=2099-01-05"]) {
+      findMany.mockClear();
+      await GET(new Request(url));
+      expect(findMany).toHaveBeenCalledTimes(1);
+      expect(findMany.mock.calls[0][0].where.pool).toEqual({ isActive: true });
+    }
+  });
 });
