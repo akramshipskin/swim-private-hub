@@ -1,6 +1,6 @@
 # Backlog Gabungan SPH — 29 Sep 2026
 
-> **Bagian 10 (paling bawah) adalah yang terbaru (29 Sep malam).** Bila status di bagian lain masih TERBUKA tetapi bagian 10 menyebut sudah diputuskan, bagian 10 yang berlaku.
+> **Bagian 11 (paling bawah) = DAFTAR KERJA GABUNGAN TERBARU (29 Sep malam, setelah Batch 1–4 + S&K v2 LIVE).** Pakai bagian 11 sebagai acuan. Bagian 7 (landing) juga sudah diperbarui. Bagian lain = riwayat; bila bertentangan, bagian 11 yang berlaku.
 
 Gabungan dari dua dokumen:
 - Verifikasi ke kode (28 Sep): [docs/reviews/2026-09-28-verifikasi-blindspot.md](../reviews/2026-09-28-verifikasi-blindspot.md) — cek klaim ChatGPT+Antigravity ke kode asli.
@@ -72,58 +72,71 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 
 ## 7. Landing — per role
 
+> **Diperbarui 29 Sep malam (setelah Batch 2–4 + S&K v2 live).** Dicocokkan ke
+> teks landing production (dibaca tanpa login, curl) + keputusan hari ini.
+> Sumber item: `~/Downloads/2026-09-26-sweep-dan-landing-blindspot.md` bagian 2.
+> Kolom "Di landing?" = kondisi LIVE sekarang. Semua kerjaan teks landing
+> dikumpulkan jadi paket **L1** di bagian 11.
+
 ### Member
 
-| Item | Status | Keputusan / Kerjaan |
-|---|---|---|
-| Tiket masuk kolam sudah termasuk paket? | TERBUKA | Gak ada di sistem juga — perlu diputuskan dulu sebagai aturan bisnis sebelum ditulis di landing |
-| Durasi 1 sesi | TERBUKA | Sama, perlu angka pasti |
-| 1 coach : 1 anak atau bisa grup? | SELESAI (commit 6db51ac) | FAQ baru "Ini les privat satu lawan satu?" ditambahkan |
-| Perlengkapan renang | TERBUKA | Belum dibahas |
-| Target belajar per paket | TERBUKA | Belum dibahas |
-| Social proof angka kecil | SELESAI (commit 6db51ac) | Badge hero & strip statistik disembunyikan sampai member ≥ 20 (`MIN_MEMBERS_TO_SHOW_STATS`) |
-| Narasi sebelum/sesudah | SEBAGIAN ADA | Landing baris 368 udah ada narasinya, tinggal dirapikan jadi perbandingan eksplisit kalau mau (opsional, rendah) |
-| Badge "Bersertifikat" disalahpahami | SEBAGIAN USANG | FAQ udah presisi ("diperiksa admin"); badge sendiri masih bisa disalahpahami tapi ini polish, bukan urgent |
-| Trial / beli 1 sesi pertama | TERBUKA | Keputusan bisnis: ada trial atau enggak |
-| Testimoni, screenshot produk, info keselamatan | TERBUKA | Belum dibahas, prioritas rendah sampai ada pengguna asli buat testimoni |
+| # | Item | Status keputusan | Di landing? | Kerjaan |
+|---|---|---|---|---|
+| M1 | Tiket masuk kolam sudah termasuk paket? | DIPUTUSKAN: termasuk (S&K 2.8 live; Hadi: 3 kolam sudah konfirmasi) | BELUM | L1 |
+| M2 | 1 coach : 1 anak atau grup? | SELESAI | ✅ FAQ | — |
+| M3 | Durasi 1 sesi | SELESAI: 60 menit | ✅ FAQ | — |
+| M4 | Perlengkapan renang | SELESAI: bawa sendiri | ✅ FAQ | — |
+| M5 | Target belajar per paket | Bisa dijawab: milestone + sertifikat level LIVE (Batch 3) | BELUM | L1 |
+| M6 | Social proof angka kecil | SEBAGIAN: strip statistik tersembunyi (<20 member), TAPI kartu kolam masih "3 member les di sini" | BOCOR | L1 (butuh keputusan b) |
+| M7 | Narasi sebelum/sesudah | SEBAGIAN ADA | sebagian | L1 opsional |
+| M8 | Arti badge "Bersertifikat" | SELESAI (FAQ presisi) | ✅ | — |
+| M9 | Bagian keamanan/kepercayaan | Bahan faktual ada (S&K 6.2 lifeguard/P3K, sertifikat diperiksa admin, sertifikat bisa banyak) | BELUM | L1 |
+| M10 | Trial / coba 1 sesi | SELESAI di sistem (Batch 4 LIVE) | BELUM | L1 (trial baru tampil kalau admin sudah membuat paket trial) |
+| M11 | Screenshot produk | TERBUKA | BELUM | nanti (butuh data non-demo) |
+| M12 | Testimoni asli | DIPUTUSKAN (bagian tersembunyi sampai ada) | tersembunyi | Hadi kirim teks → Claude pasang |
+| M13 | (baru) Sisa sesi hangus saat masa berlaku habis | DIPUTUSKAN (S&K 2.7) | BELUM | L1 (FAQ, jujur di depan) |
 
 ### Coach
 
-| Item | Status | Keputusan / Kerjaan |
-|---|---|---|
-| Persentase komisi gak disebut | DIPUTUSKAN | Komisi per MOU per kolam, **angka belum final** → landing TETAP gak boleh sebut angka sampai MOU pertama jalan |
-| "Kenapa dipotong komisi dibanding cari sendiri" | DIPUTUSKAN (arah) | Dijawab lewat fitur yang WA gak punya (riwayat, progres, jaminan sesi pengganti) — bukan lewat teks landing doang |
-| "Murid saya datang dari mana?" | DIPUTUSKAN | SPH janji bawa demand, tapi **belum terbukti** — jangan janji di landing sebelum ada member asli |
-| Biaya masuk kolam buat coach | TERBUKA | Belum ada di sistem, perlu diputuskan |
-| Murid bawaan sendiri | TERBUKA | Belum dibahas |
-| Waktu pencairan | TERBUKA | FAQ masih general ("admin memproses") |
-| **Coach/kolam dibayar kalau peserta tidak datang / sesi hangus?** (temuan 29 Sep) | TERBUKA | Sistem sekarang: tidak dibagi, uang tetap di platform. Masuk MOU pasal 5.5 & perjanjian coach pasal 4.4 |
-| FAQ beli 1 sesi kurang presisi (temuan 29 Sep) | SELESAI & LIVE (e580a78, OpenCode batch-6) | Kode pakai harga per sesi **termahal** (`src/lib/drop-in.ts:13`), FAQ cuma "harga per sesi kolam itu" — Sonnet |
-| **FAQ salah: "kolam mitra bisa menambahkanmu"** | SELESAI (commit 6db51ac) | Diubah jadi "admin yang mengafiliasikanmu" |
-| Siapa nentuin harga | SELESAI (commit 6db51ac) | FAQ coach baru: "Saya bisa menentukan tarif saya sendiri? Tidak..." |
-| Risiko transaksi di luar platform | DIPUTUSKAN | Lihat §7 #12 di atas — MOU kolam |
+| # | Item | Status keputusan | Di landing? | Kerjaan |
+|---|---|---|---|---|
+| C1 | Persentase komisi | DIPUTUSKAN: JANGAN sebut angka sampai MOU pertama | tidak (benar) | — |
+| C2 | "Kenapa dipotong komisi?" | Bisa dijawab dengan fitur LIVE: milestone, sertifikat level bertanda tangan coach, afiliasi, sesi pengganti otomatis, bayaran 50% kalau peserta tidak datang | BELUM | L1 |
+| C3 | "Murid saya datang dari mana?" | DIPUTUSKAN: jangan janji demand; afiliasi = jalur jujur "bawa murid sendiri" | BELUM (afiliasi) | L1 |
+| C4 | Biaya masuk kolam buat coach | DIPUTUSKAN: tidak ditagihkan ke coach (perjanjian coach 3.6) | BELUM | L1 |
+| C5 | Murid bawaan sendiri | DIPUTUSKAN: lewat kode afiliasi (LIVE) | BELUM | L1 |
+| C6 | Waktu pencairan | DIPUTUSKAN: manual secepatnya, tidak janji hari | ✅ FAQ | — |
+| C7 | Coach/kolam dibayar kalau peserta tidak datang | SELESAI & LIVE: coach 50%, kolam Rp0 | ✅ FAQ | — |
+| C8 | FAQ beli 1 sesi | SELESAI & LIVE | ✅ | — |
+| C9 | Siapa nentuin harga | SELESAI | ✅ FAQ | — |
+| C10 | Transaksi di luar platform | DIPUTUSKAN: di perjanjian coach & MOU (12 bulan, nonaktif + daftar hitam), member tidak kena | BELUM | L1 (butuh keputusan a: disebut atau tidak) |
+| C11 | (baru) Wajib catatan milestone tiap 2 sesi Hadir + penahanan pencairan (mulai 1 Okt) | SELESAI & LIVE | BELUM | L1 — wajib, supaya coach tidak kaget |
+| C12 | (baru) Langkah 1 "upload sertifikat" → sertifikat bisa banyak | SELESAI & LIVE | teks lama | L1 (kecil) |
 
 ### Pemilik Kolam
 
-| Item | Status | Keputusan / Kerjaan |
-|---|---|---|
-| "SPH bawa pelanggan atau cuma software?" | DIPUTUSKAN | Marketplace penuh, tapi permintaan belum terbukti — landing gak boleh janji "jam sepi pasti terisi" sampai ada bukti |
-| "Saya dapat berapa?" | DIPUTUSKAN | Per MOU, belum final — sama kayak coach |
-| Simulasi pendapatan vs tiket reguler | TERBUKA | Belum ada datanya |
-| Monopoli lintasan / gangguan pengunjung reguler | SELESAI (commit 6db51ac) | FAQ "Apa untungnya buat kolam saya?" sekarang sebut eksplisit "les privat satuan (1 coach, 1 peserta — bukan sewa club)" |
-| Tanggung jawab keselamatan/insiden | TERBUKA | Keputusan hukum, masuk draft MOU |
-| Prosedur loket/kasir | DITUNDA | Bagian dari fitur "daftar hadir loket" yang ditunda sampai ada MOU kolam pertama |
-| Wajib pakai coach dari platform? Boleh nolak coach? | TERBUKA | Sistem sekarang: kolam gak bisa tambah/tolak coach sendiri, semua lewat admin — perlu diputuskan apakah ini tetap begitu |
-| **FAQ salah: "kolam langsung tampil di halaman ini"** | SELESAI (commit 6db51ac) | Diubah: landing nampilin kolam paling aktif, kemunculan mengikuti aktivitas kolam |
-| Berapa lama proses persetujuan admin | TERBUKA | Belum dibahas |
-| Gabung gratis atau ada biaya? | TERBUKA | Belum dibahas |
-| Studi kasus / bukti dari kolam lain | TERBUKA | Belum ada pengguna asli buat bukti ini |
+| # | Item | Status keputusan | Di landing? | Kerjaan |
+|---|---|---|---|---|
+| K1 | "SPH bawa pelanggan atau software?" | SELESAI (janji dilunakkan) | ✅ | — |
+| K2 | "Saya dapat berapa?" | DIPUTUSKAN: jangan sebut angka sampai MOU | tidak (benar) | — |
+| K3 | Simulasi pendapatan vs tiket | Dokumen ada (`docs/designs/simulasi-pendapatan-kolam.md`), belum untuk landing | tidak | nanti |
+| K4 | Monopoli lintasan | SELESAI | ✅ FAQ | — |
+| K5 | Tanggung jawab keselamatan/insiden | DIPUTUSKAN (S&K 6.2 & 6.5 live) | BELUM | L1 |
+| K6 | Prosedur loket/kasir | DITUNDA (sampai MOU kolam pertama) | — | — |
+| K7 | Wajib coach platform / boleh menolak coach | "Kolam tidak menolak coach" MENUNGGU jawaban 3 kolam | ditahan | setelah jawaban kolam |
+| K8 | Lama persetujuan admin | SELESAI: 1×24 jam | ✅ FAQ | — |
+| K9 | Gabung gratis? | SELESAI | ✅ FAQ | — |
+| K10 | Studi kasus kolam | TERBUKA (belum ada kolam asli) | — | nanti |
+| K11 | (baru) Kode afiliasi kolam 5% | SELESAI & LIVE | BELUM | L1 |
+| K12 | (baru) Paket trial: harga dari SPH, bagi hasil dari harga trial (kolam ikut menanggung diskon) | SELESAI & LIVE | BELUM | L1 — wajib terbuka |
+| K13 | (baru) Tiket peserta tercakup di bagian kolam (tidak ditagih terpisah ke member) | DIPUTUSKAN | BELUM | L1 |
 
 ### Lintas peran
 
-| Item | Status | Keputusan / Kerjaan |
-|---|---|---|
-| Satu hero buat 3 audiens, gak ada pemilihan peran | TERBUKA, tapi rendah prioritas sampai ada traffic buat diuji | Bisa ditambah setelah tes Meta Ads jalan |
+| # | Item | Status | Kerjaan |
+|---|---|---|---|
+| X1 | Pemilihan peran setelah hero | TERBUKA, prioritas rendah sampai tes Meta Ads jalan | nanti |
+| X2 | (baru) **Data uji/demo tampil sebagai data asli di landing production**: "Harga mulai Rp 5.000/paket" (paket uji Renang 1x Rp5.000 & Renang 1 Menit Rp10.000 masih dijual), coach demo (Dewi, Ayu, Fajar, Nadia, Rian) | TERBUKA — bertentangan dengan prinsip "landing jujur" | D1 (Hadi matikan paket uji) + keputusan c (coach demo) |
 
 ## 8. Sisa Sweep 28 Sep
 
@@ -224,3 +237,87 @@ diberi kunci tes).
 Catatan teknis: migrasi otomatis sempat menyelipkan DROP INDEX EmailThread_externalEmail_idx
 (index dobel, tidak berbahaya) — dibuang dari migrasi supaya scope bersih.
 
+
+---
+
+## 11. DAFTAR KERJA GABUNGAN — posisi 29 Sep malam (ACUAN TERBARU)
+
+Semua sumber digabung: bagian 1–10 di atas, dokumen blind spot 26 Sep
+(`~/Downloads/2026-09-26-sweep-dan-landing-blindspot.md`), verifikasi 28 Sep,
+office hours 29 Sep, dan pekerjaan Batch 1–4 hari ini. Yang sudah LIVE tidak
+diulang di daftar kerja.
+
+### 11.1 Sudah LIVE per 29 Sep malam
+| Commit | Isi |
+|---|---|
+| 0be083e | Batch 1: batas 24 jam tandai hadir, bayaran tidak hadir (coach 50%), saldo boleh minus, saldo platform ditahan 3 hari + bukti transfer, tombol Laporkan + Laporan Kehadiran admin, tanggal lahir peserta |
+| b029d65 | Batch 2: sertifikat coach bisa banyak (maks 10), badge "Bersertifikat · nama +N" |
+| 2e9747f | Batch 3: milestone (40 butir standar A–D), sertifikat level bertanda tangan coach, penahanan pencairan coach (≥2 sesi Hadir tanpa catatan, mulai 1 Okt 2026) |
+| 750c555, ff1373b, 4e48c53 | S&K v2 (PT Makna Krabat Indonesia, tanggung jawab 100%, musyawarah) |
+| f01ac66 | Batch 4: kode afiliasi coach/kolam + komisi 5%, paket trial per anak; S&K rev 4 (pasal afiliasi & trial) |
+
+### 11.2 Tugas Hadi (di luar kode) — urut penting
+| # | Tugas | Kenapa |
+|---|---|---|
+| H1 | Uji di production: (a) coach isi catatan milestone + unggah tanda tangan, (b) member lihat perkembangan, (c) admin buka Milestone & Afiliasi, (d) unggah 1 sertifikat coach, (e) coach buka dashboard → kartu kode afiliasi | Claude dilarang login production; unggah file tidak bisa diuji di lokal |
+| H2 | Matikan paket uji "Renang 1x Rp5.000" & "Renang 1 Menit Rp10.000" (admin → Paket → tidak dijual) | Landing production menulis "Harga mulai Rp 5.000/paket" (X2) |
+| H3 | Kabari semua coach: aturan catatan milestone tiap 2 sesi Hadir (penahanan mulai 1 Okt) + minta login sekali supaya kode afiliasinya terbentuk | Aturan uang baru; perjanjian belum ditandatangani |
+| H4 | Buat paket trial per kolam kalau mau trial dijual (admin → Paket → centang Paket trial) | Trial tidak tampil ke member sebelum ada paket trial |
+| H5 | Kabari orang hukum: S&K 2.9 disesuaikan jadi "untuk Peserta yang belum pernah memiliki paket, satu kali per Peserta" | Beda dari teks yang dia setujui ("Member baru") |
+| H6 | Revisi 40 butir milestone (draf Claude, bukan standar resmi) | Belum ada UI admin untuk mengedit; kirim revisi ke Claude |
+| H7 | Kirim testimoni asli | Bagian testimoni landing masih tersembunyi |
+| H8 | Isi secret R2 | Backup DB gagal tiap malam sejak awal = belum ada cadangan |
+| H9 | Simpan kunci enkripsi production di pengelola password | Kunci hilang = rekening & 2FA terenkripsi tidak bisa dibuka |
+| H10 | Tanya akuntan: PPN atas uang sesi tidak hadir, pajak komisi afiliasi | Angka pajak belum pasti |
+| H11 | Jawaban 3 kolam (termasuk "kolam tidak menolak coach", kapasitas barengan) | Menahan K7 & MOU |
+| H12 | Isi `[ISI HADI]` perjanjian coach (18 titik) & MOU kolam (20 titik) → orang hukum → tanda tangan | Aturan uang coach/kolam baru mengikat setelah ditandatangani |
+| H13 | Tes Meta Ads | Validasi permintaan (office hours 29 Sep) |
+
+### 11.3 Keputusan yang ditunggu dari Hadi
+| # | Pertanyaan | Menahan |
+|---|---|---|
+| Q-a | Larangan transaksi di luar aplikasi (coach/kolam, 12 bulan) disebut di landing atau cukup di perjanjian? | L1 |
+| Q-b | Kartu kolam "3 member les di sini": dibuang, atau ikut ambang 20 member seperti strip statistik? | L1 |
+| Q-c | Coach demo (Dewi, Ayu, Fajar, Nadia, Rian) di landing: disembunyikan sampai ada coach asli? | L2 |
+| Q-d | Saldo pendapatan SPH bisa minus sementara karena komisi afiliasi cair setelah sesi pertama (contoh: paket Rp800rb → komisi Rp40rb, bagian SPH sesi 1 ± Rp13rb). Oke, atau waktu cair diubah? Penarikan SPH tetap ditolak selama minus | U2 |
+| Q-e | (1.1) Pembalikan Hadir setelah saldo platform ditarik: platform boleh minus sementara? (H+3 hold sudah mengurangi risiko, belum menghapus) | U1 |
+| Q-f | Anak yang didaftarkan lewat form daftar member TIDAK diminta tanggal lahir (dicek dari kode `src/app/api/register/route.ts`, hanya nama). Wajibkan di form daftar? | P1 |
+
+### 11.4 Kerjaan kode (menu)
+Aturan: uang/booking/auth/skema/webhook = Claude langsung (haram OpenCode & Cloud).
+Migrasi baru = Hadi jalankan di prod DULU, baru push.
+
+| # | Kerjaan | Berat | Gear / model | Lewat OpenCode/Cloud? | Syarat |
+|---|---|---|---|---|---|
+| L1 | Revisi teks landing: semua baris "BELUM" di bagian 7 (tiket termasuk, milestone & sertifikat level, trial, keamanan, sisa sesi hangus, afiliasi coach/kolam, biaya masuk coach, catatan milestone + penahanan, sertifikat banyak, tanggung jawab keselamatan, trial menurunkan bagian kolam, tiket dari bagian kolam) | Ringan–sedang (teks saja, ± 15 perubahan) | Sonnet Medium: Claude tulis dokumen eksekusi `docs/plans/landing-revisi-batch-9.md` | Ya, OpenCode (teks murni); Claude validasi | Q-a, Q-b |
+| L2 | Sembunyikan coach demo/data demo dari landing | Sedang (filter query + penanda demo) | Sonnet High | Tidak (sentuh data) | Q-c |
+| P1 | Wajibkan tanggal lahir anak di form daftar member | Sedang (form + validasi API daftar) | Sonnet High | Tidak (jalur pendaftaran/auth) | Q-f |
+| P2 | Cek dugaan tanggal lahir coach bergeser 1 hari (`updateCoachProfile` pakai +07:00, umur pakai tengah malam UTC) — dugaan dari baca kode, belum dijalankan | Kecil | Sonnet High (reproduksi dulu) | Tidak | — |
+| P3 | Buang kolom lama `certificateUrl`/`certificateStatus` + rapikan `seed-prod-demo.mts` (password hardcoded, kolom lama) | Kecil, tapi migrasi skema | Opus Low | Tidak (skema) | Setelah H1 membuktikan sertifikat baru jalan |
+| P4 | Halaman admin untuk mengedit butir standar milestone (teks, urutan, nonaktif) | Sedang (nonaktif butir memengaruhi hitungan level) | Opus Low | Tidak | Hadi mau / H6 |
+| P5 | Uji checkout trial & `/pembayaran/sukses` dengan order sungguhan | Sedang | Sonnet High | Tidak (pembayaran) | Hadi sediakan key Midtrans SANDBOX di lokal (sekarang key production) |
+| U1 | 1.1 pembalikan pendapatan platform setelah ditarik | Sedang, uang | Opus Medium | Tidak | Q-e |
+| U2 | Ubah waktu cair komisi afiliasi (kalau Q-d = ubah) | Sedang, uang | Opus Medium | Tidak | Q-d |
+| I1 | Tes race di CI (Postgres service di GitHub Actions) | Sedang | Sonnet High | Cloud session boleh (bukan area haram) | — |
+| I2 | Aktifkan CSP | Sedang | Sonnet High | Cloud session boleh | Daftar domain Midtrans Snap + Vercel |
+| I3 | Backup file storage (foto/sertifikat/tanda tangan) + uji pemulihan penuh | Sedang–berat | Opus Medium (desain) | Tidak | H8 |
+| X-L | Testimoni: pasang teks asli | Ringan | Sonnet Medium | Ya | H7 |
+
+### 11.5 Ditunda (ada pemicu)
+| Item | Pemicu |
+|---|---|
+| Pemilihan peran setelah hero (X1), screenshot produk (M11), studi kasus kolam (K10) | Setelah tes Meta Ads / ada data non-demo |
+| Daftar hadir loket (K6), komisi bertingkat | Setelah MOU kolam pertama |
+| Batas les barengan per kolam (N) | Ada kolam keberatan / volume naik |
+| Halaman admin testimoni (M) | Setelah ada testimoni asli |
+| Rate limit berlapis (5.3), email thread per percakapan (5.4) | Volume naik |
+| Hapus `.qa-otp.mts` | Setelah QA lokal tidak dipakai lagi |
+| File lama belum di-commit (`laporan-*.md`, `docs/plans/sweep-total-opencode*.md`, `ui-inconsistency-report-2026-09-20.md`) | Hadi putuskan: commit ke arsip atau hapus |
+
+### 11.6 Urutan yang disarankan
+1. H1–H3 (uji production + matikan paket uji + kabari coach) — sebelum 1 Okt.
+2. Jawab Q-a, Q-b, Q-c → L1 (+ L2) supaya landing jujur sebelum iklan jalan.
+3. Q-d, Q-e (uang) → U1/U2 bila perlu.
+4. Q-f → P1; P2.
+5. H8 → I3; I1, I2.
+6. P3, P4, P5 menyusul.
