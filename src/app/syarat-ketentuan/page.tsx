@@ -139,7 +139,7 @@ export default function SyaratKetentuanPage() {
         <li>
           SPH bertanggung jawab atas pemesanan, jadwal, pencatatan, penerimaan pembayaran, dan pembagian dana sesuai
           Syarat &amp; Ketentuan ini. Tanggung jawab SPH atas kerugian yang timbul dari penggunaan Aplikasi dibatasi
-          paling banyak 50% (lima puluh persen) dari nilai paket yang dibayarkan Member untuk paket yang bersangkutan.
+          paling banyak sebesar 100% (seratus persen) nilai paket yang dibayarkan Member untuk paket yang bersangkutan.
         </li>
         <li>
           Keselamatan dan penanganan insiden selama Sesi berada dalam tanggung jawab Coach dan Kolam Mitra sesuai

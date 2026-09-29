@@ -2,10 +2,10 @@
 // menampilkannya, dan pendaftaran mencatatnya sebagai versi yang disetujui
 // (User.termsVersion). Ubah dokumen = ubah tanggal di sini.
 export const TERMS_UPDATED_AT = "29 September 2026";
-// S&K diubah 2x di tanggal yang sama (29 Sep: pasal 3, lalu S&K v2 yang
-// disetujui reviewer hukum). Nomor revisi membedakan keduanya di catatan
+// S&K diubah beberapa kali di tanggal yang sama (29 Sep: pasal 3, S&K v2
+// yang disetujui reviewer hukum, lalu batas tanggung jawab 100%). Nomor revisi membedakan keduanya di catatan
 // persetujuan; naikkan kalau S&K diubah lagi di hari yang sama.
-export const TERMS_REVISION = 2;
+export const TERMS_REVISION = 3;
 export const PRIVACY_UPDATED_AT = "25 September 2026";
 
 export const LEGAL_CONSENT_VERSION = `S&K ${TERMS_UPDATED_AT} rev ${TERMS_REVISION}; Privasi ${PRIVACY_UPDATED_AT}`;

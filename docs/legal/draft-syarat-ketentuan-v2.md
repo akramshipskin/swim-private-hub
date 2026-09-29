@@ -5,7 +5,7 @@
 > Isian Hadi: penyelenggara PT Makna Krabat Indonesia; sisa sesi hangus;
 > laporan lewat 3 hari diperiksa kasus per kasus; larangan transaksi luar
 > DIHAPUS dari S&K member (dipindah ke perjanjian coach/MOU kolam, 12 bulan,
-> nonaktif + daftar hitam); batas tanggung jawab SPH 50% nilai paket; tanpa
+> nonaktif + daftar hitam); batas tanggung jawab SPH 100% nilai paket (rev 3; semula 50%); tanpa
 > asuransi; sengketa lewat musyawarah kekeluargaan; pasal 7 diubah jadi
 > "berlaku sejak diumumkan". Pasal 1.4 (afiliasi) dan 2.9 (trial) DITAHAN
 > sampai fiturnya dibangun (Batch 4).
