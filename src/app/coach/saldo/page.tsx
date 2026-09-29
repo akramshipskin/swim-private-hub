@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import SaldoView from "@/components/saldo-view";
 import { updateBankInfo, requestWithdrawal } from "./actions";
+import { openNullable, openSecret } from "@/lib/secret-box";
 
 export default async function CoachSaldoPage() {
   const session = await requireRole("COACH");
@@ -43,10 +44,11 @@ export default async function CoachSaldoPage() {
       <SaldoView
         walletBalance={profile.walletBalance}
         bankName={profile.bankName}
-        bankAccountNumber={profile.bankAccountNumber}
+        bankAccountNumber={openNullable(profile.bankAccountNumber)}
         bankAccountName={profile.bankAccountName}
         withdrawals={profile.withdrawalRequests.map((w) => ({
           ...w,
+          bankAccountNumber: openSecret(w.bankAccountNumber),
           requestedAt: w.requestedAt.toISOString(),
           processedAt: w.processedAt?.toISOString() ?? null,
         }))}

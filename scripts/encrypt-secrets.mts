@@ -1,5 +1,7 @@
 /**
- * Enkripsi kunci 2FA (User.totpSecret) yang masih tersimpan polos.
+ * Enkripsi kolom rahasia yang masih tersimpan polos:
+ *   - User.totpSecret (kunci 2FA)
+ *   - CoachProfile / Pool / WithdrawalRequest .bankAccountNumber (nomor rekening)
  * Aman dijalankan berulang: yang sudah terenkripsi dilewati.
  *
  * Urutan deploy (lihat docs/plans/deploy-enkripsi-2fa.md):
@@ -10,31 +12,38 @@
  *        DATABASE_URL="$PROD_DIRECT_URL" npx tsx scripts/encrypt-secrets.mts --apply  # tulis
  */
 import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../src/generated/prisma/client";
+import pg from "pg";
 import { isSealed, openSecret, sealSecret } from "../src/lib/secret-box";
 
 const apply = process.argv.includes("--apply");
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) });
 
 // Gagal di awal kalau kunci tidak ada/salah format, sebelum menyentuh data.
 openSecret(sealSecret("cek-kunci"));
 
-const users = await prisma.user.findMany({ where: { totpSecret: { not: null } }, select: { id: true, totpSecret: true } });
-const plain = users.filter((u) => !isSealed(u.totpSecret!));
-console.log(`Kunci 2FA tersimpan: ${users.length}, masih polos: ${plain.length}, sudah terenkripsi: ${users.length - plain.length}`);
+const COLUMNS: [table: string, column: string, label: string][] = [
+  ["User", "totpSecret", "Kunci 2FA"],
+  ["CoachProfile", "bankAccountNumber", "Rekening coach"],
+  ["Pool", "bankAccountNumber", "Rekening kolam"],
+  ["WithdrawalRequest", "bankAccountNumber", "Rekening di riwayat pencairan"],
+];
 
-if (!apply) {
-  console.log("Mode cek saja. Tambahkan --apply untuk mengenkripsi.");
-} else {
+const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
+await db.connect();
+
+for (const [table, column, label] of COLUMNS) {
+  const { rows } = await db.query<{ id: string; v: string }>(`select id, "${column}" as v from "${table}" where "${column}" is not null`);
+  const plain = rows.filter((r) => !isSealed(r.v));
+  console.log(`${label}: ${rows.length} tersimpan, ${plain.length} masih polos, ${rows.length - plain.length} sudah terenkripsi`);
+  if (!apply) continue;
   let done = 0;
-  for (const u of plain) {
-    const sealed = sealSecret(u.totpSecret!);
-    if (openSecret(sealed) !== u.totpSecret) throw new Error(`Verifikasi gagal untuk user ${u.id}, dihentikan.`);
-    // CAS: hanya kalau kuncinya masih nilai polos yang sama (tidak berubah di tengah jalan).
-    const res = await prisma.user.updateMany({ where: { id: u.id, totpSecret: u.totpSecret }, data: { totpSecret: sealed } });
-    done += res.count;
+  for (const r of plain) {
+    const sealed = sealSecret(r.v);
+    if (openSecret(sealed) !== r.v) throw new Error(`Verifikasi gagal: ${table} ${r.id}, dihentikan.`);
+    // CAS: hanya kalau nilainya masih nilai polos yang sama (tidak berubah di tengah jalan).
+    const res = await db.query(`update "${table}" set "${column}" = $1 where id = $2 and "${column}" = $3`, [sealed, r.id, r.v]);
+    done += res.rowCount ?? 0;
   }
-  console.log(`Selesai: ${done} kunci dienkripsi.`);
+  console.log(`  -> ${done} dienkripsi`);
 }
-await prisma.$disconnect();
+if (!apply) console.log("Mode cek saja. Tambahkan --apply untuk mengenkripsi.");
+await db.end();

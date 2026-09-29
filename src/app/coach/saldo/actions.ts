@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requestCoachWithdrawal, WithdrawalError } from "@/lib/withdrawal";
 import { notifyAdminsWithdrawalRequested } from "@/lib/withdrawal-notify";
 import { revalidatePath } from "next/cache";
+import { sealSecret } from "@/lib/secret-box";
 
 export type ActionState = { error?: string; ok?: boolean } | null;
 
@@ -35,7 +36,8 @@ export async function updateBankInfo(
     const profile = await getOwnCoachProfile(session.user.id);
     await prisma.coachProfile.update({
       where: { id: profile.id },
-      data: { bankName, bankAccountNumber, bankAccountName },
+      // Nomor rekening disimpan terenkripsi (src/lib/secret-box.ts).
+      data: { bankName, bankAccountNumber: sealSecret(bankAccountNumber), bankAccountName },
     });
   } catch (err) {
     return { error: err instanceof Error ? err.message : "Gagal update rekening" };

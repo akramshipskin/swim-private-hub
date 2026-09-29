@@ -34,6 +34,11 @@ export function sealSecret(plain: string): string {
   return PREFIX + [iv, cipher.getAuthTag(), ct].map((b) => b.toString("base64url")).join(":");
 }
 
+// Untuk kolom opsional (misal rekening yang belum diisi).
+export function openNullable(stored: string | null): string | null {
+  return stored == null ? null : openSecret(stored);
+}
+
 export function openSecret(stored: string): string {
   if (!isSealed(stored)) return stored;
   const [iv, tag, ct] = stored.slice(PREFIX.length).split(":").map((p) => Buffer.from(p, "base64url"));

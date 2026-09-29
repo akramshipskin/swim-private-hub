@@ -1,4 +1,4 @@
-# Langkah pasang "kunci 2FA terenkripsi" ke aplikasi asli
+# Langkah pasang "kunci 2FA & nomor rekening terenkripsi" ke aplikasi asli
 
 Untuk Hadi. Ditulis Claude, 29 Sep 2026.
 
@@ -9,8 +9,13 @@ Kalau salinan database bocor, orang bisa bikin kode login admin. Setelah
 perubahan ini, kode itu disimpan dalam bentuk terkunci; kuncinya cuma ada
 di pengaturan server (Vercel), bukan di database.
 
-Pengguna tidak merasakan perubahan apa pun: cara login dan cara pasang
-2FA tetap sama.
+Hal yang sama berlaku untuk **nomor rekening** coach dan kolam (termasuk
+yang tercatat di riwayat pencairan): disimpan terkunci. Admin tetap melihat
+nomor lengkap di halaman Pencairan Saldo untuk transfer manual; coach dan
+kolam tetap melihat nomornya sendiri.
+
+Pengguna tidak merasakan perubahan apa pun: cara login, pasang 2FA, isi
+rekening, dan ajukan pencairan tetap sama.
 
 ## Urutan WAJIB (jangan ditukar)
 
@@ -44,7 +49,7 @@ Lalu jalankan (cek dulu, belum mengubah apa pun):
 ```bash
 set -a; source .env.prod; set +a; DATABASE_URL="$PROD_DIRECT_URL" npx tsx scripts/encrypt-secrets.mts
 ```
-Hasilnya menampilkan jumlah kunci yang masih polos. Kalau angkanya masuk
+Hasilnya menampilkan jumlah data yang masih polos (kunci 2FA, rekening coach, rekening kolam, rekening di riwayat pencairan). Kalau angkanya masuk
 akal, jalankan versi yang benar-benar mengunci:
 ```bash
 set -a; source .env.prod; set +a; DATABASE_URL="$PROD_DIRECT_URL" npx tsx scripts/encrypt-secrets.mts --apply
@@ -58,7 +63,11 @@ Claude.
 
 - **Admin tidak bisa login setelah langkah 4:** hampir pasti kunci di
   Vercel beda dengan kunci di `.env.prod`. Samakan, redeploy.
-- **Kunci production hilang:** jalankan `scripts/reset-admin-2fa.mts`
+- **Halaman Saldo/Pencairan error setelah langkah 4:** sama, kunci Vercel
+  beda dengan `.env.prod`.
+- **Kunci production hilang:** nomor rekening yang terkunci tidak bisa
+  dibuka lagi; coach dan kolam harus mengisi ulang rekening di menu Saldo.
+  Untuk 2FA: jalankan `scripts/reset-admin-2fa.mts`
   (sudah ada) untuk admin, lalu pasang 2FA lagi; pengguna lain yang
   memakai 2FA juga harus pasang ulang.
 
@@ -71,4 +80,8 @@ Claude.
 - Skrip langkah 4: mode cek, lalu mengunci 1 kode, login tetap jalan;
   dijalankan ulang tidak mengubah apa pun; tanpa kunci langsung berhenti
   sebelum menyentuh data.
+- Rekening: coach lihat nomornya sendiri sebelum & sesudah dikunci; ajukan
+  pencairan -> nomor di riwayat ikut terkunci, coach lihat versi tersamar;
+  admin lihat nomor lengkap + tombol salin; tolak pengajuan -> saldo balik.
+  Nilai terkunci tidak pernah muncul di halaman.
 - Belum diuji: ke database production (Claude tidak punya akses).

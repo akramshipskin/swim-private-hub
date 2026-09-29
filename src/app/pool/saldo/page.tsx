@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import SaldoView from "@/components/saldo-view";
 import { updateBankInfo, requestWithdrawal } from "./actions";
+import { openNullable, openSecret } from "@/lib/secret-box";
 
 export default async function PoolSaldoPage() {
   const session = await requireRole("POOL_OWNER");
@@ -53,10 +54,11 @@ export default async function PoolSaldoPage() {
             <SaldoView
               walletBalance={pool.walletBalance}
               bankName={pool.bankName}
-              bankAccountNumber={pool.bankAccountNumber}
+              bankAccountNumber={openNullable(pool.bankAccountNumber)}
               bankAccountName={pool.bankAccountName}
               withdrawals={pool.withdrawalRequests.map((w) => ({
                 ...w,
+                bankAccountNumber: openSecret(w.bankAccountNumber),
                 requestedAt: w.requestedAt.toISOString(),
           processedAt: w.processedAt?.toISOString() ?? null,
               }))}
