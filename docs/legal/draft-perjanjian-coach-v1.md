@@ -102,6 +102,10 @@ sepakat sebagai berikut.
    berlaku. **[BELUM ADA DI SISTEM]** [CATATAN: pengaman terhadap coach
    yang tidak datang lalu menandai peserta Tidak Hadir adalah laporan
    member ini.]
+8. Paket trial: harga trial ditetapkan SPH. Bagi hasil sesi trial dihitung
+   dengan persentase normal dari harga trial; selisih harga dibanding sesi
+   reguler ditanggung bersama oleh Coach, Kolam Mitra, dan SPH sesuai
+   persentase masing-masing. **[BELUM ADA DI SISTEM]**
 
 ## Pasal 5 — Pencairan
 
@@ -170,8 +174,8 @@ sepakat sebagai berikut.
    (contoh: paket Rp800.000 → Rp40.000; besarnya sama untuk Coach dan
    Kolam Mitra). Dikreditkan setelah member menghadiri sesi pertamanya
    (ditandai Hadir) dan lewat masa 3 hari laporan, supaya pendaftaran palsu
-   tidak menghasilkan uang. [KONFIRMASI HADI: apakah paket trial dihitung
-   sebagai "paket pertama" — bila ya, komisinya 5% dari harga trial.]
+   tidak menghasilkan uang. Paket trial juga dihitung sebagai "paket pertama" (keputusan Hadi 29 Sep):
+   komisinya 5% dari harga paket pertama apa pun, reguler atau trial.
 4. Program tidak dibatasi waktu selama perjanjian berlaku; Coach dapat
    membawa member kapan saja. SPH dapat mengubah ketentuan afiliasi melalui
    pembaruan perjanjian atau Syarat & Ketentuan, berlaku untuk member yang
@@ -226,6 +230,5 @@ Tunduk pada hukum Republik Indonesia; sengketa melalui [ISI HADI + reviewer].
 6. Larangan transaksi luar: durasi, sanksi, murid bawaan di luar aplikasi
    (Pasal 6).
 7. Insiden dan asuransi (Pasal 7).
-8. Mekanisme pajak komisi afiliasi, paket trial dihitung "paket pertama"
-   atau tidak, sanksi (Pasal 10).
+8. Mekanisme pajak komisi afiliasi dan sanksi (Pasal 10).
 9. Jangka waktu dan forum sengketa (Pasal 9 dan 11).

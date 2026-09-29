@@ -107,6 +107,8 @@ tanggung jawab, dan kewajiban perizinan.]
    yang tidak berenang (1 orang pada satu waktu, boleh bergantian) tidak
    dikenakan tiket. Perlengkapan renang (misalnya pelampung
    dan papan) dibawa sendiri oleh Peserta.
+9. Paket trial: paket 1 Sesi dengan harga khusus yang ditetapkan SPH, hanya
+   untuk Member baru dan satu kali per Peserta. **[BELUM ADA DI SISTEM]**
 
 **3. Pemesanan dan Pembatalan**
 1. Pemesanan tunduk pada ketersediaan jadwal Coach di kolam yang dipilih.

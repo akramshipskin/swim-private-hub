@@ -148,9 +148,7 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    dicairkan), saldo menjadi negatif dan dipotong otomatis dari bagi hasil
    sesi berikutnya; saldo negatif tidak dapat dicairkan. Saat perjanjian
    berakhir, saldo negatif diselesaikan: [ISI HADI]. **[BELUM ADA DI SISTEM —
-   sistem saat ini menolak koreksi bila saldo tidak cukup.]** [KONFIRMASI
-   HADI: keputusan Hadi 29 Sep untuk coach; Claude mengasumsikan berlaku
-   sama untuk kolam.]
+   sistem saat ini menolak koreksi bila saldo tidak cukup.]** (Keputusan Hadi 29 Sep, berlaku untuk coach dan kolam.)
 8. Persentase dapat diubah dengan kesepakatan tertulis; perubahan berlaku
    untuk sesi yang ditandai Hadir setelah tanggal perubahan.
 9. Coach menandai kehadiran paling lambat 24 jam setelah sesi selesai; lewat
@@ -162,6 +160,12 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
     dapat mengoreksi status; koreksi menjadi Hadir menghasilkan bagi hasil
     normal, dan koreksi sebaliknya mengikuti butir 7.
     **[BELUM ADA DI SISTEM]**
+11. Paket trial: harga trial ditetapkan SPH. Bagi hasil sesi trial dihitung
+    dengan persentase normal dari harga trial; selisih harga dibanding sesi
+    reguler ditanggung bersama oleh Coach, Kolam Mitra, dan SPH sesuai
+    persentase masing-masing. **[BELUM ADA DI SISTEM]** [CATATAN: contoh
+    trial Rp80.000 dengan pembagian 50% kolam berarti kolam menerima
+    Rp40.000, kurang dari tiket masuk coach + peserta Rp50.000.]
 
 ## Pasal 6 — Pencairan
 
@@ -236,8 +240,8 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    (contoh: paket Rp800.000 → Rp40.000; besarnya sama untuk Coach dan
    Kolam Mitra). Dikreditkan setelah member menghadiri sesi pertamanya
    (ditandai Hadir) dan lewat masa 3 hari laporan, supaya pendaftaran palsu
-   tidak menghasilkan uang. [KONFIRMASI HADI: apakah paket trial dihitung
-   sebagai "paket pertama" — bila ya, komisinya 5% dari harga trial.]
+   tidak menghasilkan uang. Paket trial juga dihitung sebagai "paket pertama" (keputusan Hadi 29 Sep):
+   komisinya 5% dari harga paket pertama apa pun, reguler atau trial.
 4. Program tidak dibatasi waktu selama perjanjian berlaku. SPH dapat
    mengubah ketentuan afiliasi melalui pembaruan perjanjian atau Syarat &
    Ketentuan, berlaku untuk member yang mendaftar setelah perubahan;
@@ -284,6 +288,7 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
   paket pertama, cair setelah sesi pertama Hadir + 3 hari, pajak ditanggung
   SPH (Pasal 11).
 - Pendamping 1 orang pada satu waktu, boleh bergantian (Pasal 2.4).
+- Paket trial: bagi hasil persen normal dari harga trial (Pasal 5.11).
 - Saldo boleh negatif saat koreksi, dipotong dari bagi hasil berikutnya
   (Pasal 5.7).
 
@@ -297,8 +302,7 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 5. Batas maksimum waktu pencairan dan biaya transfer (Pasal 6).
 6. Refund untuk sesi yang bagi hasilnya sudah masuk (Pasal 7.2).
 7. Insiden, jam pelaporan, asuransi (Pasal 8).
-8. Mekanisme pajak komisi afiliasi, paket trial dihitung "paket pertama"
-   atau tidak, sanksi (Pasal 11).
+8. Mekanisme pajak komisi afiliasi dan sanksi (Pasal 11).
 9. Jangka waktu dan pengakhiran (Pasal 10), forum sengketa (Pasal 12).
 10. Angka persentase coach/kolam/SPH per kolam (Pasal 5.3) dan tanya 3
     kolam soal 4 pertanyaan baru.
