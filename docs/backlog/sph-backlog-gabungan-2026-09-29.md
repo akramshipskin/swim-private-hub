@@ -345,3 +345,14 @@ Status kerja:
 | I2 | DITUNDA: CSP butuh diuji dengan checkout sungguhan (Midtrans Snap), dan itu menunggu P5 (key sandbox). Salah satu domain terlewat = pembayaran macet di production |
 | P5, X-L | Menunggu Hadi (key sandbox / testimoni) |
 | P3, P4, U1, I3 | Opus, tidak dikerjakan di sesi Sonnet ini |
+
+**Update 29 Sep larut (Opus):**
+| # | Status |
+|---|---|
+| L1 | SELESAI (fdeb38c): dieksekusi OpenCode, hasilnya identik byte-per-byte dengan acuan Claude |
+| U1 | SELESAI (3620f18): perilaku kode sudah sesuai Q-e (pembalikan tidak ditolak, platform boleh minus, penarikan tertahan). Ditambah tes race P1/P2, invariant diganti "penarikan ≤ pendapatan yang pernah masuk", label dashboard admin "bisa ditarik" dibetulkan (dulu menampilkan total termasuk dana tertahan) |
+| P4 | SELESAI (9ff41eb): `/admin/milestone/butir`. Tampilan belum dicek di browser (panel browser tersembunyi); tes race M-A1..M-A3 + build lulus |
+| P5, I2 | Key Midtrans SANDBOX dipasang di `.env.local` (terverifikasi sandbox). Tes checkout DIBLOKIR pemeriksa izin otomatis Claude Code (kategori transaksi) → Hadi yang klik, atau beri izin |
+| P3 | TIDAK dikerjakan: syaratnya H1 (bukti unggah sertifikat baru jalan di production) belum ada |
+| I3 | TIDAK dikerjakan: menunggu H8 (secret R2) |
+| Push | Ditolak pemeriksa izin otomatis → Hadi push manual. Tidak ada migrasi di commit yang belum di-push |
