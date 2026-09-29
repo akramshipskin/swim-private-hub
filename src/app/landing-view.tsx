@@ -10,6 +10,7 @@ import { CoachLeaders } from "./coach-leaders";
 import { LandingHeader } from "./landing-header";
 import { Reveal } from "@/components/ui/reveal";
 import { PAYMENT_METHODS } from "./landing-payments";
+import { TESTIMONIALS, TestimonialsSection } from "./landing-testimonials";
 
 // Struktur mengikuti referensi Stride (hero foto penuh, badan krem, kartu
 // kolam selang-seling, kartu coach, FAQ, CTA gelap). Semua angka & data
@@ -99,6 +100,10 @@ const FAQ_GROUPS: FaqGroup[] = [
         a: "Ya. Setiap sesi adalah 1 coach untuk 1 peserta, dijadwalkan khusus untuk peserta itu — bukan kelas gabungan atau grup.",
       },
       {
+        q: "Berapa lama satu sesi, dan perlu bawa apa?",
+        a: "Satu sesi berlangsung 60 menit. Perlengkapan renang seperti pelampung dan papan dibawa sendiri.",
+      },
+      {
         q: "Bagaimana kalau batal mendadak?",
         a: `Setiap paket punya jatah pembatalan mandiri, paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal. Di luar itu bisa menghubungi admin lewat tombol bantuan di aplikasi. Tidak hadir tanpa membatalkan berarti sesi tetap terpakai.`,
       },
@@ -138,7 +143,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Cara mencairkan saldo?",
-        a: `Isi rekening sekali di menu Saldo, lalu ajukan pencairan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Admin memproses transfer dan statusnya terlihat di riwayat pencairan.`,
+        a: `Isi rekening sekali di menu Saldo, lalu ajukan pencairan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Untuk saat ini pencairan diproses manual oleh admin, secepatnya, dan statusnya terlihat di riwayat pencairan.`,
       },
       {
         q: "Kalau saya tidak bisa mengajar?",
@@ -147,6 +152,10 @@ const FAQ_GROUPS: FaqGroup[] = [
       {
         q: "Saya bisa menentukan tarif saya sendiri?",
         a: "Tidak. Harga paket ditentukan per kolam — diusulkan pemilik kolam, disetujui admin. Bagianmu dihitung dari persentase komisi coach yang berlaku di kolam itu.",
+      },
+      {
+        q: "Ada biaya untuk bergabung?",
+        a: "Tidak ada biaya pendaftaran maupun langganan. Platform mengambil komisi dari setiap sesi yang terlaksana.",
       },
       {
         q: "Apa untungnya dibanding cari murid sendiri?",
@@ -160,7 +169,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: "Apa untungnya buat kolam saya?",
-        a: "Kamu bisa membuka jam kosong untuk les privat satuan (1 coach, 1 peserta — bukan sewa club), dan setiap sesi yang terlaksana memberi bagian ke kolam secara otomatis. Kamu juga bisa melihat jam ramai kolam setiap hari.",
+        a: "Kamu bisa membuka jam kosong untuk les privat satuan (1 coach, 1 peserta — bukan sewa club), dan setiap sesi yang terlaksana memberi bagian ke kolam secara otomatis. Kamu juga bisa melihat jam ramai kolam setiap hari. Kolammu tetap kolam umum: pengunjung dari mana pun tetap bisa masuk.",
       },
       {
         q: "Siapa yang menentukan harga paket?",
@@ -171,12 +180,16 @@ const FAQ_GROUPS: FaqGroup[] = [
         a: "Setiap sesi yang ditandai Hadir dibagi ke platform, coach, dan kolam sesuai persentase yang disepakati per kolam. Semua pihak melihat angka yang sama.",
       },
       {
+        q: "Ada biaya untuk bergabung?",
+        a: "Tidak ada biaya pendaftaran maupun langganan. Platform mengambil komisi dari setiap sesi yang terlaksana.",
+      },
+      {
         q: "Saya juga harus menyediakan coach?",
         a: "Tidak harus. Coach yang sudah terdaftar di platform bisa diafiliasikan ke kolam kamu; kamu tetap bisa memakai coach sendiri kalau punya.",
       },
       {
         q: "Cara gabung jadi mitra?",
-        a: "Daftar lewat halaman Daftarkan Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin, kolam kamu langsung bisa menerima booking. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
+        a: "Daftar lewat halaman Daftarkan Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin (diperiksa paling lambat 1×24 jam), kolam kamu langsung bisa menerima booking. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
       },
     ],
   },
@@ -431,6 +444,8 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
           <Link href="/daftar-coach" className="font-semibold text-fixed-ink underline">daftar di sini</Link>.
         </p>
       </section>
+
+      <TestimonialsSection items={TESTIMONIALS} />
 
       {/* FAQ per peran */}
       <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-36 md:scroll-mt-20 px-4 pb-20">
