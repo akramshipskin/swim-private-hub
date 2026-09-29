@@ -18,6 +18,8 @@ const STATUS_FILTERS = {
 } as const;
 type StatusKey = keyof typeof STATUS_FILTERS;
 
+export const metadata = { title: "Pencairan Saldo | Swim Private Hub" };
+
 export default async function AdminWithdrawalsPage({
   searchParams,
 }: {

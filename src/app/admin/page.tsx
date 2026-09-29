@@ -10,6 +10,8 @@ import { getPlatformBalance } from "@/lib/platform-wallet";
 
 // Dashboard admin: kondisi bisnis hari ini dalam 1 layar. Semua angka query
 // langsung (bukan cache). Detail lengkap lewat tautan "Selengkapnya".
+export const metadata = { title: "Dashboard Admin | Swim Private Hub" };
+
 export default async function AdminDashboardPage() {
   await requireRole("ADMIN");
 

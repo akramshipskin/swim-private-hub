@@ -5,6 +5,8 @@ import { updateBankInfo, requestWithdrawal } from "./actions";
 import { openNullable, openSecret } from "@/lib/secret-box";
 import { releaseDueCommissions } from "@/lib/affiliate";
 
+export const metadata = { title: "Saldo Kolam | Swim Private Hub" };
+
 export default async function PoolSaldoPage() {
   const session = await requireRole("POOL_OWNER");
   // Komisi afiliasi yang jatuh tempo masuk saldo sebelum saldo dibaca.

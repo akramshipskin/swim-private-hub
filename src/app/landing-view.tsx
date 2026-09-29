@@ -59,7 +59,7 @@ const AUDIENCES: AudienceSteps[] = [
     key: "coach",
     label: "Coach",
     steps: [
-      { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, upload foto dan sertifikat (boleh lebih dari satu) untuk badge Bersertifikat." },
+      { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, unggah foto dan sertifikat (boleh lebih dari satu) untuk badge Bersertifikat." },
       { title: "Buka jadwal per kolam", body: "Tentukan tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
       { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi, lalu isi catatan perkembangan (milestone) peserta." },
       { title: "Cairkan saldo", body: "Komisimu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening." },
@@ -160,11 +160,11 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Ada biaya untuk bergabung?",
-        a: "Tidak ada biaya pendaftaran maupun langganan. Platform mengambil komisi dari setiap sesi yang terlaksana.",
+        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. Platform mengambil komisi dari setiap sesi yang terlaksana.",
       },
       {
-        q: "Apa untungnya dibanding cari murid sendiri?",
-        a: "Jadwal, absensi, dan pembayaran diurus sistem. Kamu tinggal membuka jam kosong, mengajar, dan menandai kehadiran.",
+        q: "Apa untungnya dibanding cari peserta sendiri?",
+        a: "Jadwal, kehadiran, dan pembayaran diurus sistem. Kamu tinggal membuka jam kosong, mengajar, dan menandai kehadiran.",
       },
       {
         q: "Wajib isi catatan perkembangan peserta?",
@@ -190,7 +190,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Ada biaya untuk bergabung?",
-        a: "Tidak ada biaya pendaftaran maupun langganan. Platform mengambil komisi dari setiap sesi yang terlaksana.",
+        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. Platform mengambil komisi dari setiap sesi yang terlaksana.",
       },
       {
         q: "Saya juga harus menyediakan coach?",
@@ -234,7 +234,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
       <LandingHeader />
 
       <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-fixed-night text-white">
-        <div className="relative h-[52svh] min-h-[320px] overflow-hidden">
+        <div className="relative h-[40svh] min-h-[240px] overflow-hidden sm:h-[44svh] sm:min-h-[320px]">
           <Image
             src="/images/landing/hero-swim-v2.jpg"
             alt=""
@@ -253,31 +253,33 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
         {/* -mt-10svh: konten ketarik naik numpang 10svh ke atas foto, jadi
             headline balik ke posisi semula sementara BG foto manjang sampai
             garis ijo. relative+z-10 biar teks di atas foto. */}
-        <div className="relative z-10 mx-auto -mt-[10svh] flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 py-10 text-center">
+        <div className="relative z-10 mx-auto -mt-[8svh] flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 py-6 text-center sm:-mt-[10svh] sm:py-10">
           <p className="rounded-full border border-white/30 px-4 py-1.5 text-sm">
             {showStats ? `Les renang privat · ${stats.poolCount} kolam mitra · ${stats.coachCount} coach` : "Les renang privat"}
           </p>
-          <h1 className="mt-5 max-w-3xl text-[length:min(7vw,3.75rem)] font-semibold leading-[1.08] tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
+          <h1 className="mt-4 max-w-3xl sm:mt-5 text-[length:min(7vw,3.75rem)] font-semibold leading-[1.08] tracking-tight drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)]">
             <span className="block">Aplikasi les renang privat.</span>
             <span className="block">Pilih coach, pilih kolam,</span>
             <span className="block">dan pilih jamnya.</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-white/85">
-            Anak (atau kamu) belajar berenang dengan coach yang dipilih sendiri, di kolam dekat rumah, di jam yang cocok. Perkembangannya tercatat, pembayarannya jelas, semua dalam satu aplikasi.
+          <p className="mt-4 max-w-xl text-base text-white/85 sm:mt-5 sm:text-lg">
+            Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam dekat rumah. Perkembangan tercatat, pembayaran jelas.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mt-6 flex flex-wrap justify-center gap-3 sm:mt-8">
             <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold text-fixed-ink hover:bg-fixed-lime-100">
-              Daftar gratis sebagai member
+              Daftar gratis
             </Link>
             <a href="#kolam" className="rounded-full border border-white/40 px-6 py-3 text-base font-semibold hover:bg-white/10">
               Lihat kolam
             </a>
           </div>
-          <p className="mt-4 text-sm text-white/75">
-            Coach?{" "}
-            <Link href="/daftar-coach" className="font-semibold text-white underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar jadi coach</Link>
-            {" · "}Punya kolam?{" "}
-            <Link href="/daftar-kolam" className="font-semibold text-white underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftarkan kolam</Link>
+          <p className="mt-1 flex flex-wrap justify-center gap-x-6 text-sm text-white/75 sm:mt-3">
+            <span className="inline-flex min-h-[44px] items-center gap-1.5">
+              Coach? <Link href="/daftar-coach" className="font-semibold text-white underline">Daftar jadi coach</Link>
+            </span>
+            <span className="inline-flex min-h-[44px] items-center gap-1.5">
+              Punya kolam? <Link href="/daftar-kolam" className="font-semibold text-white underline">Daftarkan kolam</Link>
+            </span>
           </p>
         </div>
 
@@ -333,7 +335,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             {pools.map((p, i) => (
               <Reveal key={p.id} delay={i * 60}>
                 <article className="grid overflow-hidden rounded-3xl bg-white md:grid-cols-2">
-                  <div className={`relative flex min-h-64 items-end bg-fixed-lime-100 p-8 ${i % 2 === 1 ? "md:order-2" : ""}`}>
+                  <div className={`relative flex items-end bg-fixed-lime-100 p-8 ${p.photos[0] ? "min-h-64" : "min-h-36 md:min-h-64"} ${i % 2 === 1 ? "md:order-2" : ""}`}>
                     {p.photos[0] && (
                       <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}

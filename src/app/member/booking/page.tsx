@@ -7,6 +7,8 @@ import { dropInPrice } from "@/lib/drop-in";
 import { REGULAR_TEMPLATE_WHERE } from "@/lib/trial";
 import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
 
+export const metadata = { title: "Booking Coach | Swim Private Hub" };
+
 export default async function MemberBookingPage() {
   const session = await requireRole("MEMBER");
 

@@ -8,6 +8,8 @@ import { releaseDueCommissions } from "@/lib/affiliate";
 import { AffiliateCard } from "@/components/affiliate-card";
 import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
 
+export const metadata = { title: "Dashboard Coach | Swim Private Hub" };
+
 export default async function CoachDashboardPage() {
   const session = await requireRole("COACH");
   const todayStr = todayWibDateString();

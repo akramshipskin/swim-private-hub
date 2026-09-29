@@ -23,6 +23,8 @@ const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] 
   { role: "POOL_OWNER", label: "Pemilik Kolam" },
 ];
 
+export const metadata = { title: "Kelola Pengguna | Swim Private Hub" };
+
 export default async function AdminUsersPage() {
   const session = await requireRole("ADMIN");
 
@@ -63,7 +65,7 @@ export default async function AdminUsersPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola User</h1>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola Pengguna</h1>
 
       <PendingCertificates />
 

@@ -111,7 +111,7 @@ export async function createUser(
   revalidatePath("/admin/users");
   // Bukan null: null = keadaan awal form, jadi dulu sukses tidak terlihat
   // (form tetap terisi, admin mengira gagal lalu kirim ulang -> "sudah terdaftar").
-  return { success: `Akun ${name} dibuat.${role === "MEMBER" ? " Wajib ganti password saat login pertama." : ""}` };
+  return { success: `Akun ${name} dibuat.${role === "MEMBER" ? " Wajib ganti password saat masuk pertama." : ""}` };
 }
 
 const IMPORT_DEFAULT_JATAH_CANCEL = 2;

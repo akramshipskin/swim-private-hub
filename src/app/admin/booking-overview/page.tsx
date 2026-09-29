@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { NOT_CLOSED } from "@/lib/availability";
 import BookingOverviewBoard from "./booking-overview-board";
 
+export const metadata = { title: "Jadwal Booking | Swim Private Hub" };
+
 export default async function AdminBookingOverviewPage() {
   await requireRole("ADMIN");
 

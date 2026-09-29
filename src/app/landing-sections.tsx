@@ -8,15 +8,26 @@ import Link from "next/link";
 
 type Point = { title: string; body: string };
 
+// Enam poin ditata sebagai bento tiga kolom di layar lebar: 2+1, 1+2, 2+1.
+// Sel lebar dibedakan warnanya supaya bukan enam kartu kembar. Di bawah lg
+// semua sel selebar satu kolom. Jumlah sel = jumlah poin (tanpa sel kosong).
+const WIDE_CELLS = new Set([0, 3, 4]);
+
 function PointGrid({ points, dark = false }: { points: Point[]; dark?: boolean }) {
   return (
     <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {points.map((p) => (
-        <li key={p.title} className={`rounded-2xl p-6 ${dark ? "bg-white/[0.07] ring-1 ring-white/15" : "bg-white"}`}>
-          <h3 className={`text-lg font-semibold ${dark ? "text-white" : "text-fixed-ink"}`}>{p.title}</h3>
-          <p className={`mt-2 text-sm ${dark ? "text-white/75" : "text-fixed-muted"}`}>{p.body}</p>
-        </li>
-      ))}
+      {points.map((p, i) => {
+        const wide = WIDE_CELLS.has(i);
+        const tone = dark
+          ? wide ? "bg-white/[0.13] ring-1 ring-white/25" : "bg-white/[0.07] ring-1 ring-white/15"
+          : wide ? "bg-fixed-lime-100" : "bg-white";
+        return (
+          <li key={p.title} className={`rounded-2xl p-6 ${wide ? "lg:col-span-2 lg:p-8" : ""} ${tone}`}>
+            <h3 className={`font-semibold ${wide ? "text-lg lg:text-2xl" : "text-lg"} ${dark ? "text-white" : "text-fixed-ink"}`}>{p.title}</h3>
+            <p className={`mt-2 text-sm ${wide ? "lg:max-w-xl lg:text-base" : ""} ${dark ? "text-white/75" : wide ? "text-fixed-ink-soft" : "text-fixed-muted"}`}>{p.body}</p>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -31,7 +42,7 @@ const ROLES = [
   {
     href: "#untuk-coach",
     label: "Coach",
-    line: "Jadwal, absensi, dan bayaran diurus sistem. Kamu fokus mengajar.",
+    line: "Jadwal, kehadiran, dan saldo diurus sistem. Kamu fokus mengajar.",
     cta: "Lihat untuk coach",
   },
   {
@@ -113,7 +124,7 @@ export function BeforeAfter() {
       </div>
       <div className="mt-8 text-center">
         <Link href="/register" className="inline-block rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white hover:bg-fixed-ink-deep">
-          Coba sekarang, daftar gratis
+          Daftar gratis
         </Link>
       </div>
     </section>
@@ -185,7 +196,7 @@ export function ParentSection() {
 
         <div className="mt-10 text-center">
           <Link href="/register" className="inline-block rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white hover:bg-fixed-ink-deep">
-            Daftar gratis sebagai member
+            Daftar gratis
           </Link>
         </div>
       </div>
@@ -195,7 +206,7 @@ export function ParentSection() {
 
 const COACH_POINTS: Point[] = [
   {
-    title: "Jadwal, absensi, dan bayaran otomatis",
+    title: "Jadwal, kehadiran, dan saldo otomatis",
     body: "Buka jam kosong per kolam, tandai kehadiran, dan saldomu langsung bertambah. Tidak ada tagih-menagih.",
   },
   {
@@ -203,12 +214,12 @@ const COACH_POINTS: Point[] = [
     body: "Tiket masuk kolam untuk mengajar tidak ditagihkan kepadamu.",
   },
   {
-    title: "Murid tidak datang, kamu tetap dibayar",
+    title: "Peserta tidak datang, kamu tetap dibayar",
     body: "Peserta sudah booking tapi tidak datang? Kamu tetap mendapat 50% dari bagianmu untuk sesi itu.",
   },
   {
-    title: "Bawa murid sendiri",
-    body: "Setiap coach punya kode afiliasi. Murid yang mendaftar memakai kodemu tercatat sebagai rujukanmu, dan kamu mendapat komisi afiliasi dari bagian SPH, bukan dari muridmu.",
+    title: "Ajak peserta sendiri",
+    body: "Setiap coach punya kode afiliasi. Member yang mendaftar memakai kodemu tercatat sebagai rujukanmu, dan kamu mendapat komisi afiliasi dari bagian SPH, bukan dari member.",
   },
   {
     title: "Kredensialmu tampil profesional",
@@ -230,7 +241,7 @@ export function CoachSection() {
             Kamu fokus mengajar. Sisanya diurus sistem.
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-base text-white/75">
-            Kami tidak menjanjikan murid instan. Member memilih coach dari profilnya, jadi makin lengkap keahlian,
+            Kami tidak menjanjikan peserta instan. Member memilih coach dari profilnya, jadi makin lengkap keahlian,
             sertifikat, dan jadwalmu, makin besar peluang kamu dipilih.
           </p>
         </div>
@@ -252,7 +263,7 @@ export function CoachSection() {
 const POOL_POINTS: Point[] = [
   {
     title: "Gabung gratis",
-    body: "Tanpa biaya pendaftaran maupun langganan. Platform hanya mengambil komisi dari sesi yang terlaksana.",
+    body: "Tanpa biaya pendaftaran maupun biaya bulanan. Platform hanya mengambil komisi dari sesi yang terlaksana.",
   },
   {
     title: "Bagi hasil setiap sesi Hadir",
@@ -267,7 +278,7 @@ const POOL_POINTS: Point[] = [
     body: "Tiket masuk peserta tercakup di bagian kolam dari harga paket, jadi tidak ada penagihan terpisah di loket.",
   },
   {
-    title: "Ajak pelanggan sendiri",
+    title: "Ajak member sendiri",
     body: "Kolam punya kode afiliasi. Member yang mendaftar memakai kode kolammu tercatat sebagai rujukan kolam, dan kolam mendapat komisi afiliasi dari bagian SPH.",
   },
   {
@@ -285,8 +296,8 @@ export function PoolSection({ waLink }: { waLink: string }) {
           Jam sepi kolammu, jadi les privat yang terjadwal.
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-base text-fixed-muted">
-          Kolam tetap kolam umum. Les privat mengisi jam kosong tanpa kamu mengurus pelatih atau pembayaran. SPH
-          memperkenalkan kolammu kepada orang tua yang mencari les renang di aplikasi, tanpa menjanjikan jumlah pelanggan.
+          Kolam tetap kolam umum. Les privat mengisi jam kosong tanpa kamu mengurus coach atau pembayaran. SPH
+          memperkenalkan kolammu kepada orang tua yang mencari les renang di aplikasi, tanpa menjanjikan jumlah member.
         </p>
       </div>
       <PointGrid points={POOL_POINTS} />

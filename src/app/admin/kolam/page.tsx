@@ -11,6 +11,8 @@ import PoolInfoForm from "@/components/pool-info-form";
 import { PoolPhotosForm } from "@/components/pool-photos-form";
 import { isStorageConfigured } from "@/lib/storage";
 
+export const metadata = { title: "Kelola Kolam | Swim Private Hub" };
+
 export default async function AdminKolamPage() {
   await requireRole("ADMIN");
 

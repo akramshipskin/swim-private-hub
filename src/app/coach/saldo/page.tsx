@@ -8,6 +8,8 @@ import { getOverdueParticipants } from "@/lib/milestone-hold";
 import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
 import { releaseDueCommissions } from "@/lib/affiliate";
 
+export const metadata = { title: "Saldo Coach | Swim Private Hub" };
+
 export default async function CoachSaldoPage() {
   const session = await requireRole("COACH");
   // Komisi afiliasi yang jatuh tempo masuk saldo sebelum saldo dibaca.

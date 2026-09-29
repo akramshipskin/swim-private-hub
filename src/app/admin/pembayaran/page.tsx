@@ -40,6 +40,8 @@ function formatTimeWib(d: Date) {
   return d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" });
 }
 
+export const metadata = { title: "Uang Masuk | Swim Private Hub" };
+
 export default async function AdminPembayaranPage({
   searchParams,
 }: {

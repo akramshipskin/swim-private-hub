@@ -8,6 +8,8 @@ import { Avatar } from "@/components/ui/avatar";
 import { coachBioLine } from "@/lib/coach-bio";
 import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
+export const metadata = { title: "Coach di Kolam | Swim Private Hub" };
+
 export default async function PoolCoachPage() {
   const session = await requireRole("POOL_OWNER");
   const startMonth = wibDateTime(`${todayWibDateString().slice(0, 7)}-01`, "00:00");

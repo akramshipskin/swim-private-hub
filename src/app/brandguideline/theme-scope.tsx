@@ -22,7 +22,7 @@ const THEME_VARS: Record<"light" | "dark", CSSProperties> = {
     "--color-accent-50": "#fff1f2",
     "--color-accent-100": "#ffe4e6",
     "--color-accent-500": "#f43f5e",
-    "--color-accent-600": "#e11d48",
+    "--color-accent-600": "#be123c",
     "--color-surface": "#ffffff",
     "--color-surface-muted": "#ece9dc",
     "--color-border": "#dedaca",

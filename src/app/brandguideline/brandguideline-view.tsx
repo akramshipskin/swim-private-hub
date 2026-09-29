@@ -146,7 +146,7 @@ export default function BrandGuidelineView() {
             <a
               key={item.href}
               href={item.href}
-              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-muted hover:border-brand-500 hover:text-text max-sm:min-h-[36px] max-sm:inline-flex max-sm:items-center"
+              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-muted hover:border-brand-500 hover:text-text max-sm:min-h-[44px] max-sm:inline-flex max-sm:items-center"
             >
               {item.label}
             </a>
@@ -398,6 +398,7 @@ export default function BrandGuidelineView() {
                   ["Sudut kecil", "8px (rounded-lg)", "Tombol kecil, chip"],
                   ["Sudut standar", "12px (rounded-xl)", "Tombol, input, dialog"],
                   ["Sudut kartu", "16px (rounded-2xl)", "Card, panel"],
+                  ["Sudut besar (marketing)", "24px (rounded-3xl)", "Kartu landing, kartu foto kolam, tangkapan layar produk"],
                   ["Pil", "rounded-full", "Badge, CTA marketing"],
                   ["Padding kartu", "16px (HP) / 20px (≥640px)", "CardBody"],
                   ["Jarak halaman", "16px (HP), 32px (≥1024px)", "Sisi kiri-kanan konten"],

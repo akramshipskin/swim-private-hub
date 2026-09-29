@@ -41,7 +41,7 @@ export default async function AdminMilestonePage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Milestone</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Usulan butir dari coach dan catatan perkembangan terbaru. Detail tiap peserta bisa dibuka dari sini atau dari halaman user member.
+        Usulan butir dari coach dan catatan perkembangan terbaru. Detail tiap peserta bisa dibuka dari sini atau dari halaman pengguna member.
       </p>
       <Link href="/admin/milestone/butir" className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline">
         Kelola butir standar →

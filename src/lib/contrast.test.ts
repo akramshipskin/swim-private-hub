@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { contrastRatio, wcagLevel } from "./contrast";
+import { DARK_CONTRAST_PAIRS, LIGHT_CONTRAST_PAIRS } from "../app/brandguideline/data";
 
 describe("contrastRatio", () => {
   it("gives 21:1 for pure black on pure white (max possible ratio)", () => {
@@ -46,3 +47,21 @@ describe("wcagLevel", () => {
     expect(wcagLevel(1)).toBe("fail");
   });
 });
+
+// Semua pasangan teks/latar yang dipublikasikan di /brandguideline harus lulus
+// batas teks biasa 4,5:1. Pasangan rose lama (#E11D48 di #FFF1F2) hanya 4,3:1
+// dan lolos tanpa diketahui sebelum tes ini ada (temuan 30 Sep).
+describe("pasangan warna brand yang dipublikasikan", () => {
+  it.each([...LIGHT_CONTRAST_PAIRS.map((p) => ["terang", p] as const), ...DARK_CONTRAST_PAIRS.map((p) => ["gelap", p] as const)])(
+    "tema %s: %o >= 4,5:1",
+    (_theme, pair) => {
+      expect(contrastRatio(pair.fg, pair.bg)).toBeGreaterThanOrEqual(4.5);
+    },
+  );
+
+  it("nilai rose lama memang di bawah batas (bukti tes ini menangkap bugnya)", () => {
+    expect(contrastRatio("#E11D48", "#FFF1F2")).toBeLessThan(4.5);
+    expect(contrastRatio("#BE123C", "#FFF1F2")).toBeGreaterThanOrEqual(5.5);
+  });
+});
+

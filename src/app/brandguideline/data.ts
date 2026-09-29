@@ -18,7 +18,7 @@ export const LIGHT_CONTRAST_PAIRS: ContrastPair[] = [
   { label: "Sukses", fg: "#047857", bg: "#ECFDF5" },
   { label: "Peringatan", fg: "#A8480A", bg: "#FFFBEB" },
   { label: "Bahaya", fg: "#B91C1C", bg: "#FEF2F2" },
-  { label: "Rose (Populer)", fg: "#E11D48", bg: "#FFF1F2" },
+  { label: "Rose (Populer)", fg: "#BE123C", bg: "#FFF1F2" },
   { label: "Teks putih di tombol WhatsApp", fg: "#FFFFFF", bg: "#0F7A3C" },
   { label: "Teks charcoal di CTA marketing", fg: "#14140F", bg: "#9FCC1F" },
   { label: "Teks charcoal di lime penuh", fg: "#14140F", bg: "#C6FF3D" },
@@ -50,6 +50,7 @@ export const OLD_KIT_CONTRAST_PAIRS: ContrastPair[] = [
   { label: "Peringatan versi kit lama (#B4770E)", fg: "#B4770E", bg: "#FFFFFF" },
   { label: "Bahaya versi kit lama (#C23B3B)", fg: "#C23B3B", bg: "#FFFFFF" },
   { label: "Teks samar versi kit lama (#8B8770)", fg: "#8B8770", bg: "#FFFFFF" },
+  { label: "Rose (Populer) sebelum 30 Sep (#E11D48) sebagai teks 12px", fg: "#E11D48", bg: "#FFF1F2" },
   { label: "Lime Dark versi kit lama (#6F8F1E) sebagai teks", fg: "#6F8F1E", bg: "#FFFFFF" },
 ];
 
@@ -92,6 +93,7 @@ export const CHANGELOG_ROWS = [
     v2: "Sukses #047857, peringatan #A8480A, bahaya #B91C1C — versi lama gagal batas keterbacaan",
   },
   { hal: "Teks samar", v1: "#8B8770 (3,6:1 di putih)", v2: "#6C6957 (5,5:1 di putih)" },
+  { hal: "Teks aksen rose (badge Populer, Trial)", v1: "#E11D48 (4,3:1 di #FFF1F2)", v2: "#BE123C (5,7:1), diubah 30 Sep 2026 karena di bawah batas 4,5:1" },
   {
     hal: "Palet",
     v1: "4 warna inti + 4 status",

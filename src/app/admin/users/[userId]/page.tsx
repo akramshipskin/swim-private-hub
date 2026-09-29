@@ -18,7 +18,7 @@ import AnonymizeCard from "./anonymize-card";
 import ResetTotpButton from "./reset-totp-button";
 import { openSecret } from "@/lib/secret-box";
 
-export const metadata = { title: "Detail User | Swim Private Hub" };
+export const metadata = { title: "Detail Pengguna | Swim Private Hub" };
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -108,7 +108,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <Link href="/admin/users" className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
-        ← Kembali ke Kelola User
+        ← Kembali ke Kelola Pengguna
       </Link>
 
       <div className="mt-3 flex flex-wrap items-start justify-between gap-4">

@@ -277,7 +277,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
           <p className="mt-5 text-center text-sm text-text-muted">
             Sudah punya akun?{" "}
             <a href="/login" className="font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
-              Login
+              Masuk
             </a>
           </p>
         </CardBody>

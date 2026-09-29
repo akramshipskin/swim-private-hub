@@ -8,6 +8,8 @@ import { BentoCard, Stat } from "@/components/dashboard";
 import { AffiliateCard } from "@/components/affiliate-card";
 import { releaseDueCommissions } from "@/lib/affiliate";
 
+export const metadata = { title: "Dashboard Kolam | Swim Private Hub" };
+
 export default async function PoolDashboardPage() {
   const session = await requireRole("POOL_OWNER");
   const todayStr = todayWibDateString();

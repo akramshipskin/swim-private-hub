@@ -13,6 +13,8 @@ function time(d: Date) {
 
 const BOX_TABS = ["Semua", ...INBOX_ADDRESSES] as const;
 
+export const metadata = { title: "Email | Swim Private Hub" };
+
 export default async function AdminEmailPage({ searchParams }: { searchParams: Promise<{ t?: string; box?: string }> }) {
   await requireRole("ADMIN");
   const { t, box } = await searchParams;

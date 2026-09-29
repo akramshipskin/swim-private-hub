@@ -32,6 +32,8 @@ function toDateLabelFromDate(d: Date) {
 // yang menunggu pembayaran tapi sudah tidak bisa dibayar lagi.
 const PAYMENT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
+export const metadata = { title: "Paket Saya | Swim Private Hub" };
+
 export default async function MemberPaketPage() {
   const session = await requireRole("MEMBER");
   const now = new Date();

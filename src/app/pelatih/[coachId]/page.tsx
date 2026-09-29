@@ -170,7 +170,7 @@ export default async function CoachShortcutPage({
       </p>
       {!session && (
         <Link href="/register" className={buttonClass({ className: "mt-3" })}>
-          Daftar sekarang
+          Daftar gratis
         </Link>
       )}
     </main>

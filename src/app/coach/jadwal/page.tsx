@@ -9,6 +9,8 @@ import { formatDateLabel, formatTimeWib, dateLabel, todayWibDateString } from "@
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+export const metadata = { title: "Jadwal Saya | Swim Private Hub" };
+
 export default async function CoachJadwalPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = (await searchParams).q ?? "";
   const session = await requireRole("COACH");

@@ -6,6 +6,8 @@ import { BentoCard, Stat, SessionList } from "@/components/dashboard";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
 
+export const metadata = { title: "Dashboard | Swim Private Hub" };
+
 export default async function MemberDashboardPage() {
   const session = await requireRole("MEMBER");
   const today = dateLabel(todayWibDateString());

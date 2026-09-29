@@ -6,6 +6,8 @@ import { createPoolTemplate, updatePoolTemplate } from "./actions";
 import { formatRupiah } from "@/lib/format";
 import type { PendingTemplateChange } from "@/lib/package-template";
 
+export const metadata = { title: "Paket & Harga | Swim Private Hub" };
+
 export default async function PoolPaketPage() {
   const session = await requireRole("POOL_OWNER");
   const pools = await prisma.pool.findMany({

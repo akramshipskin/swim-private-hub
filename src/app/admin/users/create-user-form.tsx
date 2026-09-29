@@ -36,7 +36,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
   return (
     <Card>
       <CardBody>
-        <h2 className="mb-4 text-sm font-semibold text-text">Tambah User Baru</h2>
+        <h2 className="mb-4 text-sm font-semibold text-text">Tambah Pengguna Baru</h2>
         <form key={formKey} action={formAction} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Nama">
             <Input
@@ -56,7 +56,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
           <Field label="Password">
             <PasswordInput name="password" required minLength={8} className="w-full" />
           </Field>
-          <Field label="Role">
+          <Field label="Peran">
             <Select
               name="role"
               required
@@ -166,7 +166,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
 
           <div className="col-span-1 sm:col-span-2">
             <Button type="submit" loading={pending} className="w-full sm:w-auto">
-              Tambah User
+              Tambah Pengguna
             </Button>
           </div>
         </form>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import LoginForm from "./login-form";
 
 export const metadata: Metadata = {
-  title: "Login | Swim Private Hub",
+  title: "Masuk | Swim Private Hub",
   description: "Masuk ke akunmu untuk memilih coach, kolam, dan jam les renang privat.",
 };
 

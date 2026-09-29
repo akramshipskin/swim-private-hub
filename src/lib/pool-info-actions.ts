@@ -39,6 +39,8 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
   const openTime = str("openTime");
   const closeTime = str("closeTime");
   if (description.length > 1000) return { error: "Deskripsi maksimal 1000 karakter." };
+  if (address.length > 300) return { error: "Alamat maksimal 300 karakter." };
+  if (contactPhone.length > 20) return { error: "No. telepon maksimal 20 karakter." };
   if ((openTime && !TIME.test(openTime)) || (closeTime && !TIME.test(closeTime))) {
     return { error: "Format jam harus JJ:MM, misal 06:00." };
   }

@@ -32,7 +32,7 @@ export default function ResetPasswordButton({
   }
 
   const waMessage = tempPassword
-    ? `Halo ${userName}, password akun Swim Private Hub kamu sudah direset admin.\n\nLogin: ${loginId}\nPassword sementara: ${tempPassword}\n\nSaat login, kamu akan diminta membuat password baru.`
+    ? `Halo ${userName}, password akun Swim Private Hub kamu sudah direset admin.\n\nNo HP/email untuk masuk: ${loginId}\nPassword sementara: ${tempPassword}\n\nSaat masuk, kamu akan diminta membuat password baru.`
     : "";
 
   return (

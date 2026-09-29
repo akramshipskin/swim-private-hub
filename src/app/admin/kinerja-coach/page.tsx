@@ -6,6 +6,8 @@ import { Field } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 
+export const metadata = { title: "Kinerja Coach | Swim Private Hub" };
+
 export default async function KinerjaCoachPage({
   searchParams,
 }: {

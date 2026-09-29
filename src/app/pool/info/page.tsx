@@ -5,6 +5,8 @@ import PoolInfoForm from "@/components/pool-info-form";
 import { PoolPhotosForm } from "@/components/pool-photos-form";
 import { isStorageConfigured } from "@/lib/storage";
 
+export const metadata = { title: "Info Kolam | Swim Private Hub" };
+
 export default async function PoolInfoPage() {
   const session = await requireRole("POOL_OWNER");
   const pools = await prisma.pool.findMany({

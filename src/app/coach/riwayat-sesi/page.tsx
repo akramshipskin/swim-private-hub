@@ -7,6 +7,8 @@ import { Card, CardBody } from "@/components/ui/card";
 import AttendanceToggle from "@/components/attendance-toggle";
 import { ATTENDANCE_MARK_WINDOW_HOURS, NO_SHOW_COACH_SHARE_PERCENT, coachCanMarkAttendance } from "@/lib/policy";
 
+export const metadata = { title: "Riwayat Sesi | Swim Private Hub" };
+
 export default async function CoachRiwayatSesiPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = (await searchParams).q ?? "";
   const session = await requireRole("COACH");

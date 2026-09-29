@@ -13,6 +13,8 @@ function time(d: Date) {
   return d.toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" });
 }
 
+export const metadata = { title: "Pesan | Swim Private Hub" };
+
 export default async function AdminPesanPage({ searchParams }: { searchParams: Promise<{ t?: string }> }) {
   await requireRole("ADMIN");
   const { t } = await searchParams;

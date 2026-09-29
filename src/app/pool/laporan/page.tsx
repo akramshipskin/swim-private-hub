@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 //
 // Nilai sesi = harga paket berbayar / totalSesi. Bagian kolam & coach diambil
 // dari ledger (yang benar-benar dikredit), sama seperti halaman Bagi Hasil admin.
+export const metadata = { title: "Laporan Kolam | Swim Private Hub" };
+
 export default async function PoolLaporanPage({
   searchParams,
 }: {

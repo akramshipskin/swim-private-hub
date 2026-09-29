@@ -23,6 +23,8 @@ const statusLabel: Record<string, string> = {
   COMPLETED: "Selesai",
 };
 
+export const metadata = { title: "Riwayat Booking | Swim Private Hub" };
+
 export default async function MemberRiwayatPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = (await searchParams).q ?? "";
   const session = await requireRole("MEMBER");

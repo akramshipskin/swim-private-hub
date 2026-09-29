@@ -12,6 +12,8 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 // Jadwal per jam buat pemilik kolam: jam mana dipakai les privat (dan oleh
 // siapa), jam mana ada slot kosong, jam mana tidak ada les sama sekali.
+export const metadata = { title: "Jadwal Kolam | Swim Private Hub" };
+
 export default async function PoolJadwalPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
   const session = await requireRole("POOL_OWNER");
   const { date } = await searchParams;

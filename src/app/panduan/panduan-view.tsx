@@ -329,7 +329,7 @@ export default function PanduanView() {
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold hover:bg-fixed-lime-100">
-                Coba jadi member
+                Daftar gratis
               </Link>
               <a
                 href={OWNER_WA_LINK}
