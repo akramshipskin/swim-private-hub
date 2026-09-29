@@ -104,8 +104,8 @@ tanggung jawab, dan kewajiban perizinan.]
    uangnya tetap di SPH; kepatutan bagi konsumen perlu dicek reviewer]. [CATATAN: saat ini sistem tidak memindahkan uang sesi
    yang hangus ke Coach atau Kolam Mitra; uang tersebut tetap di SPH.]
 8. Harga paket sudah termasuk tiket masuk kolam untuk Peserta. Pendamping
-   yang tidak berenang ([ISI HADI: 1 atau 2 orang, mengikuti ketentuan
-   kolam]) tidak dikenakan tiket. Perlengkapan renang (misalnya pelampung
+   yang tidak berenang (1 orang pada satu waktu, boleh bergantian) tidak
+   dikenakan tiket. Perlengkapan renang (misalnya pelampung
    dan papan) dibawa sendiri oleh Peserta.
 
 **3. Pemesanan dan Pembatalan**
@@ -197,7 +197,7 @@ peserta; batas 24 jam coach; laporan member 3 hari; kode afiliasi opsional.
 Masih kosong:
 1. Nama penyelenggara (PT Perorangan, proses pendirian) dan penandatangan.
 2. Nasib sisa Sesi saat paket berakhir: konfirmasi hangus tanpa refund.
-3. Jumlah pendamping gratis (1 atau 2).
+3. (Sudah diputuskan: pendamping gratis 1 orang, boleh bergantian.)
 4. Larangan transaksi di luar Aplikasi untuk Member: jangka waktu & akibat.
 5. Asuransi dan batas tanggung jawab SPH.
 6. Perlakuan laporan Tidak Hadir setelah 3 hari.
@@ -215,7 +215,7 @@ Masih kosong:
 4. Keberlakuan klausul anti-transaksi-luar terhadap konsumen.
 5. Kepatutan sesi hangus tanpa pengembalian dana bagi konsumen.
 6. Batas 3 hari untuk laporan Tidak Hadir dan penolakan laporan lewat batas.
-7. Komisi afiliasi: perlakuan pajak bagi penerima (Hadi berpendapat tidak
-   kena pajak; belum diverifikasi) dan kewajiban pemotongan oleh SPH.
+7. Komisi afiliasi: pajak ditanggung SPH (keputusan Hadi); besar dan
+   kewajiban pemotongan/penyetoran perlu dikonfirmasi akuntan.
 8. Batas pelepasan tanggung jawab SPH sebagai "penyedia platform" padahal
    SPH memegang dana dan mempertemukan para pihak.

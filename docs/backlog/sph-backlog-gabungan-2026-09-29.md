@@ -168,21 +168,25 @@ dan tabel baru = Opus + konfirmasi; migrasi production dijalankan Hadi sebelum p
 | Bug ganti nama Profil tidak ikut nama peserta diri sendiri (OpenCode batch-7) | SELESAI (0711906), divalidasi, sudah di-push Hadi |
 | Draft MOU, perjanjian coach, S&K v2, dokumen desain | DIPERBARUI 29 Sep malam sesuai keputusan di bawah |
 | Simulasi pendapatan kolam | DOKUMEN JADI: `docs/designs/simulasi-pendapatan-kolam.md` |
+| Sembunyikan harga per sesi (OpenCode batch-8) | SELESAI (6151032), divalidasi |
 
 ### 10.2 Diputuskan, belum dikerjakan
 | # | Item | Keputusan | Owner / Gear | Syarat |
 |---|---|---|---|---|
-| A | Coach tandai hadir maksimal 24 jam setelah sesi; admin bebas | Diputuskan. Detail menunggu konfirmasi: 24 jam dihitung dari jam sesi selesai; lewat batas hanya admin, coach tidak dibayar sampai admin menandai | Opus | Konfirmasi detail |
-| B | Saldo platform "aman ditarik" H+3 | Hanya uang dari sesi yang sudah lewat 3 hari yang boleh ditarik; berlaku untuk saldo platform saja (usulan); PPN ditahan (usulan) | Opus | Konfirmasi 2 usulan |
+| A | Coach tandai hadir maksimal 24 jam setelah sesi; admin bebas | Diputuskan lengkap (dikonfirmasi Hadi 29 Sep): 24 jam dari jam sesi selesai; lewat batas hanya admin; coach tidak dibayar sampai admin menandai | Opus | — |
+| B | Saldo platform "aman ditarik" H+3 | Diputuskan lengkap (dikonfirmasi): hanya uang dari sesi yang sudah lewat 3 hari; hanya saldo platform (coach/kolam tetap); PPN mengendap di saldo dan tidak ikut bisa ditarik (usulan pelepasan: penarikan bertanda setor pajak + bukti transfer). Apakah SPH PKP / PPN wajib disetor → akuntan | Opus | — |
 | C | Penarikan platform wajib bukti transfer (1.2) | Diputuskan (A) | Opus | — |
-| D | Peserta booking tidak datang | Coach 50% dari bagian coach; kolam Rp0; sisanya SPH; sesi hangus tidak dibayar | Opus | Perlu ubah aturan uang + PPN cek akuntan |
+| D | Peserta booking tidak datang | Coach 50% dari bagian coach masuk saldo LANGSUNG seperti sesi Hadir (dikonfirmasi); kolam Rp0; sisanya SPH; sesi hangus tidak dibayar | Opus | Perlu ubah aturan uang; PPN atas selisih → akuntan |
 | E | Tombol Laporkan (member, hanya status Tidak Hadir, maks 3 hari) | Diputuskan; S&K ikut (draft v2 sudah memuat) | Opus (booking/uang) + Sonnet (teks) | Bareng A dan D |
-| F | Komisi afiliasi: kode singkat per coach dan per kolam, satu kali per member baru | Diputuskan sebagian | Opus (tabel + uang) | Dasar hitung (10% paket pertama atau nilai satu sesi) dan waktu kredit |
-| G | Trial: paket trial berbayar (opsi B) | Diputuskan; penanda di template paket, member baru, 1 kali per anak | Opus (tabel) | Harga trial dan siapa menanggung diskon |
+| F | Komisi afiliasi | Diputuskan: kode singkat per coach dan per kolam (diisi di form daftar member); satu kali per member baru; 5% dari harga paket pertama (kolam = coach); cair setelah sesi pertama Hadir + 3 hari; pajak ditanggung SPH | Opus (tabel + uang) | Paket trial dihitung "paket pertama"? Mekanisme pajak → akuntan |
+| G | Trial: paket trial berbayar (opsi B) | Diputuskan; penanda di template paket, member baru, 1 kali per anak; harga trial diatur SPH (admin) per kolam | Opus (tabel) | Siapa menanggung diskon (default: persen bagi hasil tetap normal) |
 | H | Milestone/checklist perkembangan anak | Masuk rencana; diisi coach per anak, dilihat member; daftar keterampilan Claude drafkan lalu Hadi edit | Opus (tabel) + Sonnet (draf daftar) | Desain dulu |
-| I | Sembunyikan harga per sesi dari member | Diputuskan ("per paket semua") | OpenCode (dokumen batch-8) | Dokumen batch-8 |
-| J | Bagian testimoni di landing, tersembunyi sampai ada testimoni asli | Diputuskan | Sonnet | Cara Hadi mengisi testimoni (kirim ke Claude, atau halaman admin) |
+| I | Sembunyikan harga per sesi dari member | SELESAI (6151032, OpenCode batch-8, divalidasi: byte-identik dengan dokumen, tes, lint, build, dicek di browser lokal kecuali jendela konfirmasi beli 1 sesi) | — | — |
+| J | Bagian testimoni di landing, tersembunyi sampai ada testimoni asli | Diputuskan | Sonnet | Hadi mengirim teks testimoni 30 Sep; Claude memasang |
 | K | Landing: tiket sudah termasuk, durasi 60 menit, perlengkapan bawa sendiri, gabung gratis, kolam tidak menolak coach, persetujuan 1×24 jam, pencairan manual secepatnya, murid bawaan + afiliasi | Diputuskan | Sonnet | Tiket dan penolakan coach menunggu konfirmasi 3 kolam; afiliasi menunggu fitur jadi |
+| L | Saldo coach/kolam boleh minus saat koreksi Hadir ke Tidak Hadir; dipotong otomatis dari bagi hasil berikutnya; saldo negatif tidak bisa dicairkan | Diputuskan untuk coach (kolam = asumsi Claude, belum dikonfirmasi) | Opus | Bareng A dan D; MOU/perjanjian sudah memuat |
+| M | Halaman admin untuk mengisi testimoni sendiri | Opsional, nanti | Opus (tabel) | Setelah ada testimoni asli |
+| N | Batas les barengan per kolam di sistem (kolom "maks sesi barengan", kosong = tanpa batas) | Ditunda: angka per kolam dicatat di MOU dari jawaban kolam; admin menyesuaikan jadwal manual | Opus (booking) | Sampai ada kolam yang keberatan atau volume naik |
 
 ### 10.3 Keputusan yang hanya dicatat (tanpa kerja kode)
 - 2.3 data ke AI: dibiarkan (A). 2.4 kolam melihat nama peserta: tetap (A).

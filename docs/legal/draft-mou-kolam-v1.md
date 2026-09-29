@@ -70,8 +70,8 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 3. Coach yang mengajar di Kolam Mitra dalam rangka sesi aplikasi tidak
    membayar tiket masuk secara terpisah; tiket masuk coach sudah tercakup
    dalam bagian Kolam Mitra dari nilai sesi (Pasal 5).
-4. Peserta boleh didampingi paling banyak [ISI SAAT TTD: 1 atau 2]
-   pendamping yang tidak berenang; pendamping tidak dikenakan tiket masuk.
+4. Peserta boleh didampingi 1 (satu) pendamping pada satu waktu (boleh
+   bergantian) yang tidak berenang; pendamping tidak dikenakan tiket masuk.
    [CATATAN: butir 2–4 dikonfirmasi Hadi 29 Sep sebagai keinginan SPH;
    setiap kolam harus setuju saat TTD, dan bagian Kolam Mitra pada Pasal 5
    harus cukup menutup tiket coach + peserta.]
@@ -144,8 +144,13 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 6. Paket yang diberikan gratis/manual oleh admin (tanpa pembayaran) tidak
    menghasilkan bagi hasil.
 7. Bila status Hadir dikoreksi menjadi tidak Hadir, bagi hasil sesi itu
-   dibatalkan. Koreksi ditolak sistem bila saldo Kolam Mitra sudah tidak
-   mencukupi (misalnya sudah dicairkan).
+   dibatalkan. Bila saldo Kolam Mitra sudah tidak mencukupi (misalnya sudah
+   dicairkan), saldo menjadi negatif dan dipotong otomatis dari bagi hasil
+   sesi berikutnya; saldo negatif tidak dapat dicairkan. Saat perjanjian
+   berakhir, saldo negatif diselesaikan: [ISI HADI]. **[BELUM ADA DI SISTEM —
+   sistem saat ini menolak koreksi bila saldo tidak cukup.]** [KONFIRMASI
+   HADI: keputusan Hadi 29 Sep untuk coach; Claude mengasumsikan berlaku
+   sama untuk kolam.]
 8. Persentase dapat diubah dengan kesepakatan tertulis; perubahan berlaku
    untuk sesi yang ditandai Hadir setelah tanggal perubahan.
 9. Coach menandai kehadiran paling lambat 24 jam setelah sesi selesai; lewat
@@ -227,12 +232,12 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    kemudian kecuali oleh administrator SPH. Kolam Mitra tidak dapat memakai
    kodenya untuk dirinya sendiri.
 3. Komisi afiliasi diberikan **satu kali per member baru** (bukan komisi
-   tiap sesi), sebesar [ISI HADI: 10% dari harga paket pertama yang dibeli,
-   atau 10% dari nilai satu sesi — angka rupiahnya sangat berbeda; contoh
-   paket Rp800.000/8 sesi: Rp80.000 vs Rp10.000; sama dengan komisi coach
-   atau berbeda]. [USULAN CLAUDE, belum diputuskan: dikreditkan setelah
-   member menghadiri sesi pertamanya (ditandai Hadir) dan lewat masa 3 hari
-   laporan, supaya pendaftaran palsu tidak menghasilkan uang.]
+   tiap sesi), sebesar **5% dari harga paket pertama yang dibayar member**
+   (contoh: paket Rp800.000 → Rp40.000; besarnya sama untuk Coach dan
+   Kolam Mitra). Dikreditkan setelah member menghadiri sesi pertamanya
+   (ditandai Hadir) dan lewat masa 3 hari laporan, supaya pendaftaran palsu
+   tidak menghasilkan uang. [KONFIRMASI HADI: apakah paket trial dihitung
+   sebagai "paket pertama" — bila ya, komisinya 5% dari harga trial.]
 4. Program tidak dibatasi waktu selama perjanjian berlaku. SPH dapat
    mengubah ketentuan afiliasi melalui pembaruan perjanjian atau Syarat &
    Ketentuan, berlaku untuk member yang mendaftar setelah perubahan;
@@ -241,10 +246,11 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    dari bagian coach atau bagian Kolam Mitra lainnya. Harga yang dibayar
    Member tidak berubah karena kode.
 6. Saldo afiliasi dicairkan mengikuti Pasal 6.
-7. Pajak atas komisi afiliasi: [ISI HADI + reviewer]. [CATATAN: Hadi
-   berpendapat komisi afiliasi tidak kena pajak. Claude tidak dapat
-   memastikan; akuntan/reviewer wajib mengonfirmasi, termasuk apakah SPH
-   wajib memotong. Jangan menulis "bebas pajak" sebelum dikonfirmasi.]
+7. Pajak atas komisi afiliasi ditanggung SPH (keputusan Hadi 29 Sep):
+   penerima menerima komisi penuh. [ISI HADI + akuntan: mekanisme — SPH
+   memotong dan menyetorkan atas nama penerima, atau menambahkan sebesar
+   pajak. Claude tidak dapat memastikan besar dan kewajiban pajaknya;
+   akuntan wajib mengonfirmasi. Jangan menulis "bebas pajak".]
 8. Pendaftaran fiktif atau kecurangan lain: komisi dibatalkan; akibat
    lainnya [ISI HADI].
 
@@ -274,20 +280,25 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
   coach, kolam Rp0, sisanya SPH; sesi hangus: tidak ada (Pasal 5).
 - Batas 24 jam tandai hadir; member 3 hari untuk melaporkan (Pasal 5.9–5.10).
 - Kolam melihat nama peserta (Pasal 9.1). Gabung gratis (Pasal 1.5).
-- Komisi afiliasi satu kali per member baru, kode singkat (Pasal 11).
+- Komisi afiliasi satu kali per member baru, kode singkat, 5% dari harga
+  paket pertama, cair setelah sesi pertama Hadir + 3 hari, pajak ditanggung
+  SPH (Pasal 11).
+- Pendamping 1 orang pada satu waktu, boleh bergantian (Pasal 2.4).
+- Saldo boleh negatif saat koreksi, dipotong dari bagi hasil berikutnya
+  (Pasal 5.7).
 
 ### Masih kosong
 1. Nama penyelenggara SPH (PT Perorangan, proses pendirian) dan siapa yang
    menandatangani sebelum akta terbit.
-2. Jumlah pendamping (1 atau 2) per kolam (Pasal 2.4).
+2. Penyelesaian saldo negatif saat perjanjian berakhir (Pasal 5.7).
 3. Batas waktu SPH menyesuaikan jadwal saat kapasitas terganggu (1.6),
    menindaklanjuti laporan atas coach (3.2), keputusan usulan paket (2.1).
 4. Akibat pelanggaran anti-bypass oleh kolam (Pasal 4.4).
 5. Batas maksimum waktu pencairan dan biaya transfer (Pasal 6).
 6. Refund untuk sesi yang bagi hasilnya sudah masuk (Pasal 7.2).
 7. Insiden, jam pelaporan, asuransi (Pasal 8).
-8. Dasar dan waktu kredit komisi afiliasi, persentase kolam, pajak, sanksi
-   (Pasal 11).
+8. Mekanisme pajak komisi afiliasi, paket trial dihitung "paket pertama"
+   atau tidak, sanksi (Pasal 11).
 9. Jangka waktu dan pengakhiran (Pasal 10), forum sengketa (Pasal 12).
 10. Angka persentase coach/kolam/SPH per kolam (Pasal 5.3) dan tanya 3
     kolam soal 4 pertanyaan baru.

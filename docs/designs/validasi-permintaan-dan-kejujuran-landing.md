@@ -145,20 +145,23 @@ Sebelum pasang iklan: datangi atau telepon **3 kolam** di wilayah yang paling mu
 
 **Keputusan model uang dan operasional.**
 - Contoh sesi Rp100.000: kolam Rp50.000 (mencakup tiket coach Rp25.000 +
-  peserta Rp25.000; 1–2 pendamping gratis), coach Rp40.000, SPH 10% (PPN 12%
+  peserta Rp25.000; 1 pendamping gratis, boleh bergantian), coach Rp40.000, SPH 10% (PPN 12%
   sudah di dalamnya; bersih ± Rp8.929). Persentase disetel per kolam.
 - Peserta sudah booking tidak datang: coach 50% dari bagian coach, kolam Rp0,
   sisanya SPH. Sesi hangus (paket kedaluwarsa): tidak ada yang dibayar.
 - Coach menandai hadir paling lambat 24 jam setelah sesi; admin bebas.
   Member dapat melaporkan status Tidak Hadir dalam 3 hari (tombol Laporkan).
-  Saldo platform yang boleh ditarik = hanya yang sudah matang (H+3).
+  Saldo platform yang boleh ditarik = hanya yang sudah matang (H+3); PPN
+  mengendap di saldo dan tidak ikut bisa ditarik.
+- Koreksi Hadir ke Tidak Hadir saat saldo coach/kolam kurang: saldo menjadi
+  negatif dan dipotong dari bagi hasil berikutnya (bukan ditolak).
 - Penarikan platform wajib bukti transfer.
 - Trial: paket trial **berbayar** (opsi B), ditandai di template paket, untuk
   member baru, 1 kali per anak. Bukan gratis (paket gratis dari admin tidak
   menghasilkan bagi hasil, jadi coach dan kolam tidak dibayar).
 - Afiliasi: kode singkat per coach dan per kolam; komisi **satu kali** per
-  member baru yang mendaftar dengan kode; dasar hitung (10% dari paket
-  pertama atau dari nilai satu sesi) dan waktu kredit masih terbuka.
+  member baru yang mendaftar dengan kode; 5% dari harga paket pertama, sama untuk coach dan kolam, cair setelah
+  sesi pertama Hadir + 3 hari; pajak ditanggung SPH.
 - Harga per sesi tidak ditampilkan ke member; yang tampil harga paket
   (kecuali harga beli 1 sesi saat konfirmasi).
 - Testimoni di landing: bagian dibangun, otomatis tersembunyi sampai ada
@@ -174,9 +177,10 @@ Sebelum pasang iklan: datangi atau telepon **3 kolam** di wilayah yang paling mu
 bergeser ke perjanjian coach (lihat atas).
 
 **The Assignment (diperbarui).** Tanyakan ke 3 kolam:
-1. Maksimal berapa les privat yang masih nyaman berjalan barengan per jam?
-2. Club/coach apa saja yang sudah ada di kolam itu, dan apa yang kolam dapat
-   dari club?
+1. Untuk les privat, berapa lintasan/area yang boleh dipakai pada jam sepi
+   dan jam ramai? (dicatat di MOU; sistem belum membatasi)
+2. (Opsional; Hadi: tidak wajib, yang penting kolam dapat uang) Club/coach
+   apa saja yang sudah ada, dan apa yang kolam dapat dari club?
 3. Kolam bersedia coach SPH mengajar privat di situ hanya lewat aplikasi?
 4. Setuju bagian kolam Rp50.000 per sesi Rp100.000 (sudah mencakup tiket
    coach dan peserta, pendamping gratis)?

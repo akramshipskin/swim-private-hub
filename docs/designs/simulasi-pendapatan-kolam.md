@@ -18,7 +18,7 @@ disetel per kolam di MOU; di contoh ini coach 40%, kolam 50%, SPH 10%.
 | PPN 12% di dalam bagian SPH | Rp1.071 | Rp8.571 |
 
 Bagian kolam Rp50.000 sudah mencakup tiket masuk coach (Rp25.000) dan peserta
-(Rp25.000). Satu atau dua pendamping yang tidak berenang masuk gratis.
+(Rp25.000). Satu pendamping (boleh bergantian) yang tidak berenang masuk gratis.
 
 ## Pendapatan kolam per bulan (Senin–Jumat, 22 hari, semua sesi hadir)
 
@@ -57,10 +57,10 @@ cocok.
 
 ## Pertanyaan untuk kolam (untuk dicatat)
 
-1. Maksimal berapa les privat yang masih nyaman berjalan barengan per jam?
-2. Club/coach apa saja yang sudah ada, dan apa yang kolam dapat dari club?
+1. Untuk les privat, berapa lintasan/area yang boleh dipakai pada jam sepi dan jam ramai?
+2. (Opsional) Club/coach apa saja yang sudah ada, dan apa yang kolam dapat dari club?
 3. Bersedia coach SPH mengajar privat di situ hanya lewat aplikasi?
 4. Setuju bagian kolam 50% (sudah mencakup tiket coach + peserta)?
 5. Setuju kolam tidak dapat menolak coach yang disetujui SPH?
 6. Setuju kolam Rp0 bila peserta sudah booking tapi tidak datang?
-7. Pendamping gratis: 1 atau 2 orang?
+7. Pendamping gratis: 1 orang pada satu waktu, boleh bergantian. Bisa?

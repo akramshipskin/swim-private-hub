@@ -90,7 +90,11 @@ sepakat sebagai berikut.
    menghasilkan bagi hasil apa pun. **[BELUM ADA DI SISTEM]**
 5. Paket gratis/manual dari admin tidak menghasilkan bagi hasil.
 6. Bila status Hadir dikoreksi menjadi tidak Hadir, bagi hasil sesi itu
-   dibatalkan; koreksi ditolak bila saldo Coach sudah tidak mencukupi.
+   dibatalkan. Bila saldo Coach sudah tidak mencukupi (misalnya sudah
+   dicairkan), saldo menjadi negatif dan dipotong otomatis dari bagi hasil
+   sesi berikutnya; saldo negatif tidak dapat dicairkan. Saat perjanjian
+   berakhir, saldo negatif diselesaikan: [ISI HADI]. **[BELUM ADA DI
+   SISTEM — sistem saat ini menolak koreksi bila saldo tidak cukup.]**
 7. Member dapat melaporkan status Tidak Hadir yang tidak sesuai (tombol
    Laporkan) paling lambat 3 hari sejak sesi selesai. SPH memeriksa dan
    dapat mengoreksi status. Bila terbukti Coach yang tidak hadir atau
@@ -162,12 +166,12 @@ sepakat sebagai berikut.
    kecuali oleh administrator SPH. Coach tidak dapat memakai kodenya untuk
    dirinya sendiri.
 3. Komisi afiliasi diberikan **satu kali per member baru** (bukan komisi
-   tiap sesi), sebesar [ISI HADI: 10% dari harga paket pertama yang dibeli,
-   atau 10% dari nilai satu sesi — angka rupiahnya sangat berbeda; contoh
-   paket Rp800.000/8 sesi: Rp80.000 vs Rp10.000]. [USULAN CLAUDE, belum
-   diputuskan: dikreditkan setelah member menghadiri sesi pertamanya
+   tiap sesi), sebesar **5% dari harga paket pertama yang dibayar member**
+   (contoh: paket Rp800.000 → Rp40.000; besarnya sama untuk Coach dan
+   Kolam Mitra). Dikreditkan setelah member menghadiri sesi pertamanya
    (ditandai Hadir) dan lewat masa 3 hari laporan, supaya pendaftaran palsu
-   tidak menghasilkan uang.]
+   tidak menghasilkan uang. [KONFIRMASI HADI: apakah paket trial dihitung
+   sebagai "paket pertama" — bila ya, komisinya 5% dari harga trial.]
 4. Program tidak dibatasi waktu selama perjanjian berlaku; Coach dapat
    membawa member kapan saja. SPH dapat mengubah ketentuan afiliasi melalui
    pembaruan perjanjian atau Syarat & Ketentuan, berlaku untuk member yang
@@ -177,10 +181,11 @@ sepakat sebagai berikut.
    dari bagian Coach atau Kolam Mitra lainnya. Harga yang dibayar Member
    tidak berubah karena kode.
 6. Saldo afiliasi dicairkan mengikuti Pasal 5.
-7. Pajak atas komisi afiliasi: [ISI HADI + reviewer]. [CATATAN: Hadi
-   berpendapat komisi afiliasi tidak kena pajak. Claude tidak dapat
-   memastikan; akuntan/reviewer wajib mengonfirmasi, termasuk apakah SPH
-   wajib memotong. Jangan menulis "bebas pajak" sebelum dikonfirmasi.]
+7. Pajak atas komisi afiliasi ditanggung SPH (keputusan Hadi 29 Sep):
+   penerima menerima komisi penuh. [ISI HADI + akuntan: mekanisme — SPH
+   memotong dan menyetorkan atas nama penerima, atau menambahkan sebesar
+   pajak. Claude tidak dapat memastikan besar dan kewajiban pajaknya;
+   akuntan wajib mengonfirmasi. Jangan menulis "bebas pajak".]
 8. Pendaftaran fiktif atau kecurangan lain: komisi dibatalkan; akibat
    lainnya [ISI HADI].
 
@@ -202,7 +207,10 @@ Tunduk pada hukum Republik Indonesia; sengketa melalui [ISI HADI + reviewer].
 - Peserta tidak datang: coach 50% dari bagian coach, kolam Rp0, sisanya SPH;
   sesi hangus tidak dibayar; member 3 hari untuk melaporkan (Pasal 4.4, 4.7).
 - Murid bawaan boleh lewat kode afiliasi (Pasal 6.3); komisi afiliasi satu
-  kali per member baru, kode singkat (Pasal 10).
+  kali per member baru, kode singkat, 5% dari harga paket pertama, cair
+  setelah sesi pertama Hadir + 3 hari, pajak ditanggung SPH (Pasal 10).
+- Saldo boleh negatif saat koreksi, dipotong dari bagi hasil berikutnya
+  (Pasal 4.6).
 - SPH = penyedia platform; SPH tanggung jawab keuangan, jadwal, booking
   (Pasal 7.4).
 
@@ -218,5 +226,6 @@ Tunduk pada hukum Republik Indonesia; sengketa melalui [ISI HADI + reviewer].
 6. Larangan transaksi luar: durasi, sanksi, murid bawaan di luar aplikasi
    (Pasal 6).
 7. Insiden dan asuransi (Pasal 7).
-8. Dasar dan waktu kredit komisi afiliasi, pajak, sanksi (Pasal 10).
+8. Mekanisme pajak komisi afiliasi, paket trial dihitung "paket pertama"
+   atau tidak, sanksi (Pasal 10).
 9. Jangka waktu dan forum sengketa (Pasal 9 dan 11).
