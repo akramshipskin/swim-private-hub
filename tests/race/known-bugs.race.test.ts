@@ -207,7 +207,7 @@ describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairka
 describe("S4 / D4: nomor HP dan email dibakukan", () => {
   const ago = Date.now() - 10000;
   const reg = (over: Record<string, unknown>) =>
-    register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", password: "12345678", acceptedTerms: true, wantsSelf: true, formRenderedAt: ago, ...over }) }));
+    register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", password: "12345678", acceptedTerms: true, wantsSelf: true, selfBirthDate: "1990-05-05", formRenderedAt: ago, ...over }) }));
 
   // Bug: "0812-3456-7890", "081234567890" dan "+6281234567890" dianggap 3 orang berbeda.
   it("K4a: HP yang sama dengan format beda (spasi, '-', +62) -> daftar kedua ditolak 409, hanya 1 akun", async () => {

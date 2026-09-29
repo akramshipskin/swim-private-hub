@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import LandingView from "./landing-view";
 import { coachBioLine } from "@/lib/coach-bio";
 import { REGULAR_TEMPLATE_WHERE } from "@/lib/trial";
+import { rankLandingCoaches } from "@/lib/landing-rank";
 import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
 export default async function Home() {
@@ -33,6 +34,7 @@ export default async function Home() {
         select: {
           id: true,
           name: true,
+          email: true,
           coachProfile: { select: { bio: true, specialties: true, photoUrl: true, birthDate: true, gender: true, certificates: approvedCertificatesSelect } },
           poolAffiliations: { select: { pool: { select: { name: true } } } },
         },
@@ -67,10 +69,9 @@ export default async function Home() {
       .slice(0, 5);
 
     const coachSessions = new Map(sessionsPerCoach.map((r) => [r.coachId, r._count._all]));
-    // Landing menampilkan maksimal 5 coach dengan sesi Hadir terbanyak.
-    const topCoaches = [...coaches]
-      .sort((a, b) => (coachSessions.get(b.id) ?? 0) - (coachSessions.get(a.id) ?? 0) || a.name.localeCompare(b.name))
-      .slice(0, 5);
+    // Landing menampilkan maksimal 5 coach: coach asli dulu (akun demo hanya
+    // mengisi slot kosong), lalu sesi Hadir terbanyak.
+    const topCoaches = rankLandingCoaches(coaches, coachSessions);
 
     return (
       <LandingView

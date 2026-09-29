@@ -19,6 +19,17 @@ describe("ageFromBirthDate", () => {
   });
 });
 
+describe("ageFromBirthDate: tanggal lahir coach (tengah malam WIB) vs peserta (tengah malam UTC)", () => {
+  const coachDob = new Date("2000-01-15T00:00:00+07:00");
+  const pesertaDob = new Date("2000-01-15T00:00:00Z");
+  it("umur naik tepat di hari ulang tahun, bukan sehari lebih awal", () => {
+    for (const dob of [coachDob, pesertaDob]) {
+      expect(ageFromBirthDate(dob, new Date("2026-01-14T12:00:00+07:00"))).toBe(25);
+      expect(ageFromBirthDate(dob, new Date("2026-01-15T00:30:00+07:00"))).toBe(26);
+    }
+  });
+});
+
 describe("coachBioLine", () => {
   it("menggabungkan umur dan jenis kelamin, melewati yang kosong", () => {
     expect(coachBioLine({ birthDate: new Date("1996-01-01"), gender: "FEMALE" }, now)).toBe("30 tahun · Perempuan");

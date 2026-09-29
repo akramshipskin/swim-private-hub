@@ -163,11 +163,23 @@ describe("PAYMENT webhook races", () => {
 describe("REGISTRATION / ACCOUNT races", () => {
   const ago = Date.now() - 10000;
   it("A1: daftar member No HP sama 6x barengan -> 1 akun, sisanya 409 (bukan 500)", async () => {
-    const rs = await settle(Array.from({ length: 6 }, () => register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone: "081234567890", password: "12345678", acceptedTerms: true, wantsSelf: true, formRenderedAt: ago }) }))));
+    const rs = await settle(Array.from({ length: 6 }, () => register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone: "081234567890", password: "12345678", acceptedTerms: true, wantsSelf: true, selfBirthDate: "1990-05-05", formRenderedAt: ago }) }))));
     console.log("A1", summarize(rs));
     expect(await prisma.user.count({ where: { phone: "081234567890" } })).toBe(1);
     expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
     expect(await prisma.dependent.count()).toBe(1);
+  });
+  it("A1b: tanggal lahir peserta wajib: tanpa tanggal / tanggal masa depan / anak tanpa tanggal ditolak 400; lengkap tersimpan", async () => {
+    const post = (extra: object, phone: string) =>
+      register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone, password: "12345678", acceptedTerms: true, formRenderedAt: ago, ...extra }) }));
+    expect((await post({ wantsSelf: true }, "081234567801")).status).toBe(400);
+    expect((await post({ children: [{ name: "Adik" }] }, "081234567802")).status).toBe(400);
+    expect((await post({ children: [{ name: "Adik", birthDate: "2999-01-01" }] }, "081234567803")).status).toBe(400);
+    expect(await prisma.user.count()).toBe(0);
+    const ok = await post({ wantsSelf: true, selfBirthDate: "1990-05-05", children: [{ name: "adik kecil", birthDate: "2019-03-04" }] }, "081234567804");
+    expect(ok.status).toBe(201);
+    const deps = await prisma.dependent.findMany({ orderBy: { isSelf: "asc" }, select: { name: true, isSelf: true, birthDate: true } });
+    expect(deps.map((d) => [d.isSelf, d.birthDate?.toISOString().slice(0, 10)])).toEqual([[false, "2019-03-04"], [true, "1990-05-05"]]);
   });
   it("A2: daftar coach & daftar kolam No HP sama barengan -> 1 akun, gak ada 500 / kolam yatim", async () => {
     const body = { name: "a", ownerName: "a", phone: "081299999999", password: "12345678", acceptedTerms: true, specialties: ["Gaya bebas"], poolName: "K", address: "J", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago };

@@ -201,6 +201,9 @@ const FAQ_GROUPS: FaqGroup[] = [
 // meyakinkan (temuan sweep 28 Sep). Sesuaikan begitu pertumbuhan asli mulai
 // kelihatan; nilainya keputusan tampilan, bukan aturan bisnis.
 const MIN_MEMBERS_TO_SHOW_STATS = 20;
+// Kartu kolam: "N member les di sini" baru tampil kalau kolam itu sudah punya
+// segini member (Hadi 29 Sep); di bawahnya baris itu dikosongkan.
+const MIN_POOL_MEMBERS_TO_SHOW = 15;
 
 export default function LandingView({ stats, pools, coaches }: { stats: LandingStats; pools: LandingPool[]; coaches: LandingCoach[] }) {
   const showStats = stats.memberCount >= MIN_MEMBERS_TO_SHOW_STATS;
@@ -327,9 +330,11 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
                         Kolam mitra
                       </p>
                       <p className="text-3xl font-semibold leading-tight">{p.name}</p>
-                      <p className={`mt-1 text-sm ${p.photos[0] ? "text-white/85" : "text-fixed-muted"}`}>
-                        {p.memberCount > 0 ? `${p.memberCount} member les di sini` : "Kolam baru bergabung"}
-                      </p>
+                      {p.memberCount >= MIN_POOL_MEMBERS_TO_SHOW && (
+                        <p className={`mt-1 text-sm ${p.photos[0] ? "text-white/85" : "text-fixed-muted"}`}>
+                          {p.memberCount} member les di sini
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col gap-4 p-8">

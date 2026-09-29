@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { createSelfDependent } from "@/lib/dependents";
+import { createSelfDependent, parseParticipantBirthDate } from "@/lib/dependents";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { normalizeAffiliateCode } from "@/lib/affiliate";
@@ -10,15 +10,16 @@ export async function POST(request: Request) {
   const body = await request.json();
   const registeredIp =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  const { name, phone: rawPhone, email: rawEmail, password, acceptedTerms, childNames, wantsSelf, entryReferrer, referralCode, website, formRenderedAt } =
+  const { name, phone: rawPhone, email: rawEmail, password, acceptedTerms, children, wantsSelf, selfBirthDate, entryReferrer, referralCode, website, formRenderedAt } =
     body as {
       name?: string;
       phone?: string;
       email?: string;
       password?: string;
       acceptedTerms?: boolean;
-      childNames?: string[];
+      children?: { name?: string; birthDate?: string }[];
       wantsSelf?: boolean;
+      selfBirthDate?: string;
       entryReferrer?: string | null;
       referralCode?: string;
       website?: string;
@@ -58,12 +59,25 @@ export async function POST(request: Request) {
   }
 
   const properName = toProperCase(name.trim());
-  const cleanChildNames = (childNames ?? []).map((n) => toProperCase(n.trim())).filter(Boolean);
-  if (cleanChildNames.length === 0 && !wantsSelf) {
+  const cleanChildren = (children ?? [])
+    .map((c) => ({ name: toProperCase((c?.name ?? "").trim()), birthDate: c?.birthDate ?? "" }))
+    .filter((c) => c.name);
+  if (cleanChildren.length === 0 && !wantsSelf) {
     return Response.json(
       { error: "Isi minimal 1 peserta (diri sendiri atau anak)" },
       { status: 400 }
     );
+  }
+
+  // Tanggal lahir wajib untuk SEMUA peserta yang didaftarkan (keputusan Hadi
+  // 29 Sep, sama seperti "Tambah peserta"): level milestone ditentukan umur.
+  let childrenData: { name: string; birthDate: Date }[];
+  let selfBirth: Date | null = null;
+  try {
+    childrenData = cleanChildren.map((c) => ({ name: c.name, birthDate: parseParticipantBirthDate(c.birthDate) }));
+    if (wantsSelf) selfBirth = parseParticipantBirthDate(selfBirthDate ?? "");
+  } catch (err) {
+    return Response.json({ error: err instanceof Error ? err.message : "Tanggal lahir tidak valid." }, { status: 400 });
   }
 
   if (password.length < 8) {
@@ -128,13 +142,14 @@ export async function POST(request: Request) {
         },
         select: { id: true, name: true, email: true, phone: true, role: true },
       });
-      if (cleanChildNames.length > 0) {
+      if (childrenData.length > 0) {
         await tx.dependent.createMany({
-          data: cleanChildNames.map((childName) => ({ memberId: created.id, name: childName })),
+          data: childrenData.map((c) => ({ memberId: created.id, name: c.name, birthDate: c.birthDate })),
         });
       }
-      if (wantsSelf) {
-        await createSelfDependent(created.id, tx);
+      if (selfBirth) {
+        const self = await createSelfDependent(created.id, tx);
+        await tx.dependent.update({ where: { id: self.id }, data: { birthDate: selfBirth } });
       }
       return created;
     });
