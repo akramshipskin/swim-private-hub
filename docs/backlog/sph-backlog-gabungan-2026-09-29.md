@@ -22,13 +22,13 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 |---|---|---|---|---|
 | 1.1 | Pembalikan pendapatan platform gak dicek saldo (beda dari pool/coach yang dicek) | TERBUKA | Hadi putusin: platform boleh saldo minus sementara (mirip koreksi saldo 26 Sep) atau harus dikunci kayak pool/coach? PPN yang udah disetor lalu dibalik = isu nyata | Hadi jawab dulu, baru Opus (area uang) |
 | 1.2 | Penarikan platform gak ada bukti transfer/status/konfirmator | TERBUKA | Samain standar sama penarikan coach/pool (udah wajib bukti transfer) | Opus (area uang) |
-| 1.3 | Rekening bank polos di DB | SELESAI di kode (feat/encrypt-bank, 29 Sep); belum live — butuh langkah Hadi di `docs/plans/deploy-enkripsi-2fa.md` | Hadi: kunci di Vercel, push, jalankan skrip | Hadi |
+| 1.3 | Rekening bank polos di DB | SELESAI & LIVE 29 Sep: 1 rekening coach + 1 rekening kolam di prod terenkripsi; Hadi cek admin > Users rekening tampil benar | — | — |
 
 ## 2. Privasi & Data
 
 | # | Item | Status | Kerjaan berikutnya | Owner / Gear |
 |---|---|---|---|---|
-| 2.1 | `totpSecret` disimpan polos | SELESAI di kode (feat/encrypt-totp, 29 Sep); belum live — sama, lihat `docs/plans/deploy-enkripsi-2fa.md` | Hadi: kunci di Vercel, push, jalankan skrip | Hadi |
+| 2.1 | `totpSecret` disimpan polos | SELESAI & LIVE 29 Sep: 1 kunci 2FA (admin) di prod terenkripsi; Hadi login admin dengan kode berhasil | — | — |
 | 2.2 | `dev-db-sync.mjs` nyalin data asli prod TERMASUK totpSecret admin | SELESAI (e74df1a, merge d787722). Terbukti 29 Sep: sync ulang Hadi dari main -> DB dev 0 email/nama/HP/rekening/chat asli, 0 kunci 2FA, 1 hash password; ledger & pembayaran utuh; login lokal member OK, admin diarahkan pasang 2FA | — | — |
 | 2.3 | Data ke AI tanpa filter | SEBAGIAN DIPUTUSKAN (retensi chat 90 hari + arsip, 25 Sep) | Belum ada aturan "data apa yang boleh diproses AI" secara eksplisit — saat ini cuma nama+peran+ketikan user, gak baca DB | Hadi putusin kalau mau diperketat lagi |
 | 2.4 | Pemilik kolam bisa liat nama anak | TERBUKA | Hadi putusin: perlu atau cukup jumlah peserta | Hadi jawab dulu |
@@ -96,7 +96,7 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 | Murid bawaan sendiri | TERBUKA | Belum dibahas |
 | Waktu pencairan | TERBUKA | FAQ masih general ("admin memproses") |
 | **Coach/kolam dibayar kalau peserta tidak datang / sesi hangus?** (temuan 29 Sep) | TERBUKA | Sistem sekarang: tidak dibagi, uang tetap di platform. Masuk MOU pasal 5.5 & perjanjian coach pasal 4.4 |
-| FAQ beli 1 sesi kurang presisi (temuan 29 Sep) | TERBUKA, kecil | Kode pakai harga per sesi **termahal** (`src/lib/drop-in.ts:13`), FAQ cuma "harga per sesi kolam itu" — Sonnet |
+| FAQ beli 1 sesi kurang presisi (temuan 29 Sep) | SELESAI & LIVE (e580a78, OpenCode batch-6) | Kode pakai harga per sesi **termahal** (`src/lib/drop-in.ts:13`), FAQ cuma "harga per sesi kolam itu" — Sonnet |
 | **FAQ salah: "kolam mitra bisa menambahkanmu"** | SELESAI (commit 6db51ac) | Diubah jadi "admin yang mengafiliasikanmu" |
 | Siapa nentuin harga | SELESAI (commit 6db51ac) | FAQ coach baru: "Saya bisa menentukan tarif saya sendiri? Tidak..." |
 | Risiko transaksi di luar platform | DIPUTUSKAN | Lihat §7 #12 di atas — MOU kolam |
