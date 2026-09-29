@@ -14,6 +14,7 @@ import PendingCertificates from "./pending-certificates";
 import Link from "next/link";
 import { Avatar } from "@/components/ui/avatar";
 import { coachBioLine } from "@/lib/coach-bio";
+import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 import { formatRupiah } from "@/lib/format";
 
 const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] = [
@@ -41,7 +42,7 @@ export default async function AdminUsersPage() {
           orderBy: { name: "asc" },
           select: { id: true, name: true, isSelf: true },
         },
-        coachProfile: { select: { photoUrl: true, certificateStatus: true, walletBalance: true, birthDate: true, gender: true } },
+        coachProfile: { select: { photoUrl: true, walletBalance: true, birthDate: true, gender: true, certificates: approvedCertificatesSelect } },
         poolAffiliations: { select: { pool: { select: { id: true, name: true } } }, orderBy: { pool: { name: "asc" } } },
         poolOwnerships: { select: { pool: { select: { id: true, name: true, walletBalance: true } } } },
       },
@@ -135,7 +136,7 @@ export default async function AdminUsersPage() {
                             ) : (
                               <Badge tone={u.isActive ? "success" : "neutral"}>{u.isActive ? "Aktif" : "Nonaktif"}</Badge>
                             )}
-                            {role === "COACH" && u.coachProfile?.certificateStatus === "APPROVED" && (
+                            {role === "COACH" && certifiedBadgeText(u.coachProfile?.certificates) && (
                               <Badge tone="brand">Bersertifikat</Badge>
                             )}
                           </div>

@@ -1,32 +1,38 @@
 "use client";
 
-import { useActionState } from "react";
-import { uploadCoachPhoto, uploadCoachCertificate } from "./actions";
+import { useActionState, useEffect, useRef } from "react";
+import { uploadCoachPhoto, uploadCoachCertificate, deleteCoachCertificate } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Field, Input } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/avatar";
+import { ConfirmSubmit } from "@/components/ui/confirm-submit";
+import { certificateStatusBadge, MAX_CERTIFICATES_PER_COACH } from "@/lib/coach-certificates";
 
-const certStatus = {
-  NONE: { label: "Belum ada sertifikat", tone: "neutral" },
-  PENDING: { label: "Menunggu persetujuan admin", tone: "warning" },
-  APPROVED: { label: "Disetujui", tone: "success" },
-  REJECTED: { label: "Ditolak, silakan upload ulang", tone: "danger" },
-} as const;
+type Certificate = { id: string; name: string; status: keyof typeof certificateStatusBadge };
 
 export default function CoachMediaForm({
   photoUrl,
-  certificateStatus,
-  certificationNote,
+  certificates,
+  defaultCertificateName,
   storageReady,
 }: {
   photoUrl: string | null;
-  certificateStatus: keyof typeof certStatus;
-  certificationNote: string | null;
+  certificates: Certificate[];
+  // Nama sertifikat yang diisi saat daftar coach -- isian awal kalau belum
+  // pernah mengunggah sertifikat.
+  defaultCertificateName: string | null;
   storageReady: boolean;
 }) {
   const [photoState, photoAction, photoPending] = useActionState(uploadCoachPhoto, null);
   const [certState, certAction, certPending] = useActionState(uploadCoachCertificate, null);
+  const certForm = useRef<HTMLFormElement>(null);
+  const full = certificates.length >= MAX_CERTIFICATES_PER_COACH;
+
+  // Kosongkan form setelah berhasil, siap untuk sertifikat berikutnya.
+  useEffect(() => {
+    if (certState?.success) certForm.current?.reset();
+  }, [certState]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -49,27 +55,65 @@ export default function CoachMediaForm({
         </div>
       </form>
 
-      <form action={certAction} className="flex flex-col gap-3 border-t border-border pt-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-medium text-text">Sertifikat renang/lifeguard</p>
-          <Badge tone={certStatus[certificateStatus].tone}>{certStatus[certificateStatus].label}</Badge>
-        </div>
+      <div className="flex flex-col gap-3 border-t border-border pt-5">
+        <p className="text-sm font-medium text-text">Sertifikat renang/lifeguard</p>
         <p className="text-sm text-text-muted">
-          Badge &quot;Bersertifikat&quot; tampil di profil setelah sertifikat disetujui admin. Upload ulang akan
-          mengganti sertifikat lama dan menunggu persetujuan lagi.
+          Boleh lebih dari satu (maks {MAX_CERTIFICATES_PER_COACH}). Tiap sertifikat diperiksa admin; badge
+          &quot;Bersertifikat&quot; tampil di profil setelah minimal satu disetujui.
         </p>
-        <Field label="Nama sertifikat/lembaga">
-          <Input name="certificationNote" defaultValue={certificationNote ?? ""} placeholder="Misal: Sertifikasi Pelatih Renang FASI" disabled={!storageReady} required />
-        </Field>
-        <Field label="File sertifikat (JPG/PNG/WEBP/PDF, maks 3MB)">
-          <Input type="file" name="certificate" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={!storageReady} required />
-        </Field>
-        <div className="flex items-center gap-3">
-          <Button type="submit" size="sm" loading={certPending} disabled={!storageReady}>Kirim untuk Disetujui</Button>
-          {certState?.error && <p role="alert" className="text-sm text-danger-text">{certState.error}</p>}
-          {certState?.success && <p role="status" className="text-sm text-success-text">Sertifikat terkirim, menunggu persetujuan.</p>}
-        </div>
-      </form>
+
+        {certificates.length === 0 ? (
+          <p className="text-sm text-text-subtle">Belum ada sertifikat.</p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-border rounded-lg border border-border">
+            {certificates.map((c) => (
+              <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <span className="text-sm text-text">{c.name}</span>
+                  <Badge tone={certificateStatusBadge[c.status].tone}>{certificateStatusBadge[c.status].label}</Badge>
+                </div>
+                <ConfirmSubmit
+                  action={deleteCoachCertificate.bind(null, c.id)}
+                  label="Hapus"
+                  variant="danger"
+                  title={`Hapus sertifikat "${c.name}"?`}
+                  description={
+                    c.status === "APPROVED"
+                      ? "Sertifikat ini sudah disetujui. Kalau ini satu-satunya yang disetujui, badge \"Bersertifikat\" di profilmu ikut hilang."
+                      : "File sertifikat ini dihapus dan tidak bisa dikembalikan."
+                  }
+                  confirmLabel="Ya, hapus"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {full ? (
+          <p className="text-sm text-text-muted">Sudah {MAX_CERTIFICATES_PER_COACH} sertifikat. Hapus salah satu untuk menambah yang baru.</p>
+        ) : (
+          <form ref={certForm} action={certAction} className="flex flex-col gap-3">
+            <Field label="Nama sertifikat/lembaga">
+              <Input
+                name="certificateName"
+                defaultValue={certificates.length === 0 ? defaultCertificateName ?? "" : ""}
+                placeholder="Misal: Sertifikasi Pelatih Renang FASI"
+                maxLength={120}
+                disabled={!storageReady}
+                required
+              />
+            </Field>
+            <Field label="File sertifikat (JPG/PNG/WEBP/PDF, maks 3MB)">
+              <Input type="file" name="certificate" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={!storageReady} required />
+            </Field>
+            <div className="flex items-center gap-3">
+              <Button type="submit" size="sm" loading={certPending} disabled={!storageReady}>Tambah Sertifikat</Button>
+              {certState?.error && <p role="alert" className="text-sm text-danger-text">{certState.error}</p>}
+              {certState?.success && <p role="status" className="text-sm text-success-text">Sertifikat terkirim, menunggu persetujuan.</p>}
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

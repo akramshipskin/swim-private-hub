@@ -2,7 +2,16 @@
 // Pola tiap tes: siapkan data -> aksi barengan lewat settle() (dengan jitter()
 // supaya urutannya bervariasi) -> cek hasil + checkInvariants(). Jangan ubah
 // angka jitter/putaran tanpa alasan: itu hasil penyetelan (lihat catatan tiap tes).
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
+// Storage Supabase tidak ada di lokal: unggah = sukses, hapus = dicatat.
+const removeObject = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/storage", async (orig) => ({
+  ...(await orig<typeof import("@/lib/storage")>()),
+  isStorageConfigured: () => true,
+  uploadObject: async () => {},
+  removeObject,
+}));
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, jitter, spread, tally } from "./fx";
@@ -21,7 +30,7 @@ import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 import { reportAttendance } from "@/app/member/riwayat/actions";
 import { rejectWithdrawal, markPaidManually } from "@/app/admin/withdrawals/actions";
 import { requestWithdrawal as coachWithdraw } from "@/app/coach/saldo/actions";
-import { updatePasswordProfil } from "@/app/profil/actions";
+import { updatePasswordProfil, uploadCoachCertificate, deleteCoachCertificate } from "@/app/profil/actions";
 import { resetUserPassword, createUser } from "@/app/admin/users/actions";
 import { reviewCertificate } from "@/app/admin/users/certificate-actions";
 
@@ -265,24 +274,60 @@ describe("AKUN & SESI LOGIN", () => {
     expect(await prisma.poolOwnership.count()).toBe(1);
   });
 
-  it("E8: admin menyetujui dan menolak sertifikat coach yang sama barengan (20 putaran) -> status akhir utuh: APPROVED hanya jika badge aktif", async () => {
+  it("E8: admin menyetujui dan menolak sertifikat coach yang sama barengan (20 putaran) -> diputuskan tepat sekali, sertifikat lain milik coach tidak tersentuh", async () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 20; i++) {
       await reset();
       const admin = await mkUser("ADMIN"); const coach = await mkUser("COACH");
       const cp = coach.coachProfile!;
-      await prisma.coachProfile.update({ where: { id: cp.id }, data: { certificateStatus: "PENDING", certificateUrl: "x/y.pdf" } });
+      const cert = await prisma.coachCertificate.create({ data: { coachProfileId: cp.id, name: "FASI", filePath: "x/y.pdf" } });
+      const other = await prisma.coachCertificate.create({ data: { coachProfileId: cp.id, name: "Lifeguard", filePath: "x/z.pdf" } });
       const rs = await settle([
-        ...[0, 1, 2].map(() => (async () => { await jitter(6); return as({ id: admin.id, role: "ADMIN" }, () => reviewCertificate(cp.id, true)); })()),
-        ...[0, 1, 2].map(() => (async () => { await jitter(6); return as({ id: admin.id, role: "ADMIN" }, () => reviewCertificate(cp.id, false)); })()),
+        ...[0, 1, 2].map(() => (async () => { await jitter(6); return as({ id: admin.id, role: "ADMIN" }, () => reviewCertificate(cert.id, true)); })()),
+        ...[0, 1, 2].map(() => (async () => { await jitter(6); return as({ id: admin.id, role: "ADMIN" }, () => reviewCertificate(cert.id, false)); })()),
       ]);
       expect(thrownOf(rs)).toEqual([]);
-      const after = await prisma.coachProfile.findUniqueOrThrow({ where: { id: cp.id } });
-      expect(["APPROVED", "REJECTED"]).toContain(after.certificateStatus);
-      expect(after.hasCertification).toBe(after.certificateStatus === "APPROVED");
-      tally(sebaran, after.certificateStatus);
+      const after = await prisma.coachCertificate.findUniqueOrThrow({ where: { id: cert.id } });
+      expect(["APPROVED", "REJECTED"]).toContain(after.status);
+      expect(after.reviewedAt).not.toBeNull();
+      expect((await prisma.coachCertificate.findUniqueOrThrow({ where: { id: other.id } })).status).toBe("PENDING");
+      tally(sebaran, after.status);
     }
     spread("E8", sebaran);
+  });
+
+  it("E8b: coach menghapus sertifikat pas admin menyetujuinya (20 putaran) -> tidak ada 500; kalau terhapus ya hilang, tidak hidup lagi", async () => {
+    const sebaran: Record<string, number> = {};
+    for (let i = 0; i < 20; i++) {
+      await reset();
+      const admin = await mkUser("ADMIN"); const coach = await mkUser("COACH");
+      const cert = await prisma.coachCertificate.create({ data: { coachProfileId: coach.coachProfile!.id, name: "FASI", filePath: "x/y.pdf" } });
+      const rs = await settle([
+        (async () => { await jitter(6); return as({ id: admin.id, role: "ADMIN" }, () => reviewCertificate(cert.id, true)); })(),
+        (async () => { await jitter(6); return as({ id: coach.id, role: "COACH" }, () => deleteCoachCertificate(cert.id)); })(),
+      ]);
+      expect(thrownOf(rs)).toEqual([]);
+      expect(await prisma.coachCertificate.count()).toBe(0);
+      tally(sebaran, "terhapus");
+    }
+    spread("E8b", sebaran);
+  });
+
+  it("E8c: coach dengan 9 sertifikat mengunggah 4 barengan -> tepat 10, sisanya ditolak dan file-nya dibuang lagi", async () => {
+    const coach = await mkUser("COACH");
+    const cp = coach.coachProfile!;
+    await prisma.coachCertificate.createMany({ data: Array.from({ length: 9 }, (_, k) => ({ coachProfileId: cp.id, name: `S${k}`, filePath: `x/${k}.pdf` })) });
+    // Lolos cek awal (9 < 10) semuanya, jadi yang menahan cuma cek ulang di dalam kunci.
+    const pdf = () => new File([new TextEncoder().encode("%PDF-1.4 isi")], "s.pdf", { type: "application/pdf" });
+    const form = () => { const f = new FormData(); f.append("certificateName", "Baru"); f.append("certificate", pdf()); return f; };
+    removeObject.mockClear();
+    const rs = await settle(Array.from({ length: 4 }, () => as({ id: coach.id, role: "COACH" }, () => uploadCoachCertificate(null, form()))));
+    expect(thrownOf(rs)).toEqual([]);
+    expect(await prisma.coachCertificate.count({ where: { coachProfileId: cp.id } })).toBe(10);
+    const vals = valuesOf(rs) as { success?: boolean; error?: string }[];
+    expect(vals.filter((v) => v.success).length).toBe(1);
+    expect(vals.filter((v) => v.error?.includes("Maksimal 10")).length).toBe(3);
+    expect(removeObject).toHaveBeenCalledTimes(3);
   });
 });
 

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import LandingView from "./landing-view";
 import { coachBioLine } from "@/lib/coach-bio";
+import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
 export default async function Home() {
   const session = await auth();
@@ -31,7 +32,7 @@ export default async function Home() {
         select: {
           id: true,
           name: true,
-          coachProfile: { select: { bio: true, specialties: true, photoUrl: true, certificateStatus: true, certificationNote: true, birthDate: true, gender: true } },
+          coachProfile: { select: { bio: true, specialties: true, photoUrl: true, birthDate: true, gender: true, certificates: approvedCertificatesSelect } },
           poolAffiliations: { select: { pool: { select: { name: true } } } },
         },
       }),
@@ -94,8 +95,7 @@ export default async function Home() {
           bio: c.coachProfile?.bio ?? null,
           specialties: c.coachProfile?.specialties ?? [],
           photoUrl: c.coachProfile?.photoUrl ?? null,
-          certified: c.coachProfile?.certificateStatus === "APPROVED",
-          certificationNote: c.coachProfile?.certificationNote ?? null,
+          certifiedLabel: certifiedBadgeText(c.coachProfile?.certificates),
           bioLine: coachBioLine(c.coachProfile),
           pools: c.poolAffiliations.map((a) => a.pool.name),
         }))}

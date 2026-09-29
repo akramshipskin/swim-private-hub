@@ -52,6 +52,9 @@ export const POLICY = {
     ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "certificateUrl", "certificateStatus", "birthDate", "gender", "walletBalance"),
     ...BANK,
   },
+  // Nama sertifikat tampil publik di profil coach; filePath menunjuk bucket
+  // privat production (sama seperti CoachProfile.certificateUrl).
+  CoachCertificate: keep("id", "coachProfileId", "name", "filePath", "status", "reviewedAt", "createdAt"),
   Pool: {
     ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "walletBalance", "isActive", "createdAt"),
     contactPhone: (r, i) => (r.contactPhone == null ? null : `0898${pad(i, 8)}`),

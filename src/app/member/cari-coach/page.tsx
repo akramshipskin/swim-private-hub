@@ -5,6 +5,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { coachBioLine } from "@/lib/coach-bio";
+import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
 // Browse coach lintas-kolam -- fitur ini SENGAJA di luar scope Phase 1
 // (docs/designs/marketplace-pivot.md, "NOT in scope": "Cross-pool coach
@@ -26,7 +27,7 @@ export default async function CariCoachPage() {
       id: true,
       name: true,
       coachProfile: {
-        select: { bio: true, specialties: true, certificationNote: true, certificateStatus: true, photoUrl: true, birthDate: true, gender: true },
+        select: { bio: true, specialties: true, photoUrl: true, birthDate: true, gender: true, certificates: approvedCertificatesSelect },
       },
       poolAffiliations: {
         select: { pool: { select: { id: true, name: true, address: true } } },
@@ -55,10 +56,8 @@ export default async function CariCoachPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-base font-semibold text-text">{coach.name}</h2>
-                    {coach.coachProfile?.certificateStatus === "APPROVED" && (
-                      <Badge tone="success">
-                        Bersertifikat{coach.coachProfile.certificationNote ? ` · ${coach.coachProfile.certificationNote}` : ""}
-                      </Badge>
+                    {certifiedBadgeText(coach.coachProfile?.certificates) && (
+                      <Badge tone="success">{certifiedBadgeText(coach.coachProfile?.certificates)}</Badge>
                     )}
                   </div>
                   {coachBioLine(coach.coachProfile) && (

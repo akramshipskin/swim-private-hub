@@ -68,7 +68,7 @@ export default async function AdminDashboardPage() {
     prisma.dependent.count({ where: { isActive: true, member: { isActive: true }, packages: { some: usablePackageConditions() } } }),
     prisma.chatThread.count({ where: { needsAdmin: true } }),
     prisma.withdrawalRequest.aggregate({ where: { status: { in: ["PENDING", "PROCESSING"] } }, _count: true, _sum: { amount: true } }),
-    prisma.coachProfile.count({ where: { certificateStatus: "PENDING" } }),
+    prisma.coachCertificate.count({ where: { status: "PENDING" } }),
     prisma.booking.count({ where: { status: "BOOKED", attended: null, availability: { endTime: { lt: now } } } }),
     prisma.coachProfile.aggregate({ _sum: { walletBalance: true } }),
     prisma.walletTransaction.groupBy({

@@ -231,8 +231,11 @@ model CoachProfile {
   // opsional -- nama sertifikat/lembaga, ditampilin di sebelah badge.
   hasCertification  Boolean  @default(false)
   certificationNote String?
-  // Foto profil & file sertifikat (URL Supabase Storage). Badge
-  // "Bersertifikat" cuma tampil kalau certificateStatus APPROVED oleh admin.
+  // Foto profil (URL Supabase Storage). certificateUrl/certificateStatus =
+  // KOLOM LAMA, tidak dibaca lagi sejak sertifikat pindah ke tabel
+  // CoachCertificate (29 Sep); tunggu dibuang. hasCertification &
+  // certificationNote sekarang cuma "pengakuan" di form daftar coach (belum
+  // diperiksa) -- dipakai sebagai isian awal nama sertifikat di Profil.
   photoUrl          String?
   certificateUrl    String?
   certificateStatus CertificateStatus @default(NONE)
@@ -251,6 +254,30 @@ model CoachProfile {
 
   walletTransactions WalletTransaction[]
   withdrawalRequests WithdrawalRequest[]
+  certificates       CoachCertificate[]
+}
+
+// Sertifikat coach (bisa banyak, Hadi 29 Sep). Tiap sertifikat diperiksa admin
+// sendiri-sendiri; badge "Bersertifikat" tampil kalau >=1 berstatus APPROVED.
+// Menggantikan kolom tunggal CoachProfile.certificateUrl/certificateStatus --
+// isinya dipindah ke sini oleh migrasi coach_certificates.
+model CoachCertificate {
+  id             String            @id @default(cuid())
+  coachProfileId String
+  coachProfile   CoachProfile      @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
+  // Nama sertifikat/lembaga, misal "Sertifikasi Pelatih Renang FASI".
+  name           String
+  // Path di bucket privat coach-certificates (dibuka lewat signed URL).
+  // Wajib untuk unggahan baru; null hanya di baris lama hasil migrasi (akun
+  // demo yang disetujui tanpa file).
+  filePath       String?
+  // NONE tidak dipakai di tabel ini (baris ada = sudah diunggah).
+  status         CertificateStatus @default(PENDING)
+  reviewedAt     DateTime?
+  createdAt      DateTime          @default(now())
+
+  @@index([coachProfileId, status])
+  @@index([status, createdAt])
 }
 
 // Ledger lengkap tiap pergerakan saldo -- walletBalance di Pool/CoachProfile

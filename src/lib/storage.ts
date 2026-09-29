@@ -60,6 +60,16 @@ export async function uploadObject(bucket: string, path: string, file: File) {
   if (!res.ok) throw new Error(`Upload gagal (${res.status})`);
 }
 
+// Hapus file; gagal dibiarkan diam (file yatim di bucket tidak berbahaya,
+// data di DB tetap jadi acuan).
+export async function removeObject(bucket: string, path: string) {
+  if (!isStorageConfigured()) return;
+  await fetch(`${process.env.SUPABASE_URL}/storage/v1/object/${bucket}/${path}`, {
+    method: "DELETE",
+    headers: headers(),
+  }).catch(() => {});
+}
+
 export function publicObjectUrl(bucket: string, path: string) {
   return `${process.env.SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 }

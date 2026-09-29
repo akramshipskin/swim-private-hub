@@ -37,10 +37,10 @@ function CoachHeading({ c }: { c: LandingCoach }) {
       )}
       <h3 className="mt-0.5 text-2xl font-semibold leading-tight text-fixed-ink">{c.name}</h3>
       {c.bioLine && <p className="mt-0.5 text-sm text-fixed-muted">{c.bioLine}</p>}
-      {c.certified && (
+      {c.certifiedLabel && (
         <p className="mt-2">
           <span className="box-decoration-clone rounded-full bg-fixed-lime-100 px-3 py-1 text-xs font-semibold leading-[1.9] text-fixed-ink">
-            Bersertifikat{c.certificationNote ? ` · ${c.certificationNote}` : ""}
+            {c.certifiedLabel}
           </span>
         </p>
       )}

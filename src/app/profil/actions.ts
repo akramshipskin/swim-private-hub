@@ -7,7 +7,8 @@ import { toProperCase } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties";
-import { isStorageConfigured, validateUpload, extensionFor, uploadObject, publicObjectUrl, PHOTO_BUCKET, CERT_BUCKET, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR } from "@/lib/storage";
+import { isStorageConfigured, validateUpload, extensionFor, uploadObject, publicObjectUrl, PHOTO_BUCKET, CERT_BUCKET, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR, removeObject } from "@/lib/storage";
+import { MAX_CERTIFICATES_PER_COACH } from "@/lib/coach-certificates";
 import { ageFromBirthDate } from "@/lib/coach-bio";
 
 export type ActionState = { error?: string; success?: boolean } | null;
@@ -230,18 +231,28 @@ export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): 
   return { success: true };
 }
 
-// Sertifikat baru selalu masuk status PENDING -- badge "Bersertifikat" baru
-// tampil setelah admin menyetujui (lihat admin/users/certificate-actions.ts).
+const LIMIT_ERROR = `Maksimal ${MAX_CERTIFICATES_PER_COACH} sertifikat. Hapus yang lama dulu.`;
+
+// Tambah 1 sertifikat (coach bisa punya banyak, maks MAX_CERTIFICATES_PER_COACH).
+// Selalu masuk PENDING -- badge "Bersertifikat" baru tampil setelah admin
+// menyetujui minimal satu (lihat admin/users/certificate-actions.ts).
 export async function uploadCoachCertificate(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
   if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
   if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
   const file = formData.get("certificate") as File | null;
-  const note = formData.get("certificationNote")?.toString().trim() ?? "";
-  if (!note) return { error: "Isi nama sertifikat/lembaga." };
+  const name = formData.get("certificateName")?.toString().trim().slice(0, 120) ?? "";
+  if (!name) return { error: "Isi nama sertifikat/lembaga." };
   const invalid = validateUpload(file, "certificate");
   if (invalid) return { error: invalid };
   if (!(await hasMatchingSignature(file!))) return { error: SIGNATURE_MISMATCH_ERROR };
+
+  const profile = await prisma.coachProfile.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true, _count: { select: { certificates: true } } },
+  });
+  if (!profile) return { error: "Profil coach tidak ditemukan. Hubungi admin." };
+  if (profile._count.certificates >= MAX_CERTIFICATES_PER_COACH) return { error: LIMIT_ERROR };
 
   const path = `${session.user.id}/certificate-${Date.now()}.${extensionFor(file!)}`;
   try {
@@ -249,10 +260,37 @@ export async function uploadCoachCertificate(_prev: ActionState, formData: FormD
   } catch {
     return { error: "Upload sertifikat gagal, coba lagi." };
   }
-  await prisma.coachProfile.updateMany({
-    where: { userId: session.user.id },
-    data: { certificateUrl: path, certificationNote: note, certificateStatus: "PENDING", hasCertification: false },
+  // Cek batas diulang di dalam kunci baris profil: 2 unggahan barengan saat
+  // sisa slot 1 tidak boleh sama-sama lolos.
+  const created = await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM "CoachProfile" WHERE id = ${profile.id} FOR UPDATE`;
+    const count = await tx.coachCertificate.count({ where: { coachProfileId: profile.id } });
+    if (count >= MAX_CERTIFICATES_PER_COACH) return false;
+    await tx.coachCertificate.create({ data: { coachProfileId: profile.id, name, filePath: path } });
+    return true;
   });
+  if (!created) {
+    await removeObject(CERT_BUCKET, path);
+    return { error: LIMIT_ERROR };
+  }
   revalidatePath("/profil");
   return { success: true };
+}
+
+
+// Coach menghapus sertifikatnya sendiri (status apa pun). Kalau itu satu-
+// satunya yang disetujui, badge "Bersertifikat" ikut hilang.
+// Sertifikat milik coach lain / sudah terhapus = diam saja (tidak ada yang
+// perlu ditampilkan; daftar di Profil langsung diperbarui).
+export async function deleteCoachCertificate(certificateId: string): Promise<void> {
+  const session = await auth();
+  if (!session || session.user.role !== "COACH") return;
+  const cert = await prisma.coachCertificate.findFirst({
+    where: { id: certificateId, coachProfile: { userId: session.user.id } },
+    select: { id: true, filePath: true },
+  });
+  if (!cert) return;
+  await prisma.coachCertificate.deleteMany({ where: { id: cert.id } });
+  if (cert.filePath) await removeObject(CERT_BUCKET, cert.filePath);
+  revalidatePath("/", "layout");
 }

@@ -13,6 +13,7 @@ import { NavBar } from "@/components/nav-bar";
 import BackButton from "./back-button";
 import { Avatar } from "@/components/ui/avatar";
 import { coachBioLine } from "@/lib/coach-bio";
+import { certifiedBadgeText } from "@/lib/coach-certificates";
 import Image from "next/image";
 
 // Coach shortcut page (pool-first browse + cheap cross-pool discovery,
@@ -41,7 +42,14 @@ export default async function CoachShortcutPage({
       id: true,
       name: true,
       coachProfile: {
-        select: { bio: true, specialties: true, certificationNote: true, certificateStatus: true, certificateUrl: true, photoUrl: true, birthDate: true, gender: true },
+        select: {
+          bio: true,
+          specialties: true,
+          photoUrl: true,
+          birthDate: true,
+          gender: true,
+          certificates: { where: { status: "APPROVED" }, select: { id: true, name: true, filePath: true }, orderBy: { createdAt: "asc" } },
+        },
       },
       poolAffiliations: {
         select: {
@@ -58,9 +66,13 @@ export default async function CoachShortcutPage({
   // pengguna yang login dapat detail kolam (jam, fasilitas) dan bisa membuka
   // file sertifikat (signed URL berumur pendek, bukan link permanen).
   const profile = coach.coachProfile;
-  const certApproved = profile?.certificateStatus === "APPROVED";
-  const certViewUrl =
-    session && certApproved && profile?.certificateUrl ? await signedObjectUrl(CERT_BUCKET, profile.certificateUrl) : null;
+  const certificates = await Promise.all(
+    (profile?.certificates ?? []).map(async (c) => ({
+      ...c,
+      viewUrl: session && c.filePath ? await signedObjectUrl(CERT_BUCKET, c.filePath) : null,
+    }))
+  );
+  const certifiedLabel = certifiedBadgeText(certificates);
 
   const content = (
     // Login: samain container sama halaman role lain (judul gak loncat pas
@@ -85,22 +97,31 @@ export default async function CoachShortcutPage({
         </div>
       </div>
 
-      {certApproved && (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Badge tone="success">Bersertifikat{profile?.certificationNote ? ` · ${profile.certificationNote}` : ""}</Badge>
-          {session ? (
-            certViewUrl && (
-              <a href={certViewUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand-700 underline">
-                Lihat sertifikat
-              </a>
-            )
-          ) : (
-            profile?.certificateUrl && (
-              <Link href="/register" className="text-sm font-medium text-brand-700 underline">
-                Lihat sertifikat (daftar dulu)
-              </Link>
-            )
-          )}
+      {certifiedLabel && (
+        <div className="mt-4 flex flex-col gap-2">
+          <div>
+            <Badge tone="success">{certifiedLabel}</Badge>
+          </div>
+          <ul className="flex flex-col gap-1">
+            {certificates.map((c) => (
+              <li key={c.id} className="flex flex-wrap items-center gap-2 text-sm text-text">
+                <span>{c.name}</span>
+                {session ? (
+                  c.viewUrl && (
+                    <a href={c.viewUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-700 underline">
+                      Lihat sertifikat
+                    </a>
+                  )
+                ) : (
+                  c.filePath && (
+                    <Link href="/register" className="font-medium text-brand-700 underline">
+                      Lihat sertifikat (daftar dulu)
+                    </Link>
+                  )
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 

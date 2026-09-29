@@ -13,7 +13,7 @@ export default async function CoachDashboardPage() {
   const now = new Date();
 
   const [profile, slots, unmarked, openThisWeek, pools] = await Promise.all([
-    prisma.coachProfile.findUnique({ where: { userId: session.user.id }, select: { walletBalance: true, certificateStatus: true } }),
+    prisma.coachProfile.findUnique({ where: { userId: session.user.id }, select: { walletBalance: true, certificates: { where: { status: "APPROVED" }, select: { id: true }, take: 1 } } }),
     prisma.availability.findMany({
       where: { coachId: session.user.id, date: { in: [today, tomorrow] }, status: "BOOKED" },
       orderBy: { startTime: "asc" },
@@ -84,7 +84,7 @@ export default async function CoachDashboardPage() {
           <SessionList items={slots.filter((s) => s.date.getTime() === tomorrow.getTime()).map(toItem)} empty="Belum ada sesi yang dibooking besok." />
         </BentoCard>
 
-        {profile?.certificateStatus !== "APPROVED" && (
+        {!profile?.certificates.length && (
           <BentoCard title="Lengkapi profil" href="/profil" linkLabel="Buka profil" className="md:col-span-6">
             <p className="text-sm text-text-muted">
               Upload foto dan sertifikat supaya profilmu tampil lebih meyakinkan di mata orang tua. Badge

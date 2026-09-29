@@ -37,7 +37,15 @@ export default async function ProfilPage() {
     session.user.role === "COACH"
       ? await prisma.coachProfile.findUnique({
           where: { userId: session.user.id },
-          select: { bio: true, specialties: true, certificationNote: true, photoUrl: true, certificateStatus: true, birthDate: true, gender: true },
+          select: {
+            bio: true,
+            specialties: true,
+            certificationNote: true,
+            photoUrl: true,
+            birthDate: true,
+            gender: true,
+            certificates: { select: { id: true, name: true, status: true }, orderBy: { createdAt: "asc" } },
+          },
         })
       : null;
 
@@ -86,8 +94,8 @@ export default async function ProfilPage() {
                   <h2 className="mb-3 text-lg font-semibold text-text">Foto &amp; Sertifikat</h2>
                   <CoachMediaForm
                     photoUrl={coachProfile.photoUrl}
-                    certificateStatus={coachProfile.certificateStatus}
-                    certificationNote={coachProfile.certificationNote}
+                    certificates={coachProfile.certificates}
+                    defaultCertificateName={coachProfile.certificationNote}
                     storageReady={isStorageConfigured()}
                   />
                 </CardBody>

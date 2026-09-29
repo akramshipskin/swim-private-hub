@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { coachBioLine } from "@/lib/coach-bio";
+import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
 export default async function PoolCoachPage() {
   const session = await requireRole("POOL_OWNER");
@@ -26,7 +27,7 @@ export default async function PoolCoachPage() {
               id: true,
               name: true,
               phone: true,
-              coachProfile: { select: { photoUrl: true, specialties: true, certificateStatus: true, certificationNote: true, birthDate: true, gender: true } },
+              coachProfile: { select: { photoUrl: true, specialties: true, birthDate: true, gender: true, certificates: approvedCertificatesSelect } },
               availabilities: {
                 select: { status: true, startTime: true, poolId: true, bookings: { where: { attended: true }, select: { id: true } } },
                 where: { startTime: { gte: startMonth }, ...NOT_CLOSED },
@@ -69,7 +70,7 @@ export default async function PoolCoachPage() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-base font-semibold text-text">{coach.name}</p>
-                          {coach.coachProfile?.certificateStatus === "APPROVED" && <Badge tone="success">Bersertifikat</Badge>}
+                          {certifiedBadgeText(coach.coachProfile?.certificates) && <Badge tone="success">Bersertifikat</Badge>}
                         </div>
                         {coachBioLine(coach.coachProfile) && (
                           <p className="text-xs text-text-subtle">{coachBioLine(coach.coachProfile)}</p>

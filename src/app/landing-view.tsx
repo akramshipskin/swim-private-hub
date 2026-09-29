@@ -35,8 +35,8 @@ export type LandingCoach = {
   bio: string | null;
   specialties: string[];
   photoUrl: string | null;
-  certified: boolean;
-  certificationNote: string | null;
+  // "Bersertifikat · FASI +1"; null = belum ada sertifikat disetujui.
+  certifiedLabel: string | null;
   bioLine: string | null;
   pools: string[];
 };

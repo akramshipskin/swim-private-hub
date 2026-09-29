@@ -10,6 +10,8 @@ import { UserActions } from "../user-display";
 import { formatRupiah } from "@/lib/format";
 import { formatDateLabel, formatTimeWib, todayWibDateString, wibDateTime } from "@/lib/datetime";
 import { coachBioLine } from "@/lib/coach-bio";
+import { certificateStatusBadge } from "@/lib/coach-certificates";
+import { signedObjectUrl, CERT_BUCKET } from "@/lib/storage";
 import { roleLabel } from "@/lib/nav-links";
 import { deletionImpact } from "@/lib/account-deletion";
 import AnonymizeCard from "./anonymize-card";
@@ -45,7 +47,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
     include: {
       dependents: { where: { isActive: true }, orderBy: { name: "asc" } },
       packages: { orderBy: { createdAt: "desc" }, include: { dependent: true, pool: { select: { name: true } } } },
-      coachProfile: true,
+      coachProfile: { include: { certificates: { orderBy: { createdAt: "asc" } } } },
       poolAffiliations: { select: { pool: { select: { id: true, name: true } } }, orderBy: { pool: { name: "asc" } } },
       poolOwnerships: { select: { pool: { select: { id: true, name: true, walletBalance: true, isActive: true, address: true } } } },
     },
@@ -94,6 +96,12 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
       : Promise.resolve(null),
   ]);
   const manualAmount = coachManual?._sum.amount ?? 0;
+  const certificates = await Promise.all(
+    (user.coachProfile?.certificates ?? []).map(async (c) => ({
+      ...c,
+      viewUrl: c.filePath ? await signedObjectUrl(CERT_BUCKET, c.filePath) : null,
+    }))
+  );
 
   const activePackages = user.packages.filter((p) => p.status === "ACTIVE" && p.sisaSesi > 0);
 
@@ -172,13 +180,24 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               <Row
                 label="Sertifikat"
                 value={
-                  user.coachProfile.certificateStatus === "APPROVED"
-                    ? `Disetujui${user.coachProfile.certificationNote ? ` · ${user.coachProfile.certificationNote}` : ""}`
-                    : user.coachProfile.certificateStatus === "PENDING"
-                      ? "Menunggu persetujuan"
-                      : user.coachProfile.certificateStatus === "REJECTED"
-                        ? "Ditolak"
-                        : "Belum ada"
+                  certificates.length === 0 ? (
+                    "Belum ada"
+                  ) : (
+                    <ul className="flex flex-col items-end gap-1">
+                      {certificates.map((c) => (
+                        <li key={c.id} className="flex flex-wrap items-center justify-end gap-2">
+                          {c.viewUrl ? (
+                            <a href={c.viewUrl} target="_blank" rel="noopener noreferrer" className="text-brand-700 underline">
+                              {c.name}
+                            </a>
+                          ) : (
+                            c.name
+                          )}
+                          <Badge tone={certificateStatusBadge[c.status].tone}>{certificateStatusBadge[c.status].label}</Badge>
+                        </li>
+                      ))}
+                    </ul>
+                  )
                 }
               />
               <Row
