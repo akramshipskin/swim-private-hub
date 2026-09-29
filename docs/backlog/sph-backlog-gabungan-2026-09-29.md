@@ -22,13 +22,13 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 |---|---|---|---|---|
 | 1.1 | Pembalikan pendapatan platform gak dicek saldo (beda dari pool/coach yang dicek) | TERBUKA | Hadi putusin: platform boleh saldo minus sementara (mirip koreksi saldo 26 Sep) atau harus dikunci kayak pool/coach? PPN yang udah disetor lalu dibalik = isu nyata | Hadi jawab dulu, baru Opus (area uang) |
 | 1.2 | Penarikan platform gak ada bukti transfer/status/konfirmator | TERBUKA | Samain standar sama penarikan coach/pool (udah wajib bukti transfer) | Opus (area uang) |
-| 1.3 | Rekening bank polos di DB, enkripsi belum dibahas | TERBUKA (sebagian, 25 Sep: nomor disamarkan setelah pencairan otomatis) | Enkripsi level aplikasi: perlu diputuskan | Hadi, lalu Opus |
+| 1.3 | Rekening bank polos di DB | SELESAI di kode (feat/encrypt-bank, 29 Sep); belum live — butuh langkah Hadi di `docs/plans/deploy-enkripsi-2fa.md` | Hadi: kunci di Vercel, push, jalankan skrip | Hadi |
 
 ## 2. Privasi & Data
 
 | # | Item | Status | Kerjaan berikutnya | Owner / Gear |
 |---|---|---|---|---|
-| 2.1 | `totpSecret` disimpan polos | TERBUKA | Enkripsi AES-256-GCM sebelum simpan | Opus (area auth/keamanan) |
+| 2.1 | `totpSecret` disimpan polos | SELESAI di kode (feat/encrypt-totp, 29 Sep); belum live — sama, lihat `docs/plans/deploy-enkripsi-2fa.md` | Hadi: kunci di Vercel, push, jalankan skrip | Hadi |
 | 2.2 | `dev-db-sync.mjs` nyalin data asli prod TERMASUK totpSecret admin | SELESAI (e74df1a, merge d787722). Terbukti 29 Sep: sync ulang Hadi dari main -> DB dev 0 email/nama/HP/rekening/chat asli, 0 kunci 2FA, 1 hash password; ledger & pembayaran utuh; login lokal member OK, admin diarahkan pasang 2FA | — | — |
 | 2.3 | Data ke AI tanpa filter | SEBAGIAN DIPUTUSKAN (retensi chat 90 hari + arsip, 25 Sep) | Belum ada aturan "data apa yang boleh diproses AI" secara eksplisit — saat ini cuma nama+peran+ketikan user, gak baca DB | Hadi putusin kalau mau diperketat lagi |
 | 2.4 | Pemilik kolam bisa liat nama anak | TERBUKA | Hadi putusin: perlu atau cukup jumlah peserta | Hadi jawab dulu |
@@ -123,12 +123,21 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 |---|---|---|
 | Satu hero buat 3 audiens, gak ada pemilihan peran | TERBUKA, tapi rendah prioritas sampai ada traffic buat diuji | Bisa ditambah setelah tes Meta Ads jalan |
 
-## 8. Sisa Sweep 28 Sep (belum sempat, di luar topik landing/bisnis)
+## 8. Sisa Sweep 28 Sep
+
+Update 29 Sep: sweep member (089900000009) & pemilik kolam (089900000003) SELESAI di lokal (kode branch encrypt-bank). Hasil:
+- Semua halaman member (7) & pemilik kolam (7) terbuka tanpa error; akses ke peran lain ditolak.
+- Alur tulis-data diuji nyata: booking (sesi 8->7), batal (7->8, sisa jatah batal 2->1), tambah peserta anak, usul paket kolam (tersimpan nonaktif + menunggu admin, tidak tampil ke member/landing), ajukan pencairan coach + tolak admin (saldo kembali), pasang 2FA admin + login.
+- **Bug kecil baru:** ganti nama di Profil tidak ikut mengganti nama peserta "diri sendiri" (`src/app/profil/actions.ts` updateName tidak memperbarui Dependent isSelf) -> dropdown booking & dashboard menampilkan nama lama. Sonnet / OpenCode.
+- False alarm: (a) Dashboard kolam "bulan ini 1 sesi" vs Laporan "0" = beda rentang (laporan bawaan 7 hari, sesinya 13 Sep). (b) Kolom jatahCancel tidak berkurang saat batal = memang total jatah; sisa dihitung dari jumlah batal, tampilan ke member benar. (c) Screenshot sempat menampilkan admin saat login member: tidak bisa diulang setelah dicek identitas per halaman; kemungkinan sesi sisa di alat tes, penyebab pasti tidak terbukti.
+- Yang TIDAK diuji: pembayaran/checkout (key Midtrans production di lokal, dilarang), tandai Hadir oleh coach -> bagi hasil (sudah diuji di sweep 25-26 Sep, tidak diulang).
+
+
 
 | Item | Status | Kerjaan berikutnya |
 |---|---|---|
-| Sweep role member & pemilik kolam | BELUM DIKERJAKAN | Butuh password akun QA dari Hadi |
-| Alur tulis-data (submit form, koreksi saldo, dll) belum diuji | BELUM DIKERJAKAN | Lanjutan /qa-only |
+| Sweep role member & pemilik kolam | SELESAI 29 Sep | lihat catatan di atas |
+| Alur tulis-data | SEBAGIAN SELESAI 29 Sep | booking, batal, peserta, usul paket, pencairan, 2FA diuji; checkout tidak (dilarang di lokal) |
 | Fix `/pembayaran/sukses` belum diuji order asli | BELUM DIVERIFIKASI | Checkout lokal = key Midtrans production, dilarang tes langsung |
 | `.qa-otp.mts` masih nangkring di root repo | BELUM DIBERESIN | Hapus setelah sweep kelar |
 

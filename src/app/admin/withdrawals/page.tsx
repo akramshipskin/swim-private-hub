@@ -7,6 +7,7 @@ import WithdrawalRow from "./withdrawal-row";
 import PlatformWithdrawForm from "./platform-withdraw-form";
 import { getPlatformBalance } from "@/lib/platform-wallet";
 import { isIrisConfigured } from "@/lib/disbursement";
+import { openSecret } from "@/lib/secret-box";
 
 const STATUS_FILTERS = {
   waiting: { label: "Perlu diproses", statuses: ["PENDING", "PROCESSING"] },
@@ -155,7 +156,7 @@ export default async function AdminWithdrawalsPage({
                 failureReason: w.failureReason,
                 referenceId: w.midtransReferenceId ?? w.transferReference,
                 bankName: w.bankName,
-                bankAccountNumber: w.bankAccountNumber,
+                bankAccountNumber: openSecret(w.bankAccountNumber),
                 bankAccountName: w.bankAccountName,
                 holderType: w.pool ? "Kolam" : "Coach",
                 holderName: w.pool?.name ?? w.coachProfile?.user.name ?? "-",

@@ -14,6 +14,7 @@ import { roleLabel } from "@/lib/nav-links";
 import { deletionImpact } from "@/lib/account-deletion";
 import AnonymizeCard from "./anonymize-card";
 import ResetTotpButton from "./reset-totp-button";
+import { openSecret } from "@/lib/secret-box";
 
 export const metadata = { title: "Detail User | Swim Private Hub" };
 
@@ -204,7 +205,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                   // Disamarkan (keputusan Hadi 25 Sep): nomor lengkap hanya di
                   // halaman proses pencairan, tempat admin benar-benar transfer.
                   user.coachProfile.bankAccountNumber
-                    ? `${user.coachProfile.bankName ?? "-"} · •••• ${user.coachProfile.bankAccountNumber.slice(-4)} a.n. ${user.coachProfile.bankAccountName ?? "-"}`
+                    ? `${user.coachProfile.bankName ?? "-"} · •••• ${openSecret(user.coachProfile.bankAccountNumber).slice(-4)} a.n. ${user.coachProfile.bankAccountName ?? "-"}`
                     : "Belum diisi"
                 }
               />

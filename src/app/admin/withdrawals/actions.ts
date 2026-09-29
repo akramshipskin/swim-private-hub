@@ -6,6 +6,7 @@ import { markWithdrawalFailed, markWithdrawalPaid } from "@/lib/withdrawal";
 import { disburseViaIris, isIrisConfigured } from "@/lib/disbursement";
 import { notifyWithdrawalOutcome } from "@/lib/withdrawal-notify";
 import { revalidatePath } from "next/cache";
+import { openSecret } from "@/lib/secret-box";
 
 export type ActionState = { error?: string } | null;
 
@@ -42,7 +43,7 @@ export async function processWithdrawal(
   const result = await disburseViaIris({
     amount: request.amount,
     bankName: request.bankName,
-    bankAccountNumber: request.bankAccountNumber,
+    bankAccountNumber: openSecret(request.bankAccountNumber),
     bankAccountName: request.bankAccountName,
     referenceNo: request.id,
   });

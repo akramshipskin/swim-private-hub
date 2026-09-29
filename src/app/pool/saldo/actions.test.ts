@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
+import { openSecret } from "@/lib/secret-box";
 
 vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ user: { id: "owner-1" } }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
@@ -27,7 +28,11 @@ beforeEach(() => {
 describe("pool updateBankInfo", () => {
   it("menyimpan rekening kalau bank dipilih dari daftar", async () => {
     await expect(updateBankInfo("pool-1", null, form({}))).resolves.toEqual({ ok: true });
-    expect(poolUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: { bankName: "Mandiri", bankAccountNumber: "9876543210", bankAccountName: "Kolam Tirta" } }));
+    expect(poolUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: { bankName: "Mandiri", bankAccountNumber: expect.stringMatching(/^enc:v1:/), bankAccountName: "Kolam Tirta" } }));
+    // Nomor tersimpan terenkripsi, bukan polos, dan bisa dibuka kembali.
+    const stored = poolUpdate.mock.calls[0][0].data.bankAccountNumber;
+    expect(stored).not.toContain("9876543210");
+    expect(openSecret(stored)).toBe("9876543210");
   });
 
   it("menolak nama bank ketikan bebas", async () => {

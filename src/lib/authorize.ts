@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants } from "@/lib/format";
 import { clientIp, forgetAttempts, takeAttempt, LOGIN_FAILS_PER_ACCOUNT, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS } from "@/lib/rate-limit";
 import { verifyTotp } from "@/lib/totp";
+import { openSecret } from "@/lib/secret-box";
 
 // Kode error ini sampai ke browser (signIn(...).code) -- login-form.tsx
 // menerjemahkannya ke pesan. Jangan bedakan "HP tidak terdaftar" vs
@@ -63,7 +64,7 @@ export async function authorizeCredentials(credentials: Partial<Record<string, u
       await notAFailure();
       throw new OtpRequiredError();
     }
-    const step = verifyTotp(user.totpSecret, otp);
+    const step = verifyTotp(openSecret(user.totpSecret), otp);
     if (step === null) throw new OtpInvalidError();
     // Kode yang sama tidak boleh dipakai dua kali (CAS di langkah waktu), dan
     // kuncinya harus masih kunci yang barusan dicek: 2FA yang dinonaktifkan/
