@@ -29,7 +29,7 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 | # | Item | Status | Kerjaan berikutnya | Owner / Gear |
 |---|---|---|---|---|
 | 2.1 | `totpSecret` disimpan polos | TERBUKA | Enkripsi AES-256-GCM sebelum simpan | Opus (area auth/keamanan) |
-| 2.2 | `dev-db-sync.mjs` nyalin data asli prod TERMASUK totpSecret admin | TERBUKA, **lebih genting dari yang ditulis dokumen asli** | Tambah anonimisasi/redaksi sebelum masuk DB dev, minimal totpSecret & data anak | Opus |
+| 2.2 | `dev-db-sync.mjs` nyalin data asli prod TERMASUK totpSecret admin | SELESAI di kode (e74df1a, merge d787722) — **belum terbukti ke prod**: sync 29 Sep masih pakai skrip lama | Hadi jalankan ulang `npm run db:dev:sync` dari main, Claude cek DB dev bersih | Opus |
 | 2.3 | Data ke AI tanpa filter | SEBAGIAN DIPUTUSKAN (retensi chat 90 hari + arsip, 25 Sep) | Belum ada aturan "data apa yang boleh diproses AI" secara eksplisit — saat ini cuma nama+peran+ketikan user, gak baca DB | Hadi putusin kalau mau diperketat lagi |
 | 2.4 | Pemilik kolam bisa liat nama anak | TERBUKA | Hadi putusin: perlu atau cukup jumlah peserta | Hadi jawab dulu |
 | 2.5 | Sertifikat coach bisa dibuka semua yang login (bukan cuma member) | SEBAGIAN DIPUTUSKAN (25 Sep: member boleh) | Coach lain & pemilik kolam masih ikut kebuka — perlu diputuskan dibatasi atau dibiarkan | Hadi jawab dulu, lalu Sonnet |
@@ -44,15 +44,15 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 
 | # | Item | Status | Kerjaan berikutnya | Owner / Gear |
 |---|---|---|---|---|
-| 4.1 | `/pelatih` gak cek profil aktif | DAMPAK NOL saat ini (kolom `CoachProfile.isActive` gak pernah ditulis) | Gak mendesak. Bisa dirapikan sekalian saat ngerjain item lain di file yang sama | Sonnet, prioritas rendah |
-| 4.2 | Slot kolam nonaktif masih tampil di `/api/availability` (booking-nya tetap ditolak) | TERBUKA, dampak UX doang | Filter `pool.isActive` di query availability | Sonnet |
+| 4.1 | `/pelatih` gak cek profil aktif | SELESAI (d6a7d2e, OpenCode mekanis-batch-5) | — | — |
+| 4.2 | Slot kolam nonaktif masih tampil di `/api/availability` (booking-nya tetap ditolak) | SELESAI (d6a7d2e) + tes regresi | — | — |
 
 ## 5. Infrastruktur
 
 | # | Item | Status | Kerjaan berikutnya | Owner / Gear |
 |---|---|---|---|---|
 | 5.1 | Backup DB gagal tiap malam (secret R2 belum diisi); file storage gak ikut backup | TERBUKA, masalah lama | Hadi isi secret R2. File storage butuh mekanisme terpisah | Hadi (secret), lalu Opus (desain backup storage) |
-| 5.2 | CI gak jalanin build & race test | TERBUKA | Tambah step build ke `.github/workflows/test.yml` | Sonnet (mekanis) |
+| 5.2 | CI gak jalanin build & race test | Build SELESAI (d6a7d2e). Race test di CI masih TERBUKA (butuh Postgres di CI) | — | Sonnet High |
 | 5.3 | Rate limit cuma 1 lapis (level app) | TERBUKA, saran infra jangka panjang | Gak mendesak untuk tahap validasi permintaan | Nanti |
 | 5.4 | Satu alamat email = satu thread (`EmailThread.externalEmail @unique`), padahal topik beda-beda dari waktu ke waktu | TERBUKA, dampak kecil di volume sekarang | Kelompokkan berdasarkan Message-ID/subjek kalau volume email makin banyak | Nanti, gak mendesak |
 | 5.5 | CSP belum aktif (nunggu daftar domain Midtrans+Vercel) | TERBUKA | Kumpulin daftar domain, aktifkan CSP | Sonnet, setelah daftar domain siap |
@@ -61,11 +61,12 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 
 | # | Item | Status | Keputusan | Kerjaan berikutnya |
 |---|---|---|---|---|
-| 6.1 | S&K bilang "sarana bantu administrasi" tapi SPH pegang dana Midtrans dulu | DIPUTUSKAN | SPH = marketplace penuh, pegang dana & hubungan pelanggan. S&K harus diubah sesuai kenyataan ini | Draft revisi S&K (Opus) + **wajib review orang hukum** sebelum live |
+| 6.1 | S&K bilang "sarana bantu administrasi" tapi SPH pegang dana Midtrans dulu | DRAFT JADI (80b6a86): `docs/legal/draft-syarat-ketentuan-v2.md` | 12 [ISI HADI], lalu review orang hukum | Hadi |
+| 6.2 | **Temuan baru 29 Sep:** S&K live pasal 3 "hanya sesi Hadir dihitung terpakai" SALAH (sistem potong sesi saat booking; tidak hadir = terpakai) | TERBUKA — S&K yang sudah disetujui pengguna bertentangan dengan sistem | Ikut terbenahi saat S&K v2 dipasang; kalau v2 lama, pertimbangkan koreksi 1 kalimat duluan | Hadi putuskan |
 | §7 #8 | Marketplace / software / hybrid? | DIPUTUSKAN | **Marketplace penuh** | — |
 | §7 #9-10 | SPH bawa demand ke coach/kolam? | DIPUTUSKAN | Ya, itu tujuannya, tapi **belum terbukti** — landing gak boleh janji sebelum ada member asli | Lunakkan klaim di landing (lihat §7) |
 | §7 #11 | Siapa pegang hubungan pelanggan? | DIPUTUSKAN | SPH | — |
-| §7 #12 | Transaksi di luar platform (kabur ke WA)? | DIPUTUSKAN | Dicegah lewat MOU kolam ("les privat di kolam ini cuma lewat SPH") + fitur yang WA gak punya | Draft template MOU (Opus) + **wajib review orang hukum**; Hadi tanya 3 kolam dulu (The Assignment) |
+| §7 #12 | Transaksi di luar platform (kabur ke WA)? | DRAFT JADI (80b6a86): `docs/legal/draft-mou-kolam-v1.md` (23 [ISI HADI]) + `draft-perjanjian-coach-v1.md` (18 [ISI HADI]) | Hadi tanya 3 kolam (cakupan eksklusivitas), isi [ISI HADI], review orang hukum | Hadi |
 
 ## 7. Landing — per role
 
@@ -94,6 +95,8 @@ Office hours 29 Sep gak nyentuh ini sama sekali (fokusnya model bisnis & landing
 | Biaya masuk kolam buat coach | TERBUKA | Belum ada di sistem, perlu diputuskan |
 | Murid bawaan sendiri | TERBUKA | Belum dibahas |
 | Waktu pencairan | TERBUKA | FAQ masih general ("admin memproses") |
+| **Coach/kolam dibayar kalau peserta tidak datang / sesi hangus?** (temuan 29 Sep) | TERBUKA | Sistem sekarang: tidak dibagi, uang tetap di platform. Masuk MOU pasal 5.5 & perjanjian coach pasal 4.4 |
+| FAQ beli 1 sesi kurang presisi (temuan 29 Sep) | TERBUKA, kecil | Kode pakai harga per sesi **termahal** (`src/lib/drop-in.ts:13`), FAQ cuma "harga per sesi kolam itu" — Sonnet |
 | **FAQ salah: "kolam mitra bisa menambahkanmu"** | SELESAI (commit 6db51ac) | Diubah jadi "admin yang mengafiliasikanmu" |
 | Siapa nentuin harga | SELESAI (commit 6db51ac) | FAQ coach baru: "Saya bisa menentukan tarif saya sendiri? Tidak..." |
 | Risiko transaksi di luar platform | DIPUTUSKAN | Lihat §7 #12 di atas — MOU kolam |
