@@ -113,13 +113,14 @@ bukan ukuran papannya.
 
 ---
 
-## Yang masih perlu diputuskan sebelum dibangun
+## Jawaban Hadi (29 Sep malam)
 
-1. Batas umur tiap kelompok sudah pas? (A: 6 bln–3 th, B: 4–6, C: 7–12, D: 13+)
-2. Kalau anak pindah kelompok umur (misal ulang tahun ke-7 saat masih di B2),
-   lanjut di kelompok lama sampai selesai, atau langsung dipetakan ke C?
-   Usulan: lanjut di kelompok lama sampai levelnya selesai.
-3. Butir tambahan dari coach: hanya berlaku untuk peserta itu, atau bisa
-   diusulkan jadi butir standar (disetujui admin)?
-4. Isi sertifikat: nama peserta, level, tanggal, nama dan tanda tangan coach,
-   logo SPH. Tanda tangan coach berupa gambar yang diunggah coach sekali?
+1. Batas umur kelompok (A 6 bln–3 th, B 4–6, C 7–12, D 13+): cukup.
+2. Anak yang naik kelompok umur di tengah level: lanjut di kelompok lama sampai
+   levelnya selesai.
+3. Butir tambahan dari coach bisa diusulkan jadi butir standar, berlaku setelah
+   disetujui SPH (admin).
+4. Tanda tangan coach di sertifikat: gambar yang diunggah coach sekali.
+
+Usulan baru Hadi (masih dibahas): uang coach tidak bisa dicairkan sebelum
+milestone diisi, supaya coach selalu memperbarui progres peserta.
