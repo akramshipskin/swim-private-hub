@@ -10,7 +10,7 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
   const current = audiences.find((a) => a.key === active)!;
   return (
     <div>
-      <div role="tablist" aria-label="Cara kerja untuk" className="mb-8 flex flex-wrap justify-center gap-2">
+      <div role="tablist" aria-label="Cara kerja untuk" className="mb-10 flex flex-wrap gap-2">
         {audiences.map((a) => (
           <button
             key={a.key}
@@ -26,14 +26,17 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
           </button>
         ))}
       </div>
-      <ol role="tabpanel" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ol role="tabpanel" className="grid gap-0 lg:grid-cols-4 lg:gap-8">
         {current.steps.map((s, i) => (
-          <li key={s.title} className="rounded-2xl bg-white p-6">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-fixed-lime-500 text-sm font-bold text-fixed-ink">
+          <li key={s.title} className="relative pb-9 pl-14 last:pb-0 lg:pb-0 lg:pl-0 lg:pt-14">
+            <span className="absolute left-0 top-0 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-fixed-lime-500 text-sm font-bold text-fixed-ink">
               {i + 1}
             </span>
-            <h3 className="mt-4 text-lg font-semibold text-fixed-ink">{s.title}</h3>
-            <p className="mt-2 text-sm text-fixed-muted">{s.body}</p>
+            {i < current.steps.length - 1 && (
+              <span aria-hidden="true" className="absolute left-5 top-10 bottom-0 w-px bg-fixed-ink/20 lg:left-12 lg:right-[-2rem] lg:top-5 lg:bottom-auto lg:h-px lg:w-auto" />
+            )}
+            <h3 className="text-lg font-semibold leading-snug text-fixed-ink">{s.title}</h3>
+            <p className="mt-2 max-w-xs text-sm leading-relaxed text-fixed-muted">{s.body}</p>
           </li>
         ))}
       </ol>
@@ -50,7 +53,7 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
   const current = groups.find((g) => g.key === active)!;
   return (
     <div>
-      <div role="tablist" aria-label="Pertanyaan umum untuk" className="mb-6 flex flex-wrap justify-center gap-2">
+      <div role="tablist" aria-label="Pertanyaan umum untuk" className="mb-6 flex flex-wrap gap-2">
         {groups.map((g) => (
           <button
             key={g.key}
