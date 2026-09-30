@@ -76,3 +76,60 @@ Disengaja dibiarkan (DB dev bisa direset dengan `npm run db:dev:sync`): pembayar
 - Landing desktop: bagian "Kamu di sini sebagai apa?" dan "Cara kerjanya" masih tiga kartu sejajar; coach polaroid dan logo pembayaran (baris terakhir 1 logo) belum dirapikan.
 - Belum ada pengecekan visual penuh halaman sesudah perubahan di semua role selain crawl mekanis (kontras, tap target, judul, HTTP) dan tinjauan gambar landing.
 - Tidak ada perubahan migrasi/schema.
+
+---
+
+# Sweep lanjutan (30 Sep siang) — semua fitur dijalankan satu per satu
+
+Arahan Hadi: aplikasi masih pengembangan (akun dummy, termasuk di production), jalankan SEMUA fitur, jangan lewati yang "sudah pernah". Semua dijalankan lewat UI di DB dev lokal dengan browser headless, uang dicek ke ledger via SQL. Production tidak disentuh (Claude tidak boleh mengetik password ke situs non-localhost).
+
+## A. Keputusan Hadi yang sudah dikerjakan
+| Keputusan | Hasil |
+|---|---|
+| Kolam contoh ikut digeser kolam asli, maks 5 | `rankLandingPools` + 9 tes; landing dicek: 5 kolam tampil; foto contoh SVG di `public/demo` |
+| Bagi hasil final 10/40/50 | Bawaan kolam baru 10/40 (migrasi `20260930120000_pool_split_default`, hanya SET DEFAULT). Kolam yang sudah ada diubah lewat skrip `rapikan-data-produksi.mts` (lihat-saja dulu) |
+| Afiliasi 5% sekali dari paket pertama | Sudah begitu di kode; dibuktikan ujung ke ujung (bagian B) |
+| Kebijakan Privasi diperbarui | Tanggal lahir peserta, catatan & sertifikat milestone, afiliasi, data coach, bagian data anak, kunci login. **Belum dicek orang hukum** |
+| 50% coach tidak hadir di perjanjian coach | Sudah ada di Pasal 4.4; tag "BELUM ADA DI SISTEM" yang usang dibuang dari draft coach & MOU |
+| Batas salah login 3x per akun + hitung mundur | Kunci per akun (semua jaringan), layar masuk menampilkan hitung mundur; tes race L3/L3b |
+| 1 logo untuk semua latar; teks swim.privatehub ikut tema | Dicatat di brand guideline; teks mewarisi warna pembungkus |
+| File lama di-commit | `docs/archive/laporan-lama/`; alat OTP jadi `scripts/qa-otp.mts` (menolak DB non-lokal) |
+| Pesan admin ramah, nomor transaksi ringkas, foto contoh | Selesai (`#XXXXXXXX`, nomor penuh di tooltip) |
+| Matikan paket uji, paket trial per kolam | Skrip `rapikan-data-produksi.mts` (Hadi jalankan di production). Harga trial bawaan Rp50.000 = angka sementara dari Claude, ubah di Admin > Paket |
+
+## B. Fitur yang dijalankan dan hasilnya
+Semua lulus kecuali yang tertulis di bagian C.
+- **Laporkan kehadiran:** member lapor → admin ubah Tidak Hadir→Hadir (ledger ikut dikoreksi) → tutup laporan → member melihat hasilnya.
+- **Milestone:** coach isi butir + catatan, tambah butir khusus + usul jadi standar, admin setujui, level selesai → sertifikat level; member melihat progres; coach/member lain mendapat 404; tanpa login diarahkan ke masuk.
+- **Slot coach:** tambah 3 slot, bentrok lintas kolam ditolak, hapus slot.
+- **Usulan paket kolam:** paket baru & ubah harga → admin setujui / tolak (harga aktif tidak berubah saat ditolak).
+- **Daftar coach & kolam → persetujuan:** akun menunggu tidak bisa masuk; setelah disetujui bisa masuk; kolam baru butuh "Setujui" terpisah di halaman Kolam; kolam baru mendapat 10/40 bawaan.
+- **Afiliasi ujung ke ujung:** coach login pertama → kode terbentuk; member daftar dengan kode; bayar di Midtrans **sandbox** (halaman "TEST", VA BCA); notifikasi Midtrans disimulasikan lokal dengan tanda tangan asli; booking; 2 sesi Hadir → satu komisi Rp20.000 (5% × Rp400.000, sekali per member); lewat masa tahan → cair ke saldo coach, saldo SPH −Rp20.000.
+- **Webhook pembayaran:** tanda tangan salah ditolak; jumlah beda tidak mengaktifkan; challenge tetap menunggu; settlement aktif; duplikat & expire telat tidak mengubah; deny → paket EXPIRED.
+- **Trial:** pembelian menunggu menyembunyikan tombol; setelah deny tombol muncul lagi (bug yang diperbaiki semalam).
+- **Beli 1 sesi:** harga Rp120.000 = tertinggi per sesi (100.000) + 20%; bagi hasil 60.000 / 48.000 / 12.000 (dicek di ledger).
+- **Bagi hasil 10/40/50 Rp100.000 (contoh Hadi):** kolam 50.000, coach 40.000, SPH 8.929 + PPN 1.071; sesi nyata di DB dev Rp100.000 cocok persis. Tidak Hadir: coach 20.000, SPH 80.000. Tes otomatis untuk berbagai harga & persen (termasuk 0%).
+- **Nonaktifkan coach:** booking mendatang dibatalkan (oleh admin), sesi member kembali.
+- **Reset password → wajib ganti:** sama dengan sementara / terlalu pendek / tidak cocok ditolak; valid masuk.
+- **Koreksi saldo:** tambah (salah catat) dan kurangi (dipindah ke platform, pasangan ledger PLATFORM_REVENUE).
+- **2FA coach:** pasang (kunci tersimpan terenkripsi), kode salah ditolak, masuk dengan kode, matikan.
+- **Hapus akun:** diajukan member → admin setujui → identitas dianonimkan, riwayat pembayaran tetap. Diperketat: tanggal lahir peserta & isi catatan milestone ikut dihapus.
+- **Impor Excel:** 2 member dibuat (peserta + paket), baris tanpa HP dan HP yang sudah ada dilewati.
+- **Chat:** tanpa AI, pesan diteruskan ke admin, admin membalas, status selesai.
+- **Unggah file (dengan penyimpanan palsu lokal):** foto coach, tanda tangan, sertifikat PDF, foto kolam; file palsu (bukan gambar asli) dan >3MB ditolak; admin menyetujui sertifikat → badge "Bersertifikat · … +1" tampil di profil publik.
+- **Pemilik kolam:** dashboard, saldo, pencairan (di bawah minimum & melebihi saldo ditolak, sah Rp60.000 → admin tandai dibayar; tanpa bukti transfer ditolak), info kolam, paket, daftar coach.
+- **Halaman admin vs ledger:** Dashboard "saldo mengendap" = kolam + coach + platform (cocok Rp456.250); Bagi Hasil, Uang Masuk, Pencairan cocok dengan SQL.
+- **Kode dibaca (tidak bisa dijalankan):** email (Resend), notifikasi push (VAPID), pencairan otomatis Iris (memang belum ditulis), aksi pesan admin. Tidak ditemukan bug.
+
+## C. Temuan
+**Diperbaiki:** komisi afiliasi tampil sebagai "koreksi manual" di Bagi Hasil (sekarang baris sendiri); "Upload" → "Unggah"; nama kolam tanpa pemilik tidak dianggap contoh (aturan demo = nama atau pemilik @example.com); hapus akun menyisakan tanggal lahir anak; peserta per akun tanpa batas (sekarang 10).
+**Bukan bug / artefak uji:** Bagi Hasil lebih besar dari ledger sebesar Rp468.750 = 5 sesi uji buatan saya (ditandai Hadir sebelum ada pembayaran, tidak mungkin di alur nyata). Data info kolam Melati sempat kosong karena skrip uji saya melewati kunci "Edit Info Kolam"; dipulihkan lewat UI asli.
+**Perlu Hadi:**
+1. Merchant Midtrans tampil **"Les Renang Cianjur"** di halaman bayar. Ganti nama merchant di dashboard Midtrans jadi Swim Private Hub.
+2. Menyetujui pemilik kolam tidak menyalakan kolamnya; harus klik Setujui di halaman Kolam juga (dua langkah).
+3. Persetujuan sertifikat ada di halaman Pengguna (bagian atas), bukan di detail coach.
+4. Drop kolom lama `certificateUrl/certificateStatus` (P3) **ditolak pemeriksa izin otomatis** (DROP COLUMN): tidak saya kerjakan. Kolom tidak dibaca kode; aman dibuang nanti dengan persetujuan Hadi.
+5. Harga trial Rp50.000 dan 3 kolam contoh tambahan (Bahari, Cempaka, Samudra) adalah isian sementara Claude untuk data contoh.
+
+## D. Sisa
+Uji ke Supabase/S3 asli (backup file), CSP mode pantau menunggu log, balasan AI, email, push, pembayaran di production, X-L testimoni (butuh teks Hadi).
