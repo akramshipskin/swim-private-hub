@@ -16,11 +16,13 @@
 >
 > **Update 29 Sep malam:** memuat keputusan Hadi (kolam tidak eksklusif,
 > tiket masuk sudah termasuk, kolam tidak boleh menolak coach, bayaran saat
-> peserta tidak datang, komisi afiliasi). Pasal yang bertanda
-> **[BELUM ADA DI SISTEM]** menjanjikan perilaku yang BELUM dikode (batas
-> 24 jam tandai hadir, bayaran 50% coach saat tidak hadir, tombol Laporkan
-> member, komisi afiliasi). Draft ini tidak boleh ditandatangani sebelum
-> kodenya jalan atau pasalnya disesuaikan.
+> peserta tidak datang, komisi afiliasi).
+>
+> **Update 30 Sep:** semua pasal yang sebelumnya bertanda "BELUM ADA DI SISTEM"
+> (batas 24 jam tandai hadir, bayaran 50% coach saat tidak hadir, saldo negatif,
+> tombol Laporkan, trial, komisi afiliasi 5%) sekarang sudah jalan di aplikasi
+> dan dicek lewat uji langsung. Tetap wajib direview orang hukum sebelum
+> ditandatangani.
 
 ---
 
@@ -137,7 +139,7 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    a. **Peserta sudah memesan tetapi tidak datang** (tanpa membatalkan
       sesuai S&K): Coach menerima 50% dari bagian coach yang normal,
       Kolam Mitra menerima Rp0, dan sisanya menjadi milik SPH.
-      **[BELUM ADA DI SISTEM — sistem saat ini tidak membagi apa pun.]**
+
       [CATATAN NEGOSIASI: SPH menerima jauh lebih banyak dari sesi tidak
       hadir (contoh Rp80.000 vs Rp10.000) sementara kolam menyiapkan
       lintasan dan menerima Rp0. Kolam kemungkinan menawar; siapkan
@@ -150,23 +152,22 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    dibatalkan. Bila saldo Kolam Mitra sudah tidak mencukupi (misalnya sudah
    dicairkan), saldo menjadi negatif dan dipotong otomatis dari bagi hasil
    sesi berikutnya; saldo negatif tidak dapat dicairkan. Saat perjanjian
-   berakhir, saldo negatif diselesaikan: [ISI HADI]. **[BELUM ADA DI SISTEM —
-   sistem saat ini menolak koreksi bila saldo tidak cukup.]** (Keputusan Hadi 29 Sep, berlaku untuk coach dan kolam.)
+   berakhir, saldo negatif diselesaikan: [ISI HADI].  (Keputusan Hadi 29 Sep, berlaku untuk coach dan kolam.)
 8. Persentase dapat diubah dengan kesepakatan tertulis; perubahan berlaku
    untuk sesi yang ditandai Hadir setelah tanggal perubahan.
 9. Coach menandai kehadiran paling lambat 24 jam setelah sesi selesai; lewat
    itu hanya administrator SPH yang dapat menandai, dan sesi yang belum
    ditandai tidak menghasilkan bagi hasil sampai ditandai.
-   **[BELUM ADA DI SISTEM]**
+
 10. Member dapat melaporkan status Tidak Hadir yang tidak sesuai (tombol
     Laporkan) paling lambat 3 hari sejak sesi selesai. SPH memeriksa dan
     dapat mengoreksi status; koreksi menjadi Hadir menghasilkan bagi hasil
     normal, dan koreksi sebaliknya mengikuti butir 7.
-    **[BELUM ADA DI SISTEM]**
+
 11. Paket trial: harga trial ditetapkan SPH. Bagi hasil sesi trial dihitung
     dengan persentase normal dari harga trial; selisih harga dibanding sesi
     reguler ditanggung bersama oleh Coach, Kolam Mitra, dan SPH sesuai
-    persentase masing-masing. **[BELUM ADA DI SISTEM]** [CATATAN: contoh
+    persentase masing-masing.  [CATATAN: contoh
     trial Rp80.000 dengan pembagian 50% kolam berarti kolam menerima
     Rp40.000, kurang dari tiket masuk coach + peserta Rp50.000.]
 
@@ -231,7 +232,7 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 
 ## Pasal 11 — Komisi Afiliasi
 
-**[BELUM ADA DI SISTEM — pasal ini menjanjikan fitur yang belum dibuat.]**
+
 
 1. SPH memberi Kolam Mitra satu kode afiliasi singkat yang unik.
 2. Member baru yang saat mendaftar memasukkan kode itu tercatat dibawa oleh

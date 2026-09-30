@@ -13,9 +13,12 @@
 >
 > **Update 29 Sep malam:** memuat keputusan Hadi (batas 24 jam tandai
 > hadir, bayaran 50% saat peserta tidak datang, tombol Laporkan member,
-> murid bawaan lewat kode afiliasi, gabung gratis). Pasal bertanda
-> **[BELUM ADA DI SISTEM]** menjanjikan perilaku yang BELUM dikode; draft
-> tidak boleh ditandatangani sebelum kodenya jalan atau pasalnya disesuaikan.
+> murid bawaan lewat kode afiliasi, gabung gratis).
+>
+> **Update 30 Sep:** semua pasal yang sebelumnya bertanda "BELUM ADA DI SISTEM"
+> (batas 24 jam, bayaran 50% saat peserta tidak datang, saldo negatif, tombol
+> Laporkan, trial, komisi afiliasi 5%) sekarang sudah jalan di aplikasi dan
+> dicek lewat uji langsung. Tetap wajib direview orang hukum sebelum ditandatangani.
 
 ---
 
@@ -56,7 +59,7 @@ sepakat sebagai berikut.
    Tidak Hadir) di aplikasi paling lambat 24 jam setelah sesi selesai. Lewat
    batas itu hanya administrator SPH yang dapat menandai, dan sesi yang
    belum ditandai tidak menghasilkan bagi hasil sampai ditandai.
-   **[BELUM ADA DI SISTEM]** [CATATAN: Hadi menyebut alasannya supaya coach
+    [CATATAN: Hadi menyebut alasannya supaya coach
    disiplin.]
 3. Bila berhalangan, Coach membatalkan sesi melalui aplikasi selambatnya
    [ISI HADI] jam sebelum jadwal. Sesi peserta otomatis kembali ke paketnya
@@ -102,7 +105,7 @@ sepakat sebagai berikut.
    itu (contoh: nilai sesi Rp100.000, coach 40% = Rp40.000 → Rp20.000
    bila peserta tidak datang). Kolam Mitra menerima Rp0; sisanya menjadi
    milik SPH. Sisa sesi paket yang hangus karena masa berlaku habis tidak
-   menghasilkan bagi hasil apa pun. **[BELUM ADA DI SISTEM]**
+   menghasilkan bagi hasil apa pun.
 5. Paket gratis/manual dari admin tidak menghasilkan bagi hasil.
 6. Bila status Hadir dikoreksi menjadi tidak Hadir, bagi hasil sesi itu
    dibatalkan. Bila saldo Coach sudah tidak mencukupi (misalnya sudah
@@ -114,13 +117,13 @@ sepakat sebagai berikut.
    Laporkan) paling lambat 3 hari sejak sesi selesai. SPH memeriksa dan
    dapat mengoreksi status. Bila terbukti Coach yang tidak hadir atau
    menandai tidak sesuai, bagi hasil sesi itu dibatalkan dan Pasal 3.5
-   berlaku. **[BELUM ADA DI SISTEM]** [CATATAN: pengaman terhadap coach
+   berlaku.  [CATATAN: pengaman terhadap coach
    yang tidak datang lalu menandai peserta Tidak Hadir adalah laporan
    member ini.]
 8. Paket trial: harga trial ditetapkan SPH. Bagi hasil sesi trial dihitung
    dengan persentase normal dari harga trial; selisih harga dibanding sesi
    reguler ditanggung bersama oleh Coach, Kolam Mitra, dan SPH sesuai
-   persentase masing-masing. **[BELUM ADA DI SISTEM]**
+   persentase masing-masing.
 
 ## Pasal 5 — Pencairan
 
@@ -187,7 +190,7 @@ sepakat sebagai berikut.
 
 ## Pasal 10 — Komisi Afiliasi
 
-**[BELUM ADA DI SISTEM — pasal ini menjanjikan fitur yang belum dibuat.]**
+
 
 1. SPH memberi Coach satu kode afiliasi singkat yang unik.
 2. Member baru yang saat mendaftar memasukkan kode itu tercatat dibawa oleh
