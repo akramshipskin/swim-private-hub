@@ -338,14 +338,84 @@ p {
   }
 }
 
+/* ===== Gerak landing =====
+   HP ringan: geser pendek satu kali, tanpa loop, tanpa hover. Desktop lebih
+   kaya: muncul bergiliran, hover angkat, layar HP di hero melayang pelan.
+   Semua gerak HANYA di dalam media "no-preference": pengguna yang memilih
+   "kurangi gerakan" (termasuk "hapus animasi" di Android) langsung melihat
+   konten penuh tanpa gerak. Hanya memakai opacity dan transform (ringan). */
+@keyframes sph-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes sph-slide {
+  from {
+    transform: translateY(28px);
+  }
+}
+@keyframes sph-float {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Pembuka (hero): murni CSS, tidak menunggu JavaScript, jadi teks utama tampil
+   cepat walau HP lambat memuat skrip. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-rise {
+    animation: sph-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both;
+  }
+}
+
+/* Muncul saat masuk layar (komponen Reveal menandai data-visible). Tanpa
+   JavaScript (scripting: none) atau browser lama yang tak mengenal
+   "scripting", semua konten tetap tampil. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(1rem);
+    transition:
+      opacity 0.45s ease-out,
+      transform 0.45s ease-out;
+  }
+  [data-reveal][data-visible] {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Layar lebar: geser lebih jauh, sedikit lebih lambat, dan bergiliran (delay). */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  [data-reveal] {
+    transform: translateY(1.5rem);
+    transition-duration: 0.7s;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  [data-reveal][data-visible] {
+    transform: none;
+  }
+}
+
+/* Desktop saja: layar HP di hero masuk dari bawah lalu melayang pelan. */
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .hero-phone {
+    animation:
+      sph-slide 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both,
+      sph-float var(--fd, 7s) ease-in-out calc(var(--d, 0ms) + 0.9s) infinite;
+  }
+}
+
 /* HP/OS dengan "kurangi gerakan": animasi & transisi dipercepat nyaris nol
-   (spinner, efek muncul, hover) -- konten tetap tampil, hanya tanpa gerak. */
+   (spinner, hover) dan tanpa jeda -- konten tetap tampil, hanya tanpa gerak. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }

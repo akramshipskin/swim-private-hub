@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { Logotype } from "@/components/ui/logotype";
 import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
 import { BUSINESS_ADDRESS } from "@/lib/business";
@@ -9,6 +10,7 @@ import { AudienceTabs, FaqTabs, type AudienceSteps, type FaqGroup } from "./land
 import { CoachLeaders } from "./coach-leaders";
 import { LandingHeader } from "./landing-header";
 import { Reveal } from "@/components/ui/reveal";
+import { HeroVideo } from "./hero-video";
 import { PAYMENT_METHODS } from "./landing-payments";
 import { TestimonialsSection, type Testimonial } from "./landing-testimonials";
 import { BeforeAfter, CoachSection, ParentSection, PoolSection, RolePicker } from "./landing-sections";
@@ -43,6 +45,15 @@ export type LandingCoach = {
 };
 
 const OWNER_WA_LINK = buildOwnerInquiryWaLink();
+
+// Video latar hero (desktop saja). Kosong sampai Hadi menyetujui video stok
+// berlisensi (nama file, sumber, ukuran, lisensi dikirim dulu). Isi dengan
+// {mp4, webm} dari /public/videos setelah disetujui dan dipadatkan.
+const HERO_VIDEO = null as { mp4: string; webm: string } | null;
+
+// Jeda animasi pembuka (CSS variable --d, dibaca .hero-rise dan .hero-phone di globals.css).
+const heroDelay = (ms: number, floatSeconds?: number) =>
+  ({ "--d": `${ms}ms`, ...(floatSeconds ? { "--fd": `${floatSeconds}s` } : {}) }) as CSSProperties;
 
 const AUDIENCES: AudienceSteps[] = [
   {
@@ -242,28 +253,28 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           sizes="100vw"
           className="-z-20 object-cover object-[72%_20%]"
         />
+        {HERO_VIDEO && <HeroVideo {...HERO_VIDEO} poster="/images/landing/hero-swim-v2.jpg" />}
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-r from-fixed-night via-fixed-night/80 to-fixed-night/20 max-lg:bg-gradient-to-t max-lg:from-fixed-night max-lg:via-fixed-night/70 max-lg:to-fixed-night/0" />
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-fixed-night" />
 
         <div className="mx-auto grid min-h-[100dvh] w-full max-w-6xl items-end gap-10 lg:items-center px-4 pb-14 pt-28 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,0.65fr)] lg:pt-24">
           <div>
-            <Reveal eager>
-              <h1 className="text-[clamp(2rem,3.2vw,2.9rem)] font-semibold leading-[1.06] tracking-tight lg:w-[46rem]">
-                <span className="block">Aplikasi les renang privat.</span>
-                <span className="block text-fixed-lime">Pilih coach, kolam, dan jamnya.</span>
-              </h1>
-              <p className="mt-6 max-w-lg text-base text-white/85 sm:text-lg">
-                Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam dekat rumah. Perkembangan tercatat, pembayaran jelas.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/register" className="inline-flex items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
-                  Daftar gratis
-                </Link>
-                <a href="#kolam" className="inline-flex items-center rounded-full border border-white/40 px-7 py-3.5 text-base font-semibold transition-colors hover:bg-white/10">
-                  Lihat kolam
-                </a>
-              </div>
-            </Reveal>
+            <h1 className="hero-rise text-[clamp(2rem,3.2vw,2.9rem)] font-semibold leading-[1.06] tracking-tight lg:w-[46rem]">
+              <span className="block">Aplikasi les renang privat.</span>
+              <span className="block text-fixed-lime">Pilih coach, pilih kolam,</span>
+              <span className="block text-fixed-lime">dan pilih jamnya.</span>
+            </h1>
+            <p className="hero-rise mt-6 max-w-lg text-base text-white/85 sm:text-lg" style={heroDelay(90)}>
+              Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam dekat rumah. Perkembangan tercatat, pembayaran jelas.
+            </p>
+            <div className="hero-rise mt-8 flex flex-wrap gap-3" style={heroDelay(180)}>
+              <Link href="/register" className="inline-flex items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
+                Daftar gratis
+              </Link>
+              <a href="#kolam" className="inline-flex items-center rounded-full border border-white/40 px-7 py-3.5 text-base font-semibold transition-colors hover:bg-white/10">
+                Lihat kolam
+              </a>
+            </div>
           </div>
 
           <div aria-hidden="true" className="relative hidden h-[34rem] lg:-mr-10 lg:block">
@@ -273,7 +284,8 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
               width={390}
               height={844}
               sizes="200px"
-              className="absolute bottom-[-5rem] left-0 w-[12.5rem] rounded-[2rem] border border-white/15 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]"
+              className="hero-phone absolute bottom-[-5rem] left-0 w-[12.5rem] rounded-[2rem] border border-white/15 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]"
+              style={heroDelay(250, 7)}
             />
             <Image
               src="/images/landing/produk-booking.png"
@@ -281,7 +293,8 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
               width={390}
               height={844}
               sizes="220px"
-              className="absolute bottom-[-8rem] right-0 w-[13.5rem] rounded-[2rem] border border-white/15 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]"
+              className="hero-phone absolute bottom-[-8rem] right-0 w-[13.5rem] rounded-[2rem] border border-white/15 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)]"
+              style={heroDelay(420, 8.5)}
             />
           </div>
         </div>
@@ -298,8 +311,10 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
             { t: "Bayar online", d: "QRIS, virtual account, e-wallet, atau kartu." },
           ].map((f, i) => (
             <li key={f.t} className={`px-4 py-6 lg:py-8 ${i % 2 === 1 ? "border-l border-fixed-ink/10" : ""} ${i > 1 ? "border-t border-fixed-ink/10 lg:border-t-0" : ""} ${i > 0 ? "lg:border-l lg:border-fixed-ink/10" : ""}`}>
-              <p className="text-lg font-semibold leading-snug sm:text-xl">{f.t}</p>
-              <p className="mt-1 text-sm text-fixed-muted">{f.d}</p>
+              <Reveal delay={i * 70}>
+                <p className="text-lg font-semibold leading-snug sm:text-xl">{f.t}</p>
+                <p className="mt-1 text-sm text-fixed-muted">{f.d}</p>
+              </Reveal>
             </li>
           ))}
         </ul>
@@ -341,20 +356,20 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       {/* Kolam: maksimal 5 kolam paling laris, lengkap dengan foto, fasilitas,
           dan jumlah member yang les di situ. */}
       <section id="kolam" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-20">
-        <div className="mb-10 text-center">
+        <Reveal className="mb-10 text-center">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kolam mitra</h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
             Setiap kolam punya jadwal coach, harga paket, dan fasilitasnya sendiri. Info di bawah ini langsung diambil
             dari data kolam, bukan brosur lama.
           </p>
-        </div>
+        </Reveal>
         {pools.length === 0 ? (
           <p className="text-center text-fixed-muted">Kolam mitra segera hadir.</p>
         ) : (
           <div className="flex flex-col gap-6">
             {pools.map((p, i) => (
               <Reveal key={p.id} delay={i * 60}>
-                <article className="grid overflow-hidden rounded-3xl bg-white md:grid-cols-2">
+                <article className="grid overflow-hidden rounded-3xl bg-white transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_28px_56px_-28px_rgba(20,20,15,0.35)] md:grid-cols-2">
                   <div className={`relative flex items-end bg-fixed-lime-100 p-8 ${p.photos[0] ? "min-h-64" : "min-h-36 md:min-h-64"} ${i % 2 === 1 ? "md:order-2" : ""}`}>
                     {!p.photos[0] && (
                       // Belum ada foto: gradien lime brand (bukan blok polos) supaya kartu tidak terlihat bolong.
@@ -438,13 +453,13 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           saat scroll vertikal. Info lengkap tiap coach ada di /pelatih/[id]. */}
       <section id="coach" className="scroll-mt-36 md:scroll-mt-20 overflow-x-clip bg-fixed-sand py-20">
         <div className="mx-auto w-full max-w-6xl px-4">
-          <div className="mb-14 text-center">
+          <Reveal className="mb-14 text-center">
             <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
               Lihat umur, keahlian, sertifikat yang sudah diperiksa admin, dan kolam tempat mengajar. Jadwal dan profil
               lengkapnya terbuka setelah kamu mendaftar.
             </p>
-          </div>
+          </Reveal>
           {coaches.length === 0 ? (
             <p className="text-center text-fixed-muted">Coach segera hadir.</p>
           ) : (
@@ -457,11 +472,13 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
       {/* Cara kerja */}
       <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-14 sm:py-20">
-        <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">Cara kerjanya</h2>
-        <p className="mt-3 max-w-xl text-base text-fixed-muted">Pilih peranmu untuk melihat langkahnya.</p>
-        <div className="mt-8">
+        <Reveal>
+          <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">Cara kerjanya</h2>
+          <p className="mt-3 max-w-xl text-base text-fixed-muted">Pilih peranmu untuk melihat langkahnya.</p>
+        </Reveal>
+        <Reveal className="mt-8" delay={100}>
           <AudienceTabs audiences={AUDIENCES} />
-        </div>
+        </Reveal>
         <p className="mt-10 text-sm text-fixed-muted">
           Punya kolam renang?{" "}
           <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="font-semibold text-fixed-ink underline underline-offset-4">
@@ -477,21 +494,23 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
       {/* FAQ per peran */}
       <section id="faq" className="mx-auto grid w-full max-w-6xl scroll-mt-36 gap-8 md:scroll-mt-20 px-4 pb-14 sm:pb-20 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14">
-        <div>
+        <Reveal>
           <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">Pertanyaan umum</h2>
           <p className="mt-3 max-w-sm text-base text-fixed-muted">Pilih peranmu, pertanyaannya beda-beda.</p>
-        </div>
-        <FaqTabs groups={FAQ_GROUPS} />
+        </Reveal>
+        <Reveal delay={100}>
+          <FaqTabs groups={FAQ_GROUPS} />
+        </Reveal>
       </section>
 
       {/* CTA + footer gelap */}
       <footer className="mt-auto bg-fixed-ink text-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 py-14 sm:flex-row sm:items-center sm:justify-between sm:py-20">
+        <Reveal className="mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 py-14 sm:flex-row sm:items-center sm:justify-between sm:py-20">
           <h2 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">Mulai les renang minggu ini</h2>
           <Link href="/register" className="inline-flex shrink-0 items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
             Daftar gratis
           </Link>
-        </div>
+        </Reveal>
 
         {/* Metode pembayaran: semua logo dirender satu warna lime lewat CSS
             mask, jadi rapi walau warna asli tiap logo beda-beda. */}

@@ -1,48 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
-function prefersReducedMotion() {
-  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-// Scroll-reveal wrapper -- zero-dependency (IntersectionObserver + CSS
-// transition, no animation library). `eager` skips the observer and plays
-// on mount instead, for above-the-fold content that's visible immediately
-// (double rAF so the initial "hidden" state actually paints before the
-// transition kicks in, otherwise it just snaps straight to visible).
+// Efek "muncul saat masuk layar". Tanpa library: IntersectionObserver hanya
+// memberi tanda data-visible; sembunyi dan transisinya diatur CSS di globals.css
+// dan HANYA aktif bila pengguna tidak memilih "kurangi gerakan" dan JavaScript
+// menyala. Server dan browser mengirim markup yang sama, jadi tidak ada
+// perbedaan hydration yang bisa membuat bagian halaman tertinggal tersembunyi.
+// Delay (bergiliran) hanya berlaku di layar lebar; di HP semua muncul langsung.
 export function Reveal({
   children,
   className,
   delay = 0,
-  eager = false,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   delay?: number;
-  eager?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  // Lazy initializer (not an effect) so the reduced-motion case never needs
-  // a setState call inside the effect body itself.
-  const [visible, setVisible] = useState(() => prefersReducedMotion());
 
   useEffect(() => {
-    if (prefersReducedMotion()) return;
-
-    if (eager) {
-      const raf1 = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setVisible(true));
-      });
-      return () => cancelAnimationFrame(raf1);
-    }
-
     const el = ref.current;
     if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      el.dataset.visible = "true";
+      return;
+    }
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true);
+          el.dataset.visible = "true";
           io.disconnect();
         }
       },
@@ -50,16 +37,10 @@ export function Reveal({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [eager]);
+  }, []);
 
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-      } ${className ?? ""}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+    <div ref={ref} data-reveal className={className} style={{ "--reveal-delay": `${delay}ms` } as CSSProperties}>
       {children}
     </div>
   );

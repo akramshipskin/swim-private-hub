@@ -44,12 +44,15 @@ const ROLES = [
 export function RolePicker() {
   return (
     <section aria-labelledby="pilih-peran" className="mx-auto w-full max-w-6xl px-4 py-14 sm:py-20">
-      <h2 id="pilih-peran" className="max-w-xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
-        Kamu di sini sebagai apa?
-      </h2>
+      <Reveal>
+        <h2 id="pilih-peran" className="max-w-xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+          Kamu di sini sebagai apa?
+        </h2>
+      </Reveal>
       <ul className="mt-8 border-y border-fixed-ink/15 sm:mt-10">
         {ROLES.map((r, i) => (
           <li key={r.href} className={i > 0 ? "border-t border-fixed-ink/15" : ""}>
+            <Reveal delay={i * 80}>
             <a
               href={r.href}
               className="group grid gap-2 py-6 transition-colors hover:bg-fixed-lime-50 md:grid-cols-[13rem_minmax(0,1fr)_auto] md:items-center md:gap-8 md:px-4 md:py-8"
@@ -61,6 +64,7 @@ export function RolePicker() {
                 <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
               </span>
             </a>
+            </Reveal>
           </li>
         ))}
       </ul>
@@ -96,7 +100,7 @@ export function BeforeAfter() {
   return (
     <section aria-labelledby="dulu-sekarang" className="mx-auto w-full max-w-6xl px-4 pb-14 sm:pb-20">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14">
-        <div className="lg:pt-2">
+        <Reveal className="lg:pt-2">
           <h2 id="dulu-sekarang" className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
             Les renang tanpa drama chat.
           </h2>
@@ -104,8 +108,8 @@ export function BeforeAfter() {
           <Link href="/register" className="mt-7 inline-flex items-center rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
             Daftar gratis
           </Link>
-        </div>
-        <div className="overflow-hidden rounded-3xl bg-white">
+        </Reveal>
+        <Reveal className="overflow-hidden rounded-3xl bg-white" delay={120}>
           <div className="grid grid-cols-2 text-xs font-semibold">
             <p className="bg-fixed-sand px-5 py-3 text-fixed-muted sm:px-7">Cara lama</p>
             <p className="bg-fixed-ink px-5 py-3 text-fixed-lime sm:px-7">Di Swim Private Hub</p>
@@ -118,7 +122,7 @@ export function BeforeAfter() {
               </li>
             ))}
           </ul>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -163,7 +167,7 @@ export function ParentSection() {
   return (
     <section id="orang-tua" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-sand py-14 sm:py-20">
       <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-16">
-        <div className="min-w-0">
+        <Reveal className="min-w-0">
           <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
             Anak belajar dengan tenang. Kamu tahu persis apa yang dibayar.
           </h2>
@@ -179,11 +183,11 @@ export function ParentSection() {
           <Link href="/register" className="mt-10 inline-flex items-center rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
             Daftar gratis
           </Link>
-        </div>
+        </Reveal>
 
         {/* Tampilan HP asli aplikasi (data contoh). HP: digeser ke samping;
             layar lebar: tiga layar bertumpuk, yang tengah paling depan. */}
-        <div className="min-w-0 lg:pt-4">
+        <Reveal className="min-w-0 lg:pt-4" delay={120}>
           <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] lg:relative lg:mx-0 lg:block lg:h-[38rem] lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden">
             {SHOTS.map((s, i) => (
               <li
@@ -203,7 +207,7 @@ export function ParentSection() {
             ))}
           </ul>
           <p className="mt-4 text-sm text-fixed-muted">Contoh tampilan dengan data contoh: cari coach, booking jam, dan perkembangan anak.</p>
-        </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -244,13 +248,15 @@ export function CoachSection() {
   return (
     <section id="untuk-coach" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-ink py-14 text-white sm:py-20">
       <div className="mx-auto w-full max-w-6xl px-4">
-        <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
-          Kamu fokus mengajar. Sisanya diurus sistem.
-        </h2>
-        <p className="mt-4 max-w-2xl text-base text-white/75">
-          Kami tidak menjanjikan peserta instan. Member memilih coach dari profilnya, jadi makin lengkap keahlian,
-          sertifikat, dan jadwalmu, makin besar peluang kamu dipilih.
-        </p>
+        <Reveal>
+          <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+            Kamu fokus mengajar. Sisanya diurus sistem.
+          </h2>
+          <p className="mt-4 max-w-2xl text-base text-white/75">
+            Kami tidak menjanjikan peserta instan. Member memilih coach dari profilnya, jadi makin lengkap keahlian,
+            sertifikat, dan jadwalmu, makin besar peluang kamu dipilih.
+          </p>
+        </Reveal>
 
         <div className="mt-10 grid gap-3 lg:grid-cols-6">
           <Reveal className="lg:col-span-3 lg:row-span-2">
@@ -348,17 +354,19 @@ const POOL_GROUPS: { heading: string; items: Point[] }[] = [
 export function PoolSection({ waLink }: { waLink: string }) {
   return (
     <section id="untuk-kolam" className="scroll-mt-36 md:scroll-mt-20 mx-auto w-full max-w-6xl px-4 py-14 sm:py-20">
-      <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
-        Jam sepi kolammu, jadi les privat yang terjadwal.
-      </h2>
-      <p className="mt-4 max-w-2xl text-base text-fixed-muted">
-        Kolam tetap kolam umum. Les privat mengisi jam kosong tanpa kamu mengurus coach atau pembayaran. SPH
-        memperkenalkan kolammu kepada orang tua yang mencari les renang di aplikasi, tanpa menjanjikan jumlah member.
-      </p>
+      <Reveal>
+        <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+          Jam sepi kolammu, jadi les privat yang terjadwal.
+        </h2>
+        <p className="mt-4 max-w-2xl text-base text-fixed-muted">
+          Kolam tetap kolam umum. Les privat mengisi jam kosong tanpa kamu mengurus coach atau pembayaran. SPH
+          memperkenalkan kolammu kepada orang tua yang mencari les renang di aplikasi, tanpa menjanjikan jumlah member.
+        </p>
+      </Reveal>
 
       <div className="mt-12 grid gap-x-14 gap-y-12 md:grid-cols-3">
-        {POOL_GROUPS.map((g) => (
-          <div key={g.heading}>
+        {POOL_GROUPS.map((g, gi) => (
+          <Reveal key={g.heading} delay={gi * 100}>
             <h3 className="border-b-2 border-fixed-ink pb-3 text-xl font-semibold">{g.heading}</h3>
             <ul className="mt-2 divide-y divide-fixed-ink/10">
               {g.items.map((p) => (
@@ -368,18 +376,18 @@ export function PoolSection({ waLink }: { waLink: string }) {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
         ))}
       </div>
 
-      <div className="mt-12 flex flex-wrap gap-3">
+      <Reveal className="mt-12 flex flex-wrap gap-3">
         <Link href="/daftar-kolam" className="inline-flex items-center rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
           Daftarkan kolam
         </Link>
         <a href={waLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-full border border-fixed-ink/25 px-6 py-3 text-base font-semibold transition-colors hover:bg-white">
           Tanya lewat WhatsApp
         </a>
-      </div>
+      </Reveal>
     </section>
   );
 }
