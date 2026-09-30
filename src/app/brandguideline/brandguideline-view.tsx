@@ -260,8 +260,9 @@ export default function BrandGuidelineView() {
               </li>
               <li>
                 Di latar charcoal, &quot;air&quot; (bagian bawah tanda) berwarna sama dengan latar, jadi tanda tampil sebagai
-                bentuk lime dengan tepi bergelombang. Itu perilaku semua file tanda dan lockup saat ini (termasuk
-                <code>lockup-on-dark</code>), bukan galat render — lihat temuan terbuka di bagian 15.
+                bentuk lime dengan tepi bergelombang. Itu perilaku semua file tanda dan lockup (termasuk
+                <code>lockup-on-dark</code>) dan sudah diputuskan: satu tanda untuk semua latar, hanya tulisan logotype yang
+                mengikuti tema — lihat bagian 15.
               </li>
             </ul>
           </Note>
@@ -854,7 +855,7 @@ export default function BrandGuidelineView() {
                   {
                     t: "Tanda logo di latar gelap",
                     d: "Semua file tanda memakai air #14140F. Di latar charcoal (banner, foto profil, header gelap) bagian bawah tanda menyatu dengan latar.",
-                    s: "Terbuka: belum ada varian khusus latar gelap (misal air dengan warna lebih terang atau kontur tipis). Perlu keputusan identitas — mengubahnya berarti mengubah logo di seluruh aplikasi, jadi belum dikerjakan.",
+                    s: "Diputuskan Hadi 30 Sep 2026: satu tanda (logo.png) untuk semua latar, tanpa varian khusus latar gelap. Yang menyesuaikan tema hanya tulisan logotype swim.privatehub (warna teks ikut tema; titik tetap lime).",
                   },
                   {
                     t: "Dokumen guideline lama",

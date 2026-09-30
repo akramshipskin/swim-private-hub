@@ -131,5 +131,5 @@ export async function checkAiStatus(): Promise<{ provider: string; ok: boolean; 
     }
   }
   if (process.env.ANTHROPIC_API_KEY) return { provider: "Claude", ok: true, detail: "Key terpasang (belum diuji)" };
-  return { provider: "Belum ada", ok: false, detail: "GEMINI_API_KEY / ANTHROPIC_API_KEY belum diisi" };
+  return { provider: "Belum aktif", ok: false, detail: "pesan dari pengguna tidak dijawab otomatis, semuanya masuk ke sini untuk dijawab admin" };
 }

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
+import { shortOrderId } from "@/lib/order-id";
 
 export const metadata = {
   title: "Riwayat Bayar | Swim Private Hub",
@@ -90,7 +91,7 @@ export default async function MemberPembayaranPage() {
                         {p.package.dependent.isSelf ? "kamu sendiri" : p.package.dependent.name}
                       </p>
                       <p className="mt-1 text-sm text-text-subtle">{dateTimeLabel(p.createdAt)}</p>
-                      <p className="text-xs text-text-subtle">No. transaksi: {p.midtransOrderId}</p>
+                      <p className="text-xs text-text-subtle" title={p.midtransOrderId}>No. transaksi: {shortOrderId(p.midtransOrderId)}</p>
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1.5">
                       <p className="text-base font-bold text-text">{formatRupiah(p.amount)}</p>

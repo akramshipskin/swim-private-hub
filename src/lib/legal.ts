@@ -7,7 +7,10 @@ export const TERMS_UPDATED_AT = "29 September 2026";
 // afiliasi & trial). Nomor revisi membedakan keduanya di catatan
 // persetujuan; naikkan kalau S&K diubah lagi di hari yang sama.
 export const TERMS_REVISION = 4;
-export const PRIVACY_UPDATED_AT = "25 September 2026";
+// 30 Sep 2026: menambah tanggal lahir peserta, catatan & sertifikat milestone,
+// kode afiliasi, data coach (tanggal lahir, tanda tangan), bagian data anak,
+// kunci login per akun. Teks ini belum ditinjau orang hukum.
+export const PRIVACY_UPDATED_AT = "30 September 2026";
 
 export const LEGAL_CONSENT_VERSION = `S&K ${TERMS_UPDATED_AT} rev ${TERMS_REVISION}; Privasi ${PRIVACY_UPDATED_AT}`;
 

@@ -16,14 +16,24 @@ export default function KebijakanPrivasiPage() {
         Swim Private Hub (&ldquo;kami&rdquo;) melalui aplikasi pemesanan dan manajemen les
         renang (&ldquo;Aplikasi&rdquo;), tujuan penggunaannya, serta hak Pengguna atas data
         tersebut. Kebijakan ini berlaku bagi seluruh Pengguna Aplikasi, yaitu
-        orang tua/member, pelatih (coach), pemilik kolam, dan administrator.
+        member (orang tua, wali, atau peserta dewasa), coach, pemilik kolam, dan
+        administrator.
       </p>
 
       <h2>1. Data yang Dikumpulkan</h2>
       <ul>
         <li>Nama, nomor telepon, dan alamat email (email bersifat opsional) pada saat pendaftaran akun.</li>
-        <li>Nama anak/peserta les yang didaftarkan di bawah akun member.</li>
-        <li>Riwayat pemesanan jadwal, kehadiran, dan sisa sesi paket.</li>
+        <li>
+          Nama dan tanggal lahir peserta les yang didaftarkan di bawah akun member
+          (anak, atau member sendiri bila ia yang belajar). Tanggal lahir diminta
+          untuk menentukan kelompok umur pada catatan perkembangan (milestone).
+        </li>
+        <li>Riwayat pemesanan jadwal, kehadiran, laporan kehadiran yang diajukan member, dan sisa sesi paket.</li>
+        <li>
+          Catatan perkembangan peserta: butir keterampilan yang sudah dikuasai,
+          catatan tertulis dari coach setelah sesi, dan sertifikat level yang
+          diterbitkan aplikasi ketika seluruh butir satu level tercapai.
+        </li>
         <li>
           Data transaksi pembayaran (nominal, status, dan metode pembayaran). Nomor
           kartu atau rekening yang dipakai member untuk membayar tidak pernah disimpan
@@ -31,27 +41,50 @@ export default function KebijakanPrivasiPage() {
           gerbang pembayaran resmi.
         </li>
         <li>
-          Untuk pelatih dan pemilik kolam: nama bank, nomor rekening, dan nama pemilik
+          Untuk coach dan pemilik kolam: nama bank, nomor rekening, dan nama pemilik
           rekening yang diisi sendiri sebagai tujuan pencairan saldo, beserta riwayat
           saldo dan pencairannya.
         </li>
+        <li>
+          Untuk coach: tanggal lahir dan jenis kelamin (umur dan jenis kelamin
+          tampil di profil coach), bio, keahlian, foto profil, file sertifikat,
+          dan gambar tanda tangan yang diunggah untuk sertifikat level.
+        </li>
+        <li>
+          Kode afiliasi: kode singkat milik coach atau kolam, dan kode yang diisi
+          member saat mendaftar. Kaitan antara akun member dan kode itu disimpan
+          untuk menghitung komisi afiliasi satu kali per member baru.
+        </li>
         <li>Alamat IP saat pendaftaran akun dan saat percobaan masuk, untuk keamanan dan pencegahan penyalahgunaan.</li>
         <li>Waktu dan versi persetujuan atas Syarat &amp; Ketentuan serta Kebijakan Privasi saat mendaftar.</li>
-        <li>Isi percakapan pada fitur chat bantuan (lihat bagian 4).</li>
-        <li>Foto profil dan file sertifikat yang diunggah pelatih, serta foto kolam yang diunggah pemilik kolam.</li>
+        <li>Isi percakapan pada fitur chat bantuan (lihat bagian 5).</li>
+        <li>Foto kolam yang diunggah pemilik kolam.</li>
         <li>Sumber rujukan pendaftaran (misalnya tautan WhatsApp/Instagram) untuk kebutuhan internal, dan tidak dibagikan kepada pihak ketiga untuk tujuan komersial.</li>
       </ul>
 
-      <h2>2. Tujuan Penggunaan Data</h2>
+      <h2>2. Data Anak</h2>
+      <p>
+        Data anak (nama dan tanggal lahir) hanya dimasukkan oleh orang tua atau
+        wali yang mendaftarkannya, dan dengan mendaftarkan anak, orang tua atau
+        wali menyatakan berwenang melakukannya. Data anak dipakai hanya untuk
+        pemesanan les, pencatatan kehadiran, dan catatan perkembangan. Catatan
+        perkembangan dan sertifikat level dapat dilihat oleh member pemilik
+        akun, coach yang pernah atau sedang mengajar peserta itu, dan
+        administrator; pemilik kolam tidak dapat melihat isi catatan tersebut.
+      </p>
+
+      <h2>3. Tujuan Penggunaan Data</h2>
       <ul>
-        <li>Mengelola pemesanan jadwal, penugasan pelatih, dan sisa sesi paket Pengguna.</li>
+        <li>Mengelola pemesanan jadwal, penugasan coach, dan sisa sesi paket Pengguna.</li>
         <li>Memproses pembayaran dan mengaktifkan paket secara otomatis.</li>
-        <li>Menghitung komisi kolam dan pelatih per sesi serta memproses pencairan saldo ke rekening tujuan.</li>
+        <li>Menghitung bagi hasil kolam dan coach per sesi, komisi afiliasi, serta memproses pencairan saldo ke rekening tujuan.</li>
+        <li>Mencatat dan menampilkan perkembangan peserta serta menerbitkan sertifikat level.</li>
+        <li>Memeriksa laporan kehadiran yang diajukan member.</li>
         <li>Mengirimkan notifikasi terkait pemesanan (apabila fitur ini diaktifkan oleh Pengguna).</li>
         <li>Melakukan analisis penggunaan Aplikasi secara agregat untuk kepentingan pengembangan layanan.</li>
       </ul>
 
-      <h2>3. Pembagian Data kepada Pihak Ketiga</h2>
+      <h2>4. Pembagian Data kepada Pihak Ketiga</h2>
       <p>
         Kami hanya membagikan data sebatas yang diperlukan kepada pihak yang
         mendukung penyelenggaraan layanan ini:
@@ -68,7 +101,7 @@ export default function KebijakanPrivasiPage() {
         </li>
         <li>
           <strong>Supabase</strong> — penyedia basis data dan penyimpanan file
-          (foto dan sertifikat) tempat data Aplikasi disimpan.
+          (foto, sertifikat, dan tanda tangan) tempat data Aplikasi disimpan.
         </li>
         <li>
           <strong>Google (Gemini) dan Anthropic (Claude)</strong> — penyedia
@@ -88,7 +121,7 @@ export default function KebijakanPrivasiPage() {
       </ul>
       <p>Kami tidak menjual maupun menyewakan data pribadi Pengguna kepada pihak manapun.</p>
 
-      <h2>4. Chat Bantuan dan Masa Penyimpanan</h2>
+      <h2>5. Chat Bantuan dan Masa Penyimpanan</h2>
       <p>
         Pesan pada fitur chat bantuan dijawab oleh asisten berbasis kecerdasan
         buatan dan, bila perlu, oleh administrator. Riwayat chat yang tampil bagi
@@ -98,7 +131,7 @@ export default function KebijakanPrivasiPage() {
         data sensitif lain melalui chat.
       </p>
 
-      <h2>5. Cookie dan Penyimpanan Lokal</h2>
+      <h2>6. Cookie dan Penyimpanan Lokal</h2>
       <p>
         Aplikasi menggunakan sesi masuk (cookie) serta penyimpanan lokal/sesi
         peramban untuk mendukung fungsi tertentu, termasuk preferensi tampilan.
@@ -109,17 +142,19 @@ export default function KebijakanPrivasiPage() {
         .
       </p>
 
-      <h2>6. Keamanan Data</h2>
+      <h2>7. Keamanan Data</h2>
       <p>
         Kata sandi disimpan dalam bentuk terenkripsi (hash), bukan sebagai teks
-        biasa. Percobaan masuk yang salah berulang kali akan dikunci sementara,
-        dan akun administrator dilindungi verifikasi dua langkah. Akses terhadap
-        data dibatasi sesuai peran pengguna — member hanya dapat mengakses data
-        anaknya sendiri, pelatih hanya dapat mengakses jadwalnya sendiri, dan
-        seterusnya.
+        biasa. Nomor rekening dan kunci verifikasi dua langkah disimpan dalam
+        bentuk terenkripsi. Tiga kali salah memasukkan kata sandi pada satu akun
+        akan mengunci akun itu selama 15 menit, dan akun administrator
+        dilindungi verifikasi dua langkah. Akses terhadap data dibatasi sesuai
+        peran pengguna — member hanya dapat mengakses data peserta miliknya
+        sendiri, coach hanya dapat mengakses jadwal dan peserta yang diajarnya,
+        dan seterusnya.
       </p>
 
-      <h2>7. Hak Pengguna atas Data Pribadi</h2>
+      <h2>8. Hak Pengguna atas Data Pribadi</h2>
       <p>
         Sesuai dengan Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data
         Pribadi, Pengguna berhak untuk:
@@ -138,13 +173,13 @@ export default function KebijakanPrivasiPage() {
       </ul>
       <p>Untuk menggunakan hak-hak tersebut, Pengguna dapat menghubungi kami melalui kontak di bawah ini.</p>
 
-      <h2>8. Perubahan Kebijakan</h2>
+      <h2>9. Perubahan Kebijakan</h2>
       <p>
         Kebijakan ini dapat diperbarui sewaktu-waktu. Perubahan yang bersifat
         signifikan akan diinformasikan melalui Aplikasi.
       </p>
 
-      <h2>9. Kontak</h2>
+      <h2>10. Kontak</h2>
       <p>
         Pertanyaan mengenai privasi atau data pribadi dapat disampaikan melalui
         WhatsApp{" "}
