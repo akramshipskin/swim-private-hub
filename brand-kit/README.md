@@ -10,7 +10,7 @@ di situs (rute Next.js, `src/app/brandguideline/`) — bukan file HTML statis la
 | `logo/svg/` | Logo vektor (bisa diperbesar tanpa pecah, latar transparan): `lockup-on-light`, `lockup-on-dark`, `mark-lime`, `mark-cream`, `mark-white-mono` |
 | `logo/png/` | Logo siap pakai, hi-res: lockup 8320×1920 (latar cream / charcoal), tanda logo 4096×4096 |
 | `icons/` | favicon.ico, ikon aplikasi (32/180), ikon PWA 192 & 512 — sama persis dengan yang dipakai website (ukuran dipatok standar OS/PWA, bukan hi-res) |
-| `social/` | Foto profil 2000×2000 (tanda saja, tanpa tulisan), banner 6336×1584 (LinkedIn) & 6000×2000 — master hi-res (4×); platform akan resize turun otomatis saat diunggah |
+| `social/` | Foto profil 2000×2000 (tanda saja, latar transparan, tanpa tulisan), banner 6336×1584 (LinkedIn) & 6000×2000 — master hi-res (4×); platform akan resize turun otomatis saat diunggah |
 | `colors/` | `palette.json` & `palette.css` (kode warna) |
 | `fonts/` | `FONTS.md` (font yang dipakai + link download resmi) dan `sora-latin-variable.woff2` (Sora, dipakai skrip render gambar sosial) |
 

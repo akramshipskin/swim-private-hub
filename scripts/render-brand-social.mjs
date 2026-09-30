@@ -29,9 +29,9 @@ const ASSETS = {
     mark: { size: 140, x: 90, y: 128 },
     wm: { size: 85.5, x: 270, y: 134, color: CREAM, dot: LIME },
     tg: { size: 28, color: LIME, y: 242, left: 272 } },
-  // Foto profil = tanda saja, digeser ke bawah agar bagian limenya (yang terlihat) tepat di tengah lingkaran.
-  profile: { file: "profile-picture-2000.png", w: 500, h: 500, bg: CHAR,
-    mark: { size: 300, x: 100, y: 150 } },
+  // Foto profil = tanda saja, latar transparan (tanpa kotak hitam), di tengah dan aman dipotong bulat.
+  profile: { file: "profile-picture-2000.png", w: 500, h: 500, bg: "transparent",
+    mark: { size: 340, x: 80, y: 80 } },
 };
 
 const font = readFileSync(join(ROOT, "brand-kit/fonts/sora-latin-variable.woff2")).toString("base64");
