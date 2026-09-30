@@ -133,3 +133,21 @@ Semua lulus kecuali yang tertulis di bagian C.
 
 ## D. Sisa
 Uji ke Supabase/S3 asli (backup file), CSP mode pantau menunggu log, balasan AI, email, push, pembayaran di production, X-L testimoni (butuh teks Hadi).
+
+---
+
+## Babak 2 (30 Sep sore): sisa fitur dijalankan + perbaikan
+
+**Dijalankan lewat UI, semua benar:** admin buat pengguna (coach), admin assign paket, admin edit paket, bagi hasil kolam lewat form (validasi >100% ditolak, simpan, kembalikan), lepas coach dari kolam, tolak sertifikat (dan coach menghapusnya), tolak usulan butir milestone, coach membatalkan slot yang sudah dibooking (booking batal oleh coach, sesi kembali), member Cari Coach, isi tanggal lahir peserta, tambah & nonaktifkan peserta anak, jatah batal habis (tombol diganti "Hubungi Admin"), halaman pemilik kolam Jadwal & Laporan, admin Email/Kinerja/Jadwal Booking, tautan lupa password (WhatsApp).
+**Uang, ujung ke ujung (DB dev):** komisi platform 0% (kolam 0/60: sesi Rp100.000 = kolam 40.000, coach 60.000, tanpa baris platform kosong); trial Rp50.000 di 0/60 = kolam 20.000 / coach 30.000; afiliasi lewat KODE KOLAM (komisi Rp20.000 cair ke saldo kolam Melati); tidak hadir tidak memicu komisi, Hadir memicu, dibalik ke Tidak Hadir kembali menunggu.
+**Diperbaiki:**
+1. Persetujuan pertama pemilik kolam ikut menyalakan kolamnya (dulu dua klik di dua halaman).
+2. Tombol setujui/tolak sertifikat juga di halaman detail coach.
+3. Riwayat "Komisi Afiliasi" tampil di Saldo coach & pemilik kolam (dulu saldo naik tanpa keterangan).
+4. Bagi Hasil admin: kolom Kolam & Coach terpotong di layar 1440px (dua kolom) -> satu kolom kecuali layar ≥1800px.
+5. Langganan push: alamat wajib layanan push resmi (sebelumnya pengguna login bisa mendaftarkan alamat sembarang -> server mengirim ke sana = SSRF buta); body JSON rusak jadi 400. Tes race E10 ikut disesuaikan (hampir merusak job CI).
+6. Akun yang sudah dihapus tidak muncul lagi di pilihan member di form admin.
+7. Pesan email "kunci belum diisi" tidak lagi menyebut nama variabel env.
+8. `seed-prod-demo.mts`: password tertanam dibuang (acak), sertifikat lewat tabel baru. Skrip kolam contoh menghubungkan coach contoh ke kolam contoh.
+**Diketahui, tidak diubah (keputusan sebelumnya):** akun coach/pemilik kolam yang dibuat admin tidak dipaksa ganti password saat masuk pertama (hanya member; ada tes yang sengaja menetapkan itu).
+**Verifikasi akhir:** tsc 0, eslint 0, vitest 637, race 135 (E10 diperbaiki), build exit 0. Cek overflow horizontal semua halaman admin (1440 & 390), coach (1440 & 390), member & pemilik kolam (390): bersih kecuali satu tabel kecil yang memang bisa digeser.

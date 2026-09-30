@@ -345,14 +345,14 @@ describe("JADWAL, NOTIFIKASI, CHAT", () => {
   it("E10: perangkat yang sama mendaftar notifikasi 6x barengan, lalu dipakai bergantian 2 akun -> tetap 1 baris langganan, tidak ada 500", async () => {
     const a = await mkUser("MEMBER"); const b = await mkUser("COACH");
     const call = (u: { id: string; role: "MEMBER" | "COACH" }) =>
-      as(u, () => subscribePOST(new Request("http://x/api/push/subscribe", { method: "POST", body: JSON.stringify({ endpoint: "https://push.example/perangkat-1", keys: { p256dh: "p", auth: "a" } }) })));
+      as(u, () => subscribePOST(new Request("http://x/api/push/subscribe", { method: "POST", body: JSON.stringify({ endpoint: "https://fcm.googleapis.com/fcm/send/perangkat-1", keys: { p256dh: "p", auth: "a" } }) })));
     const rs1 = await settle(Array.from({ length: 6 }, () => call({ id: a.id, role: "MEMBER" })));
     expect(thrownOf(rs1)).toEqual([]);
     expect(codesOf(rs1).every((c) => c === 200)).toBe(true);
     const rs2 = await settle(Array.from({ length: 8 }, (_, i) => call(i % 2 ? { id: a.id, role: "MEMBER" } : { id: b.id, role: "COACH" })));
     expect(thrownOf(rs2)).toEqual([]);
     expect(codesOf(rs2).every((c) => c === 200)).toBe(true);
-    const rows = await prisma.pushSubscription.findMany({ where: { endpoint: "https://push.example/perangkat-1" } });
+    const rows = await prisma.pushSubscription.findMany({ where: { endpoint: "https://fcm.googleapis.com/fcm/send/perangkat-1" } });
     expect(rows.length).toBe(1);
     expect([a.id, b.id]).toContain(rows[0].userId);
   });
