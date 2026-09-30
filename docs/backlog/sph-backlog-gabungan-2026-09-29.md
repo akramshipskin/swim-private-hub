@@ -396,8 +396,8 @@ Sumber: `docs/reviews/2026-09-30-sweep-total.md` (bagian "Sweep lanjutan"). Semu
 - Ganti nama merchant Midtrans dari "Les Renang Cianjur".
 - Harga trial Rp50.000 dan kolam contoh tambahan adalah isian sementara Claude.
 
-### 12.4 Ditunda (pemicu tetap)
-Daftar hadir loket & komisi bertingkat (setelah MOU kolam pertama), batas les barengan (kolam keberatan), halaman admin testimoni (ada testimoni asli), rate limit berlapis & email per percakapan (volume naik), studi kasus kolam & screenshot dari data asli (setelah tes Meta Ads), Payouts A/B/L (jawaban Midtrans).
+### 12.4 Ditunda
+Dihapus dari daftar kerja atas permintaan Hadi (30 Sep malam): item yang cuma menunggu pemicu dibahas kalau ada masalah nyata di lapangan.
 
 ## 13. STATUS 30 SEP 2026 MALAM (menggantikan bagian 12 bila bertentangan)
 

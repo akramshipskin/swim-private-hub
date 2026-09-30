@@ -8,7 +8,7 @@ import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, MIN_WITHDRAWAL } from "@/li
 import { AudienceTabs, FaqTabs, type AudienceSteps, type FaqGroup } from "./landing-tabs";
 import { CoachLeaders } from "./coach-leaders";
 import { LandingHeader } from "./landing-header";
-import { Reveal } from "@/components/ui/reveal";
+import { Rail, RAIL_ITEM } from "./landing-rail";
 import { PAYMENT_METHODS } from "./landing-payments";
 import { TestimonialsSection, type Testimonial } from "./landing-testimonials";
 import { BeforeAfter, CoachSection, ParentSection, PoolSection, RolePicker } from "./landing-sections";
@@ -273,7 +273,15 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
               Lihat kolam
             </a>
           </div>
-          <p className="mt-1 flex flex-wrap justify-center gap-x-6 text-sm text-white/75 sm:mt-3">
+          <ul className="mt-6 flex max-w-2xl flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/85">
+            {["Les privat 60 menit, 1 coach untuk 1 anak", "Harga paket sudah termasuk tiket masuk kolam", "Sertifikat coach diperiksa admin"].map((t) => (
+              <li key={t} className="inline-flex items-center gap-1.5">
+                <span aria-hidden="true" className="text-fixed-lime">✓</span>
+                {t}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 flex flex-wrap justify-center gap-x-6 text-sm text-white/75 sm:mt-3">
             <span className="inline-flex items-center gap-1.5">
               Coach? <Link href="/daftar-coach" className="inline-flex min-h-[44px] items-center font-semibold text-white underline">Daftar jadi coach</Link>
             </span>
@@ -297,7 +305,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
       {/* Sub-navigasi tab: lompat ke info kolam / coach */}
       <nav aria-label="Lompat ke bagian" className="sticky top-[61px] z-30 md:hidden border-b border-fixed-ink/10 bg-fixed-cream/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3">
+        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-2">
           {[
             ["#orang-tua", "Orang Tua"],
             ["#untuk-coach", "Untuk Coach"],
@@ -320,9 +328,9 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
       {/* Kolam: maksimal 5 kolam paling laris, lengkap dengan foto, fasilitas,
           dan jumlah member yang les di situ. */}
-      <section id="kolam" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-20">
-        <div className="mb-10 text-center">
-          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kolam mitra</h2>
+      <section id="kolam" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-14 sm:py-16">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Kolam mitra</h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
             Setiap kolam punya jadwal coach, harga paket, dan fasilitasnya sendiri. Info di bawah ini langsung diambil
             dari data kolam, bukan brosur lama.
@@ -331,95 +339,76 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
         {pools.length === 0 ? (
           <p className="text-center text-fixed-muted">Kolam mitra segera hadir.</p>
         ) : (
-          <div className="flex flex-col gap-6">
-            {pools.map((p, i) => (
-              <Reveal key={p.id} delay={i * 60}>
-                <article className="grid overflow-hidden rounded-3xl bg-white md:grid-cols-2">
-                  <div className={`relative flex items-end bg-fixed-lime-100 p-8 ${p.photos[0] ? "min-h-64" : "min-h-36 md:min-h-64"} ${i % 2 === 1 ? "md:order-2" : ""}`}>
-                    {!p.photos[0] && (
-                      // Belum ada foto: gradien lime brand (bukan blok polos) supaya kartu tidak terlihat bolong.
-                      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(159,204,31,0.45),transparent_55%),radial-gradient(circle_at_10%_90%,rgba(198,255,61,0.35),transparent_50%)]" />
-                    )}
-                    {p.photos[0] && (
+          <Rail label="Daftar kolam mitra">
+            {pools.map((p) => (
+              <li key={p.id} className={RAIL_ITEM}>
+                <article className="flex h-full flex-col overflow-hidden rounded-3xl bg-white">
+                  <div className="relative flex h-44 items-end overflow-hidden bg-fixed-lime-100 p-5">
+                    {p.photos[0] ? (
                       <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={p.photos[0]} alt={`Foto ${p.name}`} className="absolute inset-0 h-full w-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/0" />
+                        <img src={p.photos[0]} alt={`Foto ${p.name}`} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                       </>
+                    ) : (
+                      // Belum ada foto: gradien lime brand supaya kartu tidak terlihat bolong.
+                      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(159,204,31,0.45),transparent_55%),radial-gradient(circle_at_10%_90%,rgba(198,255,61,0.35),transparent_50%)]" />
                     )}
-                    <div className={`relative ${p.photos[0] ? "text-white" : ""}`}>
-                      <p className={`text-sm font-medium ${p.photos[0] ? "text-white/80" : "text-fixed-ink/70"}`}>
-                        Kolam mitra
-                      </p>
-                      <p className="text-3xl font-semibold leading-tight">{p.name}</p>
+                    <div className={`relative ${p.photos[0] ? "text-white" : "text-fixed-ink"}`}>
+                      <h3 className="text-2xl font-semibold leading-tight">{p.name}</h3>
                       {p.memberCount >= MIN_POOL_MEMBERS_TO_SHOW && (
-                        <p className={`mt-1 text-sm ${p.photos[0] ? "text-white/85" : "text-fixed-muted"}`}>
-                          {p.memberCount} member les di sini
-                        </p>
+                        <p className={`mt-0.5 text-sm ${p.photos[0] ? "text-white/85" : "text-fixed-muted"}`}>{p.memberCount} member les di sini</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-4 p-8">
-                    {p.description ? (
-                      <p className="text-base text-fixed-ink">{p.description}</p>
-                    ) : (
-                      <p className="text-base text-fixed-muted">Les renang privat dengan coach pilihan di {p.name}.</p>
-                    )}
-                    <dl className="grid grid-cols-2 gap-4 border-t border-fixed-ink/10 pt-4 text-sm">
-                      <div>
-                        <dt className="text-fixed-muted">Lokasi</dt>
-                        <dd className="font-semibold">{p.address ?? "Segera diinformasikan"}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-fixed-muted">Jam buka</dt>
-                        <dd className="font-semibold">{p.hours ?? "Hubungi admin"}</dd>
-                      </div>
-                      <div>
+                  <div className="flex flex-1 flex-col gap-4 p-5">
+                    <p className="line-clamp-3 text-sm text-fixed-ink-soft">
+                      {p.description ?? `Les renang privat dengan coach pilihan di ${p.name}.`}
+                    </p>
+                    <dl className="grid grid-cols-2 gap-x-3 gap-y-3 border-t border-fixed-ink/10 pt-4 text-sm">
+                      <div className="col-span-2">
                         <dt className="text-fixed-muted">Harga mulai</dt>
-                        <dd className="font-semibold">{p.fromPackagePrice ? `${formatRupiah(p.fromPackagePrice)}/paket` : "Segera hadir"}</dd>
+                        <dd className="text-base font-semibold">{p.fromPackagePrice ? `${formatRupiah(p.fromPackagePrice)}/paket` : "Segera hadir"}</dd>
                       </div>
                       <div>
                         <dt className="text-fixed-muted">Coach</dt>
                         <dd className="font-semibold">{p.coachCount} coach</dd>
                       </div>
+                      <div>
+                        <dt className="text-fixed-muted">Jam buka</dt>
+                        <dd className="font-semibold">{p.hours ?? "Hubungi admin"}</dd>
+                      </div>
+                      <div className="col-span-2">
+                        <dt className="text-fixed-muted">Lokasi</dt>
+                        <dd className="line-clamp-2 font-semibold">{p.address ?? "Segera diinformasikan"}</dd>
+                      </div>
                     </dl>
                     {p.facilities.length > 0 && (
-                      <div>
-                        <p className="mb-2 text-sm text-fixed-muted">Fasilitas</p>
-                        <ul className="flex flex-wrap gap-1.5">
-                          {p.facilities.map((f) => (
-                            <li key={f} className="rounded-full bg-fixed-cream px-3 py-1 text-sm">{f}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {p.photos.length > 1 && (
-                      <ul className="flex gap-2">
-                        {p.photos.slice(1, 4).map((url, k) => (
-                          <li key={url + k} className="min-w-0 flex-1">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={url} alt={`Foto ${p.name}`} className="h-20 w-full rounded-lg object-cover" />
-                          </li>
+                      <ul aria-label={`Fasilitas ${p.name}`} className="mt-auto flex flex-wrap gap-1.5">
+                        {p.facilities.slice(0, 4).map((f) => (
+                          <li key={f} className="rounded-full bg-fixed-cream px-3 py-1 text-xs">{f}</li>
                         ))}
+                        {p.facilities.length > 4 && (
+                          <li className="rounded-full bg-fixed-cream px-3 py-1 text-xs text-fixed-muted">+{p.facilities.length - 4} lainnya</li>
+                        )}
                       </ul>
                     )}
                   </div>
                 </article>
-              </Reveal>
+              </li>
             ))}
-          </div>
+          </Rail>
         )}
       </section>
 
       <CoachSection />
 
-      {/* Coach: maksimal 5 coach gaya referensi Stride "meet the leaders" --
-          kartu polaroid agak miring, nyebar kiri-kanan, muncul satu per satu
-          saat scroll vertikal. Info lengkap tiap coach ada di /pelatih/[id]. */}
-      <section id="coach" className="scroll-mt-36 md:scroll-mt-20 overflow-x-clip bg-fixed-sand py-20">
+      {/* Coach: maksimal 5 coach dalam barisan kartu yang bisa digeser. Info
+          lengkap tiap coach ada di /pelatih/[id]. */}
+      <section id="coach" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-sand py-14 sm:py-16">
         <div className="mx-auto w-full max-w-6xl px-4">
-          <div className="mb-14 text-center">
-            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
               Lihat umur, keahlian, sertifikat yang sudah diperiksa admin, dan kolam tempat mengajar. Jadwal dan profil
               lengkapnya terbuka setelah kamu mendaftar.
@@ -436,9 +425,9 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       <PoolSection waLink={OWNER_WA_LINK} />
 
       {/* Cara kerja */}
-      <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-20">
+      <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-14 sm:py-16">
         <div className="mb-8 text-center">
-          <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Cara kerjanya</h2>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Cara kerjanya</h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">Pilih peranmu untuk melihat langkahnya.</p>
         </div>
         <AudienceTabs audiences={AUDIENCES} />
@@ -456,15 +445,15 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       <TestimonialsSection items={testimonials} />
 
       {/* FAQ per peran */}
-      <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-36 md:scroll-mt-20 px-4 pb-20">
-        <h2 className="mb-3 text-center text-4xl font-semibold tracking-tight">Pertanyaan umum</h2>
+      <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-36 md:scroll-mt-20 px-4 pb-14 sm:pb-16">
+        <h2 className="mb-3 text-center text-3xl font-semibold tracking-tight sm:text-5xl">Pertanyaan umum</h2>
         <p className="mb-8 text-center text-base text-fixed-muted">Pilih peranmu, pertanyaannya beda-beda.</p>
         <FaqTabs groups={FAQ_GROUPS} />
       </section>
 
       {/* CTA + footer gelap */}
       <footer className="mt-auto bg-fixed-ink text-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-20 text-center">
+        <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-14 text-center sm:py-20">
           <h2 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">Mulai les renang minggu ini</h2>
           <Link href="/register" className="mt-8 rounded-full bg-fixed-lime-500 px-7 py-3.5 text-base font-semibold text-fixed-ink hover:bg-fixed-lime-100">
             Daftar gratis

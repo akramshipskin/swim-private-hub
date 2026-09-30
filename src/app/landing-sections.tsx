@@ -8,26 +8,18 @@ import Link from "next/link";
 
 type Point = { title: string; body: string };
 
-// Enam poin ditata sebagai bento tiga kolom di layar lebar: 2+1, 1+2, 2+1.
-// Sel lebar dibedakan warnanya supaya bukan enam kartu kembar. Di bawah lg
-// semua sel selebar satu kolom. Jumlah sel = jumlah poin (tanpa sel kosong).
-const WIDE_CELLS = new Set([0, 3, 4]);
-
+// Enam poin ditata sebagai daftar bergaris (3 kolom di layar lebar, 2 di
+// tablet, 1 di HP), bukan enam kartu berbagai ukuran: dulu sel lebar dan sempit
+// bercampur sehingga banyak ruang kosong dan halaman terasa seperti tumpukan kartu.
 function PointGrid({ points, dark = false }: { points: Point[]; dark?: boolean }) {
   return (
-    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {points.map((p, i) => {
-        const wide = WIDE_CELLS.has(i);
-        const tone = dark
-          ? wide ? "bg-white/[0.13] ring-1 ring-white/25" : "bg-white/[0.07] ring-1 ring-white/15"
-          : wide ? "bg-fixed-lime-100" : "bg-white";
-        return (
-          <li key={p.title} className={`rounded-2xl p-6 ${wide ? "lg:col-span-2 lg:p-8" : ""} ${tone}`}>
-            <h3 className={`font-semibold ${wide ? "text-lg lg:text-2xl" : "text-lg"} ${dark ? "text-white" : "text-fixed-ink"}`}>{p.title}</h3>
-            <p className={`mt-2 text-sm ${wide ? "lg:max-w-xl lg:text-base" : ""} ${dark ? "text-white/75" : wide ? "text-fixed-ink-soft" : "text-fixed-muted"}`}>{p.body}</p>
-          </li>
-        );
-      })}
+    <ul className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+      {points.map((p) => (
+        <li key={p.title} className={`border-t pt-5 ${dark ? "border-white/25" : "border-fixed-ink/20"}`}>
+          <h3 className={`text-lg font-semibold ${dark ? "text-white" : "text-fixed-ink"}`}>{p.title}</h3>
+          <p className={`mt-2 text-sm leading-relaxed ${dark ? "text-white/75" : "text-fixed-ink-soft"}`}>{p.body}</p>
+        </li>
+      ))}
     </ul>
   );
 }
@@ -55,7 +47,7 @@ const ROLES = [
 
 export function RolePicker() {
   return (
-    <section aria-labelledby="pilih-peran" className="mx-auto w-full max-w-6xl px-4 py-16">
+    <section aria-labelledby="pilih-peran" className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16">
       <h2 id="pilih-peran" className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl md:max-w-md">
         Kamu di sini sebagai apa?
       </h2>
@@ -101,7 +93,7 @@ const AFTER = [
 
 export function BeforeAfter() {
   return (
-    <section aria-labelledby="dulu-sekarang" className="mx-auto w-full max-w-6xl px-4 pb-20">
+    <section aria-labelledby="dulu-sekarang" className="mx-auto w-full max-w-6xl px-4 pb-14 sm:pb-16">
       <h2 id="dulu-sekarang" className="mx-auto max-w-2xl text-center text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
         Les renang tanpa drama chat.
       </h2>
@@ -173,7 +165,7 @@ const SHOTS = [
 
 export function ParentSection() {
   return (
-    <section id="orang-tua" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-sand py-20">
+    <section id="orang-tua" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-sand py-14 sm:py-16">
       <div className="mx-auto w-full max-w-6xl px-4">
         <div className="mb-10 text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-fixed-muted">Untuk orang tua / peserta</p>
@@ -240,7 +232,7 @@ const COACH_POINTS: Point[] = [
 
 export function CoachSection() {
   return (
-    <section id="untuk-coach" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-ink py-20 text-white">
+    <section id="untuk-coach" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-ink py-14 text-white sm:py-16">
       <div className="mx-auto w-full max-w-6xl px-4">
         <div className="mb-10 text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-fixed-lime">Untuk coach</p>
@@ -296,7 +288,7 @@ const POOL_POINTS: Point[] = [
 
 export function PoolSection({ waLink }: { waLink: string }) {
   return (
-    <section id="untuk-kolam" className="scroll-mt-36 md:scroll-mt-20 mx-auto w-full max-w-6xl px-4 py-20">
+    <section id="untuk-kolam" className="scroll-mt-36 md:scroll-mt-20 mx-auto w-full max-w-6xl px-4 py-14 sm:py-16">
       <div className="mb-10 text-center">
         <p className="text-sm font-semibold uppercase tracking-wide text-fixed-muted">Untuk pemilik kolam</p>
         <h2 className="mx-auto mt-2 max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">

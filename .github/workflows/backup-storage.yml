@@ -61,6 +61,14 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$ENDPOINT" && test -n "$BUCKET" || { echo "Secret BACKUP_S3_ENDPOINT/BACKUP_S3_BUCKET kosong"; exit 1; }
+          # Rapikan isian secret yang sering salah ketik: spasi, tanpa https://,
+          # garis miring/nama bucket di ujung alamat, region kosong.
+          ENDPOINT="$(printf '%s' "$ENDPOINT" | tr -d '[:space:]')"
+          case "$ENDPOINT" in http://*|https://*) ;; *) ENDPOINT="https://$ENDPOINT" ;; esac
+          ENDPOINT="$(printf '%s' "$ENDPOINT" | sed -E 's#^(https?://[^/]+).*#\1#')"
+          BUCKET="$(printf '%s' "$BUCKET" | tr -d '[:space:]')"
+          AWS_DEFAULT_REGION="$(printf '%s' "${AWS_DEFAULT_REGION:-}" | tr -d '[:space:]')"
+          export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-auto}"
           aws s3 cp "$FILE" "s3://$BUCKET/$PREFIX/$FILE" --endpoint-url "$ENDPOINT" --only-show-errors
           CUTOFF="swim-storage-$(date -u -d "$KEEP_DAYS days ago" +%Y%m%dT%H%M%SZ)"
           aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$PREFIX/" --endpoint-url "$ENDPOINT" \
