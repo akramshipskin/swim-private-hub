@@ -17,6 +17,10 @@ import { AFFILIATE_COMMISSION_PERCENT, AFFILIATE_HOLD_DAYS } from "@/lib/policy"
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+// Catatan baris PLATFORM_REVENUE negatif pasangan komisi afiliasi. Dipakai juga
+// halaman Bagi Hasil untuk memisahkannya dari koreksi manual.
+export const AFFILIATE_PAYOUT_NOTE = "Komisi afiliasi dibayar";
+
 export function normalizeAffiliateCode(input: string) {
   return input.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
@@ -154,7 +158,7 @@ export async function releaseDueCommissions(now: Date = new Date()) {
       await tx.walletTransaction.createMany({
         data: [
           { type: "AFFILIATE_COMMISSION", coachProfileId: c.coachProfileId, poolId: c.poolId, amount: c.amount, note: "Komisi afiliasi" },
-          { type: "PLATFORM_REVENUE", amount: -c.amount, note: "Komisi afiliasi dibayar" },
+          { type: "PLATFORM_REVENUE", amount: -c.amount, note: AFFILIATE_PAYOUT_NOTE },
         ],
       });
       return true;

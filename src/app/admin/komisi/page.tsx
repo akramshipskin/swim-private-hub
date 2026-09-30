@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
+import { AFFILIATE_PAYOUT_NOTE } from "@/lib/affiliate";
 
 export const metadata: Metadata = {
   title: "Bagi Hasil | Swim Private Hub",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
 export default async function KomisiPage() {
   await requireRole("ADMIN");
 
-  const [attendedBookings, pools, paidOut, manualPool, processing, manualOther] = await Promise.all([
+  const [attendedBookings, pools, paidOut, manualPool, processing, manualOther, affiliatePaid] = await Promise.all([
     prisma.booking.findMany({
       // Tidak Hadir ikut dihitung sejak 29 Sep: coach dapat 50%, sisanya platform.
       where: { attended: { not: null } },
@@ -59,10 +60,20 @@ export default async function KomisiPage() {
     // Tidak masuk hitungan sesi di halaman ini, tapi ikut di saldo mereka.
     prisma.walletTransaction.groupBy({
       by: ["type"],
-      where: { type: { in: ["SESSION_PAYOUT", "PLATFORM_REVENUE", "PLATFORM_TAX"] }, bookingId: null },
+      where: {
+        type: { in: ["SESSION_PAYOUT", "PLATFORM_REVENUE", "PLATFORM_TAX"] },
+        bookingId: null,
+        // Komisi afiliasi yang dibayar dari SPH bukan koreksi manual: dihitung terpisah di bawah.
+        OR: [{ note: null }, { note: { not: AFFILIATE_PAYOUT_NOTE } }],
+      },
+      _sum: { amount: true },
+    }),
+    prisma.walletTransaction.aggregate({
+      where: { type: "PLATFORM_REVENUE", bookingId: null, note: AFFILIATE_PAYOUT_NOTE },
       _sum: { amount: true },
     }),
   ]);
+  const affiliatePaidOut = affiliatePaid._sum.amount ?? 0;
   const manualOf = (t: string) => manualOther.find((x) => x.type === t)?._sum.amount ?? 0;
   const manualCoach = manualOf("SESSION_PAYOUT");
   const manualPlatformNet = manualOf("PLATFORM_REVENUE");
@@ -136,6 +147,11 @@ export default async function KomisiPage() {
               bersih {formatRupiah(totalPlatform - totalTax)} · PPN {formatRupiah(totalTax)}
             </span>
           </p>
+          {affiliatePaidOut !== 0 && (
+            <p className="order-4 w-full border-t border-border pt-2 text-xs text-text-subtle sm:order-none">
+              Komisi afiliasi yang sudah dibayar dari bagian SPH (ikut mengurangi saldo platform, tidak masuk hitungan di halaman ini): {signed(affiliatePaidOut)}
+            </p>
+          )}
           {(manualPlatformNet !== 0 || manualPlatformTax !== 0 || manualCoach !== 0) && (
             <div className="order-4 w-full space-y-0.5 border-t border-border pt-2 text-xs text-text-subtle sm:order-none">
               <p className="font-medium text-text-muted">Koreksi manual (dicatat langsung di database, bukan dari sesi) — ikut di saldo, tidak masuk hitungan di halaman ini:</p>
