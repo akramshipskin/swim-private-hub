@@ -2,14 +2,21 @@ import { CredentialsSignin } from "next-auth";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants } from "@/lib/format";
-import { clientIp, forgetAttempts, takeAttempt, LOGIN_FAILS_PER_ACCOUNT, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS } from "@/lib/rate-limit";
+import { clientIp, forgetAttempts, lockRemainingSeconds, takeAttempt, LOGIN_FAILS_PER_ACCOUNT, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS } from "@/lib/rate-limit";
 import { verifyTotp } from "@/lib/totp";
 import { openSecret } from "@/lib/secret-box";
 
 // Kode error ini sampai ke browser (signIn(...).code) -- login-form.tsx
 // menerjemahkannya ke pesan. Jangan bedakan "HP tidak terdaftar" vs
 // "password salah" (itu tetap CredentialsSignin biasa).
-export class LockedError extends CredentialsSignin { code = "locked"; }
+// Kode "locked_<detik>": sisa waktu tunggu ikut ke browser untuk hitung mundur.
+export class LockedError extends CredentialsSignin {
+  code: string;
+  constructor(seconds?: number) {
+    super();
+    this.code = seconds ? `locked_${seconds}` : "locked";
+  }
+}
 export class OtpRequiredError extends CredentialsSignin { code = "otp_required"; }
 export class OtpInvalidError extends CredentialsSignin { code = "otp_invalid"; }
 
@@ -24,18 +31,19 @@ export async function authorizeCredentials(credentials: Partial<Record<string, u
   const isPhone = isValidIndonesianPhone(rawIdentifier.replace(/[\s\-().]/g, ""));
   const identifier = isPhone ? normalizePhone(rawIdentifier) : (normalizeEmail(rawIdentifier) ?? rawIdentifier);
 
-  // Batas salah password (keputusan Hadi 25 Sep): 3x per akun+jaringan
-  // -> tunggu 15 menit; plus 20x per jaringan untuk semua akun. Percobaan
-  // dicatat SEBELUM cek password (request barengan tidak bisa menebak
-  // lebih dari batas), lalu dihapus lagi kalau ternyata berhasil.
+  // Batas salah password (Hadi 25 Sep, diperketat 30 Sep): 3x per AKUN dari
+  // jaringan mana pun -> tunggu 15 menit; plus 20x per jaringan untuk semua
+  // akun. Percobaan dicatat SEBELUM cek password (request barengan tidak bisa
+  // menebak lebih dari batas), lalu dihapus lagi kalau ternyata berhasil.
   const ip = clientIp(request.headers);
-  const accountKey = `login:${identifier}:${ip}`;
-  const ipHit = await takeAttempt(`login-ip:${ip}`, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS);
-  if (!ipHit) throw new LockedError();
+  const accountKey = `login:${identifier}`;
+  const ipKey = `login-ip:${ip}`;
+  const ipHit = await takeAttempt(ipKey, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS);
+  if (!ipHit) throw new LockedError(await lockRemainingSeconds(ipKey, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS));
   const accountHit = await takeAttempt(accountKey, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS);
   if (!accountHit) {
     await forgetAttempts({ ids: [ipHit] });
-    throw new LockedError();
+    throw new LockedError(await lockRemainingSeconds(accountKey, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS));
   }
   const notAFailure = () => forgetAttempts({ ids: [ipHit, accountHit] });
 

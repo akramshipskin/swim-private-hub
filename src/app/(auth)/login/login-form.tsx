@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
@@ -10,11 +10,12 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { buildAdminWaLink } from "@/lib/whatsapp";
+import { formatCountdown, isLockedCode, lockSecondsFromCode } from "@/lib/login-lock";
 
 // Kode dari src/auth.ts (LockedError dll). Selain itu = salah HP/password
 // atau akun belum aktif -- sengaja tidak dibedakan.
 export function loginErrorMessage(code: string | undefined): string {
-  if (code === "locked") return "Terlalu banyak percobaan salah. Tunggu 15 menit, lalu coba lagi.";
+  if (isLockedCode(code)) return "Terlalu banyak percobaan salah. Tunggu 15 menit, lalu coba lagi.";
   if (code === "otp_invalid") return "Kode 2FA salah atau sudah dipakai. Tunggu kode berikutnya di aplikasi.";
   return "No HP/Email atau password salah — atau akunmu (coach/pemilik kolam yang baru daftar) belum diaktifkan admin.";
 }
@@ -29,9 +30,25 @@ export default function LoginForm() {
   const [needsOtp, setNeedsOtp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Waktu (ms) kunci terbuka lagi, dari sisa detik yang dikirim server.
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  const remaining = lockedUntil === null ? 0 : Math.max(0, Math.ceil((lockedUntil - now) / 1000));
+  const locked = remaining > 0;
+
+  useEffect(() => {
+    if (lockedUntil === null) return;
+    const id = setInterval(() => {
+      const t = Date.now();
+      setNow(t);
+      if (t >= lockedUntil) setLockedUntil(null);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [lockedUntil]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (locked) return;
     setError(null);
     setLoading(true);
 
@@ -48,6 +65,11 @@ export default function LoginForm() {
       if (result.code === "otp_required") {
         setNeedsOtp(true);
         return;
+      }
+      const lockSeconds = lockSecondsFromCode(result.code);
+      if (lockSeconds !== null) {
+        setNow(Date.now());
+        setLockedUntil(Date.now() + lockSeconds * 1000);
       }
       setError(loginErrorMessage(result.code));
       return;
@@ -132,14 +154,23 @@ export default function LoginForm() {
               </Field>
             )}
 
-            {error && (
-              <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">
-                {error}
-              </p>
+            {locked ? (
+              <div role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">
+                <p>Terlalu banyak percobaan salah. Akun ini dikunci sementara.</p>
+                <p className="mt-1 font-semibold">
+                  Coba lagi dalam <span className="tabular-nums">{formatCountdown(remaining)}</span>
+                </p>
+              </div>
+            ) : (
+              error && (
+                <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">
+                  {error}
+                </p>
+              )
             )}
 
-            <Button type="submit" loading={loading} className="mt-1 w-full">
-              Masuk
+            <Button type="submit" loading={loading} disabled={locked} className="mt-1 w-full">
+              {locked ? `Tunggu ${formatCountdown(remaining)}` : "Masuk"}
             </Button>
           </form>
 

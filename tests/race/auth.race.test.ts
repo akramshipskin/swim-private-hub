@@ -10,7 +10,8 @@ import { POST as registerCoach } from "@/app/api/register-coach/route";
 
 // Sweep keamanan 25 Sep (Antigravity + ChatGPT, dicek Claude): login tanpa batas
 // salah password, pendaftaran tanpa batas, belum ada 2FA admin, persetujuan
-// S&K hanya di browser. Keputusan Hadi: 3x salah per akun+jaringan -> 15 menit.
+// S&K hanya di browser. Keputusan Hadi: 3x salah per akun -> 15 menit (diperketat
+// 30 Sep dari "per akun+jaringan"), dengan hitung mundur di layar login.
 
 beforeEach(reset);
 
@@ -37,7 +38,18 @@ async function login(identifier: string, password: string, ip = "1.1.1.1", otp =
     const u = await authorizeCredentials({ identifier, password, otp }, req(ip));
     return u ? "ok" : "salah";
   } catch (e) {
-    return (e as { code?: string }).code ?? "THROW:" + String(e);
+    // "locked_742" (sisa detik untuk hitung mundur) disamakan jadi "locked".
+    return ((e as { code?: string }).code ?? "THROW:" + String(e)).replace(/^locked_\d+$/, "locked");
+  }
+}
+
+// Kode error mentah (dengan sisa detik) -- untuk tes hitung mundur.
+async function lockCode(identifier: string, password: string, ip = "1.1.1.1") {
+  try {
+    await authorizeCredentials({ identifier, password, otp: "" }, req(ip));
+    return null;
+  } catch (e) {
+    return (e as { code?: string }).code ?? null;
   }
 }
 
@@ -71,11 +83,28 @@ describe("Batas salah password", () => {
     expect(await prisma.rateLimitHit.count({ where: { key: { startsWith: "login-ip:" } } })).toBe(4);
   });
 
-  it("L3: akun terkunci dari jaringan A, pemilik asli di jaringan B tetap bisa masuk (orang iseng tidak bisa mengunci akun orang)", async () => {
+  it("L3: kunci berlaku per AKUN (keputusan Hadi 30 Sep): 3x salah dari jaringan A -> password benar dari jaringan B pun terkunci; akun lain tidak ikut", async () => {
     await mkLoginUser();
+    await mkLoginUser({ phone: "081234567891" });
     for (let k = 0; k < 3; k++) await login("081234567890", "iseng" + k, "6.6.6.6");
     expect(await login("081234567890", PASSWORD, "6.6.6.6")).toBe("locked");
-    expect(await login("081234567890", PASSWORD, "2.2.2.2")).toBe("ok");
+    expect(await login("081234567890", PASSWORD, "2.2.2.2")).toBe("locked");
+    expect(await login("081234567891", PASSWORD, "2.2.2.2")).toBe("ok");
+  });
+
+  it("L3b: pesan terkunci membawa sisa detik untuk hitung mundur (1..900) dan menyusut seiring waktu", async () => {
+    await mkLoginUser();
+    for (let k = 0; k < 3; k++) await login("081234567890", "x" + k);
+    const first = await lockCode("081234567890", PASSWORD);
+    expect(first).toMatch(/^locked_\d+$/);
+    const sec1 = Number(first!.split("_")[1]);
+    expect(sec1).toBeGreaterThan(890);
+    expect(sec1).toBeLessThanOrEqual(900);
+    // Mundurkan semua catatan 5 menit -> sisa tunggu ~600 detik.
+    await prisma.rateLimitHit.updateMany({ where: { key: "login:081234567890" }, data: { createdAt: new Date(Date.now() - 5 * 60_000) } });
+    const later = Number((await lockCode("081234567890", PASSWORD))!.split("_")[1]);
+    expect(later).toBeGreaterThan(590);
+    expect(later).toBeLessThanOrEqual(600);
   });
 
   it("L4: satu jaringan menebak 25 akun berbeda -> setelah 20 salah, jaringan itu terkunci untuk semua akun", async () => {
@@ -132,8 +161,10 @@ describe("2FA admin", () => {
     const code = totpAt(secret, currentStep());
     const rs = await settle(Array.from({ length: 5 }, (_, k) => login("081200000009", PASSWORD, `9.9.9.${k}`, code)));
     const vals = rs.map((r) => (r.status === "fulfilled" ? r.value : "REJECT"));
+    // Kunci per akun: hanya 3 percobaan pertama yang dicek (satu masuk, sisanya
+    // kode dipakai ulang), percobaan berikutnya ditolak "locked".
     expect(vals.filter((v) => v === "ok").length).toBe(1);
-    expect(vals.filter((v) => v === "otp_invalid").length).toBe(4);
+    expect(vals.every((v) => ["ok", "otp_invalid", "locked"].includes(v))).toBe(true);
   });
 
   it("T4: admin tanpa 2FA terpasang tetap bisa login (lalu diarahkan ke /keamanan oleh proxy/requireRole)", async () => {

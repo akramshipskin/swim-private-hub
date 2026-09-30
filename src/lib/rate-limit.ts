@@ -29,12 +29,31 @@ export async function takeAttempt(key: string, limit: number, windowMs: number):
   return id;
 }
 
+// Berapa detik lagi `key` boleh mencoba, dihitung saat takeAttempt baru saja
+// menolak (hitungan sudah >= limit). Batas terbuka lagi begitu percobaan ke-
+// `limit` dari yang terbaru keluar dari jendela waktu. Minimal 1 detik.
+export async function lockRemainingSeconds(key: string, limit: number, windowMs: number): Promise<number> {
+  const since = new Date(Date.now() - windowMs);
+  const hits = await prisma.rateLimitHit.findMany({
+    where: { key, createdAt: { gte: since } },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    select: { createdAt: true },
+  });
+  const pivot = hits[limit - 1];
+  if (!pivot) return 1;
+  return Math.max(1, Math.ceil((pivot.createdAt.getTime() + windowMs - Date.now()) / 1000));
+}
+
 export async function forgetAttempts(where: { ids?: string[]; key?: string }) {
   if (where.ids?.length) await prisma.rateLimitHit.deleteMany({ where: { id: { in: where.ids } } });
   if (where.key) await prisma.rateLimitHit.deleteMany({ where: { key: where.key } });
 }
 
-// Kebijakan (keputusan Hadi 25 Sep): 3x salah login per akun+jaringan -> tunggu 15 menit.
+// Kebijakan (Hadi 25 Sep, diperketat 30 Sep): 3x salah login per AKUN (dari
+// jaringan mana pun) -> tunggu 15 menit, dengan hitung mundur di layar login.
+// Konsekuensi yang sudah diketahui: orang lain bisa mengunci akun seseorang
+// dengan sengaja salah 3x; pemilik akun cukup menunggu atau minta reset admin.
 export const LOGIN_FAILS_PER_ACCOUNT = 3;
 // Satu jaringan menebak banyak akun sekaligus (credential stuffing).
 export const LOGIN_FAILS_PER_IP = 20;
