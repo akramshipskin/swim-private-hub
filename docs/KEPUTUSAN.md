@@ -17,3 +17,6 @@ Arsip keputusan Hadi dan hal sensitif. TIDAK dimuat otomatis; dibaca bila perlu.
 - Animasi: HP ringan (kartu dan section muncul), desktop lebih kaya (hover, video perenang di header), landing paling kaya; hormati reduced-motion.
 - Hal sensitif (bukan SPH): ada rahasia asli di luar repo ini yang tidak boleh dipindah ke folder tersinkron atau ditulis ke chat; detailnya ada di CLAUDE.md folder Chivas Media. Cadangan konfigurasi 1 Okt ada di folder cadangan akun (izin hanya pemilik).
 - Kunci dan token production SPH: hanya dicatat lokasinya (Vercel, .env.prod, password manager Hadi). SECRET_ENCRYPTION_KEY ada di Vercel production dan harus tersimpan di password manager.
+- 1 Okt malam: Hadi tidak mau membuka GitHub sendiri; Claude yang cek GitHub Actions lewat gh. Pengecualian: membuat secret tetap dikerjakan Hadi.
+- 1 Okt malam: file HabasyGo yang ada di folder Krabat tidak dipindah (keputusan Hadi: "gausah"). Fakta SPH di bawah PT Makna Krabat Indonesia hanya di dokumen hukum dan memori SPH; dokumen Krabat tidak menyebut SPH (disetujui).
+- 1 Okt malam: cabang brand-guideline-v2 digabung ke cabang utama (disetujui); animasi dikerjakan landing page dulu, lalu dalam aplikasi.
