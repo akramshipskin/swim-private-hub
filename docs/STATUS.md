@@ -4,7 +4,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 
 ## Sudah selesai dan live (per 30 Sep)
 - Tanggal lahir di semua form daftar; notifikasi admin untuk pendaftar baru (dengan log); testimoni (tabel dan halaman admin); kolom sertifikat lama dibuang; CSP aktif; PPN komisi 11%; landing dirombak kecuali "Kenalan dengan coach" dan "Kolam mitra"; backup database dan storage hijau.
-- 1 Okt: commit 0f903b1 (fungsi Vercel dipindah ke Singapura, dekat database) sudah di-push dan sedang deploy. Belum diukur hasilnya.
+- 1 Okt: commit 0f903b1 (fungsi Vercel dipindah ke Singapura, dekat database) sudah live. Terverifikasi 1 Okt: header x-vercel-id kini sin1::sin1 (dulu sin1::iad1); respons awal halaman depan ±0,4-0,5 detik (dulu 1-2 detik; percobaan pertama setelah deploy 1,8 detik karena dingin).
 
 ## Sedang jalan
 - Rombak cara main Claude (1 Okt): tahap 0-4 (backup, fondasi, aturan inti, aturan desain, rapikan memori) dikerjakan di sesi 1 Okt; tahap 5 (animasi) belum dimulai. Rinci: memori project_rombak_cara_main_2026-10-01 dan docs/KEPUTUSAN.md.
@@ -19,7 +19,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 7. Testimoni asli tambahan; masukan landing per nama section.
 
 ## Tugas Claude berikutnya
-- Ukur ulang kecepatan setelah pindah region (header x-vercel-id harus sin1::sin1). Bila simpan milestone masih lambat (±6 detik di production), cari penyebabnya.
+- Ukur ulang simpan milestone di production setelah pindah region (dulu ±6 detik). Bila masih lambat, cari penyebabnya.
 - Brand guideline: cabang brand-guideline-v2 punya 2 commit aset resolusi tinggi yang belum masuk ke cabang utama; putuskan penggabungan bersama Hadi.
 - Animasi (HP ringan, desktop lebih kaya, LP paling kaya) setelah aturan desain dan brand guideline beres. Video header: cari stok berlisensi, minta izin Hadi sebelum mengunduh.
 - Uji jalur ganti model: skill sph-berisiko (model opus) dan alat ganti model sesi. Butuh persetujuan Hadi di aplikasi.
