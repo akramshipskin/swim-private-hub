@@ -164,7 +164,7 @@ export default async function KomisiPage() {
         </CardBody>
       </Card>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 min-[1800px]:grid-cols-2">
         {pools.map((pool) => {
           const e = byPool.get(pool.id) ?? { own: zero(), single: zero(), legacy: zero(), noShow: zero(), free: 0 };
           const parts = [
