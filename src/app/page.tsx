@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import LandingView from "./landing-view";
 import { coachBioLine } from "@/lib/coach-bio";
 import { REGULAR_TEMPLATE_WHERE } from "@/lib/trial";
-import { rankLandingCoaches } from "@/lib/landing-rank";
+import { rankLandingCoaches, rankLandingPools } from "@/lib/landing-rank";
 import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
 export default async function Home() {
@@ -25,6 +25,7 @@ export default async function Home() {
           openTime: true,
           closeTime: true,
           packageTemplates: { where: REGULAR_TEMPLATE_WHERE, select: { price: true, totalSesi: true } },
+          ownerships: { select: { owner: { select: { email: true } } } },
           _count: { select: { affiliations: true } },
         },
       }),
@@ -63,10 +64,12 @@ export default async function Home() {
       entry.members.add(pkg.memberId);
       poolStats.set(pkg.poolId, entry);
     }
-    // Landing menampilkan maksimal 5 kolam paling laris, bukan semuanya.
-    const topPools = [...pools]
-      .sort((a, b) => (poolStats.get(b.id)?.sold ?? 0) - (poolStats.get(a.id)?.sold ?? 0) || a.name.localeCompare(b.name))
-      .slice(0, 5);
+    // Landing menampilkan maksimal 5 kolam: kolam asli dulu (kolam contoh hanya
+    // mengisi slot kosong), lalu yang paling laris.
+    const topPools = rankLandingPools(
+      pools.map((p) => ({ ...p, ownerEmails: p.ownerships.map((o) => o.owner.email) })),
+      new Map([...poolStats].map(([id, s]) => [id, s.sold])),
+    );
 
     const coachSessions = new Map(sessionsPerCoach.map((r) => [r.coachId, r._count._all]));
     // Landing menampilkan maksimal 5 coach: coach asli dulu (akun demo hanya
