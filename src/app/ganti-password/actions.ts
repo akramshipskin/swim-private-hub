@@ -3,7 +3,7 @@
 import { auth, unstable_update } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { createSelfDependent } from "@/lib/dependents";
-import { toProperCase } from "@/lib/format";
+import { readParticipants } from "@/lib/participant-input";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
@@ -42,20 +42,22 @@ export async function changePassword(
   // admin/coach skip step ini. Wajib isi minimal 1 peserta, digabung 1
   // transaction sama ganti password biar atomic (gak ada state "password
   // udah ganti tapi peserta belom keisi" kalau salah satu gagal).
-  const types = formData.getAll("participantType").map(String);
-  const names = formData.getAll("participantName").map(String);
-  const childNames = types
-    .map((t, i) => (t === "child" ? names[i]?.trim() : null))
-    .filter((n): n is string => !!n)
-    .map((n) => toProperCase(n));
-  const wantsSelf = types.includes("self");
+  // Tanggal lahir tiap peserta wajib (keputusan Hadi 30 Sep) -- dicek sebelum
+  // apa pun diubah, jadi salah isi tidak meninggalkan password setengah ganti.
+  let participants: ReturnType<typeof readParticipants>;
+  try {
+    participants = readParticipants(formData);
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Tanggal lahir peserta tidak valid." };
+  }
+  const { children, wantsSelf, selfBirthDate } = participants;
 
   // Wajib isi peserta cuma kalau member ini belum punya peserta sama sekali
   // (login pertama). Member yang password-nya direset admin udah punya.
   const needsParticipants =
     session.user.role === "MEMBER" &&
     (await prisma.dependent.count({ where: { memberId: session.user.id, isActive: true } })) === 0;
-  if (needsParticipants && childNames.length === 0 && !wantsSelf) {
+  if (needsParticipants && children.length === 0 && !wantsSelf) {
     return { error: "Isi minimal 1 peserta (diri sendiri atau anak)" };
   }
 
@@ -67,13 +69,14 @@ export async function changePassword(
       data: { passwordHash, mustChangePassword: false, sessionVersion: { increment: 1 } },
       select: { sessionVersion: true },
     });
-    if (childNames.length > 0) {
+    if (children.length > 0) {
       await tx.dependent.createMany({
-        data: childNames.map((name) => ({ memberId: session.user.id, name })),
+        data: children.map((c) => ({ memberId: session.user.id, name: c.name, birthDate: c.birthDate })),
       });
     }
     if (wantsSelf) {
-      await createSelfDependent(session.user.id, tx);
+      const self = await createSelfDependent(session.user.id, tx);
+      await tx.dependent.update({ where: { id: self.id }, data: { birthDate: selfBirthDate } });
     }
     return u;
   });

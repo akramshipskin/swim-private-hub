@@ -59,8 +59,6 @@ sepakat sebagai berikut.
    Tidak Hadir) di aplikasi paling lambat 24 jam setelah sesi selesai. Lewat
    batas itu hanya administrator SPH yang dapat menandai, dan sesi yang
    belum ditandai tidak menghasilkan bagi hasil sampai ditandai.
-    [CATATAN: Hadi menyebut alasannya supaya coach
-   disiplin.]
 3. Bila berhalangan, Coach membatalkan sesi melalui aplikasi selambatnya
    [ISI HADI] jam sebelum jadwal. Sesi peserta otomatis kembali ke paketnya
    dan peserta mendapat notifikasi.
@@ -111,15 +109,13 @@ sepakat sebagai berikut.
    dibatalkan. Bila saldo Coach sudah tidak mencukupi (misalnya sudah
    dicairkan), saldo menjadi negatif dan dipotong otomatis dari bagi hasil
    sesi berikutnya; saldo negatif tidak dapat dicairkan. Saat perjanjian
-   berakhir, saldo negatif diselesaikan: [ISI HADI]. **[BELUM ADA DI
-   SISTEM — sistem saat ini menolak koreksi bila saldo tidak cukup.]**
+   berakhir, saldo negatif diselesaikan: [ISI HADI].
 7. Member dapat melaporkan status Tidak Hadir yang tidak sesuai (tombol
    Laporkan) paling lambat 3 hari sejak sesi selesai. SPH memeriksa dan
    dapat mengoreksi status. Bila terbukti Coach yang tidak hadir atau
    menandai tidak sesuai, bagi hasil sesi itu dibatalkan dan Pasal 3.5
-   berlaku.  [CATATAN: pengaman terhadap coach
-   yang tidak datang lalu menandai peserta Tidak Hadir adalah laporan
-   member ini.]
+   berlaku.  [CATATAN: pengaman terhadap coach yang tidak datang lalu menandai
+   peserta Tidak Hadir adalah laporan member ini.]
 8. Paket trial: harga trial ditetapkan SPH. Bagi hasil sesi trial dihitung
    dengan persentase normal dari harga trial; selisih harga dibanding sesi
    reguler ditanggung bersama oleh Coach, Kolam Mitra, dan SPH sesuai

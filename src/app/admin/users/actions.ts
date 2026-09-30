@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { identityTakenWhere, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { createSelfDependent, createDependent } from "@/lib/dependents";
+import { parseImportBirthDate, readParticipants } from "@/lib/participant-input";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 import bcrypt from "bcryptjs";
 import { randomInt } from "crypto";
@@ -34,16 +35,18 @@ export async function createUser(
 
   // Samain kayak halaman daftar member sendiri -- kalau bikin akun Member,
   // wajib pilih minimal 1 peserta (diri sendiri/anak) dari sini juga.
-  const types = formData.getAll("participantType").map(String);
-  const names = formData.getAll("participantName").map(String);
-  const childNames = types
-    .map((t, i) => (t === "child" ? names[i]?.trim() : null))
-    .filter((n): n is string => !!n)
-    .map((n) => toProperCase(n));
-  const wantsSelf = types.includes("self");
-
-  if (role === "MEMBER" && childNames.length === 0 && !wantsSelf) {
-    return { error: "Pilih minimal 1 peserta (diri sendiri atau anak)" };
+  let wantsSelf = false;
+  let selfBirthDate: Date | null = null;
+  let children: { name: string; birthDate: Date }[] = [];
+  if (role === "MEMBER") {
+    try {
+      ({ wantsSelf, selfBirthDate, children } = readParticipants(formData));
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Tanggal lahir peserta tidak valid." };
+    }
+    if (children.length === 0 && !wantsSelf) {
+      return { error: "Pilih minimal 1 peserta (diri sendiri atau anak)" };
+    }
   }
 
   const poolMode = formData.get("poolMode")?.toString();
@@ -83,13 +86,14 @@ export async function createUser(
           ...(role === "COACH" ? { coachProfile: { create: {} } } : {}),
         },
       });
-      if (childNames.length > 0) {
+      if (children.length > 0) {
         await tx.dependent.createMany({
-          data: childNames.map((childName) => ({ memberId: created.id, name: childName })),
+          data: children.map((c) => ({ memberId: created.id, name: c.name, birthDate: c.birthDate })),
         });
       }
       if (wantsSelf) {
-        await createSelfDependent(created.id, tx);
+        const self = await createSelfDependent(created.id, tx);
+        await tx.dependent.update({ where: { id: self.id }, data: { birthDate: selfBirthDate } });
       }
       if (role === "POOL_OWNER") {
         const pool =
@@ -133,6 +137,7 @@ type ImportRow = {
   pesertaName: string | null;
   paketName: string | null;
   sisaSesi: string | null;
+  tanggalLahir: string | null;
 };
 
 // Header fleksibel: "Nama Member"/"nama"/"NAMA", "No HP"/"HP"/"Nomor HP", dst.
@@ -196,6 +201,7 @@ export async function importMembersXlsx(
     pesertaName: pick(row, ["nama peserta/anak", "nama peserta", "peserta", "anak", "nama anak"]),
     paketName: pick(row, ["paket aktif", "paket", "nama paket"]),
     sisaSesi: pick(row, ["sisa sesi", "sesi", "sisa sesi aktif"]),
+    tanggalLahir: pick(row, ["tanggal lahir", "tgl lahir", "lahir", "tanggal lahir peserta"]),
   }));
 
   // Grup per No HP -- 1 member bisa punya beberapa baris (1 baris = 1
@@ -223,6 +229,7 @@ export async function importMembersXlsx(
   let membersCreated = 0;
   let pesertaCreated = 0;
   let paketCreated = 0;
+  let tanpaTanggalLahir = 0;
 
   for (const [phone, groupRows] of groups) {
     const first = groupRows[0];
@@ -248,6 +255,7 @@ export async function importMembersXlsx(
     let groupMembersCreated = 0;
     let groupPesertaCreated = 0;
     let groupPaketCreated = 0;
+    let groupTanpaLahir = 0;
     const groupSkipped: string[] = [];
     // Password acak per member (dulu satu password sama untuk semua import --
     // siapa pun yang tahu No HP member baru bisa masuk ke akunnya). Cost 10,
@@ -275,9 +283,16 @@ export async function importMembersXlsx(
           // peserta terdaftar -- biarin dia isi sendiri pas login pertama.
           if (!row.pesertaName && !row.paketName) continue;
 
+          // Tanggal lahir opsional di Excel; kosong/tak terbaca -> peserta
+          // tetap dibuat, member diminta melengkapi di menu Peserta.
+          const birthDate = parseImportBirthDate(row.tanggalLahir);
+          if (!birthDate) groupTanpaLahir++;
           const dependent = row.pesertaName
-            ? await createDependent(member.id, row.pesertaName, tx)
+            ? await createDependent(member.id, row.pesertaName, tx, birthDate)
             : await createSelfDependent(member.id, tx);
+          if (!row.pesertaName && birthDate) {
+            await tx.dependent.update({ where: { id: dependent.id }, data: { birthDate } });
+          }
           groupPesertaCreated++;
 
           if (!row.paketName) continue;
@@ -318,6 +333,7 @@ export async function importMembersXlsx(
       credentials.push({ name, phone, password: tempPassword });
       pesertaCreated += groupPesertaCreated;
       paketCreated += groupPaketCreated;
+      tanpaTanggalLahir += groupTanpaLahir;
       skipped.push(...groupSkipped);
     } catch (err) {
       // Jangan tempel err.message mentah -- isinya pesan internal Prisma
@@ -337,6 +353,9 @@ export async function importMembersXlsx(
   ];
   if (skipped.length > 0) {
     parts.push(`${skipped.length} dilewati: ${skipped.slice(0, 5).join("; ")}${skipped.length > 5 ? "..." : ""}`);
+  }
+  if (tanpaTanggalLahir > 0) {
+    parts.push(`${tanpaTanggalLahir} peserta belum punya tanggal lahir (kolom kosong/tidak terbaca) — member akan diminta melengkapinya di menu Peserta.`);
   }
   if (membersCreated > 0) {
     parts.push("Password sementara tiap member ada di tabel di bawah — kirim ke masing-masing, wajib ganti saat pertama masuk.");

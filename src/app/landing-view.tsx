@@ -10,7 +10,7 @@ import { CoachLeaders } from "./coach-leaders";
 import { LandingHeader } from "./landing-header";
 import { Reveal } from "@/components/ui/reveal";
 import { PAYMENT_METHODS } from "./landing-payments";
-import { TESTIMONIALS, TestimonialsSection } from "./landing-testimonials";
+import { TestimonialsSection, type Testimonial } from "./landing-testimonials";
 import { BeforeAfter, CoachSection, ParentSection, PoolSection, RolePicker } from "./landing-sections";
 
 // Struktur mengikuti referensi Stride (hero foto penuh, badan krem, kartu
@@ -214,7 +214,7 @@ const MIN_MEMBERS_TO_SHOW_STATS = 20;
 // segini member (Hadi 29 Sep); di bawahnya baris itu dikosongkan.
 const MIN_POOL_MEMBERS_TO_SHOW = 15;
 
-export default function LandingView({ stats, pools, coaches }: { stats: LandingStats; pools: LandingPool[]; coaches: LandingCoach[] }) {
+export default function LandingView({ stats, pools, coaches, testimonials }: { stats: LandingStats; pools: LandingPool[]; coaches: LandingCoach[]; testimonials: Testimonial[] }) {
   const showStats = stats.memberCount >= MIN_MEMBERS_TO_SHOW_STATS;
   const STATS = [
     { value: stats.poolCount, label: "Kolam mitra" },
@@ -453,7 +453,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
         </p>
       </section>
 
-      <TestimonialsSection items={TESTIMONIALS} />
+      <TestimonialsSection items={testimonials} />
 
       {/* FAQ per peran */}
       <section id="faq" className="mx-auto w-full max-w-3xl scroll-mt-36 md:scroll-mt-20 px-4 pb-20">

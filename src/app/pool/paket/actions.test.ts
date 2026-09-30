@@ -8,8 +8,11 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     poolOwnership: { count: (...a: unknown[]) => ownershipCount(...a) },
     packageTemplate: { findUnique: (...a: unknown[]) => templateFindUnique(...a) },
+    pool: { findUnique: vi.fn().mockResolvedValue({ name: "Kolam Uji" }) },
   },
 }));
+const notifyAdmins = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/notify", () => ({ notifyAdmins: (...a: unknown[]) => notifyAdmins(...a) }));
 const createTemplateRecord = vi.fn().mockResolvedValue(null);
 const updateTemplateRecord = vi.fn().mockResolvedValue(null);
 vi.mock("@/lib/package-template", () => ({
@@ -31,12 +34,21 @@ describe("pool owner package templates", () => {
     ownershipCount.mockResolvedValue(0);
     expect((await createPoolTemplate(null, fd({ poolId: "other" })))?.error).toBeTruthy();
     expect(createTemplateRecord).not.toHaveBeenCalled();
+    expect(notifyAdmins).not.toHaveBeenCalled();
   });
 
   it("creates for an owned pool", async () => {
     ownershipCount.mockResolvedValue(1);
     expect(await createPoolTemplate(null, fd({ poolId: "mine" }))).toBeNull();
     expect(createTemplateRecord).toHaveBeenCalled();
+    expect(notifyAdmins).toHaveBeenCalledWith("Usulan paket kolam", "Kolam Uji mengusulkan paket, menunggu persetujuan", "/admin/paket");
+  });
+
+  it("does not notify admins when the proposal is rejected by validation", async () => {
+    ownershipCount.mockResolvedValue(1);
+    createTemplateRecord.mockResolvedValueOnce({ error: "Harga tidak valid" });
+    expect((await createPoolTemplate(null, fd({ poolId: "mine" })))?.error).toBe("Harga tidak valid");
+    expect(notifyAdmins).not.toHaveBeenCalled();
   });
 
   it("refuses editing a template of another pool", async () => {

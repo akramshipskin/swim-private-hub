@@ -151,3 +151,21 @@ Uji ke Supabase/S3 asli (backup file), CSP mode pantau menunggu log, balasan AI,
 8. `seed-prod-demo.mts`: password tertanam dibuang (acak), sertifikat lewat tabel baru. Skrip kolam contoh menghubungkan coach contoh ke kolam contoh.
 **Diketahui, tidak diubah (keputusan sebelumnya):** akun coach/pemilik kolam yang dibuat admin tidak dipaksa ganti password saat masuk pertama (hanya member; ada tes yang sengaja menetapkan itu).
 **Verifikasi akhir:** tsc 0, eslint 0, vitest 637, race 135 (E10 diperbaiki), build exit 0. Cek overflow horizontal semua halaman admin (1440 & 390), coach (1440 & 390), member & pemilik kolam (390): bersih kecuali satu tabel kecil yang memang bisa digeser.
+
+## Babak 3 (30 Sep malam): permintaan Hadi setelah daftar sisa kerjaan
+
+Semua dikerjakan dan diverifikasi (tsc 0, eslint 0, vitest 666, race 146 pada skema migrasi terbaru, build exit 0).
+
+| Item | Hasil | Cara verifikasi |
+|---|---|---|
+| Tanggal lahir di semua form daftar | Wajib di form admin buat akun member, form ganti password pertama, dan form daftar coach (17-80 tahun). Impor Excel punya kolom "Tanggal Lahir" opsional; yang kosong dilaporkan dan dilengkapi member. Pemilik kolam tidak punya umur, jadi tidak diminta. | Tes unit baru (participant-input, admin users, ganti password, register-coach) + tes race |
+| Notifikasi | Push admin baru: coach daftar, kolam daftar, sertifikat diunggah, usul paket kolam, usul butir milestone, ditambah kabar ke coach saat sertifikat/usul milestone diputuskan. Log server kalau env VAPID kosong, kalau tidak ada langganan, dan kalau layanan push menolak (dulu semua gagal senyap). | Tes race `notify.race.test.ts` (matriks 11 kejadian: penerima dan isi); uji hidup: coach daftar -> push ke admin terdekripsi dengan tanda tangan VAPID |
+| Testimoni | Tabel `Testimonial`, halaman admin `/admin/testimoni` (tambah, ubah, sembunyikan, hapus, wajib catatan izin). Testimoni Ibu Clara di-seed lewat migrasi. | UI hidup: tambah, muncul di landing, sembunyikan, hapus |
+| Buang kolom sertifikat lama | `CoachProfile.certificateUrl/certificateStatus` dibuang di migrasi yang sama. Aman: data lama sudah dipindah ke `CoachCertificate` (migrasi 29 Sep). | Migrasi diterapkan ke DB dev dan DB race; seluruh tes lulus |
+| CSP aktif | Header `Content-Security-Policy` (bukan Report-Only). Build produksi lokal dijelajahi: publik, admin, coach, member, pemilik kolam; 0 pelanggaran script/style/connect/font; service worker aktif. Satu-satunya blokir: gambar dari penyimpanan palsu http lokal (Supabase asli https). | Browser + konsol |
+| Balasan AI | Diuji hidup dengan AI palsu lokal: jawaban biasa, eskalasi `[ADMIN]`, AI gagal -> pesan diteruskan ke admin, balasan admin. Data yang dikirim ke AI: nama, peran, aturan tetap, dan ketikan pengguna. | UI + log permintaan |
+
+Catatan penting:
+- Migrasi baru memuat DROP COLUMN. Setelah dijalankan di production, kode lama yang masih live bisa error di halaman yang membaca profil coach sampai deploy baru selesai: jalankan migrasi lalu langsung push.
+- Uji hidup push lewat server dev tidak konsisten (proses anak Next tidak selalu memuat penangkap), jadi bukti utamanya tes race; uji hidup hanya menangkap satu jalur.
+- PPN: sistem memakai 12% inklusif. Hadi menyebut 11% "sama seperti pajak SPH": belum diubah, menunggu jawaban Hadi (lihat Lembar Hadi).

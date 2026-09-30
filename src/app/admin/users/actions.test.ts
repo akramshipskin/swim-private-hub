@@ -8,6 +8,7 @@ vi.mock("bcryptjs", () => ({ default: { hash: vi.fn().mockResolvedValue("hashed"
 const userFindFirst = vi.fn();
 const userCreate = vi.fn();
 const dependentCreateMany = vi.fn().mockResolvedValue({});
+const dependentUpdate = vi.fn().mockResolvedValue({});
 const packageTemplateFindMany = vi.fn().mockResolvedValue([]);
 const packageCreate = vi.fn().mockResolvedValue({});
 const userUpdate = vi.fn().mockResolvedValue({});
@@ -19,7 +20,10 @@ const poolCount = vi.fn().mockResolvedValue(1);
 function makeTx() {
   return {
     user: { create: (...args: unknown[]) => userCreate(...args) },
-    dependent: { createMany: (...args: unknown[]) => dependentCreateMany(...args) },
+    dependent: {
+      createMany: (...args: unknown[]) => dependentCreateMany(...args),
+      update: (...args: unknown[]) => dependentUpdate(...args),
+    },
     package: { create: (...args: unknown[]) => packageCreate(...args) },
     pool: { create: (...args: unknown[]) => poolCreate(...args) },
     poolOwnership: { create: (...args: unknown[]) => ownershipCreate(...args) },
@@ -94,7 +98,7 @@ describe("createUser", () => {
   });
 
   it("creates a MEMBER with mustChangePassword forced true, given a participant", async () => {
-    await createUser(null, formData({ ...base, role: "MEMBER", participantType: "self", participantName: "" }));
+    await createUser(null, formData({ ...base, role: "MEMBER", participantType: "self", participantName: "", participantBirthDate: "1990-05-05" }));
     expect(userCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ role: "MEMBER", mustChangePassword: true }) })
     );
@@ -122,14 +126,26 @@ describe("createUser", () => {
         role: "MEMBER",
         participantType: ["child", "child"],
         participantName: ["budi jr", "wati"],
+        participantBirthDate: ["2018-04-01", "2020-09-15"],
       })
     );
     expect(dependentCreateMany).toHaveBeenCalledWith({
       data: [
-        { memberId: "user-1", name: "Budi Jr" },
-        { memberId: "user-1", name: "Wati" },
+        { memberId: "user-1", name: "Budi Jr", birthDate: new Date("2018-04-01T00:00:00Z") },
+        { memberId: "user-1", name: "Wati", birthDate: new Date("2020-09-15T00:00:00Z") },
       ],
     });
+  });
+
+  it("menyimpan tanggal lahir peserta diri sendiri", async () => {
+    await createUser(null, formData({ ...base, role: "MEMBER", participantType: "self", participantName: "", participantBirthDate: "1990-05-05" }));
+    expect(dependentUpdate).toHaveBeenCalledWith({ where: { id: "dep-self" }, data: { birthDate: new Date("1990-05-05T00:00:00Z") } });
+  });
+
+  it("menolak MEMBER tanpa tanggal lahir peserta (tidak ada akun dibuat)", async () => {
+    const result = await createUser(null, formData({ ...base, role: "MEMBER", participantType: "child", participantName: "budi jr" }));
+    expect(result?.error).toMatch(/tanggal lahir/i);
+    expect(userCreate).not.toHaveBeenCalled();
   });
 });
 
@@ -279,6 +295,19 @@ describe("importMembersXlsx", () => {
     expect(packageCreate).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ sisaSesi: 5, totalSesi: 5 }) })
     );
+  });
+
+  it("membaca kolom Tanggal Lahir, dan melaporkan peserta yang kosong/tidak terbaca", async () => {
+    const result = await importMembersXlsx(
+      null,
+      importFormData([
+        { "Nama Member": "siti", "No HP": "081200000002", "Nama Peserta/Anak": "Rafi", "Tanggal Lahir": "05/07/2018" },
+        { "Nama Member": "siti", "No HP": "081200000002", "Nama Peserta/Anak": "Nadia" },
+      ])
+    );
+    expect(createDependent).toHaveBeenNthCalledWith(1, "user-1", "Rafi", expect.anything(), new Date("2018-07-05T00:00:00Z"));
+    expect(createDependent).toHaveBeenNthCalledWith(2, "user-1", "Nadia", expect.anything(), null);
+    expect(result?.result).toContain("1 peserta belum punya tanggal lahir");
   });
 
   it("groups multiple rows with the same phone number into one member with multiple participants", async () => {

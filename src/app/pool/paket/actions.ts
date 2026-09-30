@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { proposeNewTemplate, proposeTemplateUpdate } from "@/lib/package-template";
+import { notifyAdmins } from "@/lib/notify";
 
 export type ActionState = { error?: string } | null;
 
@@ -13,12 +14,18 @@ async function ownsPool(userId: string, poolId: string) {
   return (await prisma.poolOwnership.count({ where: { poolId, ownerId: userId } })) > 0;
 }
 
+async function notifyPackageProposal(poolId: string) {
+  const pool = await prisma.pool.findUnique({ where: { id: poolId }, select: { name: true } });
+  await notifyAdmins("Usulan paket kolam", `${pool?.name ?? "Kolam"} mengusulkan paket, menunggu persetujuan`, "/admin/paket");
+}
+
 export async function createPoolTemplate(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await requireRole("POOL_OWNER");
   const poolId = formData.get("poolId")?.toString() ?? "";
   if (!(await ownsPool(session.user.id, poolId))) return { error: "Kamu tidak punya akses ke kolam ini." };
   const res = await proposeNewTemplate(poolId, formData);
   if (res) return res;
+  await notifyPackageProposal(poolId);
   revalidatePath("/pool/paket");
   revalidatePath("/admin/paket");
   return null;
@@ -35,6 +42,7 @@ export async function updatePoolTemplate(_prev: ActionState, formData: FormData)
   }
   const res = await proposeTemplateUpdate(formData.get("templateId")?.toString() ?? "", formData);
   if (res) return res;
+  await notifyPackageProposal(template.poolId);
   revalidatePath("/pool/paket");
   revalidatePath("/admin/paket");
   return null;

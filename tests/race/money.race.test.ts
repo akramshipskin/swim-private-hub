@@ -182,7 +182,7 @@ describe("REGISTRATION / ACCOUNT races", () => {
     expect(deps.map((d) => [d.isSelf, d.birthDate?.toISOString().slice(0, 10)])).toEqual([[false, "2019-03-04"], [true, "1990-05-05"]]);
   });
   it("A2: daftar coach & daftar kolam No HP sama barengan -> 1 akun, gak ada 500 / kolam yatim", async () => {
-    const body = { name: "a", ownerName: "a", phone: "081299999999", password: "12345678", acceptedTerms: true, specialties: ["Gaya bebas"], poolName: "K", address: "J", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago };
+    const body = { name: "a", ownerName: "a", birthDate: "1990-05-05", phone: "081299999999", password: "12345678", acceptedTerms: true, specialties: ["Gaya bebas"], poolName: "K", address: "J", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago };
     const rs = await settle([0, 1, 2].flatMap(() => [registerCoach(new Request("http://x", { method: "POST", body: JSON.stringify(body) })), registerPool(new Request("http://x", { method: "POST", body: JSON.stringify(body) }))]));
     console.log("A2", summarize(rs));
     expect(await prisma.user.count({ where: { phone: "081299999999" } })).toBe(1);

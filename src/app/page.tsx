@@ -11,7 +11,7 @@ export default async function Home() {
   const session = await auth();
 
   if (!session) {
-    const [pools, coaches, memberCount, attendedCount, packagesPerPool, sessionsPerCoach] = await Promise.all([
+    const [pools, coaches, memberCount, attendedCount, packagesPerPool, sessionsPerCoach, testimonials] = await Promise.all([
       prisma.pool.findMany({
         where: { isActive: true },
         orderBy: { name: "asc" },
@@ -55,6 +55,11 @@ export default async function Home() {
         where: { bookings: { some: { attended: true } } },
         _count: { _all: true },
       }),
+      prisma.testimonial.findMany({
+        where: { isPublished: true },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+        select: { name: true, role: true, quote: true },
+      }),
     ]);
 
     const poolStats = new Map<string, { sold: number; members: Set<string> }>();
@@ -78,6 +83,7 @@ export default async function Home() {
 
     return (
       <LandingView
+        testimonials={testimonials}
         stats={{ poolCount: pools.length, coachCount: coaches.length, memberCount, attendedCount }}
         pools={topPools.map((p) => ({
           id: p.id,

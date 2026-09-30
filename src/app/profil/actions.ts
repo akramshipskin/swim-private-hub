@@ -9,7 +9,8 @@ import { revalidatePath } from "next/cache";
 import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties";
 import { isStorageConfigured, validateUpload, extensionFor, uploadObject, publicObjectUrl, PHOTO_BUCKET, CERT_BUCKET, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR, removeObject } from "@/lib/storage";
 import { MAX_CERTIFICATES_PER_COACH } from "@/lib/coach-certificates";
-import { ageFromBirthDate } from "@/lib/coach-bio";
+import { parseCoachBirthDate } from "@/lib/coach-bio";
+import { notifyAdmins } from "@/lib/notify";
 
 export type ActionState = { error?: string; success?: boolean } | null;
 
@@ -180,11 +181,11 @@ export async function updateCoachProfile(
   const birthDateRaw = formData.get("birthDate")?.toString().trim() ?? "";
   let birthDate: Date | null = null;
   if (birthDateRaw) {
-    const parsed = new Date(`${birthDateRaw}T00:00:00+07:00`);
-    if (Number.isNaN(parsed.getTime())) return { error: "Tanggal lahir tidak valid." };
-    const age = ageFromBirthDate(parsed);
-    if (age === null || age < 17 || age > 80) return { error: "Tanggal lahir tidak masuk akal (umur 17-80 tahun)." };
-    birthDate = parsed;
+    try {
+      birthDate = parseCoachBirthDate(birthDateRaw);
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Tanggal lahir tidak valid." };
+    }
   }
 
   const genderRaw = formData.get("gender")?.toString() ?? "";
@@ -273,6 +274,7 @@ export async function uploadCoachCertificate(_prev: ActionState, formData: FormD
     await removeObject(CERT_BUCKET, path);
     return { error: LIMIT_ERROR };
   }
+  await notifyAdmins("Sertifikat coach menunggu", `${session.user.name ?? "Coach"} mengunggah "${name}"`, `/admin/users/${session.user.id}`);
   revalidatePath("/profil");
   return { success: true };
 }

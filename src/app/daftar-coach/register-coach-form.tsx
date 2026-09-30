@@ -17,6 +17,7 @@ export default function RegisterCoachForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
   const [specialties, setSpecialties] = useState<string[]>([]);
@@ -52,6 +53,7 @@ export default function RegisterCoachForm() {
         name,
         phone,
         email: email || undefined,
+        birthDate,
         password,
         acceptedTerms: agreed,
         bio,
@@ -125,6 +127,16 @@ export default function RegisterCoachForm() {
             </Field>
             <Field label="Email (opsional)">
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+            </Field>
+            <Field label="Tanggal Lahir">
+              <Input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                max={new Date().toISOString().slice(0, 10)}
+                required
+                autoComplete="bday"
+              />
             </Field>
             <Field label="Password">
               <Input

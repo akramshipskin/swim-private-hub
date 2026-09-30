@@ -24,7 +24,7 @@ vi.mock("@/lib/prisma", () => ({
 
 const { sendPushToUser, sendPushToUsers, sendPushToRole } = await import("./push");
 
-const sub = { id: "s1", endpoint: "https://push/1", p256dh: "p", auth: "a" };
+const sub = { id: "s1", endpoint: "https://push.example/1", p256dh: "p", auth: "a" };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -41,7 +41,7 @@ describe("sendPushToUser", () => {
     await sendPushToUser("u1", { title: "t", body: "b" });
     expect(after).toHaveBeenCalledTimes(1);
     await vi.waitFor(() => expect(sendNotification).toHaveBeenCalledTimes(1));
-    expect(sendNotification.mock.calls[0][0]).toEqual({ endpoint: "https://push/1", keys: { p256dh: "p", auth: "a" } });
+    expect(sendNotification.mock.calls[0][0]).toEqual({ endpoint: "https://push.example/1", keys: { p256dh: "p", auth: "a" } });
     expect(setVapidDetails).toHaveBeenCalledWith("mailto:hello@example.com", "pub", "priv");
   });
 
@@ -70,13 +70,40 @@ describe("sendPushToUser", () => {
     expect(subDelete).toHaveBeenCalledWith({ where: { id: "s1" } });
   });
 
-  it("keeps the subscription on other errors", async () => {
+  it("keeps the subscription on other errors, and logs host + status (no keys)", async () => {
     after.mockImplementation(() => {
       throw new Error("outside");
     });
-    sendNotification.mockRejectedValue({ statusCode: 500 });
-    await sendPushToUser("u1", { title: "t", body: "b" });
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    sendNotification.mockRejectedValue({ statusCode: 403 });
+    await sendPushToUser("u1", { title: "Judul", body: "b" });
     expect(subDelete).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledWith('[push] gagal kirim "Judul" ke push.example: 403');
+    error.mockRestore();
+  });
+
+  it("logs once which env is missing when VAPID is incomplete", async () => {
+    vi.resetModules();
+    delete process.env.VAPID_PRIVATE_KEY;
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fresh = await import("./push");
+    await fresh.sendPushToUser("u1", { title: "t", body: "b" });
+    await fresh.sendPushToUser("u1", { title: "t", body: "b" });
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalledWith("[push] dilewati: env belum lengkap (VAPID_PRIVATE_KEY)");
+    warn.mockRestore();
+  });
+
+  it("logs when the recipient has no subscription at all", async () => {
+    after.mockImplementation(() => {
+      throw new Error("outside");
+    });
+    subFindMany.mockResolvedValue([]);
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    await sendPushToUser("u1", { title: "Judul", body: "b" });
+    expect(sendNotification).not.toHaveBeenCalled();
+    expect(info).toHaveBeenCalledWith('[push] tidak ada langganan untuk 1 penerima ("Judul")');
+    info.mockRestore();
   });
 });
 
@@ -92,7 +119,7 @@ describe("sendPushToRole", () => {
 
 describe("sendPushToUsers", () => {
   it("delivers to everyone with ONE after() job and ONE subscription query", async () => {
-    subFindMany.mockResolvedValue([sub, { ...sub, id: "s2", endpoint: "https://push/2" }]);
+    subFindMany.mockResolvedValue([sub, { ...sub, id: "s2", endpoint: "https://push.example/2" }]);
     await sendPushToUsers(["u1", "u2", "u3"], { title: "t", body: "b" });
     expect(after).toHaveBeenCalledTimes(1);
     expect(subFindMany).toHaveBeenCalledTimes(1);
@@ -107,7 +134,7 @@ describe("sendPushToUsers", () => {
   });
 
   it("keeps sending to the rest when one subscription fails", async () => {
-    subFindMany.mockResolvedValue([sub, { ...sub, id: "s2", endpoint: "https://push/2" }]);
+    subFindMany.mockResolvedValue([sub, { ...sub, id: "s2", endpoint: "https://push.example/2" }]);
     sendNotification.mockRejectedValueOnce({ statusCode: 500 }).mockResolvedValueOnce({});
     await sendPushToUsers(["u1", "u2"], { title: "t", body: "b" });
     await vi.waitFor(() => expect(sendNotification).toHaveBeenCalledTimes(2));

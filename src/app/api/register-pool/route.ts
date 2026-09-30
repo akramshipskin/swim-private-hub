@@ -1,5 +1,6 @@
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import bcrypt from "bcryptjs";
+import { notifyAdmins } from "@/lib/notify";
 import { prisma } from "@/lib/prisma";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
@@ -141,6 +142,7 @@ export async function POST(request: Request) {
       return { user, pool };
     });
 
+    await notifyAdmins("Pendaftaran kolam baru", `${result.pool.name} (${result.user.name}) menunggu persetujuan`, "/admin/users");
     return Response.json(
       { user: { id: result.user.id, name: result.user.name, phone: result.user.phone } },
       { status: 201 }

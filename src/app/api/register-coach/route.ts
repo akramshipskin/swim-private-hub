@@ -3,7 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
+import { notifyAdmins } from "@/lib/notify";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
+import { parseCoachBirthDate } from "@/lib/coach-bio";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, isStringArrayOrMissing, MAX_BIO, MAX_EMAIL, MAX_NAME, MAX_NOTE, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
 
 export async function POST(request: Request) {
@@ -13,6 +15,7 @@ export async function POST(request: Request) {
     name: { max: MAX_NAME, label: "Nama" },
     phone: { max: 20, label: "No HP" },
     email: { max: MAX_EMAIL, label: "Email" },
+    birthDate: { max: 10, label: "Tanggal lahir" },
     password: { max: MAX_PASSWORD, label: "Password" },
     bio: { max: MAX_BIO, label: "Bio" },
     certificationNote: { max: MAX_NOTE, label: "Catatan sertifikasi" },
@@ -24,6 +27,7 @@ export async function POST(request: Request) {
     name,
     phone: rawPhone,
     email: rawEmail,
+    birthDate: rawBirthDate,
     password,
     acceptedTerms,
     bio,
@@ -36,6 +40,7 @@ export async function POST(request: Request) {
     name?: string;
     phone?: string;
     email?: string;
+    birthDate?: string;
     password?: string;
     acceptedTerms?: boolean;
     bio?: string;
@@ -62,6 +67,15 @@ export async function POST(request: Request) {
   }
   if (password.length < 8) {
     return Response.json({ error: "Password minimal 8 karakter" }, { status: 400 });
+  }
+
+  // Tanggal lahir wajib (keputusan Hadi 30 Sep: semua form daftar).
+  let birthDate: Date;
+  try {
+    birthDate = parseCoachBirthDate((rawBirthDate ?? "").trim());
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Tanggal lahir tidak valid.";
+    return Response.json({ error: rawBirthDate ? message : "Tanggal lahir wajib diisi" }, { status: 400 });
   }
 
   const cleanSpecialties = (specialties ?? []).filter((s) =>
@@ -112,6 +126,7 @@ export async function POST(request: Request) {
         coachProfile: {
           create: {
             bio: bio?.trim() || null,
+            birthDate,
             specialties: cleanSpecialties,
             hasCertification: !!hasCertification,
             certificationNote: hasCertification ? certificationNote?.trim() || null : null,
@@ -121,6 +136,7 @@ export async function POST(request: Request) {
       select: { id: true, name: true, phone: true, role: true },
     });
 
+    await notifyAdmins("Pendaftaran coach baru", `${user.name} menunggu persetujuan`, "/admin/users");
     return Response.json({ user }, { status: 201 });
   } catch (err) {
     if (err instanceof Error && "code" in err && (err as { code?: string }).code === "P2002") {

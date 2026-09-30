@@ -245,14 +245,12 @@ model CoachProfile {
   // opsional -- nama sertifikat/lembaga, ditampilin di sebelah badge.
   hasCertification  Boolean  @default(false)
   certificationNote String?
-  // Foto profil (URL Supabase Storage). certificateUrl/certificateStatus =
-  // KOLOM LAMA, tidak dibaca lagi sejak sertifikat pindah ke tabel
-  // CoachCertificate (29 Sep); tunggu dibuang. hasCertification &
-  // certificationNote sekarang cuma "pengakuan" di form daftar coach (belum
-  // diperiksa) -- dipakai sebagai isian awal nama sertifikat di Profil.
+  // Foto profil (URL Supabase Storage). Sertifikat ada di tabel
+  // CoachCertificate (kolom tunggal lama sudah dibuang 30 Sep).
+  // hasCertification & certificationNote cuma "pengakuan" di form daftar
+  // coach (belum diperiksa) -- dipakai sebagai isian awal nama sertifikat
+  // di Profil.
   photoUrl          String?
-  certificateUrl    String?
-  certificateStatus CertificateStatus @default(NONE)
   // Tanggal lahir & jenis kelamin coach -- orang tua sering memilih coach
   // berdasarkan dua hal ini. Umur dihitung dari birthDate (jangan simpan
   // umur sebagai angka: basi tiap tahun).
@@ -633,6 +631,22 @@ model PoolAffiliation {
 
   @@unique([poolId, coachId])
   @@index([coachId])
+}
+
+// Testimoni asli yang tampil di landing ("Kata mereka"). Diisi/diubah admin di
+// /admin/testimoni; bagian landing tersembunyi kalau tidak ada yang tampil.
+// consentNote wajib: bukti izin yang bersangkutan (siapa, kapan, lewat apa).
+model Testimonial {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  quote       String
+  consentNote String
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([isPublished, sortOrder])
 }
 
 model PushSubscription {

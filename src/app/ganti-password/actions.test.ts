@@ -10,15 +10,19 @@ vi.mock("next/navigation", () => ({
 }));
 const compare = vi.fn().mockResolvedValue(false);
 vi.mock("bcryptjs", () => ({ default: { hash: vi.fn().mockResolvedValue("hashed"), compare: (...a: unknown[]) => compare(...a) } }));
-vi.mock("@/lib/dependents", () => ({ createSelfDependent: vi.fn() }));
+const createSelfDependent = vi.fn().mockResolvedValue({ id: "dep-self" });
+vi.mock("@/lib/dependents", () => ({ createSelfDependent: (...a: unknown[]) => createSelfDependent(...a) }));
+const dependentCreateMany = vi.fn();
+const dependentUpdate = vi.fn();
+const dependentCount = vi.fn().mockResolvedValue(1);
 
 const userUpdate = vi.fn().mockResolvedValue({ sessionVersion: 3 });
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    dependent: { count: vi.fn().mockResolvedValue(1) },
+    dependent: { count: (...a: unknown[]) => dependentCount(...a) },
     user: { findUnique: vi.fn().mockResolvedValue({ passwordHash: "temp-hash" }) },
     $transaction: (fn: (tx: unknown) => unknown) =>
-      fn({ user: { update: (a: unknown) => userUpdate(a) }, dependent: { createMany: vi.fn() } }),
+      fn({ user: { update: (a: unknown) => userUpdate(a) }, dependent: { createMany: (a: unknown) => dependentCreateMany(a), update: (a: unknown) => dependentUpdate(a) } }),
   },
 }));
 
@@ -59,5 +63,39 @@ describe("changePassword (tanpa password lama)", () => {
     const res = await changePassword(null, fd({ newPassword: "renang2026", confirmPassword: "renang2026" }));
     expect(res).toEqual({ error: "Password baru harus berbeda dari password sementara." });
     expect(userUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe("changePassword: peserta member login pertama", () => {
+  const member = { user: { id: "m1", role: "MEMBER", mustChangePassword: true } };
+  const base = { newPassword: "abcdefgh", confirmPassword: "abcdefgh" };
+  function withParticipants(rows: { type: string; name?: string; date?: string }[]) {
+    const f = fd(base);
+    for (const r of rows) {
+      f.append("participantType", r.type);
+      f.append("participantName", r.name ?? "");
+      f.append("participantBirthDate", r.date ?? "");
+    }
+    return f;
+  }
+
+  it("menolak peserta tanpa tanggal lahir, password tidak diubah", async () => {
+    auth.mockResolvedValue(member);
+    dependentCount.mockResolvedValueOnce(0);
+    const res = await changePassword(null, withParticipants([{ type: "child", name: "Ani" }]));
+    expect(res?.error).toMatch(/tanggal lahir/i);
+    expect(userUpdate).not.toHaveBeenCalled();
+  });
+
+  it("menyimpan anak dan diri sendiri lengkap dengan tanggal lahir", async () => {
+    auth.mockResolvedValue(member);
+    dependentCount.mockResolvedValueOnce(0);
+    await expect(
+      changePassword(null, withParticipants([{ type: "self", date: "1990-05-05" }, { type: "child", name: "ani", date: "2018-04-01" }]))
+    ).rejects.toThrow("NEXT_REDIRECT:/member/booking");
+    expect(dependentCreateMany).toHaveBeenCalledWith({
+      data: [{ memberId: "m1", name: "Ani", birthDate: new Date("2018-04-01T00:00:00Z") }],
+    });
+    expect(dependentUpdate).toHaveBeenCalledWith({ where: { id: "dep-self" }, data: { birthDate: new Date("1990-05-05T00:00:00Z") } });
   });
 });

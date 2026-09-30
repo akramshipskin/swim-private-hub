@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 type Payload = { title: string; body: string; url?: string };
 
 let vapidReady = false;
+let warnedNoVapid = false;
 
 // Dimuat malas & aman: kalau env VAPID belum diisi, push dilewati diam-diam.
 // Sebelumnya setVapidDetails jalan saat modul di-import, jadi env kosong bikin
@@ -14,7 +15,16 @@ function ensureVapid() {
   const subject = process.env.VAPID_SUBJECT;
   const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
-  if (!subject || !publicKey || !privateKey) return false;
+  if (!subject || !publicKey || !privateKey) {
+    // Sekali per proses: tanpa jejak ini, push yang mati karena env kosong
+    // tidak kelihatan di mana pun (dulu "notifikasi admin tidak masuk" tanpa petunjuk).
+    if (!warnedNoVapid) {
+      warnedNoVapid = true;
+      const missing = [!subject && "VAPID_SUBJECT", !publicKey && "NEXT_PUBLIC_VAPID_PUBLIC_KEY", !privateKey && "VAPID_PRIVATE_KEY"].filter(Boolean);
+      console.warn(`[push] dilewati: env belum lengkap (${missing.join(", ")})`);
+    }
+    return false;
+  }
   webpush.setVapidDetails(subject, publicKey, privateKey);
   vapidReady = true;
   return true;
@@ -31,6 +41,11 @@ async function deliver(userIds: string[], payload: Payload) {
 
   // ponytail: dikirim serentak tanpa batas -- cukup buat ratusan penerima;
   // kalau sudah ribuan, pecah per 50 langganan.
+  if (subscriptions.length === 0) {
+    console.info(`[push] tidak ada langganan untuk ${userIds.length} penerima ("${payload.title}")`);
+    return;
+  }
+
   await Promise.allSettled(
     subscriptions.map(async (sub) => {
       try {
@@ -47,6 +62,10 @@ async function deliver(userIds: string[], payload: Payload) {
         const statusCode = (err as { statusCode?: number })?.statusCode;
         if (statusCode === 404 || statusCode === 410) {
           await prisma.pushSubscription.delete({ where: { id: sub.id } });
+        } else {
+          // Kunci VAPID salah/tidak cocok (401/403), layanan push menolak, atau
+          // jaringan putus: catat supaya kelihatan di log, tanpa isi langganan.
+          console.error(`[push] gagal kirim "${payload.title}" ke ${new URL(sub.endpoint).host}: ${statusCode ?? (err as Error)?.message ?? "error"}`);
         }
       }
     })

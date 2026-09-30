@@ -1,11 +1,8 @@
-// Testimoni ASLI dari pengguna nyata (dengan izin mereka). Sengaja KOSONG:
-// bagian "Kata mereka" di landing otomatis tersembunyi sampai ada minimal 1
-// isi, jadi cukup tambah objek di array ini saat testimoni asli sudah ada.
-// Jangan mengisi contoh/dummy -- bagian ini tampil ke publik dan ke calon
-// pelanggan dari iklan.
+// Testimoni ASLI dari pengguna nyata (dengan izin mereka), diambil dari tabel
+// Testimonial (dikelola di /admin/testimoni). Bagian "Kata mereka" otomatis
+// tersembunyi kalau tidak ada yang tampil. Jangan mengisi contoh/dummy --
+// bagian ini tampil ke publik dan ke calon pelanggan dari iklan.
 export type Testimonial = { name: string; role: string; quote: string };
-
-export const TESTIMONIALS: Testimonial[] = [];
 
 export function TestimonialsSection({ items }: { items: Testimonial[] }) {
   if (items.length === 0) return null;

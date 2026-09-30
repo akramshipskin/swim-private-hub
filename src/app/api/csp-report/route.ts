@@ -1,4 +1,4 @@
-// Penerima laporan pelanggaran CSP (mode pantau, lihat next.config.ts). Publik
+// Penerima laporan pelanggaran CSP (lihat next.config.ts). Publik
 // tanpa login karena browser yang mengirim. Hanya mencatat ringkasan ke log
 // server (Vercel Logs) -- tidak menyimpan apa pun ke database.
 const MAX_BODY = 8 * 1024;

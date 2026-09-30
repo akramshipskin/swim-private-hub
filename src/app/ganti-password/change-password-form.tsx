@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 
-type Participant = { type: "self" | "child"; name: string };
+type Participant = { type: "self" | "child"; name: string; birthDate: string };
 
 export default function ChangePasswordForm({
   isMember,
@@ -17,7 +17,7 @@ export default function ChangePasswordForm({
 }) {
   const [state, formAction, pending] = useActionState(changePassword, null);
   const [participants, setParticipants] = useState<Participant[]>([
-    { type: "self", name: "" },
+    { type: "self", name: "", birthDate: "" },
   ]);
 
   function updateParticipant(i: number, patch: Partial<Participant>) {
@@ -37,7 +37,7 @@ export default function ChangePasswordForm({
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium text-text">Siapa yang mau les?</p>
           <p className="text-xs text-text-subtle">
-            Bisa diri sendiri, bisa anak, bisa keduanya. Bisa ditambah lagi nanti.
+            Bisa diri sendiri, bisa anak, bisa keduanya. Tanggal lahir wajib diisi untuk menentukan level belajar. Bisa ditambah lagi nanti.
           </p>
           {participants.map((p, i) => {
             // "Diri sendiri" cuma boleh dipilih di 1 baris -- sama kayak
@@ -47,7 +47,8 @@ export default function ChangePasswordForm({
               (other, idx) => idx !== i && other.type === "self"
             );
             return (
-            <div key={i} className="flex gap-2">
+            <div key={i} className="flex flex-col gap-2 rounded-xl border border-border p-2">
+            <div className="flex gap-2">
               <Select
                 name="participantType"
                 value={p.type}
@@ -75,11 +76,21 @@ export default function ChangePasswordForm({
                 />
               )}
             </div>
+            <Input
+              type="date"
+              name="participantBirthDate"
+              value={p.birthDate}
+              onChange={(e) => updateParticipant(i, { birthDate: e.target.value })}
+              max={new Date().toISOString().slice(0, 10)}
+              aria-label={`Peserta ${i + 1}: tanggal lahir`}
+              required
+            />
+            </div>
             );
           })}
           <button
             type="button"
-            onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "" }])}
+            onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "", birthDate: "" }])}
             className="self-start text-sm font-medium text-brand-700 hover:underline max-sm:min-h-[44px]"
           >
             + Tambah peserta lain

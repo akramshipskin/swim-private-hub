@@ -9,13 +9,16 @@ const nextConfig: NextConfig = {
     // lewat server action; default 1MB terlalu kecil.
     serverActions: { bodySizeLimit: "4mb" },
   },
-  // Header keamanan dasar (sweep keamanan 25 Sep). CSP dipasang dulu mode
-  // PANTAU (Report-Only, 30 Sep): tidak memblokir apa pun, pelanggaran hanya
-  // dicatat lewat /api/csp-report (log Vercel). Setelah log bersih 1-2 hari,
-  // ganti key jadi "Content-Security-Policy" supaya aktif. Midtrans tidak perlu
-  // diizinkan: checkout memakai halaman redirect (pindah domain), bukan skrip
-  // Snap di halaman kita. 'unsafe-inline' script dibutuhkan Next (skrip inline
-  // bawaan); 'unsafe-eval' hanya di mode dev.
+  // Header keamanan dasar (sweep keamanan 25 Sep). CSP sempat mode PANTAU
+  // (Report-Only, 30 Sep pagi), lalu DIAKTIFKAN 30 Sep sore setelah build
+  // produksi diuji di browser: halaman publik + admin + coach + member +
+  // pemilik kolam, tanpa pelanggaran script/style/connect/font (satu-satunya
+  // yang terblokir: gambar dari penyimpanan palsu http lokal; Supabase asli
+  // https, jadi lolos). Pelanggaran yang masih terjadi tercatat lewat
+  // /api/csp-report (log Vercel). Midtrans tidak perlu diizinkan: checkout
+  // memakai halaman redirect (pindah domain), bukan skrip Snap di halaman
+  // kita. 'unsafe-inline' script dibutuhkan Next (skrip inline bawaan);
+  // 'unsafe-eval' hanya di mode dev.
   async headers() {
     const isDev = process.env.NODE_ENV !== "production";
     const csp = [
@@ -38,7 +41,7 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
-          { key: "Content-Security-Policy-Report-Only", value: csp },
+          { key: "Content-Security-Policy", value: csp },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

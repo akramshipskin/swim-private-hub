@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/require-role";
+import { notifyAdmins, notifyUser } from "@/lib/notify";
 import { coachTeachesDependent, visibleItemsWhere } from "@/lib/milestone-data";
 import {
   MILESTONE_GROUPS,
@@ -147,6 +148,7 @@ export async function addMilestoneItem(
         proposalStatus: propose ? "PENDING" : "NONE",
       },
     });
+    if (propose) await notifyAdmins("Usulan butir milestone", `Coach mengusulkan: "${text.slice(0, 80)}"`, "/admin/milestone");
   } catch (err) {
     if (err instanceof MilestoneError) return { error: err.message };
     throw err;
@@ -160,9 +162,18 @@ export async function addMilestoneItem(
 // supaya klik ganda / 2 admin tidak saling timpa.
 export async function reviewMilestoneProposal(itemId: string, approve: boolean) {
   await requireRole("ADMIN");
-  await prisma.milestoneItem.updateMany({
+  const item = await prisma.milestoneItem.findUnique({ where: { id: itemId }, select: { text: true, createdById: true } });
+  const { count } = await prisma.milestoneItem.updateMany({
     where: { id: itemId, proposalStatus: "PENDING" },
     data: approve ? { proposalStatus: "APPROVED", dependentId: null } : { proposalStatus: "REJECTED" },
   });
+  if (count > 0 && item?.createdById) {
+    await notifyUser(
+      item.createdById,
+      approve ? "Usulan milestone disetujui" : "Usulan milestone ditolak",
+      approve ? `"${item.text.slice(0, 80)}" jadi butir standar.` : `"${item.text.slice(0, 80)}" tetap jadi butir khusus peserta itu.`,
+      "/coach/peserta"
+    );
+  }
   revalidatePath("/admin/milestone");
 }

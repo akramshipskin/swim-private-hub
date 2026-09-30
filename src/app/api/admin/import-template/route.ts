@@ -12,15 +12,16 @@ const HEADERS = [
   "Nama Peserta/Anak",
   "Paket Aktif",
   "Sisa Sesi",
+  "Tanggal Lahir",
 ];
 
 // Baris contoh -- nunjukin 2 pola: (1) member booking buat diri sendiri
 // dengan paket aktif, (2) member dengan 2 anak, 1 udah punya paket 1
 // belum. Baris dengan No HP sama = peserta beda dari member yang sama.
 const EXAMPLE_ROWS = [
-  ["Budi Santoso", "081234567890", "", "", "8x Renang", "5"],
-  ["Siti Aminah", "081298765432", "siti@email.com", "Rafi", "Private 2 Bulan", "6"],
-  ["Siti Aminah", "081298765432", "siti@email.com", "Nadia", "", ""],
+  ["Budi Santoso", "081234567890", "", "", "8x Renang", "5", "1990-03-21"],
+  ["Siti Aminah", "081298765432", "siti@email.com", "Rafi", "Private 2 Bulan", "6", "2018-07-05"],
+  ["Siti Aminah", "081298765432", "siti@email.com", "Nadia", "", "", "2020-11-30"],
 ];
 
 export async function GET() {
@@ -38,6 +39,7 @@ export async function GET() {
     ["- \"Paket Aktif\" & \"Sisa Sesi\" boleh dikosongkan kalau peserta itu belum punya paket aktif."],
     ["- Baris tanpa \"Nama Peserta/Anak\" DAN tanpa \"Paket Aktif\" = member polos, belum ada peserta terdaftar."],
     ["  (member akan diminta mengisi peserta sendiri saat login pertama, seperti alur biasa)."],
+    ["- \"Tanggal Lahir\" = tanggal lahir peserta di baris itu (contoh 2018-07-05 atau 05/07/2018). Boleh kosong: peserta tetap dibuat dan member diminta melengkapinya."],
     ["- Password sementara tiap member dibuat acak dan tampil di layar setelah import — wajib ganti saat login pertama."],
     ["- No HP yang sudah terpakai email/HP-nya di sistem akan di-skip (dilaporkan di hasil import)."],
   ]);

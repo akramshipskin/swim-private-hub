@@ -8,12 +8,12 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 
 type Role = "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
-type Participant = { type: "self" | "child"; name: string };
+type Participant = { type: "self" | "child"; name: string; birthDate: string };
 
 export default function CreateUserForm({ pools }: { pools: { id: string; name: string }[] }) {
   const [state, formAction, pending] = useActionState(createUser, null);
   const [role, setRole] = useState<Role>("MEMBER");
-  const [participants, setParticipants] = useState<Participant[]>([{ type: "self", name: "" }]);
+  const [participants, setParticipants] = useState<Participant[]>([{ type: "self", name: "", birthDate: "" }]);
   const [newUserName, setNewUserName] = useState("");
   const [poolMode, setPoolMode] = useState<"existing" | "new">(pools.length > 0 ? "existing" : "new");
   // Berhasil -> kosongkan form (key baru = input tak terkontrol ikut kosong).
@@ -23,7 +23,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
     setSeenState(state);
     if (state?.success) {
       setRole("MEMBER");
-      setParticipants([{ type: "self", name: "" }]);
+      setParticipants([{ type: "self", name: "", birthDate: "" }]);
       setNewUserName("");
       setFormKey((k) => k + 1);
     }
@@ -105,14 +105,15 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
             <div className="col-span-1 flex flex-col gap-2 sm:col-span-2">
               <p className="text-sm font-medium text-text">Siapa yang mau les?</p>
               <p className="text-xs text-text-subtle">
-                Bisa diri sendiri, bisa anak, bisa keduanya. Bisa ditambah lagi nanti.
+                Bisa diri sendiri, bisa anak, bisa keduanya. Tanggal lahir wajib. Bisa ditambah lagi nanti.
               </p>
               {participants.map((p, i) => {
                 const selfTakenElsewhere = participants.some(
                   (other, idx) => idx !== i && other.type === "self"
                 );
                 return (
-                  <div key={i} className="flex gap-2">
+                  <div key={i} className="flex flex-col gap-2 rounded-xl border border-border p-2">
+                  <div className="flex gap-2">
                     <Select
                       name="participantType"
                       aria-label={`Peserta ${i + 1}: siapa`}
@@ -152,11 +153,21 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
                       </button>
                     )}
                   </div>
+                  <Input
+                    type="date"
+                    name="participantBirthDate"
+                    value={p.birthDate}
+                    onChange={(e) => updateParticipant(i, { birthDate: e.target.value })}
+                    max={new Date().toISOString().slice(0, 10)}
+                    aria-label={`Peserta ${i + 1}: tanggal lahir`}
+                    required
+                  />
+                  </div>
                 );
               })}
               <button
                 type="button"
-                onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "" }])}
+                onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "", birthDate: "" }])}
                 className="self-start text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
               >
                 + Tambah peserta lain

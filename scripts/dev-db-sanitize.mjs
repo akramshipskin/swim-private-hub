@@ -49,11 +49,11 @@ export const POLICY = {
     birthDate: (r) => (r.birthDate == null ? null : new Date(Date.UTC(new Date(r.birthDate).getUTCFullYear(), 0, 1))),
   },
   CoachProfile: {
-    ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "certificateUrl", "certificateStatus", "birthDate", "gender", "walletBalance", "signaturePath"),
+    ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "birthDate", "gender", "walletBalance", "signaturePath"),
     ...BANK,
   },
   // Nama sertifikat tampil publik di profil coach; filePath menunjuk bucket
-  // privat production (sama seperti CoachProfile.certificateUrl).
+  // privat production.
   // Milestone: butir & pencapaian disalin (tidak berisi data pribadi, perlu
   // untuk mereproduksi hitungan level/penahanan). Isi catatan coach = teks
   // bebas tentang anak, diganti.
@@ -68,6 +68,8 @@ export const POLICY = {
   // supaya bug komisi bisa direproduksi).
   AffiliateCode: keep("id", "code", "coachProfileId", "poolId", "createdAt"),
   AffiliateCommission: keep("id", "memberId", "coachProfileId", "poolId", "paymentId", "amount", "status", "bookingId", "releaseAt", "releasedAt", "createdAt"),
+  // Testimoni: teks publik di landing (nama & peran sudah izin tampil).
+  Testimonial: keep("id", "name", "role", "quote", "consentNote", "isPublished", "sortOrder", "createdAt"),
   CoachCertificate: keep("id", "coachProfileId", "name", "filePath", "status", "reviewedAt", "createdAt"),
   Pool: {
     ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "walletBalance", "isActive", "createdAt"),
