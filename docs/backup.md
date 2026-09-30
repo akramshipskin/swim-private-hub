@@ -20,13 +20,35 @@
 
 ## Yang TIDAK ikut
 
-- **Foto coach & sertifikat di Supabase Storage TIDAK ikut.** Backup ini hanya
-  database. Kalau proyek Supabase hilang, file foto/sertifikat ikut hilang;
-  database hasil pemulihan hanya berisi alamat file-nya.
 - Data internal Supabase (skema `auth`, `storage`, dll.) — aplikasi ini tidak
   memakai login Supabase, jadi tidak dibutuhkan.
 - Pengaturan di Vercel, Midtrans, Resend, dan isi `.env` — simpan terpisah
   (password manager).
+
+## File foto & sertifikat (workflow terpisah: Backup Storage)
+
+Backup database hanya memuat alamat file. Isi file (foto coach/kolam,
+sertifikat, tanda tangan di Supabase Storage) dicadangkan oleh workflow
+**Backup Storage** (`.github/workflows/backup-storage.yml`, 02:30 WIB):
+mengunduh semua file di bucket `coach-photos` & `coach-certificates`,
+mengemas + mengenkripsi dengan passphrase yang sama, lalu mengunggah ke bucket
+yang sama di folder `storage/` (30 hari terakhir disimpan).
+
+Secret tambahan di GitHub (selain yang di bawah): `PROD_SUPABASE_URL` dan
+`PROD_SUPABASE_SERVICE_ROLE_KEY` (nilai `SUPABASE_URL` dan
+`SUPABASE_SERVICE_ROLE_KEY` dari Vercel production).
+
+Pulihkan: unduh `storage/swim-storage-<tanggal>.tar.gz.gpg`, lalu
+
+```bash
+gpg --output storage.tar.gz --decrypt swim-storage-<tanggal>.tar.gz.gpg
+tar -xzf storage.tar.gz            # menghasilkan folder cadangan/
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/backup-storage.mjs restore --from cadangan
+```
+
+Status pengujian: skrip diuji lawan penyimpanan palsu lokal (backup → hapus
+semua → pulihkan → checksum semua file identik, 30 Sep 2026). Belum diuji ke
+Supabase & S3 asli: jalankan manual sekali setelah secret diisi.
 
 ## Yang harus Hadi siapkan
 

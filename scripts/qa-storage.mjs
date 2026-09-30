@@ -33,6 +33,22 @@ http
     };
 
     let m;
+    // Daftar: POST /storage/v1/object/list/<bucket> {prefix,limit,offset}
+    if (req.method === "POST" && (m = p.match(/^\/storage\/v1\/object\/list\/([^/]+)$/))) {
+      const chunks = [];
+      req.on("data", (c) => chunks.push(c));
+      req.on("end", () => {
+        const { prefix = "", limit = 100, offset = 0 } = JSON.parse(Buffer.concat(chunks).toString() || "{}");
+        const dir = safe(path.join(m[1], prefix));
+        if (!dir || !fs.existsSync(dir)) return send(200, []);
+        const items = fs
+          .readdirSync(dir, { withFileTypes: true })
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((e) => (e.isDirectory() ? { name: e.name, id: null } : { name: e.name, id: `${m[1]}/${prefix}/${e.name}` }));
+        send(200, items.slice(offset, offset + limit));
+      });
+      return;
+    }
     // Tautan bertanda tangan: POST /storage/v1/object/sign/<bucket>/<path>
     if (req.method === "POST" && (m = p.match(/^\/storage\/v1\/object\/sign\/(.+)$/))) {
       const f = safe(m[1]);
@@ -58,8 +74,8 @@ http
       if (f && fs.existsSync(f)) fs.unlinkSync(f);
       return send(200, { message: "ok" });
     }
-    // Baca: publik atau bertanda tangan
-    if (req.method === "GET" && (m = p.match(/^\/storage\/v1\/object\/(?:public|sign-get)\/(.+)$/))) {
+    // Baca: publik, bertanda tangan, atau terautentikasi (GET /object/<bucket>/<path>)
+    if (req.method === "GET" && (m = p.match(/^\/storage\/v1\/object\/(?:public\/|sign-get\/)?(.+)$/))) {
       const f = safe(m[1]);
       if (!f || !fs.existsSync(f)) return send(404, { error: "not found" });
       return send(200, fs.readFileSync(f), MIME[path.extname(f).slice(1)] ?? "application/octet-stream");

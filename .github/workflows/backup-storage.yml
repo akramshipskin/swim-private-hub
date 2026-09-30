@@ -1,0 +1,75 @@
+name: Backup Storage
+
+# Cadangan harian FILE di Supabase Storage (foto coach/kolam, sertifikat, tanda
+# tangan) -- backup database (Backup DB) tidak memuat file. Dienkripsi lalu
+# diunggah ke penyimpanan S3 yang sama dengan Backup DB (prefix storage/).
+# Cara pakai & pulihkan: docs/backup.md. Skrip sudah diuji lawan penyimpanan
+# palsu lokal (backup, hapus, pulihkan, checksum identik); BELUM diuji ke
+# Supabase & S3 asli -- jalankan manual sekali (Actions -> Backup Storage).
+on:
+  schedule:
+    - cron: "30 19 * * *" # 02:30 WIB, setelah Backup DB. Hanya jalan dari main.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-storage
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      KEEP_DAYS: "30"
+      PREFIX: storage
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Unduh file + enkripsi
+        env:
+          SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PROD_SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_URL" && test -n "$SUPABASE_SERVICE_ROLE_KEY" || { echo "Secret PROD_SUPABASE_URL / PROD_SUPABASE_SERVICE_ROLE_KEY kosong"; exit 1; }
+          test -n "$BACKUP_PASSPHRASE" || { echo "Secret BACKUP_PASSPHRASE kosong"; exit 1; }
+          node scripts/backup-storage.mjs backup --out cadangan
+          FILE="swim-storage-$(date -u +%Y%m%dT%H%M%SZ).tar.gz.gpg"
+          tar -czf - cadangan | gpg --batch --yes --symmetric --cipher-algo AES256 --compress-algo none \
+            --passphrase-fd 3 --output "$FILE" 3<<< "$BACKUP_PASSPHRASE"
+          # Uji baca: dekripsi + daftar isi harus memuat manifest.
+          gpg --batch --quiet --decrypt --passphrase-fd 3 "$FILE" 3<<< "$BACKUP_PASSPHRASE" | tar -tzf - | grep -q 'cadangan/manifest.json' || { echo "manifest tidak ada di backup"; exit 1; }
+          echo "Ukuran: $(du -h "$FILE" | cut -f1)"
+          echo "FILE=$FILE" >> "$GITHUB_ENV"
+
+      - name: Unggah + hapus yang lebih dari ${{ env.KEEP_DAYS }} hari
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
+          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: |
+          set -euo pipefail
+          test -n "$ENDPOINT" && test -n "$BUCKET" || { echo "Secret BACKUP_S3_ENDPOINT/BACKUP_S3_BUCKET kosong"; exit 1; }
+          aws s3 cp "$FILE" "s3://$BUCKET/$PREFIX/$FILE" --endpoint-url "$ENDPOINT" --only-show-errors
+          CUTOFF="swim-storage-$(date -u -d "$KEEP_DAYS days ago" +%Y%m%dT%H%M%SZ)"
+          aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$PREFIX/" --endpoint-url "$ENDPOINT" \
+              --query 'Contents[].Key' --output text | tr '\t' '\n' \
+            | { grep -E "^$PREFIX/swim-storage-[0-9]{8}T[0-9]{6}Z\.tar\.gz\.gpg$" || true; } \
+            | while read -r key; do
+                name="${key#"$PREFIX/"}"
+                if [[ "$name" < "$CUTOFF" ]]; then
+                  echo "hapus $key"
+                  aws s3 rm "s3://$BUCKET/$key" --endpoint-url "$ENDPOINT" --only-show-errors
+                fi
+              done
