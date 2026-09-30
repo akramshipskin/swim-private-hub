@@ -52,11 +52,11 @@ export function PoolPhotosForm({
           <Input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required disabled={!storageReady} />
         </Field>
         <Button type="submit" loading={uploading} disabled={!storageReady}>
-          Upload Foto
+          Unggah Foto
         </Button>
       </form>
 
-      {!storageReady && <p className="text-sm text-warning-text">Upload file belum diaktifkan (storage belum dikonfigurasi).</p>}
+      {!storageReady && <p className="text-sm text-warning-text">Unggah file belum diaktifkan (penyimpanan belum dikonfigurasi).</p>}
       {error && (
         <p role="alert" className="text-sm text-danger-text">
           {error}

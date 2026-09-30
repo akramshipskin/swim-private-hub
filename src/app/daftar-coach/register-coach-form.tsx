@@ -180,7 +180,7 @@ export default function RegisterCoachForm() {
               <span>
                 Saya punya sertifikasi renang/lifeguard resmi
                 <span className="block text-xs text-text-muted">
-                  File sertifikat diupload di menu Profil setelah akun disetujui admin. Badge &quot;Bersertifikat&quot; tampil
+                  File sertifikat diunggah di menu Profil setelah akun disetujui admin. Badge &quot;Bersertifikat&quot; tampil
                   setelah sertifikat diperiksa.
                 </span>
               </span>

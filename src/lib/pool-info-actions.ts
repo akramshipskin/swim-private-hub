@@ -80,7 +80,7 @@ export async function uploadPoolPhoto(_prev: PoolInfoState, formData: FormData):
   const poolId = formData.get("poolId")?.toString() ?? "";
   const access = await canEditPool(poolId);
   if ("error" in access) return access;
-  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan (storage belum dikonfigurasi)." };
+  if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan (penyimpanan belum dikonfigurasi)." };
 
   const file = formData.get("photo") as File | null;
   const invalid = validateUpload(file, "photo");
@@ -95,7 +95,7 @@ export async function uploadPoolPhoto(_prev: PoolInfoState, formData: FormData):
   try {
     await uploadObject(PHOTO_BUCKET, path, file!);
   } catch {
-    return { error: "Upload foto gagal, coba lagi." };
+    return { error: "Unggah foto gagal, coba lagi." };
   }
   await prisma.pool.update({
     where: { id: poolId },

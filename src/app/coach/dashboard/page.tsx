@@ -107,7 +107,7 @@ export default async function CoachDashboardPage() {
         {!profile?.certificates.length && (
           <BentoCard title="Lengkapi profil" href="/profil" linkLabel="Buka profil" className="md:col-span-6">
             <p className="text-sm text-text-muted">
-              Upload foto dan sertifikat supaya profilmu tampil lebih meyakinkan di mata orang tua. Badge
+              Unggah foto dan sertifikat supaya profilmu tampil lebih meyakinkan di mata orang tua. Badge
               &quot;Bersertifikat&quot; muncul setelah sertifikat disetujui admin.
             </p>
           </BentoCard>

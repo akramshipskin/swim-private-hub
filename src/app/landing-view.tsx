@@ -475,7 +475,7 @@ export default function LandingView({ stats, pools, coaches }: { stats: LandingS
             mask, jadi rapi walau warna asli tiap logo beda-beda. */}
         <div className="mx-auto max-w-6xl border-t border-white/15 px-4 py-8">
           <p className="mb-4 text-center text-sm text-white/70">Pembayaran aman lewat Midtrans</p>
-          <ul className="mx-auto grid max-w-3xl grid-cols-3 items-center justify-items-center gap-x-4 gap-y-5 sm:grid-cols-5 lg:grid-cols-7">
+          <ul className="mx-auto flex max-w-[42rem] flex-wrap items-center justify-center gap-x-8 gap-y-5">
             {PAYMENT_METHODS.map((m) =>
               m.logo ? (
                 <li key={m.label}>

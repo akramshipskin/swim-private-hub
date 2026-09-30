@@ -89,7 +89,7 @@ describe("uploadCoachCertificate", () => {
 
   it("gagal upload file = tidak ada baris baru", async () => {
     uploadObject.mockRejectedValueOnce(new Error("x"));
-    expect(await uploadCoachCertificate(null, fd("FASI"))).toEqual({ error: "Upload sertifikat gagal, coba lagi." });
+    expect(await uploadCoachCertificate(null, fd("FASI"))).toEqual({ error: "Unggah sertifikat gagal, coba lagi." });
     expect(certCreate).not.toHaveBeenCalled();
   });
 });

@@ -44,7 +44,7 @@ export default function CoachMediaForm({
     <div className="flex flex-col gap-6">
       {!storageReady && (
         <p className="rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
-          Upload file belum aktif. Hubungi admin.
+          Unggah file belum aktif. Hubungi admin.
         </p>
       )}
       <form action={photoAction} className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -54,7 +54,7 @@ export default function CoachMediaForm({
             <Input type="file" name="photo" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />
           </Field>
           <div className="flex items-center gap-3">
-            <Button type="submit" size="sm" loading={photoPending} disabled={!storageReady}>Upload Foto</Button>
+            <Button type="submit" size="sm" loading={photoPending} disabled={!storageReady}>Unggah Foto</Button>
             {photoState?.error && <p role="alert" className="text-sm text-danger-text">{photoState.error}</p>}
             {photoState?.success && <p role="status" className="text-sm text-success-text">Foto tersimpan.</p>}
           </div>

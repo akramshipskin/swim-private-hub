@@ -56,24 +56,31 @@ const ROLES = [
 export function RolePicker() {
   return (
     <section aria-labelledby="pilih-peran" className="mx-auto w-full max-w-6xl px-4 py-16">
-      <h2 id="pilih-peran" className="text-center text-3xl font-semibold tracking-tight sm:text-4xl">
+      <h2 id="pilih-peran" className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl md:max-w-md">
         Kamu di sini sebagai apa?
       </h2>
-      <ul className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {ROLES.map((r) => (
-          <li key={r.href}>
-            <a
-              href={r.href}
-              className="flex h-full flex-col justify-between gap-6 rounded-3xl bg-white p-7 transition-colors hover:bg-fixed-lime-50"
-            >
-              <div>
-                <p className="text-sm font-semibold text-fixed-muted">{r.label}</p>
-                <p className="mt-2 text-xl font-semibold leading-snug">{r.line}</p>
-              </div>
-              <span className="text-sm font-semibold underline">{r.cta} →</span>
-            </a>
-          </li>
-        ))}
+      {/* Kartu pertama (orang tua = pengguna terbanyak) jadi kartu besar, dua
+          lainnya bertumpuk di sampingnya -- bukan tiga kartu kembar. */}
+      <ul className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-5 md:grid-rows-2">
+        {ROLES.map((r, i) => {
+          const lead = i === 0;
+          return (
+            <li key={r.href} className={lead ? "md:col-span-3 md:row-span-2" : "md:col-span-2"}>
+              <a
+                href={r.href}
+                className={`flex h-full flex-col justify-between gap-6 rounded-3xl transition-colors ${
+                  lead ? "bg-fixed-lime-100 p-7 hover:brightness-95 md:p-10" : "bg-white p-7 hover:bg-fixed-lime-50"
+                }`}
+              >
+                <div>
+                  <p className="text-sm font-semibold text-fixed-muted">{r.label}</p>
+                  <p className={`mt-2 font-semibold leading-snug ${lead ? "text-2xl md:max-w-md md:text-4xl" : "text-xl"}`}>{r.line}</p>
+                </div>
+                <span className="text-sm font-semibold underline">{r.cta} →</span>
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

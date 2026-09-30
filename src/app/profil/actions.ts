@@ -210,7 +210,7 @@ export async function updateCoachProfile(
 export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
   if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
-  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
+  if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("photo") as File | null;
   const invalid = validateUpload(file, "photo");
   if (invalid) return { error: invalid };
@@ -220,7 +220,7 @@ export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): 
   try {
     await uploadObject(PHOTO_BUCKET, path, file!);
   } catch {
-    return { error: "Upload foto gagal, coba lagi." };
+    return { error: "Unggah foto gagal, coba lagi." };
   }
   // ?v= biar browser gak nampilin foto lama dari cache setelah ganti.
   await prisma.coachProfile.updateMany({
@@ -239,7 +239,7 @@ const LIMIT_ERROR = `Maksimal ${MAX_CERTIFICATES_PER_COACH} sertifikat. Hapus ya
 export async function uploadCoachCertificate(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
   if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
-  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
+  if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("certificate") as File | null;
   const name = formData.get("certificateName")?.toString().trim().slice(0, 120) ?? "";
   if (!name) return { error: "Isi nama sertifikat/lembaga." };
@@ -258,7 +258,7 @@ export async function uploadCoachCertificate(_prev: ActionState, formData: FormD
   try {
     await uploadObject(CERT_BUCKET, path, file!);
   } catch {
-    return { error: "Upload sertifikat gagal, coba lagi." };
+    return { error: "Unggah sertifikat gagal, coba lagi." };
   }
   // Cek batas diulang di dalam kunci baris profil: 2 unggahan barengan saat
   // sisa slot 1 tidak boleh sama-sama lolos.
@@ -300,7 +300,7 @@ export async function deleteCoachCertificate(certificateId: string): Promise<voi
 export async function uploadCoachSignature(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
   if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
-  if (!isStorageConfigured()) return { error: "Upload file belum diaktifkan admin." };
+  if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("signature") as File | null;
   const invalid = validateUpload(file, "photo");
   if (invalid) return { error: invalid.replace("Foto", "Tanda tangan") };
@@ -310,7 +310,7 @@ export async function uploadCoachSignature(_prev: ActionState, formData: FormDat
   try {
     await uploadObject(CERT_BUCKET, path, file!);
   } catch {
-    return { error: "Upload tanda tangan gagal, coba lagi." };
+    return { error: "Unggah tanda tangan gagal, coba lagi." };
   }
   const old = await prisma.coachProfile.findUnique({ where: { userId: session.user.id }, select: { signaturePath: true } });
   await prisma.coachProfile.updateMany({ where: { userId: session.user.id }, data: { signaturePath: path } });
