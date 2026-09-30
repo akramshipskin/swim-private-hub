@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 const { parseParticipantBirthDate, createDependent, MAX_DEPENDENTS_PER_MEMBER } = await import("./dependents");
 
+import { MAX_PERSON_NAME_LENGTH } from "./format";
+
 const NOW = new Date("2026-09-29T05:00:00Z");
 
 describe("parseParticipantBirthDate", () => {
@@ -39,6 +41,14 @@ describe("createDependent: batas jumlah peserta", () => {
     const { db, create } = fakeDb(MAX_DEPENDENTS_PER_MEMBER);
     await expect(createDependent("m", "ani", db)).rejects.toThrow("Maksimal");
     expect(create).not.toHaveBeenCalled();
+  });
+
+  it("nama terlalu panjang ditolak, tidak ada yang dibuat; tepat di batas boleh", async () => {
+    const { db, create } = fakeDb(0);
+    await expect(createDependent("m", "a".repeat(MAX_PERSON_NAME_LENGTH + 1), db)).rejects.toThrow("Nama maksimal");
+    expect(create).not.toHaveBeenCalled();
+    await createDependent("m", "a".repeat(MAX_PERSON_NAME_LENGTH), db);
+    expect(create).toHaveBeenCalledOnce();
   });
 
   it("nama kosong ditolak sebelum cek batas", async () => {

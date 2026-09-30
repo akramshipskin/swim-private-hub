@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { toProperCase } from "@/lib/format";
+import { toProperCase, MAX_PERSON_NAME_LENGTH } from "@/lib/format";
 import type { Prisma } from "@/generated/prisma/client";
 
 // `db` opsional -- pass Prisma transaction client (`tx`) kalau manggil dari
@@ -12,6 +12,7 @@ export const MAX_DEPENDENTS_PER_MEMBER = 10;
 export async function createDependent(memberId: string, name: string, db: Db = prisma, birthDate: Date | null = null) {
   const trimmed = toProperCase(name.trim());
   if (!trimmed) throw new Error("Nama anak tidak boleh kosong");
+  if (trimmed.length > MAX_PERSON_NAME_LENGTH) throw new Error(`Nama maksimal ${MAX_PERSON_NAME_LENGTH} karakter.`);
   // Batas sama dengan pendaftaran (maks 10 peserta per akun), supaya satu akun
   // tidak bisa menumpuk ribuan peserta lewat form Profil/admin.
   if ((await db.dependent.count({ where: { memberId } })) >= MAX_DEPENDENTS_PER_MEMBER) {

@@ -3,7 +3,7 @@
 import { auth, unstable_update } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { createDependent, createSelfDependent, assertDependentOwnedByMember, parseParticipantBirthDate } from "@/lib/dependents";
-import { toProperCase } from "@/lib/format";
+import { toProperCase, MAX_PERSON_NAME_LENGTH } from "@/lib/format";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties";
@@ -24,6 +24,9 @@ export async function updateName(
   const rawName = formData.get("name")?.toString().trim() ?? "";
   if (!rawName) {
     return { error: "Nama tidak boleh kosong" };
+  }
+  if (rawName.length > MAX_PERSON_NAME_LENGTH) {
+    return { error: `Nama maksimal ${MAX_PERSON_NAME_LENGTH} karakter.` };
   }
   const name = toProperCase(rawName);
 
