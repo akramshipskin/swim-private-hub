@@ -21,3 +21,10 @@ Arsip keputusan Hadi dan hal sensitif. TIDAK dimuat otomatis; dibaca bila perlu.
 - 1 Okt malam: file HabasyGo yang ada di folder Krabat tidak dipindah (keputusan Hadi: "gausah"). Fakta SPH di bawah PT Makna Krabat Indonesia hanya di dokumen hukum dan memori SPH; dokumen Krabat tidak menyebut SPH (disetujui).
 - 1 Okt malam: cabang brand-guideline-v2 digabung ke cabang utama (disetujui); animasi dikerjakan landing page dulu, lalu dalam aplikasi.
 - 1 Okt malam: Claude tidak boleh mengganti model sesinya sendiri (alat ganti model menolak sesi sendiri). Jalur otomatis: skill dengan model opus dan asisten berkonteks segar dengan model pilihan; jalur manual: Hadi memilih di menu model.
+
+## 1 Okt 2026 (malam): arahan Hadi untuk brand v2 dan animasi landing
+- Gabung brand v2: banner dan foto profil dirender ulang dengan teks tagline terbaru; Hadi melihat dan menyetujui gambarnya SEBELUM masuk cabang utama.
+- Ukur kecepatan landing sebelum dan sesudah animasi di lingkungan yang sama (versi jadi di laptop), plus cek di situs asli setelah tayang. Bila Lighthouse tidak ada, sebut alat pengganti.
+- Video header: hanya desktop; berhenti bila "kurangi gerakan" atau hemat data menyala; pilih yang tanpa wajah jelas (terutama anak) dan jangan terkesan coach atau kolam SPH asli; izin Hadi dulu sebelum unduh.
+- Push dua kali: setelah tahap 1 (brand v2) lulus, dan setelah tahap 2 (animasi landing).
+- Gaya laporan: jelaskan istilah teknis (tsc, vitest, build, Lighthouse, cabang, bentrok) dengan bahasa awam; jangan sebut nama cabang atau file kecuali Hadi minta.
