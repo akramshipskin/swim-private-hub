@@ -10,6 +10,7 @@ import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 
 export const ANONYMIZED_NAME = "Pengguna dihapus";
 export const ANONYMIZED_DEPENDENT_NAME = "Peserta dihapus";
+export const ANONYMIZED_NOTE = "(catatan dihapus)";
 
 export class AccountDeletionError extends Error {}
 
@@ -75,7 +76,11 @@ export async function anonymizeMember(userId: string) {
         anonymizedAt: new Date(),
       },
     });
-    await tx.dependent.updateMany({ where: { memberId: userId }, data: { name: ANONYMIZED_DEPENDENT_NAME, isActive: false } });
+    // Tanggal lahir peserta ikut dihapus (data pribadi anak), dan isi catatan
+    // milestone dikosongkan karena bisa memuat nama/detail anak. Butir yang
+    // tercapai & sertifikat level tidak memuat identitas, jadi dibiarkan.
+    await tx.dependent.updateMany({ where: { memberId: userId }, data: { name: ANONYMIZED_DEPENDENT_NAME, isActive: false, birthDate: null } });
+    await tx.milestoneNote.updateMany({ where: { dependent: { memberId: userId } }, data: { note: ANONYMIZED_NOTE } });
     await tx.pushSubscription.deleteMany({ where: { userId } });
   });
 

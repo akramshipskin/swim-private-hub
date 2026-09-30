@@ -22,6 +22,9 @@ describe("Hapus akun member", () => {
     const future = await book(m.id, (await mkSlot(coach.id, pool.id, 48)).id, pkg.id);
     const past = await book(m.id, (await mkSlot(coach.id, pool.id, -5)).id, pkg.id);
     await prisma.chatThread.create({ data: { userId: m.id, messages: { create: { sender: "USER", content: "halo" } } } });
+    const dep = await prisma.dependent.findFirstOrThrow({ where: { memberId: m.id } });
+    await prisma.dependent.update({ where: { id: dep.id }, data: { birthDate: new Date("2019-05-17T00:00:00Z") } });
+    await prisma.milestoneNote.create({ data: { dependentId: dep.id, coachId: coach.id, note: "Ani sudah berani masuk kolam" } });
     const phone = m.phone!;
 
     expect(await requestAccountDeletion(m.id)).toBe(true);
@@ -36,6 +39,9 @@ describe("Hapus akun member", () => {
     expect((await prisma.booking.findUniqueOrThrow({ where: { id: past.id } })).status).toBe("BOOKED");
     expect(await prisma.payment.count({ where: { packageId: pkg.id } })).toBe(1);
     expect(await prisma.chatMessage.count({ where: { thread: { userId: m.id } } })).toBe(1);
+    // Tanggal lahir peserta dihapus; isi catatan milestone dikosongkan (30 Sep).
+    expect(u.dependents.every((d) => d.birthDate === null)).toBe(true);
+    expect((await prisma.milestoneNote.findMany({ where: { dependent: { memberId: m.id } } })).every((n) => n.note === "(catatan dihapus)")).toBe(true);
     const login = await authorizeCredentials({ identifier: phone, password: "rahasia123" }, new Request("http://x", { headers: { "x-forwarded-for": "5.5.5.5" } })).catch((e) => e);
     expect(login).toBeNull();
     expect(await checkInvariants()).toEqual([]);

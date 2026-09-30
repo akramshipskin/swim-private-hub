@@ -7,9 +7,16 @@ import type { Prisma } from "@/generated/prisma/client";
 // default ke client global kalau berdiri sendiri.
 type Db = typeof prisma | Prisma.TransactionClient;
 
+export const MAX_DEPENDENTS_PER_MEMBER = 10;
+
 export async function createDependent(memberId: string, name: string, db: Db = prisma, birthDate: Date | null = null) {
   const trimmed = toProperCase(name.trim());
   if (!trimmed) throw new Error("Nama anak tidak boleh kosong");
+  // Batas sama dengan pendaftaran (maks 10 peserta per akun), supaya satu akun
+  // tidak bisa menumpuk ribuan peserta lewat form Profil/admin.
+  if ((await db.dependent.count({ where: { memberId } })) >= MAX_DEPENDENTS_PER_MEMBER) {
+    throw new Error(`Maksimal ${MAX_DEPENDENTS_PER_MEMBER} peserta per akun. Hubungi admin kalau perlu lebih.`);
+  }
   return db.dependent.create({ data: { memberId, name: trimmed, birthDate } });
 }
 

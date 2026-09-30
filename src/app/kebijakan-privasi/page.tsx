@@ -164,8 +164,9 @@ export default function KebijakanPrivasiPage() {
         <li>Meminta perbaikan atas data yang tidak akurat.</li>
         <li>
           Meminta penghapusan akun melalui menu Profil (member) atau kontak di
-          bawah. Setelah disetujui administrator, nama, nomor telepon, email, dan
-          nama peserta dihapus dari akun. Riwayat transaksi dan arsip percakapan
+          bawah. Setelah disetujui administrator, nama, nomor telepon, email, serta
+          nama dan tanggal lahir peserta dihapus dari akun, dan isi catatan
+          perkembangan peserta dikosongkan. Riwayat transaksi dan arsip percakapan
           tetap disimpan tanpa identitas tersebut, sesuai ketentuan
           perundang-undangan dan keperluan penyelesaian masalah.
         </li>

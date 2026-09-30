@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
-const { parseParticipantBirthDate } = await import("./dependents");
+const { parseParticipantBirthDate, createDependent, MAX_DEPENDENTS_PER_MEMBER } = await import("./dependents");
 
 const NOW = new Date("2026-09-29T05:00:00Z");
 
@@ -20,5 +20,29 @@ describe("parseParticipantBirthDate", () => {
     expect(() => parseParticipantBirthDate("2026-10-01", NOW)).toThrow("masa depan");
     expect(() => parseParticipantBirthDate("1920-01-01", NOW)).toThrow("tidak masuk akal");
     expect(parseParticipantBirthDate("2026-09-29", NOW)).toBeInstanceOf(Date);
+  });
+});
+
+describe("createDependent: batas jumlah peserta", () => {
+  const fakeDb = (count: number) => {
+    const create = vi.fn().mockResolvedValue({ id: "d" });
+    return { db: { dependent: { count: vi.fn().mockResolvedValue(count), create } } as never, create };
+  };
+
+  it("di bawah batas -> dibuat", async () => {
+    const { db, create } = fakeDb(MAX_DEPENDENTS_PER_MEMBER - 1);
+    await createDependent("m", "ani", db);
+    expect(create).toHaveBeenCalledOnce();
+  });
+
+  it("sudah mencapai batas -> ditolak, tidak ada yang dibuat", async () => {
+    const { db, create } = fakeDb(MAX_DEPENDENTS_PER_MEMBER);
+    await expect(createDependent("m", "ani", db)).rejects.toThrow("Maksimal");
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("nama kosong ditolak sebelum cek batas", async () => {
+    const { db } = fakeDb(0);
+    await expect(createDependent("m", "  ", db)).rejects.toThrow("Nama anak");
   });
 });

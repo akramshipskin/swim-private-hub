@@ -363,3 +363,46 @@ describe("hook afiliasi", () => {
     expect(onSessionUnattended).toHaveBeenCalledWith(tx, "b1");
   });
 });
+
+// Keputusan Hadi 29-30 Sep: contoh sesi Rp100.000 di kolam 10/40/50 -- kolam
+// 50.000, coach 40.000, SPH 10.000 (PPN 12% sudah di dalamnya, bersih 8.929).
+// Angka ini juga dicocokkan lewat UI + ledger di DB dev (sweep 30 Sep).
+describe("bagi hasil 10/40/50 (contoh keputusan Hadi)", () => {
+  const rows = async (perSessionValue: number, attended: boolean, pool = { commissionPercent: 10, coachSharePercent: 40 }) => {
+    const tx = createMockTx({ pool });
+    await creditSessionRevenue(tx, { poolId: "p", coachProfileId: "c", bookingId: "b", perSessionValue, attended });
+    const data = (tx.walletTransaction.createMany as ReturnType<typeof vi.fn>).mock.calls[0][0].data as { type: string; amount: number }[];
+    return Object.fromEntries(data.map((r) => [r.type, r.amount]));
+  };
+
+  it("Hadir Rp100.000: kolam 50.000, coach 40.000, SPH bersih 8.929 + PPN 1.071", async () => {
+    expect(await rows(100_000, true)).toEqual({ SESSION_REVENUE: 50_000, SESSION_PAYOUT: 40_000, PLATFORM_REVENUE: 8_929, PLATFORM_TAX: 1_071 });
+  });
+
+  it("Tidak Hadir Rp100.000: coach 20.000 (50%), kolam Rp0, SPH 80.000 (bersih 71.429 + PPN 8.571)", async () => {
+    expect(await rows(100_000, false)).toEqual({ SESSION_PAYOUT: 20_000, PLATFORM_REVENUE: 71_429, PLATFORM_TAX: 8_571 });
+  });
+
+  it("beli 1 sesi Rp120.000 (harga tertinggi 100.000 + markup 20%): kolam 60.000, coach 48.000, SPH 12.000", async () => {
+    const r = await rows(120_000, true);
+    expect(r.SESSION_REVENUE).toBe(60_000);
+    expect(r.SESSION_PAYOUT).toBe(48_000);
+    expect(r.PLATFORM_REVENUE + r.PLATFORM_TAX).toBe(12_000);
+  });
+
+  it("Tidak Hadir: jumlah semua baris = nilai sesi dan tidak ada yang negatif, di berbagai harga & persen", async () => {
+    for (const v of [93_750, 100_000, 133_333, 7, 1, 999_999]) {
+      for (const pool of [
+        { commissionPercent: 10, coachSharePercent: 40 },
+        { commissionPercent: 0, coachSharePercent: 100 },
+        { commissionPercent: 0, coachSharePercent: 50 },
+        { commissionPercent: 15, coachSharePercent: 55 },
+      ]) {
+        const r = await rows(v, false, pool);
+        const sum = Object.values(r).reduce((a, b) => a + b, 0);
+        expect({ v, pool, sum, negative: Object.values(r).some((x) => x < 0) }).toEqual({ v, pool, sum: v, negative: false });
+        expect(r.SESSION_REVENUE).toBeUndefined();
+      }
+    }
+  });
+});
