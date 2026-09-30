@@ -1,31 +1,25 @@
 # DRAFT Syarat & Ketentuan Swim Private Hub — v2
 
-> **DIPASANG LIVE 29 Sep 2026 (rev 2)** setelah disetujui reviewer hukum.
-> Teks live ada di `src/app/syarat-ketentuan/page.tsx` dan itulah acuannya.
-> Isian Hadi: penyelenggara PT Makna Krabat Indonesia; sisa sesi hangus;
-> laporan lewat 3 hari diperiksa kasus per kasus; larangan transaksi luar
-> DIHAPUS dari S&K member (dipindah ke perjanjian coach/MOU kolam, 12 bulan,
-> nonaktif + daftar hitam); batas tanggung jawab SPH 100% nilai paket (rev 3; semula 50%); tanpa
-> asuransi; sengketa lewat musyawarah kekeluargaan; pasal 7 diubah jadi
-> "berlaku sejak diumumkan". Pasal 1.4 (afiliasi) dan 2.9 (trial) dipasang
-> bareng fiturnya (Batch 4, rev 4); 2.9 disesuaikan: "hanya untuk Peserta
-> yang belum pernah memiliki paket, satu kali per Peserta" (keputusan Hadi
-> per anak).
-
-> **Status: DRAFT, BELUM BERLAKU.** Ditulis Claude (Opus) 29 Sep 2026 dari
-> keputusan office hours (`docs/designs/validasi-permintaan-dan-kejujuran-landing.md`).
-> Claude bukan penasihat hukum. Wajib direview orang hukum sebelum
-> dipasang ke `src/app/syarat-ketentuan/page.tsx`. Mengganti S&K berarti
-> mengubah `TERMS_UPDATED_AT` di `src/lib/legal.ts`, sehingga versi
-> persetujuan pengguna ikut berubah.
+> **ARSIP (dirapikan 1 Okt 2026). Bukan acuan.** Teks yang berlaku ada di
+> `src/app/syarat-ketentuan/page.tsx`; dokumen ini hanya riwayat penyusunan
+> untuk reviewer. Riwayat: v2 dipasang live 29 Sep 2026 setelah disetujui
+> reviewer hukum (rev 2), batas tanggung jawab 100% nilai paket (rev 3), pasal
+> 1.4 afiliasi dan 2.9 trial dipasang bareng fiturnya (rev 4; 2.9: "hanya untuk
+> Peserta yang belum pernah memiliki paket, satu kali per Peserta").
+> Isian Hadi di versi ini: penyelenggara PT Makna Krabat Indonesia; sisa sesi
+> hangus; laporan lewat 3 hari diperiksa kasus per kasus; larangan transaksi
+> luar dipindah ke perjanjian coach/MOU kolam (12 bulan, nonaktif + daftar
+> hitam); tanpa asuransi; sengketa lewat musyawarah kekeluargaan; pasal 7
+> "berlaku sejak diumumkan".
 >
-> Tanda `[ISI HADI: ...]` = keputusan bisnis yang belum diambil. Jangan
-> dipasang selama masih ada tanda ini.
->
-> **Update 29 Sep malam:** memuat keputusan Hadi. Pasal bertanda
-> **[BELUM ADA DI SISTEM]** menjanjikan perilaku yang BELUM dikode (batas 24
-> jam coach, tombol Laporkan member, kode afiliasi). Teks live baru boleh
-> memuatnya bersamaan dengan kodenya jalan.
+> Penanda lama **[sudah ada di sistem]** sudah diganti **[sudah ada di sistem]**
+> setelah dicek ke kode pada 1 Okt 2026 (batas 24 jam: `ATTENDANCE_MARK_WINDOW_HOURS`
+> di `src/lib/policy.ts`; tombol Laporkan 3 hari: `ATTENDANCE_REPORT_WINDOW_DAYS`
+> dan `src/app/member/riwayat/report-button.tsx`; kode afiliasi: `src/lib/affiliate.ts`;
+> paket trial: `src/lib/package-template.ts`). Tanda `[ISI HADI: ...]` yang
+> tersisa di badan dokumen adalah sisa draf lama; keputusan yang sudah diambil
+> Hadi tercatat di atas, sisanya belum dicek satu per satu terhadap teks live. Mengganti S&K berarti mengubah `TERMS_UPDATED_AT` di
+> `src/lib/legal.ts`.
 
 ## A. Kenapa S&K perlu diubah (ringkasan untuk reviewer)
 
@@ -96,7 +90,7 @@ tanggung jawab, dan kewajiban perizinan.]
    Kolam Mitra (opsional). Kode tidak mengubah harga yang dibayar Member;
    komisi afiliasi dibayarkan SPH kepada pemilik kode dari bagian SPH, bukan
    dari Member. Ketentuan komisi bagi Coach dan Kolam Mitra diatur dalam
-   perjanjian kemitraan masing-masing. **[BELUM ADA DI SISTEM]**
+   perjanjian kemitraan masing-masing. **[sudah ada di sistem]**
 
 **2. Paket dan Sesi**
 1. Les di SPH adalah les privat: setiap Sesi adalah satu Coach untuk satu
@@ -120,7 +114,7 @@ tanggung jawab, dan kewajiban perizinan.]
    dikenakan tiket. Perlengkapan renang (misalnya pelampung
    dan papan) dibawa sendiri oleh Peserta.
 9. Paket trial: paket 1 Sesi dengan harga khusus yang ditetapkan SPH, hanya
-   untuk Member baru dan satu kali per Peserta. **[BELUM ADA DI SISTEM]**
+   untuk Member baru dan satu kali per Peserta. **[sudah ada di sistem]**
 10. Coach mencatat perkembangan Peserta (milestone) di Aplikasi dan Member
     dapat melihatnya di menu Peserta. Catatan melekat pada Peserta dan tetap
     berlanjut bila Peserta berganti Coach. Sertifikat level yang diterbitkan
@@ -142,12 +136,12 @@ tanggung jawab, dan kewajiban perizinan.]
    tanpa mengurangi jatah pembatalan Member.
 6. Kehadiran ditandai oleh Coach paling lambat 24 jam setelah Sesi selesai;
    setelah batas itu hanya administrator yang dapat menandai.
-   **[BELUM ADA DI SISTEM]**
+   **[sudah ada di sistem]**
 7. Member dapat melaporkan status Tidak Hadir yang tidak sesuai melalui
    tombol Laporkan di Aplikasi paling lambat 3 (tiga) hari sejak Sesi
    selesai. SPH memeriksa laporan dan dapat mengoreksi status. Laporan
    setelah batas itu: [ISI HADI + reviewer: tidak diproses / diproses kasus
-   per kasus]. **[BELUM ADA DI SISTEM]**
+   per kasus]. **[sudah ada di sistem]**
 
 **4. Pembayaran**
 1. Pembayaran diproses melalui Midtrans (virtual account, QRIS, dompet

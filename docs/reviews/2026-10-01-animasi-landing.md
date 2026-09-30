@@ -20,8 +20,10 @@ HP = layar 375, prosesor diperlambat 4×, jaringan ±1,6 Mbps / 150 ms. Desktop 
 | Laptop, versi jadi, SESUDAH | Desktop | 372 ms | 284 ms | 485 KB | 0 | 0 |
 | Situs asli, SEBELUM push | HP | 2368 ms | 924 ms | 393 KB | 0 | 0 |
 | Situs asli, SEBELUM push | Desktop | 344 ms | 344 ms | 461 KB | 0 | 0 |
+| Situs asli, SESUDAH push (6493c3b) | HP | 1540 ms (ulangan: 1688, 1124, 2472, 1540, 1288) | 1048 ms | 394 KB | 0 | 1 |
+| Situs asli, SESUDAH push (6493c3b) | Desktop | 332 ms | 332 ms | 462 KB | 0 | 0 |
 
-Catatan jujur: pengukuran pertama sesudah build sempat menunjukkan FCP HP 924 ms; dua pengukuran ulang 856 ms (server baru dihidupkan). Angka hanya sebanding dengan angka dari skrip dan laptop yang sama. Bukan Lighthouse, dan bukan HP asli.
+Catatan jujur: di situs asli internetnya sungguhan sehingga lebih berisik (satu ulangan HP sesudah = 2472 ms, menyentuh rentang sebelum = 2308–3216 ms); nilai tengah tetap lebih cepat, tapi perbedaannya tidak sejelas di laptop. FCP HP situs asli 924 -> 1048 ms: dalam rentang variasi internet, belum dipastikan sebagai perlambatan atau bukan. pengukuran pertama sesudah build sempat menunjukkan FCP HP 924 ms; dua pengukuran ulang 856 ms (server baru dihidupkan). Angka hanya sebanding dengan angka dari skrip dan laptop yang sama. Bukan Lighthouse, dan bukan HP asli.
 
 ## Kandidat video (BELUM diunduh; menunggu izin Hadi)
 Lisensi Pexels: gratis dipakai termasuk komersial. Deskripsi "wajah tidak terlihat" dibaca dari halaman Pexels, BELUM dilihat langsung: lihat sendiri sebelum pilih.
