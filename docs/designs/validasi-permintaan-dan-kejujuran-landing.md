@@ -145,8 +145,8 @@ Sebelum pasang iklan: datangi atau telepon **3 kolam** di wilayah yang paling mu
 
 **Keputusan model uang dan operasional.**
 - Contoh sesi Rp100.000: kolam Rp50.000 (mencakup tiket coach Rp25.000 +
-  peserta Rp25.000; 1 pendamping gratis, boleh bergantian), coach Rp40.000, SPH 10% (PPN 12%
-  sudah di dalamnya; bersih ± Rp8.929). Persentase disetel per kolam.
+  peserta Rp25.000; 1 pendamping gratis, boleh bergantian), coach Rp40.000, SPH 10% (PPN 11%
+  sudah di dalamnya; bersih ± Rp9.009). Persentase disetel per kolam.
 - Peserta sudah booking tidak datang: coach 50% dari bagian coach, kolam Rp0,
   sisanya SPH. Sesi hangus (paket kedaluwarsa): tidak ada yang dibayar.
 - Coach menandai hadir paling lambat 24 jam setelah sesi; admin bebas.

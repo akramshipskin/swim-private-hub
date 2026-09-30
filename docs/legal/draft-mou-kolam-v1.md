@@ -130,8 +130,8 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 4. Contoh (angka ilustrasi, bukan kesepakatan): paket Rp800.000 untuk 8
    sesi → nilai sesi Rp100.000. Jika coach 40%, Kolam Mitra 50%, SPH 10%,
    per sesi Hadir: coach Rp40.000; Kolam Mitra Rp50.000 (setara tiket masuk
-   coach Rp25.000 + peserta Rp25.000); SPH Rp10.000 (sudah termasuk PPN 12%
-   ± Rp1.071, bersih ± Rp8.929). Bila peserta tidak datang (butir 5a): coach
+   coach Rp25.000 + peserta Rp25.000); SPH Rp10.000 (sudah termasuk PPN 11%
+   ± Rp991, bersih ± Rp9.009). Bila peserta tidak datang (butir 5a): coach
    Rp20.000, Kolam Mitra Rp0, SPH Rp80.000.
 5. Bagian Kolam Mitra masuk ke saldo Kolam Mitra di aplikasi saat sesi
    ditandai Hadir. Sesi yang **tidak** ditandai Hadir tidak menghasilkan

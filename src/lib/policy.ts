@@ -17,8 +17,11 @@ export const DROP_IN_DURATION_DAYS = 14;
 export const MIN_WITHDRAWAL = 50_000;
 
 // PPN atas komisi platform. Komisi dianggap SUDAH termasuk PPN:
-// komisi Rp11.200 = pendapatan bersih Rp10.000 + PPN Rp1.200.
-export const PLATFORM_TAX_PERCENT = 12;
+// komisi Rp11.100 = pendapatan bersih Rp10.000 + PPN Rp1.100.
+// Tarif 11% berlaku untuk sesi yang dikreditkan sejak 30 Sep 2026 (keputusan
+// Hadi). Baris ledger lama (12%) TIDAK dihitung ulang; pembalikan membaca
+// jumlah yang tercatat, jadi tarif berbeda antar periode aman.
+export const PLATFORM_TAX_PERCENT = 11;
 
 export function splitPlatformTax(commission: number) {
   const tax = Math.round((commission * PLATFORM_TAX_PERCENT) / (100 + PLATFORM_TAX_PERCENT));

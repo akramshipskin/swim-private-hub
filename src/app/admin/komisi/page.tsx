@@ -207,7 +207,7 @@ export default async function KomisiPage() {
                       <dl className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-sm tabular-nums">
                         <dt className="text-text-muted">Platform bersih</dt>
                         <dd className="text-right text-text">{formatRupiah(p.platform - p.tax)}</dd>
-                        <dt className="text-text-muted">PPN 12%</dt>
+                        <dt className="text-text-muted">PPN</dt>
                         <dd className="text-right text-text">{formatRupiah(p.tax)}</dd>
                         <dt className="text-text-muted">Kolam</dt>
                         <dd className="text-right text-text">{formatRupiah(p.pool)}</dd>
@@ -225,7 +225,7 @@ export default async function KomisiPage() {
                         <th className="py-1 text-right font-medium">Sesi</th>
                         <th className="py-1 text-right font-medium">Nilai</th>
                         <th className="py-1 text-right font-medium">Platform bersih</th>
-                        <th className="py-1 text-right font-medium">PPN 12%</th>
+                        <th className="py-1 text-right font-medium">PPN</th>
                         <th className="py-1 text-right font-medium">Kolam</th>
                         <th className="py-1 text-right font-medium">Coach</th>
                       </tr>

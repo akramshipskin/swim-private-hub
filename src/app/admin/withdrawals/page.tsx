@@ -74,7 +74,7 @@ export default async function AdminWithdrawalsPage({
           <div>
             <h2 className="text-lg font-semibold text-text">Saldo Platform</h2>
             <p className="text-sm text-text-muted">
-              Komisi platform dari setiap sesi, sudah dipisah dari PPN 12%. Dana sesi baru bisa ditarik setelah ditahan{" "}
+              Komisi platform dari setiap sesi, sudah dipisah dari PPN (11% sejak 30 Sep 2026, sebelumnya 12%). Dana sesi baru bisa ditarik setelah ditahan{" "}
               {PLATFORM_HOLD_DAYS} hari (masa member melapor). Catat di sini setiap kali saldo ditarik dari akun Midtrans, lengkap
               dengan bukti transfer.
             </p>
@@ -86,7 +86,7 @@ export default async function AdminWithdrawalsPage({
               <p className="text-xs text-text-subtle">Total termasuk yang masih ditahan: {formatRupiah(platform.revenue)}</p>
             </div>
             <div className="rounded-xl bg-surface-muted p-3">
-              <p className="text-sm text-text-muted">Saldo PPN 12% (untuk disetor ke negara)</p>
+              <p className="text-sm text-text-muted">Saldo PPN (untuk disetor ke negara)</p>
               <p className="text-2xl font-bold text-text">{formatRupiah(Math.max(0, platform.availableTax))}</p>
               <p className="text-xs text-text-subtle">Total termasuk yang masih ditahan: {formatRupiah(platform.tax)}</p>
             </div>

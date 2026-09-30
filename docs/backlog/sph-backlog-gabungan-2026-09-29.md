@@ -402,5 +402,7 @@ Daftar hadir loket & komisi bertingkat (setelah MOU kolam pertama), batas les ba
 ## 13. STATUS 30 SEP 2026 MALAM (menggantikan bagian 12 bila bertentangan)
 
 Selesai (lihat laporan Babak 3): tanggal lahir semua form daftar, notifikasi admin baru + log, testimoni + halaman admin, buang kolom sertifikat lama (P3), CSP aktif, uji balasan AI, penjelasan milestone.
-Tetap menunggu Hadi: GitHub Actions `race`, secret backup R2/Supabase, tes production (unggah, email, push, pembayaran asli), isi `[ISI HADI]` (usulan ada di Lembar Hadi), 3 kolam, akuntan, keputusan PPN 11% vs 12%, ganti nama merchant Midtrans (production sudah benar).
+Tetap menunggu Hadi: GitHub Actions `race`, secret backup R2/Supabase, tes production (unggah, email, push, pembayaran asli), isi `[ISI HADI]` (usulan ada di Lembar Hadi), 3 kolam, akuntan, ganti nama merchant Midtrans (production sudah benar).
 Dihapus dari daftar: setuju ulang Kebijakan Privasi (belum ada pengguna lama), paksa ganti password coach/pemilik kolam (tidak dilakukan), tes Meta Ads (urusan Hadi).
+
+Update: PPN diputuskan 11% (30 Sep malam), sudah di kode. Akuntan tetap perlu memastikan mekanisme setor dan pajak komisi afiliasi.

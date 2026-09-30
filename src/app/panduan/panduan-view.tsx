@@ -33,7 +33,7 @@ const HIGHLIGHTS = [
   },
   {
     title: "Bagi hasil otomatis",
-    body: "Setiap sesi yang ditandai Hadir langsung dibagi ke saldo kolam, coach, dan komisi platform (termasuk PPN 12%). Kalau peserta sudah booking tapi tidak datang, coach dapat 50% dari bagiannya dan kolam tidak dapat bagian. Kolam dan coach mencairkan saldonya sendiri.",
+    body: "Setiap sesi yang ditandai Hadir langsung dibagi ke saldo kolam, coach, dan komisi platform (termasuk PPN 11%). Kalau peserta sudah booking tapi tidak datang, coach dapat 50% dari bagiannya dan kolam tidak dapat bagian. Kolam dan coach mencairkan saldonya sendiri.",
   },
   {
     title: "Harga per kolam",
@@ -207,7 +207,7 @@ const GUIDES: Guide[] = [
         heading: "4. Keuangan",
         steps: [
           { title: "Uang Masuk", body: "Semua pembayaran paket dari member lewat Midtrans beserta statusnya." },
-          { title: "Bagi Hasil", body: "Rincian per kolam: komisi platform (termasuk PPN 12%), komisi kolam, dan komisi coach untuk tiap sesi Hadir." },
+          { title: "Bagi Hasil", body: "Rincian per kolam: komisi platform (termasuk PPN 11%), komisi kolam, dan komisi coach untuk tiap sesi Hadir." },
           { title: "Pencairan Saldo", body: "Proses pengajuan dari kolam & coach (Tandai Dibayar / Tolak), dan catat penarikan pendapatan platform." },
         ],
       },

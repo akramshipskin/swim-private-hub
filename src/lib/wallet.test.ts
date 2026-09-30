@@ -53,6 +53,8 @@ describe("creditSessionRevenue", () => {
   // Regression: nilai ini persis kasus yang diverifikasi live 2026-09-16
   // (booking beneran, payment Rp750.000/8 sesi, kolam commission 15% +
   // coach share 55%) -- pool dapet Rp28.125, coach dapet Rp51.563.
+  // Catatan: sesi lama (dikreditkan sebelum 30 Sep 2026) tercatat dengan PPN 12%;
+  // pembalikan membaca jumlah tercatat (lihat tes reverseSessionRevenue), bukan tarif.
   it("splits perSessionValue by the pool's commission and coach-share percent", async () => {
     const tx = createMockTx({ pool: { commissionPercent: 15, coachSharePercent: 55 } });
 
@@ -75,8 +77,8 @@ describe("creditSessionRevenue", () => {
       data: [
         { type: "SESSION_REVENUE", poolId: "pool-1", amount: 28125, bookingId: "booking-1" },
         { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: 51563, bookingId: "booking-1" },
-        { type: "PLATFORM_REVENUE", amount: 12555, bookingId: "booking-1" },
-        { type: "PLATFORM_TAX", amount: 1507, bookingId: "booking-1" },
+        { type: "PLATFORM_REVENUE", amount: 12668, bookingId: "booking-1" },
+        { type: "PLATFORM_TAX", amount: 1394, bookingId: "booking-1" },
       ],
     });
   });
@@ -147,8 +149,8 @@ describe("creditSessionRevenue", () => {
     expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
       data: [
         { type: "SESSION_REVENUE", poolId: "pool-1", amount: 85000, bookingId: "booking-1" },
-        { type: "PLATFORM_REVENUE", amount: 13393, bookingId: "booking-1" },
-        { type: "PLATFORM_TAX", amount: 1607, bookingId: "booking-1" },
+        { type: "PLATFORM_REVENUE", amount: 13514, bookingId: "booking-1" },
+        { type: "PLATFORM_TAX", amount: 1486, bookingId: "booking-1" },
       ],
     });
   });
@@ -313,12 +315,12 @@ describe("creditSessionRevenue: peserta tidak datang (attended=false)", () => {
       where: { id: "coach-1" },
       data: { walletBalance: { increment: 20000 } },
     });
-    // 80.000 ke platform: PPN 12% di dalamnya = round(80000*12/112) = 8571.
+    // 80.000 ke platform: PPN 11% di dalamnya = round(80000*11/111) = 7928.
     expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
       data: [
         { type: "SESSION_PAYOUT", coachProfileId: "coach-1", amount: 20000, bookingId: "booking-1" },
-        { type: "PLATFORM_REVENUE", amount: 71429, bookingId: "booking-1" },
-        { type: "PLATFORM_TAX", amount: 8571, bookingId: "booking-1" },
+        { type: "PLATFORM_REVENUE", amount: 72072, bookingId: "booking-1" },
+        { type: "PLATFORM_TAX", amount: 7928, bookingId: "booking-1" },
       ],
     });
   });
@@ -338,8 +340,8 @@ describe("creditSessionRevenue: peserta tidak datang (attended=false)", () => {
     expect(tx.coachProfile.update).not.toHaveBeenCalled();
     expect(tx.walletTransaction.createMany).toHaveBeenCalledWith({
       data: [
-        { type: "PLATFORM_REVENUE", amount: 1000, bookingId: "b" },
-        { type: "PLATFORM_TAX", amount: 120, bookingId: "b" },
+        { type: "PLATFORM_REVENUE", amount: 1009, bookingId: "b" },
+        { type: "PLATFORM_TAX", amount: 111, bookingId: "b" },
       ],
     });
   });
@@ -365,7 +367,7 @@ describe("hook afiliasi", () => {
 });
 
 // Keputusan Hadi 29-30 Sep: contoh sesi Rp100.000 di kolam 10/40/50 -- kolam
-// 50.000, coach 40.000, SPH 10.000 (PPN 12% sudah di dalamnya, bersih 8.929).
+// 50.000, coach 40.000, SPH 10.000 (PPN 11% sudah di dalamnya, bersih 9.009).
 // Angka ini juga dicocokkan lewat UI + ledger di DB dev (sweep 30 Sep).
 describe("bagi hasil 10/40/50 (contoh keputusan Hadi)", () => {
   const rows = async (perSessionValue: number, attended: boolean, pool = { commissionPercent: 10, coachSharePercent: 40 }) => {
@@ -375,12 +377,12 @@ describe("bagi hasil 10/40/50 (contoh keputusan Hadi)", () => {
     return Object.fromEntries(data.map((r) => [r.type, r.amount]));
   };
 
-  it("Hadir Rp100.000: kolam 50.000, coach 40.000, SPH bersih 8.929 + PPN 1.071", async () => {
-    expect(await rows(100_000, true)).toEqual({ SESSION_REVENUE: 50_000, SESSION_PAYOUT: 40_000, PLATFORM_REVENUE: 8_929, PLATFORM_TAX: 1_071 });
+  it("Hadir Rp100.000: kolam 50.000, coach 40.000, SPH bersih 9.009 + PPN 991", async () => {
+    expect(await rows(100_000, true)).toEqual({ SESSION_REVENUE: 50_000, SESSION_PAYOUT: 40_000, PLATFORM_REVENUE: 9_009, PLATFORM_TAX: 991 });
   });
 
-  it("Tidak Hadir Rp100.000: coach 20.000 (50%), kolam Rp0, SPH 80.000 (bersih 71.429 + PPN 8.571)", async () => {
-    expect(await rows(100_000, false)).toEqual({ SESSION_PAYOUT: 20_000, PLATFORM_REVENUE: 71_429, PLATFORM_TAX: 8_571 });
+  it("Tidak Hadir Rp100.000: coach 20.000 (50%), kolam Rp0, SPH 80.000 (bersih 72.072 + PPN 7.928)", async () => {
+    expect(await rows(100_000, false)).toEqual({ SESSION_PAYOUT: 20_000, PLATFORM_REVENUE: 72_072, PLATFORM_TAX: 7_928 });
   });
 
   it("beli 1 sesi Rp120.000 (harga tertinggi 100.000 + markup 20%): kolam 60.000, coach 48.000, SPH 12.000", async () => {

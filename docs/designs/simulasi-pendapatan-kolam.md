@@ -15,7 +15,7 @@ disetel per kolam di MOU; di contoh ini coach 40%, kolam 50%, SPH 10%.
 | Kolam | Rp50.000 | Rp0 |
 | Coach | Rp40.000 | Rp20.000 |
 | SPH (kotor) | Rp10.000 | Rp80.000 |
-| PPN 12% di dalam bagian SPH | Rp1.071 | Rp8.571 |
+| PPN 11% di dalam bagian SPH | Rp991 | Rp7.928 |
 
 Bagian kolam Rp50.000 sudah mencakup tiket masuk coach (Rp25.000) dan peserta
 (Rp25.000). Satu pendamping (boleh bergantian) yang tidak berenang masuk gratis.

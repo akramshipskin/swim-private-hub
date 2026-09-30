@@ -168,4 +168,4 @@ Semua dikerjakan dan diverifikasi (tsc 0, eslint 0, vitest 666, race 146 pada sk
 Catatan penting:
 - Migrasi baru memuat DROP COLUMN. Setelah dijalankan di production, kode lama yang masih live bisa error di halaman yang membaca profil coach sampai deploy baru selesai: jalankan migrasi lalu langsung push.
 - Uji hidup push lewat server dev tidak konsisten (proses anak Next tidak selalu memuat penangkap), jadi bukti utamanya tes race; uji hidup hanya menangkap satu jalur.
-- PPN: sistem memakai 12% inklusif. Hadi menyebut 11% "sama seperti pajak SPH": belum diubah, menunggu jawaban Hadi (lihat Lembar Hadi).
+- PPN: Hadi memutuskan 11% ("ubah", 30 Sep malam). `PLATFORM_TAX_PERCENT` 12 -> 11 untuk sesi yang dikreditkan sejak itu; baris ledger lama (12%) tidak dihitung ulang, pembalikan membaca jumlah tercatat. Contoh Rp100.000 di 10/40/50: SPH bersih 9.009 + PPN 991 (dulu 8.929 + 1.071); tidak hadir: 72.072 + 7.928. Label admin dibuat netral ("PPN") + catatan tarif berubah.

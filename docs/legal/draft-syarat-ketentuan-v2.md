@@ -228,7 +228,7 @@ Masih kosong:
 1. Kualifikasi hukum SPH yang menerima dan menahan dana sebelum dibagikan:
    apakah memerlukan izin tertentu (misalnya terkait penyelenggaraan sistem
    pembayaran/penampungan dana) atau cukup sebagai penjual jasa.
-2. Perlakuan PPN atas komisi platform (sistem menghitung PPN 12% di dalam
+2. Perlakuan PPN atas komisi platform (sistem menghitung PPN 11% di dalam
    komisi platform) dan status PKP penyelenggara.
 3. Kesesuaian dengan UU Perlindungan Konsumen (klausula baku, batas tanggung
    jawab) dan UU Pelindungan Data Pribadi (data anak).
