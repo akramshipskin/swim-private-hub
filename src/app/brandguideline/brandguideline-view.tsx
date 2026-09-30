@@ -235,14 +235,14 @@ export default function BrandGuidelineView() {
             <SubHeading>Varian tanda (mark)</SubHeading>
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { src: "/brand-kit/logo/svg/mark-lime.svg", label: "mark-lime", bg: "bg-surface" },
-                { src: "/brand-kit/logo/svg/mark-cream.svg", label: "mark-cream", bg: "bg-fixed-lime" },
-                { src: "/brand-kit/logo/svg/mark-white-mono.svg", label: "mark-white-mono", bg: "bg-fixed-ink" },
-                { src: "/brand-kit/logo/png/mark-lime-4096.png", label: "mark-lime (PNG 4096px, latar krem bawaan file)", bg: "bg-fixed-cream" },
+                { src: "/brand-kit/logo/svg/mark-lime.svg", label: "mark-lime", bg: "bg-surface", text: "text-text-subtle" },
+                { src: "/brand-kit/logo/svg/mark-cream.svg", label: "mark-cream", bg: "bg-fixed-lime", text: "text-fixed-muted" },
+                { src: "/brand-kit/logo/svg/mark-white-mono.svg", label: "mark-white-mono", bg: "bg-fixed-ink", text: "text-white/70" },
+                { src: "/brand-kit/logo/png/mark-lime-4096.png", label: "mark-lime (PNG 4096px, latar krem bawaan file)", bg: "bg-fixed-cream", text: "text-fixed-muted" },
               ].map((m) => (
                 <div key={m.label} className={`flex flex-col items-center gap-2 rounded-xl border border-border ${m.bg} p-3`}>
                   <Image src={m.src} alt="" width={40} height={40} className="h-10 w-10" />
-                  <span className="text-center text-xs font-mono text-text-subtle">{m.label}</span>
+                  <span className={`text-center text-xs font-mono ${m.text}`}>{m.label}</span>
                 </div>
               ))}
             </div>

@@ -119,7 +119,7 @@ export default function SaldoView({
           </div>
 
           <form action={cairAction} className="flex flex-col gap-2 sm:flex-row sm:items-end">
-            <Field label={`Nominal (min. ${formatRupiah(MIN_WITHDRAWAL)})`} className="flex-1">
+            <Field label={`Nominal (minimal ${formatRupiah(MIN_WITHDRAWAL)})`} className="flex-1">
               <PriceInput
                 name="amount"
                 defaultValue={walletBalance >= MIN_WITHDRAWAL ? walletBalance : ""}

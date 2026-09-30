@@ -95,7 +95,7 @@ export default async function MemberBookingPage() {
 
       {children.length > 0 && packageOptions.length === 0 && (
         <div className="mb-6 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
-          Belum ada anak yang punya paket aktif dengan sisa sesi.{" "}
+          Belum ada peserta yang punya paket aktif dengan sisa sesi.{" "}
           <Link href="/member/paket" className="font-medium underline">
             Beli paket dulu
           </Link>
@@ -123,8 +123,8 @@ export default async function MemberBookingPage() {
           </svg>
         </summary>
         <p className="mt-2">
-          Pembatalan booking min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
-          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan = sesi tetap terpotong dan
+          Pembatalan booking paling lambat {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
+          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan = sesi tetap terpakai dan
           tidak dikembalikan. Jatah habis? Hubungi admin via WhatsApp.
         </p>
       </details>
@@ -132,8 +132,8 @@ export default async function MemberBookingPage() {
       <div className="mb-6 hidden rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:block">
         <p className="mb-1 font-medium text-text">KEBIJAKAN PEMBATALAN</p>
         <p>
-          Pembatalan booking min. {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
-          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan = sesi tetap terpotong dan
+          Pembatalan booking paling lambat {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
+          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan = sesi tetap terpakai dan
           tidak dikembalikan. Jatah habis? Hubungi admin via WhatsApp.
         </p>
       </div>

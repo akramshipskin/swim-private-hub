@@ -78,7 +78,7 @@ export function DateQuickPicker({
                 : "border-border bg-surface text-text hover:bg-surface-muted"
             }`}
           >
-            <span className={isSelected ? "text-white/80" : "text-text-subtle"}>{o.dow}</span>
+            <span className={isSelected ? "text-white" : "text-text-subtle"}>{o.dow}</span>
             <span className="text-base font-semibold">{o.num}</span>
             {availableDates.has(o.key) && !isSelected && (
               <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-brand-500" />

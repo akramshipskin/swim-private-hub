@@ -152,7 +152,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
                               <Badge>Belum</Badge>
                             )}
                             {done?.withCertificate && (
-                              <Link href={`/milestone/${dependentId}/sertifikat/${done.id}`} className="text-sm font-medium text-brand-700 underline">
+                              <Link href={`/milestone/${dependentId}/sertifikat/${done.id}`} className="text-sm font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                                 Sertifikat
                               </Link>
                             )}
@@ -203,7 +203,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
                       <li key={c.id} className="flex flex-wrap items-center gap-2 text-sm text-text">
                         {levelLabel(c.group as MilestoneGroup, c.level)} · {formatMilestoneDate(c.completedAt)}
                         {c.withCertificate && (
-                          <Link href={`/milestone/${dependentId}/sertifikat/${c.id}`} className="font-medium text-brand-700 underline">
+                          <Link href={`/milestone/${dependentId}/sertifikat/${c.id}`} className="font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                             Sertifikat
                           </Link>
                         )}

@@ -110,7 +110,7 @@ export default async function AdminKolamPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Kelola Kolam</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Persentase pembagian per kolam — bisa diubah kapan saja, tidak butuh migrasi. Sisanya
+        Persentase pembagian per kolam — bisa diubah kapan saja. Sisanya
         (100% - komisi platform - komisi coach) otomatis jadi komisi kolam.
       </p>
 

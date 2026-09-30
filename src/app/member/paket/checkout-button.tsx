@@ -50,7 +50,7 @@ export default function CheckoutButton({
       <Select aria-label="Paket ini untuk peserta" value={dependentId} onChange={(e) => setDependentId(e.target.value)} className="w-full">
         {dependents.map((d) => (
           <option key={d.id} value={d.id}>
-            Buat {d.name}
+            Untuk {d.name}
           </option>
         ))}
       </Select>

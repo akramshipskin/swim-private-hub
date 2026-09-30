@@ -85,7 +85,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-text">Jadwal Saya</h1>
           <p className="mt-1 text-sm text-text-muted">
-            Tambah slot per tanggal. Member akan lihat & booking slot ini secara real-time.
+            Tambah slot per tanggal. Member langsung bisa melihat dan membooking slot ini.
           </p>
         </div>
       </div>

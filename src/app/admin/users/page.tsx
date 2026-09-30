@@ -99,9 +99,9 @@ export default async function AdminUsersPage() {
       </div>
 
       {/* --- Assign paket khusus ke member --- */}
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Assign Paket ke Peserta</h2>
+      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Berikan Paket ke Peserta</h2>
       <p className="mb-3 text-sm text-text-muted">
-        Buat paket khusus buat 1 anak tertentu (koreksi, promo, atau kasus di luar
+        Buat paket khusus untuk 1 peserta tertentu (koreksi, promo, atau kasus di luar
         alur beli-online).
       </p>
       <AssignPackageForm members={memberOptions} templates={templates.map((t) => ({ id: t.id, name: t.name, totalSesi: t.totalSesi, jatahCancel: t.jatahCancel, poolId: t.poolId }))} dependents={dependents} pools={pools} />

@@ -156,7 +156,7 @@ export default function AssignPackageForm({
             <DatePicker name="expiredDate" className="sm:w-40" clearable />
           </Field>
           <Button type="submit" loading={pending} className="w-full sm:w-auto">
-            Assign (langsung Aktif)
+            Berikan paket (langsung Aktif)
           </Button>
         </form>
         {state?.error && (

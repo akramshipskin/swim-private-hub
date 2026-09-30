@@ -20,8 +20,8 @@ export function BentoCard({
   return (
     <Card className={cn("flex flex-col", className)}>
       <CardBody className="flex flex-1 flex-col gap-3">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-base font-semibold text-text">{title}</h2>
+        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+          <h2 className="min-w-0 text-base font-semibold text-text">{title}</h2>
           {href && (
             <Link href={href} className="shrink-0 text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               {linkLabel} &rarr;

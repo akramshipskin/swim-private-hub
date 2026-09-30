@@ -114,7 +114,7 @@ export default async function CoachShortcutPage({
                   )
                 ) : (
                   c.filePath && (
-                    <Link href="/register" className="font-medium text-brand-700 underline">
+                    <Link href="/register" className="font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                       Lihat sertifikat (daftar dulu)
                     </Link>
                   )

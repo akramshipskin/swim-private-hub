@@ -19,7 +19,7 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
     return (
       <Card className="mb-8 mt-5">
         <CardBody className="py-6 text-center text-sm text-text-muted">
-          Kamu belum terafiliasi ke kolam manapun. Hubungi admin agar bisa buka jadwal.
+          Kamu belum terafiliasi ke kolam mana pun. Hubungi admin agar bisa buka jadwal.
         </CardBody>
       </Card>
     );
@@ -72,9 +72,9 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
           </p>
         )}
         <p className="mt-2 text-xs text-text-subtle">
-          Slot otomatis dipecah per jam — misal 08.00–10.00 jadi 2 slot terpisah (08–09,
-          09–10), masing-masing bisa dibooking member beda. Jam 12.00–13.00 (istirahat) tidak
-          dijadiin slot.
+          Slot otomatis dipecah per jam — misalnya 08.00–10.00 menjadi 2 slot terpisah (08–09,
+          09–10), masing-masing bisa dibooking member yang berbeda. Jam 12.00–13.00 (istirahat) tidak
+          dijadikan slot.
         </p>
       </CardBody>
     </Card>

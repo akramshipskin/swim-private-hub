@@ -254,7 +254,7 @@ export default async function KomisiPage() {
                     </tbody>
                   </table>
                 </div>
-                {e.free > 0 && <p className="text-xs text-text-subtle">{e.free} sesi dari paket gratis/assign manual (tanpa uang) tidak dihitung.</p>}
+                {e.free > 0 && <p className="text-xs text-text-subtle">{e.free} sesi dari paket gratis/pemberian manual (tanpa uang) tidak dihitung.</p>}
                 {(() => {
                   const manual = manualPool.find((x) => x.poolId === pool.id)?._sum.amount ?? 0;
                   return manual !== 0 ? (

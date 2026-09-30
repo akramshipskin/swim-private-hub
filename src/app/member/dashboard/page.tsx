@@ -82,7 +82,7 @@ export default async function MemberDashboardPage() {
             <Stat label="Paket aktif" value={packages.length} hint={`${pesertaCount} peserta terdaftar`} />
             <Stat label="Total sisa sesi" value={totalSisa} />
             <Stat label="Sesi terjadwal" value={upcomingCount} />
-            <Stat label="Sesi dihadiri" value={attendedCount} hint={`${attendedThisMonth} bulan ini`} />
+            <Stat label="Sesi dihadiri" value={attendedCount} hint={`${attendedThisMonth} sesi bulan ini`} />
           </div>
           <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-border pt-4 xl:grid-cols-4">
             <Stat label="Belanja paket bulan ini" value={formatRupiah(spentThisMonth._sum.amount ?? 0)} />

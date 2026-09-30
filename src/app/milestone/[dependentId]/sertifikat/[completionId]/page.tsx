@@ -57,7 +57,7 @@ export default async function LevelCertificatePage({
     <main className="min-h-screen bg-fixed-cream px-4 py-6 print:bg-white print:p-0">
       <style>{`@page { size: A4 landscape; margin: 12mm; }`}</style>
       <div className="mx-auto mb-4 flex max-w-4xl flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link href={`/milestone/${dependentId}`} className="text-sm font-medium text-fixed-ink underline">
+        <Link href={`/milestone/${dependentId}`} className="text-sm font-medium text-fixed-ink underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
           ← Kembali
         </Link>
         <PrintButton />
