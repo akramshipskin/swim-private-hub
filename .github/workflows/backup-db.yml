@@ -82,6 +82,14 @@ jobs:
           BUCKET="$(printf '%s' "$BUCKET" | tr -d '[:space:]')"
           AWS_DEFAULT_REGION="$(printf '%s' "${AWS_DEFAULT_REGION:-}" | tr -d '[:space:]')"
           export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-auto}"
+          # Petunjuk salah-ketik tanpa membocorkan alamat (GitHub menyamarkan
+          # nilai secret di log, jadi yang dicetak hanya ciri-cirinya).
+          HOST="${ENDPOINT#*://}"
+          if printf '%s' "$HOST" | grep -Eq '^[0-9a-f]{32}(\.(eu|fedramp))?\.r2\.cloudflarestorage\.com$'; then
+            echo "Endpoint tampak seperti alamat R2 yang benar."
+          else
+            echo "PERINGATAN: endpoint tidak berbentuk <32 karakter hex>.r2.cloudflarestorage.com (panjang host ${#HOST} karakter). Salin persis dari R2 > bucket > Settings > S3 API."
+          fi
           aws --version
           aws s3 cp "$FILE" "s3://$BUCKET/$PREFIX/$FILE" --endpoint-url "$ENDPOINT" --only-show-errors
           # Hapus backup lama HANYA setelah unggahan hari ini berhasil, dan hanya

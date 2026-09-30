@@ -23,6 +23,11 @@ describe("CoachLeaders", () => {
     expect(screen.getByAltText("Foto Dewi Lestari")).toHaveAttribute("src", "https://x.test/a.jpg");
   });
 
+  it("kolam mengajar dipendekkan: dua nama pertama + jumlah sisanya", () => {
+    render(<CoachLeaders coaches={[{ ...base, pools: ["Kolam A", "Kolam B", "Kolam C", "Kolam D"] }]} />);
+    expect(screen.getByText("Kolam A, Kolam B +2")).toBeInTheDocument();
+  });
+
   it("satu daftar berlabel dengan satu item per coach (tanpa efek muncul-saat-scroll yang menyembunyikan kartu)", () => {
     render(<CoachLeaders coaches={[base, { ...base, id: "c2", name: "Rian" }]} />);
     const list = screen.getByRole("list", { name: "Daftar coach" });

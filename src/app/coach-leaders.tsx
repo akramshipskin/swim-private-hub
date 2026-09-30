@@ -38,8 +38,8 @@ function CoachCard({ c }: { c: LandingCoach }) {
               <span className="inline-block rounded-full bg-fixed-lime-100 px-3 py-1 text-xs font-semibold text-fixed-ink">{c.certifiedLabel}</span>
             </p>
           )}
-          <p className="mt-1 line-clamp-2 text-sm text-fixed-muted">
-            Mengajar di: <span className="font-medium text-fixed-ink">{c.pools.join(", ") || "-"}</span>
+          <p className="mt-1 text-sm text-fixed-muted">
+            Mengajar di: <span className="font-medium text-fixed-ink">{c.pools.length === 0 ? "-" : c.pools.length > 2 ? `${c.pools.slice(0, 2).join(", ")} +${c.pools.length - 2}` : c.pools.join(", ")}</span>
           </p>
           <Link href={`/pelatih/${c.id}`} className="mt-auto inline-flex min-h-[44px] items-center pt-2 text-sm font-semibold text-fixed-ink underline">
             Lihat profil lengkap
