@@ -7,8 +7,13 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { endpoint } = (await request.json()) as { endpoint?: string };
-  if (!endpoint) {
+  let endpoint: unknown;
+  try {
+    endpoint = ((await request.json()) as { endpoint?: unknown })?.endpoint;
+  } catch {
+    return Response.json({ error: "Body bukan JSON valid" }, { status: 400 });
+  }
+  if (typeof endpoint !== "string" || !endpoint) {
     return Response.json({ error: "endpoint wajib diisi" }, { status: 400 });
   }
 

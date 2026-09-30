@@ -61,7 +61,8 @@ export default async function AdminUsersPage() {
   const members = users.filter((u) => u.role === "MEMBER");
   // Yang dikirim ke komponen client HANYA field ini. Baris User utuh dulu
   // ikut ter-serialisasi ke browser (hash password & kunci 2FA semua member).
-  const memberOptions = members.map((u) => ({ id: u.id, name: u.name, email: u.email, phone: u.phone }));
+  // Akun yang sudah dihapus (dianonimkan) tidak ditawarkan di pilihan assign paket / tambah peserta.
+  const memberOptions = members.filter((u) => !u.anonymizedAt).map((u) => ({ id: u.id, name: u.name, email: u.email, phone: u.phone }));
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">

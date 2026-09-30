@@ -20,7 +20,7 @@ export const INBOX_ADDRESSES = [
 
 function client() {
   const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error("RESEND_API_KEY belum diisi di .env");
+  if (!key) throw new Error("Pengiriman email belum aktif: kunci layanan email belum dipasang di server.");
   return new Resend(key);
 }
 
