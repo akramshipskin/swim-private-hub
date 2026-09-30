@@ -8,11 +8,13 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - 1 Okt: GitHub Actions hijau untuk semua push terbaru (Test: 0f903b1, 04bf065, ad75dd2; Backup DB dan Storage hijau sejak 15:41 UTC 30 Sep).
 - 1 Okt: rombak cara main Claude tahap 0-4 selesai (backup, pengaturan, aturan inti, aturan desain, rapikan memori). Rinci: memori project_rombak_cara_main_2026-10-01 dan docs/KEPUTUSAN.md.
 
+- 1 Okt malam: brand v2 digabung dan tayang (8f067b8; GitHub hijau, Vercel selesai, 3 gambar sosial di situs asli identik dengan repo). Banner dirender ulang dengan tagline bertitik; foto profil = tanda saja; skrip render gambar sosial ada di repo.
+
 ## Sedang jalan
 - Uji sesi baru pertama setelah rombak: cek 3 baris pembuka, format jawaban, hook pengingat, skill baru.
 
 ## Tugas Claude berikutnya (sudah disetujui Hadi 1 Okt malam)
-1. Gabungkan cabang brand-guideline-v2 (2 commit aset resolusi tinggi, 34 file) ke cabang utama.
+1. (Selesai 1 Okt malam, lihat bagian atas.)
 2. Animasi landing page dulu (HP ringan: kartu dan section muncul; desktop lebih kaya: hover, muncul bertahap, video perenang di header). Sonnet High. Video: cari stok berlisensi, minta izin Hadi sebelum mengunduh (nama file, sumber, ukuran, lisensi). Ukur kecepatan sebelum dan sesudah.
 3. Setelah LP: animasi dalam aplikasi per peran (admin, coach, pemilik kolam, member), lebih halus.
 4. Uji jalur ganti model otomatis: skill sph-berisiko (model opus) dan asisten Opus. Alat ganti model sesi sendiri TIDAK bisa (ditolak sistem); untuk kerjaan sensitif yang panjang, minta Hadi pilih Opus di menu model.
