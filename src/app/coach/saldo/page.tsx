@@ -28,6 +28,10 @@ export default async function CoachSaldoPage() {
         orderBy: { createdAt: "desc" },
         select: { id: true, amount: true, note: true, createdAt: true },
       },
+      affiliateCommissions: {
+        orderBy: { createdAt: "desc" },
+        select: { id: true, amount: true, status: true, releaseAt: true, releasedAt: true },
+      },
       withdrawalRequests: {
         orderBy: { requestedAt: "desc" },
         select: { id: true, amount: true, status: true, requestedAt: true, processedAt: true, failureReason: true, bankName: true, bankAccountNumber: true, bankAccountName: true, midtransReferenceId: true, transferReference: true },
@@ -82,6 +86,7 @@ export default async function CoachSaldoPage() {
           processedAt: w.processedAt?.toISOString() ?? null,
         }))}
         adjustments={profile.walletTransactions.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() }))}
+        commissions={profile.affiliateCommissions.map((c) => ({ ...c, releaseAt: c.releaseAt?.toISOString() ?? null, releasedAt: c.releasedAt?.toISOString() ?? null }))}
         updateBankInfoAction={updateBankInfo}
         requestWithdrawalAction={requestWithdrawal}
       />

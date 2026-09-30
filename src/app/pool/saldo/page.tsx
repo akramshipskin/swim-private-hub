@@ -33,6 +33,10 @@ export default async function PoolSaldoPage() {
         orderBy: { createdAt: "desc" },
         select: { id: true, amount: true, note: true, createdAt: true },
       },
+      affiliateCommissions: {
+        orderBy: { createdAt: "desc" },
+        select: { id: true, amount: true, status: true, releaseAt: true, releasedAt: true },
+      },
       withdrawalRequests: {
         orderBy: { requestedAt: "desc" },
         select: { id: true, amount: true, status: true, requestedAt: true, processedAt: true, failureReason: true, bankName: true, bankAccountNumber: true, bankAccountName: true, midtransReferenceId: true, transferReference: true },
@@ -68,6 +72,7 @@ export default async function PoolSaldoPage() {
           processedAt: w.processedAt?.toISOString() ?? null,
               }))}
               adjustments={pool.walletTransactions.map((a) => ({ ...a, createdAt: a.createdAt.toISOString() }))}
+              commissions={pool.affiliateCommissions.map((c) => ({ ...c, releaseAt: c.releaseAt?.toISOString() ?? null, releasedAt: c.releasedAt?.toISOString() ?? null }))}
               updateBankInfoAction={updateBankInfo.bind(null, pool.id)}
               requestWithdrawalAction={requestWithdrawal.bind(null, pool.id)}
             />

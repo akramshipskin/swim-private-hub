@@ -28,6 +28,16 @@ type Withdrawal = {
 // Koreksi saldo dari admin (lihat src/lib/wallet-adjustment.ts).
 export type Adjustment = { id: string; amount: number; note: string | null; createdAt: string };
 
+// Komisi afiliasi yang masuk (atau akan masuk) ke saldo pemilik kode. Tanpa
+// nama member (privasi): cukup jumlah & status.
+export type Commission = {
+  id: string;
+  amount: number;
+  status: "WAITING" | "PENDING" | "RELEASED";
+  releaseAt: string | null;
+  releasedAt: string | null;
+};
+
 export type SaldoActionState = { error?: string; ok?: boolean } | null;
 
 const statusInfo = {
@@ -61,6 +71,7 @@ export default function SaldoView({
   bankAccountName,
   withdrawals,
   adjustments = [],
+  commissions = [],
   updateBankInfoAction,
   requestWithdrawalAction,
 }: {
@@ -70,6 +81,7 @@ export default function SaldoView({
   bankAccountName: string | null;
   withdrawals: Withdrawal[];
   adjustments?: Adjustment[];
+  commissions?: Commission[];
   updateBankInfoAction: (state: SaldoActionState, formData: FormData) => Promise<SaldoActionState>;
   requestWithdrawalAction: (state: SaldoActionState, formData: FormData) => Promise<SaldoActionState>;
 }) {
@@ -186,6 +198,31 @@ export default function SaldoView({
       </div>
 
       <div className="flex flex-col gap-6">
+      {commissions.length > 0 && (
+        <div>
+          <h2 className="mb-3 text-base font-semibold text-text">Komisi Afiliasi</h2>
+          <div className="flex flex-col gap-2">
+            {commissions.map((c) => (
+              <Card key={c.id}>
+                <CardBody className="flex items-start justify-between gap-3 py-4">
+                  <div>
+                    <p className="text-lg font-semibold text-success-text">+{formatRupiah(c.amount)}</p>
+                    <p className="text-sm text-text-muted">
+                      {c.status === "RELEASED" && c.releasedAt
+                        ? `Sudah masuk saldo ${dateTime(c.releasedAt)}`
+                        : c.status === "PENDING" && c.releaseAt
+                          ? `Masuk saldo setelah ${dateTime(c.releaseAt)}`
+                          : "Menunggu sesi pertama member ditandai Hadir"}
+                    </p>
+                  </div>
+                  <Badge tone={c.status === "RELEASED" ? "success" : "warning"}>{c.status === "RELEASED" ? "Cair" : "Menunggu"}</Badge>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       {adjustments.length > 0 && (
         <div>
           <h2 className="mb-3 text-base font-semibold text-text">Riwayat Koreksi Saldo</h2>
