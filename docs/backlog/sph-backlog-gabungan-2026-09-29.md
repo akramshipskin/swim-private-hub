@@ -356,3 +356,45 @@ Status kerja:
 | P3 | TIDAK dikerjakan: syaratnya H1 (bukti unggah sertifikat baru jalan di production) belum ada |
 | I3 | TIDAK dikerjakan: menunggu H8 (secret R2) |
 | Push | Ditolak pemeriksa izin otomatis → Hadi push manual. Tidak ada migrasi di commit yang belum di-push |
+
+---
+
+## 12. STATUS 30 SEP 2026 SIANG (menggantikan bagian 11 bila bertentangan)
+
+Sumber: `docs/reviews/2026-09-30-sweep-total.md` (bagian "Sweep lanjutan"). Semua sudah live di `main` (3548c82 dan sesudahnya).
+
+### 12.1 Keputusan Hadi 30 Sep (final)
+- Aplikasi masih pengembangan, semua akun dummy/sandbox termasuk production; tes semua fitur tanpa izin lagi. (Batas nyata dari sistem keamanan sesi Claude: tidak mengetik password ke situs non-lokal, tidak membaca `.env`, `git push` sering diblokir, DROP kolom diblokir.)
+- Kolam contoh ikut digeser kolam asli, maksimal 5 di landing. Bagi hasil final 10/40/50. Afiliasi 5% sekali dari paket pertama. Kebijakan Privasi diperbarui. Login salah 3x per akun + hitung mundur. Satu logo (teks logotype ikut tema). File lama diarsipkan. Pajak (PPN sesi tidak hadir, komisi afiliasi) ditanggung SPH. S&K 2.9 sudah disetujui orang hukum. 40 butir milestone disetujui. H13 (tes Meta Ads) nanti.
+
+### 12.2 Selesai
+| Item | Status |
+|---|---|
+| Migrasi `20260930120000_pool_split_default` | Sudah di production (Hadi, 30 Sep) |
+| H2 matikan paket uji, bagi hasil 10/40, H4 paket trial per kolam | Skrip `rapikan-data-produksi.mts` dijalankan Hadi di production (2 paket dimatikan, 2 kolam ke 10/40, 2 trial Rp50.000 dibuat) |
+| Kolam contoh + foto contoh | `fill-demo-pools.mts` dijalankan Hadi di production (Bahari, Cempaka, Samudra dibuat; foto kolam & 5 coach demo). Langkah hubungkan coach contoh ke kolam contoh baru ditambah setelahnya (jalankan ulang skrip) |
+| L1/L2, P1, P2, P4, U1 | Sudah live sebelumnya |
+| I1 tes race di CI | Job ditulis; diuji di klon bersih dengan env kosong (135 tes lulus). Hasil run GitHub belum dilihat |
+| I2 CSP | Mode pantau (Report-Only) + `/api/csp-report`; aktifkan setelah log Vercel bersih 1-2 hari |
+| I3 backup file storage | `scripts/backup-storage.mjs` + `.github/workflows/backup-storage.yml`, diuji lawan penyimpanan palsu lokal; belum ke Supabase/S3 asli |
+| P5 tes checkout sandbox | Dijalankan lokal (Midtrans sandbox + notifikasi simulasi `scripts/qa-webhook.mts`) |
+| Persetujuan pemilik kolam | Persetujuan pertama sekarang menyalakan kolamnya juga; setujui/tolak sertifikat juga ada di detail coach |
+| Riwayat komisi afiliasi | Tampil di Saldo coach & pemilik kolam |
+| Keamanan kecil | Alamat langganan push wajib layanan resmi (cegah SSRF buta); body JSON rusak jadi 400 |
+
+### 12.3 Belum / butuh Hadi
+- P3 buang kolom `certificateUrl/certificateStatus`: ditolak pemeriksa izin (DROP COLUMN); perlu persetujuan + dijalankan Hadi. Kolom tidak dibaca kode.
+- H1: tes production yang tidak bisa Claude lakukan: unggah ke Supabase asli, email Resend, push, satu pembayaran asli sampai paket aktif (termasuk notifikasi Midtrans masuk ke production).
+- H3: kabari coach (aturan milestone berlaku 1 Okt; akun sekarang dummy, jadi tidak mendesak).
+- H5, H6, H10: sudah dijawab Hadi (lihat 12.1).
+- H7: testimoni asli (nama, peran, kutipan 1-3 kalimat, izin mereka) -> X-L.
+- H8: secret R2 + `PROD_SUPABASE_URL`/`PROD_SUPABASE_SERVICE_ROLE_KEY`; jalankan Backup DB & Backup Storage manual sekali (`docs/backup.md`).
+- H9: kunci enkripsi (`SECRET_ENCRYPTION_KEY`, ada di Vercel production) disimpan di password manager.
+- H11: jawaban 3 kolam (6 pertanyaan di `docs/designs/validasi-permintaan-dan-kejujuran-landing.md`, bagian The Assignment).
+- H12: isi `[ISI HADI]` draft perjanjian coach & MOU kolam -> orang hukum -> tanda tangan. Tag "BELUM ADA DI SISTEM" sudah dibuang (semua fitur live).
+- Kebijakan Privasi baru (30 Sep) dicek orang hukum. Pengguna lama belum diminta setuju ulang (fitur belum ada).
+- Ganti nama merchant Midtrans dari "Les Renang Cianjur".
+- Harga trial Rp50.000 dan kolam contoh tambahan adalah isian sementara Claude.
+
+### 12.4 Ditunda (pemicu tetap)
+Daftar hadir loket & komisi bertingkat (setelah MOU kolam pertama), batas les barengan (kolam keberatan), halaman admin testimoni (ada testimoni asli), rate limit berlapis & email per percakapan (volume naik), studi kasus kolam & screenshot dari data asli (setelah tes Meta Ads), Payouts A/B/L (jawaban Midtrans).
