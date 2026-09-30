@@ -169,3 +169,12 @@ Catatan penting:
 - Migrasi baru memuat DROP COLUMN. Setelah dijalankan di production, kode lama yang masih live bisa error di halaman yang membaca profil coach sampai deploy baru selesai: jalankan migrasi lalu langsung push.
 - Uji hidup push lewat server dev tidak konsisten (proses anak Next tidak selalu memuat penangkap), jadi bukti utamanya tes race; uji hidup hanya menangkap satu jalur.
 - PPN: Hadi memutuskan 11% ("ubah", 30 Sep malam). `PLATFORM_TAX_PERCENT` 12 -> 11 untuk sesi yang dikreditkan sejak itu; baris ledger lama (12%) tidak dihitung ulang, pembalikan membaca jumlah tercatat. Contoh Rp100.000 di 10/40/50: SPH bersih 9.009 + PPN 991 (dulu 8.929 + 1.071); tidak hadir: 72.072 + 7.928. Label admin dibuat netral ("PPN") + catatan tarif berubah.
+
+## Babak 4 (30 Sep malam hingga 1 Okt): sesi admin dan coach di production
+
+Diuji lewat sesi Hadi di panel browser (Claude tidak login production).
+- Admin: 18 halaman admin terbuka tanpa error; testimoni sembunyikan/tampilkan terbukti mengubah landing publik; label PPN + catatan tarif tampil; 9 akun demo (5 coach, 2 pemilik kolam, 2 member) di-reset lewat menu Reset password (password sementara ada di artifact "Akun Uji Production"); login coach Dewi dengan password sementara berhasil (Hadi), lalu password diganti.
+- Coach Dewi: dashboard menampilkan kode afiliasi DEWI20; catatan milestone untuk peserta Bimo tersimpan (kelompok, butir tercapai, catatan). Waktu simpan sekitar 6 detik.
+- Temuan performa: header `x-vercel-id: sin1::iad1` = fungsi berjalan di Washington sementara database di Singapura (`ap-southeast-1`); TTFB landing 1-2 detik. Perbaikan: `vercel.json` `regions: ["sin1"]` (efek setelah deploy).
+- Backup DB dan Backup Storage sudah hijau (Hadi). Sebab kegagalan awal: endpoint R2 tanpa `https://`, lalu alamat salah; workflow sekarang merapikan isian dan menulis peringatan.
+- Landing dirombak (kecuali Kolam mitra dan Kenalan dengan coach).
