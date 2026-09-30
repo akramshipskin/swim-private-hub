@@ -22,6 +22,8 @@ HP = layar 375, prosesor diperlambat 4×, jaringan ±1,6 Mbps / 150 ms. Desktop 
 | Situs asli, SEBELUM push | Desktop | 344 ms | 344 ms | 461 KB | 0 | 0 |
 | Situs asli, SESUDAH push (6493c3b) | HP | 1540 ms (ulangan: 1688, 1124, 2472, 1540, 1288) | 1048 ms | 394 KB | 0 | 1 |
 | Situs asli, SESUDAH push (6493c3b) | Desktop | 332 ms | 332 ms | 462 KB | 0 | 0 |
+| Situs asli, sesudah semua perbaikan (fe5de3a) | HP | 1320 ms (ulangan: 1596, 3464, 1116, 1320, 1108) | 908 ms | 395 KB | 0 | - |
+| Situs asli, sesudah semua perbaikan (fe5de3a) | Desktop | 376 ms | 376 ms | 463 KB | 0 | - |
 
 Catatan jujur: di situs asli internetnya sungguhan sehingga lebih berisik (satu ulangan HP sesudah = 2472 ms, menyentuh rentang sebelum = 2308–3216 ms); nilai tengah tetap lebih cepat, tapi perbedaannya tidak sejelas di laptop. FCP HP situs asli 924 -> 1048 ms: dalam rentang variasi internet, belum dipastikan sebagai perlambatan atau bukan. pengukuran pertama sesudah build sempat menunjukkan FCP HP 924 ms; dua pengukuran ulang 856 ms (server baru dihidupkan). Angka hanya sebanding dengan angka dari skrip dan laptop yang sama. Bukan Lighthouse, dan bukan HP asli.
 
