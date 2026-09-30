@@ -406,6 +406,40 @@ p {
   }
 }
 
+/* ===== Gerak di dalam aplikasi (admin, coach, pemilik kolam, member) =====
+   Halus dan seragam: halaman memudar masuk saat pindah menu, dialog muncul
+   dengan sedikit membesar. Tanpa loop, hanya opacity dan transform. */
+@keyframes sph-page {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes sph-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sph-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* "backwards": setelah selesai elemen kembali normal tanpa transform, jadi
+     elemen fixed di dalam halaman tidak ikut terpengaruh. */
+  .page-enter {
+    animation: sph-page 0.25s ease-out backwards;
+  }
+  .dialog-overlay {
+    animation: sph-fade 0.15s ease-out backwards;
+  }
+  .dialog-panel {
+    animation: sph-pop 0.2s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+}
+
 /* HP/OS dengan "kurangi gerakan": animasi & transisi dipercepat nyaris nol
    (spinner, hover) dan tanpa jeda -- konten tetap tampil, hanya tanpa gerak. */
 @media (prefers-reduced-motion: reduce) {

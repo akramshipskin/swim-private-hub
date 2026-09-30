@@ -51,12 +51,12 @@ export default function ResetPasswordButton({
       />
       {(tempPassword || error) && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="dialog-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby={`reset-result-${userId}`}
         >
-          <div className="w-full max-w-sm rounded-xl bg-surface p-5 text-left shadow-lg">
+          <div className="dialog-panel w-full max-w-sm rounded-xl bg-surface p-5 text-left shadow-lg">
             <h2 id={`reset-result-${userId}`} className="text-base font-semibold text-text">
               {error ? "Gagal reset password" : "Password direset"}
             </h2>

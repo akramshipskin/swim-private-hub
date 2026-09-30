@@ -323,7 +323,7 @@ export default function BookingBoard({
       )}
       <Card className="mb-4">
         <CardBody className="flex flex-col gap-3 py-3 sm:flex-row sm:items-end sm:flex-wrap">
-          <Field label="Buat peserta">
+          <Field label="Untuk peserta">
             <Select
               value={dependentId}
               onChange={(e) => setDependentId(e.target.value)}
@@ -408,7 +408,7 @@ export default function BookingBoard({
       {dependentId && poolId && !selectedPkg && (
         <div className="mb-4 flex flex-col gap-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text sm:flex-row sm:items-center sm:justify-between">
           <p>
-            Belum ada paket aktif buat peserta ini di {selectedPool?.name}.
+            Belum ada paket aktif untuk peserta ini di {selectedPool?.name}.
             {dependentPoolNames.length > 0 && <> Paketnya berlaku di: {dependentPoolNames.join(", ")}.</>}
             {!canBuySingleSession && " Beli paket dulu agar bisa booking."}
             {canBuySingleSession &&
@@ -420,7 +420,7 @@ export default function BookingBoard({
               Beli 1 sesi di sini — {formatRupiah(selectedPool.singleSessionPrice)}
             </Button>
           ) : (
-            <Link href="/member/paket" className="shrink-0 font-medium underline">
+            <Link href="/member/paket" className="shrink-0 font-medium underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
               Lihat paket
             </Link>
           )}
@@ -575,8 +575,8 @@ export default function BookingBoard({
       )}
 
       {confirmBuy && selectedPool?.singleSessionPrice != null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="buy-title">
-          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-surface p-5 shadow-lg">
+        <div className="dialog-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="buy-title">
+          <div className="dialog-panel max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-surface p-5 shadow-lg">
             <h2 id="buy-title" className="text-lg font-semibold text-text">Beli 1 sesi di {selectedPool.name}?</h2>
             <p className="mt-1 text-2xl font-bold text-text">{formatRupiah(selectedPool.singleSessionPrice)}</p>
             <ul className="mt-3 flex list-disc flex-col gap-1 pl-5 text-sm text-text">

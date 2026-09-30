@@ -60,7 +60,7 @@ export function ChatWidget() {
         <div
           role="dialog"
           aria-label="Chat bantuan"
-          className="mb-3 flex h-[28rem] max-h-[70vh] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-xl sm:w-96"
+          className="dialog-panel mb-3 flex h-[28rem] max-h-[70vh] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-xl sm:w-96"
         >
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div>
