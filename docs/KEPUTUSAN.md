@@ -20,3 +20,4 @@ Arsip keputusan Hadi dan hal sensitif. TIDAK dimuat otomatis; dibaca bila perlu.
 - 1 Okt malam: Hadi tidak mau membuka GitHub sendiri; Claude yang cek GitHub Actions lewat gh. Pengecualian: membuat secret tetap dikerjakan Hadi.
 - 1 Okt malam: file HabasyGo yang ada di folder Krabat tidak dipindah (keputusan Hadi: "gausah"). Fakta SPH di bawah PT Makna Krabat Indonesia hanya di dokumen hukum dan memori SPH; dokumen Krabat tidak menyebut SPH (disetujui).
 - 1 Okt malam: cabang brand-guideline-v2 digabung ke cabang utama (disetujui); animasi dikerjakan landing page dulu, lalu dalam aplikasi.
+- 1 Okt malam: Claude tidak boleh mengganti model sesinya sendiri (alat ganti model menolak sesi sendiri). Jalur otomatis: skill dengan model opus dan asisten berkonteks segar dengan model pilihan; jalur manual: Hadi memilih di menu model.

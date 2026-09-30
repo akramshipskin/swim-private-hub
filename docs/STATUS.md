@@ -15,7 +15,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 1. Gabungkan cabang brand-guideline-v2 (2 commit aset resolusi tinggi, 34 file) ke cabang utama.
 2. Animasi landing page dulu (HP ringan: kartu dan section muncul; desktop lebih kaya: hover, muncul bertahap, video perenang di header). Sonnet High. Video: cari stok berlisensi, minta izin Hadi sebelum mengunduh (nama file, sumber, ukuran, lisensi). Ukur kecepatan sebelum dan sesudah.
 3. Setelah LP: animasi dalam aplikasi per peran (admin, coach, pemilik kolam, member), lebih halus.
-4. Uji jalur ganti model (skill sph-berisiko dengan model opus; alat ganti model sesi). Butuh persetujuan Hadi di aplikasi.
+4. Uji jalur ganti model otomatis: skill sph-berisiko (model opus) dan asisten Opus. Alat ganti model sesi sendiri TIDAK bisa (ditolak sistem); untuk kerjaan sensitif yang panjang, minta Hadi pilih Opus di menu model.
 5. Cek GitHub Actions sendiri lewat gh setelah tiap push; Hadi tidak perlu membuka GitHub.
 6. Ukur ulang simpan milestone di production (dulu ±6 detik).
 7. Rapikan draf Syarat & Ketentuan v2 lama yang masih bertanda "BELUM ADA DI SISTEM" (arsip, bukan yang live).
