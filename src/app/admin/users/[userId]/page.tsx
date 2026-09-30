@@ -16,6 +16,8 @@ import { roleLabel } from "@/lib/nav-links";
 import { deletionImpact } from "@/lib/account-deletion";
 import AnonymizeCard from "./anonymize-card";
 import ResetTotpButton from "./reset-totp-button";
+import { ConfirmSubmit } from "@/components/ui/confirm-submit";
+import { reviewCertificate } from "../certificate-actions";
 import { openSecret } from "@/lib/secret-box";
 
 export const metadata = { title: "Detail Pengguna | Swim Private Hub" };
@@ -194,6 +196,25 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                             c.name
                           )}
                           <Badge tone={certificateStatusBadge[c.status].tone}>{certificateStatusBadge[c.status].label}</Badge>
+                          {c.status === "PENDING" && (
+                            <span className="flex gap-2">
+                              <ConfirmSubmit
+                                action={reviewCertificate.bind(null, c.id, true)}
+                                label="Setujui"
+                                title={`Setujui sertifikat ${user.name}?`}
+                                description={`"${c.name}" langsung tampil di profil coach ini untuk semua orang, dengan badge "Bersertifikat".`}
+                                confirmLabel="Ya, setujui"
+                              />
+                              <ConfirmSubmit
+                                action={reviewCertificate.bind(null, c.id, false)}
+                                label="Tolak"
+                                variant="danger"
+                                title={`Tolak sertifikat ${user.name}?`}
+                                description={`"${c.name}" ditolak. Coach bisa menghapusnya dan mengunggah ulang.`}
+                                confirmLabel="Ya, tolak"
+                              />
+                            </span>
+                          )}
                         </li>
                       ))}
                     </ul>

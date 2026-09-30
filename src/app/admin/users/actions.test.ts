@@ -26,6 +26,7 @@ function makeTx() {
   };
 }
 
+const poolUpdateMany = vi.fn();
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     $transaction: (fn: (tx: unknown) => unknown) => fn(makeTx()),
@@ -35,7 +36,7 @@ vi.mock("@/lib/prisma", () => ({
       updateMany: (...args: unknown[]) => userUpdateMany(...args),
     },
     packageTemplate: { findMany: (...args: unknown[]) => packageTemplateFindMany(...args) },
-    pool: { count: (...args: unknown[]) => poolCount(...args) },
+    pool: { count: (...args: unknown[]) => poolCount(...args), updateMany: (...args: unknown[]) => poolUpdateMany(...args) },
   },
 }));
 
@@ -151,6 +152,22 @@ describe("toggleUserActive", () => {
     userUpdate.mockResolvedValueOnce({ role: "COACH" });
     await toggleUserActive("user-2", true);
     expect(userUpdateMany).toHaveBeenCalledWith({ where: { id: "user-2", approvedAt: null }, data: { approvedAt: expect.any(Date) } });
+  });
+
+  it("persetujuan PERTAMA pemilik kolam ikut menyalakan kolamnya; bukan yang pertama atau bukan pemilik kolam: tidak", async () => {
+    userUpdate.mockResolvedValueOnce({ role: "POOL_OWNER" });
+    userUpdateMany.mockResolvedValueOnce({ count: 1 });
+    await toggleUserActive("owner-1", true);
+    expect(poolUpdateMany).toHaveBeenCalledWith({ where: { isActive: false, ownerships: { some: { ownerId: "owner-1" } } }, data: { isActive: true } });
+
+    poolUpdateMany.mockClear();
+    userUpdate.mockResolvedValueOnce({ role: "POOL_OWNER" });
+    userUpdateMany.mockResolvedValueOnce({ count: 0 });
+    await toggleUserActive("owner-1", true);
+    userUpdate.mockResolvedValueOnce({ role: "COACH" });
+    userUpdateMany.mockResolvedValueOnce({ count: 1 });
+    await toggleUserActive("coach-1", true);
+    expect(poolUpdateMany).not.toHaveBeenCalled();
   });
 
   it("does not touch approval when deactivating", async () => {

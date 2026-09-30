@@ -358,7 +358,15 @@ export async function toggleUserActive(userId: string, nextActive: boolean) {
   // Aktifkan pertama kali = persetujuan pendaftaran (penanda "menunggu
   // persetujuan" di dashboard hilang). Tidak menimpa tanggal lama.
   if (nextActive) {
-    await prisma.user.updateMany({ where: { id: userId, approvedAt: null }, data: { approvedAt: new Date() } });
+    const firstApproval = await prisma.user.updateMany({ where: { id: userId, approvedAt: null }, data: { approvedAt: new Date() } });
+    // Pemilik kolam yang baru didaftarkan: kolamnya ikut dinyalakan (dulu admin
+    // harus klik Setujui dua kali, di Pengguna lalu di Kolam). Hanya saat
+    // persetujuan PERTAMA, jadi kolam yang sengaja dinonaktifkan nanti tidak
+    // ikut menyala saat pemilik diaktifkan ulang.
+    if (firstApproval?.count > 0 && user.role === "POOL_OWNER") {
+      await prisma.pool.updateMany({ where: { isActive: false, ownerships: { some: { ownerId: userId } } }, data: { isActive: true } });
+      revalidatePath("/admin/kolam");
+    }
   }
 
   // Coach dinonaktifkan: booking yang BELUM dimulai dibatalkan otomatis

@@ -7,6 +7,8 @@
  *      Rp750.000, jam buka 06.00-20.00, dan foto contoh.
  *   2. Beri foto contoh ke kolam contoh yang belum punya foto.
  *   3. Beri foto contoh ke coach contoh (email @example.com) yang belum punya foto.
+ *   4. Hubungkan tiap coach contoh ke tiap kolam contoh yang belum terhubung
+ *      (supaya kartu kolam di landing tidak menampilkan 0 coach).
  * Foto contoh = gambar ilustrasi di public/demo/ (bukan foto asli).
  *
  * Default = HANYA MENAMPILKAN rencana. Tambah --apply untuk menjalankan. Aman
@@ -94,6 +96,20 @@ console.log(`\n3. Coach contoh tanpa foto: ${demoCoaches.length}`);
 for (const [i, c] of demoCoaches.entries()) {
   console.log(`   - ${c.user.name} -> ${COACH_PHOTO(i)}`);
   if (apply) await prisma.coachProfile.update({ where: { id: c.id }, data: { photoUrl: COACH_PHOTO(i) } });
+}
+
+// 4. Afiliasi coach contoh <-> kolam contoh
+const demoCoachUsers = await prisma.user.findMany({
+  where: { role: "COACH", email: { endsWith: "@example.com", mode: "insensitive" } },
+  select: { id: true, name: true },
+});
+const demoPoolRows = await prisma.pool.findMany({ where: { name: { in: [...DEMO_POOL_NAMES] } }, select: { id: true, name: true } });
+const existingAff = new Set((await prisma.poolAffiliation.findMany({ select: { poolId: true, coachId: true } })).map((a) => `${a.poolId}:${a.coachId}`));
+const missingAff = demoPoolRows.flatMap((p) => demoCoachUsers.filter((c) => !existingAff.has(`${p.id}:${c.id}`)).map((c) => ({ poolId: p.id, coachId: c.id, label: `${c.name} -> ${p.name}` })));
+console.log(`\n4. Afiliasi coach contoh <-> kolam contoh yang belum ada: ${missingAff.length}`);
+for (const a of missingAff) console.log(`   - ${a.label}`);
+if (apply && missingAff.length) {
+  await prisma.poolAffiliation.createMany({ data: missingAff.map(({ poolId, coachId }) => ({ poolId, coachId })), skipDuplicates: true });
 }
 
 console.log(apply ? "\nSelesai." : "\nIni hanya rencana. Tambah --apply untuk menjalankan.");

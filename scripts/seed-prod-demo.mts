@@ -14,6 +14,7 @@
  *   DATABASE_URL="$PROD_DIRECT_URL" npx tsx scripts/seed-prod-demo.mts
  */
 import "dotenv/config";
+import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
@@ -65,7 +66,6 @@ const POOL_INFO = [
 const NADIA = {
   name: "Nadia Puspita",
   email: "nadia.coach@example.com",
-  password: "qwertyuiop",
   birthDate: "1994-06-08",
   gender: "FEMALE",
   bio: "Coach renang spesialis anak usia dini dan kelas perempuan.",
@@ -123,7 +123,9 @@ async function main() {
     throw new Error(`Data berikut tidak ditemukan di DB tujuan:\n- ${missing.join("\n- ")}`);
   }
 
-  const passwordHash = await bcrypt.hash(NADIA.password, 10);
+  // Password acak yang tidak diketahui siapa pun (akun demo tidak untuk login; 30 Sep:
+  // dulu password tetap tertanam di berkas ini).
+  const passwordHash = await bcrypt.hash(randomBytes(32).toString("hex"), 10);
   const nadia = await prisma.user.upsert({
     where: { email: NADIA.email },
     update: {},
@@ -144,7 +146,6 @@ async function main() {
       specialties: [...NADIA.specialties],
       hasCertification: true,
       certificationNote: NADIA.certificationNote,
-      certificateStatus: "APPROVED",
     },
     create: {
       userId: nadia.id,
@@ -154,8 +155,14 @@ async function main() {
       specialties: [...NADIA.specialties],
       hasCertification: true,
       certificationNote: NADIA.certificationNote,
-      certificateStatus: "APPROVED",
     },
+  });
+  // Sertifikat (tabel CoachCertificate, tanpa file: akun demo). Idempoten lewat id tetap.
+  const nadiaProfile = await prisma.coachProfile.findUniqueOrThrow({ where: { userId: nadia.id }, select: { id: true } });
+  await prisma.coachCertificate.upsert({
+    where: { id: `demo-cert-${nadiaProfile.id}` },
+    update: {},
+    create: { id: `demo-cert-${nadiaProfile.id}`, coachProfileId: nadiaProfile.id, name: NADIA.certificationNote, status: "APPROVED", reviewedAt: new Date() },
   });
   for (const pool of nadiaPools) {
     await prisma.poolAffiliation.upsert({
