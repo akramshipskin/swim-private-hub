@@ -102,7 +102,7 @@ describe("checkout paket pilih coach", () => {
     const res = await POST(buy({ sesi: 1 }));
     expect(res.status).toBe(200);
     expect(packageCreate).toHaveBeenCalledWith({
-      data: expect.objectContaining({ totalSesi: 1, isTrial: true, poolPrice: 65_000, coachPrice: 110_000, serviceFee: 11_375, durationDays: 14, jatahCancel: 1 }),
+      data: expect.objectContaining({ totalSesi: 1, isTrial: true, poolPrice: 65_000, coachPrice: 110_000, serviceFee: 11_375, durationDays: 7, jatahCancel: 0 }),
     });
     expect(paymentCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ amount: 186_375 }) });
 

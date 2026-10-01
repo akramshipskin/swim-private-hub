@@ -7,13 +7,13 @@ import { NO_SHOW_COACH_SHARE_PERCENT } from "@/lib/policy";
 export const PACK_SIZES = [4, 8] as const;
 export type PackSize = (typeof PACK_SIZES)[number];
 
-// 4 sesi = 2 bulan, 8 sesi = 3 bulan (Hadi 2 Okt). Sesi coba ikut masa
-// berlaku paket 1 sesi lama.
+// 4 sesi = 2 bulan, 8 sesi = 3 bulan, sesi coba 7 hari (Hadi 2 Okt).
 export const PACK_DURATION_DAYS: Record<PackSize, number> = { 4: 60, 8: 90 };
-export const TRIAL_DURATION_DAYS = 14;
-// Jatah batal mandiri: bawaan katalog lama (2x), sesi coba 1x.
-export const PACK_CANCEL_QUOTA = 2;
-export const TRIAL_CANCEL_QUOTA = 1;
+export const TRIAL_DURATION_DAYS = 7;
+// Jatah batal mandiri (Hadi 2 Okt): paket 4 = 2x, paket 8 = 4x. Sesi coba
+// tidak bisa dibatalkan sendiri (tidak hadir = hangus), hanya lewat admin.
+export const PACK_CANCEL_QUOTA: Record<PackSize, number> = { 4: 2, 8: 4 };
+export const TRIAL_CANCEL_QUOTA = 0;
 
 // Biaya layanan SPH dalam basis poin (650 = 6,5%). Dikunci di bawah 7% supaya
 // kalimat "biaya layanan di bawah 7%" selalu benar.
@@ -60,7 +60,7 @@ function build(totalSesi: number, poolPrice: number, coachPrice: number, feeBps:
     serviceFee,
     total: poolPrice + coachPrice + serviceFee,
     durationDays: isTrial ? TRIAL_DURATION_DAYS : PACK_DURATION_DAYS[totalSesi as PackSize],
-    jatahCancel: isTrial ? TRIAL_CANCEL_QUOTA : PACK_CANCEL_QUOTA,
+    jatahCancel: isTrial ? TRIAL_CANCEL_QUOTA : PACK_CANCEL_QUOTA[totalSesi as PackSize],
     isTrial,
   };
 }

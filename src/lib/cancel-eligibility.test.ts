@@ -65,4 +65,9 @@ describe("evaluateCancelEligibility", () => {
     });
     expect(result.canCancel).toBe(false);
   });
+  it("sesi coba (jatah 0) tidak bisa dibatalkan sendiri, dengan pesan khusus", () => {
+    const r = evaluateCancelEligibility({ quota: 0, used: 0, startTime: new Date(Date.now() + 48 * 3600e3) });
+    expect(r.canCancel).toBe(false);
+    expect(r.reason).toMatch(/Sesi coba tidak bisa dibatalkan sendiri/);
+  });
 });

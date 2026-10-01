@@ -261,7 +261,7 @@ export default async function MemberPaketPage() {
                         {[
                           ...(eight ? [{ q: eight, label: "Paket 8 sesi", note: saving > 0 ? `Hemat ${saving}% per sesi dibanding paket 4` : null }] : []),
                           ...(four ? [{ q: four, label: "Paket 4 sesi", note: null }] : []),
-                          ...(trial && trialChildren.length > 0 ? [{ q: trial, label: "Sesi coba", note: "Sekali per peserta, untuk peserta yang belum pernah punya paket." }] : []),
+                          ...(trial && trialChildren.length > 0 ? [{ q: trial, label: "Sesi coba", note: "Sekali per peserta yang belum pernah punya paket. Tidak bisa dibatalkan sendiri; tidak hadir = hangus." }] : []),
                         ].map(({ q, label, note }) => (
                           <li key={label} className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
                             <div className="flex items-start justify-between gap-2">
@@ -289,7 +289,7 @@ export default async function MemberPaketPage() {
                             <ul className="flex flex-wrap gap-1.5">
                               <li><Badge tone="brand">{q.totalSesi} sesi les</Badge></li>
                               <li><Badge tone="neutral">Berlaku {q.durationDays} hari</Badge></li>
-                              <li><Badge tone="neutral">Jatah batal {q.jatahCancel}×</Badge></li>
+                              <li><Badge tone="neutral">{q.jatahCancel > 0 ? `Jatah batal ${q.jatahCancel}×` : "Tidak bisa dibatalkan"}</Badge></li>
                             </ul>
                             <div className="mt-auto pt-1">
                               {note && <p className="mb-2 text-xs text-text-muted">{note}</p>}

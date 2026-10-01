@@ -37,6 +37,16 @@ export function evaluateCancelEligibility({
     };
   }
 
+  // Sesi coba (jatah 0, Hadi 2 Okt): tidak bisa dibatalkan sendiri.
+  if (quota === 0) {
+    return {
+      canCancel: false,
+      reason: "Sesi coba tidak bisa dibatalkan sendiri; tidak hadir = sesi hangus. Hubungi admin kalau ada keadaan khusus.",
+      used,
+      quota,
+    };
+  }
+
   if (used >= quota) {
     return {
       canCancel: false,

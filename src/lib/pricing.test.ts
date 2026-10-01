@@ -18,10 +18,10 @@ const coach = { pricePack4: 440_000, pricePack8: 800_000 };
 describe("packQuote", () => {
   it("contoh rancangan: paket 8 = 480.000 + 800.000 + 6,5%", () => {
     const q = packQuote(pool, coach, 8)!;
-    expect(q).toMatchObject({ poolPrice: 480_000, coachPrice: 800_000, serviceFee: 83_200, total: 1_363_200, durationDays: 90, isTrial: false });
+    expect(q).toMatchObject({ poolPrice: 480_000, coachPrice: 800_000, serviceFee: 83_200, total: 1_363_200, durationDays: 90, jatahCancel: 4, isTrial: false });
   });
   it("paket 4 berlaku 60 hari", () => {
-    expect(packQuote(pool, coach, 4)!.durationDays).toBe(60);
+    expect(packQuote(pool, coach, 4)).toMatchObject({ durationDays: 60, jatahCancel: 2 });
   });
   it("null bila kolam atau coach belum memasang harga", () => {
     expect(packQuote({ ...pool, pricePack8: null }, coach, 8)).toBeNull();
@@ -33,7 +33,7 @@ describe("packQuote", () => {
 describe("trialQuote", () => {
   it("per sesi paket 4 kolam + coach + biaya layanan", () => {
     const q = trialQuote(pool, coach)!;
-    expect(q).toMatchObject({ totalSesi: 1, poolPrice: 65_000, coachPrice: 110_000, serviceFee: 11_375, total: 186_375, isTrial: true, jatahCancel: 1 });
+    expect(q).toMatchObject({ totalSesi: 1, poolPrice: 65_000, coachPrice: 110_000, serviceFee: 11_375, total: 186_375, isTrial: true, jatahCancel: 0, durationDays: 7 });
   });
   it("null tanpa harga paket 4", () => {
     expect(trialQuote({ ...pool, pricePack4: null }, coach)).toBeNull();
