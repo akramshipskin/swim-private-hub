@@ -10,19 +10,21 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - 1 Okt malam: animasi landing tahap 2 (bug bagian kosong saat "kurangi gerakan" diperbaiki), animasi dalam aplikasi tahap 3 (4 peran), sweeping UI+sistem pertama. docs/reviews/2026-10-01-sweeping-ui-sistem.md.
 - 2 Okt (Opus): animasi landing v2 bertema air (riak, judul muncul dari air, gelombang, HP miring, perenang di lintasan, coretan cara lama, parallax, sorotan, tombol magnetis) + video perenang desktop. Situs asli: elemen terbesar HP 0,93 dtk (awal 2,37). docs/reviews/2026-10-01-animasi-landing.md bagian v2.
 - 2 Okt (Opus): kunci pembatas login diringkas; batas nama 100 di semua jalur akun/peserta (diperiksa Opus kedua); audit buku besar + aksi uang lewat tampilan + 146 tes balapan: cocok/lulus; sweeping ulang + konsistensi gaya. docs/reviews/2026-10-02-sweeping-opus.md.
-- Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang, render-brand-social.
+- 2 Okt (Opus): HARGA DARI COACH tahap 1+2 live. Kolam (tiket) & coach (jasa) pasang harga paket 4 sesi (60 hari, batal 2x) / 8 sesi (90 hari, batal 4x); member bayar + biaya layanan SPH 6,5% (maks 6,9%); sesi coba 7 hari, tidak bisa dibatalkan sendiri; eceran & kartu kredit dihapus; paket terikat coach; bagi uang per rupiah + PPh 0,5% (titipan, bukan pendapatan SPH); saldo member; ganti coach lewat pengajuan + admin (menu Ganti Coach); catat setor PPh (Bagi Hasil). Harga dummy production diisi (kolam 260/480rb, coach 440/800rb). Rancangan: docs/designs/harga-dari-coach.md.
+- Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja, Hadi), isi-harga-dummy (production: HARGA_DUMMY_PROD=1, Hadi), render-brand-social.
 
 ## Sedang jalan
-- Harga dari coach tahap 1 LIVE (2 Okt). Tahap 2 (saldo member, ganti coach, catat setor PPh) LIVE. Berikutnya tahap 3 (teks S&K, orang hukum). Diuji: 725 tes, 160 tes balapan, alur browser lokal, pemeriksa Opus kedua (temuan dibetulkan).
+- Tidak ada. Harga dari coach tahap 1-2 live (diuji: 725 tes, 160 tes balapan, alur browser lokal, 2 putaran pemeriksa Opus kedua). Jalur bayar Midtrans (beli & tambah bayar ganti coach) belum diklik di laptop maupun production.
 
 ## Tugas Claude berikutnya
-1. Revisi animasi sesuai masukan Hadi per bagian; ukur ulang sebelum/sesudah.
-2. Cek GitHub Actions dan situs asli setelah tiap push.
-3. Audit buku besar production: dijalankan Hadi 2 Okt, semua cocok (5 kolam, 5 coach, 1 sesi berbayar, 0 pencairan). Ulangi setelah ada transaksi asli (AUDIT_PROD=1, baca-saja).
-4. Harga dari coach: setelah migrasi production -> push, cek GitHub & situs asli; lalu tahap 2 (saldo member + pengajuan ganti coach), tahap 3 (S&K, perlu orang hukum).
+1. Harga dari coach tahap 3: teks Syarat & Ketentuan baru (harga dari coach, saldo member, ganti coach, sesi coba tidak bisa dibatalkan, PPh 0,5%) -> Hadi kirim ke orang hukum.
+2. Ubah 2 isian sementara tahap 2 bila Hadi pilih B.
+3. Tugas terpisah: indeks EmailThread hilang dari schema (selalu muncul DROP INDEX di migrasi baru; buang manual sampai dibetulkan).
+4. Animasi landing v2: revisi sesuai masukan Hadi (ditunda atas permintaan Hadi).
+5. Audit buku besar production diulang setelah ada transaksi asli (2 Okt: cocok). Cek GitHub & situs asli setelah tiap push.
 
 ## Tugas Hadi
-1. Jawab 2 aturan sisa tahap 2 (uang ganti coach gagal, setoran PPh vs tanda hadir dibalik). Animasi landing v2 ditunda.
+1. Jawab 2 aturan sisa tahap 2 (uang ganti coach gagal -> saldo atau rekening; setoran PPh vs tanda hadir dibalik). Cek menu Paket (member) & Ganti Coach (admin) di production.
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
@@ -34,4 +36,5 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - HP asli dan Safari (landing, animasi, aplikasi); notifikasi push; unggah file ke penyimpanan asli; email; pembayaran asli sampai paket aktif; buku besar production; tampilan halaman yang butuh login di production.
 
 ## Catatan lingkungan lokal
+- Port 3100 di laptop dipakai server Next lain (bukan dari Claude, tidak dimatikan); uji Claude pakai konfigurasi swim-private-hub-dev-3102. Data uji harga-coach lokal: paket uji-hdc-*, saldo Member 8, pengajuan ganti coach Coach 4 -> Coach 5.
 - Akun admin lokal (089900000001) sekarang ber-2FA; kode lewat scripts/qa-otp.mts. Data uji lokal: Kolam Bahari 0/60 (uji 30 Sep), 5 sesi Hadir tanpa uang (pembayaran disisipkan belakangan), saldo kolam/coach berubah karena uji aksi uang 2 Okt.
