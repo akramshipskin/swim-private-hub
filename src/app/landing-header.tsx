@@ -31,10 +31,10 @@ export function LandingHeader() {
           <Logotype className="text-sm sm:text-xl" />
         </Link>
         <nav aria-label="Navigasi utama" className="hidden items-center gap-7 text-sm font-medium md:flex">
-          <a href="#kolam" className="hover:underline">Kolam</a>
-          <a href="#coach" className="hover:underline">Coach</a>
-          <a href="#cara-kerja" className="hover:underline">Cara Kerja</a>
-          <a href="#faq" className="hover:underline">FAQ</a>
+          <a href="#kolam" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">Kolam</a>
+          <a href="#coach" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">Coach</a>
+          <a href="#cara-kerja" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">Cara Kerja</a>
+          <a href="#faq" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">FAQ</a>
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Masuk</Link>

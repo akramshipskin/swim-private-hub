@@ -93,7 +93,7 @@ export default async function PembayaranSuksesPage({
           </h1>
           <p className="mb-6 text-sm text-text-muted">
             {isFailed
-              ? "Pembayaran dibatalkan atau gagal diproses. Belum ada saldo yang terpotong — kamu bisa coba lagi kapan saja."
+              ? "Pembayaran dibatalkan atau belum diselesaikan. Saldo SPH yang sempat terpakai kembali otomatis bila pembayaran tidak selesai. Lanjutkan dari menu Paket dalam 24 jam, atau beli lagi kapan saja."
               : isUnknown
                 ? "Status pembayaranmu bisa dilihat di halaman Paket Saya. Paket aktif otomatis begitu pembayaran masuk."
                 : isPending

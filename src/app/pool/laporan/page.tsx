@@ -193,7 +193,39 @@ export default async function PoolLaporanPage({
                   </CardBody>
                 </Card>
               ) : (
-                <Card>
+                <>
+                {/* HP: satu kartu per sesi supaya angka uangnya tidak terpotong ke kanan. */}
+                <ul className="flex flex-col gap-3 sm:hidden">
+                  {rows.map((r) => (
+                    <li key={r.booking.id}>
+                      <Card>
+                        <CardBody className="py-4">
+                          <p className="text-sm font-medium text-text">
+                            {formatDateLabel(r.booking.availability.date)} · {formatTimeWib(r.booking.availability.startTime)}&ndash;{formatTimeWib(r.booking.availability.endTime)}
+                          </p>
+                          <p className="mt-0.5 text-xs text-text-subtle">
+                            {r.booking.availability.coach.name} · {r.booking.package.dependent.name}
+                          </p>
+                          <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3 text-xs">
+                            <div>
+                              <dt className="text-text-subtle">Bagian kolam</dt>
+                              <dd className="mt-0.5 font-mono text-sm text-text">{formatRupiah(r.poolAmount)}</dd>
+                            </div>
+                            <div>
+                              <dt className="text-text-subtle">PPh 0,5%</dt>
+                              <dd className="mt-0.5 font-mono text-sm text-text-muted">{r.pph > 0 ? <>&minus;{formatRupiah(r.pph)}</> : "–"}</dd>
+                            </div>
+                            <div>
+                              <dt className="text-text-subtle">Masuk saldo</dt>
+                              <dd className="mt-0.5 font-mono text-sm font-semibold text-text">{formatRupiah(r.netAmount)}</dd>
+                            </div>
+                          </dl>
+                        </CardBody>
+                      </Card>
+                    </li>
+                  ))}
+                </ul>
+                <Card className="max-sm:hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
@@ -231,6 +263,7 @@ export default async function PoolLaporanPage({
                     </table>
                   </div>
                 </Card>
+                </>
               )}
             </div>
           );

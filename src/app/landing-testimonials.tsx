@@ -14,7 +14,11 @@ export function TestimonialsSection({ items }: { items: Testimonial[] }) {
   const single = items.length === 1;
 
   return (
-    <section id="testimoni" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-lime-100 py-14 sm:py-20">
+    <section id="testimoni" className="relative isolate mb-14 scroll-mt-36 overflow-hidden bg-fixed-lime-100 py-14 sm:mb-20 sm:py-20 md:scroll-mt-20">
+      {/* Tanda kutip besar di belakang teks (desktop): melayang pelan saat scroll. */}
+      <span aria-hidden="true" className="fx-quote pointer-events-none absolute -top-10 right-10 -z-10 hidden select-none text-[22rem] font-semibold leading-none text-fixed-lime-500/25 lg:block">
+        &rdquo;
+      </span>
       <div className="mx-auto w-full max-w-6xl px-4">
         <Reveal>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">Kata mereka</h2>

@@ -28,7 +28,7 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
       </div>
       <ol role="tabpanel" className="grid gap-0 lg:grid-cols-4 lg:gap-8">
         {current.steps.map((s, i) => (
-          <li key={s.title} className="relative pb-9 pl-14 last:pb-0 lg:pb-0 lg:pl-0 lg:pt-14">
+          <li key={s.title} className="fx-step relative pb-9 pl-14 last:pb-0 lg:pb-0 lg:pl-0 lg:pt-14">
             <span className="absolute left-0 top-0 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-fixed-lime-500 text-sm font-bold text-fixed-ink">
               {i + 1}
             </span>
@@ -73,7 +73,7 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
       </div>
       <div role="tabpanel" className="flex flex-col divide-y divide-fixed-ink/10 border-y border-fixed-ink/10">
         {current.items.map((item) => (
-          <details key={item.q} className="group py-5">
+          <details key={item.q} className="fx-faq group py-5">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold marker:content-none max-sm:min-h-[44px]">
               {item.q}
               <span aria-hidden="true" className="text-2xl leading-none transition-transform group-open:rotate-45">

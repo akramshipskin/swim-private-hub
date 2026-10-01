@@ -42,8 +42,9 @@ export default function PembayaranGagalPage() {
             Pembayaran Belum Selesai
           </h1>
           <p className="mb-6 text-sm text-text-muted">
-            Pembayaran dibatalkan atau gagal diproses. Belum ada saldo yang
-            terpotong — kamu bisa coba lagi kapan saja.
+            Pembayaran dibatalkan atau belum diselesaikan. Saldo SPH yang sempat
+            terpakai kembali otomatis bila pembayaran tidak selesai. Lanjutkan
+            dari menu Paket dalam 24 jam, atau beli lagi kapan saja.
           </p>
           <div className="flex w-full flex-col gap-2">
             <Link href="/member/paket" className={buttonClass({ className: "w-full" })}>

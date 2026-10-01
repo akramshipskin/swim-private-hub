@@ -689,3 +689,220 @@ body {
     transition-delay: 0s !important;
   }
 }
+
+/* ===== Gerak landing v3 (2 Okt, Sonnet): desktop saja =====
+   Tiap section punya gerak sendiri. Semua di dalam media "desktop + hover +
+   tanpa kurangi gerakan", hanya transform/opacity/warna (ringan), tanpa loop
+   kecuali satu denyut tombol penutup. HP tidak mendapat satu pun dari ini. */
+@keyframes sph-pop-in {
+  from {
+    opacity: 0.2;
+    transform: scale(0.72);
+  }
+}
+@keyframes sph-quote-drift {
+  from {
+    transform: translateY(60px);
+  }
+  to {
+    transform: translateY(-40px);
+  }
+}
+@keyframes sph-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(1.35, 1.7);
+    opacity: 0;
+  }
+}
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* Menu header: garis lime tumbuh dari kiri. */
+  .fx-nav {
+    background: linear-gradient(var(--color-fixed-lime), var(--color-fixed-lime)) left bottom / 0% 2px no-repeat;
+    padding-bottom: 3px;
+    transition: background-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fx-nav:hover {
+    background-size: 100% 2px;
+    text-decoration: none;
+  }
+
+  /* Bilah fakta: garis lime di atas tiap poin tumbuh saat disorot. */
+  .fx-fact {
+    position: relative;
+    transition: background-color 0.3s ease;
+  }
+  .fx-fact::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--color-fixed-lime-500);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fx-fact:hover {
+    background-color: rgb(255 255 255 / 0.55);
+  }
+  .fx-fact:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* Pilih peran: teks bergeser ke kanan mengikuti panah. */
+  .fx-role {
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .group:hover .fx-role {
+    transform: translateX(0.75rem);
+  }
+
+  /* Tabel dulu-sekarang: baris yang disorot menegas, kolom baru bergeser. */
+  .fx-row .ba-new {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease;
+  }
+  .fx-row:hover .ba-new {
+    transform: translateX(6px);
+    background-color: var(--color-fixed-lime-100);
+  }
+
+  /* Poin orang tua: garis atas jadi tebal lime dari kiri, judul naik sedikit. */
+  .fx-point {
+    position: relative;
+  }
+  .fx-point::before {
+    content: "";
+    position: absolute;
+    inset: -1px 0 auto 0;
+    height: 3px;
+    background: var(--color-fixed-lime-500);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fx-point:hover::before {
+    transform: scaleX(1);
+  }
+  .fx-point h3 {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fx-point:hover h3 {
+    transform: translateY(-2px);
+  }
+
+  /* Tiga layar HP bertumpuk: miring sedikit, yang disorot berdiri tegak dan naik. */
+  .fx-shot {
+    rotate: var(--r, 0deg);
+    transition: rotate 0.5s cubic-bezier(0.22, 1, 0.36, 1), translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fx-shot:hover {
+    rotate: 0deg;
+    translate: 0 -14px;
+    z-index: 20;
+  }
+
+  /* Chip fasilitas kolam. */
+  .fx-chip {
+    transition: transform 0.25s ease, background-color 0.25s ease;
+  }
+  .fx-chip:hover {
+    transform: translateY(-2px);
+    background-color: var(--color-fixed-lime-100);
+  }
+
+  /* Sel bento coach: terangkat saat disorot. */
+  .fx-cell {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+  }
+  .fx-cell:hover {
+    transform: translateY(-5px);
+  }
+
+  /* Cara kerja: lingkaran nomor membesar, judul langkah bergeser. */
+  .fx-step > span:first-child {
+    transition: scale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+  }
+  .fx-step:hover > span:first-child {
+    scale: 1.18;
+    background-color: var(--color-fixed-lime);
+  }
+
+  /* FAQ: pertanyaan yang disorot bergeser sedikit. */
+  .fx-faq summary {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fx-faq summary:hover {
+    transform: translateX(6px);
+  }
+
+  /* Tombol penutup: cincin lime berdenyut pelan di luar tombol. */
+  .fx-pulse {
+    position: relative;
+  }
+  .fx-pulse::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    border: 2px solid var(--color-fixed-lime);
+    pointer-events: none;
+    animation: sph-pulse-ring 2.8s ease-out infinite;
+  }
+  .fx-pulse:hover::after {
+    animation-play-state: paused;
+    opacity: 0;
+  }
+
+  /* Logo pembayaran dan tautan footer. */
+  .fx-logo {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .fx-logo:hover {
+    transform: scale(1.14);
+  }
+  .fx-link {
+    background: linear-gradient(currentColor, currentColor) left bottom / 0% 1px no-repeat;
+    transition: background-size 0.3s ease, color 0.2s ease;
+  }
+  .fx-link:hover {
+    background-size: 100% 1px;
+    text-decoration: none;
+  }
+}
+
+/* Terhubung ke scroll (browser yang mendukung saja): desktop. */
+@supports (animation-timeline: view()) {
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    /* Angka besar "50%": membesar dari kecil saat section masuk layar. */
+    .fx-num {
+      transform-origin: left bottom;
+      animation: sph-pop-in linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 40%;
+    }
+    /* Garis judul kelompok pemilik kolam tergambar saat masuk layar. */
+    .fx-draw {
+      position: relative;
+    }
+    .fx-draw::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 -2px 0;
+      height: 2px;
+      background: var(--color-fixed-lime-500);
+      transform-origin: left;
+      animation: sph-grow-x linear both;
+      animation-timeline: view();
+      animation-range: entry 30% cover 35%;
+    }
+    /* Tanda kutip besar di belakang testimoni melayang pelan berlawanan arah scroll. */
+    .fx-quote {
+      animation: sph-quote-drift linear both;
+      animation-timeline: view();
+    }
+  }
+}

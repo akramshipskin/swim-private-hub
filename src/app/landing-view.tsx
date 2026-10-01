@@ -63,9 +63,9 @@ const AUDIENCES: AudienceSteps[] = [
     label: "Orang tua / peserta",
     steps: [
       { title: "Daftar & tambah peserta", body: "Satu akun untuk kamu sendiri dan/atau beberapa anak. Setiap peserta punya paket dan sisa sesi sendiri." },
-      { title: "Beli paket di kolam pilihan", body: "Bayar online lewat Midtrans. Paket langsung aktif dan berlaku di kolam tempat paket dibeli." },
-      { title: "Booking coach & jam", body: "Pilih coach dan jam yang masih kosong. Slot yang sudah diambil orang lain otomatis terkunci." },
-      { title: "Datang & les", body: `Tidak bisa datang? Batalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelumnya, sesi kembali ke paket.` },
+      { title: "Pilih coach & kolam, lalu beli paket", body: "Harga tampil rinci sebelum bayar: tiket kolam, jasa coach, dan biaya layanan SPH. Belum yakin? Mulai dari 1 sesi coba. Bayar online lewat Midtrans (saldo di akunmu dipakai dulu), paket langsung aktif." },
+      { title: "Booking jam yang masih kosong", body: "Pilih jam dari jadwal coach pilihanmu. Slot yang sudah diambil orang lain otomatis terkunci." },
+      { title: "Datang & les", body: `Tidak bisa datang? Batalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelumnya, sesi kembali ke paket. Perkembangan anak dicatat coach setelah sesi.` },
     ],
   },
   {
@@ -73,9 +73,9 @@ const AUDIENCES: AudienceSteps[] = [
     label: "Coach",
     steps: [
       { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, unggah foto dan sertifikat (boleh lebih dari satu) untuk badge Bersertifikat." },
-      { title: "Buka jadwal per kolam", body: "Tentukan tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
+      { title: "Pasang harga & buka jadwal", body: "Tentukan harga paket 4 dan 8 sesimu sendiri, lalu buka tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
       { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi, lalu isi catatan perkembangan (milestone) peserta." },
-      { title: "Cairkan saldo", body: "Komisimu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening." },
+      { title: "Cairkan saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening." },
     ],
   },
   {
@@ -102,6 +102,14 @@ const FAQ_GROUPS: FaqGroup[] = [
         a: "Tidak perlu. Swim Private Hub berbasis web, cukup dibuka lewat browser HP atau komputer. Bisa juga ditambahkan ke layar utama HP supaya terbuka seperti aplikasi.",
       },
       {
+        q: "Berapa biayanya, dan apa saja yang dibayar?",
+        a: "Harga paket = tiket masuk kolam + jasa coach + biaya layanan SPH (di bawah 7%). Rinciannya tampil sebelum kamu bayar. Paket 4 sesi berlaku 60 hari, paket 8 sesi berlaku 90 hari (lebih hemat per sesi).",
+      },
+      {
+        q: "Bisa coba 1 sesi dulu?",
+        a: "Bisa, untuk peserta yang belum pernah punya paket: satu kali per peserta, berlaku 7 hari. Sesi coba tidak bisa dibatalkan sendiri, jadi pilih jam yang pasti bisa hadir.",
+      },
+      {
         q: "Paket bisa dipakai di kolam mana saja?",
         a: "Paket dibeli dengan memilih kolam dan coach, dan berlaku untuk coach itu di kolam itu. Mau les di kolam atau dengan coach lain, beli paket untuk pilihan tersebut.",
       },
@@ -119,7 +127,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Bagaimana kalau batal mendadak?",
-        a: `Setiap paket punya jatah pembatalan mandiri, paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal. Di luar itu bisa menghubungi admin lewat tombol bantuan di aplikasi. Tidak hadir tanpa membatalkan berarti sesi tetap terpakai. Kalau ditandai Tidak Hadir padahal hadir, laporkan dari menu Riwayat paling lambat 3 hari setelah sesi.`,
+        a: `Paket 4 sesi punya jatah batal 2 kali dan paket 8 sesi 4 kali, paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal; sesinya kembali ke paket. Di luar itu bisa menghubungi admin lewat tombol bantuan di aplikasi. Tidak hadir tanpa membatalkan berarti sesi tetap terpakai. Kalau ditandai Tidak Hadir padahal hadir, laporkan dari menu Riwayat paling lambat 3 hari setelah sesi.`,
       },
       {
         q: "Kalau coach berhalangan, sesinya hangus?",
@@ -127,7 +135,11 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Pembayarannya lewat apa?",
-        a: "Lewat Midtrans: virtual account bank, QRIS, atau e-wallet. Paket aktif otomatis setelah pembayaran masuk.",
+        a: "Lewat Midtrans: virtual account bank, QRIS, atau e-wallet. Kalau akunmu punya saldo, saldo dipakai dulu dan sisanya dibayar lewat Midtrans. Paket aktif otomatis setelah pembayaran masuk.",
+      },
+      {
+        q: "Kalau tidak cocok dengan coach-nya?",
+        a: "Ajukan ganti coach dari menu Paket; sisa sesi ikut pindah ke coach baru setelah disetujui admin. Kalau coach baru lebih murah, selisihnya masuk ke saldomu. Kalau lebih mahal, kamu menambah selisihnya.",
       },
       {
         q: "Apakah coach-nya bersertifikat?",
@@ -153,11 +165,11 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Bisa mengajar di lebih dari satu kolam?",
-        a: "Bisa. Jadwal dibuka per kolam, dan sistem mencegah kamu membuka jam yang bentrok antar kolam.",
+        a: "Bisa. Jadwal dibuka per kolam, hargamu sama di semua kolam, dan sistem mencegah kamu membuka jam yang bentrok antar kolam.",
       },
       {
         q: "Kapan bagian saya masuk?",
-        a: "Tandai kehadiran paling lambat 24 jam setelah sesi selesai. Sesi Hadir langsung menambah saldo kamu sebesar harga paketmu dibagi jumlah sesinya. Kalau peserta sudah booking tapi tidak datang, tandai Tidak Hadir: kamu tetap dapat 50% dari bagianmu.",
+        a: "Tandai kehadiran paling lambat 24 jam setelah sesi selesai. Sesi Hadir langsung menambah saldo kamu sebesar harga paketmu dibagi jumlah sesinya. Kalau peserta sudah booking tapi tidak datang, tandai Tidak Hadir: kamu tetap dapat 50% dari bagianmu. Bagianmu dipotong PPh final 0,5% yang disetor SPH atas namamu, kecuali kamu menyerahkan surat pernyataan omzet di bawah Rp500 juta setahun.",
       },
       {
         q: "Cara mencairkan saldo?",
@@ -165,7 +177,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kalau saya tidak bisa mengajar?",
-        a: "Batalkan sesinya dari menu Jadwal. Sisa sesi member otomatis kembali dan member mendapat notifikasi, jadi tidak ada yang dirugikan diam-diam.",
+        a: "Batalkan sesinya dari menu Jadwal. Sisa sesi member otomatis kembali dan member mendapat notifikasi, jadi tidak ada yang dirugikan diam-diam. Jam itu ditutup untuk booking baru; kalau ternyata bisa mengajar, kamu bisa membukanya lagi.",
       },
       {
         q: "Saya bisa menentukan tarif saya sendiri?",
@@ -330,9 +342,9 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
             { t: "60 menit, 1 coach", d: "Untuk 1 anak, bukan kelas gabungan." },
             { t: "Tiket masuk termasuk", d: "Peserta tidak membayar lagi di loket." },
             { t: "Sertifikat diperiksa", d: "Badge Bersertifikat tampil setelah admin menyetujui." },
-            { t: "Bayar online", d: "QRIS, virtual account, atau e-wallet." },
+            { t: "Harga jelas di depan", d: "Tiket, jasa coach, dan biaya layanan tampil sebelum bayar." },
           ].map((f, i) => (
-            <li key={f.t} className={`px-4 py-6 lg:py-8 ${i % 2 === 1 ? "border-l border-fixed-ink/10" : ""} ${i > 1 ? "border-t border-fixed-ink/10 lg:border-t-0" : ""} ${i > 0 ? "lg:border-l lg:border-fixed-ink/10" : ""}`}>
+            <li key={f.t} className={`fx-fact px-4 py-6 lg:py-8 ${i % 2 === 1 ? "border-l border-fixed-ink/10" : ""} ${i > 1 ? "border-t border-fixed-ink/10 lg:border-t-0" : ""} ${i > 0 ? "lg:border-l lg:border-fixed-ink/10" : ""}`}>
               <Reveal delay={i * 70}>
                 <p className="text-lg font-semibold leading-snug sm:text-xl">{f.t}</p>
                 <p className="mt-1 text-sm text-fixed-muted">{f.d}</p>
@@ -445,7 +457,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
                         <p className="mb-2 text-sm text-fixed-muted">Fasilitas</p>
                         <ul className="flex flex-wrap gap-1.5">
                           {p.facilities.map((f) => (
-                            <li key={f} className="rounded-full bg-fixed-cream px-3 py-1 text-sm">{f}</li>
+                            <li key={f} className="fx-chip rounded-full bg-fixed-cream px-3 py-1 text-sm">{f}</li>
                           ))}
                         </ul>
                       </div>
@@ -537,7 +549,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
         <Reveal className="mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 py-14 sm:flex-row sm:items-center sm:justify-between sm:py-20">
           <h2 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">Mulai les renang minggu ini</h2>
           <Magnetic>
-            <Link href="/register" className="inline-flex shrink-0 items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
+            <Link href="/register" className="fx-pulse inline-flex shrink-0 items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
               Daftar gratis
             </Link>
           </Magnetic>
@@ -554,7 +566,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
                   <span
                     role="img"
                     aria-label={m.label}
-                    className="block h-5 w-16 bg-fixed-lime"
+                    className="fx-logo block h-5 w-16 bg-fixed-lime"
                     style={{
                       WebkitMaskImage: `url(${m.logo})`,
                       maskImage: `url(${m.logo})`,
@@ -598,18 +610,18 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Gabung</p>
-            <Link href="/register" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar sebagai member</Link>
-            <Link href="/daftar-coach" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar jadi coach</Link>
-            <Link href="/daftar-kolam" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftarkan kolam</Link>
-            <Link href="/panduan" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Panduan pemakaian</Link>
+            <Link href="/register" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar sebagai member</Link>
+            <Link href="/daftar-coach" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar jadi coach</Link>
+            <Link href="/daftar-kolam" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftarkan kolam</Link>
+            <Link href="/panduan" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Panduan pemakaian</Link>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Ketentuan</p>
-            <Link href="/syarat-ketentuan" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Syarat &amp; Ketentuan</Link>
-            <Link href="/kebijakan-privasi" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Privasi</Link>
-            <Link href="/kebijakan-pengembalian" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Pengembalian</Link>
-            <Link href="/kebijakan-cookie" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Cookie</Link>
+            <Link href="/syarat-ketentuan" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Syarat &amp; Ketentuan</Link>
+            <Link href="/kebijakan-privasi" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Privasi</Link>
+            <Link href="/kebijakan-pengembalian" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Pengembalian</Link>
+            <Link href="/kebijakan-cookie" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Cookie</Link>
           </div>
         </div>
 

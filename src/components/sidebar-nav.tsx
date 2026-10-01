@@ -62,7 +62,7 @@ export function SidebarNav({
                 key={link.href}
                 href={link.href}
                 prefetch={active ? false : undefined}
-                className={`rounded-lg px-3 py-2 text-sm transition-colors ${
+                className={`rounded-lg px-3 py-2 text-sm transition-colors md:max-lg:py-3 ${
                   active
                     ? "bg-brand-600 font-semibold text-white"
                     : "font-normal text-text-muted hover:bg-surface-muted hover:text-text"

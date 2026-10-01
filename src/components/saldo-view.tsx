@@ -105,7 +105,7 @@ export default function SaldoView({
       <div className="flex flex-col gap-6">
       <Card>
         <CardBody className="flex flex-col gap-4 py-6">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div>
               <p className="text-sm text-text-muted">Saldo bisa dicairkan</p>
               <p className={`mt-1 whitespace-nowrap text-3xl font-semibold ${walletBalance < 0 ? "text-danger-text" : "text-text"}`}>

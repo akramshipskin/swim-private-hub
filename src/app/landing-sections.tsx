@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/reveal";
 import { Spotlight } from "./landing-fx";
@@ -59,7 +60,7 @@ export function RolePicker() {
               className="group grid gap-2 bg-[linear-gradient(90deg,var(--color-fixed-lime-100),var(--color-fixed-lime-50))] bg-[length:0%_100%] bg-no-repeat py-6 transition-[background-size] duration-500 ease-out hover:bg-[length:100%_100%] md:grid-cols-[13rem_minmax(0,1fr)_auto] md:items-center md:gap-8 md:px-4 md:py-8"
             >
               <span className="text-sm font-semibold text-fixed-muted">{r.label}</span>
-              <span className={`font-semibold leading-snug text-balance ${i === 0 ? "text-2xl md:text-4xl" : "text-xl md:text-3xl"}`}>{r.line}</span>
+              <span className={`fx-role font-semibold leading-snug text-balance ${i === 0 ? "text-2xl md:text-4xl" : "text-xl md:text-3xl"}`}>{r.line}</span>
               <span className="mt-2 inline-flex items-center gap-2 text-sm font-semibold underline decoration-fixed-ink/30 underline-offset-4 md:mt-0 md:no-underline">
                 {r.cta}
                 <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
@@ -117,7 +118,7 @@ export function BeforeAfter() {
           </div>
           <ul>
             {COMPARE.map((row, i) => (
-              <li key={row.before} className={`grid grid-cols-2 ${i > 0 ? "border-t border-fixed-ink/10" : ""}`}>
+              <li key={row.before} className={`fx-row grid grid-cols-2 ${i > 0 ? "border-t border-fixed-ink/10" : ""}`}>
                 <p className="px-5 py-5 text-sm text-fixed-muted sm:px-7 sm:text-base">
                   <span className="ba-old">{row.before}</span>
                 </p>
@@ -142,7 +143,7 @@ const PARENT_POINTS: Point[] = [
   },
   {
     title: "Kamu yang memilih coach",
-    body: "Lihat keahlian, umur, dan kolam tempat mengajar. Badge Bersertifikat berarti sertifikat yang diunggah coach sudah diperiksa dan disetujui admin.",
+    body: "Lihat keahlian, umur, harga, dan kolam tempat mengajar. Badge Bersertifikat berarti sertifikat yang diunggah coach sudah diperiksa dan disetujui admin. Tidak cocok? Ajukan ganti coach, sisa sesi ikut pindah.",
   },
   {
     title: "Perkembangan anak tercatat",
@@ -154,7 +155,7 @@ const PARENT_POINTS: Point[] = [
   },
   {
     title: "Boleh coba dulu",
-    body: "Belum yakin? Peserta yang belum pernah punya paket bisa beli 1 sesi coba dengan coach pilihanmu.",
+    body: "Belum yakin? Peserta yang belum pernah punya paket bisa beli 1 sesi coba dengan coach pilihanmu (satu kali per peserta, berlaku 7 hari).",
   },
 ];
 
@@ -177,7 +178,7 @@ export function ParentSection() {
           <p className="mt-4 max-w-xl text-base text-fixed-muted">Tanpa biaya tersembunyi, tanpa kejutan di kolam.</p>
           <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
             {PARENT_POINTS.map((p) => (
-              <li key={p.title} className="border-t border-fixed-ink/20 pt-5">
+              <li key={p.title} className="fx-point border-t border-fixed-ink/20 pt-5">
                 <h3 className="text-lg font-semibold leading-snug">{p.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-fixed-ink-soft">{p.body}</p>
               </li>
@@ -195,7 +196,8 @@ export function ParentSection() {
             {SHOTS.map((s, i) => (
               <li
                 key={s.src}
-                className={`w-[210px] shrink-0 snap-center lg:absolute lg:w-[12.5rem] ${
+                style={{ "--r": i === 0 ? "-4deg" : i === 1 ? "0deg" : "4deg" } as CSSProperties}
+                className={`fx-shot w-[210px] shrink-0 snap-center lg:absolute lg:w-[12.5rem] ${
                   i === 0 ? "lg:left-0 lg:top-24" : i === 1 ? "lg:left-[9.25rem] lg:top-0 lg:z-10" : "lg:left-[18.5rem] lg:top-40"
                 }`}
               >
@@ -222,8 +224,8 @@ const COACH_CELLS: { title: string; body: string }[] = [
     body: "Peserta sudah booking tapi tidak datang? Kamu tetap mendapat 50% dari bagianmu untuk sesi itu.",
   },
   {
-    title: "Jadwal, kehadiran, dan saldo otomatis",
-    body: "Buka jam kosong per kolam, tandai kehadiran, dan saldomu langsung bertambah. Tidak ada tagih-menagih.",
+    title: "Tarifmu, kamu yang tentukan",
+    body: "Pasang harga paket 4 dan 8 sesi sendiri, satu harga untuk semua kolam tempat kamu mengajar. Buka jam kosong, tandai kehadiran, dan saldomu langsung bertambah. Tidak ada tagih-menagih.",
   },
   {
     title: "Tanpa biaya masuk kolam",
@@ -239,7 +241,7 @@ const COACH_CELLS: { title: string; body: string }[] = [
   },
   {
     title: "Semua pihak melihat angka yang sama",
-    body: "Bagianmu dari setiap sesi tercatat jelas. Pencairan diproses manual oleh admin, secepatnya, dan statusnya terlihat.",
+    body: "Bagianmu dari setiap sesi tercatat jelas, dipotong PPh final 0,5% yang disetor SPH atas namamu. Pencairan diproses manual oleh admin, secepatnya, dan statusnya terlihat.",
   },
 ];
 
@@ -264,7 +266,7 @@ export function CoachSection() {
         <Spotlight className="mt-10 grid gap-3 lg:grid-cols-6">
           <Reveal className="lg:col-span-3 lg:row-span-2">
             <div className="flex h-full min-h-72 flex-col justify-between gap-8 rounded-3xl bg-fixed-lime p-7 text-fixed-ink sm:p-9">
-              <p className="text-7xl font-semibold leading-none tracking-tight sm:text-8xl">50%</p>
+              <p className="fx-num text-7xl font-semibold leading-none tracking-tight sm:text-8xl">50%</p>
               <div>
                 <h3 className="text-2xl font-semibold leading-snug text-balance sm:text-3xl">{lead.title}</h3>
                 <p className="mt-3 max-w-md text-base text-fixed-ink-soft">{lead.body}</p>
@@ -282,7 +284,7 @@ export function CoachSection() {
           </Reveal>
 
           <Reveal className="lg:col-span-3" delay={140}>
-            <div data-spot className="h-full rounded-3xl bg-white/[0.06] p-7 ring-1 ring-white/25 transition-[box-shadow] duration-300 hover:ring-fixed-lime/50">
+            <div data-spot className="fx-cell h-full rounded-3xl bg-white/[0.06] p-7 ring-1 ring-white/25 transition-[box-shadow] duration-300 hover:ring-fixed-lime/50">
               <h3 className="text-xl font-semibold leading-snug">{free.title}</h3>
               <p className="mt-2 max-w-md text-sm text-white/75">{free.body}</p>
             </div>
@@ -290,7 +292,7 @@ export function CoachSection() {
 
           {rest.map((c, i) => (
             <Reveal key={c.title} className="lg:col-span-2" delay={200 + i * 60}>
-              <div data-spot className="h-full rounded-3xl bg-white/[0.06] p-7 ring-1 ring-white/15 transition-[box-shadow] duration-300 hover:ring-fixed-lime/50">
+              <div data-spot className="fx-cell h-full rounded-3xl bg-white/[0.06] p-7 ring-1 ring-white/15 transition-[box-shadow] duration-300 hover:ring-fixed-lime/50">
                 <h3 className="text-lg font-semibold leading-snug">{c.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/75">{c.body}</p>
               </div>
@@ -318,11 +320,11 @@ const POOL_GROUPS: { heading: string; items: Point[] }[] = [
     items: [
       {
         title: "Gabung gratis",
-        body: "Tanpa biaya pendaftaran maupun biaya bulanan. Platform hanya mengambil komisi dari sesi yang terlaksana.",
+        body: "Tanpa biaya pendaftaran maupun biaya bulanan. SPH hanya mengambil biaya layanan yang dibayar member di atas harga paket, bukan dipotong dari bagian kolam.",
       },
       {
         title: "Bagi hasil setiap sesi Hadir",
-        body: "Bagian kolam masuk ke saldo otomatis setiap sesi ditandai Hadir, dan semua pihak melihat angka yang sama.",
+        body: "Bagian kolam masuk ke saldo otomatis setiap sesi ditandai Hadir, dipotong PPh final 0,5% yang disetor SPH atas nama kolam, dan semua pihak melihat angka yang sama.",
       },
     ],
   },
@@ -330,8 +332,8 @@ const POOL_GROUPS: { heading: string; items: Point[] }[] = [
     heading: "Paket dan harga",
     items: [
       {
-        title: "Kamu yang menentukan paket dan harga",
-        body: "Usulkan paket dan harga untuk kolammu. Berlaku setelah diperiksa admin, paling lambat 1×24 jam.",
+        title: "Kamu yang menentukan harga tiket",
+        body: "Pasang harga tiket untuk paket 4 dan 8 sesi di kolammu. Perubahan langsung berlaku untuk pembelian berikutnya; paket yang sudah dibeli tidak ikut berubah.",
       },
       {
         title: "Tiket peserta sudah tercakup",
@@ -370,7 +372,7 @@ export function PoolSection({ waLink }: { waLink: string }) {
       <div className="mt-12 grid gap-x-14 gap-y-12 md:grid-cols-3">
         {POOL_GROUPS.map((g, gi) => (
           <Reveal key={g.heading} delay={gi * 100}>
-            <h3 className="border-b-2 border-fixed-ink pb-3 text-xl font-semibold">{g.heading}</h3>
+            <h3 className="fx-draw border-b-2 border-fixed-ink pb-3 text-xl font-semibold">{g.heading}</h3>
             <ul className="mt-2 divide-y divide-fixed-ink/10">
               {g.items.map((p) => (
                 <li key={p.title} className="py-5">
