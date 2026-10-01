@@ -77,6 +77,18 @@ export default async function PoolLaporanPage({
     },
     _sum: { amount: true },
   });
+  // Potongan PPh 0,5% bagian kolam (baris negatif ber-poolId). Dikelompokkan
+  // terpisah karena PPh coach di booking yang sama ikut ber-type PPH_WITHHELD.
+  const pphRows = await prisma.walletTransaction.groupBy({
+    by: ["bookingId"],
+    where: {
+      bookingId: { in: bookingsByPool.flat().map((b) => b.id) },
+      type: "PPH_WITHHELD",
+      poolId: { in: pools.map((p) => p.id) },
+    },
+    _sum: { amount: true },
+  });
+  const poolPph = (bookingId: string) => -(pphRows.find((l) => l.bookingId === bookingId)?._sum.amount ?? 0);
   const credited = (bookingId: string, type: "SESSION_REVENUE" | "SESSION_PAYOUT" | "PLATFORM_REVENUE" | "PLATFORM_TAX") =>
     ledger.find((l) => l.bookingId === bookingId && l.type === type)?._sum.amount ?? 0;
 
@@ -84,7 +96,7 @@ export default async function PoolLaporanPage({
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Laporan Kolam</h1>
       <p className="mb-6 text-sm text-text-muted">
-        Rincian komisi kolam kamu per sesi yang benar-benar ditandai Hadir.
+        Rincian bagian kolam kamu per sesi yang benar-benar ditandai Hadir.
       </p>
 
       <Card className="mb-6">
@@ -124,11 +136,15 @@ export default async function PoolLaporanPage({
               const poolAmount = credited(b.id, "SESSION_REVENUE");
               const coachAmount = credited(b.id, "SESSION_PAYOUT");
               const platformAmount = perSessionValue - poolAmount - coachAmount;
-              return { booking: b, perSessionValue, coachAmount, poolAmount, platformAmount };
+              // Sama dengan yang masuk saldo: bagian kolam dikurangi PPh 0,5%.
+              const pph = poolPph(b.id);
+              return { booking: b, perSessionValue, coachAmount, poolAmount, platformAmount, pph, netAmount: poolAmount - pph };
             })
             .filter((r): r is NonNullable<typeof r> => r !== null);
 
           const totalPoolShare = rows.reduce((sum, r) => sum + r.poolAmount, 0);
+          const totalPph = rows.reduce((sum, r) => sum + r.pph, 0);
+          const totalNet = totalPoolShare - totalPph;
 
           return (
             <div key={pool.id}>
@@ -143,9 +159,9 @@ export default async function PoolLaporanPage({
                 </Card>
                 <Card>
                   <CardBody className="py-3">
-                    <p className="text-xs text-text-subtle">Rata-rata komisi kolam per sesi</p>
+                    <p className="text-xs text-text-subtle">Rata-rata masuk saldo per sesi</p>
                     <p className="text-lg font-semibold text-text">
-                      {formatRupiah(rows.length ? Math.round(totalPoolShare / rows.length) : 0)}
+                      {formatRupiah(rows.length ? Math.round(totalNet / rows.length) : 0)}
                     </p>
                   </CardBody>
                 </Card>
@@ -159,8 +175,13 @@ export default async function PoolLaporanPage({
                 </Card>
                 <Card>
                   <CardBody className="py-3">
-                    <p className="text-xs text-text-subtle">Komisi Kolam Kamu</p>
-                    <p className="text-lg font-semibold text-text">{formatRupiah(totalPoolShare)}</p>
+                    <p className="text-xs text-text-subtle">Masuk saldo</p>
+                    <p className="text-lg font-semibold text-text">{formatRupiah(totalNet)}</p>
+                    {totalPph > 0 && (
+                      <p className="mt-0.5 text-xs text-text-subtle">
+                        {formatRupiah(totalPoolShare)} &minus; PPh {formatRupiah(totalPph)}
+                      </p>
+                    )}
                   </CardBody>
                 </Card>
               </div>
@@ -180,7 +201,9 @@ export default async function PoolLaporanPage({
                           <th className="px-4 py-3 font-medium">Tanggal</th>
                           <th className="px-4 py-3 font-medium">Coach</th>
                           <th className="px-4 py-3 font-medium">Peserta</th>
-                          <th className="px-4 py-3 text-right font-medium">Komisi Kolam</th>
+                          <th className="px-4 py-3 text-right font-medium">Bagian Kolam</th>
+                          <th className="px-4 py-3 text-right font-medium">PPh 0,5%</th>
+                          <th className="px-4 py-3 text-right font-medium">Masuk Saldo</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -195,8 +218,12 @@ export default async function PoolLaporanPage({
                             </td>
                             <td className="px-4 py-3 text-text">{r.booking.availability.coach.name}</td>
                             <td className="px-4 py-3 text-text">{r.booking.package.dependent.name}</td>
+                            <td className="px-4 py-3 text-right font-mono text-text">{formatRupiah(r.poolAmount)}</td>
+                            <td className="px-4 py-3 text-right font-mono text-text-muted">
+                              {r.pph > 0 ? <>&minus;{formatRupiah(r.pph)}</> : "–"}
+                            </td>
                             <td className="px-4 py-3 text-right font-mono font-semibold text-text">
-                              {formatRupiah(r.poolAmount)}
+                              {formatRupiah(r.netAmount)}
                             </td>
                           </tr>
                         ))}
@@ -212,8 +239,9 @@ export default async function PoolLaporanPage({
 
       <p className="mt-4 text-xs text-text-subtle">
         Hanya sesi yang benar-benar ditandai Hadir dan paketnya berbayar (bukan paket pemberian admin/gratis)
-        yang dihitung di sini — sama seperti dasar hitung saldo kolam. Yang ditampilkan adalah komisi kolam kamu
-        sesuai persentase yang berlaku saat sesi itu ditandai Hadir.
+        yang dihitung di sini — sama seperti dasar hitung saldo kolam. Bagian kolam dipotong PPh final 0,5% yang
+        disetor SPH atas nama kolam (kecuali kolam sudah menyerahkan surat bebas PPh); &ldquo;Masuk Saldo&rdquo; adalah angka
+        yang benar-benar masuk ke saldo kamu.
       </p>
     </main>
   );

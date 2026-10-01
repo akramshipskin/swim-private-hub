@@ -4,6 +4,7 @@ vi.mock("@/lib/push", () => ({ sendPushToUser: vi.fn().mockResolvedValue(undefin
 
 const findUnique = vi.fn();
 const bookingUpdateMany = vi.fn();
+const availabilityUpdate = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     booking: { findUnique: (...args: unknown[]) => findUnique(...args) },
@@ -11,7 +12,7 @@ vi.mock("@/lib/prisma", () => ({
       fn({
         $queryRaw: vi.fn().mockResolvedValue([{ jatahCancel: 2 }]),
         booking: { count: vi.fn().mockResolvedValue(0), updateMany: (...args: unknown[]) => bookingUpdateMany(...args) },
-        availability: { update: vi.fn().mockResolvedValue({}) },
+        availability: { update: (...args: unknown[]) => availabilityUpdate(...args) },
         package: { update: vi.fn().mockResolvedValue({}) },
       }),
   },
@@ -129,5 +130,17 @@ describe("cancelBooking", () => {
     expect(bookingUpdateMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "b-1", status: "BOOKED", attended: null } })
     );
+  });
+
+  // Hadi 2 Okt (1A): coach batal karena sakit -> jam itu ditutup, tidak
+  // dibuka lagi untuk member lain. Member/admin batal -> slot kosong lagi.
+  it("closes the slot when the coach cancels, reopens it when member or admin cancels", async () => {
+    findUnique.mockResolvedValue(booking());
+    await cancelBooking({ bookingId: "b-1", actor: { role: "COACH", coachId: "c-1" } });
+    expect(availabilityUpdate).toHaveBeenLastCalledWith({ where: { id: "a-1" }, data: { status: "CLOSED" } });
+    await cancelBooking({ bookingId: "b-1", actor: { role: "ADMIN" } });
+    expect(availabilityUpdate).toHaveBeenLastCalledWith({ where: { id: "a-1" }, data: { status: "AVAILABLE" } });
+    await cancelBooking({ bookingId: "b-1", actor: { role: "MEMBER", memberId: "m-1" } });
+    expect(availabilityUpdate).toHaveBeenLastCalledWith({ where: { id: "a-1" }, data: { status: "AVAILABLE" } });
   });
 });

@@ -144,6 +144,24 @@ describe("CANCEL races", () => {
     const winners = await prisma.booking.count({ where: { packageId: { in: others.map((o) => o.pkg.id) }, status: "BOOKED" } });
     expect(pk.reduce((s, p) => s + (8 - p.sisaSesi), 0)).toBe(winners);
   });
+
+  it("R9b: coach batal (sakit) vs member lain booking slot yang sama barengan -> slot tertutup, tidak ada booking baru", async () => {
+    const pool = await mkPool(); const coach = await mkUser("COACH");
+    const slot = await mkSlot(coach.id, pool.id, 48);
+    const a = await mkMemberWithPackage(pool.id);
+    const others = await Promise.all(Array.from({ length: 6 }, () => mkMemberWithPackage(pool.id)));
+    const b = await book(a.m.id, slot.id, a.pkg.id);
+    const rs = await settle([
+      as({ id: coach.id, role: "COACH" }, () => cancelBookingAsCoach(null, fd({ bookingId: b.id }))),
+      ...others.map((o) => as({ id: o.m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: slot.id, packageId: o.pkg.id })))),
+    ]);
+    console.log("R9b", summarize(rs));
+    expect(await prisma.booking.count({ where: { availabilityId: slot.id, status: "BOOKED" } })).toBe(0);
+    expect((await prisma.availability.findUniqueOrThrow({ where: { id: slot.id } })).status).toBe("CLOSED");
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: a.pkg.id } })).sisaSesi).toBe(8);
+    const pk = await prisma.package.findMany({ where: { id: { in: others.map((o) => o.pkg.id) } } });
+    expect(pk.every((p) => p.sisaSesi === 8)).toBe(true);
+  });
 });
 
 describe("ATTENDANCE / WALLET races", () => {

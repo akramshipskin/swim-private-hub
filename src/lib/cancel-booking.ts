@@ -129,9 +129,14 @@ export async function cancelBooking({
           throw new CancelError("Booking ini sudah dibatalkan/selesai", 409);
         }
 
+        // Coach batal (sakit/darurat) = jam itu coach memang tidak bisa
+        // mengajar, jadi slot ditutup, bukan dibuka lagi untuk member lain
+        // (Hadi 2 Okt, 1A). Coach bisa membukanya lagi lewat Tambah Jadwal
+        // (slot CLOSED di jam yang sama dibuka ulang). Member/admin batal =
+        // slot kembali kosong seperti biasa.
         await tx.availability.update({
           where: { id: booking.availabilityId },
-          data: { status: "AVAILABLE" },
+          data: { status: actor.role === "COACH" ? "CLOSED" : "AVAILABLE" },
         });
 
         await tx.package.update({
