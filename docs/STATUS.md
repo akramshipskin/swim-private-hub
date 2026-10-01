@@ -16,18 +16,18 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja, Hadi), isi-harga-dummy (production: HARGA_DUMMY_PROD=1, Hadi), render-brand-social.
 
 ## Sedang jalan
-- Menunggu 5 jawaban Hadi (2 Okt malam): (1) slot terbuka lagi saat coach batal karena sakit: tutup/biarkan; (2) 7 perbaikan ringan sisa sweeping (testimoni langsung tampil, konfirmasi admin uang, label "Sesi habis", Lanjut bayar di Riwayat Bayar, form kosong setelah ditolak, tgl lahir di tambah peserta admin, laporan kolam sebelum PPh); (3) MOU & perjanjian coach: centang di aplikasi saat daftar vs tanda tangan PDF diunggah admin; (4) terbitkan draf MOU/perjanjian jadi halaman pribadi; (5) landing mulai dari pelacak iklan Meta (Pixel + Conversions API, perlu ubah Kebijakan Privasi/Cookie + orang hukum) atau bagian harga.
+- 5 jawaban Hadi masuk 2 Okt (1A 2A 3A 4B 5A, lihat KEPUTUSAN). Breakdown + rekomendasi model sudah dikirim; menunggu "lanjut" dan konfirmasi arti 4B. Pixel/CAPI butuh ID Pixel, token di Vercel (diisi Hadi), dan persetujuan orang hukum untuk ubah Kebijakan Privasi/Cookie.
 - Jalur bayar Midtrans (beli, sesi coba, tambah bayar ganti coach, saldo dipakai dulu) sudah diuji di laptop mode uji + notifikasi tiruan; di production belum ada pembayaran sungguhan.
 
 ## Tugas Claude berikutnya
-1. Kerjakan jawaban Hadi atas 5 pertanyaan di atas (yang menyentuh booking/uang = Opus + pemeriksa kedua).
+1. Kerjakan jawaban Hadi atas 5 pertanyaan setelah "lanjut" (booking/uang/login/skema = Opus + pemeriksa kedua).
 2. Nilai ulang komisi afiliasi 5% (sisa SPH tipis setelah biaya Midtrans) sebelum iklan jalan.
 3. Animasi landing v2: revisi sesuai masukan Hadi (ditunda; belum ada masukan tertunda).
 4. Rekening coach/kolam yang tersimpan format lama tidak dinormalisasi otomatis: cek sebelum ada coach asli.
 5. Audit buku besar production diulang setelah ada transaksi asli (2 Okt: cocok). Cek GitHub & situs asli setelah tiap push.
 
 ## Tugas Hadi
-1. Jawab 5 pertanyaan (lihat Sedang jalan). Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif (tombol Beli sudah dibetulkan).
+1. Bilang "lanjut" + konfirmasi arti 4B. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif (tombol Beli sudah dibetulkan).
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
