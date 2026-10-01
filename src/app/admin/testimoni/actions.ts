@@ -34,7 +34,9 @@ export async function addTestimonial(_prev: TestimonialActionState, formData: Fo
   const r = readFields(formData);
   if ("error" in r) return { error: r.error };
   const last = await prisma.testimonial.aggregate({ _max: { sortOrder: true } });
-  await prisma.testimonial.create({ data: { ...r.fields, sortOrder: (last._max.sortOrder ?? -1) + 1 } });
+  // Testimoni baru disembunyikan dulu; admin memeriksa lalu menekan "Tampilkan"
+  // (sweeping 2 Okt, no. 19: dulu langsung tampil di landing).
+  await prisma.testimonial.create({ data: { ...r.fields, isPublished: false, sortOrder: (last._max.sortOrder ?? -1) + 1 } });
   refresh();
   return { success: true };
 }

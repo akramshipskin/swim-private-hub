@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 // Dropdown compact -- cuma nunjukin status yang lagi kepilih, bukan 2
 // tombol Hadir/Gak Hadir + tombol Edit sekaligus. Ganti pilihan langsung
@@ -19,18 +20,27 @@ export default function AttendanceToggle({
   bookingId,
   attended,
   lockedReason,
+  confirm = false,
 }: {
   bookingId: string;
   attended: boolean | null;
   // Diisi kalau pengguna ini sudah tidak boleh mengubah (coach lewat batas
   // 24 jam). Server tetap menolak; ini supaya coach tahu sebelum mencoba.
   lockedReason?: string;
+  // Admin: tiap perubahan memindahkan uang kolam/coach/SPH, jadi minta
+  // konfirmasi dulu (sweeping 2 Okt, no. 12).
+  confirm?: boolean;
 }) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(markAttendance, null);
   const formRef = useRef<HTMLFormElement>(null);
   const [localAttended, setLocalAttended] = useState(attended);
   const wasPending = useRef(false);
+  const [toConfirm, setToConfirm] = useState<boolean | null>(null);
+  function apply(v: boolean | null) {
+    setLocalAttended(v);
+    if (v !== null) requestAnimationFrame(() => formRef.current?.requestSubmit());
+  }
   // Sinkron kalau nilai dari server berubah (pola "adjust state during render").
   const [syncedAttended, setSyncedAttended] = useState(attended);
   if (attended !== syncedAttended) {
@@ -77,9 +87,9 @@ export default function AttendanceToggle({
           value={shown === null ? "" : String(shown)}
           disabled={pending}
           onChange={(e) => {
-            const v = e.target.value;
-            setLocalAttended(v === "true" ? true : v === "false" ? false : null);
-            if (v) requestAnimationFrame(() => formRef.current?.requestSubmit());
+            const v = e.target.value === "true" ? true : e.target.value === "false" ? false : null;
+            if (confirm && v !== null) setToConfirm(v);
+            else apply(v);
           }}
           aria-label="Status kehadiran"
           className={`appearance-none rounded-lg border py-1 pl-2 pr-6 text-xs font-medium max-sm:min-h-[44px] max-sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 ${toneClass}`}
@@ -104,6 +114,22 @@ export default function AttendanceToggle({
         </svg>
       </div>
       {state?.error && <p className="max-w-[140px] text-right text-xs text-danger-text">{state.error}</p>}
+      <ConfirmDialog
+        open={toConfirm !== null}
+        title={toConfirm ? "Tandai Hadir?" : "Tandai Tidak Hadir?"}
+        description={
+          toConfirm
+            ? "Bagi hasil sesi ini langsung masuk ke saldo kolam, coach, dan SPH."
+            : "Sesi ini dianggap hangus dan bagi hasil Tidak Hadir langsung masuk ke saldo. Mengubahnya lagi nanti akan membalik pembukuannya."
+        }
+        confirmLabel={toConfirm ? "Ya, tandai Hadir" : "Ya, tandai Tidak Hadir"}
+        confirmVariant="primary"
+        onCancel={() => setToConfirm(null)}
+        onConfirm={() => {
+          apply(toConfirm);
+          setToConfirm(null);
+        }}
+      />
     </form>
   );
 }

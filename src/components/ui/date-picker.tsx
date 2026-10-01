@@ -208,6 +208,8 @@ export function DatePicker({
                 <button
                   key={key}
                   type="button"
+                  aria-label={`${day} ${MONTH_LABELS[viewM]} ${viewY}`}
+                  aria-pressed={isSelected}
                   onClick={() => {
                     setValue(key);
                     setOpen(false);

@@ -193,7 +193,7 @@ export default function BookingOverviewBoard({
                                     <div className="flex shrink-0 flex-col items-end gap-2">
                                       {booking ? (
                                         isPast ? (
-                                          <AttendanceToggle bookingId={booking.id} attended={booking.attended} />
+                                          <AttendanceToggle bookingId={booking.id} attended={booking.attended} confirm />
                                         ) : (
                                           <>
                                             <Badge tone="brand">Terisi</Badge>

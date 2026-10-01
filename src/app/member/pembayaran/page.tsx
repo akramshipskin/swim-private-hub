@@ -103,9 +103,19 @@ export default async function MemberPembayaranPage() {
                           </Link>
                         </>
                       ) : (
-                        <Badge tone={statusTone[p.status as keyof typeof statusTone] ?? "neutral"}>
-                          {statusLabel[p.status] ?? p.status}
-                        </Badge>
+                        <>
+                          <Badge tone={statusTone[p.status as keyof typeof statusTone] ?? "neutral"}>
+                            {statusLabel[p.status] ?? p.status}
+                          </Badge>
+                          {p.status === "PENDING" && p.snapRedirectUrl && (
+                            <a
+                              href={p.snapRedirectUrl}
+                              className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+                            >
+                              Lanjut bayar &rarr;
+                            </a>
+                          )}
+                        </>
                       )}
                     </div>
                   </CardBody>

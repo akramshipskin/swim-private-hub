@@ -66,7 +66,7 @@ export default async function AdminLaporanKehadiranPage() {
             </div>
             <div className="flex flex-col items-end gap-1">
               <p className="text-xs text-text-subtle">Status kehadiran sekarang</p>
-              <AttendanceToggle bookingId={b.id} attended={b.attended} />
+              <AttendanceToggle bookingId={b.id} attended={b.attended} confirm />
             </div>
           </div>
           <p className="rounded-lg bg-surface-muted px-3 py-2 text-sm text-text">

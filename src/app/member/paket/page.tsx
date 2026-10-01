@@ -63,6 +63,9 @@ export default async function MemberPaketPage() {
       include: {
         dependent: { select: { name: true, isSelf: true } },
         pool: { select: { id: true, name: true } },
+        // Sesi yang sudah dijadwalkan tapi belum berjalan: bedakan "semua sesi
+        // sudah dijadwalkan" dari "sesi habis" (temuan sweeping 2 Okt, no. 8).
+        _count: { select: { bookings: { where: { status: "BOOKED", attended: null } } } },
         // Link bayar Midtrans terakhir yang masih menunggu (tombol "Lanjut bayar").
         payments: { where: { status: "PENDING", snapRedirectUrl: { not: null }, coachChangeRequestId: null }, orderBy: { createdAt: "desc" }, take: 1, select: { snapRedirectUrl: true } },
         // Pengajuan ganti coach yang masih berjalan (paling banyak satu per paket).
@@ -259,7 +262,7 @@ export default async function MemberPaketPage() {
                             </p>
                           </div>
                           {used ? (
-                            <Badge tone="neutral">Sesi habis</Badge>
+                            <Badge tone="neutral">{p._count.bookings > 0 ? "Semua sesi sudah dijadwalkan" : "Sesi habis"}</Badge>
                           ) : expired ? (
                             <Badge tone="neutral">Kedaluwarsa</Badge>
                           ) : p.status === "PENDING_PAYMENT" && p.payments[0]?.snapRedirectUrl ? (

@@ -152,7 +152,16 @@ describe("addChildForMember", () => {
   it("creates a named child dependent otherwise", async () => {
     const result = await addChildForMember(null, formData({ memberId: "member-1", type: "child", name: "Budi" }));
     expect(result).toEqual({ success: "Peserta ditambahkan." });
-    expect(createDependent).toHaveBeenCalledWith("member-1", "Budi");
+    expect(createDependent).toHaveBeenCalledWith("member-1", "Budi", expect.anything(), null);
+  });
+
+  it("menyimpan tanggal lahir bila diisi, menolak yang tidak valid", async () => {
+    await addChildForMember(null, formData({ memberId: "member-1", type: "child", name: "Budi", birthDate: "2020-05-17" }));
+    expect(createDependent).toHaveBeenLastCalledWith("member-1", "Budi", expect.anything(), new Date("2020-05-17T00:00:00Z"));
+    createDependent.mockClear();
+    const bad = await addChildForMember(null, formData({ memberId: "member-1", type: "child", name: "Budi", birthDate: "2999-01-01" }));
+    expect(bad).toEqual({ error: "Tanggal lahir tidak boleh di masa depan." });
+    expect(createDependent).not.toHaveBeenCalled();
   });
 
   it("surfaces the underlying error message instead of throwing", async () => {

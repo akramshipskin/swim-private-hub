@@ -56,7 +56,8 @@ export default function PackPriceForm({
           </Button>
         </>
       )}
-      {state?.error && <p className="w-full text-xs text-danger-text">{state.error}</p>}
+      {state?.error && <p role="alert" className="w-full text-xs text-danger-text">{state.error}</p>}
+      {state?.ok && edit.locked && <p role="status" className="w-full text-xs text-success-text">Harga tersimpan.</p>}
     </form>
   );
 }

@@ -163,6 +163,8 @@ export function AvailabilityDatePicker({
                 <button
                   key={key}
                   type="button"
+                  aria-label={`${day} ${MONTH_LABELS[viewM]} ${viewY}${hasSlot ? ", sudah ada slot" : ""}`}
+                  aria-pressed={isSelected}
                   disabled={isPast}
                   aria-disabled={isPast}
                   onClick={() => {

@@ -4,12 +4,14 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { PriceInput } from "@/components/ui/price-input";
+import { useKeepFormOnError } from "@/hooks/use-keep-form-on-error";
 import { recordPphRemittance } from "./actions";
 
 export default function PphRemitForm() {
   const [state, action, pending] = useActionState(recordPphRemittance, null);
+  const keep = useKeepFormOnError(state, action);
   return (
-    <form action={action} className="flex flex-wrap items-end gap-3">
+    <form key={keep.key} onSubmit={keep.onSubmit} className="flex flex-wrap items-end gap-3">
       <Field label="Nominal disetor (Rp)">
         <PriceInput name="amount" className="w-full sm:w-36" />
       </Field>

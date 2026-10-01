@@ -18,7 +18,7 @@ export default async function AdminTestimonialsPage() {
       <h1 className="text-2xl font-semibold tracking-tight text-text">Testimoni</h1>
       <p className="mt-1 text-sm text-text-muted">
         Tampil di landing pada bagian &quot;Kata mereka&quot;. Hanya isi testimoni ASLI dengan izin yang bersangkutan
-        (catat izinnya). Bagian itu otomatis tersembunyi kalau tidak ada yang berstatus tampil.{" "}
+        (catat izinnya). Testimoni baru disembunyikan dulu; periksa lalu tekan Tampilkan. Bagian itu otomatis tersembunyi kalau tidak ada yang berstatus tampil.{" "}
         {shown === 0 ? "Sekarang: tersembunyi." : `Sekarang: ${shown} testimoni tampil.`}
       </p>
 

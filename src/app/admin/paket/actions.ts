@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { withDedupeLock } from "@/lib/dedupe-lock";
 import { createTemplateRecord, updateTemplateRecord, reviewTemplateChange } from "@/lib/package-template";
 import { createDependent, createSelfDependent } from "@/lib/dependents";
+import { parseParticipantBirthDate } from "@/lib/participant-input";
 import { formNumber, toProperCase } from "@/lib/format";
 import { resolveExpiredDate } from "@/lib/datetime";
 import { revalidatePath } from "next/cache";
@@ -66,10 +67,15 @@ export async function addChildForMember(
   }
 
   try {
+    // Tanggal lahir opsional untuk admin (member yang belum punya diminta
+    // melengkapi sendiri di menu Peserta), tapi kalau diisi harus valid.
+    const birthRaw = formData.get("birthDate")?.toString().trim() ?? "";
+    const birthDate = birthRaw ? parseParticipantBirthDate(birthRaw) : null;
     if (type === "self") {
-      await createSelfDependent(memberId);
+      const self = await createSelfDependent(memberId);
+      if (birthDate) await prisma.dependent.update({ where: { id: self.id }, data: { birthDate } });
     } else {
-      await createDependent(memberId, name);
+      await createDependent(memberId, name, prisma, birthDate);
     }
   } catch (err) {
     return { error: userErrorMessage(err, "Gagal menambah peserta") };

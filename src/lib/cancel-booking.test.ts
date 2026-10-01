@@ -4,13 +4,14 @@ vi.mock("@/lib/push", () => ({ sendPushToUser: vi.fn().mockResolvedValue(undefin
 
 const findUnique = vi.fn();
 const bookingUpdateMany = vi.fn();
+let jatah = 2;
 const availabilityUpdate = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     booking: { findUnique: (...args: unknown[]) => findUnique(...args) },
     $transaction: (fn: (tx: unknown) => unknown) =>
       fn({
-        $queryRaw: vi.fn().mockResolvedValue([{ jatahCancel: 2 }]),
+        $queryRaw: vi.fn().mockImplementation(async () => [{ jatahCancel: jatah }]),
         booking: { count: vi.fn().mockResolvedValue(0), updateMany: (...args: unknown[]) => bookingUpdateMany(...args) },
         availability: { update: (...args: unknown[]) => availabilityUpdate(...args) },
         package: { update: vi.fn().mockResolvedValue({}) },
@@ -36,6 +37,7 @@ function booking(overrides: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  jatah = 2;
   bookingUpdateMany.mockResolvedValue({ count: 1 });
 });
 
@@ -142,5 +144,11 @@ describe("cancelBooking", () => {
     expect(availabilityUpdate).toHaveBeenLastCalledWith({ where: { id: "a-1" }, data: { status: "AVAILABLE" } });
     await cancelBooking({ bookingId: "b-1", actor: { role: "MEMBER", memberId: "m-1" } });
     expect(availabilityUpdate).toHaveBeenLastCalledWith({ where: { id: "a-1" }, data: { status: "AVAILABLE" } });
+  });
+
+  it("member batal sesi coba (jatah 0): pesan khusus sesi coba, bukan 'jatah habis'", async () => {
+    jatah = 0;
+    findUnique.mockResolvedValue(booking());
+    await expect(cancelBooking({ bookingId: "b-1", actor: { role: "MEMBER", memberId: "m-1" } })).rejects.toThrow("Sesi coba tidak bisa dibatalkan sendiri");
   });
 });

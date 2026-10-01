@@ -1,20 +1,35 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Textarea } from "@/components/ui/input";
 import { approveAction, rejectAction } from "./actions";
 
 export default function DecideForm({ requestId, approveLabel }: { requestId: string; approveLabel: string }) {
   const [approveState, approve, approving] = useActionState(approveAction, null);
   const [rejectState, reject, rejecting] = useActionState(rejectAction, null);
+  const [confirming, setConfirming] = useState(false);
+  const approveForm = useRef<HTMLFormElement>(null);
   return (
     <div className="flex flex-col gap-3">
-      <form action={approve}>
+      <form ref={approveForm} action={approve}>
         <input type="hidden" name="requestId" value={requestId} />
-        <Button type="submit" size="sm" loading={approving} disabled={rejecting}>
+        <Button type="button" size="sm" loading={approving} disabled={rejecting} onClick={() => setConfirming(true)}>
           {approveLabel}
         </Button>
+        <ConfirmDialog
+          open={confirming}
+          title="Setujui ganti coach?"
+          description="Sisa sesi dipindah ke coach baru dan selisih harganya langsung dicatat ke saldo member. Keputusan ini tidak bisa dibatalkan."
+          confirmLabel="Ya, setujui"
+          confirmVariant="primary"
+          onCancel={() => setConfirming(false)}
+          onConfirm={() => {
+            setConfirming(false);
+            approveForm.current?.requestSubmit();
+          }}
+        />
         {approveState?.error && <p className="mt-1 text-xs text-danger-text">{approveState.error}</p>}
       </form>
       <form action={reject} className="flex flex-col gap-2">

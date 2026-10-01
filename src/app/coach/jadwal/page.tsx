@@ -32,6 +32,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
           where: { status: "BOOKED" },
           select: {
             id: true,
+            attended: true,
             package: { select: { dependent: { select: { name: true } } } },
           },
           take: 1,
@@ -147,7 +148,11 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                             </div>
                             {a.status === "BOOKED" && a.bookings[0] && a.startTime <= now ? (
                               <span className="shrink-0 text-right text-sm text-text-subtle">
-                                Sudah mulai — tandai di Riwayat Sesi
+                                {a.bookings[0].attended === null
+                                  ? "Sudah mulai — tandai di Riwayat Sesi"
+                                  : a.bookings[0].attended
+                                    ? "Sudah ditandai Hadir"
+                                    : "Sudah ditandai Tidak Hadir"}
                               </span>
                             ) : a.status === "BOOKED" && a.bookings[0] ? (
                               <CancelBookingButton

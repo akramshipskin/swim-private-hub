@@ -108,7 +108,9 @@ export async function cancelBooking({
           const quota = pkg?.jatahCancel ?? 0;
           if (selfCancelCount >= quota) {
             throw new CancelError(
-              "Jatah pembatalan mandiri sudah habis. Hubungi admin untuk kasus khusus.",
+              quota === 0
+                ? "Sesi coba tidak bisa dibatalkan sendiri; tidak hadir = sesi hangus. Hubungi admin kalau ada keadaan khusus."
+                : "Jatah pembatalan mandiri sudah habis. Hubungi admin untuk kasus khusus.",
               409
             );
           }

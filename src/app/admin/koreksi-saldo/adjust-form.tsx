@@ -6,6 +6,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Field, Textarea } from "@/components/ui/input";
 import { PriceInput } from "@/components/ui/price-input";
 import { formatRupiah } from "@/lib/format";
+import { useKeepFormOnError } from "@/hooks/use-keep-form-on-error";
 import { adjustWallet } from "./actions";
 
 function signed(n: number) {
@@ -26,6 +27,7 @@ export default function AdjustForm({
 }) {
   const [state, action, pending] = useActionState(adjustWallet, null);
   const form = useRef<HTMLFormElement>(null);
+  const keep = useKeepFormOnError(state, action);
   const [submitKey, setSubmitKey] = useState("");
   const [confirm, setConfirm] = useState<{ amount: number; fromPlatform: boolean } | null>(null);
 
@@ -43,7 +45,7 @@ export default function AdjustForm({
 
   return (
     <>
-      <form key={state?.ok ? state.id : "form"} ref={form} action={action} className="flex flex-col gap-3">
+      <form key={keep.key} ref={form} onSubmit={keep.onSubmit} className="flex flex-col gap-3">
         <input type="hidden" name="targetType" value={targetType} />
         <input type="hidden" name="targetId" value={targetId} />
         <input type="hidden" name="idempotencyKey" value={submitKey} readOnly />

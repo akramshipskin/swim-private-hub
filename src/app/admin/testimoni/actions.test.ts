@@ -37,7 +37,7 @@ beforeEach(() => {
 describe("addTestimonial", () => {
   it("menyimpan (dirapikan) dengan urutan terakhir + 1 dan menyegarkan landing", async () => {
     expect(await addTestimonial(null, fd(valid))).toEqual({ success: true });
-    expect(create).toHaveBeenCalledWith({ data: { name: "Ibu Clara", role: "Orang tua", quote: "Sangat membantu.", consentNote: "Izin WA 30 Sep", sortOrder: 5 } });
+    expect(create).toHaveBeenCalledWith({ data: { name: "Ibu Clara", role: "Orang tua", quote: "Sangat membantu.", consentNote: "Izin WA 30 Sep", isPublished: false, sortOrder: 5 } });
     expect(revalidatePath).toHaveBeenCalledWith("/");
   });
 

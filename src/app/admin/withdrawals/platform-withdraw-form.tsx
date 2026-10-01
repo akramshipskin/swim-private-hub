@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { formatRupiah } from "@/lib/format";
 import { PriceInput } from "@/components/ui/price-input";
+import { useKeepFormOnError } from "@/hooks/use-keep-form-on-error";
 
 export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number; tax: number }) {
   // revenue/tax di sini = yang SUDAH boleh ditarik (lewat masa tahan).
   const [state, action, pending] = useActionState(withdrawPlatform, null);
+  const keep = useKeepFormOnError(state, action);
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form key={keep.key} onSubmit={keep.onSubmit} className="flex flex-col gap-3">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label={`Tarik pendapatan (maks. ${formatRupiah(Math.max(0, revenue))})`}>
           <PriceInput name="revenueAmount" defaultValue={Math.max(0, revenue)} required />

@@ -5,6 +5,7 @@ import { addChildForMember } from "./actions";
 import { Field, Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { useKeepFormOnError } from "@/hooks/use-keep-form-on-error";
 
 type Member = { id: string; name: string; email: string | null; phone: string | null };
 
@@ -12,10 +13,11 @@ export default function AddChildForm({ members }: { members: Member[] }) {
   const [state, formAction, pending] = useActionState(addChildForMember, null);
   const [type, setType] = useState<"self" | "child">("child");
 
+  const keep = useKeepFormOnError(state, formAction);
   return (
     <Card className="mb-8">
       <CardBody>
-        <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+        <form key={keep.key} onSubmit={keep.onSubmit} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
           <Field label="Member (ortu)">
             <Select name="memberId" required className="w-full sm:w-56">
               {members.map((m) => (
@@ -41,6 +43,9 @@ export default function AddChildForm({ members }: { members: Member[] }) {
               <Input name="name" required className="w-full sm:w-48" />
             </Field>
           )}
+          <Field label="Tanggal Lahir (opsional)">
+            <Input name="birthDate" type="date" max={new Date().toISOString().slice(0, 10)} className="w-full sm:w-44" />
+          </Field>
           <Button type="submit" loading={pending} className="w-full sm:w-auto">
             Tambah
           </Button>
