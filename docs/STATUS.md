@@ -2,7 +2,7 @@
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: 9181551 (2 Okt; GitHub test + race hijau, Vercel selesai, dicek di situs asli)
+## Terakhir live: d51a93e (2 Okt; migrasi harga_dari_coach dijalankan Hadi di production; GitHub test + race hijau; situs asli dicek)
 
 ## Sudah selesai dan live
 - Per 30 Sep: tanggal lahir di semua form daftar; notifikasi admin pendaftar baru; testimoni; CSP aktif; PPN komisi 11%; landing dirombak; backup database dan storage hijau.
@@ -13,7 +13,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang, render-brand-social.
 
 ## Sedang jalan
-- Harga dari coach tahap 1 (2 Okt, Opus): SELESAI di laptop, di-commit, BELUM di-push. Ada migrasi baru (harga_dari_coach) -> Hadi jalankan migrasi production dulu. Rancangan: docs/designs/harga-dari-coach.md. Diuji: tes otomatis, 148 tes balapan, uji alur lewat browser lokal (pemilik kolam & coach pasang harga, member lihat harga, booking coach lain ditolak, Hadir/Tidak Hadir/Hadir + audit cocok), pemeriksa Opus kedua (4 temuan ringan, sudah dibetulkan).
+- Harga dari coach tahap 1 LIVE (2 Okt). Harga kolam/coach di production masih kosong -> landing tampil "Segera hadir" sampai Hadi menjalankan skrip isi-harga-dummy. Berikutnya tahap 2 (saldo member, ganti coach, catat setor PPh).
 
 ## Tugas Claude berikutnya
 1. Revisi animasi sesuai masukan Hadi per bagian; ukur ulang sebelum/sesudah.
@@ -22,7 +22,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 4. Harga dari coach: setelah migrasi production -> push, cek GitHub & situs asli; lalu tahap 2 (saldo member + pengajuan ganti coach), tahap 3 (S&K, perlu orang hukum).
 
 ## Tugas Hadi
-1. Jalankan migrasi production harga_dari_coach (perintah di chat 2 Okt), lalu isi harga kolam & coach di production (sebelum itu kolam tidak bisa dijual). Animasi landing v2 ditunda.
+1. Jalankan skrip isi harga dummy di production (perintah di chat 2 Okt); jawab aturan tahap 2. Animasi landing v2 ditunda.
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
