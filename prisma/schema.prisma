@@ -550,6 +550,10 @@ model Payment {
   // paket): webhook menyelesaikan pengajuannya, status paket tidak disentuh.
   coachChangeRequestId String?
   coachChangeRequest   CoachChangeRequest? @relation(fields: [coachChangeRequestId], references: [id])
+  // Cookie Pixel Meta (_fbp/_fbc) + user agent saat checkout, untuk event
+  // Purchase dari server saat notifikasi lunas (src/lib/meta-capi.ts). Tanpa IP.
+  // Dikosongkan saat akun member dihapus (anonim).
+  metaTracking      Json?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 

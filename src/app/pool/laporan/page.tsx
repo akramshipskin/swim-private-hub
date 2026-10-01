@@ -241,7 +241,7 @@ export default async function PoolLaporanPage({
         Hanya sesi yang benar-benar ditandai Hadir dan paketnya berbayar (bukan paket pemberian admin/gratis)
         yang dihitung di sini — sama seperti dasar hitung saldo kolam. Bagian kolam dipotong PPh final 0,5% yang
         disetor SPH atas nama kolam (kecuali kolam sudah menyerahkan surat bebas PPh); &ldquo;Masuk Saldo&rdquo; adalah angka
-        yang benar-benar masuk ke saldo kamu.
+        yang masuk ke saldo kamu dari sesi itu (komisi afiliasi dan koreksi saldo dari admin tercatat terpisah di halaman Saldo).
       </p>
     </main>
   );

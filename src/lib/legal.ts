@@ -11,7 +11,9 @@ export const TERMS_REVISION = 3;
 // kode afiliasi, data coach (tanggal lahir, tanda tangan), bagian data anak,
 // kunci login per akun. Teks ini belum ditinjau orang hukum.
 // 2 Okt 2026: riwayat Saldo Member, alasan ganti coach, surat pernyataan omzet
-// (PPh); disetujui orang hukum bersama draf harga-dari-coach v3.
+// (PPh); disetujui orang hukum bersama draf harga-dari-coach v3. Lalu Meta
+// Pixel + Conversions API (Hadi 2 Okt, 5B: orang hukum setuju tanpa menunggu
+// persetujuan cookie).
 export const PRIVACY_UPDATED_AT = "2 Oktober 2026";
 
 export const LEGAL_CONSENT_VERSION = `S&K ${TERMS_UPDATED_AT} rev ${TERMS_REVISION}; Privasi ${PRIVACY_UPDATED_AT}`;

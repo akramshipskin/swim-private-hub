@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { existsSync } from "node:fs";
 import { PARTNER_AGREEMENTS, needsPartnerAgreement, partnerAgreementData, partnerAgreementFor } from "./partner-agreement";
 
 const original = { coach: PARTNER_AGREEMENTS.COACH.version, pool: PARTNER_AGREEMENTS.POOL_OWNER.version };
@@ -36,5 +37,13 @@ describe("perjanjian kemitraan", () => {
     expect(partnerAgreementData("POOL_OWNER", "true")).toBeNull();
     const now = new Date("2026-10-05T00:00:00Z");
     expect(partnerAgreementData("POOL_OWNER", true, now)).toEqual({ partnerAgreementAcceptedAt: now, partnerAgreementVersion: "MOU Kolam v1" });
+  });
+
+  // Pemeriksa 2 Okt: versi diisi sebelum halaman teksnya ada = orang menyetujui
+  // dokumen yang tidak bisa dibuka (404). Tes ini gagal kalau itu terjadi.
+  it("perjanjian yang sudah aktif punya halaman teksnya", () => {
+    for (const doc of Object.values(PARTNER_AGREEMENTS)) {
+      if (doc.version) expect(existsSync(`src/app${doc.href}/page.tsx`), doc.href).toBe(true);
+    }
   });
 });

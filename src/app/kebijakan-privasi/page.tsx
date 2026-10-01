@@ -87,6 +87,7 @@ export default function KebijakanPrivasiPage() {
         <li>Memeriksa laporan kehadiran yang diajukan member.</li>
         <li>Mengirimkan notifikasi terkait pemesanan (apabila fitur ini diaktifkan oleh Pengguna).</li>
         <li>Melakukan analisis penggunaan Aplikasi secara agregat untuk kepentingan pengembangan layanan.</li>
+        <li>Mengukur dan menyempurnakan iklan Swim Private Hub di Facebook dan Instagram (lihat Meta pada bagian 4).</li>
       </ul>
 
       <h2>4. Pembagian Data kepada Pihak Ketiga</h2>
@@ -103,6 +104,19 @@ export default function KebijakanPrivasiPage() {
         <li>
           <strong>Vercel Analytics</strong> — layanan analitik kunjungan halaman
           yang bersifat <em>cookieless</em> dan tidak melacak individu pengguna.
+        </li>
+        <li>
+          <strong>Meta (Facebook dan Instagram)</strong> — penyedia layanan iklan.
+          Pada halaman umum dan halaman member, Aplikasi memuat Meta Pixel yang
+          menyimpan cookie pengenal iklan dan mengirim halaman yang dikunjungi
+          serta saat Pengguna memulai pembayaran. Ketika Pengguna mendaftar
+          sebagai member atau pembayaran paket berhasil, server kami mengirim
+          peristiwa tersebut ke Meta (Conversions API) beserta nomor HP, email,
+          dan nomor akun yang sudah diacak (<em>hash</em>) sehingga tidak dapat
+          dibaca langsung, cookie pengenal iklan, jenis peramban, alamat IP
+          (saat pendaftaran), dan nilai pembelian. Data ini dipakai untuk
+          mengukur dan menyempurnakan iklan kami. Halaman coach, pemilik kolam,
+          dan administrator tidak memuat Meta Pixel.
         </li>
         <li>
           <strong>Supabase</strong> — penyedia basis data dan penyimpanan file
@@ -139,7 +153,8 @@ export default function KebijakanPrivasiPage() {
       <h2>6. Cookie dan Penyimpanan Lokal</h2>
       <p>
         Aplikasi menggunakan sesi masuk (cookie) serta penyimpanan lokal/sesi
-        peramban untuk mendukung fungsi tertentu, termasuk preferensi tampilan.
+        peramban untuk mendukung fungsi tertentu, termasuk preferensi tampilan,
+        serta cookie pengenal iklan Meta untuk mengukur iklan.
         Penjelasan lebih lanjut tersedia pada{" "}
         <a href="/kebijakan-cookie" className="-my-3 inline-block py-3 text-brand-700 hover:underline">
           Kebijakan Cookie

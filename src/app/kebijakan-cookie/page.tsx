@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 
 export default function KebijakanCookiePage() {
   return (
-    <LegalPageLayout title="Kebijakan Cookie" updatedAt="10 September 2026">
+    <LegalPageLayout title="Kebijakan Cookie" updatedAt="2 Oktober 2026">
       <p>
         Aplikasi ini menggunakan cookie dan penyimpanan lokal peramban
-        (local/session storage) sebatas yang diperlukan agar Aplikasi dapat
-        berfungsi dengan semestinya, dan bukan untuk kepentingan periklanan
-        maupun diperjualbelikan kepada pihak ketiga.
+        (local/session storage) agar Aplikasi dapat berfungsi dengan semestinya,
+        serta cookie pengenal iklan Meta untuk mengukur iklan kami. Data
+        Pengguna tidak diperjualbelikan kepada pihak ketiga.
       </p>
 
       <h2>1. Yang Kami Gunakan</h2>
@@ -35,12 +35,23 @@ export default function KebijakanCookiePage() {
           pendaftaran untuk kebutuhan internal, dan terhapus otomatis ketika tab
           peramban ditutup.
         </li>
+        <li>
+          <strong>Cookie iklan Meta (Meta Pixel: _fbp, _fbc)</strong> — dipasang
+          pada halaman umum dan halaman member untuk mengukur kunjungan dari iklan
+          Facebook/Instagram, pendaftaran, dan pembelian paket. Tidak dipasang di
+          halaman coach, pemilik kolam, dan administrator. Rincian data yang
+          dikirim ke Meta ada di{" "}
+          <a href="/kebijakan-privasi" className="-my-3 inline-block py-3 text-brand-700 hover:underline">
+            Kebijakan Privasi
+          </a>{" "}
+          bagian 4.
+        </li>
       </ul>
 
       <h2>2. Yang Tidak Kami Gunakan</h2>
       <p>
-        Kami tidak menggunakan cookie pelacak iklan pihak ketiga (Google Ads,
-        Facebook Pixel, dan sejenisnya). Analitik kunjungan halaman (Vercel
+        Selain Meta Pixel di atas, kami tidak menggunakan cookie pelacak iklan
+        pihak ketiga lain (misalnya Google Ads). Analitik kunjungan halaman (Vercel
         Analytics) bersifat <em>cookieless</em> dan agregat, serta tidak
         melacak pengguna secara individual.
       </p>
@@ -48,7 +59,8 @@ export default function KebijakanCookiePage() {
       <h2>3. Cara Menonaktifkan</h2>
       <p>
         Pengguna dapat menghapus cookie/penyimpanan lokal kapan saja melalui
-        pengaturan peramban. Oleh karena cookie sesi masuk bersifat esensial,
+        pengaturan peramban, atau memblokir cookie pihak ketiga untuk menolak
+        cookie iklan Meta. Oleh karena cookie sesi masuk bersifat esensial,
         penghapusannya akan secara otomatis mengeluarkan (logout) Pengguna dari
         Aplikasi.
       </p>

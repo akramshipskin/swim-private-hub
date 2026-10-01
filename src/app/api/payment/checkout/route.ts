@@ -8,6 +8,8 @@ import { NON_CARD_PAYMENTS } from "@/lib/midtrans-methods";
 import { withDedupeLock } from "@/lib/dedupe-lock";
 import { trialBlockingPackageWhere } from "@/lib/trial";
 import { userErrorMessage } from "@/lib/user-error";
+import { metaCapiEnabled, sendMetaEvent, trackingFromRequest } from "@/lib/meta-capi";
+import { clientIp } from "@/lib/rate-limit";
 
 
 export async function POST(request: Request) {
@@ -86,6 +88,10 @@ export async function POST(request: Request) {
   // Klik Beli dobel (atau 2 tab) dulu bikin paket "Menunggu pembayaran"
   // numpuk. Tolak pembelian barang yang sama buat anak yang sama kalau
   // yang sebelumnya baru dibuat < 1 menit lalu.
+  // Cookie Pixel Meta + user agent, disimpan di Payment untuk event Purchase
+  // saat notifikasi lunas datang (Hadi 2 Okt, 5A).
+  const metaTracking = trackingFromRequest(request);
+
   const pkg = await withDedupeLock(`checkout:${session.user.id}:${dependentId}`, async (tx) => {
     const recentDuplicate = await tx.package.findFirst({
       where: {
@@ -138,7 +144,7 @@ export async function POST(request: Request) {
       // terpakai tanpa tagihan yang bisa kedaluwarsa.
       const cash = item.price - saldoUsed;
       const orderId = `PKG-${created.id}-${Date.now()}`;
-      await tx.payment.create({ data: { packageId: created.id, midtransOrderId: orderId, amount: cash, status: "PENDING" } });
+      await tx.payment.create({ data: { packageId: created.id, midtransOrderId: orderId, amount: cash, status: "PENDING", metaTracking } });
       return { ...created, cash, orderId };
     }
     const now = new Date();
@@ -166,7 +172,21 @@ export async function POST(request: Request) {
 
   const orderId = pkg.orderId;
   const origin = new URL(request.url).origin;
-  if (pkg.cash === 0) return Response.json({ redirectUrl: `${origin}/pembayaran/sukses` });
+  if (pkg.cash === 0) {
+    // Lunas dari saldo = pembelian selesai sekarang (tidak ada notifikasi Midtrans).
+    if (metaCapiEnabled()) {
+      const member = await prisma.user.findUnique({ where: { id: session.user.id }, select: { phone: true, email: true } });
+      await sendMetaEvent({
+        eventName: "Purchase",
+        eventId: `SALDO-${pkg.id}`,
+        user: { userId: session.user.id, email: member?.email, phone: member?.phone },
+        tracking: { ...metaTracking, ip: clientIp(request.headers) },
+        sourceUrl: `${origin}/pembayaran/sukses`,
+        value: item.price,
+      });
+    }
+    return Response.json({ redirectUrl: `${origin}/pembayaran/sukses` });
+  }
 
   try {
     const transaction = await snap.createTransaction({

@@ -6,6 +6,10 @@ vi.mock("@/lib/midtrans", () => ({ platformServerKey: () => "server-key" }));
 const sendPushToUser = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/lib/push", () => ({ sendPushToUser: (...a: unknown[]) => sendPushToUser(...a) }));
 
+const sendMetaEvent = vi.fn().mockResolvedValue(undefined);
+let metaEnabled = false;
+vi.mock("@/lib/meta-capi", () => ({ metaCapiEnabled: () => metaEnabled, sendMetaEvent: (...a: unknown[]) => sendMetaEvent(...a) }));
+
 const paymentFindUnique = vi.fn();
 const packageUpdate = vi.fn().mockResolvedValue({});
 const tx = {
@@ -15,6 +19,7 @@ const tx = {
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     payment: { findUnique: (...a: unknown[]) => paymentFindUnique(...a), update: vi.fn() },
+    user: { findUnique: vi.fn().mockResolvedValue({ phone: "081200000009", email: null }) },
     $transaction: (fn: (t: typeof tx) => unknown) => fn(tx),
   },
 }));
@@ -200,5 +205,49 @@ describe("webhook amount check", () => {
     const data = tx.payment.updateMany.mock.calls.at(-1)![0].data;
     expect(data.status).toBe("SUCCESS");
     expect(data.paidAt).toBeInstanceOf(Date);
+  });
+});
+
+describe("webhook: pelacak iklan Meta (Purchase)", () => {
+  const paid = (over: Record<string, unknown> = {}) => ({
+    id: "pay-m",
+    status: "PENDING",
+    amount: 135000,
+    packageId: "pkg-m",
+    metaTracking: { fbp: "fb.1.1.1", ua: "UA" },
+    package: { memberId: "member-m", name: "Paket 4 sesi", saldoUsed: 0, isSingleSession: false, durationDays: 60, template: null },
+    ...over,
+  });
+
+  // Nilai = tunai + saldo terpakai; saldo 0 di sini karena saldo > 0 memicu
+  // penarikan saldo ulang (dites terpisah di tes saldo member).
+  it("aktif: sekali saat pertama lunas, event id = order id", async () => {
+    metaEnabled = true;
+    paymentFindUnique.mockResolvedValue(paid());
+    await POST(settlement());
+    expect(sendMetaEvent).toHaveBeenCalledTimes(1);
+    expect(sendMetaEvent.mock.calls[0][0]).toMatchObject({
+      eventName: "Purchase",
+      eventId: "PKG-1",
+      value: 135000,
+      tracking: { fbp: "fb.1.1.1", ua: "UA" },
+      user: { userId: "member-m", phone: "081200000009" },
+    });
+
+    sendMetaEvent.mockClear();
+    paymentFindUnique.mockResolvedValue(paid({ status: "SUCCESS" }));
+    await POST(settlement());
+    expect(sendMetaEvent).not.toHaveBeenCalled();
+    metaEnabled = false;
+  });
+
+  it("tidak aktif (env kosong) atau masih ditahan: tidak mengirim", async () => {
+    paymentFindUnique.mockResolvedValue(paid());
+    await POST(settlement());
+    metaEnabled = true;
+    paymentFindUnique.mockResolvedValue(paid());
+    await POST(capture("challenge"));
+    metaEnabled = false;
+    expect(sendMetaEvent).not.toHaveBeenCalled();
   });
 });

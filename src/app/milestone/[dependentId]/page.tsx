@@ -37,6 +37,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.mustChangePassword) redirect("/ganti-password");
+  if (session.user.needsPartnerAgreement) redirect("/perjanjian");
   const { dependentId } = await params;
 
   const access = await milestoneAccess(session.user, dependentId);

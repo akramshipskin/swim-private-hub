@@ -7,6 +7,7 @@ import { sendPushToUser } from "@/lib/push";
 import { completeCoachChange, notifyCoachChangeResult } from "@/lib/coach-change";
 import { creditMember, reclaimRefundedBalance, refundMemberBalanceOnce } from "@/lib/member-wallet";
 import { notifyAdmins } from "@/lib/notify";
+import { metaCapiEnabled, sendMetaEvent, type MetaTracking } from "@/lib/meta-capi";
 
 // Signature Midtrans dihitung pake Server Key platform -- service
 // provider posture (revisi 2026-09-12), 1 akun Midtrans buat semua kolam.
@@ -231,6 +232,19 @@ export async function POST(request: Request) {
       body: `${payment.package.name} sudah aktif. Yuk booking jadwal.`,
       url: "/member/booking",
     }).catch(() => {});
+    // Pelacak iklan Meta (Hadi 2 Okt, 5A): sekali, di transisi pertama ke
+    // lunas. Nilai = total harga paket (tunai + saldo yang dipakai).
+    if (metaCapiEnabled()) {
+      const member = await prisma.user.findUnique({ where: { id: payment.package.memberId }, select: { phone: true, email: true } }).catch(() => null);
+      await sendMetaEvent({
+        eventName: "Purchase",
+        eventId: orderId,
+        user: { userId: payment.package.memberId, phone: member?.phone, email: member?.email },
+        tracking: (payment.metaTracking ?? {}) as MetaTracking,
+        sourceUrl: `${new URL(request.url).origin}/pembayaran/sukses`,
+        value: payment.amount + payment.package.saldoUsed,
+      }).catch(() => {});
+    }
   }
 
   if (saldoShortage > 0) {

@@ -23,12 +23,14 @@ const nextConfig: NextConfig = {
     const isDev = process.env.NODE_ENV !== "production";
     const csp = [
       "default-src 'self'",
-      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com`,
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com https://connect.facebook.net`,
       "style-src 'self' 'unsafe-inline'",
       // Foto kolam/coach dari Supabase Storage (host berbeda per proyek) + ikon data:.
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      `connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com${isDev ? " ws: http://localhost:*" : ""}`,
+      // Pixel Meta (src/components/meta-pixel.tsx): skrip dari connect.facebook.net,
+      // kiriman event ke www.facebook.com (gambar sudah lolos lewat img-src https:).
+      `connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com https://www.facebook.com https://connect.facebook.net${isDev ? " ws: http://localhost:*" : ""}`,
       "worker-src 'self'",
       "manifest-src 'self'",
       "object-src 'none'",

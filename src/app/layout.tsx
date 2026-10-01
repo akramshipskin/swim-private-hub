@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import AuthSessionProvider from "@/components/session-provider";
 import ServiceWorkerRegister from "@/components/service-worker-register";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { MetaPixel } from "@/components/meta-pixel";
 import "./globals.css";
 
 // Identitas visual sengaja beda total dari les-renang-cianjur (Geist) --
@@ -77,6 +78,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AuthSessionProvider>{children}</AuthSessionProvider>
         <CookieConsentBanner />
         <Analytics />
+        <MetaPixel />
       </body>
     </html>
   );

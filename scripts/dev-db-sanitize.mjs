@@ -87,6 +87,7 @@ export const POLICY = {
     // Payload webhook Midtrans memuat data pembayar; link Snap = token bayar asli.
     rawWebhookPayload: () => null,
     snapRedirectUrl: () => null,
+    metaTracking: () => null,
   },
   ChatThread: keep("id", "userId", "needsAdmin", "updatedAt", "createdAt"),
   ChatMessage: {

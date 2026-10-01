@@ -7,6 +7,7 @@ import { normalizeAffiliateCode } from "@/lib/affiliate";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, MAX_EMAIL, MAX_NAME, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
 import { userErrorMessage } from "@/lib/user-error";
+import { sendMetaEvent, trackingFromRequest } from "@/lib/meta-capi";
 
 // Batas jumlah anak per pendaftaran (wajar untuk satu keluarga; mencegah body raksasa).
 const MAX_CHILDREN = 10;
@@ -183,6 +184,14 @@ export async function POST(request: Request) {
       return created;
     });
 
+    // Pelacak iklan Meta (Hadi 2 Okt, 5A): daftar member = konversi utama iklan.
+    await sendMetaEvent({
+      eventName: "CompleteRegistration",
+      eventId: `REG-${user.id}`,
+      user: { userId: user.id, phone: user.phone, email: user.email },
+      tracking: { ...trackingFromRequest(request), ip: registeredIp },
+      sourceUrl: request.headers.get("referer") ?? `${new URL(request.url).origin}/register`,
+    });
     return Response.json({ user }, { status: 201 });
   } catch (err) {
     // Race jarang: 2 request register HP/email sama nyaris bersamaan,

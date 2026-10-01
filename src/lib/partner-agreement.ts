@@ -6,6 +6,8 @@
 // diminta di pendaftaran dan akun lama tidak diarahkan ke halaman setuju.
 // Isi versi (mis. "Perjanjian Coach 5 Oktober 2026") begitu teksnya tayang;
 // mengubah versi = semua coach/pemilik kolam diminta setuju ulang (Hadi 4A).
+// Versi coach dan kolam wajib berbeda (awali dengan nama dokumen): kolom
+// versinya satu, jadi teks versi yang sama dianggap sudah disetujui.
 export const PARTNER_AGREEMENTS = {
   COACH: { version: null as string | null, title: "Perjanjian Kemitraan Coach", href: "/perjanjian-coach" },
   POOL_OWNER: { version: null as string | null, title: "MOU Kolam Mitra", href: "/mou-kolam" },

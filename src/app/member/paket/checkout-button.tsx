@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/input";
+import { trackMeta } from "@/components/meta-pixel";
 
 type Dependent = { id: string; name: string };
 
@@ -28,6 +29,7 @@ export default function CheckoutButton({
     }
     setLoading(true);
     setError(null);
+    trackMeta("InitiateCheckout");
 
     try {
       const res = await fetch("/api/payment/checkout", {

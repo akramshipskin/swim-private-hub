@@ -1,6 +1,7 @@
 import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 
 // Hapus akun member (keputusan Hadi 25 Sep): member mengajukan dari Profil,
@@ -90,6 +91,8 @@ export async function anonymizeMember(userId: string) {
     await tx.dependent.updateMany({ where: { memberId: userId }, data: { name: ANONYMIZED_DEPENDENT_NAME, isActive: false, birthDate: null } });
     await tx.milestoneNote.updateMany({ where: { dependent: { memberId: userId } }, data: { note: ANONYMIZED_NOTE } });
     await tx.pushSubscription.deleteMany({ where: { userId } });
+    // Cookie pelacak iklan Meta yang tersimpan saat checkout.
+    await tx.payment.updateMany({ where: { package: { memberId: userId }, NOT: { metaTracking: { equals: Prisma.DbNull } } }, data: { metaTracking: Prisma.DbNull } });
   });
 
   // Booking yang belum dimulai dibatalkan sebagai pembatalan admin (slot coach

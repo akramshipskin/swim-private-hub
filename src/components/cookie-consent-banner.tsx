@@ -34,8 +34,9 @@ export function CookieConsentBanner() {
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface px-4 py-2.5 shadow-[0_-4px_16px_-4px_rgba(20,20,15,0.15)] sm:py-3">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
         <p className="text-xs text-text-muted sm:text-sm">
-          Kami pakai cookie sesi masuk dan penyimpanan tema seperlunya agar aplikasi
-          ini jalan.{" "}
+          {process.env.NEXT_PUBLIC_META_PIXEL_ID
+            ? "Kami pakai cookie agar aplikasi ini jalan dan untuk mengukur iklan kami di Meta."
+            : "Kami pakai cookie sesi masuk dan penyimpanan tema seperlunya agar aplikasi ini jalan."}{" "}
           <a href="/kebijakan-cookie" className="-my-3.5 inline-block py-3.5 font-medium text-brand-700 hover:underline">
             Kebijakan Cookie
           </a>

@@ -21,6 +21,7 @@ class MilestoneError extends Error {}
 async function requireTeachingCoach(dependentId: string) {
   const session = await auth();
   if (!session || session.user.role !== "COACH") throw new MilestoneError("Hanya coach yang bisa mengisi milestone.");
+  if (session.user.needsPartnerAgreement) throw new MilestoneError("Setujui perjanjian kemitraan dulu.");
   if (!(await coachTeachesDependent(session.user.id, dependentId))) {
     throw new MilestoneError("Kamu belum pernah mengajar peserta ini.");
   }
