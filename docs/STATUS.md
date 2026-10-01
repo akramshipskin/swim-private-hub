@@ -2,7 +2,7 @@
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: 50df207 (2 Okt; migrasi saldo_member_ganti_coach dijalankan Hadi; GitHub test + race hijau; situs asli dicek)
+## Terakhir live: 6012572 (2 Okt malam; GitHub hijau, Vercel sukses; tanpa migrasi baru)
 
 ## Sudah selesai dan live
 - Per 30 Sep: tanggal lahir di semua form daftar; notifikasi admin pendaftar baru; testimoni; CSP aktif; PPN komisi 11%; landing dirombak; backup database dan storage hijau.
@@ -16,15 +16,18 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja, Hadi), isi-harga-dummy (production: HARGA_DUMMY_PROD=1, Hadi), render-brand-social.
 
 ## Sedang jalan
-- Tidak ada. Harga dari coach tahap 1-2 live (diuji: 725 tes, 160 tes balapan, alur browser lokal, 2 putaran pemeriksa Opus kedua). Jalur bayar Midtrans (beli & tambah bayar ganti coach) belum diklik di laptop maupun production.
+- Menunggu 5 jawaban Hadi (2 Okt malam): (1) slot terbuka lagi saat coach batal karena sakit: tutup/biarkan; (2) 7 perbaikan ringan sisa sweeping (testimoni langsung tampil, konfirmasi admin uang, label "Sesi habis", Lanjut bayar di Riwayat Bayar, form kosong setelah ditolak, tgl lahir di tambah peserta admin, laporan kolam sebelum PPh); (3) MOU & perjanjian coach: centang di aplikasi saat daftar vs tanda tangan PDF diunggah admin; (4) terbitkan draf MOU/perjanjian jadi halaman pribadi; (5) landing mulai dari pelacak iklan Meta (Pixel + Conversions API, perlu ubah Kebijakan Privasi/Cookie + orang hukum) atau bagian harga.
+- Jalur bayar Midtrans (beli, sesi coba, tambah bayar ganti coach, saldo dipakai dulu) sudah diuji di laptop mode uji + notifikasi tiruan; di production belum ada pembayaran sungguhan.
 
 ## Tugas Claude berikutnya
-1. Nilai ulang komisi afiliasi 5% (sisa SPH tipis setelah biaya Midtrans) sebelum iklan jalan.
-2. Animasi landing v2: revisi sesuai masukan Hadi (ditunda atas permintaan Hadi).
-3. Audit buku besar production diulang setelah ada transaksi asli (2 Okt: cocok). Cek GitHub & situs asli setelah tiap push.
+1. Kerjakan jawaban Hadi atas 5 pertanyaan di atas (yang menyentuh booking/uang = Opus + pemeriksa kedua).
+2. Nilai ulang komisi afiliasi 5% (sisa SPH tipis setelah biaya Midtrans) sebelum iklan jalan.
+3. Animasi landing v2: revisi sesuai masukan Hadi (ditunda; belum ada masukan tertunda).
+4. Rekening coach/kolam yang tersimpan format lama tidak dinormalisasi otomatis: cek sebelum ada coach asli.
+5. Audit buku besar production diulang setelah ada transaksi asli (2 Okt: cocok). Cek GitHub & situs asli setelah tiap push.
 
 ## Tugas Hadi
-1. Cek menu Paket (member) & Ganti Coach (admin) di production.
+1. Jawab 5 pertanyaan (lihat Sedang jalan). Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif (tombol Beli sudah dibetulkan).
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
@@ -36,4 +39,5 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 
 ## Catatan lingkungan lokal
 - Port 3100 di laptop dipakai server Next lain (bukan dari Claude, tidak dimatikan); uji Claude pakai konfigurasi swim-private-hub-dev-3102. Data uji harga-coach lokal: paket uji-hdc-*, saldo Member 8, pengajuan ganti coach Coach 4 -> Coach 5.
+- Sweep 2 Okt malam meninggalkan data uji lokal: akun 089977700002-05 (impor, daftar member/coach/kolam; 089977700003 terkunci 15 menit), paket & booking Member 12 / Anak Uji Sweep, saldo coach/kolam bergeser. Database lokal (db:dev) & penyimpanan tiruan (qa-storage) harus dinyalakan ulang setelah laptop tidur.
 - Akun admin lokal (089900000001) sekarang ber-2FA; kode lewat scripts/qa-otp.mts. Data uji lokal: Kolam Bahari 0/60 (uji 30 Sep), 5 sesi Hadir tanpa uang (pembayaran disisipkan belakangan), saldo kolam/coach berubah karena uji aksi uang 2 Okt.
