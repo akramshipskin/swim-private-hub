@@ -5,6 +5,7 @@ import { dateLabel, todayWibDateString } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import PoolShareForm from "./pool-share-form";
+import PoolPricingForm from "./pool-pricing-form";
 import AffiliateCoachForm from "./affiliate-coach-form";
 import PoolActiveToggle from "./pool-active-toggle";
 import PoolInfoForm from "@/components/pool-info-form";
@@ -25,6 +26,10 @@ export default async function AdminKolamPage() {
         isActive: true,
         commissionPercent: true,
         coachSharePercent: true,
+        pricePack4: true,
+        pricePack8: true,
+        serviceFeeBps: true,
+        pphExempt: true,
         walletBalance: true,
         description: true,
         address: true,
@@ -59,7 +64,7 @@ export default async function AdminKolamPage() {
   // Rincian asal saldo per kolam: pendapatan sesi dipisah menurut jenis paket
   // yang dipakai (paket kolam ini / beli 1 sesi / paket kolam lain dari masa
   // lintas-kolam sebelum 17 Sep 2026), lalu dikurangi pencairan.
-  const [revenueTxns, paidOut, processing] = await Promise.all([
+  const [revenueTxns, paidOut, processing, pphByPool, affiliateByPool] = await Promise.all([
     prisma.walletTransaction.findMany({
       where: { type: "SESSION_REVENUE", poolId: { not: null } },
       select: { poolId: true, amount: true, bookingId: true },
@@ -69,6 +74,10 @@ export default async function AdminKolamPage() {
     // balik lagi kalau ditolak/gagal), jadi harus muncul di rincian supaya
     // jumlahnya cocok dengan saldo.
     prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { not: null }, status: { in: ["PENDING", "PROCESSING"] } }, _sum: { amount: true } }),
+    // Potongan PPh 0,5% paket model harga-dari-coach (baris negatif).
+    prisma.walletTransaction.groupBy({ by: ["poolId"], where: { type: "PPH_WITHHELD", poolId: { not: null } }, _sum: { amount: true } }),
+    // Komisi afiliasi yang sudah cair ke saldo kolam (dulu tidak tampil, rincian selisih dari saldo).
+    prisma.walletTransaction.groupBy({ by: ["poolId"], where: { type: "AFFILIATE_COMMISSION", poolId: { not: null } }, _sum: { amount: true } }),
   ]);
   // Booking mendatang yang masih jalan di kolam nonaktif (kolam dinonaktifkan
   // setelah member booking): tetap berlaku, admin perlu menghubungi member.
@@ -149,7 +158,7 @@ export default async function AdminKolamPage() {
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                   <div className="rounded-xl bg-surface-muted p-3">
-                    <p className="text-sm font-semibold text-text">Harga paket</p>
+                    <p className="text-sm font-semibold text-text">Katalog paket lama (untuk pemberian paket manual)</p>
                     {p.packageTemplates.length === 0 ? (
                       <p className="text-sm text-warning-text">Belum ada paket di katalog.</p>
                     ) : (
@@ -169,6 +178,8 @@ export default async function AdminKolamPage() {
                     const r = revenueBreakdown(p.id);
                     const paid = paidOut.find((x) => x.poolId === p.id)?._sum.amount ?? 0;
                     const inProgress = processing.find((x) => x.poolId === p.id)?._sum.amount ?? 0;
+                    const pph = pphByPool.find((x) => x.poolId === p.id)?._sum.amount ?? 0;
+                    const affiliate = affiliateByPool.find((x) => x.poolId === p.id)?._sum.amount ?? 0;
                     return (
                       <div className="rounded-xl bg-surface-muted p-3">
                         <div className="flex items-baseline justify-between gap-2">
@@ -181,6 +192,8 @@ export default async function AdminKolamPage() {
                           <dt className="text-text-muted">Dari beli 1 sesi (member kolam lain)</dt><dd className="text-right text-text">{formatRupiah(r.single)}</dd>
                           {r.legacy > 0 && (<><dt className="text-text-muted">Paket kolam lain (sebelum 17 Sep)</dt><dd className="text-right text-text">{formatRupiah(r.legacy)}</dd></>)}
                           {r.manual !== 0 && (<><dt className="text-text-muted">Koreksi manual (tanpa sesi)</dt><dd className="text-right text-text">{r.manual < 0 ? "−" : ""}{formatRupiah(Math.abs(r.manual))}</dd></>)}
+                          {affiliate !== 0 && (<><dt className="text-text-muted">Komisi afiliasi</dt><dd className="text-right text-text">{formatRupiah(affiliate)}</dd></>)}
+                          {pph !== 0 && (<><dt className="text-text-muted">Potongan PPh 0,5% (disetor SPH)</dt><dd className="text-right text-text">−{formatRupiah(-pph)}</dd></>)}
                           <dt className="text-text-muted">Sudah dicairkan</dt><dd className="text-right text-text">−{formatRupiah(paid)}</dd>
                           {inProgress > 0 && (<><dt className="text-text-muted">Pencairan sedang diproses</dt><dd className="text-right text-text">−{formatRupiah(inProgress)}</dd></>)}
                         </dl>
@@ -188,7 +201,20 @@ export default async function AdminKolamPage() {
                     );
                   })()}
                   <div className="rounded-xl bg-surface-muted p-3">
-                    <p className="mb-2 text-sm font-semibold text-text">Pembagian komisi</p>
+                    <p className="mb-2 text-sm font-semibold text-text">Harga paket kolam &amp; biaya layanan</p>
+                    <PoolPricingForm
+                      poolId={p.id}
+                      pricePack4={p.pricePack4}
+                      pricePack8={p.pricePack8}
+                      serviceFeeBps={p.serviceFeeBps}
+                      pphExempt={p.pphExempt}
+                    />
+                    <p className="mt-2 text-xs text-text-subtle">
+                      Dipakai paket baru (pilih kolam + coach). Biaya layanan dibayar member di atas harga kolam + coach.
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-surface-muted p-3">
+                    <p className="mb-2 text-sm font-semibold text-text">Pembagian komisi paket lama</p>
                     <PoolShareForm
                       poolId={p.id}
                       commissionPercent={p.commissionPercent}

@@ -5,6 +5,7 @@ import { formatRupiah } from "@/lib/format";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
 import { AFFILIATE_PAYOUT_NOTE } from "@/lib/affiliate";
+import { formatBps } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Bagi Hasil | Swim Private Hub",
@@ -43,12 +44,13 @@ export default async function KomisiPage() {
             totalSesi: true,
             isSingleSession: true,
             poolId: true,
+            coachId: true,
             payments: { where: { status: "SUCCESS" }, select: { amount: true }, take: 1 },
           },
         },
       },
     }),
-    prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, commissionPercent: true, coachSharePercent: true, walletBalance: true } }),
+    prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, commissionPercent: true, coachSharePercent: true, serviceFeeBps: true, walletBalance: true } }),
     prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { not: null }, status: "PAID" }, _sum: { amount: true } }),
     // Koreksi manual saldo kolam (baris tanpa sesi, dibuat langsung di DB):
     // tidak masuk tabel sesi di bawah, tapi ikut di "Saldo kolam". Ditampilkan
@@ -74,6 +76,9 @@ export default async function KomisiPage() {
     }),
   ]);
   const affiliatePaidOut = affiliatePaid._sum.amount ?? 0;
+  // Titipan PPh 0,5% dari bagian kolam/coach (paket model harga-dari-coach):
+  // uang mereka yang disetor SPH ke kantor pajak, bukan pendapatan SPH.
+  const pphHeld = -((await prisma.walletTransaction.aggregate({ where: { type: "PPH_WITHHELD" }, _sum: { amount: true } }))._sum.amount ?? 0);
   const manualOf = (t: string) => manualOther.find((x) => x.type === t)?._sum.amount ?? 0;
   const manualCoach = manualOf("SESSION_PAYOUT");
   const manualPlatformNet = manualOf("PLATFORM_REVENUE");
@@ -95,11 +100,11 @@ export default async function KomisiPage() {
   // jumlah pembulatan per sesi (angka Dashboard & Pencairan pakai ledger).
   type Part = { sessions: number; gross: number; platform: number; tax: number; pool: number; coach: number };
   const zero = (): Part => ({ sessions: 0, gross: 0, platform: 0, tax: 0, pool: 0, coach: 0 });
-  const byPool = new Map<string, { own: Part; single: Part; legacy: Part; noShow: Part; free: number }>();
+  const byPool = new Map<string, { own: Part; coach: Part; single: Part; legacy: Part; noShow: Part; free: number }>();
 
   for (const b of attendedBookings) {
     const poolId = b.availability.poolId;
-    if (!byPool.has(poolId)) byPool.set(poolId, { own: zero(), single: zero(), legacy: zero(), noShow: zero(), free: 0 });
+    if (!byPool.has(poolId)) byPool.set(poolId, { own: zero(), coach: zero(), single: zero(), legacy: zero(), noShow: zero(), free: 0 });
     const entry = byPool.get(poolId)!;
     const payment = b.package.payments[0];
     if (!payment) {
@@ -107,8 +112,17 @@ export default async function KomisiPage() {
       continue;
     }
     const part =
-      b.attended === false ? entry.noShow : b.package.isSingleSession ? entry.single : b.package.poolId !== poolId ? entry.legacy : entry.own;
-    const gross = Math.round(payment.amount / b.package.totalSesi);
+      b.attended === false
+        ? entry.noShow
+        : b.package.coachId
+          ? entry.coach
+          : b.package.isSingleSession
+            ? entry.single
+            : b.package.poolId !== poolId
+              ? entry.legacy
+              : entry.own;
+    // Paket model harga-dari-coach dibagi dari floor(bayar / sesi), sama dengan wallet.
+    const gross = b.package.coachId ? Math.floor(payment.amount / b.package.totalSesi) : Math.round(payment.amount / b.package.totalSesi);
     const pool = credited(b.id, "SESSION_REVENUE");
     const coach = credited(b.id, "SESSION_PAYOUT");
     part.sessions += 1;
@@ -120,7 +134,7 @@ export default async function KomisiPage() {
   }
 
   const sum = (parts: Part[], k: keyof Part) => parts.reduce((n, p) => n + p[k], 0);
-  const allParts = [...byPool.values()].flatMap((e) => [e.own, e.single, e.legacy, e.noShow]);
+  const allParts = [...byPool.values()].flatMap((e) => [e.own, e.coach, e.single, e.legacy, e.noShow]);
   const totalPlatform = sum(allParts, "platform");
   const totalTax = sum(allParts, "tax");
 
@@ -130,7 +144,8 @@ export default async function KomisiPage() {
       <p className="mt-1 text-sm text-text-muted">
         Pembagian uang dari setiap sesi yang sudah ditandai: komisi platform, komisi kolam, dan komisi coach. Sesi
         Tidak Hadir (peserta sudah booking tapi tidak datang): coach dapat 50% dari bagiannya, kolam tidak dapat bagian.
-        Sesi yang belum ditandai belum dihitung. Nilai sesi = harga paket ÷ jumlah sesi.
+        Sesi yang belum ditandai belum dihitung. Nilai sesi = harga paket ÷ jumlah sesi. Paket pilih coach: kolam dan coach
+        dapat harga mereka ÷ jumlah sesi (sebelum potongan PPh 0,5%), sisanya biaya layanan SPH.
       </p>
       <Card className="mt-4">
         <CardBody className="flex flex-wrap items-center justify-between gap-3">
@@ -147,6 +162,11 @@ export default async function KomisiPage() {
               bersih {formatRupiah(totalPlatform - totalTax)} · PPN {formatRupiah(totalTax)}
             </span>
           </p>
+          {pphHeld !== 0 && (
+            <p className="order-4 w-full border-t border-border pt-2 text-xs text-text-subtle sm:order-none">
+              Titipan PPh 0,5% dari bagian kolam &amp; coach (bukan pendapatan SPH, wajib disetor atas nama mereka): {signed(pphHeld)}
+            </p>
+          )}
           {affiliatePaidOut !== 0 && (
             <p className="order-4 w-full border-t border-border pt-2 text-xs text-text-subtle sm:order-none">
               Komisi afiliasi yang sudah dibayar dari bagian SPH (ikut mengurangi saldo platform, tidak masuk hitungan di halaman ini): {signed(affiliatePaidOut)}
@@ -166,14 +186,15 @@ export default async function KomisiPage() {
 
       <div className="mt-4 grid grid-cols-1 gap-4 min-[1800px]:grid-cols-2">
         {pools.map((pool) => {
-          const e = byPool.get(pool.id) ?? { own: zero(), single: zero(), legacy: zero(), noShow: zero(), free: 0 };
+          const e = byPool.get(pool.id) ?? { own: zero(), coach: zero(), single: zero(), legacy: zero(), noShow: zero(), free: 0 };
           const parts = [
-            { label: "Paket kolam ini", p: e.own },
+            ...(e.coach.sessions > 0 ? [{ label: "Paket pilih coach", p: e.coach }] : []),
+            { label: "Paket kolam ini (lama)", p: e.own },
             { label: "Beli 1 sesi", p: e.single },
             ...(e.legacy.sessions > 0 ? [{ label: "Paket kolam lain (sebelum 17 Sep)", p: e.legacy }] : []),
             ...(e.noShow.sessions > 0 ? [{ label: "Peserta tidak datang", p: e.noShow }] : []),
           ];
-          const all = [e.own, e.single, e.legacy, e.noShow];
+          const all = [e.own, e.coach, e.single, e.legacy, e.noShow];
           // Tampilan HP: tabel 7 kolom tidak muat, jadi tiap baris jadi kartu.
           const cards = [
             ...parts.map(({ label, p }) => ({ label, total: false, p })),
@@ -191,7 +212,7 @@ export default async function KomisiPage() {
                   <div>
                     <h2 className="text-lg font-semibold text-text">{pool.name}</h2>
                     <p className="text-sm text-text-muted">
-                      Komisi {pool.commissionPercent}% · coach {pool.coachSharePercent}% · kolam {100 - pool.commissionPercent - pool.coachSharePercent}%
+                      Paket pilih coach: biaya layanan {formatBps(pool.serviceFeeBps)} · paket lama: komisi {pool.commissionPercent}% · coach {pool.coachSharePercent}% · kolam {100 - pool.commissionPercent - pool.coachSharePercent}%
                     </p>
                   </div>
                   <Link href={`/admin/withdrawals?pool=${pool.id}`} className="shrink-0 text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">

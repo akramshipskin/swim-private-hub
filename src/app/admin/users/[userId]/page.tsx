@@ -1,5 +1,6 @@
 import { isPendingApproval } from "@/lib/pending-approval";
 import Link from "next/link";
+import CoachPricingForm from "./coach-pricing-form";
 import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
@@ -250,6 +251,15 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                 }
               />
               {user.coachProfile.bio && <p className="mt-3 text-sm text-text-muted">{user.coachProfile.bio}</p>}
+              <div className="mt-3 rounded-xl bg-surface-muted p-3">
+                <p className="mb-2 text-sm font-semibold text-text">Harga paket coach</p>
+                <CoachPricingForm
+                  userId={user.id}
+                  pricePack4={user.coachProfile.pricePack4}
+                  pricePack8={user.coachProfile.pricePack8}
+                  pphExempt={user.coachProfile.pphExempt}
+                />
+              </div>
               <Link
                 href={`/pelatih/${user.id}`}
                 className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"

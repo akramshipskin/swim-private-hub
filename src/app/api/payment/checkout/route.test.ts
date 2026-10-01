@@ -5,20 +5,20 @@ vi.mock("@/lib/dependents", () => ({ assertDependentOwnedByMember: vi.fn().mockR
 const createTransaction = vi.fn().mockResolvedValue({ redirect_url: "https://pay" });
 vi.mock("@/lib/midtrans", () => ({ snap: { createTransaction: (...a: unknown[]) => createTransaction(...a) } }));
 
-const packageCount = vi.fn();
+const packageCount = vi.fn().mockResolvedValue(0);
 const packageFindFirst = vi.fn().mockResolvedValue(null);
 const packageCreate = vi.fn().mockResolvedValue({ id: "pkg-new" });
 const poolFindFirst = vi.fn();
-const templateFindFirst = vi.fn();
+const userFindFirst = vi.fn();
 const paymentCreate = vi.fn().mockResolvedValue({});
 const paymentDeleteMany = vi.fn().mockResolvedValue({ count: 1 });
 const paymentUpdate = vi.fn().mockResolvedValue({});
 const packageDelete = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    package: { count: packageCount, findFirst: packageFindFirst, create: packageCreate, delete: (...a: unknown[]) => packageDelete(...a) },
+    package: { count: (...a: unknown[]) => packageCount(...a), findFirst: packageFindFirst, create: packageCreate, delete: (...a: unknown[]) => packageDelete(...a) },
     pool: { findFirst: poolFindFirst },
-    packageTemplate: { findFirst: templateFindFirst },
+    user: { findFirst: userFindFirst },
     payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a), update: (...a: unknown[]) => paymentUpdate(...a) },
     $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
   },
@@ -35,51 +35,100 @@ function req(body: object) {
   return new Request("http://x/api/payment/checkout", { method: "POST", body: JSON.stringify(body) });
 }
 
+const POOL = { id: "pool-A", pricePack4: 260_000, pricePack8: 480_000, serviceFeeBps: 650 };
+const COACH = { name: "Coach Budi", coachProfile: { isActive: true, pricePack4: 440_000, pricePack8: 800_000 } };
+const buy = (o: object = {}) => req({ dependentId: "d1", poolId: "pool-A", coachId: "c1", sesi: 8, ...o });
+
 beforeEach(() => {
   vi.clearAllMocks();
   packageFindFirst.mockResolvedValue(null);
+  packageCount.mockResolvedValue(0);
+  poolFindFirst.mockResolvedValue(POOL);
+  userFindFirst.mockResolvedValue(COACH);
 });
 
-describe("checkout 1 sesi", () => {
-  it("refuses when the member has no active regular package", async () => {
-    packageCount.mockResolvedValue(0);
-    const res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
-    expect(res.status).toBe(403);
-    expect(packageCount).toHaveBeenCalledWith({
-      where: expect.objectContaining({ memberId: "m1", isSingleSession: false }),
+describe("checkout paket pilih coach", () => {
+  it("menagih harga hitungan server dan menyalin harga ke paket", async () => {
+    const res = await POST(buy({ price: 1 }));
+    expect(res.status).toBe(200);
+    expect(packageCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        poolId: "pool-A",
+        coachId: "c1",
+        totalSesi: 8,
+        sisaSesi: 8,
+        poolPrice: 480_000,
+        coachPrice: 800_000,
+        serviceFee: 83_200,
+        durationDays: 90,
+        isTrial: false,
+        isSingleSession: false,
+        templateId: null,
+        name: "Paket 8 sesi · Coach Budi",
+      }),
     });
+    expect(paymentCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ amount: 1_363_200 }) });
+    // Kartu kredit tidak ditawarkan.
+    expect(createTransaction.mock.calls[0][0].enabled_payments).not.toContain("credit_card");
+  });
+
+  it("hanya coach aktif yang mengajar di kolam itu", async () => {
+    await POST(buy());
+    expect(userFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: "c1", role: "COACH", isActive: true, poolAffiliations: { some: { poolId: "pool-A" } } } })
+    );
+    userFindFirst.mockResolvedValue(null);
+    packageCreate.mockClear();
+    const res = await POST(buy());
+    expect(res.status).toBe(400);
     expect(packageCreate).not.toHaveBeenCalled();
   });
 
-  it("charges the server-computed price and creates a 1-session package at that pool", async () => {
-    packageCount.mockResolvedValue(1);
-    poolFindFirst.mockResolvedValue({
-      id: "pool-B",
-      name: "Kolam B",
-      packageTemplates: [{ price: 200_000, totalSesi: 4 }],
-    });
-    const res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B", templateId: "ignored" }));
+  it("menolak ukuran paket selain 1/4/8 dan kolam tidak aktif", async () => {
+    expect((await POST(buy({ sesi: 6 }))).status).toBe(400);
+    poolFindFirst.mockResolvedValue(null);
+    expect((await POST(buy())).status).toBe(400);
+    expect(packageCreate).not.toHaveBeenCalled();
+  });
+
+  it("menolak bila kolam atau coach belum memasang harga ukuran itu", async () => {
+    poolFindFirst.mockResolvedValue({ ...POOL, pricePack8: null });
+    const res = await POST(buy());
+    expect(res.status).toBe(400);
+    expect(createTransaction).not.toHaveBeenCalled();
+  });
+
+  it("sesi coba: per sesi paket 4 kolam + coach + layanan, 1x per peserta", async () => {
+    const res = await POST(buy({ sesi: 1 }));
     expect(res.status).toBe(200);
     expect(packageCreate).toHaveBeenCalledWith({
-      data: expect.objectContaining({ poolId: "pool-B", totalSesi: 1, sisaSesi: 1, isSingleSession: true, templateId: null }),
+      data: expect.objectContaining({ totalSesi: 1, isTrial: true, poolPrice: 65_000, coachPrice: 110_000, serviceFee: 11_375, durationDays: 14, jatahCancel: 1 }),
     });
-    // 200000/4 = 50000 * 1.2 = 60000
-    expect(paymentCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ amount: 60_000 }) });
-    expect(templateFindFirst).not.toHaveBeenCalled();
+    expect(paymentCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ amount: 186_375 }) });
+
+    vi.clearAllMocks();
+    poolFindFirst.mockResolvedValue(POOL);
+    userFindFirst.mockResolvedValue(COACH);
+    packageFindFirst.mockResolvedValue(null);
+    packageCount.mockResolvedValue(1);
+    expect((await POST(buy({ sesi: 1 }))).status).toBe(403);
+    expect(packageCreate).not.toHaveBeenCalled();
+  });
+
+  it("beli 1 sesi eceran lama tidak dijual lagi", async () => {
+    const res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    expect(res.status).toBe(400);
+    expect(packageCreate).not.toHaveBeenCalled();
   });
 
   it("records the Payment before opening the Midtrans transaction", async () => {
-    packageCount.mockResolvedValue(1);
-    poolFindFirst.mockResolvedValue({ id: "pool-B", name: "Kolam B", packageTemplates: [{ price: 200_000, totalSesi: 4 }] });
-    await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    await POST(buy());
     expect(paymentCreate.mock.invocationCallOrder[0]).toBeLessThan(createTransaction.mock.invocationCallOrder[0]);
   });
 
   // Tombol "Lanjut bayar" (member menutup halaman Midtrans sebelum selesai).
   it("stores the Midtrans payment link on the Payment, and still succeeds if that save fails", async () => {
-    packageCount.mockResolvedValue(1);
-    poolFindFirst.mockResolvedValue({ id: "pool-B", name: "Kolam B", packageTemplates: [{ price: 200_000, totalSesi: 4 }] });
-    let res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    let res = await POST(buy());
     expect(res.status).toBe(200);
     expect(paymentUpdate).toHaveBeenCalledWith({
       where: { midtransOrderId: expect.stringMatching(/^PKG-pkg-new-/) },
@@ -88,54 +137,39 @@ describe("checkout 1 sesi", () => {
 
     paymentUpdate.mockRejectedValueOnce(new Error("db down"));
     const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    res = await POST(buy());
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ redirectUrl: "https://pay" });
     errSpy.mockRestore();
   });
 
   it("cleans up package+payment and hides Midtrans details when Snap fails", async () => {
-    packageCount.mockResolvedValue(1);
-    poolFindFirst.mockResolvedValue({ id: "pool-B", name: "Kolam B", packageTemplates: [{ price: 200_000, totalSesi: 4 }] });
     createTransaction.mockRejectedValueOnce(new Error("ServerKey invalid: SB-Mid-xxx"));
     vi.spyOn(console, "error").mockImplementation(() => {});
-    const res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    const res = await POST(buy());
     expect(res.status).toBe(502);
     expect(JSON.stringify(await res.json())).not.toMatch(/ServerKey/);
     expect(paymentDeleteMany).toHaveBeenCalledWith({ where: { packageId: "pkg-new" } });
     expect(packageDelete).toHaveBeenCalledWith({ where: { id: "pkg-new" } });
   });
 
-  it("refuses a catalog package that is priced Rp0 (legacy data)", async () => {
-    templateFindFirst.mockResolvedValue({ id: "t0", poolId: "pool-A", name: "Gratis", totalSesi: 4, jatahCancel: 1, price: 0 });
-    const res = await POST(req({ dependentId: "d1", templateId: "t0" }));
-    expect(res.status).toBe(400);
-    expect(packageCreate).not.toHaveBeenCalled();
-    expect(createTransaction).not.toHaveBeenCalled();
-  });
-
   it("blocks an account that still has a temporary password", async () => {
     const { auth } = await import("@/auth");
     vi.mocked(auth).mockResolvedValueOnce({ user: { id: "m1", role: "MEMBER", mustChangePassword: true } } as never);
-    const res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
+    const res = await POST(buy());
     expect(res.status).toBe(403);
     expect(packageCreate).not.toHaveBeenCalled();
-  });
-
-  it("refuses a pool with no catalog", async () => {
-    packageCount.mockResolvedValue(1);
-    poolFindFirst.mockResolvedValue({ id: "pool-B", name: "Kolam B", packageTemplates: [] });
-    const res = await POST(req({ dependentId: "d1", singleSessionPoolId: "pool-B" }));
-    expect(res.status).toBe(400);
   });
 });
 
 describe("checkout double submit", () => {
   it("refuses a second purchase of the same item for the same child within a minute", async () => {
-    templateFindFirst.mockResolvedValue({ id: "t1", poolId: "pool-A", name: "Paket", totalSesi: 4, jatahCancel: 2, price: 200_000 });
     packageFindFirst.mockResolvedValue({ id: "pkg-old" });
-    const res = await POST(req({ dependentId: "d1", templateId: "t1" }));
+    const res = await POST(buy());
     expect(res.status).toBe(409);
+    expect(packageFindFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ coachId: "c1", totalSesi: 8, isTrial: false, poolId: "pool-A" }) })
+    );
     expect(packageCreate).not.toHaveBeenCalled();
   });
 });

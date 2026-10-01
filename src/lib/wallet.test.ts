@@ -408,3 +408,100 @@ describe("bagi hasil 10/40/50 (contoh keputusan Hadi)", () => {
     }
   });
 });
+
+// Model harga-dari-coach (Hadi 2 Okt): bagian tetap per sesi + PPh 0,5%.
+function fixedTx({ poolExempt = false, coachExempt = false, rows = [] as { type: string; amount: number; poolId?: string; coachProfileId?: string }[] } = {}) {
+  const match = (r: (typeof rows)[number], where: Record<string, unknown>) =>
+    r.type === where.type &&
+    (!("poolId" in where) || (typeof where.poolId === "string" ? r.poolId === where.poolId : !!r.poolId)) &&
+    (!("coachProfileId" in where) || (typeof where.coachProfileId === "string" ? r.coachProfileId === where.coachProfileId : !!r.coachProfileId));
+  return {
+    pool: { findUniqueOrThrow: vi.fn().mockResolvedValue({ pphExempt: poolExempt }), update: vi.fn() },
+    coachProfile: { findUniqueOrThrow: vi.fn().mockResolvedValue({ pphExempt: coachExempt }), update: vi.fn() },
+    walletTransaction: {
+      createMany: vi.fn(),
+      findFirst: vi.fn(async ({ where }: { where: Record<string, unknown> }) => rows.find((r) => match(r, where)) ?? null),
+      aggregate: vi.fn(async ({ where }: { where: Record<string, unknown> }) => ({
+        _sum: { amount: rows.filter((r) => match(r, where)).reduce((n, r) => n + r.amount, 0) },
+      })),
+    },
+  } as unknown as Prisma.TransactionClient;
+}
+const pricing = { paid: 1_363_200, totalSesi: 8, poolPrice: 480_000, coachPrice: 800_000 };
+
+describe("creditSessionRevenue model harga-dari-coach", () => {
+  it("hadir: kolam 60.000, coach 100.000, masing-masing dipotong PPh 0,5%; SPH 10.400", async () => {
+    onSessionAttended.mockClear();
+    const tx = fixedTx();
+    await creditSessionRevenue(tx, { poolId: "p", coachProfileId: "c", bookingId: "b", perSessionValue: 0, pricing });
+    expect(tx.pool.update).toHaveBeenCalledWith({ where: { id: "p" }, data: { walletBalance: { increment: 59_700 } } });
+    expect(tx.coachProfile.update).toHaveBeenCalledWith({ where: { id: "c" }, data: { walletBalance: { increment: 99_500 } } });
+    const data = (tx.walletTransaction.createMany as ReturnType<typeof vi.fn>).mock.calls[0][0].data;
+    expect(data).toEqual([
+      { type: "SESSION_REVENUE", poolId: "p", amount: 60_000, bookingId: "b" },
+      { type: "PPH_WITHHELD", poolId: "p", amount: -300, bookingId: "b" },
+      { type: "SESSION_PAYOUT", coachProfileId: "c", amount: 100_000, bookingId: "b" },
+      { type: "PPH_WITHHELD", coachProfileId: "c", amount: -500, bookingId: "b" },
+      { type: "PLATFORM_REVENUE", amount: 9_369, bookingId: "b" },
+      { type: "PLATFORM_TAX", amount: 1_031, bookingId: "b" },
+    ]);
+    // Uang tidak tercipta/hilang: kolam + coach + SPH = nilai sesi.
+    expect(data.filter((r: { type: string }) => r.type !== "PPH_WITHHELD").reduce((n: number, r: { amount: number }) => n + r.amount, 0)).toBe(170_400);
+    expect(onSessionAttended).toHaveBeenCalledOnce();
+  });
+
+  it("bebas potongan: tidak ada baris PPh", async () => {
+    const tx = fixedTx({ poolExempt: true, coachExempt: true });
+    await creditSessionRevenue(tx, { poolId: "p", coachProfileId: "c", bookingId: "b", perSessionValue: 0, pricing });
+    const data = (tx.walletTransaction.createMany as ReturnType<typeof vi.fn>).mock.calls[0][0].data;
+    expect(data.some((r: { type: string }) => r.type === "PPH_WITHHELD")).toBe(false);
+    expect(tx.pool.update).toHaveBeenCalledWith({ where: { id: "p" }, data: { walletBalance: { increment: 60_000 } } });
+  });
+
+  it("tidak hadir: kolam tidak disentuh, coach 50.000 - PPh 250, sisanya SPH", async () => {
+    onSessionAttended.mockClear();
+    const tx = fixedTx();
+    await creditSessionRevenue(tx, { poolId: "p", coachProfileId: "c", bookingId: "b", perSessionValue: 0, attended: false, pricing });
+    expect(tx.pool.update).not.toHaveBeenCalled();
+    expect(tx.coachProfile.update).toHaveBeenCalledWith({ where: { id: "c" }, data: { walletBalance: { increment: 49_750 } } });
+    const data = (tx.walletTransaction.createMany as ReturnType<typeof vi.fn>).mock.calls[0][0].data;
+    expect(data).toEqual([
+      { type: "SESSION_PAYOUT", coachProfileId: "c", amount: 50_000, bookingId: "b" },
+      { type: "PPH_WITHHELD", coachProfileId: "c", amount: -250, bookingId: "b" },
+      { type: "PLATFORM_REVENUE", amount: 108_468, bookingId: "b" },
+      { type: "PLATFORM_TAX", amount: 11_932, bookingId: "b" },
+    ]);
+    expect(onSessionAttended).not.toHaveBeenCalled();
+  });
+});
+
+describe("reverseSessionRevenue model harga-dari-coach", () => {
+  it("mengembalikan potongan PPh ke dompet yang dipotong", async () => {
+    const tx = fixedTx({
+      rows: [
+        { type: "SESSION_REVENUE", amount: 60_000, poolId: "p" },
+        { type: "PPH_WITHHELD", amount: -300, poolId: "p" },
+        { type: "SESSION_PAYOUT", amount: 100_000, coachProfileId: "c" },
+        { type: "PPH_WITHHELD", amount: -500, coachProfileId: "c" },
+        { type: "PLATFORM_REVENUE", amount: 9_369 },
+        { type: "PLATFORM_TAX", amount: 1_031 },
+      ],
+    });
+    (tx.pool as unknown as { update: ReturnType<typeof vi.fn> }).update.mockResolvedValue({});
+    await reverseSessionRevenue(tx, { bookingId: "b" });
+    const poolCalls = (tx.pool.update as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0].data.walletBalance);
+    const coachCalls = (tx.coachProfile.update as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0].data.walletBalance);
+    // Bersih: kolam -60.000 + 300 = -59.700; coach -100.000 + 500 = -99.500.
+    const net = (calls: { increment?: number; decrement?: number }[]) => calls.reduce((n, c) => n + (c.increment ?? 0) - (c.decrement ?? 0), 0);
+    expect(net(poolCalls)).toBe(-59_700);
+    expect(net(coachCalls)).toBe(-99_500);
+    const data = (tx.walletTransaction.createMany as ReturnType<typeof vi.fn>).mock.calls[0][0].data;
+    expect(data).toEqual(
+      expect.arrayContaining([
+        { type: "PPH_WITHHELD", poolId: "p", amount: 300, bookingId: "b" },
+        { type: "PPH_WITHHELD", coachProfileId: "c", amount: 500, bookingId: "b" },
+        { type: "PLATFORM_REVENUE", amount: -9_369, bookingId: "b" },
+      ])
+    );
+  });
+});

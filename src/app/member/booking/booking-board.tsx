@@ -3,8 +3,6 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { formatRupiah } from "@/lib/format";
-import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS } from "@/lib/policy";
 import { useSession } from "next-auth/react";
 import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +20,9 @@ type PackageOption = {
   packageName: string;
   dependentId: string;
   poolId: string;
+  // Paket model harga-dari-coach hanya untuk coach ini; null = paket lama (coach mana pun).
+  coachId: string | null;
+  coachName: string | null;
   sisaSesi: number;
   cancelRemaining: number;
 };
@@ -36,7 +37,6 @@ type PoolOption = {
   facilities: string[];
   photos: string[];
   hours: string | null;
-  singleSessionPrice: number | null;
 };
 
 type Slot = {
@@ -83,12 +83,10 @@ export default function BookingBoard({
   dependents,
   packageOptions,
   pools,
-  canBuySingleSession,
 }: {
   dependents: DependentOption[];
   packageOptions: PackageOption[];
   pools: PoolOption[];
-  canBuySingleSession: boolean;
 }) {
   const router = useRouter();
   const { data: session } = useSession();
@@ -100,12 +98,15 @@ export default function BookingBoard({
     packageOptions[0]?.dependentId ?? dependents[0]?.id ?? ""
   );
   const [poolId, setPoolId] = useState(packageOptions[0]?.poolId ?? pools[0]?.id ?? "");
-  // Paket cuma berlaku di kolam tempat beli -- paket yang dipake = paket
-  // aktif paling lama milik anak ini DI kolam ini. Gak ada = gak bisa
-  // booking di sini (tawarin beli 1 sesi).
-  const selectedPkg =
-    packageOptions.find((p) => p.dependentId === dependentId && p.poolId === poolId) ?? null;
-  const packageId = selectedPkg?.packageId ?? "";
+  // Paket cuma berlaku di kolam tempat beli, dan paket model harga-dari-coach
+  // cuma untuk coach-nya. Paket yang dipakai untuk slot = paket aktif paling
+  // lama milik anak ini di kolam ini untuk coach slot itu (atau paket lama
+  // yang boleh coach mana pun).
+  const poolPkgs = packageOptions.filter((p) => p.dependentId === dependentId && p.poolId === poolId);
+  const selectedPkg = poolPkgs[0] ?? null;
+  const pkgForCoach = (coachId: string) =>
+    poolPkgs.find((p) => p.coachId === coachId) ?? poolPkgs.find((p) => p.coachId === null) ?? null;
+  const pkgCoachNames = [...new Set(poolPkgs.map((p) => p.coachName).filter(Boolean))];
   const selectedPool = pools.find((p) => p.id === poolId) ?? null;
   const dependentPoolNames = [
     ...new Set(
@@ -115,8 +116,6 @@ export default function BookingBoard({
         .filter(Boolean)
     ),
   ];
-  const [buyLoading, setBuyLoading] = useState(false);
-  const [confirmBuy, setConfirmBuy] = useState(false);
   // Kolam tempat member punya paket aktif (lintas semua peserta).
   const activePoolSummary = pools
     .map((pool) => ({
@@ -206,26 +205,10 @@ export default function BookingBoard({
       }));
   }, [slots]);
 
-  async function handleBuySingleSession() {
-    setBuyLoading(true);
-    setMessage(null);
-    const res = await fetch("/api/payment/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dependentId, singleSessionPoolId: poolId }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setBuyLoading(false);
-      setMessage({ text: data.error ?? "Gagal memulai pembayaran", ok: false });
-      return;
-    }
-    window.location.href = data.redirectUrl;
-  }
-
-  async function handleBook(availabilityId: string) {
+  async function handleBook(availabilityId: string, coachId: string) {
+    const packageId = pkgForCoach(coachId)?.packageId;
     if (!packageId) {
-      setMessage({ text: "Peserta ini belum punya paket di kolam ini", ok: false });
+      setMessage({ text: "Peserta ini belum punya paket untuk coach ini di kolam ini", ok: false });
       return;
     }
     setPendingId(availabilityId);
@@ -316,7 +299,9 @@ export default function BookingBoard({
               <Badge tone={selectedPkg.cancelRemaining <= 1 ? "warning" : "neutral"}>
                 Sisa jatah batal: {selectedPkg.cancelRemaining}
               </Badge>
-              <Badge tone="neutral">{selectedPkg.packageName}</Badge>
+              {poolPkgs.map((p) => (
+                <Badge key={p.packageId} tone="neutral">{p.packageName}</Badge>
+              ))}
             </div>
           )}
         </div>
@@ -410,21 +395,18 @@ export default function BookingBoard({
           <p>
             Belum ada paket aktif untuk peserta ini di {selectedPool?.name}.
             {dependentPoolNames.length > 0 && <> Paketnya berlaku di: {dependentPoolNames.join(", ")}.</>}
-            {!canBuySingleSession && " Beli paket dulu agar bisa booking."}
-            {canBuySingleSession &&
-              selectedPool?.singleSessionPrice == null &&
-              " Kolam ini belum menjual 1 sesi."}
+            {" "}Beli paket dulu agar bisa booking.
           </p>
-          {canBuySingleSession && selectedPool?.singleSessionPrice != null ? (
-            <Button size="sm" loading={buyLoading} onClick={() => setConfirmBuy(true)} className="shrink-0">
-              Beli 1 sesi di sini — {formatRupiah(selectedPool.singleSessionPrice)}
-            </Button>
-          ) : (
-            <Link href="/member/paket" className="shrink-0 font-medium underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
-              Lihat paket
-            </Link>
-          )}
+          <Link href="/member/paket" className="shrink-0 font-medium underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            Lihat paket
+          </Link>
         </div>
+      )}
+
+      {selectedPkg && pkgCoachNames.length > 0 && !poolPkgs.some((p) => p.coachId === null) && (
+        <p className="mb-4 text-sm text-text-muted">
+          Paket peserta ini untuk coach {pkgCoachNames.join(", ")}. Jadwal coach lain bisa dilihat, tapi tidak bisa dibooking dengan paket ini.
+        </p>
       )}
 
       {selectedPool && (selectedPool.address || selectedPool.hours || selectedPool.facilities.length > 0) && (
@@ -558,9 +540,9 @@ export default function BookingBoard({
                         <Button
                           size="sm"
                           variant={s.status === "BOOKED" ? "secondary" : "primary"}
-                          disabled={s.status === "BOOKED" || pendingId === s.id || !packageId}
+                          disabled={s.status === "BOOKED" || pendingId === s.id || !pkgForCoach(s.coach.id)}
                           loading={pendingId === s.id}
-                          onClick={() => handleBook(s.id)}
+                          onClick={() => handleBook(s.id, s.coach.id)}
                         >
                           {s.status === "BOOKED" ? "Sudah dibooking" : "Booking"}
                         </Button>
@@ -571,36 +553,6 @@ export default function BookingBoard({
               </ul>
             </div>
           ))}
-        </div>
-      )}
-
-      {confirmBuy && selectedPool?.singleSessionPrice != null && (
-        <div className="dialog-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="buy-title">
-          <div className="dialog-panel max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-surface p-5 shadow-lg">
-            <h2 id="buy-title" className="text-lg font-semibold text-text">Beli 1 sesi di {selectedPool.name}?</h2>
-            <p className="mt-1 text-2xl font-bold text-text">{formatRupiah(selectedPool.singleSessionPrice)}</p>
-            <ul className="mt-3 flex list-disc flex-col gap-1 pl-5 text-sm text-text">
-              <li>1 sesi les untuk <b>{dependents.find((d) => d.id === dependentId)?.name}</b>.</li>
-              <li>Hanya berlaku di <b>{selectedPool.name}</b>, tidak bisa dipakai di kolam lain.</li>
-              <li>Berlaku {DROP_IN_DURATION_DAYS} hari sejak pembayaran berhasil.</li>
-              <li>Jatah batal 1x (paling lambat {CANCEL_WINDOW_HOURS} jam sebelum jadwal); sesinya kembali dan bisa dibooking ulang.</li>
-              <li>Kalau sering ke sini, beli paket lebih hemat.</li>
-            </ul>
-            <div className="mt-4 rounded-lg bg-surface-muted px-3 py-2 text-sm">
-              <p className="font-semibold text-text">Tentang {selectedPool.name}</p>
-              {selectedPool.address && <p className="text-text-muted">{selectedPool.address}</p>}
-              {selectedPool.hours && <p className="text-text-muted">Buka {selectedPool.hours}</p>}
-              {selectedPool.facilities.length > 0 && <p className="text-text-muted">Fasilitas: {selectedPool.facilities.join(", ")}</p>}
-              {selectedPool.description && <p className="mt-1 text-text">{selectedPool.description}</p>}
-              {!selectedPool.address && !selectedPool.hours && !selectedPool.description && selectedPool.facilities.length === 0 && (
-                <p className="text-text-muted">Info kolam belum dilengkapi.</p>
-              )}
-            </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <Button variant="secondary" size="sm" onClick={() => setConfirmBuy(false)} disabled={buyLoading}>Batal</Button>
-              <Button size="sm" loading={buyLoading} onClick={handleBuySingleSession}>Lanjut ke pembayaran</Button>
-            </div>
-          </div>
         </div>
       )}
 

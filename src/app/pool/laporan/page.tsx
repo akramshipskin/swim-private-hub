@@ -110,7 +110,8 @@ export default async function PoolLaporanPage({
             .map((b) => {
               const payment = b.package.payments[0];
               if (!payment) return null;
-              const perSessionValue = Math.round(payment.amount / b.package.totalSesi);
+              // floor, sama dengan dompet (src/app/coach/riwayat-sesi/actions.ts).
+              const perSessionValue = Math.floor(payment.amount / b.package.totalSesi);
               // Angka kolam & coach dari pembukuan (yang benar-benar dikredit saat
               // sesi ditandai Hadir, dengan persen yang berlaku saat itu), bukan
               // dihitung ulang dari persen sekarang. Platform = sisanya.

@@ -48,12 +48,22 @@ describe("POST /api/booking pool lock", () => {
     expect(where.AND).toContainEqual({ id: "pkg-1", poolId: "pool-B" });
   });
 
+  // Model harga-dari-coach (Hadi 2 Okt): paket terikat ke coach-nya; paket lama
+  // (coachId null) tetap boleh coach mana pun.
+  it("only claims a package bound to the slot's coach (or a legacy package)", async () => {
+    availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", coachId: "coach-7", pool: { isActive: true } });
+    packageUpdateMany.mockResolvedValue({ count: 1 });
+    await POST(req());
+    const where = packageUpdateMany.mock.calls[0][0].where;
+    expect(where.AND).toContainEqual({ OR: [{ coachId: null, poolPrice: null }, { coachId: "coach-7" }] });
+  });
+
   it("rejects without touching the slot when the package is for another pool", async () => {
     availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", pool: { isActive: true } });
     packageUpdateMany.mockResolvedValue({ count: 0 });
     const res = await POST(req());
     expect(res.status).toBe(409);
-    expect((await res.json()).error).toMatch(/kolam lain/);
+    expect((await res.json()).error).toMatch(/kolam atau coach lain/);
     expect(availabilityUpdateMany).not.toHaveBeenCalled();
   });
 

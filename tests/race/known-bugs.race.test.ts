@@ -17,7 +17,7 @@ import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 import { requestWithdrawal as coachWithdraw } from "@/app/coach/saldo/actions";
 import { toggleUserActive } from "@/app/admin/users/actions";
 import { reviewTemplate } from "@/app/admin/paket/actions";
-import { updatePoolTemplate } from "@/app/pool/paket/actions";
+import { proposeTemplateUpdate } from "@/lib/package-template";
 
 // Semua bug di file ini sudah diperbaiki (tesnya sudah `it`). Untuk bug baru
 // yang belum diperbaiki, pasang lagi:
@@ -270,7 +270,7 @@ describe("Kehilangan usulan harga (lost update)", () => {
       });
       await settle([
         (async () => { await jitter(14); return as({ id: admin.id, role: "ADMIN" }, () => reviewTemplate(t.id, true)); })(),
-        as({ id: owner.id, role: "POOL_OWNER" }, () => updatePoolTemplate(null, fd({ templateId: t.id, name: "T", totalSesi: "8", price: "950000", durationDays: "60", jatahCancel: "2", isActive: "on" }))),
+        proposeTemplateUpdate(t.id, fd({ templateId: t.id, name: "T", totalSesi: "8", price: "950000", durationDays: "60", jatahCancel: "2", isActive: "on" })),
       ]);
       const after = await prisma.packageTemplate.findUniqueOrThrow({ where: { id: t.id } });
       const pending = after.pendingChanges as { price?: number } | null;

@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import SaldoView from "@/components/saldo-view";
+import { formatRupiah } from "@/lib/format";
 import { updateBankInfo, requestWithdrawal } from "./actions";
 import { openNullable, openSecret } from "@/lib/secret-box";
 import { releaseDueCommissions } from "@/lib/affiliate";
@@ -44,6 +45,14 @@ export default async function PoolSaldoPage() {
     },
   });
 
+  // Potongan PPh 0,5% (paket model harga-dari-coach), disetor SPH atas nama kolam.
+  const pph = await prisma.walletTransaction.groupBy({
+    by: ["poolId"],
+    where: { type: "PPH_WITHHELD", poolId: { in: pools.map((p) => p.id) } },
+    _sum: { amount: true },
+  });
+  const pphOf = (poolId: string) => -(pph.find((x) => x.poolId === poolId)?._sum.amount ?? 0);
+
   if (pools.length === 0) {
     return (
       <main className="mx-auto max-w-lg px-4 py-8 text-center text-sm text-text-muted">
@@ -60,6 +69,11 @@ export default async function PoolSaldoPage() {
         {pools.map((pool) => (
           <div key={pool.id}>
             <h2 className="mb-3 text-lg font-semibold text-text">{pool.name}</h2>
+            {pphOf(pool.id) > 0 && (
+              <p className="mb-3 text-sm text-text-muted">
+                Potongan PPh 0,5% sejauh ini: {formatRupiah(pphOf(pool.id))} (sudah dikurangkan dari saldo, disetor SPH atas nama kolam).
+              </p>
+            )}
             <SaldoView
               walletBalance={pool.walletBalance}
               bankName={pool.bankName}

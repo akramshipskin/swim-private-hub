@@ -49,7 +49,7 @@ export const POLICY = {
     birthDate: (r) => (r.birthDate == null ? null : new Date(Date.UTC(new Date(r.birthDate).getUTCFullYear(), 0, 1))),
   },
   CoachProfile: {
-    ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "birthDate", "gender", "walletBalance", "signaturePath"),
+    ...keep("id", "userId", "bio", "specialties", "isActive", "hasCertification", "certificationNote", "photoUrl", "birthDate", "gender", "walletBalance", "signaturePath", "pricePack4", "pricePack8", "pphExempt"),
     ...BANK,
   },
   // Nama sertifikat tampil publik di profil coach; filePath menunjuk bucket
@@ -72,7 +72,7 @@ export const POLICY = {
   Testimonial: keep("id", "name", "role", "quote", "consentNote", "isPublished", "sortOrder", "createdAt"),
   CoachCertificate: keep("id", "coachProfileId", "name", "filePath", "status", "reviewedAt", "createdAt"),
   Pool: {
-    ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "walletBalance", "isActive", "createdAt"),
+    ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "pricePack4", "pricePack8", "serviceFeeBps", "pphExempt", "walletBalance", "isActive", "createdAt"),
     contactPhone: (r, i) => (r.contactPhone == null ? null : `0898${pad(i, 8)}`),
     ...BANK,
   },
@@ -122,7 +122,7 @@ export const POLICY = {
   },
   WalletTransaction: keep("id", "type", "poolId", "coachProfileId", "amount", "paymentId", "bookingId", "withdrawalRequestId", "note", "createdById", "idempotencyKey", "createdAt"),
   PackageTemplate: keep("id", "poolId", "name", "totalSesi", "price", "durationDays", "jatahCancel", "isTrial", "isActive", "pendingChanges", "createdAt"),
-  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt"),
+  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt", "coachId", "poolPrice", "coachPrice", "serviceFee", "durationDays"),
   Availability: keep("id", "coachId", "poolId", "date", "startTime", "endTime", "kapasitas", "status", "recurrenceRule", "createdAt"),
   PoolOwnership: keep("id", "poolId", "ownerId", "createdAt"),
   PoolAffiliation: keep("id", "poolId", "coachId", "createdAt"),

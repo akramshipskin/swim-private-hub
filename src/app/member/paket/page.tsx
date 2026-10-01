@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDateLabel } from "@/lib/datetime";
 import { formatRupiah } from "@/lib/format";
+import { formatBps, pack8SavingPercent, packQuote, trialQuote } from "@/lib/pricing";
 
 const statusTone = {
   PENDING_PAYMENT: "warning",
@@ -39,7 +40,7 @@ export default async function MemberPaketPage() {
   const now = new Date();
   const paymentCutoff = new Date(now.getTime() - PAYMENT_WINDOW_MS);
 
-  const [packages, templates, children] = await Promise.all([
+  const [packages, pools, children] = await Promise.all([
     prisma.package.findMany({
       where: {
         memberId: session.user.id,
@@ -59,16 +60,30 @@ export default async function MemberPaketPage() {
         payments: { where: { status: "PENDING", snapRedirectUrl: { not: null } }, orderBy: { createdAt: "desc" }, take: 1, select: { snapRedirectUrl: true } },
       },
     }),
-    prisma.packageTemplate.findMany({
-      // Kolam yang dinonaktifin admin (atau belum di-approve) gak boleh
-      // jualan paket lagi.
-      where: { isActive: true, pool: { isActive: true } },
-      orderBy: { totalSesi: "asc" },
-      include: {
-        pool: { select: { id: true, name: true, address: true, description: true, facilities: true, photos: true, openTime: true, closeTime: true } },
-        // Paket yang pernah aktif (startDate keisi = dibayar/diassign) --
-        // dasar badge "Populer", bukan urutan kartu.
-        _count: { select: { packages: { where: { startDate: { not: null } } } } },
+    // Model harga-dari-coach (Hadi 2 Okt): kolam aktif + coach yang mengajar
+    // di sana. Harga paket = harga kolam + harga coach + biaya layanan SPH.
+    prisma.pool.findMany({
+      where: { isActive: true },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        description: true,
+        facilities: true,
+        photos: true,
+        openTime: true,
+        closeTime: true,
+        pricePack4: true,
+        pricePack8: true,
+        serviceFeeBps: true,
+        affiliations: {
+          where: { coach: { role: "COACH", isActive: true, coachProfile: { isActive: true } } },
+          orderBy: { coach: { name: "asc" } },
+          select: {
+            coach: { select: { id: true, name: true, coachProfile: { select: { pricePack4: true, pricePack8: true, specialties: true } } } },
+          },
+        },
       },
     }),
     prisma.dependent.findMany({
@@ -80,11 +95,20 @@ export default async function MemberPaketPage() {
   // Peserta yang masih boleh beli trial (belum pernah punya paket).
   const trialChildren = children.filter((c) => c._count.packages === 0);
 
-  // Trial tidak ikut dinilai "Populer" (paket percobaan, bukan pilihan paket).
-  const maxSold = Math.max(0, ...templates.filter((t) => !t.isTrial).map((t) => t._count.packages));
-  // Seri = gak ada yang beneran paling laku, jangan pilih salah satu asal.
-  const topSellers = templates.filter((t) => !t.isTrial && t._count.packages === maxSold);
-  const popularTemplateId = maxSold > 0 && topSellers.length === 1 ? topSellers[0].id : undefined;
+  // Kombinasi kolam + coach yang bisa dibeli (keduanya sudah memasang harga).
+  const offers = pools
+    .map((pool) => ({
+      pool,
+      coaches: pool.affiliations
+        .map(({ coach }) => {
+          const prices = coach.coachProfile!;
+          const four = packQuote(pool, prices, 4);
+          const eight = packQuote(pool, prices, 8);
+          return { coach, four, eight, trial: trialQuote(pool, prices), saving: four && eight ? pack8SavingPercent(four, eight) : 0 };
+        })
+        .filter((c) => c.four || c.eight),
+    }))
+    .filter((o) => o.coaches.length > 0);
 
   // "Member" cuma valid begitu paket pernah aktif (beli/diassign) --
   // sebelum itu dia masih pengunjung biasa, jangan diklaim member.
@@ -173,23 +197,19 @@ export default async function MemberPaketPage() {
 
       <h2 className="mb-1 text-xl font-semibold text-text">Beli Paket Baru</h2>
       <p className="mb-4 text-sm text-text-muted">
-        Paket hanya bisa dipakai booking di kolam tempat paket itu dibeli. Pilih kolam yang paling sering kamu datangi.
+        Pilih kolam, lalu coach. Paket berlaku untuk coach dan kolam yang kamu pilih. Harga sudah termasuk tiket masuk
+        untuk 1 peserta, 1 pendamping, dan coach-nya, plus biaya layanan SPH di bawah 7%.
       </p>
       {children.length === 0 ? (
         <p className="text-sm text-text-muted">
           Belum ada peserta terdaftar. Tambah peserta dulu di menu{" "}
           <a href="/member/peserta" className="font-medium text-brand-700 underline">Peserta</a> sebelum beli paket.
         </p>
-      ) : templates.length === 0 ? (
-        <p className="text-sm text-text-muted">Belum ada katalog paket tersedia.</p>
+      ) : offers.length === 0 ? (
+        <p className="text-sm text-text-muted">Belum ada paket yang bisa dibeli. Kolam dan coach sedang menyiapkan harganya.</p>
       ) : (
-        // Tiap kolam dibungkus SATU Card (pola yang sama dengan bagian
-        // "Paket Saya" di atas dan halaman lain). Sebelumnya header kolam
-        // cuma dipisah garis border-b memanjang, jadi ambigu: garisnya
-        // kebaca sebagai pemisah antar blok, padahal paket di bawahnya
-        // punya kolam di atasnya (Hadi 18 Sep v3).
         <div className="flex flex-col gap-4">
-          {[...new Map(templates.map((t) => [t.pool.id, t.pool])).values()].map((pool) => (
+          {offers.map(({ pool, coaches }) => (
             <Card key={pool.id}>
               <CardBody className="flex flex-col gap-4">
                 <div className="flex flex-col gap-3 sm:flex-row">
@@ -222,44 +242,64 @@ export default async function MemberPaketPage() {
                   </div>
                 </div>
 
-                <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {templates
-                    .filter((t) => t.pool.id === pool.id && (!t.isTrial || trialChildren.length > 0))
-                    .map((t) => (
-                      <li
-                        key={t.id}
-                        className={
-                          t.id === popularTemplateId
-                            ? "flex flex-col gap-3 rounded-xl border border-brand-500 bg-surface-muted p-4 ring-1 ring-brand-500"
-                            : "flex flex-col gap-3 rounded-xl border border-border bg-surface-muted p-4"
-                        }
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <h4 className="text-base font-semibold leading-snug text-text">{t.name}</h4>
-                          {t.isTrial ? (
-                            <Badge tone="accent" className="shrink-0">Trial</Badge>
-                          ) : (
-                            t.id === popularTemplateId && <Badge tone="accent" className="shrink-0">Populer</Badge>
+                <ul className="flex flex-col gap-3">
+                  {coaches.map(({ coach, four, eight, trial, saving }) => (
+                    <li key={coach.id} className="rounded-xl border border-border bg-surface-muted p-4">
+                      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Coach</p>
+                          <h3 className="text-base font-semibold text-text">{coach.name}</h3>
+                          {coach.coachProfile!.specialties.length > 0 && (
+                            <p className="text-sm text-text-muted">{coach.coachProfile!.specialties.join(" · ")}</p>
                           )}
                         </div>
-                        <div>
-                          <p className="text-2xl font-bold leading-tight text-text">{formatRupiah(t.price)}</p>
-                        </div>
-                        <ul className="flex flex-wrap gap-1.5">
-                          <li><Badge tone="brand">{t.totalSesi} sesi les</Badge></li>
-                          <li><Badge tone="neutral">Berlaku {t.durationDays} hari</Badge></li>
-                          <li><Badge tone="neutral">Jatah batal {t.jatahCancel}×</Badge></li>
-                        </ul>
-                        <div className="mt-auto pt-1">
-                          {t.isTrial && (
-                            <p className="mb-2 text-xs text-text-muted">
-                              Sekali per peserta, untuk peserta yang belum pernah punya paket.
-                            </p>
-                          )}
-                          <CheckoutButton templateId={t.id} dependents={t.isTrial ? trialChildren : children} />
-                        </div>
-                      </li>
-                    ))}
+                        <a href={`/pelatih/${coach.id}`} className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                          Lihat profil coach
+                        </a>
+                      </div>
+                      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {[
+                          ...(eight ? [{ q: eight, label: "Paket 8 sesi", note: saving > 0 ? `Hemat ${saving}% per sesi dibanding paket 4` : null }] : []),
+                          ...(four ? [{ q: four, label: "Paket 4 sesi", note: null }] : []),
+                          ...(trial && trialChildren.length > 0 ? [{ q: trial, label: "Sesi coba", note: "Sekali per peserta, untuk peserta yang belum pernah punya paket." }] : []),
+                        ].map(({ q, label, note }) => (
+                          <li key={label} className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
+                            <div className="flex items-start justify-between gap-2">
+                              <h4 className="text-base font-semibold leading-snug text-text">{label}</h4>
+                              {q.isTrial ? (
+                                <Badge tone="accent" className="shrink-0">Coba</Badge>
+                              ) : (
+                                q.totalSesi === 8 && saving > 0 && <Badge tone="accent" className="shrink-0">Lebih hemat</Badge>
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-2xl font-bold leading-tight text-text">{formatRupiah(q.total)}</p>
+                              {q.totalSesi > 1 && (
+                                <p className="text-sm text-text-muted">{formatRupiah(Math.round(q.total / q.totalSesi))} per sesi</p>
+                              )}
+                            </div>
+                            <dl className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5 text-sm tabular-nums">
+                              <dt className="text-text-muted">Kolam</dt>
+                              <dd className="text-right text-text">{formatRupiah(q.poolPrice)}</dd>
+                              <dt className="text-text-muted">Coach</dt>
+                              <dd className="text-right text-text">{formatRupiah(q.coachPrice)}</dd>
+                              <dt className="text-text-muted">Biaya layanan SPH ({formatBps(pool.serviceFeeBps)})</dt>
+                              <dd className="text-right text-text">{formatRupiah(q.serviceFee)}</dd>
+                            </dl>
+                            <ul className="flex flex-wrap gap-1.5">
+                              <li><Badge tone="brand">{q.totalSesi} sesi les</Badge></li>
+                              <li><Badge tone="neutral">Berlaku {q.durationDays} hari</Badge></li>
+                              <li><Badge tone="neutral">Jatah batal {q.jatahCancel}×</Badge></li>
+                            </ul>
+                            <div className="mt-auto pt-1">
+                              {note && <p className="mb-2 text-xs text-text-muted">{note}</p>}
+                              <CheckoutButton poolId={pool.id} coachId={coach.id} sesi={q.totalSesi} dependents={q.isTrial ? trialChildren : children} />
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
                 </ul>
               </CardBody>
             </Card>

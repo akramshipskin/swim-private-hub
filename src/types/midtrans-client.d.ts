@@ -18,6 +18,8 @@ declare module "midtrans-client" {
       name: string;
     }>;
     callbacks?: { finish?: string; unfinish?: string; error?: string };
+    // Metode bayar yang ditawarkan (Snap); kosong = semua yang aktif di akun.
+    enabled_payments?: string[];
   }
 
   interface TransactionResult {

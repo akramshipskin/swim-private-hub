@@ -87,6 +87,11 @@ export async function POST(request: Request) {
           AND: [
             activePackageWhere(session.user.id),
             { id: packageId, poolId: slot.poolId },
+            // Paket model harga-dari-coach terikat ke 1 coach (harganya
+            // harga coach itu); paket lama (tanpa harga tersalin) boleh coach
+            // mana pun. Paket model baru yang coach-nya hilang (akun dihapus,
+            // coachId jadi null) TIDAK boleh dipakai coach lain.
+            { OR: [{ coachId: null, poolPrice: null }, { coachId: slot.coachId }] },
             { OR: [{ expiredDate: null }, { expiredDate: { gt: slot.startTime } }] },
           ],
         },
@@ -102,7 +107,7 @@ export async function POST(request: Request) {
           );
         }
         throw new BookingError(
-          "Paket ini tidak bisa dipakai untuk slot ini: paketnya untuk kolam lain, kuota sesi habis, belum aktif, atau sudah kedaluwarsa.",
+          "Paket ini tidak bisa dipakai untuk slot ini: paketnya untuk kolam atau coach lain, kuota sesi habis, belum aktif, atau sudah kedaluwarsa.",
           409
         );
       }

@@ -7,10 +7,14 @@ import { Select } from "@/components/ui/input";
 type Dependent = { id: string; name: string };
 
 export default function CheckoutButton({
-  templateId,
+  poolId,
+  coachId,
+  sesi,
   dependents,
 }: {
-  templateId: string;
+  poolId: string;
+  coachId: string;
+  sesi: number;
   dependents: Dependent[];
 }) {
   const [dependentId, setDependentId] = useState(dependents[0]?.id ?? "");
@@ -29,7 +33,7 @@ export default function CheckoutButton({
       const res = await fetch("/api/payment/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ templateId, dependentId }),
+        body: JSON.stringify({ poolId, coachId, sesi, dependentId }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.redirectUrl) {

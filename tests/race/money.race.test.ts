@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize, jitter } from "./fx";
+import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize, jitter, mkPricedOffer } from "./fx";
+import { checkInvariants } from "./invariants";
 import { requestWithdrawal as coachWithdraw } from "@/app/coach/saldo/actions";
 import { requestWithdrawal as poolWithdraw } from "@/app/pool/saldo/actions";
 import { rejectWithdrawal, markPaidManually } from "@/app/admin/withdrawals/actions";
@@ -150,10 +151,9 @@ describe("PAYMENT webhook races", () => {
   });
 
   it("P4: member double-klik Beli (checkout) 5x -> berapa paket PENDING kebikin?", async () => {
-    const pool = await mkPool(); const m = await mkUser("MEMBER");
+    const { pool, coach } = await mkPricedOffer(); const m = await mkUser("MEMBER");
     const dep = await prisma.dependent.create({ data: { memberId: m.id, name: "A" } });
-    const t = await prisma.packageTemplate.create({ data: { poolId: pool.id, name: "T", totalSesi: 8, price: 800000 } });
-    const rs = await settle(Array.from({ length: 5 }, () => as({ id: m.id, role: "MEMBER", name: "M" }, () => checkout(new Request("http://x/api/payment/checkout", { method: "POST", body: JSON.stringify({ templateId: t.id, dependentId: dep.id }) })))));
+    const rs = await settle(Array.from({ length: 5 }, () => as({ id: m.id, role: "MEMBER", name: "M" }, () => checkout(new Request("http://x/api/payment/checkout", { method: "POST", body: JSON.stringify({ poolId: pool.id, coachId: coach.id, sesi: 8, dependentId: dep.id }) })))));
     const n = await prisma.package.count({ where: { memberId: m.id } });
     console.log("P4", summarize(rs), "packages:", n);
     expect(n).toBe(1);
@@ -243,6 +243,61 @@ describe("REGISTRATION / ACCOUNT races", () => {
     const sum = (await prisma.walletTransaction.aggregate({ _sum: { amount: true } }))._sum.amount ?? 0;
     console.log("A8", summarize(rs), { credited: sum });
     expect(sum).toBeLessThanOrEqual(100000);
+  });
+});
+
+// Model harga-dari-coach (Hadi 2 Okt): bagian tetap per sesi + potongan PPh 0,5%.
+describe("PAKET PILIH COACH", () => {
+  async function pricedBooking(hoursFromNow = -3) {
+    const { pool, coach } = await mkPricedOffer();
+    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 1363200 });
+    await prisma.package.update({ where: { id: pkg.id }, data: { coachId: coach.id, poolPrice: 480000, coachPrice: 800000, serviceFee: 83200, durationDays: 90 } });
+    const slot = await mkSlot(coach.id, pool.id, hoursFromNow);
+    const b = await book(m.id, slot.id, pkg.id);
+    return { pool, coach, m, pkg, b };
+  }
+
+  it("HC1: admin double-klik Hadir 6x -> sekali kredit: kolam 59.700, coach 99.500, SPH 10.400, titipan PPh 800", async () => {
+    const { pool, coach, b } = await pricedBooking();
+    const admin = await mkUser("ADMIN");
+    await settle(Array.from({ length: 6 }, () => as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" })))));
+    expect((await prisma.pool.findUniqueOrThrow({ where: { id: pool.id } })).walletBalance).toBe(59700);
+    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { id: coach.coachProfile!.id } })).walletBalance).toBe(99500);
+    const sum = async (type: "PLATFORM_REVENUE" | "PLATFORM_TAX" | "PPH_WITHHELD") => (await prisma.walletTransaction.aggregate({ where: { type }, _sum: { amount: true } }))._sum.amount;
+    expect((await sum("PLATFORM_REVENUE"))! + (await sum("PLATFORM_TAX"))!).toBe(10400);
+    expect(await sum("PPH_WITHHELD")).toBe(-800);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("HC2: Hadir dan Tidak Hadir dikirim bersamaan berulang (10 putaran) -> uang sesuai salah satu tanda, pembukuan cocok", async () => {
+    for (let i = 0; i < 10; i++) {
+      await reset();
+      const { pool, coach, b } = await pricedBooking();
+      const admin = await mkUser("ADMIN");
+      await settle([
+        as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" }))),
+        as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "false" }))),
+      ]);
+      const after = await prisma.booking.findUniqueOrThrow({ where: { id: b.id } });
+      const poolBal = (await prisma.pool.findUniqueOrThrow({ where: { id: pool.id } })).walletBalance;
+      const coachBal = (await prisma.coachProfile.findUniqueOrThrow({ where: { id: coach.coachProfile!.id } })).walletBalance;
+      if (after.attended === true) expect([poolBal, coachBal]).toEqual([59700, 99500]);
+      else if (after.attended === false) expect([poolBal, coachBal]).toEqual([0, 49750]);
+      else expect([poolBal, coachBal]).toEqual([0, 0]);
+      expect(await checkInvariants()).toEqual([]);
+    }
+  });
+
+  it("HC3: paket pilih coach tidak bisa dibooking untuk slot coach lain (10 permintaan bersamaan) -> semua ditolak, sisa sesi utuh", async () => {
+    const { pool, pkg, m } = await pricedBooking(48);
+    const other = await mkUser("COACH");
+    await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: other.id } });
+    const slots = await Promise.all(Array.from({ length: 10 }, (_, i) => mkSlot(other.id, pool.id, 50 + i)));
+    const { POST } = await import("@/app/api/booking/route");
+    const rs = await settle(slots.map((s) => as({ id: m.id, role: "MEMBER", name: "M" }, () => POST(new Request("http://x", { method: "POST", body: JSON.stringify({ availabilityId: s.id, packageId: pkg.id }) })))));
+    expect(rs.every((r) => r.status === "fulfilled" && (r.value as Response).status === 409)).toBe(true);
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).sisaSesi).toBe(7);
+    expect(await checkInvariants()).toEqual([]);
   });
 });
 

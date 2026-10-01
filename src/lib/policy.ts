@@ -5,11 +5,9 @@
 // Minimal jam sebelum jadwal buat member masih bisa cancel sendiri.
 export const CANCEL_WINDOW_HOURS = 2;
 
-// Markup harga beli 1 sesi di kolam lain, dari harga per sesi paket kolam
-// itu -- biar beli paket tetep lebih murah dari eceran.
-export const DROP_IN_MARKUP_PERCENT = 20;
-
-// Masa berlaku paket 1 sesi (hari, dihitung dari pembayaran sukses).
+// Masa berlaku paket 1 sesi eceran lama (hari, dihitung dari pembayaran
+// sukses). Eceran tidak dijual lagi sejak 2 Okt; tetap dipakai webhook untuk
+// pembayaran paket eceran lama yang masih menunggu.
 export const DROP_IN_DURATION_DAYS = 14;
 
 // Minimal nominal pencairan saldo (kolam & coach). Dipake server

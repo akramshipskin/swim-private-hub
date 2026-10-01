@@ -41,6 +41,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/coach/jadwal", label: "Jadwal", icon: "calendar" },
     { href: "/coach/riwayat-sesi", label: "Riwayat Sesi", icon: "clipboard-check" },
     { href: "/coach/peserta", label: "Peserta", icon: "users" },
+    { href: "/coach/harga", label: "Harga", icon: "package" },
     { href: "/coach/saldo", label: "Saldo", icon: "credit-card" },
     { href: "/profil", label: "Profil Saya", icon: "settings", group: "Pengaturan" },
   ],

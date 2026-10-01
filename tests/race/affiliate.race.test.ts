@@ -1,7 +1,7 @@
 // Afiliasi + trial (Batch 4, 29 Sep) terhadap Postgres lokal.
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, jitter, spread, tally } from "./fx";
+import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, jitter, spread, tally, mkPricedOffer } from "./fx";
 import { checkInvariants } from "./invariants";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 import { releaseDueCommissions, getOrCreateAffiliateCode } from "@/lib/affiliate";
@@ -120,13 +120,15 @@ describe("AFILIASI", () => {
 
 describe("TRIAL", () => {
   async function trialSetup() {
-    const pool = await mkPool();
+    const { pool, coach } = await mkPricedOffer();
+    // Template trial lama masih dipakai T3 (pemilik kolam tidak bisa mengubahnya).
     const t = await prisma.packageTemplate.create({ data: { poolId: pool.id, name: "Trial", totalSesi: 1, price: 50000, isTrial: true } });
     const m = await mkUser("MEMBER");
     const dep = await prisma.dependent.create({ data: { memberId: m.id, name: "Anak" } });
-    const buy = (templateId = t.id, dependentId = dep.id) =>
+    // Sesi coba model harga-dari-coach = sesi: 1.
+    const buy = (_unused?: string, dependentId = dep.id) =>
       as({ id: m.id, role: "MEMBER", name: "M" }, () =>
-        checkout(new Request("http://x/api/payment/checkout", { method: "POST", body: JSON.stringify({ templateId, dependentId }) })),
+        checkout(new Request("http://x/api/payment/checkout", { method: "POST", body: JSON.stringify({ poolId: pool.id, coachId: coach.id, sesi: 1, dependentId }) })),
       );
     return { pool, t, m, dep, buy };
   }

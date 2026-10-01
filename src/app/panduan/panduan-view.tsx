@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Logotype } from "@/components/ui/logotype";
 import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
-import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, MIN_WITHDRAWAL } from "@/lib/policy";
+import { CANCEL_WINDOW_HOURS, MIN_WITHDRAWAL } from "@/lib/policy";
 import { formatRupiah } from "@/lib/format";
 
 // Panduan ditulis ulang 18 Sep 2026: dulu berupa blob HTML dengan font dan
@@ -33,11 +33,11 @@ const HIGHLIGHTS = [
   },
   {
     title: "Bagi hasil otomatis",
-    body: "Setiap sesi yang ditandai Hadir langsung dibagi ke saldo kolam, coach, dan komisi platform (termasuk PPN 11%). Kalau peserta sudah booking tapi tidak datang, coach dapat 50% dari bagiannya dan kolam tidak dapat bagian. Kolam dan coach mencairkan saldonya sendiri.",
+    body: "Setiap sesi yang ditandai Hadir langsung dibagi: kolam dan coach menerima harga paket mereka dibagi jumlah sesi (dipotong PPh 0,5% kecuali bebas potongan), sisanya biaya layanan SPH (termasuk PPN 11%). Kalau peserta sudah booking tapi tidak datang, coach dapat 50% dari bagiannya dan kolam tidak dapat bagian. Kolam dan coach mencairkan saldonya sendiri.",
   },
   {
-    title: "Harga per kolam",
-    body: "Tiap kolam punya katalog paket dan harganya sendiri. Perubahan harga diusulkan pemilik kolam dan berlaku setelah disetujui admin.",
+    title: "Harga dari kolam dan coach",
+    body: "Kolam memasang harga tiket dan coach memasang harga jasanya, masing-masing untuk paket 4 sesi (berlaku 2 bulan) dan 8 sesi (berlaku 3 bulan). Member membayar keduanya + biaya layanan SPH di bawah 7%. Harga baru langsung berlaku; paket yang sudah dibeli tidak berubah.",
   },
   {
     title: "Notifikasi dua arah",
@@ -64,9 +64,9 @@ const GUIDES: Guide[] = [
       {
         heading: "2. Beli paket",
         steps: [
-          { title: "Pilih kolam", body: "Setiap kolam menampilkan alamat, jam buka, fasilitas, dan foto. Paket hanya berlaku di kolam tempat paket dibeli." },
-          { title: "Pilih paket dan pesertanya", body: "Tiap paket menampilkan harga, jumlah sesi, masa berlaku, dan jatah pembatalan. Pilih dulu paket ini untuk peserta yang mana." },
-          { title: "Bayar lewat Midtrans", body: "Virtual account, QRIS, e-wallet, atau kartu. Paket aktif otomatis setelah pembayaran masuk, dan semua transaksi tercatat di menu Riwayat Bayar." },
+          { title: "Pilih kolam dan coach", body: "Setiap kolam menampilkan alamat, jam buka, fasilitas, foto, dan coach yang mengajar di sana. Paket hanya berlaku untuk coach itu di kolam itu." },
+          { title: "Pilih paket dan pesertanya", body: "Paket 4 atau 8 sesi, dengan rincian harga kolam, coach, dan biaya layanan SPH. Peserta yang belum pernah punya paket bisa beli 1 sesi coba." },
+          { title: "Bayar lewat Midtrans", body: "Virtual account, QRIS, atau e-wallet. Paket aktif otomatis setelah pembayaran masuk, dan semua transaksi tercatat di menu Riwayat Bayar." },
         ],
       },
       {
@@ -76,7 +76,7 @@ const GUIDES: Guide[] = [
           { title: "Pilih coach & jam", body: "Slot kosong ada tombol Booking. Slot yang sudah diambil member lain otomatis terkunci." },
           { title: "Selesai", body: "Sisa sesi berkurang 1, dan coach mendapat notifikasi kalau notifikasinya sudah aktif." },
         ],
-        note: `Belum punya paket di kolam itu tapi masih punya paket aktif di kolam lain? Ada tombol beli 1 sesi (harga khusus 1 sesi yang tertera saat pembelian, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
+        note: "Jadwal semua coach di kolam itu bisa dilihat, tapi yang bisa dibooking hanya jadwal coach paketmu.",
       },
       {
         heading: "4. Riwayat & pembatalan",
@@ -125,7 +125,7 @@ const GUIDES: Guide[] = [
         steps: [
           { title: "Buka menu Riwayat Sesi", body: "Semua sesi yang sudah lewat waktunya menunggu ditandai. Batasnya 24 jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai." },
           { title: "Pilih Hadir atau Tidak Hadir", body: "Langsung tersimpan begitu dipilih, tidak perlu tombol Simpan." },
-          { title: "Saldo masuk", body: "Hadir: komisimu masuk penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu dapat 50% dari komisimu." },
+          { title: "Saldo masuk", body: "Hadir: bagianmu (harga paketmu ÷ jumlah sesi, dipotong PPh 0,5% kecuali bebas potongan) masuk penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu dapat 50% dari bagianmu." },
         ],
         note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum ditandai — pastikan pilihannya benar.",
       },
@@ -157,7 +157,7 @@ const GUIDES: Guide[] = [
       {
         heading: "2. Paket & info kolam",
         steps: [
-          { title: "Usulkan paket atau harga", body: "Isi nama, harga, jumlah sesi, masa berlaku, dan jatah batal, lalu Kirim Usulan. Usulan berlaku setelah disetujui admin; paket yang sudah dibeli member tidak ikut berubah." },
+          { title: "Pasang harga tiket", body: "Di menu Paket & Harga, isi harga tiket kolam untuk paket 4 dan 8 sesi (tiket untuk 1 peserta, 1 pendamping, dan coach). Langsung berlaku untuk pembelian berikutnya; paket yang sudah dibeli member tidak ikut berubah." },
           { title: "Lengkapi info kolam", body: "Deskripsi, alamat, telepon, jam buka-tutup, dan fasilitas. Informasi ini langsung tampil di halaman booking member, profil coach, dan landing page." },
           { title: "Unggah foto kolam", body: "Maksimal 6 foto. Foto pertama dipakai sebagai sampul di landing page dan halaman booking." },
         ],
@@ -198,8 +198,8 @@ const GUIDES: Guide[] = [
       {
         heading: "3. Kolam, paket, dan booking",
         steps: [
-          { title: "Tab Kolam", body: "Harga paket, saldo kolam, pembagian komisi (platform, coach, kolam), info & foto kolam, dan coach terafiliasi." },
-          { title: "Tab Paket", body: "Katalog paket per kolam, persetujuan usulan harga dari pemilik kolam, dan paket per member untuk koreksi manual." },
+          { title: "Tab Kolam", body: "Harga tiket paket, biaya layanan SPH (maks 6,9%), tanda bebas potongan PPh, saldo kolam, pembagian komisi paket lama, info & foto kolam, dan coach terafiliasi." },
+          { title: "Tab Paket", body: "Katalog paket lama untuk pemberian paket manual, dan paket per member untuk koreksi manual. Harga & bebas potongan PPh coach diatur di halaman detail coach (Pengguna)." },
           { title: "Tab Jadwal Booking", body: "Semua slot dikelompokkan per coach, tanggal, dan kolam. Admin bisa menandai kehadiran atau membatalkan booking siapa pun." },
         ],
       },

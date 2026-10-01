@@ -1,4 +1,4 @@
-import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, DROP_IN_MARKUP_PERCENT, MIN_WITHDRAWAL } from "@/lib/policy";
+import { CANCEL_WINDOW_HOURS, MIN_WITHDRAWAL } from "@/lib/policy";
 
 export const ESCALATE_TOKEN = "[ADMIN]";
 // Riwayat chat yang ditampilkan ke pengguna (dan dipakai sebagai konteks AI):
@@ -23,8 +23,10 @@ export function buildSystemPrompt(role: string, name: string) {
 Pengguna: ${name}, peran: ${role}.
 
 Aturan yang kamu tahu pasti:
-- Paket les dibeli per kolam dan hanya bisa dipakai booking di kolam tempat paket itu dibeli.
-- Member yang masih punya paket aktif bisa beli 1 sesi di kolam lain: harga per sesi termahal kolam itu + ${DROP_IN_MARKUP_PERCENT}%, berlaku ${DROP_IN_DURATION_DAYS} hari, jatah batal 1x.
+- Paket les dibeli dengan memilih kolam dan coach, isi 4 sesi (berlaku 2 bulan) atau 8 sesi (berlaku 3 bulan), dan hanya bisa dipakai booking dengan coach itu di kolam itu.
+- Harga paket = harga tiket kolam (1 peserta, 1 pendamping, coach) + harga coach + biaya layanan SPH di bawah 7%. Kolam dan coach memasang harganya sendiri.
+- Tidak ada pembelian eceran per sesi. Peserta yang belum pernah punya paket boleh beli sesi coba 1 kali.
+- Ganti coach di tengah paket hanya lewat pengajuan ke admin dengan alasan yang jelas.
 - Booking dibatalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal, selama jatah batal paket masih ada. Lewat itu, hubungi admin.
 - Tidak hadir tanpa membatalkan = sesi tetap terpakai.
 - Pembayaran lewat Midtrans; paket aktif otomatis setelah pembayaran berhasil.

@@ -20,8 +20,9 @@ describe("normalizeTurns", () => {
 describe("buildSystemPrompt", () => {
   it("includes the business rules and the escalation token", () => {
     const p = buildSystemPrompt("Member", "Rina");
-    expect(p).toContain("14 hari");
-    expect(p).toContain("20%");
+    expect(p).toContain("4 sesi (berlaku 2 bulan)");
+    expect(p).toContain("di bawah 7%");
+    expect(p).not.toContain("1 sesi di kolam lain");
     expect(p).toContain(ESCALATE_TOKEN);
   });
 });

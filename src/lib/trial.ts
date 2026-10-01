@@ -20,7 +20,3 @@ export function trialBlockingPackageWhere(now: Date = new Date()): Prisma.Packag
     ],
   };
 }
-
-// Template yang dipakai untuk harga "mulai dari" & harga beli 1 sesi: trial
-// tidak ikut (harga promosinya merusak kedua angka itu).
-export const REGULAR_TEMPLATE_WHERE = { isActive: true, isTrial: false } as const;

@@ -3,9 +3,21 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import LandingView from "./landing-view";
 import { coachBioLine } from "@/lib/coach-bio";
-import { REGULAR_TEMPLATE_WHERE } from "@/lib/trial";
+import { PACK_SIZES, packQuote } from "@/lib/pricing";
 import { rankLandingCoaches, rankLandingPools } from "@/lib/landing-rank";
 import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
+
+function cheapestPack(p: {
+  pricePack4: number | null;
+  pricePack8: number | null;
+  serviceFeeBps: number;
+  affiliations: { coach: { coachProfile: { pricePack4: number | null; pricePack8: number | null } | null } }[];
+}) {
+  const totals = p.affiliations
+    .flatMap(({ coach }) => (coach.coachProfile ? PACK_SIZES.map((n) => packQuote(p, coach.coachProfile!, n)?.total) : []))
+    .filter((t): t is number => t != null);
+  return totals.length ? Math.min(...totals) : null;
+}
 
 export default async function Home() {
   const session = await auth();
@@ -24,7 +36,13 @@ export default async function Home() {
           photos: true,
           openTime: true,
           closeTime: true,
-          packageTemplates: { where: REGULAR_TEMPLATE_WHERE, select: { price: true, totalSesi: true } },
+          pricePack4: true,
+          pricePack8: true,
+          serviceFeeBps: true,
+          affiliations: {
+            where: { coach: { role: "COACH", isActive: true, coachProfile: { isActive: true } } },
+            select: { coach: { select: { coachProfile: { select: { pricePack4: true, pricePack8: true } } } } },
+          },
           ownerships: { select: { owner: { select: { email: true } } } },
           _count: { select: { affiliations: true } },
         },
@@ -95,10 +113,9 @@ export default async function Home() {
           memberCount: poolStats.get(p.id)?.members.size ?? 0,
           hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
           coachCount: p._count.affiliations,
-          // Harga paket termurah dari katalog kolam itu (harga per sesi tidak ditampilkan ke publik).
-          fromPackagePrice: p.packageTemplates.length
-            ? Math.min(...p.packageTemplates.map((t) => t.price))
-            : null,
+          // Harga paket termurah di kolam itu (kolam + coach + biaya layanan), dari
+          // semua coach yang mengajar di sana dan sudah memasang harga.
+          fromPackagePrice: cheapestPack(p),
         }))}
         coaches={topCoaches.map((c) => ({
           id: c.id,

@@ -104,6 +104,16 @@ export async function markAttendance(
         bookingId,
         perSessionValue,
         attended,
+        // Paket model harga-dari-coach: dibagi dari harga yang disalin saat beli.
+        pricing:
+          booking.package.poolPrice != null && booking.package.coachPrice != null
+            ? {
+                paid: successPayment.amount,
+                totalSesi: booking.package.totalSesi,
+                poolPrice: booking.package.poolPrice,
+                coachPrice: booking.package.coachPrice,
+              }
+            : undefined,
       });
     });
   } catch (err) {

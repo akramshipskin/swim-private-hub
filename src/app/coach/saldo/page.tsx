@@ -1,6 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import SaldoView from "@/components/saldo-view";
+import { formatRupiah } from "@/lib/format";
 import { updateBankInfo, requestWithdrawal } from "./actions";
 import { openNullable, openSecret } from "@/lib/secret-box";
 import Link from "next/link";
@@ -40,6 +41,13 @@ export default async function CoachSaldoPage() {
   });
 
   const overdue = await getOverdueParticipants(session.user.id);
+  // Potongan PPh 0,5% (paket model harga-dari-coach), disetor SPH atas nama coach.
+  const pph = -((
+    await prisma.walletTransaction.aggregate({
+      where: { type: "PPH_WITHHELD", coachProfile: { userId: session.user.id } },
+      _sum: { amount: true },
+    })
+  )._sum.amount ?? 0);
 
   if (!profile) {
     return (
@@ -54,6 +62,7 @@ export default async function CoachSaldoPage() {
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Saldo Saya</h1>
       <p className="mb-6 text-sm text-text-muted">
         Bagian kamu dari tiap sesi yang ditandai Hadir (penuh) atau Tidak Hadir karena peserta tidak datang (50%).
+        {pph > 0 && <> Potongan PPh 0,5% sejauh ini: {formatRupiah(pph)} (sudah dikurangkan dari saldo, disetor SPH atas namamu).</>}
       </p>
       {overdue.length > 0 && (
         <div role="alert" className="mb-6 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">

@@ -13,16 +13,16 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang, render-brand-social.
 
 ## Sedang jalan
-- Tidak ada. Menunggu Hadi melihat animasi v2 di HP asli dan laptop.
+- Harga dari coach tahap 1 (2 Okt, Opus): SELESAI di laptop, di-commit, BELUM di-push. Ada migrasi baru (harga_dari_coach) -> Hadi jalankan migrasi production dulu. Rancangan: docs/designs/harga-dari-coach.md. Diuji: tes otomatis, 148 tes balapan, uji alur lewat browser lokal (pemilik kolam & coach pasang harga, member lihat harga, booking coach lain ditolak, Hadir/Tidak Hadir/Hadir + audit cocok), pemeriksa Opus kedua (4 temuan ringan, sudah dibetulkan).
 
 ## Tugas Claude berikutnya
 1. Revisi animasi sesuai masukan Hadi per bagian; ukur ulang sebelum/sesudah.
 2. Cek GitHub Actions dan situs asli setelah tiap push.
 3. Audit buku besar production: dijalankan Hadi 2 Okt, semua cocok (5 kolam, 5 coach, 1 sesi berbayar, 0 pencairan). Ulangi setelah ada transaksi asli (AUDIT_PROD=1, baca-saja).
-4. Brainstorm harga dari coach: menunggu jawaban Hadi 5 pertanyaan + akuntan (komisi vs markup).
+4. Harga dari coach: setelah migrasi production -> push, cek GitHub & situs asli; lalu tahap 2 (saldo member + pengajuan ganti coach), tahap 3 (S&K, perlu orang hukum).
 
 ## Tugas Hadi
-1. Lihat landing v2 di HP asli dan laptop, beri masukan per bagian. Jawab 5 pertanyaan harga dari coach; tanya akuntan komisi vs markup.
+1. Jalankan migrasi production harga_dari_coach (perintah di chat 2 Okt), lalu isi harga kolam & coach di production (sebelum itu kolam tidak bisa dijual). Animasi landing v2 ditunda.
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.

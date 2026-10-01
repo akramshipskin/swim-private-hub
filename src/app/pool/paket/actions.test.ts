@@ -3,24 +3,15 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ user: { id: "owner-1" } }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 const ownershipCount = vi.fn();
-const templateFindUnique = vi.fn();
+const poolUpdate = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     poolOwnership: { count: (...a: unknown[]) => ownershipCount(...a) },
-    packageTemplate: { findUnique: (...a: unknown[]) => templateFindUnique(...a) },
-    pool: { findUnique: vi.fn().mockResolvedValue({ name: "Kolam Uji" }) },
+    pool: { update: (...a: unknown[]) => poolUpdate(...a) },
   },
 }));
-const notifyAdmins = vi.fn().mockResolvedValue(undefined);
-vi.mock("@/lib/notify", () => ({ notifyAdmins: (...a: unknown[]) => notifyAdmins(...a) }));
-const createTemplateRecord = vi.fn().mockResolvedValue(null);
-const updateTemplateRecord = vi.fn().mockResolvedValue(null);
-vi.mock("@/lib/package-template", () => ({
-  proposeNewTemplate: (...a: unknown[]) => createTemplateRecord(...a),
-  proposeTemplateUpdate: (...a: unknown[]) => updateTemplateRecord(...a),
-}));
 
-const { createPoolTemplate, updatePoolTemplate } = await import("./actions");
+const { updatePoolPrices } = await import("./actions");
 const fd = (o: Record<string, string>) => {
   const f = new FormData();
   for (const [k, v] of Object.entries(o)) f.set(k, v);
@@ -29,32 +20,22 @@ const fd = (o: Record<string, string>) => {
 
 beforeEach(() => vi.clearAllMocks());
 
-describe("pool owner package templates", () => {
-  it("refuses creating a template for a pool the owner doesn't own", async () => {
+describe("harga paket kolam", () => {
+  it("menolak kolam milik orang lain", async () => {
     ownershipCount.mockResolvedValue(0);
-    expect((await createPoolTemplate(null, fd({ poolId: "other" })))?.error).toBeTruthy();
-    expect(createTemplateRecord).not.toHaveBeenCalled();
-    expect(notifyAdmins).not.toHaveBeenCalled();
+    expect((await updatePoolPrices(null, fd({ poolId: "other", pricePack4: "200000" })))?.error).toBeTruthy();
+    expect(poolUpdate).not.toHaveBeenCalled();
   });
 
-  it("creates for an owned pool", async () => {
+  it("menolak harga tidak valid", async () => {
     ownershipCount.mockResolvedValue(1);
-    expect(await createPoolTemplate(null, fd({ poolId: "mine" }))).toBeNull();
-    expect(createTemplateRecord).toHaveBeenCalled();
-    expect(notifyAdmins).toHaveBeenCalledWith("Usulan paket kolam", "Kolam Uji mengusulkan paket, menunggu persetujuan", "/admin/paket");
+    expect((await updatePoolPrices(null, fd({ poolId: "mine", pricePack4: "0", pricePack8: "" })))?.error).toBeTruthy();
+    expect(poolUpdate).not.toHaveBeenCalled();
   });
 
-  it("does not notify admins when the proposal is rejected by validation", async () => {
+  it("menyimpan langsung untuk kolam sendiri; kosong = tidak dijual", async () => {
     ownershipCount.mockResolvedValue(1);
-    createTemplateRecord.mockResolvedValueOnce({ error: "Harga tidak valid" });
-    expect((await createPoolTemplate(null, fd({ poolId: "mine" })))?.error).toBe("Harga tidak valid");
-    expect(notifyAdmins).not.toHaveBeenCalled();
-  });
-
-  it("refuses editing a template of another pool", async () => {
-    templateFindUnique.mockResolvedValue({ poolId: "other" });
-    ownershipCount.mockResolvedValue(0);
-    expect((await updatePoolTemplate(null, fd({ templateId: "t1" })))?.error).toBeTruthy();
-    expect(updateTemplateRecord).not.toHaveBeenCalled();
+    expect(await updatePoolPrices(null, fd({ poolId: "mine", pricePack4: "260000", pricePack8: "" }))).toEqual({ ok: true });
+    expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "mine" }, data: { pricePack4: 260_000, pricePack8: null } });
   });
 });

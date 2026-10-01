@@ -5,7 +5,7 @@ import { Logotype } from "@/components/ui/logotype";
 import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
 import { BUSINESS_ADDRESS } from "@/lib/business";
 import { formatRupiah } from "@/lib/format";
-import { CANCEL_WINDOW_HOURS, DROP_IN_DURATION_DAYS, MIN_WITHDRAWAL } from "@/lib/policy";
+import { CANCEL_WINDOW_HOURS, MIN_WITHDRAWAL } from "@/lib/policy";
 import { AudienceTabs, FaqTabs, type AudienceSteps, type FaqGroup } from "./landing-tabs";
 import { CoachLeaders } from "./coach-leaders";
 import { LandingHeader } from "./landing-header";
@@ -83,7 +83,7 @@ const AUDIENCES: AudienceSteps[] = [
     label: "Pemilik kolam",
     steps: [
       { title: "Gabung jadi mitra", body: "Daftarkan kolam, lengkapi alamat, jam buka, dan fasilitas." },
-      { title: "Usulkan paket & harga", body: "Setiap kolam punya katalog dan harga sendiri; perubahan berlaku setelah diperiksa admin." },
+      { title: "Pasang harga tiket", body: "Kolam memasang harga tiket untuk paket 4 dan 8 sesi; perubahan langsung berlaku untuk pembelian berikutnya." },
       { title: "Pantau jam ramai", body: "Lihat jam berapa kolam dipakai les privat, oleh coach siapa, setiap hari." },
       { title: "Terima bagi hasil", body: "Komisi kolam masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening." },
     ],
@@ -103,7 +103,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Paket bisa dipakai di kolam mana saja?",
-        a: `Paket berlaku di kolam tempat paket dibeli. Kalau sesekali ingin les di kolam mitra lain, member yang masih punya paket aktif bisa beli 1 sesi di kolam tersebut (harga khusus 1 sesi yang tertera saat pembelian, berlaku ${DROP_IN_DURATION_DAYS} hari).`,
+        a: "Paket dibeli dengan memilih kolam dan coach, dan berlaku untuk coach itu di kolam itu. Mau les di kolam atau dengan coach lain, beli paket untuk pilihan tersebut.",
       },
       {
         q: "Satu akun untuk berapa anak?",
@@ -127,7 +127,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Pembayarannya lewat apa?",
-        a: "Lewat Midtrans: virtual account bank, QRIS, e-wallet, atau kartu. Paket aktif otomatis setelah pembayaran masuk.",
+        a: "Lewat Midtrans: virtual account bank, QRIS, atau e-wallet. Paket aktif otomatis setelah pembayaran masuk.",
       },
       {
         q: "Apakah coach-nya bersertifikat?",
@@ -157,7 +157,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kapan bagian saya masuk?",
-        a: "Tandai kehadiran paling lambat 24 jam setelah sesi selesai. Sesi Hadir langsung menambah saldo kamu sesuai persentase komisi coach di kolam tersebut. Kalau peserta sudah booking tapi tidak datang, tandai Tidak Hadir: kamu tetap dapat 50% dari bagianmu.",
+        a: "Tandai kehadiran paling lambat 24 jam setelah sesi selesai. Sesi Hadir langsung menambah saldo kamu sebesar harga paketmu dibagi jumlah sesinya. Kalau peserta sudah booking tapi tidak datang, tandai Tidak Hadir: kamu tetap dapat 50% dari bagianmu.",
       },
       {
         q: "Cara mencairkan saldo?",
@@ -169,11 +169,11 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Saya bisa menentukan tarif saya sendiri?",
-        a: "Tidak. Harga paket ditentukan per kolam: diusulkan pemilik kolam, disetujui admin. Bagianmu dihitung dari persentase komisi coach yang berlaku di kolam itu.",
+        a: "Bisa. Kamu memasang harga paket 4 dan 8 sesi di menu Harga, satu harga untuk semua kolam tempat kamu mengajar. Member membayar harga kolam + hargamu + biaya layanan SPH. Paket yang sudah dibeli tidak ikut berubah saat kamu mengganti harga.",
       },
       {
         q: "Ada biaya untuk bergabung?",
-        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. Platform mengambil komisi dari setiap sesi yang terlaksana.",
+        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. SPH mengambil biaya layanan di bawah 7% yang dibayar member di atas harga kolam dan coach.",
       },
       {
         q: "Apa untungnya dibanding cari peserta sendiri?",
@@ -195,15 +195,15 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Siapa yang menentukan harga paket?",
-        a: "Kamu yang mengusulkan paket dan harga untuk kolam kamu. Usulan berlaku setelah diperiksa admin, dan paket yang sudah dibeli member tidak ikut berubah.",
+        a: "Kamu memasang harga tiket kolam untuk paket 4 dan 8 sesi (tiket untuk 1 peserta, 1 pendamping, dan coach-nya), coach memasang harga jasanya sendiri. Harga baru langsung berlaku untuk pembelian berikutnya; paket yang sudah dibeli tidak ikut berubah.",
       },
       {
         q: "Bagaimana pembagian hasilnya?",
-        a: "Setiap sesi yang ditandai Hadir dibagi ke platform, coach, dan kolam sesuai persentase yang disepakati per kolam. Semua pihak melihat angka yang sama.",
+        a: "Setiap sesi yang ditandai Hadir, kolam menerima harga tiket paketnya dibagi jumlah sesi, coach menerima harga jasanya dibagi jumlah sesi, dan biaya layanan menjadi bagian SPH. Bagian kolam dan coach dipotong PPh 0,5% kecuali sudah menyerahkan surat pernyataan omzet di bawah Rp500 juta.",
       },
       {
         q: "Ada biaya untuk bergabung?",
-        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. Platform mengambil komisi dari setiap sesi yang terlaksana.",
+        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. SPH mengambil biaya layanan di bawah 7% yang dibayar member di atas harga kolam dan coach.",
       },
       {
         q: "Saya juga harus menyediakan coach?",
@@ -330,7 +330,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
             { t: "60 menit, 1 coach", d: "Untuk 1 anak, bukan kelas gabungan." },
             { t: "Tiket masuk termasuk", d: "Peserta tidak membayar lagi di loket." },
             { t: "Sertifikat diperiksa", d: "Badge Bersertifikat tampil setelah admin menyetujui." },
-            { t: "Bayar online", d: "QRIS, virtual account, e-wallet, atau kartu." },
+            { t: "Bayar online", d: "QRIS, virtual account, atau e-wallet." },
           ].map((f, i) => (
             <li key={f.t} className={`px-4 py-6 lg:py-8 ${i % 2 === 1 ? "border-l border-fixed-ink/10" : ""} ${i > 1 ? "border-t border-fixed-ink/10 lg:border-t-0" : ""} ${i > 0 ? "lg:border-l lg:border-fixed-ink/10" : ""}`}>
               <Reveal delay={i * 70}>

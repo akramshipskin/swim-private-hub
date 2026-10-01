@@ -26,6 +26,14 @@ export async function mkUser(role: Role, extra: { coachBalance?: number; bank?: 
   const u = await prisma.user.create({ data: { name: role + uid(), phone: "08" + uid().slice(-10), passwordHash: "x", role, ...(role === "COACH" ? { coachProfile: { create: { walletBalance: extra.coachBalance ?? 0, ...(extra.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } } } : {}) }, include: { coachProfile: true } });
   return u;
 }
+// Model harga-dari-coach: kolam + coach yang sudah memasang harga dan coach
+// mengajar di kolam itu (Pool 260rb/480rb, coach 440rb/800rb, layanan 6,5%).
+export async function mkPricedOffer() {
+  const pool = await prisma.pool.create({ data: { name: "Pool " + uid(), pricePack4: 260000, pricePack8: 480000, serviceFeeBps: 650 } });
+  const coach = await prisma.user.create({ data: { name: "COACH" + uid(), phone: "08" + uid().slice(-10), passwordHash: "x", role: "COACH", coachProfile: { create: { pricePack4: 440000, pricePack8: 800000 } } }, include: { coachProfile: true } });
+  await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
+  return { pool, coach };
+}
 export async function mkMemberWithPackage(poolId: string, opts: { sisa?: number; total?: number; jatah?: number; price?: number | null; expired?: Date | null } = {}) {
   const m = await mkUser("MEMBER");
   const dep = await prisma.dependent.create({ data: { memberId: m.id, name: "Anak" + uid() } });

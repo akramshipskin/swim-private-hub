@@ -32,6 +32,9 @@ for (const [label, table, col] of [["kolam", "Pool", "poolId"], ["coach", "Coach
 // 3. Pembagian per sesi.
 const bookings = await q(`
   SELECT b.id, b.status, b.attended, p."totalSesi", p."isTrial", p."isSingleSession",
+    p."poolPrice" AS poolprice, p."coachPrice" AS coachprice, p."coachId" AS pkgcoach, a."coachId" AS slotcoach,
+    COALESCE(SUM(w.amount) FILTER (WHERE w.type='PPH_WITHHELD' AND w."poolId" IS NOT NULL),0)::int AS pphpool,
+    COALESCE(SUM(w.amount) FILTER (WHERE w.type='PPH_WITHHELD' AND w."coachProfileId" IS NOT NULL),0)::int AS pphcoach,
     (SELECT pay.amount FROM "Payment" pay WHERE pay."packageId" = p.id AND pay.status = 'SUCCESS' ORDER BY pay."createdAt" LIMIT 1) AS paid,
     (SELECT pay."paidAt" FROM "Payment" pay WHERE pay."packageId" = p.id AND pay.status = 'SUCCESS' ORDER BY pay."createdAt" LIMIT 1) AS paidat,
     b."attendedAt" AS attendedat,
@@ -40,9 +43,9 @@ const bookings = await q(`
     COALESCE(SUM(w.amount) FILTER (WHERE w.type='PLATFORM_REVENUE'),0)::int AS net,
     COALESCE(SUM(w.amount) FILTER (WHERE w.type='PLATFORM_TAX'),0)::int AS tax,
     MIN(w."createdAt") FILTER (WHERE w.type='PLATFORM_TAX' AND w.amount > 0) AS taxAt
-  FROM "Booking" b JOIN "Package" p ON p.id = b."packageId"
+  FROM "Booking" b JOIN "Package" p ON p.id = b."packageId" JOIN "Availability" a ON a.id = b."availabilityId"
   LEFT JOIN "WalletTransaction" w ON w."bookingId" = b.id
-  GROUP BY b.id, p.id`);
+  GROUP BY b.id, p.id, a.id`);
 // PPN 11% mulai dari commit ae6e433 (30 Sep 2026 22:01 WIB); baris sebelumnya memakai 12%.
 const PPN_11_SINCE = new Date("2026-09-30T22:01:17+07:00");
 let checked = 0;
@@ -64,6 +67,21 @@ for (const b of bookings) {
   if (total !== v) bad("sesi", `${b.id}: total dibagi ${total} != nilai sesi ${v} (harga ${b.paid}/${b.totalSesi})`);
   if (b.pool < 0 || b.coach < 0 || b.net < 0 || b.tax < 0) bad("sesi", `${b.id}: ada bagian negatif (kolam ${b.pool}, coach ${b.coach}, platform ${b.net}, PPN ${b.tax})`);
   if (b.attended === false && b.pool !== 0) bad("sesi", `${b.id}: Tidak Hadir tapi kolam dapat ${b.pool}`);
+  // Model harga-dari-coach (2 Okt): bagian tetap per sesi dari harga yang disalin saat beli,
+  // potongan PPh 0,5% (atau 0 bila bebas), dan sesi hanya dengan coach paketnya.
+  if (b.poolprice != null && b.coachprice != null) {
+    if (b.pkgcoach && b.pkgcoach !== b.slotcoach) bad("sesi", `${b.id}: paket untuk coach ${b.pkgcoach} tapi sesi dengan coach ${b.slotcoach}`);
+    let coachExp = Math.floor(b.coachprice / b.totalSesi);
+    let poolExp = b.attended ? Math.floor(b.poolprice / b.totalSesi) : 0;
+    if (!b.attended) coachExp = Math.floor(coachExp * 50 / 100);
+    coachExp = Math.min(coachExp, v);
+    poolExp = Math.min(poolExp, v - coachExp);
+    if (b.pool !== poolExp || b.coach !== coachExp) bad("sesi", `${b.id}: paket pilih coach, kolam ${b.pool}/${poolExp}, coach ${b.coach}/${coachExp} (tercatat/harusnya)`);
+    for (const [who, gross, pph] of [["kolam", b.pool, b.pphpool], ["coach", b.coach, b.pphcoach]]) {
+      const full = -Math.round(gross * 50 / 10000);
+      if (pph !== 0 && pph !== full) bad("PPh", `${b.id}: potongan ${who} ${pph}, harusnya 0 (bebas) atau ${full}`);
+    }
+  } else if (b.pphpool || b.pphcoach) bad("PPh", `${b.id}: paket lama tapi ada potongan PPh`);
   const platform = b.net + b.tax;
   const t11 = Math.round((platform * 11) / 111), t12 = Math.round((platform * 12) / 112);
   if (b.tax !== t11 && b.tax !== t12) bad("PPN", `${b.id}: PPN ${b.tax} dari komisi ${platform} (harusnya ${t11} untuk 11% atau ${t12} untuk 12%)`);
@@ -104,6 +122,8 @@ const plat = (await q(`SELECT
   (SELECT COALESCE(SUM(amount),0)::int FROM "WalletTransaction" WHERE type='PLATFORM_REVENUE') - (SELECT COALESCE(SUM("revenueAmount"),0)::int FROM "PlatformWithdrawal") AS revenue,
   (SELECT COALESCE(SUM(amount),0)::int FROM "WalletTransaction" WHERE type='PLATFORM_TAX') - (SELECT COALESCE(SUM("taxAmount"),0)::int FROM "PlatformWithdrawal") AS tax`))[0];
 notes.push(`platform: pendapatan bersih ${plat.revenue}, PPN ${plat.tax}`);
+const pphHeld = (await q(`SELECT COALESCE(-SUM(amount),0)::int AS s FROM "WalletTransaction" WHERE type='PPH_WITHHELD'`))[0].s;
+notes.push(`titipan PPh 0,5% kolam/coach (bukan pendapatan SPH): ${pphHeld}`);
 if (plat.tax < 0) bad("platform", `saldo PPN minus ${plat.tax}`);
 
 console.log(notes.join("\n"));

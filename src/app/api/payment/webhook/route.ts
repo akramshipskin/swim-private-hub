@@ -129,9 +129,10 @@ export async function POST(request: Request) {
     packageStatus = null;
   }
 
-  const durationDays = payment.package.isSingleSession
-    ? DROP_IN_DURATION_DAYS
-    : (payment.package.template?.durationDays ?? 60);
+  // Paket model harga-dari-coach menyimpan masa berlakunya sendiri.
+  const durationDays =
+    payment.package.durationDays ??
+    (payment.package.isSingleSession ? DROP_IN_DURATION_DAYS : (payment.package.template?.durationDays ?? 60));
   const now = new Date();
   const expiredDate = new Date(now);
   expiredDate.setDate(expiredDate.getDate() + durationDays);
@@ -180,7 +181,7 @@ export async function POST(request: Request) {
   if (activated) {
     await sendPushToUser(payment.package.memberId, {
       title: "Pembayaran berhasil",
-      body: `${payment.package.template?.name ?? "Paket 1 sesi"} sudah aktif. Yuk booking jadwal.`,
+      body: `${payment.package.name} sudah aktif. Yuk booking jadwal.`,
       url: "/member/booking",
     }).catch(() => {});
   }

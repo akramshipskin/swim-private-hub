@@ -125,7 +125,7 @@ describe("webhook push notification", () => {
       status: "PENDING",
       amount: 135000,
       packageId: "pkg-9",
-      package: { memberId: "member-9", isSingleSession: false, template: { name: "Private 4x", durationDays: 30 } },
+      package: { memberId: "member-9", name: "Private 4x", isSingleSession: false, durationDays: null, template: { name: "Private 4x", durationDays: 30 } },
       ...over,
     };
   }

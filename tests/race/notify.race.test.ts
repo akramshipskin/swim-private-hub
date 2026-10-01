@@ -35,7 +35,6 @@ import { rejectWithdrawal } from "@/app/admin/withdrawals/actions";
 import { adjustWallet } from "@/app/admin/koreksi-saldo/actions";
 import { cancelBookingAsCoach, addAvailability } from "@/app/coach/jadwal/actions";
 import { requestDeletionAction } from "@/app/profil/account-deletion-actions";
-import { createPoolTemplate } from "@/app/pool/paket/actions";
 import { replyToThread } from "@/app/admin/pesan/actions";
 
 process.env.VAPID_SUBJECT = "mailto:qa@example.com";
@@ -86,17 +85,6 @@ describe("NOTIFIKASI ke admin (butuh tindakan admin)", () => {
     expect(res.status).toBe(201);
     expect(await inbox()).toEqual({ [admin1.id]: ["Pendaftaran kolam baru"], [admin2.id]: ["Pendaftaran kolam baru"] });
     expect(last()?.body).toBe("Kolam Bahari (Budi Pemilik) menunggu persetujuan");
-  });
-
-  it("N3: pemilik kolam mengusulkan paket -> admin aktif dapat; usulan ditolak validasi -> tidak ada notifikasi", async () => {
-    const pool = await mkPool();
-    await prisma.poolOwnership.create({ data: { poolId: pool.id, ownerId: owner.id } });
-    const bad = await as({ id: owner.id, role: "POOL_OWNER" }, () => createPoolTemplate(null, fd({ poolId: pool.id, name: "" })));
-    expect(bad?.error).toBeTruthy();
-    expect(sent).toEqual([]);
-    const ok = await as({ id: owner.id, role: "POOL_OWNER" }, () => createPoolTemplate(null, fd({ poolId: pool.id, name: "Paket 8x", totalSesi: "8", price: "800000", durationDays: "60", jatahCancel: "2" })));
-    expect(ok).toBeNull();
-    expect(await inbox()).toEqual({ [admin1.id]: ["Usulan paket kolam"], [admin2.id]: ["Usulan paket kolam"] });
   });
 
   it("N4: coach mengajukan pencairan -> admin aktif dapat; pemilik kolam mengajukan -> juga", async () => {

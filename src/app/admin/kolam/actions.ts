@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { removeOpenSlots } from "@/lib/availability";
 import { formNumber } from "@/lib/format";
 import { PENDING_APPROVAL_WHERE } from "@/lib/pending-approval";
+import { changedPackPrices, isValidServiceFeeBps, MAX_SERVICE_FEE_BPS, parsePackPrices } from "@/lib/pricing";
+import type { PackPriceState } from "@/components/pack-price-form";
 
 export type ActionState = { error?: string } | null;
 
@@ -121,4 +123,27 @@ export async function updatePoolShares(
 
   revalidatePath("/admin/kolam");
   return null;
+}
+
+// Model harga-dari-coach: admin bisa mengisi harga paket kolam, biaya layanan
+// SPH (maks 6,9%, bahasa ke pengguna "di bawah 7%"), dan tanda bebas potongan
+// PPh 0,5% (setelah kolam menyerahkan surat pernyataan omzet < Rp500 juta).
+export async function updatePoolPricing(_prev: PackPriceState, formData: FormData): Promise<PackPriceState> {
+  await requireRole("ADMIN");
+  const poolId = formData.get("poolId")?.toString() ?? "";
+  if (!poolId) return { error: "Kolam tidak valid." };
+  const prices = parsePackPrices(formData);
+  if ("error" in prices) return prices;
+  const feeRaw = formData.get("serviceFeePercent")?.toString().trim().replace(",", ".") ?? "";
+  const serviceFeeBps = feeRaw === "" ? NaN : Math.round(Number(feeRaw) * 100);
+  if (!isValidServiceFeeBps(serviceFeeBps)) return { error: `Biaya layanan harus 0 sampai ${MAX_SERVICE_FEE_BPS / 100}%.` };
+  const res = await prisma.pool.updateMany({
+    where: { id: poolId },
+    data: { ...changedPackPrices(formData, prices), serviceFeeBps, pphExempt: formData.get("pphExempt") === "on" },
+  });
+  if (res.count === 0) return { error: "Kolam tidak ditemukan." };
+  revalidatePath("/admin/kolam");
+  revalidatePath("/member/paket");
+  revalidatePath("/");
+  return { ok: true };
 }

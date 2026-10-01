@@ -85,7 +85,7 @@ const COMPARE = [
   },
   {
     before: "Transfer manual, kirim bukti, menunggu dikonfirmasi.",
-    after: "Bayar online (virtual account, QRIS, e-wallet, kartu). Paket aktif otomatis.",
+    after: "Bayar online (virtual account, QRIS, e-wallet). Paket aktif otomatis.",
   },
   {
     before: "Mencatat sendiri sudah les berapa kali dan tersisa berapa.",
@@ -134,7 +134,7 @@ export function BeforeAfter() {
 const PARENT_POINTS: Point[] = [
   {
     title: "Harga paket sudah termasuk tiket masuk kolam",
-    body: "Peserta tidak membayar tiket lagi di loket. Pendamping yang tidak berenang juga tidak dikenakan tiket.",
+    body: "Peserta tidak membayar tiket lagi di loket. Tiket per sesi sudah mencakup 1 peserta, 1 pendamping, dan coach-nya.",
   },
   {
     title: "Benar-benar privat: 1 coach, 1 anak",
@@ -154,7 +154,7 @@ const PARENT_POINTS: Point[] = [
   },
   {
     title: "Boleh coba dulu",
-    body: "Belum yakin? Kolam yang menyediakan paket coba 1 sesi menampilkannya di katalog untuk peserta yang belum pernah punya paket.",
+    body: "Belum yakin? Peserta yang belum pernah punya paket bisa beli 1 sesi coba dengan coach pilihanmu.",
   },
 ];
 

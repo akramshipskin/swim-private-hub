@@ -3,8 +3,6 @@ import { prisma } from "@/lib/prisma";
 import BookingBoard from "./booking-board";
 import Link from "next/link";
 import { activePackageWhere } from "@/lib/active-package";
-import { dropInPrice } from "@/lib/drop-in";
-import { REGULAR_TEMPLATE_WHERE } from "@/lib/trial";
 import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
 
 export const metadata = { title: "Booking Coach | Swim Private Hub" };
@@ -31,7 +29,8 @@ export default async function MemberBookingPage() {
       poolId: true,
       sisaSesi: true,
       jatahCancel: true,
-      isSingleSession: true,
+      coachId: true,
+      coach: { select: { name: true } },
       _count: { select: { bookings: { where: { status: "CANCELLED", cancelledBy: "MEMBER" } } } },
     },
   });
@@ -40,10 +39,11 @@ export default async function MemberBookingPage() {
     packageName: p.name,
     dependentId: p.dependentId,
     poolId: p.poolId,
+    coachId: p.coachId,
+    coachName: p.coach?.name ?? null,
     sisaSesi: p.sisaSesi,
     cancelRemaining: Math.max(0, p.jatahCancel - p._count.bookings),
   }));
-  const canBuySingleSession = usable.some((p) => !p.isSingleSession);
 
   const pools = (
     await prisma.pool.findMany({
@@ -58,7 +58,6 @@ export default async function MemberBookingPage() {
         photos: true,
         openTime: true,
         closeTime: true,
-        packageTemplates: { where: REGULAR_TEMPLATE_WHERE, select: { price: true, totalSesi: true } },
       },
     })
   ).map((p) => ({
@@ -69,7 +68,6 @@ export default async function MemberBookingPage() {
     facilities: p.facilities,
     photos: p.photos,
     hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
-    singleSessionPrice: dropInPrice(p.packageTemplates),
   }));
 
   return (
@@ -142,7 +140,6 @@ export default async function MemberBookingPage() {
         dependents={children.map((c) => ({ id: c.id, name: c.name }))}
         packageOptions={packageOptions}
         pools={pools}
-        canBuySingleSession={canBuySingleSession}
       />
     </main>
   );

@@ -41,6 +41,12 @@ enum WalletTransactionType {
   // Dicatat bareng baris PLATFORM_REVENUE negatif senilai sama: komisi
   // dibayar dari bagian SPH (pajaknya ditanggung SPH). Lihat src/lib/affiliate.ts.
   AFFILIATE_COMMISSION
+  // Potongan PPh 0,5% (PMK 37/2025, Hadi 2 Okt) dari bagian kolam/coach per
+  // sesi paket model harga-dari-coach. Baris NEGATIF dengan poolId ATAU
+  // coachProfileId (tepat 1 terisi): saldo mereka = kredit sesi - potongan.
+  // Uangnya titipan pajak yang disetor SPH atas nama mereka, BUKAN pendapatan
+  // SPH (tidak dihitung di PLATFORM_*). Lihat src/lib/pricing.ts.
+  PPH_WITHHELD
 }
 
 // Penarikan saldo platform oleh admin (transfer manual dari akun Midtrans).
@@ -173,6 +179,7 @@ model User {
   packages            Package[]
   bookings            Booking[]
   availabilities      Availability[]     @relation("CoachAvailabilities")
+  coachedPackages     Package[]          @relation("PackageCoach")
   pushSubscriptions   PushSubscription[]
   poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
   poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
@@ -263,6 +270,15 @@ model CoachProfile {
   bankName          String?
   bankAccountNumber String?
   bankAccountName   String?
+  // Harga jasa coach untuk paket 4 dan 8 sesi (Hadi 2 Okt), satu harga untuk
+  // semua kolam, diubah coach sendiri dan langsung berlaku (paket yang sudah
+  // dibeli menyimpan harganya sendiri di Package.coachPrice). null = belum
+  // memasang harga, coach belum bisa dibeli.
+  pricePack4        Int?
+  pricePack8        Int?
+  // Sudah menyerahkan surat pernyataan omzet < Rp500 juta/tahun: bagiannya
+  // tidak dipotong PPh 0,5%. Hanya admin yang mengubah.
+  pphExempt         Boolean  @default(false)
 
   walletTransactions WalletTransaction[]
   withdrawalRequests WithdrawalRequest[]
@@ -467,6 +483,18 @@ model Package {
   // buat cek kuota self-cancel, bukan konstanta global -- tiap paket
   // bisa punya jatah beda.
   jatahCancel Int              @default(2)
+  // Model harga-dari-coach (Hadi 2 Okt): paket terikat ke 1 coach. Harga
+  // kolam, harga coach, dan biaya layanan SPH disalin saat dibeli -- dasar
+  // pembagian uang tiap sesi (src/lib/pricing.ts), tidak ikut berubah kalau
+  // harga diubah belakangan. Semua null = paket model lama (katalog kolam,
+  // bagi hasil persen kolam, boleh coach mana pun di kolam itu).
+  coachId      String?
+  coach        User?           @relation("PackageCoach", fields: [coachId], references: [id])
+  poolPrice    Int?
+  coachPrice   Int?
+  serviceFee   Int?
+  // Masa berlaku (hari) sejak aktif; null = ikut template/aturan lama.
+  durationDays Int?
   // Paket eceran 1 sesi buat renang di kolam selain kolam paket utama.
   // Cuma bisa dibeli member yang masih punya paket biasa (bukan 1 sesi)
   // yang aktif -- dan paket 1 sesi sendiri gak ngitung sebagai syarat itu.
@@ -484,6 +512,7 @@ model Package {
   @@index([memberId])
   @@index([dependentId])
   @@index([poolId])
+  @@index([coachId])
 }
 
 model Payment {
@@ -577,6 +606,16 @@ model Pool {
   // Hadir (lihat src/lib/wallet.ts). commissionPercent + coachSharePercent
   // harus <=100 (sisanya buat kolam), dicek di action layer pas admin edit.
   coachSharePercent  Int      @default(40)
+  // Model harga-dari-coach (Hadi 2 Okt): harga tiket kolam untuk paket 4 dan
+  // 8 sesi (1 coach + 1 peserta + 1 pendamping per sesi), diubah pemilik
+  // kolam/admin dan langsung berlaku. null = kolam belum memasang harga.
+  pricePack4         Int?
+  pricePack8         Int?
+  // Biaya layanan SPH di atas harga kolam + coach, dalam basis poin
+  // (650 = 6,5%). Dibatasi maks 690 (bahasa ke pengguna: "di bawah 7%").
+  serviceFeeBps      Int      @default(650)
+  // Lihat CoachProfile.pphExempt.
+  pphExempt          Boolean  @default(false)
   // Saldo kolam ini dari sesi-sesi yang BENERAN diajar di kolam ini
   // (dikredit pas Booking ditandai Hadir, bukan pas Package dibeli --
   // revisi 2026-09-12: paket lintas-kolam, kolam yang kredit itu kolam

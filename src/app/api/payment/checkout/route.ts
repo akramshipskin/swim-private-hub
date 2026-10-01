@@ -2,9 +2,22 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { snap } from "@/lib/midtrans";
 import { assertDependentOwnedByMember } from "@/lib/dependents";
-import { dropInPrice, dropInEligibilityWhere } from "@/lib/drop-in";
+import { packQuote, trialQuote } from "@/lib/pricing";
 import { withDedupeLock } from "@/lib/dedupe-lock";
-import { REGULAR_TEMPLATE_WHERE, trialBlockingPackageWhere } from "@/lib/trial";
+import { trialBlockingPackageWhere } from "@/lib/trial";
+
+const NON_CARD_PAYMENTS = [
+  "gopay",
+  "shopeepay",
+  "other_qris",
+  "bca_va",
+  "bni_va",
+  "bri_va",
+  "cimb_va",
+  "permata_va",
+  "echannel",
+  "other_va",
+] as const;
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -15,13 +28,13 @@ export async function POST(request: Request) {
     return Response.json({ error: "Ganti password sementara dulu sebelum membeli paket." }, { status: 403 });
   }
 
-  let body: { templateId?: string; dependentId?: string; singleSessionPoolId?: string };
+  let body: { poolId?: string; coachId?: string; sesi?: number; dependentId?: string };
   try {
     body = await request.json();
   } catch {
     return Response.json({ error: "Format permintaan tidak valid." }, { status: 400 });
   }
-  const { templateId, dependentId, singleSessionPoolId } = body;
+  const { poolId, coachId, sesi, dependentId } = body;
 
   if (!dependentId) {
     return Response.json({ error: "Pilih anak dulu" }, { status: 400 });
@@ -35,72 +48,43 @@ export async function POST(request: Request) {
     );
   }
 
-  // Yang dibeli: paket dari katalog (templateId), ATAU 1 sesi eceran di
-  // kolam lain (singleSessionPoolId) -- harganya dihitung server dari
-  // katalog kolam itu, gak pernah dipercaya dari client.
-  let item: {
-    poolId: string;
-    templateId: string | null;
-    name: string;
-    totalSesi: number;
-    jatahCancel: number;
-    price: number;
-    isSingleSession: boolean;
-    isTrial: boolean;
-  };
-
-  if (singleSessionPoolId) {
-    const eligible = await prisma.package.count({ where: dropInEligibilityWhere(session.user.id) });
-    if (eligible === 0) {
-      return Response.json(
-        { error: "Beli 1 sesi hanya bisa kalau kamu masih punya paket aktif. Beli paket dulu." },
-        { status: 403 }
-      );
-    }
-    const pool = await prisma.pool.findFirst({
-      where: { id: singleSessionPoolId, isActive: true },
-      select: {
-        id: true,
-        name: true,
-        packageTemplates: { where: REGULAR_TEMPLATE_WHERE, select: { price: true, totalSesi: true } },
-      },
-    });
-    const price = pool ? dropInPrice(pool.packageTemplates) : null;
-    if (!pool || price === null) {
-      return Response.json({ error: "Kolam ini belum menjual 1 sesi" }, { status: 400 });
-    }
-    item = {
-      poolId: pool.id,
-      templateId: null,
-      name: "1 Sesi",
-      totalSesi: 1,
-      // Batal 1x (min. 2 jam sebelum) -> sesinya balik, bisa dibooking
-      // ulang di kolam ini selama masa berlaku.
-      jatahCancel: 1,
-      price,
-      isSingleSession: true,
-      isTrial: false,
-    };
-  } else {
-    const template = templateId
-      ? await prisma.packageTemplate.findFirst({
-          where: { id: templateId, isActive: true, pool: { isActive: true } },
-        })
-      : null;
-    if (!template) {
-      return Response.json({ error: "Paket tidak valid" }, { status: 400 });
-    }
-    item = {
-      poolId: template.poolId,
-      templateId: template.id,
-      name: template.name,
-      totalSesi: template.totalSesi,
-      jatahCancel: template.jatahCancel,
-      price: template.price,
-      isSingleSession: false,
-      isTrial: template.isTrial,
-    };
+  // Model harga-dari-coach (Hadi 2 Okt): yang dibeli = kolam + coach + ukuran
+  // paket (4/8 sesi, atau 1 = sesi coba). Harga dihitung server dari harga
+  // kolam & coach saat ini, tidak pernah dipercaya dari browser. Paket katalog
+  // lama dan beli 1 sesi eceran tidak dijual lagi.
+  if (!poolId || !coachId || (sesi !== 1 && sesi !== 4 && sesi !== 8)) {
+    return Response.json({ error: "Pilih kolam, coach, dan paket dulu." }, { status: 400 });
   }
+  const [pool, coach] = await Promise.all([
+    prisma.pool.findFirst({
+      where: { id: poolId, isActive: true },
+      select: { id: true, pricePack4: true, pricePack8: true, serviceFeeBps: true },
+    }),
+    prisma.user.findFirst({
+      where: { id: coachId, role: "COACH", isActive: true, poolAffiliations: { some: { poolId } } },
+      select: { name: true, coachProfile: { select: { isActive: true, pricePack4: true, pricePack8: true } } },
+    }),
+  ]);
+  if (!pool) {
+    return Response.json({ error: "Kolam tidak ditemukan atau sedang tidak aktif." }, { status: 400 });
+  }
+  if (!coach?.coachProfile?.isActive) {
+    return Response.json({ error: "Coach ini tidak mengajar di kolam ini atau sedang tidak aktif." }, { status: 400 });
+  }
+  const quote = sesi === 1 ? trialQuote(pool, coach.coachProfile) : packQuote(pool, coach.coachProfile, sesi);
+  if (!quote) {
+    return Response.json({ error: "Harga paket ini belum dipasang kolam atau coach." }, { status: 400 });
+  }
+  const item = {
+    poolId: pool.id,
+    templateId: null,
+    name: `${quote.isTrial ? "Sesi coba" : `Paket ${quote.totalSesi} sesi`} · ${coach.name}`,
+    totalSesi: quote.totalSesi,
+    jatahCancel: quote.jatahCancel,
+    price: quote.total,
+    isSingleSession: false,
+    isTrial: quote.isTrial,
+  };
 
   // Form katalog sekarang nolak harga < Rp1, tapi data lama bisa aja
   // udah terlanjur Rp0 -- jangan sampai jadi paket gratis lewat checkout.
@@ -118,8 +102,9 @@ export async function POST(request: Request) {
         dependentId,
         status: "PENDING_PAYMENT",
         poolId: item.poolId,
-        templateId: item.templateId,
-        isSingleSession: item.isSingleSession,
+        coachId,
+        totalSesi: item.totalSesi,
+        isTrial: item.isTrial,
         createdAt: { gte: new Date(Date.now() - 60_000) },
       },
       select: { id: true },
@@ -142,6 +127,11 @@ export async function POST(request: Request) {
         jatahCancel: item.jatahCancel,
         isSingleSession: item.isSingleSession,
         isTrial: item.isTrial,
+        coachId,
+        poolPrice: quote.poolPrice,
+        coachPrice: quote.coachPrice,
+        serviceFee: quote.serviceFee,
+        durationDays: quote.durationDays,
         status: "PENDING_PAYMENT",
       },
     });
@@ -178,13 +168,17 @@ export async function POST(request: Request) {
   try {
     const transaction = await snap.createTransaction({
       transaction_details: { order_id: orderId, gross_amount: item.price },
+      // Kartu kredit tidak ditawarkan (Hadi 2 Okt): biaya Midtrans ditanggung
+      // SPH dan tidak boleh dibebankan ke pembeli (aturan BI), biaya kartu
+      // ~2,9% hampir menghabiskan biaya layanan.
+      enabled_payments: [...NON_CARD_PAYMENTS],
       customer_details: {
         first_name: session.user.name ?? undefined,
         email: session.user.email ?? undefined,
       },
       item_details: [
         {
-          id: item.templateId ?? `single-${item.poolId}`,
+          id: `${item.poolId}-${coachId}-${item.totalSesi}`,
           price: item.price,
           quantity: 1,
           // Midtrans nolak item name > 50 karakter.
