@@ -48,7 +48,7 @@ export default function AnonymizeCard({
         {memberBalance > 0 && (
           <p className="mt-2 rounded-md bg-warning-bg px-3 py-2 text-sm text-warning-text">
             Member masih punya saldo <b>{formatRupiah(memberBalance)}</b>. Saldo ini boleh dipakai sampai habis lewat admin
-            sebelum akun ditutup: hubungi member dulu sebelum menyetujui.
+            sebelum akun ditutup: hubungi member dulu. Kalau member tetap minta dihapus, sisa saldo hangus.
           </p>
         )}
         <Button variant="danger" size="sm" className="mt-3" onClick={() => setOpen(true)}>

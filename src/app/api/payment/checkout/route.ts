@@ -177,7 +177,9 @@ export async function POST(request: Request) {
       },
       item_details: [
         {
-          id: `${item.poolId}-${coachId}-${item.totalSesi}`,
+          // Midtrans nolak item id > 50 karakter (dua cuid + ukuran = 53, ketahuan
+          // saat uji sandbox 2 Okt). Id ini cuma label; pencocokan pakai order_id.
+          id: `paket${item.totalSesi}-${coachId}`.slice(0, 50),
           price: pkg.cash,
           quantity: 1,
           // Midtrans nolak item name > 50 karakter.

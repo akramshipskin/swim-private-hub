@@ -167,7 +167,8 @@ export default function SyaratKetentuanPage() {
           penggantian Coach, dan kekurangannya dibayar melalui Midtrans; (c) tidak dapat dicairkan, ditukar dengan
           uang, atau dipindahkan ke akun lain; (d) bila pembayaran yang memakai Saldo Member gagal atau kedaluwarsa,
           Saldo Member yang terpakai dikembalikan; (e) bila Member mengajukan penghapusan akun, Saldo Member yang masih
-          ada dapat dipakai dengan bantuan administrator sampai habis sebelum akun ditutup.
+          ada dapat dipakai dengan bantuan administrator sampai habis sebelum akun ditutup; Saldo Member yang masih
+          tersisa saat akun ditutup dinyatakan hangus.
         </li>
       </ol>
 

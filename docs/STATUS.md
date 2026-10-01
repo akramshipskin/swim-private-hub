@@ -27,9 +27,8 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
-5. 8 sesi production yang lewat 24 jam belum ditandai Hadir: hanya admin (Admin, Jadwal Booking).
-6. Hukum, akuntan, kolam: hasil orang hukum (Kebijakan Privasi, perjanjian coach, MOU); jawaban 3 kolam; akuntan (setor PPN 11%, pajak komisi afiliasi, PPh coach, PPN sesi tidak hadir).
-7. Membuat secret di GitHub bila diminta. Testimoni asli tambahan.
+5. Isi [ISI HADI] perjanjian coach & MOU kolam (teks harga-dari-coach sudah disetujui orang hukum); jawaban 3 kolam; akuntan (setor PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus).
+6. Membuat secret di GitHub bila diminta. Testimoni asli tambahan.
 
 ## Belum terverifikasi
 - HP asli dan Safari (landing, animasi, aplikasi); notifikasi push; unggah file ke penyimpanan asli; email; pembayaran asli sampai paket aktif; buku besar production; tampilan halaman yang butuh login di production.

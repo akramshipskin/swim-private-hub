@@ -45,7 +45,7 @@ export default function DeleteAccountCard({ requestedAt, memberBalance }: { requ
             {memberBalance > 0 && (
               <p className="mt-2 text-sm text-text">
                 Kamu masih punya saldo <b>{formatRupiah(memberBalance)}</b>. Pakai dulu untuk membeli paket, atau minta
-                bantuan admin memakainya sebelum akun ditutup.
+                bantuan admin memakainya sebelum akun ditutup. Sisa saldo hangus saat akun dihapus.
               </p>
             )}
             <Button variant="danger" size="sm" className="mt-3" onClick={() => setOpen(true)}>

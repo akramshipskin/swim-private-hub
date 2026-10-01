@@ -45,7 +45,8 @@ export async function deletionImpact(userId: string) {
     upcomingBookings,
     remainingSessions: usablePackages.reduce((n, p) => n + p.sisaSesi, 0),
     // Hadi 2 Okt: saldo member bisa dipakai sampai habis lewat admin sebelum
-    // akun ditutup, jadi admin perlu melihatnya sebelum menyetujui.
+    // akun ditutup; kalau member tetap minta dihapus, sisa saldo hangus (tetap
+    // tercatat di buku besar akun yang dianonimkan, tidak bisa dipakai lagi).
     memberBalance: user?.memberBalance ?? 0,
   };
 }

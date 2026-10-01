@@ -184,6 +184,17 @@ describe("checkout dengan saldo member", () => {
     expect(params.item_details[0]).toMatchObject({ price: 1_063_200, name: expect.stringContaining("dipotong saldo") });
   });
 
+  it("id item Midtrans maksimal 50 karakter walau id kolam/coach panjang (regresi 2 Okt: Midtrans menolak 53 karakter)", async () => {
+    spendMemberBalance.mockResolvedValue(0);
+    poolFindFirst.mockResolvedValueOnce({ ...POOL, id: "cmu6b29si000017h8c5vxol9l" });
+    const res = await POST(buy({ poolId: "cmu6b29si000017h8c5vxol9l", coachId: "cmunq32ml0000k5h8rcdsikn1" }));
+    expect(res.status).toBe(200);
+    const item = createTransaction.mock.calls[0][0].item_details[0];
+    expect(item.id.length).toBeLessThanOrEqual(50);
+    expect(item.name.length).toBeLessThanOrEqual(50);
+    expect(item.price * item.quantity).toBe(createTransaction.mock.calls[0][0].transaction_details.gross_amount);
+  });
+
   it("saldo menutup penuh: tanpa Midtrans, paket langsung aktif", async () => {
     spendMemberBalance.mockResolvedValue(1_363_200);
     const res = await POST(buy());
