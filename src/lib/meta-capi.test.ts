@@ -44,6 +44,8 @@ describe("meta-capi", () => {
     const req = new Request("http://x", { headers: { cookie: "a=1; _fbp=fb.1.9.9; _fbc=fb.1.8.abc", "user-agent": "UA" } });
     expect(trackingFromRequest(req)).toEqual({ fbp: "fb.1.9.9", fbc: "fb.1.8.abc", ua: "UA" });
     expect(trackingFromRequest(new Request("http://x"))).toEqual({ fbp: undefined, fbc: undefined, ua: undefined });
+    // Cookie rusak tidak boleh menggagalkan checkout/daftar.
+    expect(trackingFromRequest(new Request("http://x", { headers: { cookie: "_fbp=%E0%A4" } })).fbp).toBeUndefined();
   });
 
   it("env kosong: tidak memanggil Meta sama sekali", async () => {

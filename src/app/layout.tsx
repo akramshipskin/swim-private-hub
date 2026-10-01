@@ -75,10 +75,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         <ServiceWorkerRegister />
-        <AuthSessionProvider>{children}</AuthSessionProvider>
+        <AuthSessionProvider>
+          {children}
+          <MetaPixel />
+        </AuthSessionProvider>
         <CookieConsentBanner />
         <Analytics />
-        <MetaPixel />
       </body>
     </html>
   );

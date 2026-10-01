@@ -37,9 +37,9 @@ export default function KebijakanCookiePage() {
         </li>
         <li>
           <strong>Cookie iklan Meta (Meta Pixel: _fbp, _fbc)</strong> — dipasang
-          pada halaman umum dan halaman member untuk mengukur kunjungan dari iklan
-          Facebook/Instagram, pendaftaran, dan pembelian paket. Tidak dipasang di
-          halaman coach, pemilik kolam, dan administrator. Rincian data yang
+          untuk pengunjung yang belum masuk dan member, untuk mengukur kunjungan
+          dari iklan Facebook/Instagram, pendaftaran, dan pembelian paket. Akun
+          coach, pemilik kolam, dan administrator tidak dilacak. Rincian data yang
           dikirim ke Meta ada di{" "}
           <a href="/kebijakan-privasi" className="-my-3 inline-block py-3 text-brand-700 hover:underline">
             Kebijakan Privasi
@@ -59,8 +59,8 @@ export default function KebijakanCookiePage() {
       <h2>3. Cara Menonaktifkan</h2>
       <p>
         Pengguna dapat menghapus cookie/penyimpanan lokal kapan saja melalui
-        pengaturan peramban, atau memblokir cookie pihak ketiga untuk menolak
-        cookie iklan Meta. Oleh karena cookie sesi masuk bersifat esensial,
+        pengaturan peramban. Cookie iklan Meta dapat dihapus dengan cara yang
+        sama atau dicegah dengan pemblokir iklan pada peramban. Oleh karena cookie sesi masuk bersifat esensial,
         penghapusannya akan secara otomatis mengeluarkan (logout) Pengguna dari
         Aplikasi.
       </p>

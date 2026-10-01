@@ -10,6 +10,14 @@ const packageFindFirst = vi.fn().mockResolvedValue(null);
 const packageCreate = vi.fn().mockResolvedValue({ id: "pkg-new" });
 const poolFindFirst = vi.fn();
 const userFindFirst = vi.fn();
+const userFindUnique = vi.fn().mockResolvedValue({ phone: "081200000001", email: null });
+const sendMetaEvent = vi.fn().mockResolvedValue(undefined);
+let metaEnabled = false;
+vi.mock("@/lib/meta-capi", () => ({
+  metaCapiEnabled: () => metaEnabled,
+  sendMetaEvent: (...a: unknown[]) => sendMetaEvent(...a),
+  trackingFromRequest: () => ({ fbp: "fb.1.1.1" }),
+}));
 const paymentCreate = vi.fn().mockResolvedValue({});
 const paymentDeleteMany = vi.fn().mockResolvedValue({ count: 1 });
 const paymentUpdate = vi.fn().mockResolvedValue({});
@@ -19,7 +27,7 @@ vi.mock("@/lib/prisma", () => {
   const prisma: Record<string, unknown> = {
     package: { count: (...a: unknown[]) => packageCount(...a), findFirst: packageFindFirst, create: packageCreate, update: (...a: unknown[]) => packageUpdate(...a), delete: (...a: unknown[]) => packageDelete(...a) },
     pool: { findFirst: poolFindFirst },
-    user: { findFirst: userFindFirst },
+    user: { findFirst: userFindFirst, findUnique: (...a: unknown[]) => userFindUnique(...a) },
     payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a), update: (...a: unknown[]) => paymentUpdate(...a) },
   };
   prisma.$transaction = (arg: unknown) => (typeof arg === "function" ? arg(prisma) : Promise.all(arg as Promise<unknown>[]));
@@ -201,6 +209,28 @@ describe("checkout dengan saldo member", () => {
     expect(await res.json()).toEqual({ redirectUrl: "http://x/pembayaran/sukses" });
     expect(createTransaction).not.toHaveBeenCalled();
     expect(paymentCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ amount: 0, status: "SUCCESS", midtransOrderId: "SALDO-pkg-new" }) });
+  });
+
+  it("pelacak Meta: lunas dari saldo mengirim Purchase sekali; gagal baca data member tidak menggagalkan pembelian", async () => {
+    metaEnabled = true;
+    try {
+      spendMemberBalance.mockResolvedValue(1_363_200);
+      expect((await POST(buy())).status).toBe(200);
+      expect(sendMetaEvent).toHaveBeenCalledTimes(1);
+      expect(sendMetaEvent.mock.calls[0][0]).toMatchObject({ eventName: "Purchase", eventId: "SALDO-pkg-new", value: 1_363_200 });
+
+      userFindUnique.mockRejectedValueOnce(new Error("db down"));
+      expect((await POST(buy())).status).toBe(200);
+
+      // Tunai lewat Midtrans: Purchase menunggu notifikasi lunas, cookie disimpan di Payment.
+      sendMetaEvent.mockClear();
+      spendMemberBalance.mockResolvedValue(0);
+      await POST(buy());
+      expect(sendMetaEvent).not.toHaveBeenCalled();
+      expect(paymentCreate).toHaveBeenLastCalledWith({ data: expect.objectContaining({ metaTracking: { fbp: "fb.1.1.1" } }) });
+    } finally {
+      metaEnabled = false;
+    }
   });
 
   it("Midtrans gagal: saldo yang terpakai dikembalikan", async () => {

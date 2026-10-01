@@ -175,7 +175,7 @@ export async function POST(request: Request) {
   if (pkg.cash === 0) {
     // Lunas dari saldo = pembelian selesai sekarang (tidak ada notifikasi Midtrans).
     if (metaCapiEnabled()) {
-      const member = await prisma.user.findUnique({ where: { id: session.user.id }, select: { phone: true, email: true } });
+      const member = await prisma.user.findUnique({ where: { id: session.user.id }, select: { phone: true, email: true } }).catch(() => null);
       await sendMetaEvent({
         eventName: "Purchase",
         eventId: `SALDO-${pkg.id}`,

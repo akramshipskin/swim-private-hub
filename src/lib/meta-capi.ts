@@ -43,7 +43,12 @@ export function hashedUserData(user: MetaUser) {
 
 function cookie(header: string | null, name: string) {
   const m = header?.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
-  return m ? decodeURIComponent(m[1]) : undefined;
+  if (!m) return undefined;
+  try {
+    return decodeURIComponent(m[1]);
+  } catch {
+    return undefined; // cookie rusak: abaikan, jangan gagalkan checkout/daftar
+  }
 }
 
 // Cookie _fbp/_fbc dari Pixel browser + user agent. Nilai dipangkas supaya

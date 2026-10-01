@@ -107,16 +107,19 @@ export default function KebijakanPrivasiPage() {
         </li>
         <li>
           <strong>Meta (Facebook dan Instagram)</strong> — penyedia layanan iklan.
-          Pada halaman umum dan halaman member, Aplikasi memuat Meta Pixel yang
-          menyimpan cookie pengenal iklan dan mengirim halaman yang dikunjungi
+          Untuk pengunjung yang belum masuk dan member, Aplikasi memuat Meta Pixel
+          yang menyimpan cookie pengenal iklan dan mengirim halaman yang dikunjungi
           serta saat Pengguna memulai pembayaran. Ketika Pengguna mendaftar
           sebagai member atau pembayaran paket berhasil, server kami mengirim
           peristiwa tersebut ke Meta (Conversions API) beserta nomor HP, email,
           dan nomor akun yang sudah diacak (<em>hash</em>) sehingga tidak dapat
           dibaca langsung, cookie pengenal iklan, jenis peramban, alamat IP
-          (saat pendaftaran), dan nilai pembelian. Data ini dipakai untuk
-          mengukur dan menyempurnakan iklan kami. Halaman coach, pemilik kolam,
-          dan administrator tidak memuat Meta Pixel.
+          (saat pendaftaran dan saat pembelian dibayar penuh dengan saldo), dan
+          nilai pembelian. Cookie pengenal iklan dan jenis peramban disimpan
+          bersama catatan pembayaran sampai dikirim saat pembayaran berhasil, dan
+          dihapus bila akun dihapus. Data ini dipakai untuk mengukur dan
+          menyempurnakan iklan kami. Akun coach, pemilik kolam, dan administrator
+          tidak dilacak Meta Pixel.
         </li>
         <li>
           <strong>Supabase</strong> — penyedia basis data dan penyimpanan file
