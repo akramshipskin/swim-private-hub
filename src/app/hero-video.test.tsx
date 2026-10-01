@@ -14,7 +14,8 @@ function stubBrowser(matches: Record<string, boolean>, connection?: { saveData?:
 
 const DESKTOP = { "(min-width: 1024px)": true, "(hover: hover)": true, "(prefers-reduced-motion: reduce)": false };
 const props = { mp4: "/v/hero.mp4", webm: "/v/hero.webm", poster: "/p.jpg" };
-const tick = () => new Promise((r) => setTimeout(r, 30));
+// Video baru dinilai 800 ms setelah halaman selesai dimuat; tunggu lewat dari itu.
+const tick = () => new Promise((r) => setTimeout(r, 1000));
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -25,7 +26,7 @@ describe("HeroVideo", () => {
   it("desktop normal: tag video muncul dengan sumber webm lalu mp4, tanpa suara, berulang", async () => {
     stubBrowser(DESKTOP);
     const { container } = render(<HeroVideo {...props} />);
-    await waitFor(() => expect(container.querySelector("video")).not.toBeNull());
+    await waitFor(() => expect(container.querySelector("video")).not.toBeNull(), { timeout: 2000 });
     const v = container.querySelector("video")!;
     expect(v.muted).toBe(true);
     expect(v.loop).toBe(true);

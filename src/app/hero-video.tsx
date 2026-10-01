@@ -8,6 +8,8 @@ import { readVideoEnv, shouldPlayHeroVideo } from "@/lib/hero-video";
 // Mulai setelah halaman selesai dimuat supaya tidak berebut dengan gambar
 // pembuka; foto pembuka tetap jadi latar sampai video siap, lalu memudar ke
 // video. Berhenti saat hero keluar layar.
+const START_DELAY_MS = 800;
+
 export function HeroVideo({ mp4, webm, poster }: { mp4: string; webm: string; poster: string }) {
   const [play, setPlay] = useState(false);
   const [ready, setReady] = useState(false);
@@ -16,9 +18,14 @@ export function HeroVideo({ mp4, webm, poster }: { mp4: string; webm: string; po
   useEffect(() => {
     const queries = ["(min-width: 1024px)", "(hover: hover)", "(prefers-reduced-motion: reduce)"].map((q) => window.matchMedia(q));
     const evaluate = () => setPlay(shouldPlayHeroVideo(readVideoEnv(window)));
-    const first = window.setTimeout(evaluate, 0);
-    const onLoad = () => evaluate();
-    if (document.readyState !== "complete") window.addEventListener("load", onLoad, { once: true });
+    // Baru dinilai SETELAH halaman selesai dimuat (+ jeda), supaya unduhan video
+    // tidak berebut jaringan dengan gambar pembuka (elemen terbesar).
+    let first = 0;
+    const onLoad = () => {
+      first = window.setTimeout(evaluate, START_DELAY_MS);
+    };
+    if (document.readyState === "complete") onLoad();
+    else window.addEventListener("load", onLoad, { once: true });
     queries.forEach((q) => q.addEventListener("change", evaluate));
     return () => {
       window.clearTimeout(first);

@@ -11,6 +11,7 @@ import { CoachLeaders } from "./coach-leaders";
 import { LandingHeader } from "./landing-header";
 import { Reveal } from "@/components/ui/reveal";
 import { HeroVideo } from "./hero-video";
+import { HeroFx, Magnetic } from "./landing-fx";
 import { PAYMENT_METHODS } from "./landing-payments";
 import { TestimonialsSection, type Testimonial } from "./landing-testimonials";
 import { BeforeAfter, CoachSection, ParentSection, PoolSection, RolePicker } from "./landing-sections";
@@ -46,10 +47,11 @@ export type LandingCoach = {
 
 const OWNER_WA_LINK = buildOwnerInquiryWaLink();
 
-// Video latar hero (desktop saja). Kosong sampai Hadi menyetujui video stok
-// berlisensi (nama file, sumber, ukuran, lisensi dikirim dulu). Isi dengan
-// {mp4, webm} dari /public/videos setelah disetujui dan dipadatkan.
-const HERO_VIDEO = null as { mp4: string; webm: string } | null;
+// Video latar hero (desktop saja). Pexels #6012384 (Tima Miroshnichenko, lisensi
+// Pexels: bebas dipakai komersial), dipotong detik 2,2-19 supaya wajah perenang
+// tidak tampil jelas, 720p tanpa suara (MP4 1,65 MB, WebM 1,40 MB). Disetujui
+// Hadi 2 Okt (pilihan B).
+const HERO_VIDEO: { mp4: string; webm: string } | null = { mp4: "/videos/hero-perenang.mp4", webm: "/videos/hero-perenang.webm" };
 
 // Jeda animasi pembuka (CSS variable --d, dibaca .hero-rise dan .hero-phone di globals.css).
 const heroDelay = (ms: number, floatSeconds?: number) =>
@@ -254,30 +256,50 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           className="-z-20 object-cover object-[72%_20%]"
         />
         {HERO_VIDEO && <HeroVideo {...HERO_VIDEO} poster="/images/landing/hero-swim-v2.jpg" />}
+        <HeroFx />
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-r from-fixed-night via-fixed-night/80 to-fixed-night/20 max-lg:bg-gradient-to-t max-lg:from-fixed-night max-lg:via-fixed-night/70 max-lg:to-fixed-night/0" />
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-fixed-night" />
 
         <div className="mx-auto grid min-h-[100dvh] w-full max-w-6xl items-end gap-10 lg:items-center px-4 pb-14 pt-28 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,0.65fr)] lg:pt-24">
           <div>
-            <h1 className="hero-rise text-[clamp(2rem,3.2vw,2.9rem)] font-semibold leading-[1.06] tracking-tight lg:w-[46rem]">
-              <span className="block">Aplikasi les renang privat.</span>
-              <span className="block text-fixed-lime">Pilih coach, pilih kolam,</span>
-              <span className="block text-fixed-lime">dan pilih jamnya.</span>
+            <h1 className="text-[clamp(2rem,3.2vw,2.9rem)] font-semibold leading-[1.06] tracking-tight lg:w-[46rem]">
+              {/* Tiap baris "muncul dari bawah air" (garis potong = permukaan). */}
+              <span className="hero-mask">
+                <span style={heroDelay(0)}>Aplikasi les renang privat.</span>
+              </span>
+              <span className="hero-mask text-fixed-lime">
+                <span style={heroDelay(120)}>Pilih coach, pilih kolam,</span>
+              </span>
+              <span className="hero-mask text-fixed-lime">
+                <span style={heroDelay(240)}>
+                  dan{" "}
+                  <span className="wave-under">
+                    pilih jamnya.
+                    <span aria-hidden="true" className="wave-under__line" style={heroDelay(900)}>
+                      <svg viewBox="0 0 200 20" preserveAspectRatio="none">
+                        <path d="M0 10 C12.5 0 37.5 20 50 10 C62.5 0 87.5 20 100 10 C112.5 0 137.5 20 150 10 C162.5 0 187.5 20 200 10" fill="none" stroke="currentColor" strokeWidth="3" vectorEffect="non-scaling-stroke" />
+                      </svg>
+                    </span>
+                  </span>
+                </span>
+              </span>
             </h1>
-            <p className="hero-rise mt-6 max-w-lg text-base text-white/85 sm:text-lg" style={heroDelay(90)}>
+            <p className="hero-slide mt-6 max-w-lg text-base text-white/85 sm:text-lg" style={heroDelay(300)}>
               Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam dekat rumah. Perkembangan tercatat, pembayaran jelas.
             </p>
-            <div className="hero-rise mt-8 flex flex-wrap gap-3" style={heroDelay(180)}>
-              <Link href="/register" className="inline-flex items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
-                Daftar gratis
-              </Link>
+            <div className="hero-rise mt-8 flex flex-wrap gap-3" style={heroDelay(480)}>
+              <Magnetic>
+                <Link href="/register" className="inline-flex items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
+                  Daftar gratis
+                </Link>
+              </Magnetic>
               <a href="#kolam" className="inline-flex items-center rounded-full border border-white/40 px-7 py-3.5 text-base font-semibold transition-colors hover:bg-white/10">
                 Lihat kolam
               </a>
             </div>
           </div>
 
-          <div aria-hidden="true" className="relative hidden h-[34rem] lg:-mr-10 lg:block">
+          <div aria-hidden="true" data-tilt className="hero-tilt relative hidden h-[34rem] lg:-mr-10 lg:block">
             <Image
               src="/images/landing/produk-cari-coach.png"
               alt=""
@@ -369,8 +391,8 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           <div className="flex flex-col gap-6">
             {pools.map((p, i) => (
               <Reveal key={p.id} delay={i * 60}>
-                <article className="grid overflow-hidden rounded-3xl bg-white transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_28px_56px_-28px_rgba(20,20,15,0.35)] md:grid-cols-2">
-                  <div className={`relative flex items-end bg-fixed-lime-100 p-8 ${p.photos[0] ? "min-h-64" : "min-h-36 md:min-h-64"} ${i % 2 === 1 ? "md:order-2" : ""}`}>
+                <article className="group grid overflow-hidden rounded-3xl bg-white transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_28px_56px_-28px_rgba(20,20,15,0.35)] md:grid-cols-2">
+                  <div className={`relative flex items-end overflow-hidden bg-fixed-lime-100 p-8 ${p.photos[0] ? "min-h-64" : "min-h-36 md:min-h-64"} ${i % 2 === 1 ? "md:order-2" : ""}`}>
                     {!p.photos[0] && (
                       // Belum ada foto: gradien lime brand (bukan blok polos) supaya kartu tidak terlihat bolong.
                       <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(159,204,31,0.45),transparent_55%),radial-gradient(circle_at_10%_90%,rgba(198,255,61,0.35),transparent_50%)]" />
@@ -378,7 +400,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
                     {p.photos[0] && (
                       <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={p.photos[0]} alt={`Foto ${p.name}`} className="absolute inset-0 h-full w-full object-cover" />
+                        <img src={p.photos[0]} alt={`Foto ${p.name}`} className="parallax-img absolute inset-0 h-full w-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/0" />
                       </>
                     )}
@@ -503,13 +525,22 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
         </Reveal>
       </section>
 
+      {/* Gelombang: peralihan dari badan krem ke footer gelap (mengalir pelan di desktop). */}
+      <div aria-hidden="true" className="footer-wave mt-auto -mb-px overflow-hidden text-fixed-ink">
+        <svg viewBox="0 0 2880 48" preserveAspectRatio="none" className="h-8 sm:h-12">
+          <path d="M0 24 C240 48 480 0 720 24 C960 48 1200 0 1440 24 C1680 48 1920 0 2160 24 C2400 48 2640 0 2880 24 L2880 48 L0 48 Z" fill="currentColor" />
+        </svg>
+      </div>
+
       {/* CTA + footer gelap */}
-      <footer className="mt-auto bg-fixed-ink text-white">
+      <footer className="bg-fixed-ink text-white">
         <Reveal className="mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 py-14 sm:flex-row sm:items-center sm:justify-between sm:py-20">
           <h2 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">Mulai les renang minggu ini</h2>
-          <Link href="/register" className="inline-flex shrink-0 items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
-            Daftar gratis
-          </Link>
+          <Magnetic>
+            <Link href="/register" className="inline-flex shrink-0 items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
+              Daftar gratis
+            </Link>
+          </Magnetic>
         </Reveal>
 
         {/* Metode pembayaran: semua logo dirender satu warna lime lewat CSS

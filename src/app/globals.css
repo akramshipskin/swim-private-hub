@@ -363,7 +363,17 @@ p {
 
 /* Pembuka (hero): murni CSS, tidak menunggu JavaScript, jadi teks utama tampil
    cepat walau HP lambat memuat skrip. */
+@keyframes sph-slide-sm {
+  from {
+    transform: translateY(14px);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
+  /* Paragraf pembuka = elemen terbesar di HP: hanya bergeser, tidak pernah
+     transparan, jadi langsung terhitung tampil sejak cat pertama. */
+  .hero-slide {
+    animation: sph-slide-sm 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both;
+  }
   .hero-rise {
     animation: sph-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both;
   }
@@ -403,6 +413,226 @@ p {
     animation:
       sph-slide 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both,
       sph-float var(--fd, 7s) ease-in-out calc(var(--d, 0ms) + 0.9s) infinite;
+  }
+}
+
+/* ===== Gerak landing v2 (2 Okt): tema air, interaktif ===== */
+@keyframes sph-surface {
+  from {
+    transform: translateY(105%);
+  }
+}
+@keyframes sph-ripple {
+  from {
+    transform: scale(0.08);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+@keyframes sph-wave-drift {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes sph-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes sph-lane {
+  to {
+    transform: translateX(calc(100vw - 2rem));
+  }
+}
+@keyframes sph-strike {
+  from {
+    text-decoration-color: transparent;
+  }
+  to {
+    text-decoration-color: rgb(20 20 15 / 0.6);
+    opacity: 0.6;
+  }
+}
+@keyframes sph-fill {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+@keyframes sph-parallax {
+  from {
+    transform: translateY(-7%) scale(1.16);
+  }
+  to {
+    transform: translateY(7%) scale(1.16);
+  }
+}
+
+/* Riak air di hero (dibuat landing-fx.tsx saat kursor bergerak / layar diketuk). */
+.hero-ripple {
+  position: absolute;
+  width: 9rem;
+  height: 9rem;
+  margin: -4.5rem 0 0 -4.5rem;
+  border-radius: 9999px;
+  border: 1.5px solid rgb(198 255 61 / 0.5);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08) inset;
+  pointer-events: none;
+  animation: sph-ripple 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.hero-ripple.is-tap {
+  width: 14rem;
+  height: 14rem;
+  margin: -7rem 0 0 -7rem;
+  border-width: 2px;
+  animation-duration: 1.4s;
+}
+/* Tanpa gerak: riak tidak pernah dibuat (dicek di JS), dan ini cadangan. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-ripple {
+    display: none;
+  }
+}
+
+/* Judul muncul dari "bawah air": tiap baris naik dari balik garis potong. */
+.hero-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.hero-mask > span {
+  display: block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-mask > span {
+    animation: sph-surface 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both;
+  }
+}
+
+/* Garis gelombang di bawah frasa: tergambar dari kiri, lalu (desktop) mengalir. */
+.wave-under {
+  position: relative;
+  display: inline-block;
+}
+.wave-under__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.16em;
+  height: 0.34em;
+  overflow: hidden;
+  transform-origin: left;
+}
+.wave-under__line svg {
+  display: block;
+  width: 200%;
+  height: 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wave-under__line {
+    animation: sph-grow-x 1s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 600ms) both;
+  }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .wave-under__line svg {
+    animation: sph-wave-drift 5s linear infinite;
+  }
+}
+
+/* Layar HP di hero miring mengikuti kursor (nilai --rx/--ry dari landing-fx.tsx). */
+.hero-tilt {
+  transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Tali lintasan di bawah header + perenang kecil yang maju seiring scroll. */
+.lane-rope {
+  background: repeating-linear-gradient(90deg, rgb(198 255 61 / 0.55) 0 10px, rgb(255 255 255 / 0.35) 10px 20px);
+}
+.lane-swimmer {
+  display: none;
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lane-swimmer {
+      display: block;
+      animation: sph-lane linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* Cara lama tercoret, cara baru terisi lime: mengikuti posisi scroll. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ba-old {
+      text-decoration-line: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: transparent;
+      animation: sph-strike linear both;
+      animation-timeline: view();
+      animation-range: entry 70% cover 45%;
+    }
+    .ba-new {
+      /* Sapuan bertepi lembut: gradien 250% lebar digeser dari kanan ke kiri. */
+      background-image: linear-gradient(90deg, rgb(198 255 61 / 0.5) 0%, rgb(198 255 61 / 0.5) 40%, transparent 60%);
+      background-repeat: no-repeat;
+      background-size: 250% 100%;
+      background-position: 100% 0;
+      animation: sph-fill linear both;
+      animation-timeline: view();
+      animation-range: entry 80% cover 50%;
+    }
+    .parallax-img {
+      animation: sph-parallax linear both;
+      animation-timeline: view();
+    }
+  }
+}
+/* Desktop: foto kolam sedikit membesar saat kartu disorot. Properti `scale`
+   terpisah dari `transform` milik parallax, jadi keduanya bisa jalan bersama. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .parallax-img {
+    transition: scale 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .group:hover .parallax-img {
+    scale: 1.06;
+  }
+}
+
+/* Sorotan kursor di kartu coach (desktop; --mx/--my dari landing-fx.tsx). */
+[data-spot] {
+  position: relative;
+  isolation: isolate;
+}
+[data-spot]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(22rem circle at var(--mx, 50%) var(--my, 50%), rgb(198 255 61 / 0.16), transparent 45%);
+}
+.spot-on [data-spot]::after {
+  opacity: 1;
+}
+
+/* Gelombang di bagian penutup: mengalir pelan di desktop, diam di HP. */
+.footer-wave svg {
+  display: block;
+  width: 200%;
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .footer-wave svg {
+    animation: sph-wave-drift 14s linear infinite;
   }
 }
 

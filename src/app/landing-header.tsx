@@ -41,6 +41,16 @@ export function LandingHeader() {
           <Link href="/register" className="rounded-full bg-white px-2.5 py-2 text-sm font-semibold text-fixed-ink hover:bg-fixed-lime-100 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar</Link>
         </div>
       </div>
+      {/* Tali lintasan kolam di bawah header; perenang kecil maju sesuai posisi
+          scroll (CSS scroll timeline, browser lama: tali saja). */}
+      <div aria-hidden="true" className={`pointer-events-none absolute inset-x-0 bottom-0 h-[3px] transition-opacity duration-300 ${scrolled ? "opacity-100" : "opacity-0"}`}>
+        <div className="lane-rope h-full" />
+        <svg className="lane-swimmer absolute -top-[11px] left-0 h-5 w-8 text-fixed-lime" viewBox="0 0 32 20" fill="none">
+          <circle cx="25" cy="9" r="3.2" fill="currentColor" />
+          <path d="M3 13 C9 11.5 15 11.5 21 11" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+          <path d="M12 11 C15 4 20 2.5 26 3.5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      </div>
     </header>
   );
 }

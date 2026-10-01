@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/reveal";
+import { Spotlight } from "./landing-fx";
 
 // Section jualan landing (blind spot 26 Sep, diputuskan Hadi 29 Sep): satu
 // section per peran + pilih peran + dulu-vs-sekarang. Semua klaim bersumber
@@ -55,7 +56,7 @@ export function RolePicker() {
             <Reveal delay={i * 80}>
             <a
               href={r.href}
-              className="group grid gap-2 py-6 transition-colors hover:bg-fixed-lime-50 md:grid-cols-[13rem_minmax(0,1fr)_auto] md:items-center md:gap-8 md:px-4 md:py-8"
+              className="group grid gap-2 bg-[linear-gradient(90deg,var(--color-fixed-lime-100),var(--color-fixed-lime-50))] bg-[length:0%_100%] bg-no-repeat py-6 transition-[background-size] duration-500 ease-out hover:bg-[length:100%_100%] md:grid-cols-[13rem_minmax(0,1fr)_auto] md:items-center md:gap-8 md:px-4 md:py-8"
             >
               <span className="text-sm font-semibold text-fixed-muted">{r.label}</span>
               <span className={`font-semibold leading-snug text-balance ${i === 0 ? "text-2xl md:text-4xl" : "text-xl md:text-3xl"}`}>{r.line}</span>
@@ -117,8 +118,10 @@ export function BeforeAfter() {
           <ul>
             {COMPARE.map((row, i) => (
               <li key={row.before} className={`grid grid-cols-2 ${i > 0 ? "border-t border-fixed-ink/10" : ""}`}>
-                <p className="px-5 py-5 text-sm text-fixed-muted sm:px-7 sm:text-base">{row.before}</p>
-                <p className="border-l border-fixed-ink/10 bg-fixed-lime-50 px-5 py-5 text-sm font-medium text-fixed-ink sm:px-7 sm:text-base">{row.after}</p>
+                <p className="px-5 py-5 text-sm text-fixed-muted sm:px-7 sm:text-base">
+                  <span className="ba-old">{row.before}</span>
+                </p>
+                <p className="ba-new border-l border-fixed-ink/10 bg-fixed-lime-50 px-5 py-5 text-sm font-medium text-fixed-ink sm:px-7 sm:text-base">{row.after}</p>
               </li>
             ))}
           </ul>
@@ -258,7 +261,7 @@ export function CoachSection() {
           </p>
         </Reveal>
 
-        <div className="mt-10 grid gap-3 lg:grid-cols-6">
+        <Spotlight className="mt-10 grid gap-3 lg:grid-cols-6">
           <Reveal className="lg:col-span-3 lg:row-span-2">
             <div className="flex h-full min-h-72 flex-col justify-between gap-8 rounded-3xl bg-fixed-lime p-7 text-fixed-ink sm:p-9">
               <p className="text-7xl font-semibold leading-none tracking-tight sm:text-8xl">50%</p>
@@ -279,7 +282,7 @@ export function CoachSection() {
           </Reveal>
 
           <Reveal className="lg:col-span-3" delay={140}>
-            <div className="h-full rounded-3xl bg-white/[0.06] p-7 ring-1 ring-white/25">
+            <div data-spot className="h-full rounded-3xl bg-white/[0.06] p-7 ring-1 ring-white/25 transition-[box-shadow] duration-300 hover:ring-fixed-lime/50">
               <h3 className="text-xl font-semibold leading-snug">{free.title}</h3>
               <p className="mt-2 max-w-md text-sm text-white/75">{free.body}</p>
             </div>
@@ -287,13 +290,13 @@ export function CoachSection() {
 
           {rest.map((c, i) => (
             <Reveal key={c.title} className="lg:col-span-2" delay={200 + i * 60}>
-              <div className="h-full rounded-3xl bg-white/[0.06] p-7 ring-1 ring-white/15">
+              <div data-spot className="h-full rounded-3xl bg-white/[0.06] p-7 ring-1 ring-white/15 transition-[box-shadow] duration-300 hover:ring-fixed-lime/50">
                 <h3 className="text-lg font-semibold leading-snug">{c.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/75">{c.body}</p>
               </div>
             </Reveal>
           ))}
-        </div>
+        </Spotlight>
 
         <p className="mt-8 max-w-2xl text-sm text-white/70">
           Satu kewajiban yang perlu kamu tahu: mulai 1 Oktober 2026, catatan perkembangan peserta diisi setiap 2 sesi
