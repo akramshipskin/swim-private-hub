@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { INBOX_ADDRESSES, INBOX_FROM_ADDRESS, sendReplyEmail } from "@/lib/email";
 import { takeAttempt } from "@/lib/rate-limit";
+import { userErrorMessage } from "@/lib/user-error";
 
 // Sweep keamanan 25 Sep: batas email keluar supaya akun admin yang dibobol
 // tidak bisa dipakai kirim spam dari domain kita.
@@ -62,7 +63,7 @@ export async function replyToEmailThread(_prev: ReplyState, formData: FormData):
       inReplyToMessageId: thread.messages[0]?.resendId ?? null,
     });
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal kirim email." };
+    return { error: userErrorMessage(err, "Gagal kirim email.") };
   }
 
   await prisma.$transaction([
@@ -108,7 +109,7 @@ export async function composeEmail(_prev: ReplyState, formData: FormData): Promi
   try {
     sent = await sendReplyEmail({ from, to, subject, text: content });
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal kirim email." };
+    return { error: userErrorMessage(err, "Gagal kirim email.") };
   }
 
   const thread = await prisma.emailThread.upsert({

@@ -6,6 +6,7 @@ import { createSelfDependent } from "@/lib/dependents";
 import { readParticipants } from "@/lib/participant-input";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
+import { userErrorMessage } from "@/lib/user-error";
 
 export type ActionState = { error?: string } | null;
 
@@ -48,7 +49,7 @@ export async function changePassword(
   try {
     participants = readParticipants(formData);
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Tanggal lahir peserta tidak valid." };
+    return { error: userErrorMessage(err, "Tanggal lahir peserta tidak valid.") };
   }
   const { children, wantsSelf, selfBirthDate } = participants;
 

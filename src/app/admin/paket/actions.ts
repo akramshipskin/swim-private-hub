@@ -8,6 +8,7 @@ import { createDependent, createSelfDependent } from "@/lib/dependents";
 import { formNumber, toProperCase } from "@/lib/format";
 import { resolveExpiredDate } from "@/lib/datetime";
 import { revalidatePath } from "next/cache";
+import { userErrorMessage } from "@/lib/user-error";
 
 export type ActionState = { error?: string; success?: string } | null;
 
@@ -71,7 +72,7 @@ export async function addChildForMember(
       await createDependent(memberId, name);
     }
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal menambah peserta" };
+    return { error: userErrorMessage(err, "Gagal menambah peserta") };
   }
 
   revalidatePath("/admin/paket");

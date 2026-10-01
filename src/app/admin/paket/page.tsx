@@ -91,8 +91,8 @@ export default async function AdminPaketPage() {
       {/* --- Katalog Paket --- */}
       <h2 className="mb-3 text-lg font-semibold text-text">Katalog Paket</h2>
       <p className="mb-3 text-sm text-text-muted">
-        Paket generik, tidak ditujukan ke member mana pun — ini yang muncul di halaman
-        &ldquo;Beli Paket&rdquo; member.
+        Paket model lama, hanya untuk pemberian paket manual dari admin. Member membeli paket dari harga
+        kolam + harga coach (diatur di menu Kolam dan oleh coach), bukan dari katalog ini.
       </p>
 
       <CreateTemplateForm pools={pools} allowTrial />

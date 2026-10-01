@@ -12,6 +12,7 @@ import { isStorageConfigured, validateUpload, extensionFor, uploadObject, public
 import { MAX_CERTIFICATES_PER_COACH } from "@/lib/coach-certificates";
 import { parseCoachBirthDate } from "@/lib/coach-bio";
 import { notifyAdmins } from "@/lib/notify";
+import { userErrorMessage } from "@/lib/user-error";
 
 export type ActionState = { error?: string; success?: boolean } | null;
 
@@ -119,7 +120,7 @@ export async function addChild(
       await createDependent(session.user.id, name, prisma, birthDate);
     }
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal menambah peserta" };
+    return { error: userErrorMessage(err, "Gagal menambah peserta") };
   }
 
   revalidatePath("/profil");
@@ -142,7 +143,7 @@ export async function setDependentBirthDate(
     const birthDate = parseParticipantBirthDate(formData.get("birthDate")?.toString().trim() ?? "");
     await prisma.dependent.update({ where: { id: dependentId }, data: { birthDate } });
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal menyimpan tanggal lahir" };
+    return { error: userErrorMessage(err, "Gagal menyimpan tanggal lahir") };
   }
   revalidatePath("/member/peserta");
   return { success: true };
@@ -188,7 +189,7 @@ export async function updateCoachProfile(
     try {
       birthDate = parseCoachBirthDate(birthDateRaw);
     } catch (err) {
-      return { error: err instanceof Error ? err.message : "Tanggal lahir tidak valid." };
+      return { error: userErrorMessage(err, "Tanggal lahir tidak valid.") };
     }
   }
 

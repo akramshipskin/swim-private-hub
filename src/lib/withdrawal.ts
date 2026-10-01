@@ -86,6 +86,9 @@ function parseAmount(amount: number | undefined, balance: number) {
   if (!Number.isInteger(value) || value <= 0) {
     throw new WithdrawalError("Nominal pencairan tidak valid.");
   }
+  // Dicek di sini juga (bukan cuma CAS di bawah): angka raksasa membuat
+  // database error "out of range" alih-alih pesan yang jelas (sweep 2 Okt).
+  if (value > balance) throw new WithdrawalError("Saldo tidak cukup.");
   return value;
 }
 

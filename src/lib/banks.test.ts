@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BANKS, BANK_LABELS, bankCode, matchBankLabel, validateBankName } from "./banks";
+import { BANKS, BANK_LABELS, bankCode, matchBankLabel, normalizeBankAccount, validateBankName } from "./banks";
 
 describe("BANKS", () => {
   it("label dan kode unik, kode huruf kecil (syarat Midtrans Payouts)", () => {
@@ -39,5 +39,17 @@ describe("matchBankLabel (rekening lama diketik bebas)", () => {
     expect(matchBankLabel(null)).toBeNull();
     expect(matchBankLabel("")).toBeNull();
     expect(matchBankLabel("  ")).toBeNull();
+  });
+});
+
+describe("normalizeBankAccount", () => {
+  it("menerima angka 6-20 digit, spasi/strip dibuang", () => {
+    expect(normalizeBankAccount("123-456 7890", "Ayu")).toEqual({ number: "1234567890" });
+  });
+  it("menolak huruf, terlalu pendek/panjang, dan nama > 100 huruf", () => {
+    expect(normalizeBankAccount("12ab", "Ayu")).toHaveProperty("error");
+    expect(normalizeBankAccount("12345", "Ayu")).toHaveProperty("error");
+    expect(normalizeBankAccount("1".repeat(21), "Ayu")).toHaveProperty("error");
+    expect(normalizeBankAccount("1234567890", "a".repeat(101))).toHaveProperty("error");
   });
 });

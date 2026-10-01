@@ -7,6 +7,7 @@ import { refundMemberBalanceOnce, spendMemberBalance } from "@/lib/member-wallet
 import { NON_CARD_PAYMENTS } from "@/lib/midtrans-methods";
 import { withDedupeLock } from "@/lib/dedupe-lock";
 import { trialBlockingPackageWhere } from "@/lib/trial";
+import { userErrorMessage } from "@/lib/user-error";
 
 
 export async function POST(request: Request) {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     await assertDependentOwnedByMember(dependentId, session.user.id);
   } catch (err) {
     return Response.json(
-      { error: err instanceof Error ? err.message : "Anak tidak valid" },
+      { error: userErrorMessage(err, "Anak tidak valid") },
       { status: 403 }
     );
   }

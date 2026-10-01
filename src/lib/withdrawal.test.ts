@@ -93,6 +93,12 @@ describe("requestPoolWithdrawal", () => {
     expect(poolUpdateMany).not.toHaveBeenCalled();
   });
 
+  it("nominal di atas saldo (mis. 12 miliar) ditolak dengan pesan jelas sebelum menyentuh database (sweep 2 Okt)", async () => {
+    poolFindUniqueOrThrow.mockResolvedValue(okPool);
+    await expect(requestPoolWithdrawal("pool-1", 12_000_030_000)).rejects.toThrow("Saldo tidak cukup");
+    expect(poolUpdateMany).not.toHaveBeenCalled();
+  });
+
   it("rejects when bank info is missing", async () => {
     poolFindUniqueOrThrow.mockResolvedValue({ ...okPool, bankName: null });
     await expect(requestPoolWithdrawal("pool-1")).rejects.toThrow("Isi rekening tujuan dulu");

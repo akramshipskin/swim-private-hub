@@ -310,6 +310,14 @@ describe("importMembersXlsx", () => {
     expect(result?.result).toContain("1 peserta belum punya tanggal lahir");
   });
 
+  it("kolom \"Tanggal Lahir (opsional)\" (nama di teks petunjuk) juga terbaca (sweep 2 Okt)", async () => {
+    await importMembersXlsx(
+      null,
+      importFormData([{ "Nama Member": "siti", "No HP": "081200000002", "Nama Peserta/Anak": "Rafi", "Tanggal Lahir (opsional)": "2018-07-05" }])
+    );
+    expect(createDependent).toHaveBeenCalledWith("user-1", "Rafi", expect.anything(), new Date("2018-07-05T00:00:00Z"));
+  });
+
   it("groups multiple rows with the same phone number into one member with multiple participants", async () => {
     const result = await importMembersXlsx(
       null,

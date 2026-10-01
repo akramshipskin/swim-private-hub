@@ -7,6 +7,7 @@ import { notifyAdmins } from "@/lib/notify";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 import { parseCoachBirthDate } from "@/lib/coach-bio";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, isStringArrayOrMissing, MAX_BIO, MAX_EMAIL, MAX_NAME, MAX_NOTE, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
+import { userErrorMessage } from "@/lib/user-error";
 
 export async function POST(request: Request) {
   const body = await readJsonObject(request);
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
   try {
     birthDate = parseCoachBirthDate((rawBirthDate ?? "").trim());
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Tanggal lahir tidak valid.";
+    const message = userErrorMessage(err, "Tanggal lahir tidak valid.");
     return Response.json({ error: rawBirthDate ? message : "Tanggal lahir wajib diisi" }, { status: 400 });
   }
 

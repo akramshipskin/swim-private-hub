@@ -7,6 +7,7 @@ import { notifyCoachChangeResult } from "@/lib/coach-change";
 import { notifyUser } from "@/lib/notify";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
+import { userErrorMessage } from "@/lib/user-error";
 
 export type DecideState = { error?: string; ok?: boolean } | null;
 
@@ -22,7 +23,7 @@ export async function approveAction(_prev: DecideState, formData: FormData): Pro
   try {
     res = await approveCoachChange(requestId);
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal menyetujui." };
+    return { error: userErrorMessage(err, "Gagal menyetujui.") };
   }
   if ("error" in res) return res;
   if (res.status === "COMPLETED") await notifyCoachChangeResult(requestId, "completed").catch(() => {});

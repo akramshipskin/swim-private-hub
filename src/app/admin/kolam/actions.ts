@@ -136,7 +136,7 @@ export async function updatePoolPricing(_prev: PackPriceState, formData: FormDat
   if ("error" in prices) return prices;
   const feeRaw = formData.get("serviceFeePercent")?.toString().trim().replace(",", ".") ?? "";
   const serviceFeeBps = feeRaw === "" ? NaN : Math.round(Number(feeRaw) * 100);
-  if (!isValidServiceFeeBps(serviceFeeBps)) return { error: `Biaya layanan harus 0 sampai ${MAX_SERVICE_FEE_BPS / 100}%.` };
+  if (!isValidServiceFeeBps(serviceFeeBps)) return { error: `Biaya layanan harus 0 sampai ${String(MAX_SERVICE_FEE_BPS / 100).replace(".", ",")}%.` };
   const res = await prisma.pool.updateMany({
     where: { id: poolId },
     data: { ...changedPackPrices(formData, prices), serviceFeeBps, pphExempt: formData.get("pphExempt") === "on" },

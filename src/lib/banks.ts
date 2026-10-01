@@ -72,3 +72,12 @@ export function matchBankLabel(saved: string | null | undefined): string | null 
 export function validateBankName(bankName: string): string | null {
   return BANK_LABELS.includes(bankName) ? null : "Pilih nama bank dari daftar.";
 }
+
+// Nomor rekening bank Indonesia: angka saja (spasi/strip diabaikan), 6-20
+// digit. Nama pemilik maks 100 huruf. Sweep 2 Okt: "12ab" sempat tersimpan.
+export function normalizeBankAccount(number: string, name: string): { number: string } | { error: string } {
+  const digits = number.replace(/[\s-]/g, "");
+  if (!/^\d{6,20}$/.test(digits)) return { error: "Nomor rekening hanya angka, 6–20 digit." };
+  if (name.length > 100) return { error: "Nama pemilik rekening maksimal 100 huruf." };
+  return { number: digits };
+}

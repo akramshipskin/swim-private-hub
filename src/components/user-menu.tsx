@@ -85,7 +85,7 @@ export function UserMenu({
               className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-danger-text hover:bg-danger-bg max-sm:min-h-[44px]"
             >
               <LogoutIcon className="h-4 w-4" />
-              Logout
+              Keluar
             </button>
           </form>
         </div>

@@ -6,6 +6,7 @@ import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { normalizeAffiliateCode } from "@/lib/affiliate";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, MAX_EMAIL, MAX_NAME, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
+import { userErrorMessage } from "@/lib/user-error";
 
 // Batas jumlah anak per pendaftaran (wajar untuk satu keluarga; mencegah body raksasa).
 const MAX_CHILDREN = 10;
@@ -102,7 +103,7 @@ export async function POST(request: Request) {
     childrenData = cleanChildren.map((c) => ({ name: c.name, birthDate: parseParticipantBirthDate(c.birthDate) }));
     if (wantsSelf) selfBirth = parseParticipantBirthDate(selfBirthDate ?? "");
   } catch (err) {
-    return Response.json({ error: err instanceof Error ? err.message : "Tanggal lahir tidak valid." }, { status: 400 });
+    return Response.json({ error: userErrorMessage(err, "Tanggal lahir tidak valid.") }, { status: 400 });
   }
 
   if (password.length < 8) {

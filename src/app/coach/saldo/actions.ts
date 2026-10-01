@@ -1,12 +1,13 @@
 "use server";
 
-import { validateBankName } from "@/lib/banks";
+import { validateBankName, normalizeBankAccount } from "@/lib/banks";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { requestCoachWithdrawal, WithdrawalError } from "@/lib/withdrawal";
 import { notifyAdminsWithdrawalRequested } from "@/lib/withdrawal-notify";
 import { revalidatePath } from "next/cache";
 import { sealSecret } from "@/lib/secret-box";
+import { userErrorMessage } from "@/lib/user-error";
 
 export type ActionState = { error?: string; ok?: boolean } | null;
 
@@ -31,16 +32,18 @@ export async function updateBankInfo(
   }
   const bankError = validateBankName(bankName);
   if (bankError) return { error: bankError };
+  const account = normalizeBankAccount(bankAccountNumber, bankAccountName);
+  if ("error" in account) return { error: account.error };
 
   try {
     const profile = await getOwnCoachProfile(session.user.id);
     await prisma.coachProfile.update({
       where: { id: profile.id },
       // Nomor rekening disimpan terenkripsi (src/lib/secret-box.ts).
-      data: { bankName, bankAccountNumber: sealSecret(bankAccountNumber), bankAccountName },
+      data: { bankName, bankAccountNumber: sealSecret(account.number), bankAccountName },
     });
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal update rekening" };
+    return { error: userErrorMessage(err, "Gagal update rekening") };
   }
 
   revalidatePath("/coach/saldo");
@@ -55,7 +58,7 @@ export async function requestWithdrawal(_prev: ActionState, formData: FormData):
     const request = await requestCoachWithdrawal(profile.id, Number(formData.get("amount")));
     await notifyAdminsWithdrawalRequested(session.user.name ?? "Coach", request.amount);
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Gagal ajukan pencairan" };
+    return { error: userErrorMessage(err, "Gagal ajukan pencairan") };
   }
 
   revalidatePath("/coach/saldo");

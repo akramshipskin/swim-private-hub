@@ -71,7 +71,7 @@ export default async function KeamananPage() {
                     Google Authenticator di HP-mu. Kodenya berganti tiap 30 detik.
                   </p>
                   <p>
-                    <b className="text-text">Kenapa berguna?</b> Akun coach dan pemilik kolam menyimpan saldo. Kalau password-mu bocor,
+                    <b className="text-text">Kenapa berguna?</b> Akunmu menyimpan saldo, paket, dan data peserta. Kalau password-mu bocor,
                     orang lain tetap tidak bisa masuk tanpa kode dari HP-mu.
                   </p>
                 </div>

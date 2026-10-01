@@ -11,6 +11,7 @@ import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 import bcrypt from "bcryptjs";
 import { randomInt } from "crypto";
 import * as XLSX from "xlsx";
+import { userErrorMessage } from "@/lib/user-error";
 
 export type ActionState = { error?: string; success?: string } | null;
 
@@ -45,7 +46,7 @@ export async function createUser(
     try {
       ({ wantsSelf, selfBirthDate, children } = readParticipants(formData));
     } catch (err) {
-      return { error: err instanceof Error ? err.message : "Tanggal lahir peserta tidak valid." };
+      return { error: userErrorMessage(err, "Tanggal lahir peserta tidak valid.") };
     }
     if (children.length === 0 && !wantsSelf) {
       return { error: "Pilih minimal 1 peserta (diri sendiri atau anak)" };
@@ -207,7 +208,7 @@ export async function importMembersXlsx(
     pesertaName: pick(row, ["nama peserta/anak", "nama peserta", "peserta", "anak", "nama anak"]),
     paketName: pick(row, ["paket aktif", "paket", "nama paket"]),
     sisaSesi: pick(row, ["sisa sesi", "sesi", "sisa sesi aktif"]),
-    tanggalLahir: pick(row, ["tanggal lahir", "tgl lahir", "lahir", "tanggal lahir peserta"]),
+    tanggalLahir: pick(row, ["tanggal lahir", "tanggal lahir (opsional)", "tgl lahir", "lahir", "tanggal lahir peserta"]),
   }));
 
   // Grup per No HP -- 1 member bisa punya beberapa baris (1 baris = 1
