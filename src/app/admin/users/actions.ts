@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { identityTakenWhere, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
+import { MAX_ADDRESS, MAX_EMAIL, MAX_NAME, MAX_POOL_NAME } from "@/lib/register-input";
 import { createSelfDependent, createDependent } from "@/lib/dependents";
 import { parseImportBirthDate, readParticipants } from "@/lib/participant-input";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
@@ -25,9 +26,11 @@ export async function createUser(
   const password = formData.get("password") as string;
   const role = formData.get("role") as "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
 
-  if (!rawName || !phone || !password || !role) {
+  if (!rawName?.trim() || !phone || !password || !role) {
     return { error: "Nama, No HP, password, dan role wajib diisi" };
   }
+  if (rawName.trim().length > MAX_NAME) return { error: `Nama maksimal ${MAX_NAME} karakter.` };
+  if (email && email.length > MAX_EMAIL) return { error: `Email maksimal ${MAX_EMAIL} karakter.` };
   const name = toProperCase(rawName.trim());
   if (password.length < 8) {
     return { error: "Password minimal 8 karakter" };
@@ -54,6 +57,9 @@ export async function createUser(
   const newPoolName = formData.get("newPoolName")?.toString().trim() ?? "";
   const newPoolAddress = formData.get("newPoolAddress")?.toString().trim() ?? "";
   if (role === "POOL_OWNER") {
+    if (newPoolName.length > MAX_POOL_NAME || newPoolAddress.length > MAX_ADDRESS) {
+      return { error: `Nama kolam maksimal ${MAX_POOL_NAME} karakter, alamat maksimal ${MAX_ADDRESS} karakter.` };
+    }
     if (poolMode === "new" ? !newPoolName : !poolId) {
       return { error: "Pilih kolam yang ada atau isi nama kolam baru" };
     }
@@ -238,8 +244,21 @@ export async function importMembersXlsx(
       skipped.push(`${phone} — baris pertama tidak ada Nama Member`);
       continue;
     }
+    if (rawName.trim().length > MAX_NAME) {
+      skipped.push(`${phone} — Nama Member lebih dari ${MAX_NAME} karakter`);
+      continue;
+    }
     const name = toProperCase(rawName);
     const email = normalizeEmail(groupRows.find((r) => r.email)?.email);
+    if (email && email.length > MAX_EMAIL) {
+      skipped.push(`${name} (${phone}) — email lebih dari ${MAX_EMAIL} karakter`);
+      continue;
+    }
+    const longPeserta = groupRows.find((r) => (r.pesertaName?.trim().length ?? 0) > MAX_NAME);
+    if (longPeserta) {
+      skipped.push(`${name} (${phone}) — Nama Peserta lebih dari ${MAX_NAME} karakter`);
+      continue;
+    }
 
     const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
     if (existing) {

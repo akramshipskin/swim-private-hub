@@ -3,7 +3,8 @@
 import { auth, unstable_update } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { createDependent, createSelfDependent, assertDependentOwnedByMember, parseParticipantBirthDate } from "@/lib/dependents";
-import { toProperCase, MAX_PERSON_NAME_LENGTH } from "@/lib/format";
+import { toProperCase } from "@/lib/format";
+import { MAX_NAME } from "@/lib/register-input";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties";
@@ -25,8 +26,8 @@ export async function updateName(
   if (!rawName) {
     return { error: "Nama tidak boleh kosong" };
   }
-  if (rawName.length > MAX_PERSON_NAME_LENGTH) {
-    return { error: `Nama maksimal ${MAX_PERSON_NAME_LENGTH} karakter.` };
+  if (rawName.length > MAX_NAME) {
+    return { error: `Nama maksimal ${MAX_NAME} karakter.` };
   }
   const name = toProperCase(rawName);
 

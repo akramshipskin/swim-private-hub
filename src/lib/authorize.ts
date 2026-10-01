@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants } from "@/lib/format";
 import { clientIp, forgetAttempts, lockRemainingSeconds, takeAttempt, LOGIN_FAILS_PER_ACCOUNT, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS } from "@/lib/rate-limit";
 import { verifyTotp } from "@/lib/totp";
+import { MAX_EMAIL } from "@/lib/register-input";
 import { openSecret } from "@/lib/secret-box";
 
 // Kode error ini sampai ke browser (signIn(...).code) -- login-form.tsx
@@ -25,6 +26,10 @@ export async function authorizeCredentials(credentials: Partial<Record<string, u
   const password = credentials?.password as string | undefined;
   const otp = (credentials?.otp as string | undefined)?.trim() || "";
   if (!rawIdentifier || !password) return null;
+  // Identitas yang sah = no HP atau email (maks 254 karakter). Yang lebih
+  // panjang pasti tidak ada akunnya: tolak tanpa menyentuh database, supaya
+  // teks raksasa tidak ikut tersimpan sebagai kunci pembatas percobaan.
+  if (rawIdentifier.length > MAX_EMAIL) return null;
 
   // Identifier bisa email atau no HP. HP dicari dalam semua bentuk lama
   // (08.., 628.., +628..) supaya akun sebelum pembakuan tetap bisa masuk.

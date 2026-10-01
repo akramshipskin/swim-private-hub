@@ -1,4 +1,5 @@
 import { toProperCase } from "@/lib/format";
+import { MAX_NAME } from "@/lib/register-input";
 
 // Tanggal lahir peserta dari input form (YYYY-MM-DD). Disimpan tengah malam
 // UTC -- konvensi yang dibaca ageFromBirthDate. Peserta bisa bayi sampai
@@ -37,6 +38,7 @@ export function readParticipants(formData: FormData, now: Date = new Date()): Pa
     } else if (type === "child") {
       const name = names[i]?.trim();
       if (!name) return;
+      if (name.length > MAX_NAME) throw new Error(`Nama peserta maksimal ${MAX_NAME} karakter.`);
       children.push({ name: toProperCase(name), birthDate: parseParticipantBirthDate(dates[i] ?? "", now) });
     }
   });

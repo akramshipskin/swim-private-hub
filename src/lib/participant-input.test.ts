@@ -52,3 +52,17 @@ describe("parseParticipantBirthDate (dipindah ke modul ini)", () => {
     expect(() => parseParticipantBirthDate("17-05-2019", NOW)).toThrow("Isi tanggal lahir");
   });
 });
+
+describe("readParticipants: batas nama", () => {
+  it("nama peserta lebih dari 100 karakter ditolak; tepat 100 boleh", async () => {
+    const { MAX_NAME } = await import("./register-input");
+    const fd = (name: string) => {
+      const f = new FormData();
+      f.append("participantType", "child"); f.append("participantName", name); f.append("participantBirthDate", "2019-05-17");
+      return f;
+    };
+    expect(() => readParticipants(fd("a".repeat(MAX_NAME + 1)))).toThrow("maksimal");
+    expect(readParticipants(fd("a".repeat(MAX_NAME))).children).toHaveLength(1);
+  });
+});
+

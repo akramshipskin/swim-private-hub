@@ -1,10 +1,6 @@
 // Kapitalisasi huruf depan tiap kata doang -- sengaja gak nge-lowercase
 // sisanya, biar gak ngerusak nama yang emang sengaja ada huruf besar di
 // tengah (misal "TTT", akronim, dst).
-// Batas panjang nama orang (akun, peserta). Tanpa batas, nama ribuan huruf bisa
-// tersimpan dan merusak tampilan di semua halaman yang menampilkannya.
-export const MAX_PERSON_NAME_LENGTH = 100;
-
 export function toProperCase(input: string): string {
   return input
     .split(" ")
