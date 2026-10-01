@@ -759,6 +759,10 @@ model EmailThread {
   messages      EmailMessage[]
 
   @@index([needsAdmin, updatedAt])
+  // Indeks lama dari migrasi 20260923001318 (dobel dengan @unique, tapi ada di
+  // semua database). Dicatat di sini supaya migrasi baru tidak terus membuat
+  // DROP INDEX; dibuang kalau suatu saat ada migrasi yang sengaja menghapusnya.
+  @@index([externalEmail])
 }
 
 enum EmailDirection {
