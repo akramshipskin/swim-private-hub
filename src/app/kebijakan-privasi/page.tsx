@@ -43,7 +43,12 @@ export default function KebijakanPrivasiPage() {
         <li>
           Untuk coach dan pemilik kolam: nama bank, nomor rekening, dan nama pemilik
           rekening yang diisi sendiri sebagai tujuan pencairan saldo, beserta riwayat
-          saldo dan pencairannya.
+          saldo dan pencairannya, serta status surat pernyataan peredaran bruto untuk
+          pemotongan pajak penghasilan.
+        </li>
+        <li>
+          Untuk member: riwayat Saldo Member, serta alasan yang ditulis saat
+          mengajukan penggantian coach (dibaca administrator).
         </li>
         <li>
           Untuk coach: tanggal lahir dan jenis kelamin (umur dan jenis kelamin

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function KebijakanPengembalianPage() {
   return (
-    <LegalPageLayout title="Kebijakan Pengembalian" updatedAt="10 September 2026">
+    <LegalPageLayout title="Kebijakan Pengembalian" updatedAt="2 Oktober 2026">
       <p>
         Halaman ini menjelaskan ketentuan pengembalian dana (refund) atas
         pembayaran paket les, serta perbedaannya dengan jatah pembatalan
@@ -22,7 +22,8 @@ export default function KebijakanPengembalianPage() {
         Pengguna membatalkan pemesanan sebelum jadwal berlangsung. Hal ini{" "}
         <strong>bukan</strong> merupakan pengembalian dana — sesi tetap tersedia
         pada paket Pengguna untuk dijadwalkan ulang. Pengembalian dana hanya
-        berlaku pada kondisi khusus sebagaimana dijelaskan di bawah ini.
+        berlaku pada kondisi khusus sebagaimana dijelaskan di bawah ini. Saldo Member bukan pengembalian dana
+        tunai; ketentuannya diatur dalam Syarat &amp; Ketentuan Pasal 4 butir 5.
       </p>
 
       <h2>2. Kondisi yang Dapat Diajukan Pengembalian Dana</h2>
@@ -30,6 +31,7 @@ export default function KebijakanPengembalianPage() {
         <li>Pembayaran ganda/duplikat untuk paket yang sama akibat kesalahan teknis.</li>
         <li>Sistem mengaktifkan paket yang keliru akibat kesalahan pada pihak kami.</li>
         <li>Dana telah terpotong namun status transaksi gagal/mengalami kesalahan pada sisi gerbang pembayaran (bukan akibat pembatalan oleh pembeli sendiri).</li>
+        <li>Selisih penggantian coach yang sudah dibayar tetapi penggantiannya tidak dapat diselesaikan: dikembalikan ke Saldo Member, bukan ke rekening.</li>
       </ul>
 
       <h2>3. Kondisi yang Tidak Dapat Diajukan Pengembalian Dana</h2>
@@ -37,13 +39,15 @@ export default function KebijakanPengembalianPage() {
         <li>Paket yang sesinya telah digunakan, baik sebagian maupun seluruhnya.</li>
         <li>Pembatalan keikutsertaan setelah paket aktif tanpa sesi yang terpakai, yang diajukan lebih dari 7 (tujuh) hari sejak tanggal pembayaran (dapat dipertimbangkan secara kasus per kasus melalui kontak di bawah).</li>
         <li>Kesalahan input data peserta yang dilakukan oleh pembeli sendiri (dapat dikoreksi melalui administrator, dan bukan merupakan dasar pengajuan pengembalian dana).</li>
+        <li>Sesi coba yang tidak dihadiri peserta, kecuali dikabulkan administrator.</li>
+        <li>Saldo Member (tidak dapat dicairkan).</li>
       </ul>
 
       <h2>4. Tata Cara Pengajuan</h2>
       <ol className="list-decimal pl-5">
         <li>Menghubungi kami melalui WhatsApp/email di bawah dengan menyertakan nomor transaksi atau nama akun.</li>
         <li>Tim kami akan memverifikasi status transaksi melalui sistem dan Midtrans.</li>
-        <li>Apabila disetujui, dana akan dikembalikan ke metode pembayaran asal paling lambat 14 (empat belas) hari kerja.</li>
+        <li>Apabila disetujui, dana akan dikembalikan ke metode pembayaran asal paling lambat 14 (empat belas) hari kerja. Untuk pembelian yang sebagian dibayar dengan Saldo Member, bagian itu dikembalikan ke Saldo Member.</li>
       </ol>
 
       <h2>5. Kontak Pengajuan Pengembalian Dana</h2>

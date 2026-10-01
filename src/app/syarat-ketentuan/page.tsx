@@ -9,9 +9,8 @@ export const metadata: Metadata = {
 };
 
 // Teks = docs/legal/draft-syarat-ketentuan-v2.md yang disetujui reviewer
-// hukum (29 Sep), dengan isian Hadi. Pasal afiliasi (1.4) dan trial (2.9)
-// dipasang bareng fiturnya (Batch 4); kalimat trial disesuaikan dengan
-// keputusan Hadi "per anak" (bukan "Member baru").
+// hukum (29 Sep), dengan isian Hadi, ditambah perubahan "harga dari coach"
+// docs/legal/draft-harga-dari-coach-v3.md (disetujui orang hukum 2 Okt).
 export default function SyaratKetentuanPage() {
   return (
     <LegalPageLayout title="Syarat & Ketentuan" updatedAt={TERMS_UPDATED_AT}>
@@ -25,12 +24,16 @@ export default function SyaratKetentuanPage() {
         peserta yang didaftarkannya. &ldquo;Peserta&rdquo; adalah orang yang mengikuti les (Member sendiri atau
         anak/tanggungannya). &ldquo;Coach&rdquo; adalah pelatih renang mitra SPH. &ldquo;Kolam Mitra&rdquo; adalah
         pengelola kolam renang yang bekerja sama dengan SPH. &ldquo;Sesi&rdquo; adalah satu pertemuan les pada
-        jadwal yang dipesan.
+        jadwal yang dipesan. &ldquo;Biaya Layanan&rdquo; adalah biaya platform SPH yang ditambahkan di atas harga
+        Coach dan harga Kolam Mitra dan ditampilkan terpisah saat pembelian. &ldquo;Saldo Member&rdquo; adalah nilai
+        dalam Aplikasi milik Member yang hanya dapat dipakai sesuai Pasal 4 butir 5.
       </p>
       <p>
         <strong>Peran SPH.</strong> SPH menyelenggarakan platform yang mempertemukan Member dengan Coach dan Kolam
-        Mitra, menerima pembayaran paket dari Member, dan membagikan bagian Coach dan Kolam Mitra setelah Sesi
-        terlaksana. Pengajaran renang dilakukan oleh Coach di fasilitas Kolam Mitra.
+        Mitra. Harga jasa mengajar ditetapkan oleh masing-masing Coach dan harga tiket kolam ditetapkan oleh
+        masing-masing Kolam Mitra; SPH menambahkan Biaya Layanan. SPH menerima pembayaran dari Member atas nama Coach
+        dan Kolam Mitra dan meneruskan bagian mereka setelah Sesi terlaksana. Pengajaran renang dilakukan oleh Coach
+        di fasilitas Kolam Mitra.
       </p>
 
       <h2>1. Akun</h2>
@@ -51,10 +54,15 @@ export default function SyaratKetentuanPage() {
       <h2>2. Paket dan Sesi</h2>
       <ol>
         <li>Les di SPH adalah les privat: setiap Sesi adalah satu Coach untuk satu Peserta, bukan kelas gabungan.</li>
-        <li>Paket terdiri atas sejumlah Sesi dan berlaku di kolam tempat paket dibeli, selama masa berlaku yang tertera saat pembelian.</li>
         <li>
-          Member yang masih memiliki paket aktif dapat membeli paket 1 Sesi di Kolam Mitra lain dengan harga khusus
-          1 Sesi yang tertera saat pembelian, berlaku 14 hari sejak pembayaran berhasil.
+          Paket terdiri atas 4 (empat) Sesi dengan masa berlaku 60 (enam puluh) hari atau 8 (delapan) Sesi dengan
+          masa berlaku 90 (sembilan puluh) hari, dihitung sejak pembayaran berhasil. Paket berlaku untuk satu Coach dan
+          satu Kolam Mitra yang dipilih saat pembelian.
+        </li>
+        <li>
+          Harga paket terdiri atas harga Kolam Mitra, harga Coach, dan Biaya Layanan, yang ditampilkan terpisah sebelum
+          pembayaran. Harga per Sesi adalah harga paket dibagi jumlah Sesi. Coach dan Kolam Mitra dapat mengubah
+          harganya sewaktu-waktu; perubahan tidak berlaku bagi paket yang sudah dibeli.
         </li>
         <li>Paket aktif otomatis setelah pembayaran berhasil dikonfirmasi sistem.</li>
         <li>
@@ -67,13 +75,19 @@ export default function SyaratKetentuanPage() {
           dikembalikan dalam bentuk uang.
         </li>
         <li>
-          Harga paket sudah termasuk tiket masuk kolam untuk Peserta. Pendamping yang tidak berenang (1 orang pada
-          satu waktu, boleh bergantian) tidak dikenakan tiket. Perlengkapan renang (misalnya pelampung dan papan)
-          dibawa sendiri oleh Peserta.
+          Harga Kolam Mitra dalam paket sudah mencakup tiket masuk kolam untuk Peserta, Coach, dan 1 (satu)
+          pendamping yang tidak berenang (boleh bergantian) pada setiap Sesi. Perlengkapan renang (misalnya pelampung
+          dan papan) dibawa sendiri oleh Peserta.
         </li>
         <li>
-          Paket trial: paket 1 Sesi dengan harga khusus yang ditetapkan SPH per kolam, hanya untuk Peserta yang belum
-          pernah memiliki paket, satu kali per Peserta.
+          Sesi coba: paket 1 (satu) Sesi, satu kali per Peserta yang belum pernah memiliki paket. Harganya sama dengan
+          harga per Sesi paket 4 Sesi (Kolam Mitra dan Coach yang dipilih) ditambah Biaya Layanan. Sesi coba berlaku 7
+          (tujuh) hari sejak pembayaran berhasil, tidak dapat dibatalkan sendiri oleh Member, dan hangus bila Peserta
+          tidak hadir, kecuali administrator mengabulkan permohonan Member melalui kontak di Aplikasi.
+        </li>
+        <li>
+          Paket yang dibeli sebelum 2 Oktober 2026 tetap mengikuti ketentuan yang berlaku saat pembelian sampai paket
+          tersebut habis atau berakhir.
         </li>
         <li>
           Coach mencatat perkembangan Peserta (milestone) di Aplikasi dan Member dapat melihatnya di menu Peserta.
@@ -89,9 +103,14 @@ export default function SyaratKetentuanPage() {
         <li>Pemesanan tunduk pada ketersediaan jadwal Coach di kolam yang dipilih. Satu jadwal hanya dapat dipesan oleh satu Peserta.</li>
         <li>Setiap pemesanan mengurangi satu Sesi dari paket.</li>
         <li>
-          Member dapat membatalkan sendiri paling lambat 2 (dua) jam sebelum jadwal selama jatah pembatalan paket
-          masih tersedia; Sesi kembali ke paket dan jatah pembatalan berkurang satu. Di luar ketentuan itu,
+          Member dapat membatalkan sendiri paling lambat 2 (dua) jam sebelum jadwal selama jatah pembatalan masih
+          tersedia: 2 (dua) kali untuk paket 4 Sesi dan 4 (empat) kali untuk paket 8 Sesi. Sesi kembali ke paket dan
+          jatah pembatalan berkurang satu. Sesi coba tidak memiliki jatah pembatalan. Di luar ketentuan itu,
           pembatalan hanya melalui administrator.
+        </li>
+        <li>
+          Pemesanan hanya dapat dilakukan pada jadwal Coach paket di Kolam Mitra paket. Apabila Coach berhalangan,
+          Coach atau administrator membatalkan jadwal dan Sesi kembali ke paket untuk dijadwalkan ulang.
         </li>
         <li>Peserta yang tidak hadir tanpa membatalkan sesuai butir 3: Sesi tetap dihitung terpakai.</li>
         <li>Apabila Coach atau administrator membatalkan jadwal, Sesi kembali ke paket tanpa mengurangi jatah pembatalan Member.</li>
@@ -104,13 +123,27 @@ export default function SyaratKetentuanPage() {
           lambat 3 (tiga) hari sejak Sesi selesai. SPH memeriksa laporan dan dapat mengoreksi status. Laporan yang
           masuk setelah batas itu diperiksa kasus per kasus oleh administrator.
         </li>
+        <li>
+          Member dapat mengajukan penggantian Coach untuk sisa Sesi paket melalui Aplikasi dengan menyebutkan alasan.
+          Penggantian hanya ke Coach lain yang mengajar di Kolam Mitra yang sama dan memasang harga untuk ukuran paket
+          tersebut, dan berlaku setelah disetujui administrator; Coach sebelumnya diberi tahu. Sisa Sesi dihitung ulang
+          dengan harga Coach baru beserta Biaya Layanannya: (a) bila lebih murah, selisihnya masuk ke Saldo Member;
+          (b) bila lebih mahal, Member membayar selisihnya paling lambat 24 (dua puluh empat) jam sejak disetujui, dan
+          bila tidak dibayar, pengajuan batal dan paket tetap dengan Coach sebelumnya. Jadwal dengan Coach sebelumnya
+          yang belum berlangsung dibatalkan dan Sesinya kembali ke paket untuk dijadwalkan ulang dengan Coach baru.
+          Sesi yang sudah berlangsung tidak dihitung ulang. Bila penggantian tidak dapat diselesaikan setelah selisih
+          dibayar (misalnya Coach baru tidak lagi aktif atau paket berakhir), pembayaran selisih dikembalikan ke Saldo
+          Member.
+        </li>
       </ol>
 
       <h2>4. Pembayaran</h2>
       <ol>
         <li>
-          Pembayaran diproses melalui Midtrans (virtual account, QRIS, dompet digital, kartu debit/kredit) dan
-          diterima oleh penyelenggara SPH.
+          Pembayaran diproses melalui Midtrans (virtual account, QRIS, dompet digital, dan metode lain yang
+          ditampilkan saat pembayaran; kartu kredit tidak diterima) dan diterima oleh penyelenggara SPH. Member tidak
+          dikenakan biaya tambahan atas metode pembayaran. Pembayaran yang tidak diselesaikan dalam batas waktu
+          Midtrans dianggap batal.
         </li>
         <li>
           Bagian Coach dan Kolam Mitra dibayarkan oleh SPH berdasarkan perjanjian kemitraan masing-masing, setelah
@@ -123,6 +156,17 @@ export default function SyaratKetentuanPage() {
             Kebijakan Pengembalian
           </a>
           .
+        </li>
+        <li>
+          Atas bagian Coach dan Kolam Mitra, SPH memotong dan menyetorkan pajak penghasilan sesuai ketentuan
+          perpajakan yang berlaku. Potongan ini tidak mengubah harga yang dibayar Member.
+        </li>
+        <li>
+          Saldo Member: (a) bertambah dari selisih penggantian Coach (Pasal 3) dan dari pengembalian sebagaimana diatur
+          dalam Kebijakan Pengembalian; (b) otomatis dipakai lebih dulu saat Member membeli paket atau membayar selisih
+          penggantian Coach, dan kekurangannya dibayar melalui Midtrans; (c) tidak dapat dicairkan, ditukar dengan
+          uang, atau dipindahkan ke akun lain; (d) bila pembayaran yang memakai Saldo Member gagal atau kedaluwarsa,
+          Saldo Member yang terpakai dikembalikan.
         </li>
       </ol>
 
@@ -149,7 +193,8 @@ export default function SyaratKetentuanPage() {
         <li>
           SPH bertanggung jawab atas pemesanan, jadwal, pencatatan, penerimaan pembayaran, dan pembagian dana sesuai
           Syarat &amp; Ketentuan ini. Tanggung jawab SPH atas kerugian yang timbul dari penggunaan Aplikasi dibatasi
-          paling banyak sebesar 100% (seratus persen) nilai paket yang dibayarkan Member untuk paket yang bersangkutan.
+          paling banyak sebesar 100% (seratus persen) nilai paket yang dibayarkan Member untuk paket yang bersangkutan,
+          termasuk Saldo Member yang dipakai untuk paket tersebut.
         </li>
         <li>
           Keselamatan dan penanganan insiden selama Sesi berada dalam tanggung jawab Coach dan Kolam Mitra sesuai
@@ -160,9 +205,10 @@ export default function SyaratKetentuanPage() {
 
       <h2>7. Perubahan Layanan</h2>
       <p>
-        Fitur, harga paket, dan ketentuan ini dapat berubah. Perubahan ketentuan diumumkan melalui Aplikasi dan
-        berlaku sejak diumumkan; Pengguna yang tetap menggunakan Aplikasi setelah itu dianggap menyetujui versi baru.
-        Perubahan harga tidak berlaku surut terhadap paket yang telah dibeli.
+        Fitur dan ketentuan ini dapat berubah. Perubahan ketentuan diumumkan melalui Aplikasi dan berlaku sejak
+        diumumkan; Pengguna yang tetap menggunakan Aplikasi setelah itu dianggap menyetujui versi baru. Perubahan
+        harga oleh Coach, Kolam Mitra, atau perubahan Biaya Layanan tidak berlaku surut terhadap paket yang telah
+        dibeli.
       </p>
 
       <h2>8. Hukum yang Berlaku</h2>

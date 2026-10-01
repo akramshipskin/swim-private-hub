@@ -24,6 +24,10 @@
 > dan dicek lewat uji langsung. Tetap wajib direview orang hukum sebelum
 > ditandatangani.
 
+> **Update 2 Okt (harga dari coach, disetujui orang hukum 2 Okt):** pasal harga,
+> bagi hasil, sesi coba, ganti coach, dan PPh 0,5% diganti sesuai
+> docs/legal/draft-harga-dari-coach-v3.md bagian C/D. `[ISI HADI]` lain tetap.
+
 ---
 
 **PERJANJIAN KERJA SAMA KOLAM MITRA SWIM PRIVATE HUB**
@@ -53,7 +57,7 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    yang boleh dipakai untuk les: [ISI SAAT TTD: misalnya lintasan tepi /
    kolam anak].
 5. Kerja sama ini tidak berbayar bagi Kolam Mitra: tidak ada biaya
-   pendaftaran maupun langganan. Imbalan SPH hanya komisi pada Pasal 5.
+   pendaftaran maupun langganan. Imbalan SPH hanya Biaya Layanan yang dibayar member (Pasal 5).
 6. SPH tidak menetapkan batas jumlah les yang berjalan bersamaan di Kolam
    Mitra. Bila kapasitas kolam terganggu, Kolam Mitra memberi tahu SPH dan
    SPH menyesuaikan jadwal yang tampil di aplikasi dalam [ISI HADI: berapa
@@ -63,20 +67,13 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 
 ## Pasal 2 — Paket dan Harga
 
-1. Kolam Mitra mengusulkan paket les dan harganya melalui aplikasi. Usulan
-   berlaku setelah disetujui SPH. Paket yang sudah dibeli member tidak
-   berubah bila harga berubah. SPH memberi keputusan atas usulan paling
-   lambat 1×24 jam sejak diterima [ISI HADI: kalender atau hari kerja].
-2. Harga paket untuk peserta **sudah termasuk** tiket masuk kolam untuk
-   peserta.
-3. Coach yang mengajar di Kolam Mitra dalam rangka sesi aplikasi tidak
-   membayar tiket masuk secara terpisah; tiket masuk coach sudah tercakup
-   dalam bagian Kolam Mitra dari nilai sesi (Pasal 5).
-4. Peserta boleh didampingi 1 (satu) pendamping pada satu waktu (boleh
-   bergantian) yang tidak berenang; pendamping tidak dikenakan tiket masuk.
-   [CATATAN: butir 2–4 dikonfirmasi Hadi 29 Sep sebagai keinginan SPH;
-   setiap kolam harus setuju saat TTD, dan bagian Kolam Mitra pada Pasal 5
-   harus cukup menutup tiket coach + peserta.]
+1. Kolam Mitra menetapkan sendiri harga tiket untuk paket 4 Sesi dan paket 8
+   Sesi melalui aplikasi. Perubahan langsung berlaku untuk pembelian
+   berikutnya dan tidak mengubah paket yang sudah dibeli.
+2. Harga Kolam Mitra per sesi mencakup tiket masuk untuk 1 (satu) coach, 1
+   (satu) peserta, dan 1 (satu) pendamping yang tidak berenang (boleh
+   bergantian). Coach, peserta, dan pendamping tidak dikenakan tiket lain
+   untuk sesi aplikasi.
 
 ## Pasal 3 — Coach
 
@@ -119,20 +116,15 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 
 1. Member membayar paket kepada SPH melalui Midtrans. Kolam Mitra tidak
    menerima pembayaran langsung dari member untuk sesi aplikasi.
-2. **Nilai satu sesi** = harga paket yang dibayar member dibagi jumlah sesi
-   paket, dibulatkan ke bawah ke rupiah penuh.
-3. Setiap sesi yang ditandai **Hadir**, nilai sesi dibagi:
-   - Bagian coach: **[ISI SAAT TTD] %** dari nilai sesi.
-   - Bagian Kolam Mitra: **[ISI SAAT TTD] %** dari nilai sesi.
-   - Bagian SPH (komisi platform, sudah termasuk PPN bila berlaku): sisanya,
-     yaitu **[ISI SAAT TTD] %**, termasuk selisih pembulatan.
-   Ketiga persentase berjumlah 100%.
-4. Contoh (angka ilustrasi, bukan kesepakatan): paket Rp800.000 untuk 8
-   sesi → nilai sesi Rp100.000. Jika coach 40%, Kolam Mitra 50%, SPH 10%,
-   per sesi Hadir: coach Rp40.000; Kolam Mitra Rp50.000 (setara tiket masuk
-   coach Rp25.000 + peserta Rp25.000); SPH Rp10.000 (sudah termasuk PPN 11%
-   ± Rp991, bersih ± Rp9.009). Bila peserta tidak datang (butir 5a): coach
-   Rp20.000, Kolam Mitra Rp0, SPH Rp80.000.
+2. **Bagian Kolam Mitra per sesi** = harga Kolam Mitra dalam paket dibagi
+   jumlah sesi paket, dibulatkan ke bawah ke rupiah penuh. Biaya Layanan SPH
+   ditambahkan di atas harga dan dibayar member, bukan dipotong dari bagian
+   Kolam Mitra.
+3. Untuk setiap sesi yang ditandai **Hadir**, bagian Kolam Mitra masuk ke
+   saldo Kolam Mitra setelah dipotong PPh sebagaimana butir 12.
+4. Contoh: harga Kolam Mitra paket 8 sesi Rp480.000 → Rp60.000 per sesi; PPh
+   0,5% Rp300; masuk saldo Rp59.700. Bila peserta tidak datang (butir 5a):
+   Kolam Mitra Rp0.
 5. Bagian Kolam Mitra masuk ke saldo Kolam Mitra di aplikasi saat sesi
    ditandai Hadir. Sesi yang **tidak** ditandai Hadir tidak menghasilkan
    bagi hasil, dengan pengecualian dan penegasan berikut:
@@ -142,7 +134,9 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 
       [CATATAN NEGOSIASI: SPH menerima jauh lebih banyak dari sesi tidak
       hadir (contoh Rp80.000 vs Rp10.000) sementara kolam menyiapkan
-      lintasan dan menerima Rp0. Kolam kemungkinan menawar; siapkan
+      lintasan dan menerima Rp0. Angka 2 Okt, paket 8 sesi kolam Rp480.000 +
+      coach Rp800.000: peserta tidak datang = kolam Rp0, coach Rp50.000, SPH
+      Rp120.400. Kolam kemungkinan menawar; siapkan
       jawabannya. Perlakuan PPN atas selisih ini: tanya akuntan.]
    b. **Sisa sesi paket yang hangus** karena masa berlaku habis: tidak ada
       bagi hasil bagi siapa pun.
@@ -153,8 +147,8 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
    dicairkan), saldo menjadi negatif dan dipotong otomatis dari bagi hasil
    sesi berikutnya; saldo negatif tidak dapat dicairkan. Saat perjanjian
    berakhir, saldo negatif diselesaikan: [ISI HADI].  (Keputusan Hadi 29 Sep, berlaku untuk coach dan kolam.)
-8. Persentase dapat diubah dengan kesepakatan tertulis; perubahan berlaku
-   untuk sesi yang ditandai Hadir setelah tanggal perubahan.
+8. Harga dapat diubah Kolam Mitra kapan saja melalui aplikasi sesuai Pasal 2
+   butir 1.
 9. Coach menandai kehadiran paling lambat 24 jam setelah sesi selesai; lewat
    itu hanya administrator SPH yang dapat menandai, dan sesi yang belum
    ditandai tidak menghasilkan bagi hasil sampai ditandai.
@@ -164,12 +158,13 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
     dapat mengoreksi status; koreksi menjadi Hadir menghasilkan bagi hasil
     normal, dan koreksi sebaliknya mengikuti butir 7.
 
-11. Paket trial: harga trial ditetapkan SPH. Bagi hasil sesi trial dihitung
-    dengan persentase normal dari harga trial; selisih harga dibanding sesi
-    reguler ditanggung bersama oleh Coach, Kolam Mitra, dan SPH sesuai
-    persentase masing-masing.  [CATATAN: contoh
-    trial Rp80.000 dengan pembagian 50% kolam berarti kolam menerima
-    Rp40.000, kurang dari tiket masuk coach + peserta Rp50.000.]
+11. Sesi coba: harga Kolam Mitra = harga paket 4 sesi dibagi 4; bagian Kolam
+    Mitra dihitung seperti sesi biasa.
+12. SPH memotong PPh final 0,5% dari bagian Kolam Mitra setiap sesi dan
+    menyetorkannya atas nama Kolam Mitra. Kolam Mitra yang menyerahkan surat
+    pernyataan peredaran bruto di bawah Rp500.000.000 setahun tidak dipotong
+    sejak surat diterima SPH. Bukti potong diberikan [ISI HADI + akuntan: cara
+    dan waktunya].
 
 ## Pasal 6 — Pencairan
 
@@ -284,15 +279,18 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 - Kolam tidak boleh menolak coach (Pasal 3.2).
 - Kolam tidak eksklusif atas pengunjung; privat = 1 lawan 1 di kolam umum
   (Pasal 4); tidak ada batas les barengan (Pasal 1.6).
-- Bagi hasil contoh 40/50/10; peserta tidak datang: coach 50% dari bagian
+- Harga dari coach (2 Okt): kolam pasang harga tiket paket 4/8 sesi sendiri
+  (coach + peserta + pendamping); bagian kolam = harga kolam / jumlah sesi,
+  dipotong PPh 0,5% (Pasal 2, 5).
+- Peserta tidak datang: coach 50% dari bagian
   coach, kolam Rp0, sisanya SPH; sesi hangus: tidak ada (Pasal 5).
 - Batas 24 jam tandai hadir; member 3 hari untuk melaporkan (Pasal 5.9–5.10).
 - Kolam melihat nama peserta (Pasal 9.1). Gabung gratis (Pasal 1.5).
 - Komisi afiliasi satu kali per member baru, kode singkat, 5% dari harga
   paket pertama, cair setelah sesi pertama Hadir + 3 hari, pajak ditanggung
   SPH (Pasal 11).
-- Pendamping 1 orang pada satu waktu, boleh bergantian (Pasal 2.4).
-- Paket trial: bagi hasil persen normal dari harga trial (Pasal 5.11).
+- Pendamping 1 orang pada satu waktu, boleh bergantian (Pasal 2.2).
+- Sesi coba: harga kolam paket 4 / 4 (Pasal 5.11).
 - Saldo boleh negatif saat koreksi, dipotong dari bagi hasil berikutnya
   (Pasal 5.7).
 
@@ -308,5 +306,5 @@ sepakat mengadakan kerja sama dengan ketentuan berikut.
 7. Insiden, jam pelaporan, asuransi (Pasal 8).
 8. Mekanisme pajak komisi afiliasi dan sanksi (Pasal 11).
 9. Jangka waktu dan pengakhiran (Pasal 10), forum sengketa (Pasal 12).
-10. Angka persentase coach/kolam/SPH per kolam (Pasal 5.3) dan tanya 3
-    kolam soal 4 pertanyaan baru.
+10. Tanya 3 kolam soal 4 pertanyaan baru (persentase per kolam tidak
+    dipakai lagi sejak harga dari coach 2 Okt).

@@ -4,8 +4,8 @@
 > (Opus) 29 Sep 2026. Claude bukan penasihat hukum; wajib direview orang
 > hukum. Pasangan dari `draft-mou-kolam-v1.md`; mekanisme uang sama dan
 > sudah dicocokkan dengan kode (`src/lib/wallet.ts`, `src/lib/cancel-booking.ts`,
-> `src/lib/withdrawal.ts`). Persentase coach mengikuti kolam tempat sesi
-> diajar (per kolam, bukan per coach).
+> `src/lib/withdrawal.ts`). Sejak 2 Okt coach memasang harga
+> sendiri (Pasal 4); persentase per kolam tidak dipakai lagi.
 >
 > [CATATAN REVIEWER: status coach adalah mitra independen, bukan karyawan.
 > Pastikan isi perjanjian (kendali jadwal oleh coach sendiri, tidak ada gaji
@@ -19,6 +19,10 @@
 > (batas 24 jam, bayaran 50% saat peserta tidak datang, saldo negatif, tombol
 > Laporkan, trial, komisi afiliasi 5%) sekarang sudah jalan di aplikasi dan
 > dicek lewat uji langsung. Tetap wajib direview orang hukum sebelum ditandatangani.
+
+> **Update 2 Okt (harga dari coach, disetujui orang hukum 2 Okt):** pasal harga,
+> bagi hasil, sesi coba, ganti coach, dan PPh 0,5% diganti sesuai
+> docs/legal/draft-harga-dari-coach-v3.md bagian C/D. `[ISI HADI]` lain tetap.
 
 ---
 
@@ -40,8 +44,8 @@ sepakat sebagai berikut.
 2. Coach menentukan sendiri jadwal yang dibuka di aplikasi, per kolam mitra
    tempat Coach diafiliasikan oleh SPH.
 3. Bergabung sebagai Coach tidak dikenakan biaya pendaftaran maupun
-   langganan. Imbalan SPH hanya komisi platform (bagian SPH dari nilai sesi,
-   Pasal 4).
+   langganan. Imbalan SPH hanya Biaya Layanan yang dibayar member di
+   atas harga Coach (Pasal 4).
 
 ## Pasal 2 — Syarat Coach
 
@@ -87,21 +91,24 @@ sepakat sebagai berikut.
 
 ## Pasal 4 — Bagi Hasil
 
-1. Coach tidak menentukan tarif sendiri. Harga paket ditentukan per kolam
-   (diusulkan kolam, disetujui SPH).
-2. **Nilai satu sesi** = harga paket yang dibayar member dibagi jumlah sesi
-   paket, dibulatkan ke bawah ke rupiah penuh.
-3. Untuk setiap sesi yang ditandai **Hadir**, Coach menerima persentase
-   bagian coach yang berlaku di **kolam tempat sesi itu diajar**, sesuai
-   perjanjian SPH dengan kolam tersebut. Persentase per kolam dapat dilihat
-   Coach di aplikasi: [ISI HADI: pastikan ini benar-benar tampil untuk
-   coach, atau cantumkan di lampiran perjanjian].
+1. Coach menetapkan sendiri harga jasanya untuk paket 4 Sesi dan paket 8 Sesi
+   melalui Aplikasi. Satu harga berlaku di semua Kolam Mitra tempat Coach
+   mengajar. Perubahan harga langsung berlaku untuk pembelian berikutnya dan
+   tidak mengubah paket yang sudah dibeli. Coach yang belum memasang harga
+   tidak dapat dipilih Member.
+2. **Bagian Coach per sesi** = harga Coach dalam paket dibagi jumlah sesi
+   paket, dibulatkan ke bawah ke rupiah penuh. Biaya Layanan SPH ditambahkan
+   di atas harga Coach dan dibayar Member, bukan dipotong dari bagian Coach.
+3. Untuk setiap sesi yang ditandai **Hadir**, bagian Coach per sesi masuk ke
+   saldo Coach di aplikasi setelah dipotong PPh sebagaimana Pasal 5.4. Contoh:
+   harga Coach paket 8 sesi Rp800.000 → Rp100.000 per sesi; PPh 0,5% Rp500;
+   masuk saldo Rp99.500.
 4. Sesi yang tidak ditandai Hadir tidak menghasilkan bagi hasil, dengan
    pengecualian: bila peserta **sudah memesan tetapi tidak datang** (tanpa
    membatalkan sesuai S&K) dan Coach menandainya Tidak Hadir dalam batas
    waktu, Coach menerima **50% dari bagian coach yang normal** untuk sesi
-   itu (contoh: nilai sesi Rp100.000, coach 40% = Rp40.000 → Rp20.000
-   bila peserta tidak datang). Kolam Mitra menerima Rp0; sisanya menjadi
+   itu (contoh: bagian Coach Rp100.000 → Rp50.000 bila peserta tidak
+   datang, dipotong PPh). Kolam Mitra menerima Rp0; sisanya menjadi
    milik SPH. Sisa sesi paket yang hangus karena masa berlaku habis tidak
    menghasilkan bagi hasil apa pun.
 5. Paket gratis/manual dari admin tidak menghasilkan bagi hasil.
@@ -116,10 +123,13 @@ sepakat sebagai berikut.
    menandai tidak sesuai, bagi hasil sesi itu dibatalkan dan Pasal 3.5
    berlaku.  [CATATAN: pengaman terhadap coach yang tidak datang lalu menandai
    peserta Tidak Hadir adalah laporan member ini.]
-8. Paket trial: harga trial ditetapkan SPH. Bagi hasil sesi trial dihitung
-   dengan persentase normal dari harga trial; selisih harga dibanding sesi
-   reguler ditanggung bersama oleh Coach, Kolam Mitra, dan SPH sesuai
-   persentase masing-masing.
+8. Sesi coba: harga Coach = harga Coach paket 4 sesi dibagi 4. Bagian Coach
+   dihitung seperti sesi biasa.
+9. Member dapat dipindahkan ke Coach lain di Kolam Mitra yang sama atas
+   pengajuan Member yang disetujui SPH. Coach sebelumnya diberi tahu, jadwal
+   yang belum berlangsung dibatalkan, dan sesi yang sudah diajar tetap dibayar
+   dengan harga Coach sebelumnya. Coach tidak berhak atas sisa sesi yang
+   dipindahkan.
 
 ## Pasal 5 — Pencairan
 
@@ -131,8 +141,10 @@ sepakat sebagai berikut.
    transfer paling lambat [ISI HADI: batas maksimum] sejak pengajuan. Biaya
    transfer: [ISI HADI]. [CATATAN: Hadi tidak mau menjanjikan jumlah hari
    sampai pencairan otomatis Midtrans disetujui.]
-4. Pajak penghasilan atas bagi hasil Coach: [ISI HADI + reviewer: dipotong
-   SPH atau dilaporkan Coach sendiri].
+4. SPH memotong PPh final 0,5% dari bagian Coach setiap sesi dan
+   menyetorkannya atas nama Coach. Coach yang menyerahkan surat pernyataan
+   peredaran bruto di bawah Rp500.000.000 setahun tidak dipotong sejak surat
+   diterima SPH. Bukti potong diberikan [ISI HADI + akuntan: cara dan waktunya].
 5. **Penahanan pencairan.** Selama ada Peserta yang sudah 2 (dua) sesi
    Hadir atau lebih bersama Coach tanpa catatan perkembangan dari Coach
    (Pasal 3.7), Coach tidak dapat mengajukan pencairan baru atas **seluruh**
@@ -232,6 +244,9 @@ Tunduk pada hukum Republik Indonesia; sengketa melalui [ISI HADI + reviewer].
 ### Sudah diputuskan Hadi (29 Sep) dan sudah masuk pasal
 - Gabung gratis (Pasal 1.3); tiket masuk coach sudah tercakup (Pasal 3.6).
 - Batas 24 jam tandai hadir; admin bebas (Pasal 3.2).
+- Harga dari coach (2 Okt): coach pasang harga paket 4/8 sesi sendiri; bagian
+  coach = harga coach / jumlah sesi, dipotong PPh 0,5% (Pasal 4, 5.4); ganti
+  coach lewat pengajuan + admin (Pasal 4.9).
 - Peserta tidak datang: coach 50% dari bagian coach, kolam Rp0, sisanya SPH;
   sesi hangus tidak dibayar; member 3 hari untuk melaporkan (Pasal 4.4, 4.7).
 - Murid bawaan boleh lewat kode afiliasi (Pasal 6.3); komisi afiliasi satu
@@ -253,7 +268,7 @@ Tunduk pada hukum Republik Indonesia; sengketa melalui [ISI HADI + reviewer].
 2. Syarat sertifikat tambahan (Pasal 2.4).
 3. Batas jam pembatalan coach, sanksi batal berulang dan tanda Hadir palsu
    (Pasal 3).
-4. Persentase coach tampil di aplikasi atau di lampiran (Pasal 4.3).
+4. (Selesai 2 Okt: coach memasang harga sendiri di aplikasi, Pasal 4.1.)
 5. Batas maksimum waktu pencairan, biaya transfer, pajak penghasilan coach
    (Pasal 5).
 6. Larangan transaksi luar: durasi, sanksi, murid bawaan di luar aplikasi
