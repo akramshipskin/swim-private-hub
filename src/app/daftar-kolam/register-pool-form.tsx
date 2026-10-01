@@ -10,6 +10,10 @@ import { Field, Input, Textarea } from "@/components/ui/input";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import { isValidIndonesianPhone } from "@/lib/format";
 import { TimeSelect } from "@/components/ui/time-select";
+import { partnerAgreementFor } from "@/lib/partner-agreement";
+
+// Satu centang untuk S&K, Privasi, dan perjanjian kemitraan (bila sudah aktif).
+const agreement = partnerAgreementFor("POOL_OWNER");
 
 export default function RegisterPoolForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -201,6 +205,14 @@ export default function RegisterPoolForm() {
                 <a href="/kebijakan-privasi" target="_blank" className="font-medium text-brand-700 hover:underline">
                   Kebijakan Privasi
                 </a>
+                {agreement && (
+                  <>
+                    , serta{" "}
+                    <a href={agreement.href} target="_blank" className="font-medium text-brand-700 hover:underline">
+                      {agreement.title}
+                    </a>
+                  </>
+                )}
                 .
               </span>
             </label>

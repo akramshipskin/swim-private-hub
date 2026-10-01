@@ -18,6 +18,9 @@ export async function requireRole(role: "ADMIN" | "COACH" | "MEMBER" | "POOL_OWN
   if (session.user.needsTotpSetup) {
     redirect("/keamanan");
   }
+  if (session.user.needsPartnerAgreement) {
+    redirect("/perjanjian");
+  }
 
   return {
     user: {

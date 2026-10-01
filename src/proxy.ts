@@ -18,6 +18,12 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/keamanan", req.nextUrl));
   }
 
+  // Coach/pemilik kolam wajib menyetujui perjanjian kemitraan dulu
+  // (halaman /perjanjian, di luar matcher ini).
+  if (req.auth.user.needsPartnerAgreement) {
+    return NextResponse.redirect(new URL("/perjanjian", req.nextUrl));
+  }
+
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }

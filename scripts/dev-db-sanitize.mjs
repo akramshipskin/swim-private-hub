@@ -29,7 +29,7 @@ export const POLICY = {
   RateLimitHit: null,
 
   User: {
-    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId", "memberBalance"),
+    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "partnerAgreementAcceptedAt", "partnerAgreementVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId", "memberBalance"),
     name: (r, i) => `${ROLE_LABEL[r.role] ?? "User"} ${i}`,
     phone: (r, i) => `0899${pad(i, 8)}`,
     email: (r, i) => (r.email == null ? null : `user${i}@dev.invalid`),

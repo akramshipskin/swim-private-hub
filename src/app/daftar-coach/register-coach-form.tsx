@@ -9,6 +9,10 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { isValidIndonesianPhone } from "@/lib/format";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
+import { partnerAgreementFor } from "@/lib/partner-agreement";
+
+// Satu centang untuk S&K, Privasi, dan perjanjian kemitraan (bila sudah aktif).
+const agreement = partnerAgreementFor("COACH");
 
 export default function RegisterCoachForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -224,6 +228,14 @@ export default function RegisterCoachForm() {
                 <a href="/kebijakan-privasi" target="_blank" className="font-medium text-brand-700 hover:underline">
                   Kebijakan Privasi
                 </a>
+                {agreement && (
+                  <>
+                    , serta{" "}
+                    <a href={agreement.href} target="_blank" className="font-medium text-brand-700 hover:underline">
+                      {agreement.title}
+                    </a>
+                  </>
+                )}
                 .
               </span>
             </label>

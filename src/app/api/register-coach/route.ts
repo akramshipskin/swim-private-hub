@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
+import { partnerAgreementData } from "@/lib/partner-agreement";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 import { notifyAdmins } from "@/lib/notify";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
@@ -87,7 +88,10 @@ export async function POST(request: Request) {
   }
 
   const consent = consentData(acceptedTerms);
-  if (!consent) {
+  // Centang yang sama juga menyetujui perjanjian kemitraan bila sudah aktif
+  // (Hadi 2 Okt, 3A); {} bila belum aktif.
+  const agreement = partnerAgreementData("COACH", acceptedTerms);
+  if (!consent || !agreement) {
     return Response.json({ error: CONSENT_REQUIRED_ERROR }, { status: 400 });
   }
 
@@ -118,6 +122,7 @@ export async function POST(request: Request) {
         email,
         passwordHash,
         ...consent,
+        ...agreement,
         role: "COACH",
         // Coach yang daftar sendiri gak langsung bisa login/keliatan --
         // nunggu admin approve dulu (toggle isActive di /admin/users).

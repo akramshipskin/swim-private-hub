@@ -13,6 +13,7 @@ declare module "next-auth" {
       role: "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
       mustChangePassword: boolean;
       needsTotpSetup?: boolean;
+      needsPartnerAgreement?: boolean;
     } & DefaultSession["user"];
     // Cuma dipakai sebagai payload unstable_update (lihat callback jwt).
     sessionVersion?: number;
@@ -26,5 +27,6 @@ declare module "next-auth/jwt" {
     mustChangePassword: boolean;
     sessionVersion?: number;
     needsTotpSetup?: boolean;
+    needsPartnerAgreement?: boolean;
   }
 }

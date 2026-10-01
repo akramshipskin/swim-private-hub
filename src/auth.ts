@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { authorizeCredentials } from "@/lib/authorize";
 import { needsTotpSetup } from "@/lib/totp";
+import { needsPartnerAgreement } from "@/lib/partner-agreement";
 
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   trustHost: true,
@@ -42,7 +43,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
 
       const dbUser = await prisma.user.findUnique({
         where: { id: token.id as string },
-        select: { isActive: true, role: true, mustChangePassword: true, name: true, sessionVersion: true, totpEnabledAt: true },
+        select: { isActive: true, role: true, mustChangePassword: true, name: true, sessionVersion: true, totpEnabledAt: true, partnerAgreementVersion: true },
       });
 
       if (!dbUser || !dbUser.isActive) {
@@ -60,6 +61,9 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       token.mustChangePassword = dbUser.mustChangePassword;
       // Admin wajib pasang 2FA dulu (proxy.ts mengarahkan ke /keamanan).
       token.needsTotpSetup = needsTotpSetup(dbUser.role, dbUser.totpEnabledAt);
+      // Coach/pemilik kolam wajib menyetujui perjanjian kemitraan versi
+      // terbaru (proxy.ts & requireRole mengarahkan ke /perjanjian).
+      token.needsPartnerAgreement = needsPartnerAgreement(dbUser.role, dbUser.partnerAgreementVersion);
       // Nama juga disinkron ulang tiap request (bukan cuma pas sign-in) --
       // tanpa ini, ganti nama di /profil kesimpen bener di DB tapi
       // session.user.name kebawa stale sampe logout-login ulang.
@@ -72,6 +76,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         session.user.role = token.role as "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
         session.user.mustChangePassword = token.mustChangePassword as boolean;
         session.user.needsTotpSetup = token.needsTotpSetup === true;
+        session.user.needsPartnerAgreement = token.needsPartnerAgreement === true;
       }
       return session;
     },

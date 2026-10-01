@@ -35,6 +35,11 @@ describe("requireRole", () => {
     await expect(requireRole("ADMIN")).rejects.toThrow("NEXT_REDIRECT:/keamanan");
   });
 
+  it("sends a coach/pool owner who has not accepted the partner agreement to /perjanjian", async () => {
+    auth.mockResolvedValue({ user: { id: "u1", role: "COACH", mustChangePassword: false, needsPartnerAgreement: true } });
+    await expect(requireRole("COACH")).rejects.toThrow("NEXT_REDIRECT:/perjanjian");
+  });
+
   it("returns the session user when role matches", async () => {
     auth.mockResolvedValue({ user: { id: "u1", role: "ADMIN", name: "Hadi", email: "h@x.id", mustChangePassword: false } });
     const res = await requireRole("ADMIN");

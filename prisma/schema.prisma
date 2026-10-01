@@ -157,6 +157,10 @@ model User {
   // tanggal dokumen, lihat src/lib/legal.ts). Null = akun dibuat admin/import.
   termsAcceptedAt    DateTime?
   termsVersion       String?
+  // Persetujuan perjanjian kemitraan lewat centang (coach: perjanjian coach,
+  // pemilik kolam: MOU kolam). Lihat src/lib/partner-agreement.ts.
+  partnerAgreementAcceptedAt DateTime?
+  partnerAgreementVersion    String?
   // 2FA (TOTP, Google Authenticator) -- wajib untuk ADMIN. totpSecret terisi
   // saat setup dimulai; baru berlaku setelah totpEnabledAt terisi.
   // totpLastStep = langkah waktu kode terakhir yang dipakai (tolak kode ulang).

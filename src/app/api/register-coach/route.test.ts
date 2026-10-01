@@ -52,3 +52,26 @@ describe("POST /api/register-coach: tanggal lahir", () => {
     expect(data.coachProfile.create.birthDate).toEqual(new Date("1995-06-15T00:00:00+07:00"));
   });
 });
+
+describe("POST /api/register-coach: perjanjian kemitraan (Hadi 2 Okt, 3A)", () => {
+  it("belum aktif: tidak mencatat apa pun; aktif: centang yang sama mencatat versi perjanjian coach", async () => {
+    const { PARTNER_AGREEMENTS } = await import("@/lib/partner-agreement");
+    const original = PARTNER_AGREEMENTS.COACH.version;
+    try {
+      PARTNER_AGREEMENTS.COACH.version = null;
+      await POST(req());
+      expect(userCreate.mock.calls[0][0].data.partnerAgreementVersion).toBeUndefined();
+
+      PARTNER_AGREEMENTS.COACH.version = "Perjanjian Coach v1";
+      const res = await POST(req());
+      expect(res.status).toBe(201);
+      expect(userCreate.mock.calls[1][0].data).toMatchObject({ partnerAgreementVersion: "Perjanjian Coach v1", partnerAgreementAcceptedAt: expect.any(Date) });
+
+      userCreate.mockClear();
+      expect((await POST(req({ acceptedTerms: false }))).status).toBe(400);
+      expect(userCreate).not.toHaveBeenCalled();
+    } finally {
+      PARTNER_AGREEMENTS.COACH.version = original;
+    }
+  });
+});
