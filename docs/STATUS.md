@@ -1,8 +1,8 @@
-# STATUS SPH (diperbarui 2 Okt 2026)
+# STATUS SPH (diperbarui 2 Okt 2026 pagi)
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: 6012572 (2 Okt malam; GitHub hijau, Vercel sukses; tanpa migrasi baru)
+## Terakhir live: batch Opus 2 Okt + batch Sonnet (cek GitHub/Vercel: commit terakhir di cabang utama). Migrasi production (partner_agreement, payment_meta_tracking) SUDAH dijalankan Hadi.
 
 ## Sudah selesai dan live
 - Per 30 Sep: tanggal lahir di semua form daftar; notifikasi admin pendaftar baru; testimoni; CSP aktif; PPN komisi 11%; landing dirombak; backup database dan storage hijau.
@@ -16,24 +16,25 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja, Hadi), isi-harga-dummy (production: HARGA_DUMMY_PROD=1, Hadi), render-brand-social.
 
 ## Sedang jalan
-- 2 Okt dini hari (Opus, BELUM push, ada 2 migrasi baru: partner_agreement + payment_meta_tracking -> Hadi migrate production dulu): (1) coach batal sakit = slot ditutup; (2) laporan kolam tampil PPh & masuk saldo; (3) mekanisme centang perjanjian coach/MOU kolam (belum aktif: versi null sampai teks [ISI HADI] final + halaman teksnya dibuat); (4) Meta Pixel + Conversions API (mati sampai ID Pixel & token diisi di Vercel), Privasi/Cookie/banner disesuaikan. Pemeriksa Opus kedua: perjanjian & slot tidak ada temuan berat (catatan ringan sudah diperbaiki); bagian Meta: tidak ada temuan berat; catatan sedang (Pixel ikut jalan di /profil & /milestone untuk coach/kolam/admin, PageView dobel) + ringan sudah diperbaiki.
-- Sisa jawaban Hadi: 6 perbaikan ringan (Sonnet/OpenCode), isi [ISI HADI] (daftar dikirim ke Hadi 2 Okt).
-- Jalur bayar Midtrans (beli, sesi coba, tambah bayar ganti coach, saldo dipakai dulu) sudah diuji di laptop mode uji + notifikasi tiruan; di production belum ada pembayaran sungguhan.
+- Batch Opus 2 Okt (live): coach batal sakit = jam ditutup; laporan kolam tampil PPh & masuk saldo; mekanisme centang perjanjian coach/MOU kolam (MATI: versi null sampai teks [ISI HADI] final + halaman teks perjanjian dibuat; tes halaman-teks otomatis mencegah diaktifkan tanpa halaman); Meta Pixel + Conversions API (MATI sampai ID Pixel & token diisi di Vercel; Pixel hanya pengunjung belum masuk + member). Diperiksa Opus kedua: tidak ada temuan berat, catatan sudah diperbaiki.
+- Batch Sonnet High 2 Okt (live): 8 perbaikan ringan sweeping, konfirmasi admin untuk aksi uang, isian form tidak hilang saat ditolak, tgl lahir di tambah peserta admin, tap target tablet, saldo kolam/laporan kolam rapi di HP, teks pembayaran belum selesai, landing: animasi desktop per section (hover, garis tumbuh, angka 50% membesar, denyut tombol; semua hanya desktop + hormati "kurangi gerakan"), jarak testimoni-FAQ, teks landing disesuaikan sistem harga-dari-coach + jawaban blind spot (coach tidak dipotong komisi, SPH belum cek latar belakang coach). Sweeping ulang penuh: docs/reviews/2026-10-02-sweeping-sonnet-high.md (432 kunjungan layar, 375 uji hak akses, 166 uji formulir, audit buku besar cocok, 757 tes + 161 balapan lulus).
+- Menunggu Hadi: jawaban 22 isian [ISI HADI] perjanjian coach & MOU kolam (daftar usulan Claude di chat 2 Okt); ID Pixel + token Conversions API; cek tampilan landing di HP asli/Safari; apakah susunan "Kenalan dengan coach" desktop mau dirapatkan.
+- Jalur bayar Midtrans diuji di laptop mode uji; di production belum ada pembayaran sungguhan.
 
 ## Tugas Claude berikutnya
-1. Setelah Hadi migrate production: push batch Opus 2 Okt, cek GitHub & situs. Lalu 6 perbaikan ringan (Sonnet; label teks lewat OpenCode) dan halaman teks perjanjian/MOU setelah [ISI HADI] dijawab.
-2. Nilai ulang komisi afiliasi 5% (sisa SPH tipis setelah biaya Midtrans) sebelum iklan jalan.
-3. Animasi landing v2: revisi sesuai masukan Hadi (ditunda; belum ada masukan tertunda).
-4. Rekening coach/kolam yang tersimpan format lama tidak dinormalisasi otomatis: cek sebelum ada coach asli.
-5. Audit buku besar production diulang setelah ada transaksi asli (2 Okt: cocok). Cek GitHub & situs asli setelah tiap push.
+1. Setelah jawaban [ISI HADI]: rapikan perjanjian + MOU, buat halaman teksnya (/perjanjian-coach, /mou-kolam), isi versi di partner-agreement.ts lalu aktifkan centang.
+2. Setelah ID Pixel & token: cek event masuk di Meta Events Manager (kode uji), lalu hapus kode uji.
+3. Nilai ulang komisi afiliasi 5% sebelum iklan jalan.
+4. Rekening format lama tidak dinormalisasi otomatis: cek sebelum ada coach asli.
+5. Audit buku besar production diulang setelah ada transaksi asli. Cek GitHub & situs asli setelah tiap push.
 
 ## Tugas Hadi
-1. Jalankan migrasi production (2 migrasi baru), kirim jawaban [ISI HADI], ID Pixel + isi token Conversions API di Vercel. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif (tombol Beli sudah dibetulkan).
-2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
-3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
-4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
-5. Isi [ISI HADI] perjanjian coach & MOU kolam (teks harga-dari-coach sudah disetujui orang hukum); jawaban 3 kolam; akuntan (setor PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus).
-6. Membuat secret di GitHub bila diminta. Testimoni asli tambahan.
+1. Jawab 22 isian [ISI HADI] (perjanjian coach & MOU kolam); sebagian perlu reviewer/akuntan.
+2. Kirim ID Pixel Meta (di chat), isi token Conversions API sendiri di Vercel dengan nama META_CAPI_TOKEN (jangan dikirim ke chat).
+3. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif. Cek landing di HP asli + Safari.
+4. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
+5. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; ukur waktu simpan milestone.
+6. Akuntan: setor PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus. Testimoni asli (testimoni baru kini tersembunyi sampai ditekan Tampilkan).
 
 ## Belum terverifikasi
 - HP asli dan Safari (landing, animasi, aplikasi); notifikasi push; unggah file ke penyimpanan asli; email; pembayaran asli sampai paket aktif; buku besar production; tampilan halaman yang butuh login di production.

@@ -225,7 +225,7 @@ const COACH_CELLS: { title: string; body: string }[] = [
   },
   {
     title: "Tarifmu, kamu yang tentukan",
-    body: "Pasang harga paket 4 dan 8 sesi sendiri, satu harga untuk semua kolam tempat kamu mengajar. Buka jam kosong, tandai kehadiran, dan saldomu langsung bertambah. Tidak ada tagih-menagih.",
+    body: "Pasang harga paket 4 dan 8 sesi sendiri, satu harga untuk semua kolam tempat kamu mengajar. Biaya layanan SPH dibayar member di atas harga itu, bukan dipotong dari bagianmu. Buka jam kosong, tandai kehadiran, dan saldomu langsung bertambah.",
   },
   {
     title: "Tanpa biaya masuk kolam",

@@ -143,7 +143,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Apakah coach-nya bersertifikat?",
-        a: 'Coach bisa mengunggah satu atau beberapa sertifikat renang/lifeguard. Badge "Bersertifikat" hanya tampil setelah sertifikat diperiksa dan disetujui admin.',
+        a: 'Coach bisa mengunggah satu atau beberapa sertifikat renang/lifeguard. Badge "Bersertifikat" hanya tampil setelah sertifikat diperiksa dan disetujui admin. Setiap coach juga disetujui admin sebelum tampil di aplikasi. SPH belum melakukan pemeriksaan latar belakang (background check) pribadi, jadi perhatikan profil dan sertifikatnya sebelum memilih.',
       },
       {
         q: "Umur berapa yang bisa ikut?",
@@ -188,8 +188,12 @@ const FAQ_GROUPS: FaqGroup[] = [
         a: "Tidak ada biaya pendaftaran maupun biaya bulanan. SPH mengambil biaya layanan di bawah 7% yang dibayar member di atas harga kolam dan coach.",
       },
       {
+        q: "Bagian saya dipotong komisi?",
+        a: "Tidak. Harga jasa yang kamu pasang adalah bagianmu per sesi. Biaya layanan SPH dibayar member di atas harga itu, bukan dipotong dari bagianmu. Yang dipotong hanya PPh final 0,5% (disetor SPH atas namamu).",
+      },
+      {
         q: "Apa untungnya dibanding cari peserta sendiri?",
-        a: "Jadwal, kehadiran, dan pembayaran diurus sistem. Kamu tinggal membuka jam kosong, mengajar, dan menandai kehadiran.",
+        a: "Calon peserta menemukan dan memilihmu dari profil di aplikasi, tanpa janji jumlah peserta. Jadwal, kehadiran, sisa sesi, dan pembayaran diurus sistem, jadi tidak ada tagih-menagih. Murid yang sudah kamu punya juga bisa didaftarkan lewat kode afiliasimu.",
       },
       {
         q: "Wajib isi catatan perkembangan peserta?",
