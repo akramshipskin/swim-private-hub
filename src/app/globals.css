@@ -279,6 +279,12 @@ p {
   text-wrap-style: pretty; /* longhand -- lihat catatan di h1-h6 */
 }
 
+/* Kata/teks tanpa spasi yang lebih panjang dari wadahnya (nama, kode, tautan) boleh
+   dipatah supaya tidak melebarkan halaman ke samping. Kata normal tidak terpengaruh. */
+body {
+  overflow-wrap: break-word;
+}
+
 /* Smooth anchor/CTA scroll app-wide -- guarded biar gak jalan pas user
    pilih "reduce motion" di OS. */
 @media (prefers-reduced-motion: no-preference) {

@@ -148,7 +148,7 @@ export function Magnetic({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <span ref={ref} className="inline-flex transition-transform duration-300 ease-out">
+    <span ref={ref} className="inline-flex shrink-0 transition-transform duration-300 ease-out">
       {children}
     </span>
   );
