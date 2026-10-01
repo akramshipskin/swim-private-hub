@@ -18,10 +18,11 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 ## Tugas Claude berikutnya
 1. Revisi animasi sesuai masukan Hadi per bagian; ukur ulang sebelum/sesudah.
 2. Cek GitHub Actions dan situs asli setelah tiap push.
-3. Audit buku besar production: ditunda sampai ada transaksi asli (usul Claude; menunggu jawaban Hadi). Skrip audit menolak DB non-lokal; Hadi yang menjalankan bila perlu.
+3. Audit buku besar production: dijalankan Hadi 2 Okt, semua cocok (5 kolam, 5 coach, 1 sesi berbayar, 0 pencairan). Ulangi setelah ada transaksi asli (AUDIT_PROD=1, baca-saja).
+4. Brainstorm harga dari coach: menunggu jawaban Hadi 5 pertanyaan + akuntan (komisi vs markup).
 
 ## Tugas Hadi
-1. Lihat landing v2 di HP asli dan laptop, beri masukan per bagian; jawab soal audit production (tunda atau jalankan).
+1. Lihat landing v2 di HP asli dan laptop, beri masukan per bagian. Jawab 5 pertanyaan harga dari coach; tanya akuntan komisi vs markup.
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
