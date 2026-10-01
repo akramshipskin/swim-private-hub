@@ -18,13 +18,12 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 
 ## Tugas Claude berikutnya
 1. Harga dari coach tahap 3: teks Syarat & Ketentuan baru (harga dari coach, saldo member, ganti coach, sesi coba tidak bisa dibatalkan, PPh 0,5%) -> Hadi kirim ke orang hukum.
-2. Ubah 2 isian sementara tahap 2 bila Hadi pilih B.
-3. Tugas terpisah: indeks EmailThread hilang dari schema (selalu muncul DROP INDEX di migrasi baru; buang manual sampai dibetulkan).
-4. Animasi landing v2: revisi sesuai masukan Hadi (ditunda atas permintaan Hadi).
-5. Audit buku besar production diulang setelah ada transaksi asli (2 Okt: cocok). Cek GitHub & situs asli setelah tiap push.
+2. Tugas terpisah: indeks EmailThread hilang dari schema (selalu muncul DROP INDEX di migrasi baru; buang manual sampai dibetulkan).
+3. Animasi landing v2: revisi sesuai masukan Hadi (ditunda atas permintaan Hadi).
+4. Audit buku besar production diulang setelah ada transaksi asli (2 Okt: cocok). Cek GitHub & situs asli setelah tiap push.
 
 ## Tugas Hadi
-1. Jawab 2 aturan sisa tahap 2 (uang ganti coach gagal -> saldo atau rekening; setoran PPh vs tanda hadir dibalik). Cek menu Paket (member) & Ganti Coach (admin) di production.
+1. Cek menu Paket (member) & Ganti Coach (admin) di production.
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
