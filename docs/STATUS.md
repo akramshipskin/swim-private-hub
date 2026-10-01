@@ -1,8 +1,8 @@
-# STATUS SPH (diperbarui 2 Okt 2026 pagi)
+# STATUS SPH (diperbarui 2 Okt 2026 pagi, sapu memori)
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: batch Opus 2 Okt + batch Sonnet (cek GitHub/Vercel: commit terakhir di cabang utama). Migrasi production (partner_agreement, payment_meta_tracking) SUDAH dijalankan Hadi.
+## Terakhir live: 513a498 (2 Okt pagi; GitHub hijau, situs asli memuat landing baru; 2 migrasi baru sudah dijalankan Hadi di production). Kecepatan HP landing: elemen terbesar 0,94 dtk (tidak turun).
 
 ## Sudah selesai dan live
 - Per 30 Sep: tanggal lahir di semua form daftar; notifikasi admin pendaftar baru; testimoni; CSP aktif; PPN komisi 11%; landing dirombak; backup database dan storage hijau.
@@ -13,12 +13,12 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - 2 Okt (Opus): HARGA DARI COACH tahap 1+2 live. Kolam (tiket) & coach (jasa) pasang harga paket 4 sesi (60 hari, batal 2x) / 8 sesi (90 hari, batal 4x); member bayar + biaya layanan SPH 6,5% (maks 6,9%); sesi coba 7 hari, tidak bisa dibatalkan sendiri; eceran & kartu kredit dihapus; paket terikat coach; bagi uang per rupiah + PPh 0,5% (titipan, bukan pendapatan SPH); saldo member; ganti coach lewat pengajuan + admin (menu Ganti Coach); catat setor PPh (Bagi Hasil). Harga dummy production diisi (kolam 260/480rb, coach 440/800rb). Rancangan: docs/designs/harga-dari-coach.md.
 - 2 Okt: indeks email lama dicatat di schema (migrasi baru tidak lagi memunculkan DROP INDEX). Teks hukum harga-dari-coach disetujui orang hukum dan dipasang (+ S&K 4.5e saldo saat hapus akun; peringatan saldo di Profil member & layar persetujuan admin) (S&K, Pengembalian, Privasi; perjanjian coach & MOU kolam disesuaikan, masih ada [ISI HADI]).
 - 2 Okt malam (Opus): cek menyeluruh SEMUA fitur x 4 peran + publik di laptop (docs/reviews/2026-10-02-sweeping-sistem-semua-fitur.md). Diperbaiki: tombol Beli paket ditolak Midtrans (live 9efc7d8), error database mentah tampil ke pengguna (18 tempat), nomor rekening boleh huruf, kolom tgl lahir impor Excel, teks mekanis. Temuan menunggu keputusan Hadi ada di laporan.
+- 2 Okt dini hari (Opus, live): coach batal sakit = jam ditutup (+ tes balapan R9b); Laporan Kolam menampilkan Bagian Kolam / PPh 0,5% / Masuk Saldo; mekanisme centang perjanjian coach & MOU kolam (MATI sampai teks final, lihat Sedang jalan); Meta Pixel + Conversions API (MATI sampai ID/token). Opus kedua: tidak ada temuan berat, catatan diperbaiki.
+- 2 Okt pagi (Sonnet High, live): 8 perbaikan ringan sweeping, dialog konfirmasi admin untuk aksi uang, isian form dipertahankan saat ditolak, tgl lahir di tambah peserta admin, saldo/laporan kolam rapi di HP, tap target tablet, landing: animasi desktop per section + teks sesuai sistem harga-dari-coach + jawaban blind spot. Sweeping ulang penuh: docs/reviews/2026-10-02-sweeping-sonnet-high.md.
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja, Hadi), isi-harga-dummy (production: HARGA_DUMMY_PROD=1, Hadi), render-brand-social.
 
 ## Sedang jalan
-- Batch Opus 2 Okt (live): coach batal sakit = jam ditutup; laporan kolam tampil PPh & masuk saldo; mekanisme centang perjanjian coach/MOU kolam (MATI: versi null sampai teks [ISI HADI] final + halaman teks perjanjian dibuat; tes halaman-teks otomatis mencegah diaktifkan tanpa halaman); Meta Pixel + Conversions API (MATI sampai ID Pixel & token diisi di Vercel; Pixel hanya pengunjung belum masuk + member). Diperiksa Opus kedua: tidak ada temuan berat, catatan sudah diperbaiki.
-- Batch Sonnet High 2 Okt (live): 8 perbaikan ringan sweeping, konfirmasi admin untuk aksi uang, isian form tidak hilang saat ditolak, tgl lahir di tambah peserta admin, tap target tablet, saldo kolam/laporan kolam rapi di HP, teks pembayaran belum selesai, landing: animasi desktop per section (hover, garis tumbuh, angka 50% membesar, denyut tombol; semua hanya desktop + hormati "kurangi gerakan"), jarak testimoni-FAQ, teks landing disesuaikan sistem harga-dari-coach + jawaban blind spot (coach tidak dipotong komisi, SPH belum cek latar belakang coach). Sweeping ulang penuh: docs/reviews/2026-10-02-sweeping-sonnet-high.md (432 kunjungan layar, 375 uji hak akses, 166 uji formulir, audit buku besar cocok, 757 tes + 161 balapan lulus).
-- Menunggu Hadi: jawaban 22 isian [ISI HADI] perjanjian coach & MOU kolam (daftar usulan Claude di chat 2 Okt); ID Pixel + token Conversions API; cek tampilan landing di HP asli/Safari; apakah susunan "Kenalan dengan coach" desktop mau dirapatkan.
+- Menunggu Hadi: (1) jawaban 22 isian [ISI HADI] perjanjian coach & MOU kolam (daftar usulan di chat 2 Okt; centang perjanjian tetap mati, versi null di partner-agreement.ts, tes memaksa halaman teksnya ada sebelum diaktifkan); (2) ID Pixel + token Conversions API (META_CAPI_TOKEN, diisi Hadi di Vercel); (3) apakah susunan "Kenalan dengan coach" desktop mau dirapatkan (A/B).
 - Jalur bayar Midtrans diuji di laptop mode uji; di production belum ada pembayaran sungguhan.
 
 ## Tugas Claude berikutnya
