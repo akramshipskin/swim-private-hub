@@ -16,18 +16,19 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja, Hadi), isi-harga-dummy (production: HARGA_DUMMY_PROD=1, Hadi), render-brand-social.
 
 ## Sedang jalan
-- 5 jawaban Hadi masuk 2 Okt (1A 2A 3A 4B 5A, lihat KEPUTUSAN). Breakdown + rekomendasi model sudah dikirim; menunggu "lanjut" dan konfirmasi arti 4B. Pixel/CAPI butuh ID Pixel, token di Vercel (diisi Hadi), dan persetujuan orang hukum untuk ubah Kebijakan Privasi/Cookie.
+- 2 Okt dini hari (Opus, BELUM push, ada 2 migrasi baru: partner_agreement + payment_meta_tracking -> Hadi migrate production dulu): (1) coach batal sakit = slot ditutup; (2) laporan kolam tampil PPh & masuk saldo; (3) mekanisme centang perjanjian coach/MOU kolam (belum aktif: versi null sampai teks [ISI HADI] final + halaman teksnya dibuat); (4) Meta Pixel + Conversions API (mati sampai ID Pixel & token diisi di Vercel), Privasi/Cookie/banner disesuaikan. Pemeriksa Opus kedua: perjanjian & slot tidak ada temuan berat (catatan ringan sudah diperbaiki); bagian Meta sedang diperiksa.
+- Sisa jawaban Hadi: 6 perbaikan ringan (Sonnet/OpenCode), isi [ISI HADI] (daftar dikirim ke Hadi 2 Okt).
 - Jalur bayar Midtrans (beli, sesi coba, tambah bayar ganti coach, saldo dipakai dulu) sudah diuji di laptop mode uji + notifikasi tiruan; di production belum ada pembayaran sungguhan.
 
 ## Tugas Claude berikutnya
-1. Kerjakan jawaban Hadi atas 5 pertanyaan setelah "lanjut" (booking/uang/login/skema = Opus + pemeriksa kedua).
+1. Setelah Hadi migrate production: push batch Opus 2 Okt, cek GitHub & situs. Lalu 6 perbaikan ringan (Sonnet; label teks lewat OpenCode) dan halaman teks perjanjian/MOU setelah [ISI HADI] dijawab.
 2. Nilai ulang komisi afiliasi 5% (sisa SPH tipis setelah biaya Midtrans) sebelum iklan jalan.
 3. Animasi landing v2: revisi sesuai masukan Hadi (ditunda; belum ada masukan tertunda).
 4. Rekening coach/kolam yang tersimpan format lama tidak dinormalisasi otomatis: cek sebelum ada coach asli.
 5. Audit buku besar production diulang setelah ada transaksi asli (2 Okt: cocok). Cek GitHub & situs asli setelah tiap push.
 
 ## Tugas Hadi
-1. Bilang "lanjut" + konfirmasi arti 4B. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif (tombol Beli sudah dibetulkan).
+1. Jalankan migrasi production (2 migrasi baru), kirim jawaban [ISI HADI], ID Pixel + isi token Conversions API di Vercel. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif (tombol Beli sudah dibetulkan).
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.
