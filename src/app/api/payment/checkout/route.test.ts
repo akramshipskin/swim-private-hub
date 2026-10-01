@@ -14,14 +14,24 @@ const paymentCreate = vi.fn().mockResolvedValue({});
 const paymentDeleteMany = vi.fn().mockResolvedValue({ count: 1 });
 const paymentUpdate = vi.fn().mockResolvedValue({});
 const packageDelete = vi.fn().mockResolvedValue({});
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    package: { count: (...a: unknown[]) => packageCount(...a), findFirst: packageFindFirst, create: packageCreate, delete: (...a: unknown[]) => packageDelete(...a) },
+const packageUpdate = vi.fn().mockResolvedValue({});
+vi.mock("@/lib/prisma", () => {
+  const prisma: Record<string, unknown> = {
+    package: { count: (...a: unknown[]) => packageCount(...a), findFirst: packageFindFirst, create: packageCreate, update: (...a: unknown[]) => packageUpdate(...a), delete: (...a: unknown[]) => packageDelete(...a) },
     pool: { findFirst: poolFindFirst },
     user: { findFirst: userFindFirst },
     payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a), update: (...a: unknown[]) => paymentUpdate(...a) },
-    $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
-  },
+  };
+  prisma.$transaction = (arg: unknown) => (typeof arg === "function" ? arg(prisma) : Promise.all(arg as Promise<unknown>[]));
+  return { prisma };
+});
+
+// Saldo member: bawaan tidak ada saldo (dites terpisah di bawah dan di tes balapan).
+const spendMemberBalance = vi.fn().mockResolvedValue(0);
+const refundMemberBalanceOnce = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/member-wallet", () => ({
+  spendMemberBalance: (...a: unknown[]) => spendMemberBalance(...a),
+  refundMemberBalanceOnce: (...a: unknown[]) => refundMemberBalanceOnce(...a),
 }));
 
 vi.mock("@/lib/dedupe-lock", async () => {
@@ -45,6 +55,7 @@ beforeEach(() => {
   packageCount.mockResolvedValue(0);
   poolFindFirst.mockResolvedValue(POOL);
   userFindFirst.mockResolvedValue(COACH);
+  spendMemberBalance.mockResolvedValue(0);
 });
 
 describe("checkout paket pilih coach", () => {
@@ -159,6 +170,35 @@ describe("checkout paket pilih coach", () => {
     const res = await POST(buy());
     expect(res.status).toBe(403);
     expect(packageCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe("checkout dengan saldo member", () => {
+  it("saldo sebagian: Midtrans menagih sisanya, nama item diberi keterangan", async () => {
+    spendMemberBalance.mockResolvedValue(300_000);
+    const res = await POST(buy());
+    expect(res.status).toBe(200);
+    expect(paymentCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ amount: 1_063_200, status: "PENDING" }) });
+    const params = createTransaction.mock.calls[0][0];
+    expect(params.transaction_details.gross_amount).toBe(1_063_200);
+    expect(params.item_details[0]).toMatchObject({ price: 1_063_200, name: expect.stringContaining("dipotong saldo") });
+  });
+
+  it("saldo menutup penuh: tanpa Midtrans, paket langsung aktif", async () => {
+    spendMemberBalance.mockResolvedValue(1_363_200);
+    const res = await POST(buy());
+    expect(await res.json()).toEqual({ redirectUrl: "http://x/pembayaran/sukses" });
+    expect(createTransaction).not.toHaveBeenCalled();
+    expect(paymentCreate).toHaveBeenCalledWith({ data: expect.objectContaining({ amount: 0, status: "SUCCESS", midtransOrderId: "SALDO-pkg-new" }) });
+  });
+
+  it("Midtrans gagal: saldo yang terpakai dikembalikan", async () => {
+    spendMemberBalance.mockResolvedValue(300_000);
+    createTransaction.mockRejectedValueOnce(new Error("down"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await POST(buy());
+    expect(res.status).toBe(502);
+    expect(refundMemberBalanceOnce).toHaveBeenCalledWith(expect.anything(), "m1", 300_000, { packageId: "pkg-new" });
   });
 });
 

@@ -59,6 +59,7 @@ export default async function PoolLaporanPage({
           package: {
             select: {
               totalSesi: true,
+              poolPrice: true,
               dependent: { select: { name: true } },
               payments: { where: { status: "SUCCESS" }, select: { amount: true }, take: 1 },
             },
@@ -72,11 +73,11 @@ export default async function PoolLaporanPage({
     by: ["bookingId", "type"],
     where: {
       bookingId: { in: bookingsByPool.flat().map((b) => b.id) },
-      type: { in: ["SESSION_REVENUE", "SESSION_PAYOUT"] },
+      type: { in: ["SESSION_REVENUE", "SESSION_PAYOUT", "PLATFORM_REVENUE", "PLATFORM_TAX"] },
     },
     _sum: { amount: true },
   });
-  const credited = (bookingId: string, type: "SESSION_REVENUE" | "SESSION_PAYOUT") =>
+  const credited = (bookingId: string, type: "SESSION_REVENUE" | "SESSION_PAYOUT" | "PLATFORM_REVENUE" | "PLATFORM_TAX") =>
     ledger.find((l) => l.bookingId === bookingId && l.type === type)?._sum.amount ?? 0;
 
   return (
@@ -111,7 +112,12 @@ export default async function PoolLaporanPage({
               const payment = b.package.payments[0];
               if (!payment) return null;
               // floor, sama dengan dompet (src/app/coach/riwayat-sesi/actions.ts).
-              const perSessionValue = Math.floor(payment.amount / b.package.totalSesi);
+              // Paket pilih coach: nilai sesi = yang benar-benar dibagi di buku besar
+              // (sebagian bisa dibayar saldo member, harga bisa berubah setelah ganti coach).
+              const perSessionValue =
+                b.package.poolPrice != null
+                  ? credited(b.id, "SESSION_REVENUE") + credited(b.id, "SESSION_PAYOUT") + credited(b.id, "PLATFORM_REVENUE") + credited(b.id, "PLATFORM_TAX")
+                  : Math.floor(payment.amount / b.package.totalSesi);
               // Angka kolam & coach dari pembukuan (yang benar-benar dikredit saat
               // sesi ditandai Hadir, dengan persen yang berlaku saat itu), bukan
               // dihitung ulang dari persen sekarang. Platform = sisanya.

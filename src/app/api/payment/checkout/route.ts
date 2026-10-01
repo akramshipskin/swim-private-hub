@@ -3,21 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { snap } from "@/lib/midtrans";
 import { assertDependentOwnedByMember } from "@/lib/dependents";
 import { packQuote, trialQuote } from "@/lib/pricing";
+import { refundMemberBalanceOnce, spendMemberBalance } from "@/lib/member-wallet";
+import { NON_CARD_PAYMENTS } from "@/lib/midtrans-methods";
 import { withDedupeLock } from "@/lib/dedupe-lock";
 import { trialBlockingPackageWhere } from "@/lib/trial";
 
-const NON_CARD_PAYMENTS = [
-  "gopay",
-  "shopeepay",
-  "other_qris",
-  "bca_va",
-  "bni_va",
-  "bri_va",
-  "cimb_va",
-  "permata_va",
-  "echannel",
-  "other_va",
-] as const;
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -115,7 +105,7 @@ export async function POST(request: Request) {
     if (item.isTrial && (await tx.package.count({ where: { dependentId, ...trialBlockingPackageWhere() } })) > 0) {
       return "TRIAL_USED" as const;
     }
-    return tx.package.create({
+    const created = await tx.package.create({
       data: {
         memberId: session.user.id,
         dependentId,
@@ -135,6 +125,30 @@ export async function POST(request: Request) {
         status: "PENDING_PAYMENT",
       },
     });
+    // Saldo member dipakai dulu (Hadi 2 Okt), sisanya lewat Midtrans. Lunas
+    // dari saldo = paket langsung aktif tanpa Midtrans; Payment tetap dicatat
+    // (jumlah 0) sebagai tanda paket sudah dibayar untuk pembagian uang sesi.
+    const saldoUsed = await spendMemberBalance(tx, session.user.id, item.price, { packageId: created.id });
+    if (saldoUsed < item.price) {
+      if (saldoUsed > 0) await tx.package.update({ where: { id: created.id }, data: { saldoUsed } });
+      // Payment dicatat di transaksi yang sama dengan pemakaian saldo, SEBELUM
+      // transaksi Midtrans dibuat -- kebalikannya bisa meninggalkan transaksi
+      // Midtrans tanpa Payment (uang masuk, paket tidak aktif) atau saldo
+      // terpakai tanpa tagihan yang bisa kedaluwarsa.
+      const cash = item.price - saldoUsed;
+      const orderId = `PKG-${created.id}-${Date.now()}`;
+      await tx.payment.create({ data: { packageId: created.id, midtransOrderId: orderId, amount: cash, status: "PENDING" } });
+      return { ...created, cash, orderId };
+    }
+    const now = new Date();
+    await tx.package.update({
+      where: { id: created.id },
+      data: { saldoUsed, status: "ACTIVE", startDate: now, expiredDate: new Date(now.getTime() + quote.durationDays * 86_400_000) },
+    });
+    await tx.payment.create({
+      data: { packageId: created.id, midtransOrderId: `SALDO-${created.id}`, amount: 0, status: "SUCCESS", paidAt: now },
+    });
+    return { ...created, cash: 0, orderId: "" };
   });
   if (pkg === "TRIAL_USED") {
     return Response.json(
@@ -149,28 +163,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const orderId = `PKG-${pkg.id}-${Date.now()}`;
+  const orderId = pkg.orderId;
   const origin = new URL(request.url).origin;
-
-  // Payment dicatat SEBELUM transaksi Midtrans dibuat -- kebalikannya
-  // (Snap dulu baru Payment) bisa ninggalin transaksi Midtrans hidup
-  // tanpa Payment di DB kalau simpan gagal: member tetep bisa bayar, uang
-  // masuk, webhook gak nemu Payment, paket gak pernah aktif.
-  await prisma.payment.create({
-    data: {
-      packageId: pkg.id,
-      midtransOrderId: orderId,
-      amount: item.price,
-      status: "PENDING",
-    },
-  });
+  if (pkg.cash === 0) return Response.json({ redirectUrl: `${origin}/pembayaran/sukses` });
 
   try {
     const transaction = await snap.createTransaction({
-      transaction_details: { order_id: orderId, gross_amount: item.price },
-      // Kartu kredit tidak ditawarkan (Hadi 2 Okt): biaya Midtrans ditanggung
-      // SPH dan tidak boleh dibebankan ke pembeli (aturan BI), biaya kartu
-      // ~2,9% hampir menghabiskan biaya layanan.
+      transaction_details: { order_id: orderId, gross_amount: pkg.cash },
       enabled_payments: [...NON_CARD_PAYMENTS],
       customer_details: {
         first_name: session.user.name ?? undefined,
@@ -179,10 +178,10 @@ export async function POST(request: Request) {
       item_details: [
         {
           id: `${item.poolId}-${coachId}-${item.totalSesi}`,
-          price: item.price,
+          price: pkg.cash,
           quantity: 1,
           // Midtrans nolak item name > 50 karakter.
-          name: item.name.slice(0, 50),
+          name: (pkg.cash < item.price ? `${item.name} (dipotong saldo)` : item.name).slice(0, 50),
         },
       ],
       callbacks: {
@@ -202,10 +201,12 @@ export async function POST(request: Request) {
     return Response.json({ redirectUrl: transaction.redirect_url });
   } catch (err) {
     // Snap gagal = belum ada transaksi yang bisa dibayar, aman dibersihin.
-    await prisma.$transaction([
-      prisma.payment.deleteMany({ where: { packageId: pkg.id } }),
-      prisma.package.delete({ where: { id: pkg.id } }),
-    ]);
+    // Saldo yang sempat terpakai dikembalikan dulu.
+    await prisma.$transaction(async (tx) => {
+      await refundMemberBalanceOnce(tx, session.user.id, item.price - pkg.cash, { packageId: pkg.id });
+      await tx.payment.deleteMany({ where: { packageId: pkg.id } });
+      await tx.package.delete({ where: { id: pkg.id } });
+    });
     // Detail error Midtrans cuma ke log server, gak dikirim ke browser.
     console.error("snap.createTransaction failed", err);
     return Response.json(

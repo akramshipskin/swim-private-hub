@@ -13,7 +13,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang, render-brand-social.
 
 ## Sedang jalan
-- Harga dari coach tahap 1 LIVE (2 Okt). Harga kolam/coach di production masih kosong -> landing tampil "Segera hadir" sampai Hadi menjalankan skrip isi-harga-dummy. Berikutnya tahap 2 (saldo member, ganti coach, catat setor PPh).
+- Harga dari coach tahap 1 LIVE (2 Okt). Tahap 2 (saldo member, ganti coach, catat setor PPh) SELESAI di laptop, di-commit, BELUM di-push: ada migrasi baru saldo_member_ganti_coach -> Hadi jalankan migrasi production dulu. Diuji: 725 tes, 160 tes balapan, alur browser lokal, pemeriksa Opus kedua (temuan dibetulkan).
 
 ## Tugas Claude berikutnya
 1. Revisi animasi sesuai masukan Hadi per bagian; ukur ulang sebelum/sesudah.
@@ -22,7 +22,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 4. Harga dari coach: setelah migrasi production -> push, cek GitHub & situs asli; lalu tahap 2 (saldo member + pengajuan ganti coach), tahap 3 (S&K, perlu orang hukum).
 
 ## Tugas Hadi
-1. Jalankan skrip isi harga dummy di production (perintah di chat 2 Okt); jawab aturan tahap 2. Animasi landing v2 ditunda.
+1. Jalankan migrasi production saldo_member_ganti_coach, lalu Claude push. Jawab 2 aturan sisa tahap 2 (lihat chat). Animasi landing v2 ditunda.
 2. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
 3. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; satu pembayaran sampai paket aktif.
 4. Ukur waktu simpan milestone di production (dulu ±6 detik): butuh login production, Claude tidak boleh.

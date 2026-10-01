@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { creditSessionRevenue, reverseSessionRevenue } from "@/lib/wallet";
+import { pricesForSessionCoach } from "@/lib/coach-change";
 import { ATTENDANCE_MARK_WINDOW_HOURS, coachCanMarkAttendance } from "@/lib/policy";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -97,6 +98,12 @@ export async function markAttendance(
       // (jumlah persis yang dulu dicatat) lalu catat yang baru. Tanda sama
       // dikirim ulang = tidak ada perubahan uang.
       if (booking.attended === attended) return;
+      const sessionPrices = await pricesForSessionCoach(tx, booking.package, booking.availability.coachId, booking.availability.startTime);
+      // Paket model baru tanpa harga untuk coach sesi ini (tidak seharusnya
+      // terjadi): jangan jatuh ke bagi hasil persen kolam.
+      if (booking.package.poolPrice != null && !sessionPrices) {
+        throw new Error("Harga sesi ini tidak ditemukan. Hubungi admin.");
+      }
       if (booking.attended !== null) await reverseSessionRevenue(tx, { bookingId });
       await creditSessionRevenue(tx, {
         poolId: booking.availability.poolId,
@@ -104,16 +111,18 @@ export async function markAttendance(
         bookingId,
         perSessionValue,
         attended,
-        // Paket model harga-dari-coach: dibagi dari harga yang disalin saat beli.
-        pricing:
-          booking.package.poolPrice != null && booking.package.coachPrice != null
-            ? {
-                paid: successPayment.amount,
-                totalSesi: booking.package.totalSesi,
-                poolPrice: booking.package.poolPrice,
-                coachPrice: booking.package.coachPrice,
-              }
-            : undefined,
+        // Paket model harga-dari-coach: dibagi dari harga paket yang tersimpan
+        // (kolam + coach + layanan), bukan Payment.amount -- sebagian harga bisa
+        // dibayar dari saldo member. Setelah ganti coach, sesi yang diajar coach
+        // lama tetap memakai harga lama.
+        pricing: sessionPrices
+          ? {
+              paid: sessionPrices.poolPrice + sessionPrices.coachPrice + sessionPrices.serviceFee,
+              totalSesi: booking.package.totalSesi,
+              poolPrice: sessionPrices.poolPrice,
+              coachPrice: sessionPrices.coachPrice,
+            }
+          : undefined,
       });
     });
   } catch (err) {

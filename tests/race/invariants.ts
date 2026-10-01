@@ -63,6 +63,13 @@ export async function checkInvariants(opts: { packages?: boolean; ledger?: boole
     }
   }
 
+  // 3b. Saldo member = jumlah catatannya, tidak pernah minus (Hadi 2 Okt).
+  for (const u of await prisma.user.findMany({ select: { id: true, memberBalance: true } })) {
+    const l = (await prisma.memberWalletTransaction.aggregate({ where: { memberId: u.id }, _sum: { amount: true } }))._sum.amount ?? 0;
+    if (l !== u.memberBalance) bad.push(`saldo member ${u.id} ${u.memberBalance} != catatan ${l}`);
+    if (u.memberBalance < 0) bad.push(`saldo member ${u.id} minus ${u.memberBalance}`);
+  }
+
   // 4. Platform tidak pernah menarik lebih dari pendapatan yang pernah masuk.
   // Saldonya sendiri BOLEH minus (keputusan Hadi 29 Sep, Q-d & Q-e): komisi
   // afiliasi dibayar di muka dari bagian SPH, dan pembalikan Hadir tetap

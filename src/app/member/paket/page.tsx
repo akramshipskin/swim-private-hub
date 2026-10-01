@@ -4,7 +4,12 @@ import CheckoutButton from "./checkout-button";
 import { trialBlockingPackageWhere } from "@/lib/trial";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDateLabel } from "@/lib/datetime";
+import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
+import { expireStaleCoachChanges } from "@/lib/coach-change-actions-core";
+import { releaseStalePayments } from "@/lib/stale-payments";
+import { COACH_CHANGE_PAY_WINDOW_MS } from "@/lib/coach-change-rules";
+import { CoachChangeForm, PayDifferenceButton } from "./coach-change-form";
+import { withdrawCoachChange } from "./coach-change-actions";
 import { formatRupiah } from "@/lib/format";
 import { formatBps, pack8SavingPercent, packQuote, trialQuote } from "@/lib/pricing";
 
@@ -40,7 +45,9 @@ export default async function MemberPaketPage() {
   const now = new Date();
   const paymentCutoff = new Date(now.getTime() - PAYMENT_WINDOW_MS);
 
-  const [packages, pools, children] = await Promise.all([
+  await releaseStalePayments(now);
+  await expireStaleCoachChanges(now);
+  const [packages, pools, children, wallet] = await Promise.all([
     prisma.package.findMany({
       where: {
         memberId: session.user.id,
@@ -57,7 +64,13 @@ export default async function MemberPaketPage() {
         dependent: { select: { name: true, isSelf: true } },
         pool: { select: { id: true, name: true } },
         // Link bayar Midtrans terakhir yang masih menunggu (tombol "Lanjut bayar").
-        payments: { where: { status: "PENDING", snapRedirectUrl: { not: null } }, orderBy: { createdAt: "desc" }, take: 1, select: { snapRedirectUrl: true } },
+        payments: { where: { status: "PENDING", snapRedirectUrl: { not: null }, coachChangeRequestId: null }, orderBy: { createdAt: "desc" }, take: 1, select: { snapRedirectUrl: true } },
+        // Pengajuan ganti coach yang masih berjalan (paling banyak satu per paket).
+        coachChangeRequests: {
+          where: { status: { in: ["PENDING", "AWAITING_PAYMENT"] } },
+          take: 1,
+          select: { id: true, status: true, amount: true, sessions: true, decidedAt: true, toCoach: { select: { name: true } }, payments: { where: { status: "PENDING" }, select: { id: true } } },
+        },
       },
     }),
     // Model harga-dari-coach (Hadi 2 Okt): kolam aktif + coach yang mengajar
@@ -91,7 +104,13 @@ export default async function MemberPaketPage() {
       orderBy: { name: "asc" },
       select: { id: true, name: true, _count: { select: { packages: { where: trialBlockingPackageWhere(now) } } } },
     }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { memberBalance: true, memberWalletTransactions: { orderBy: { createdAt: "desc" }, take: 5, select: { id: true, amount: true, note: true, type: true, createdAt: true } } },
+    }),
   ]);
+  // Coach pengganti per kolam (yang sudah memasang harga), untuk form ganti coach.
+  const coachesByPool = new Map(pools.map((pool) => [pool.id, pool.affiliations.map((a) => a.coach)]));
   // Peserta yang masih boleh beli trial (belum pernah punya paket).
   const trialChildren = children.filter((c) => c._count.packages === 0);
 
@@ -130,12 +149,83 @@ export default async function MemberPaketPage() {
     <Badge tone="neutral">Belum ada paket</Badge>
   );
 
+  function renderCoachChange(p: (typeof packages)[number]) {
+    const req = p.coachChangeRequests[0];
+    if (req?.status === "PENDING") {
+      return (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+          <span>Pengajuan ganti ke {req.toCoach.name} menunggu keputusan admin.</span>
+          <form action={withdrawCoachChange}>
+            <input type="hidden" name="requestId" value={req.id} />
+            <button type="submit" className="font-medium underline max-sm:min-h-[44px]">Batalkan pengajuan</button>
+          </form>
+        </div>
+      );
+    }
+    if (req?.status === "AWAITING_PAYMENT" && req.amount != null && req.decidedAt) {
+      const deadline = new Date(req.decidedAt.getTime() + COACH_CHANGE_PAY_WINDOW_MS);
+      return (
+        <div className="flex flex-col gap-2 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+          <span>
+            Ganti ke {req.toCoach.name} disetujui. Tambah bayar {formatRupiah(req.amount)} untuk {req.sessions} sesi sisa, paling lambat{" "}
+            {formatDateLabel(deadline)} pukul {formatTimeWib(deadline)} WIB. Saldo dipakai dulu kalau ada.
+          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <PayDifferenceButton requestId={req.id} label={req.payments.length ? "Lanjut bayar" : `Bayar ${formatRupiah(req.amount)}`} />
+            {req.payments.length === 0 && (
+              <form action={withdrawCoachChange}>
+                <input type="hidden" name="requestId" value={req.id} />
+                <button type="submit" className="font-medium underline max-sm:min-h-[44px]">Batalkan pengajuan</button>
+              </form>
+            )}
+          </div>
+        </div>
+      );
+    }
+    const options = (coachesByPool.get(p.pool.id) ?? [])
+      .filter((c) => c.id !== p.coachId)
+      .map((c) => {
+        const price = p.totalSesi === 4 ? c.coachProfile?.pricePack4 : p.totalSesi === 8 ? c.coachProfile?.pricePack8 : null;
+        return price == null ? null : { id: c.id, name: c.name, note: `jasa paket ${p.totalSesi} sesi ${formatRupiah(price)}` };
+      })
+      .filter((o): o is { id: string; name: string; note: string } => o !== null);
+    if (options.length === 0) return null;
+    return <CoachChangeForm packageId={p.id} coaches={options} />;
+  }
+
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-semibold tracking-tight text-text">Paket Saya</h1>
         {membershipBadge}
       </div>
+
+      {wallet && (wallet.memberBalance > 0 || wallet.memberWalletTransactions.length > 0) && (
+        <Card className="mb-6">
+          <CardBody className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="text-sm font-semibold text-text">Saldo kamu</p>
+              <p className="text-xl font-bold text-text">{formatRupiah(wallet.memberBalance)}</p>
+            </div>
+            <p className="text-xs text-text-muted">Otomatis dipakai saat membeli paket berikutnya atau tambah bayar ganti coach. Tidak bisa dicairkan.</p>
+            {wallet.memberWalletTransactions.length > 0 && (
+              <ul className="flex flex-col gap-0.5 border-t border-border pt-2 text-xs text-text-muted">
+                {wallet.memberWalletTransactions.map((t) => (
+                  <li key={t.id} className="flex justify-between gap-3">
+                    <span>
+                      {formatDateLabel(t.createdAt)} · {t.note ?? (t.type === "PURCHASE" ? "Dipakai membeli" : "Masuk")}
+                    </span>
+                    <span className={t.amount > 0 ? "text-success-text" : "text-text"}>
+                      {t.amount > 0 ? "+" : "−"}
+                      {formatRupiah(Math.abs(t.amount))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardBody>
+        </Card>
+      )}
 
       {packages.length === 0 ? (
         <Card className="mb-8">
@@ -157,7 +247,7 @@ export default async function MemberPaketPage() {
                       const used = p.status === "ACTIVE" && p.sisaSesi <= 0;
                       const expired = p.status === "ACTIVE" && p.expiredDate && p.expiredDate < now;
                       return (
-                        <li key={p.id} className="flex items-start justify-between gap-3 py-3">
+                        <li key={p.id} className="flex flex-wrap items-start justify-between gap-3 py-3">
                           <div className="min-w-0">
                             <p className="text-base font-semibold text-text">
                               {p.dependent.isSelf ? "Kamu sendiri" : p.dependent.name}
@@ -185,6 +275,9 @@ export default async function MemberPaketPage() {
                           ) : (
                             <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
                           )}
+                          {p.status === "ACTIVE" && !expired && p.coachId && p.poolPrice != null && !p.isTrial && (
+                            <div className="w-full">{renderCoachChange(p)}</div>
+                          )}
                         </li>
                       );
                     })}
@@ -199,6 +292,7 @@ export default async function MemberPaketPage() {
       <p className="mb-4 text-sm text-text-muted">
         Pilih kolam, lalu coach. Paket berlaku untuk coach dan kolam yang kamu pilih. Harga sudah termasuk tiket masuk
         untuk 1 peserta, 1 pendamping, dan coach-nya, plus biaya layanan SPH di bawah 7%.
+        {wallet && wallet.memberBalance > 0 && <> Saldomu {formatRupiah(wallet.memberBalance)} otomatis dipakai dulu, sisanya dibayar lewat Midtrans.</>}
       </p>
       {children.length === 0 ? (
         <p className="text-sm text-text-muted">

@@ -32,7 +32,13 @@ for (const [label, table, col] of [["kolam", "Pool", "poolId"], ["coach", "Coach
 // 3. Pembagian per sesi.
 const bookings = await q(`
   SELECT b.id, b.status, b.attended, p."totalSesi", p."isTrial", p."isSingleSession",
-    p."poolPrice" AS poolprice, p."coachPrice" AS coachprice, p."coachId" AS pkgcoach, a."coachId" AS slotcoach,
+    p."poolPrice" AS poolprice,
+    -- Harga menurut WAKTU sesi: sesi sebelum sebuah ganti coach selesai memakai harga
+    -- sebelum ganti itu (dan harus diajar coach lama); sesudahnya harga paket sekarang.
+    CASE WHEN nx.id IS NOT NULL THEN (CASE WHEN nx."fromCoachId" = a."coachId" THEN nx."oldCoachPrice" END)
+         WHEN p."coachId" = a."coachId" OR p."coachId" IS NULL THEN p."coachPrice" END AS coachprice,
+    CASE WHEN nx.id IS NOT NULL THEN (CASE WHEN nx."fromCoachId" = a."coachId" THEN nx."oldServiceFee" END)
+         WHEN p."coachId" = a."coachId" OR p."coachId" IS NULL THEN p."serviceFee" END AS servicefee,
     COALESCE(SUM(w.amount) FILTER (WHERE w.type='PPH_WITHHELD' AND w."poolId" IS NOT NULL),0)::int AS pphpool,
     COALESCE(SUM(w.amount) FILTER (WHERE w.type='PPH_WITHHELD' AND w."coachProfileId" IS NOT NULL),0)::int AS pphcoach,
     (SELECT pay.amount FROM "Payment" pay WHERE pay."packageId" = p.id AND pay.status = 'SUCCESS' ORDER BY pay."createdAt" LIMIT 1) AS paid,
@@ -44,8 +50,10 @@ const bookings = await q(`
     COALESCE(SUM(w.amount) FILTER (WHERE w.type='PLATFORM_TAX'),0)::int AS tax,
     MIN(w."createdAt") FILTER (WHERE w.type='PLATFORM_TAX' AND w.amount > 0) AS taxAt
   FROM "Booking" b JOIN "Package" p ON p.id = b."packageId" JOIN "Availability" a ON a.id = b."availabilityId"
+  LEFT JOIN LATERAL (SELECT c.id, c."fromCoachId", c."oldCoachPrice", c."oldServiceFee" FROM "CoachChangeRequest" c
+    WHERE c."packageId" = p.id AND c.status = 'COMPLETED' AND c."completedAt" >= a."startTime" ORDER BY c."completedAt" LIMIT 1) nx ON true
   LEFT JOIN "WalletTransaction" w ON w."bookingId" = b.id
-  GROUP BY b.id, p.id, a.id`);
+  GROUP BY b.id, p.id, a.id, nx.id, nx."fromCoachId", nx."oldCoachPrice", nx."oldServiceFee"`);
 // PPN 11% mulai dari commit ae6e433 (30 Sep 2026 22:01 WIB); baris sebelumnya memakai 12%.
 const PPN_11_SINCE = new Date("2026-09-30T22:01:17+07:00");
 let checked = 0;
@@ -63,14 +71,19 @@ for (const b of bookings) {
     continue;
   }
   checked++;
-  const v = Math.floor(b.paid / b.totalSesi);
-  if (total !== v) bad("sesi", `${b.id}: total dibagi ${total} != nilai sesi ${v} (harga ${b.paid}/${b.totalSesi})`);
+  // Paket model harga-dari-coach dibagi dari harga tersimpan (sebagian bisa dibayar saldo member).
+  const v = b.poolprice != null && b.coachprice != null && b.servicefee != null
+    ? Math.floor((b.poolprice + b.coachprice + b.servicefee) / b.totalSesi)
+    : Math.floor(b.paid / b.totalSesi);
+  if (total !== v) bad("sesi", `${b.id}: total dibagi ${total} != nilai sesi ${v} (bayar ${b.paid}, ${b.totalSesi} sesi)`);
   if (b.pool < 0 || b.coach < 0 || b.net < 0 || b.tax < 0) bad("sesi", `${b.id}: ada bagian negatif (kolam ${b.pool}, coach ${b.coach}, platform ${b.net}, PPN ${b.tax})`);
   if (b.attended === false && b.pool !== 0) bad("sesi", `${b.id}: Tidak Hadir tapi kolam dapat ${b.pool}`);
   // Model harga-dari-coach (2 Okt): bagian tetap per sesi dari harga yang disalin saat beli,
   // potongan PPh 0,5% (atau 0 bila bebas), dan sesi hanya dengan coach paketnya.
-  if (b.poolprice != null && b.coachprice != null) {
-    if (b.pkgcoach && b.pkgcoach !== b.slotcoach) bad("sesi", `${b.id}: paket untuk coach ${b.pkgcoach} tapi sesi dengan coach ${b.slotcoach}`);
+  if (b.poolprice != null && (b.coachprice == null || b.servicefee == null)) {
+    bad("sesi", `${b.id}: paket pilih coach tapi sesi dengan coach ${b.slotcoach} yang bukan coach paket ini (dan tidak tercatat ganti coach)`);
+  } else if (b.poolprice != null && b.coachprice != null) {
+
     let coachExp = Math.floor(b.coachprice / b.totalSesi);
     let poolExp = b.attended ? Math.floor(b.poolprice / b.totalSesi) : 0;
     if (!b.attended) coachExp = Math.floor(coachExp * 50 / 100);
@@ -123,7 +136,24 @@ const plat = (await q(`SELECT
   (SELECT COALESCE(SUM(amount),0)::int FROM "WalletTransaction" WHERE type='PLATFORM_TAX') - (SELECT COALESCE(SUM("taxAmount"),0)::int FROM "PlatformWithdrawal") AS tax`))[0];
 notes.push(`platform: pendapatan bersih ${plat.revenue}, PPN ${plat.tax}`);
 const pphHeld = (await q(`SELECT COALESCE(-SUM(amount),0)::int AS s FROM "WalletTransaction" WHERE type='PPH_WITHHELD'`))[0].s;
-notes.push(`titipan PPh 0,5% kolam/coach (bukan pendapatan SPH): ${pphHeld}`);
+const pphPaid = (await q(`SELECT COALESCE(SUM(amount),0)::int AS s FROM "PphRemittance"`))[0].s;
+notes.push(`titipan PPh 0,5% kolam/coach (bukan pendapatan SPH): ${pphHeld}, sudah disetor ${pphPaid}, belum disetor ${pphHeld - pphPaid}`);
+if (pphPaid > pphHeld) bad("PPh", `setoran ${pphPaid} melebihi titipan ${pphHeld}`);
+
+// 9. Saldo member = jumlah catatannya, tidak pernah minus.
+const mw = await q(`SELECT u.id, u."memberBalance" AS bal, COALESCE(SUM(t.amount),0)::int AS ledger
+  FROM "User" u LEFT JOIN "MemberWalletTransaction" t ON t."memberId" = u.id GROUP BY u.id HAVING u."memberBalance" <> 0 OR COUNT(t.id) > 0`);
+for (const r of mw) {
+  if (r.bal !== r.ledger) bad("saldo member", `${r.id}: tersimpan ${r.bal}, catatan ${r.ledger}`);
+  if (r.bal < 0) bad("saldo member", `${r.id}: minus ${r.bal}`);
+}
+notes.push(`saldo member: ${mw.length} dompet dicek`);
+// 10. Paket yang memakai saldo: bayar Midtrans (atau 0) + saldo = harga tersimpan.
+const ps = await q(`SELECT p.id, p."saldoUsed" AS saldo, p."poolPrice" + p."coachPrice" + p."serviceFee" AS price,
+  (SELECT pay.amount FROM "Payment" pay WHERE pay."packageId" = p.id AND pay.status = 'SUCCESS' AND pay."coachChangeRequestId" IS NULL ORDER BY pay."createdAt" LIMIT 1) AS paid,
+  (SELECT COUNT(*) FROM "CoachChangeRequest" c WHERE c."packageId" = p.id AND c.status = 'COMPLETED')::int AS changes
+  FROM "Package" p WHERE p."saldoUsed" > 0 AND p.status = 'ACTIVE'`);
+for (const r of ps) if (r.changes === 0 && r.paid != null && r.paid + r.saldo !== r.price) bad("saldo member", `paket ${r.id}: bayar ${r.paid} + saldo ${r.saldo} != harga ${r.price}`);
 if (plat.tax < 0) bad("platform", `saldo PPN minus ${plat.tax}`);
 
 console.log(notes.join("\n"));

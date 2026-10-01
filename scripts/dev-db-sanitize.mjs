@@ -29,7 +29,7 @@ export const POLICY = {
   RateLimitHit: null,
 
   User: {
-    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId"),
+    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId", "memberBalance"),
     name: (r, i) => `${ROLE_LABEL[r.role] ?? "User"} ${i}`,
     phone: (r, i) => `0899${pad(i, 8)}`,
     email: (r, i) => (r.email == null ? null : `user${i}@dev.invalid`),
@@ -83,7 +83,7 @@ export const POLICY = {
     transferReference: (r, i) => (r.transferReference == null ? null : `DEV-TRF-${i}`),
   },
   Payment: {
-    ...keep("id", "packageId", "midtransOrderId", "amount", "status", "paidAt", "createdAt", "updatedAt"),
+    ...keep("id", "packageId", "midtransOrderId", "amount", "status", "paidAt", "createdAt", "updatedAt", "coachChangeRequestId"),
     // Payload webhook Midtrans memuat data pembayar; link Snap = token bayar asli.
     rawWebhookPayload: () => null,
     snapRedirectUrl: () => null,
@@ -122,11 +122,22 @@ export const POLICY = {
   },
   WalletTransaction: keep("id", "type", "poolId", "coachProfileId", "amount", "paymentId", "bookingId", "withdrawalRequestId", "note", "createdById", "idempotencyKey", "createdAt"),
   PackageTemplate: keep("id", "poolId", "name", "totalSesi", "price", "durationDays", "jatahCancel", "isTrial", "isActive", "pendingChanges", "createdAt"),
-  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt", "coachId", "poolPrice", "coachPrice", "serviceFee", "durationDays"),
+  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt", "coachId", "poolPrice", "coachPrice", "serviceFee", "durationDays", "saldoUsed"),
   Availability: keep("id", "coachId", "poolId", "date", "startTime", "endTime", "kapasitas", "status", "recurrenceRule", "createdAt"),
   PoolOwnership: keep("id", "poolId", "ownerId", "createdAt"),
   PoolAffiliation: keep("id", "poolId", "coachId", "createdAt"),
   Booking: keep("id", "memberId", "availabilityId", "packageId", "status", "cancelledBy", "cancelledAt", "attended", "attendedBy", "attendedAt", "createdAt"),
+  // Saldo member & ganti coach (Hadi 2 Okt): angka disalin; teks bebas disamarkan.
+  MemberWalletTransaction: keep("id", "memberId", "type", "amount", "packageId", "coachChangeRequestId", "note", "createdAt"),
+  CoachChangeRequest: {
+    ...keep("id", "packageId", "memberId", "fromCoachId", "toCoachId", "status", "sessions", "amount", "newCoachPrice", "oldCoachPrice", "oldServiceFee", "saldoUsed", "decidedAt", "completedAt", "createdAt"),
+    reason: () => "Alasan ganti coach (disamarkan)",
+    adminNote: (r) => (r.adminNote == null ? null : "Catatan admin (disamarkan)"),
+  },
+  PphRemittance: {
+    ...keep("id", "amount", "note", "createdById", "createdAt"),
+    reference: () => "NTPN-DEV",
+  },
 };
 
 // Kembalikan true kalau tabel disalin, false kalau sengaja dilewati.

@@ -143,6 +143,10 @@ model User {
   role               Role     @default(MEMBER)
   isActive           Boolean  @default(true)
   mustChangePassword Boolean  @default(false)
+  // Saldo member (Hadi 2 Okt): selisih ganti ke coach lebih murah. Hanya untuk
+  // membeli paket / tambah bayar, tidak bisa dicairkan. Cache dari
+  // MemberWalletTransaction (sumber kebenaran).
+  memberBalance      Int      @default(0)
   // Naik tiap password diganti/direset -- JWT yang nyimpen versi lama
   // ditolak di callback jwt (src/auth.ts), jadi sesi curian ikut mati.
   sessionVersion     Int      @default(0)
@@ -180,6 +184,10 @@ model User {
   bookings            Booking[]
   availabilities      Availability[]     @relation("CoachAvailabilities")
   coachedPackages     Package[]          @relation("PackageCoach")
+  memberWalletTransactions MemberWalletTransaction[]
+  coachChangeRequests      CoachChangeRequest[] @relation("CoachChangeMember")
+  coachChangesFrom         CoachChangeRequest[] @relation("CoachChangeFrom")
+  coachChangesTo           CoachChangeRequest[] @relation("CoachChangeTo")
   pushSubscriptions   PushSubscription[]
   poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
   poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
@@ -495,6 +503,10 @@ model Package {
   serviceFee   Int?
   // Masa berlaku (hari) sejak aktif; null = ikut template/aturan lama.
   durationDays Int?
+  // Bagian harga yang dibayar dari saldo member (sisanya lewat Midtrans,
+  // Payment.amount). Total harga paket model baru = poolPrice + coachPrice + serviceFee.
+  saldoUsed    Int              @default(0)
+  coachChangeRequests CoachChangeRequest[]
   // Paket eceran 1 sesi buat renang di kolam selain kolam paket utama.
   // Cuma bisa dibeli member yang masih punya paket biasa (bukan 1 sesi)
   // yang aktif -- dan paket 1 sesi sendiri gak ngitung sebagai syarat itu.
@@ -530,6 +542,10 @@ model Payment {
   // Link halaman bayar Midtrans (berlaku ~24 jam) -- tombol "Lanjut bayar"
   // untuk paket yang masih menunggu pembayaran.
   snapRedirectUrl   String?
+  // Diisi kalau pembayaran ini tambahan bayar ganti coach (bukan pembelian
+  // paket): webhook menyelesaikan pengajuannya, status paket tidak disentuh.
+  coachChangeRequestId String?
+  coachChangeRequest   CoachChangeRequest? @relation(fields: [coachChangeRequestId], references: [id])
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
@@ -927,4 +943,90 @@ model AffiliateCommission {
   @@index([status, releaseAt])
   @@index([coachProfileId])
   @@index([poolId])
+}
+
+// Buku besar saldo member (Hadi 2 Okt). amount positif = masuk, negatif = terpakai.
+enum MemberWalletType {
+  // Selisih ganti ke coach lebih murah (atau kelebihan tambah bayar).
+  COACH_CHANGE_CREDIT
+  // Dipakai membeli paket / tambah bayar ganti coach (negatif).
+  PURCHASE
+  // Pengembalian saldo saat pembayaran gagal/kedaluwarsa (positif).
+  PURCHASE_REFUND
+}
+
+model MemberWalletTransaction {
+  id                   String           @id @default(cuid())
+  memberId             String
+  member               User             @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  type                 MemberWalletType
+  amount               Int
+  // Tanpa relasi: paket yang batal dibuat (Midtrans gagal) dihapus, catatan tetap ada.
+  packageId            String?
+  coachChangeRequestId String?
+  note                 String?
+  createdAt            DateTime         @default(now())
+
+  @@index([memberId, createdAt])
+  @@index([packageId])
+}
+
+// Pengajuan ganti coach (Hadi 2 Okt): member mengajukan dengan alasan, admin
+// memutuskan (coach lama diberi tahu). Hanya ke coach lain di kolam yang sama.
+// amount = selisih sisa sesi dengan harga coach baru (positif = member tambah
+// bayar, negatif = masuk saldo member), dihitung saat disetujui.
+enum CoachChangeStatus {
+  PENDING
+  AWAITING_PAYMENT
+  COMPLETED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+model CoachChangeRequest {
+  id          String            @id @default(cuid())
+  packageId   String
+  package     Package           @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  memberId    String
+  member      User              @relation("CoachChangeMember", fields: [memberId], references: [id], onDelete: Cascade)
+  fromCoachId String
+  fromCoach   User              @relation("CoachChangeFrom", fields: [fromCoachId], references: [id])
+  toCoachId   String
+  toCoach     User              @relation("CoachChangeTo", fields: [toCoachId], references: [id])
+  reason      String
+  status      CoachChangeStatus @default(PENDING)
+  sessions    Int?
+  amount      Int?
+  // Harga paket coach baru (ukuran paket ini) saat disetujui -- dipakai saat
+  // menyelesaikan, supaya perubahan harga coach di tengah jalan tidak mengubah
+  // tagihan yang sudah dibayar.
+  newCoachPrice Int?
+  // Harga coach lama & biaya layanan paket sebelum pindah (diisi saat selesai):
+  // sesi yang dijalani coach lama tetap dibagi dengan harga ini, termasuk kalau
+  // tanda hadirnya diubah setelah pindah coach.
+  oldCoachPrice Int?
+  oldServiceFee Int?
+  // Bagian tambah bayar yang diambil dari saldo member.
+  saldoUsed   Int               @default(0)
+  adminNote   String?
+  decidedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime          @default(now())
+
+  payments Payment[]
+
+  @@index([status, createdAt])
+  @@index([packageId])
+}
+
+// Setoran titipan PPh 0,5% ke kantor pajak (dicatat admin). Titipan belum
+// disetor = -SUM(WalletTransaction PPH_WITHHELD) - SUM(amount di sini).
+model PphRemittance {
+  id          String   @id @default(cuid())
+  amount      Int
+  reference   String
+  note        String?
+  createdById String
+  createdAt   DateTime @default(now())
 }

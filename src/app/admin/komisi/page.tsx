@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
 import { AFFILIATE_PAYOUT_NOTE } from "@/lib/affiliate";
 import { formatBps } from "@/lib/pricing";
+import { formatDateLabel } from "@/lib/datetime";
+import PphRemitForm from "./pph-remit-form";
 
 export const metadata: Metadata = {
   title: "Bagi Hasil | Swim Private Hub",
@@ -45,6 +47,9 @@ export default async function KomisiPage() {
             isSingleSession: true,
             poolId: true,
             coachId: true,
+            poolPrice: true,
+            coachPrice: true,
+            serviceFee: true,
             payments: { where: { status: "SUCCESS" }, select: { amount: true }, take: 1 },
           },
         },
@@ -79,6 +84,8 @@ export default async function KomisiPage() {
   // Titipan PPh 0,5% dari bagian kolam/coach (paket model harga-dari-coach):
   // uang mereka yang disetor SPH ke kantor pajak, bukan pendapatan SPH.
   const pphHeld = -((await prisma.walletTransaction.aggregate({ where: { type: "PPH_WITHHELD" }, _sum: { amount: true } }))._sum.amount ?? 0);
+  const remittances = await prisma.pphRemittance.findMany({ orderBy: { createdAt: "desc" }, take: 10 });
+  const pphPaid = (await prisma.pphRemittance.aggregate({ _sum: { amount: true } }))._sum.amount ?? 0;
   const manualOf = (t: string) => manualOther.find((x) => x.type === t)?._sum.amount ?? 0;
   const manualCoach = manualOf("SESSION_PAYOUT");
   const manualPlatformNet = manualOf("PLATFORM_REVENUE");
@@ -89,10 +96,10 @@ export default async function KomisiPage() {
   // termasuk koreksi), komisi platform = nilai sesi - bagian kolam - coach.
   const ledger = await prisma.walletTransaction.groupBy({
     by: ["bookingId", "type"],
-    where: { bookingId: { in: attendedBookings.map((b) => b.id) }, type: { in: ["SESSION_REVENUE", "SESSION_PAYOUT", "PLATFORM_TAX"] } },
+    where: { bookingId: { in: attendedBookings.map((b) => b.id) }, type: { in: ["SESSION_REVENUE", "SESSION_PAYOUT", "PLATFORM_REVENUE", "PLATFORM_TAX"] } },
     _sum: { amount: true },
   });
-  const credited = (bookingId: string, type: "SESSION_REVENUE" | "SESSION_PAYOUT" | "PLATFORM_TAX") =>
+  const credited = (bookingId: string, type: "SESSION_REVENUE" | "SESSION_PAYOUT" | "PLATFORM_REVENUE" | "PLATFORM_TAX") =>
     ledger.find((l) => l.bookingId === bookingId && l.type === type)?._sum.amount ?? 0;
 
   // tax = PPN yang benar-benar dicatat ledger per sesi. Jangan hitung ulang
@@ -111,10 +118,14 @@ export default async function KomisiPage() {
       entry.free += 1; // paket assign manual/gratis: tidak ada uang
       continue;
     }
+    const snapshot =
+      b.package.poolPrice != null && b.package.coachPrice != null && b.package.serviceFee != null
+        ? b.package.poolPrice + b.package.coachPrice + b.package.serviceFee
+        : null;
     const part =
       b.attended === false
         ? entry.noShow
-        : b.package.coachId
+        : snapshot != null
           ? entry.coach
           : b.package.isSingleSession
             ? entry.single
@@ -122,7 +133,12 @@ export default async function KomisiPage() {
               ? entry.legacy
               : entry.own;
     // Paket model harga-dari-coach dibagi dari floor(bayar / sesi), sama dengan wallet.
-    const gross = b.package.coachId ? Math.floor(payment.amount / b.package.totalSesi) : Math.round(payment.amount / b.package.totalSesi);
+    // Paket pilih coach: nilai sesi = yang benar-benar dibagi di buku besar (harga
+    // bisa berubah setelah ganti coach, sebagian bisa dibayar dari saldo member).
+    const gross =
+      snapshot != null
+        ? credited(b.id, "SESSION_REVENUE") + credited(b.id, "SESSION_PAYOUT") + credited(b.id, "PLATFORM_REVENUE") + credited(b.id, "PLATFORM_TAX")
+        : Math.round(payment.amount / b.package.totalSesi);
     const pool = credited(b.id, "SESSION_REVENUE");
     const coach = credited(b.id, "SESSION_PAYOUT");
     part.sessions += 1;
@@ -162,10 +178,24 @@ export default async function KomisiPage() {
               bersih {formatRupiah(totalPlatform - totalTax)} · PPN {formatRupiah(totalTax)}
             </span>
           </p>
-          {pphHeld !== 0 && (
-            <p className="order-4 w-full border-t border-border pt-2 text-xs text-text-subtle sm:order-none">
-              Titipan PPh 0,5% dari bagian kolam &amp; coach (bukan pendapatan SPH, wajib disetor atas nama mereka): {signed(pphHeld)}
-            </p>
+          {(pphHeld !== 0 || pphPaid !== 0) && (
+            <div className="order-4 w-full space-y-2 border-t border-border pt-2 text-xs text-text-subtle sm:order-none">
+              <p>
+                Titipan PPh 0,5% dari bagian kolam &amp; coach (bukan pendapatan SPH, wajib disetor atas nama mereka): {signed(pphHeld)} ·
+                sudah disetor {formatRupiah(pphPaid)} · <b className="text-text">belum disetor {signed(pphHeld - pphPaid)}</b>
+              </p>
+              {pphHeld - pphPaid > 0 && <PphRemitForm />}
+              {remittances.length > 0 && (
+                <ul className="space-y-0.5">
+                  {remittances.map((r) => (
+                    <li key={r.id}>
+                      {formatDateLabel(r.createdAt)} · {formatRupiah(r.amount)} · {r.reference}
+                      {r.note ? ` · ${r.note}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
           {affiliatePaidOut !== 0 && (
             <p className="order-4 w-full border-t border-border pt-2 text-xs text-text-subtle sm:order-none">

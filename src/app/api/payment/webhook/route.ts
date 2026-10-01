@@ -4,6 +4,9 @@ import { platformServerKey } from "@/lib/midtrans";
 import type { Prisma } from "@/generated/prisma/client";
 import { DROP_IN_DURATION_DAYS } from "@/lib/policy";
 import { sendPushToUser } from "@/lib/push";
+import { completeCoachChange, notifyCoachChangeResult } from "@/lib/coach-change";
+import { creditMember, reclaimRefundedBalance, refundMemberBalanceOnce } from "@/lib/member-wallet";
+import { notifyAdmins } from "@/lib/notify";
 
 // Signature Midtrans dihitung pake Server Key platform -- service
 // provider posture (revisi 2026-09-12), 1 akun Midtrans buat semua kolam.
@@ -138,6 +141,11 @@ export async function POST(request: Request) {
   expiredDate.setDate(expiredDate.getDate() + durationDays);
 
   let activated = false;
+  // Tambahan bayar ganti coach: status paket tidak disentuh sama sekali.
+  const coachChangeId = payment.coachChangeRequestId;
+  if (coachChangeId) packageStatus = null;
+  let coachChangeResult: "completed" | "refunded" | "expired" | null = null;
+  let saldoShortage = 0;
 
   await prisma.$transaction(async (tx) => {
     // Payment yang udah SUCCESS gak boleh turun status lagi -- notif
@@ -173,6 +181,45 @@ export async function POST(request: Request) {
     // tiap sesi BENERAN dipake (lihat src/lib/wallet.ts, dipanggil dari
     // markAttendance). Payment sukses cuma bikin Package aktif.
     activated = packageStatus === "ACTIVE";
+
+    // Saldo member yang terpakai dikembalikan kalau pembayaran gagal/kedaluwarsa.
+    const failed = paymentStatus === "FAILED" || paymentStatus === "EXPIRED";
+    if (!coachChangeId && failed) {
+      await refundMemberBalanceOnce(tx, payment.package.memberId, payment.package.saldoUsed, { packageId: payment.packageId });
+    }
+    // Lunas setelah sempat dianggap gagal (saldo sudah dikembalikan): saldo dipakai lagi.
+    if (!coachChangeId && paymentStatus === "SUCCESS") {
+      saldoShortage = await reclaimRefundedBalance(tx, payment.package.memberId, payment.package.saldoUsed, { packageId: payment.packageId });
+    }
+    if (coachChangeId) {
+      const req = await tx.coachChangeRequest.findUniqueOrThrow({ where: { id: coachChangeId } });
+      if (paymentStatus === "SUCCESS") {
+        saldoShortage = await reclaimRefundedBalance(tx, req.memberId, req.saldoUsed, { packageId: req.packageId, coachChangeRequestId: req.id });
+        const done = await completeCoachChange(tx, coachChangeId, now);
+        if (done.ok) coachChangeResult = "completed";
+        else {
+          // Uang sudah masuk tapi ganti coach tidak bisa diselesaikan (coach
+          // baru nonaktif, dst): seluruh tambahan bayar masuk saldo member.
+          // Saldo yang tidak berhasil ditarik lagi (sudah terpakai member) tidak
+          // ikut dikreditkan: member hanya menerima kembali yang benar-benar ia bayar.
+          await creditMember(tx, req.memberId, payment.amount + req.saldoUsed - saldoShortage, "PURCHASE_REFUND", {
+            packageId: req.packageId,
+            coachChangeRequestId: req.id,
+            note: "Ganti coach gagal diselesaikan, tambahan bayar dikembalikan ke saldo",
+          });
+          saldoShortage = 0;
+          await tx.coachChangeRequest.updateMany({
+            where: { id: req.id, status: { in: ["PENDING", "AWAITING_PAYMENT", "EXPIRED"] } },
+            data: { status: "EXPIRED", adminNote: done.error },
+          });
+          coachChangeResult = "refunded";
+        }
+      } else if (failed) {
+        await tx.coachChangeRequest.updateMany({ where: { id: req.id, status: "AWAITING_PAYMENT" }, data: { status: "EXPIRED" } });
+        await refundMemberBalanceOnce(tx, req.memberId, req.saldoUsed, { packageId: req.packageId, coachChangeRequestId: req.id });
+        coachChangeResult = "expired";
+      }
+    }
   });
 
   // Setelah commit & cuma untuk transisi pertama ke SUCCESS (notifikasi
@@ -184,6 +231,14 @@ export async function POST(request: Request) {
       body: `${payment.package.name} sudah aktif. Yuk booking jadwal.`,
       url: "/member/booking",
     }).catch(() => {});
+  }
+
+  if (saldoShortage > 0) {
+    console.error(`[webhook] ${orderId} lunas setelah saldo dikembalikan; saldo member kurang ${saldoShortage}`);
+    await notifyAdmins("Cek saldo member", `Pembayaran ${orderId} lunas belakangan; saldo member kurang ${saldoShortage} untuk ditarik kembali`, "/admin/pembayaran").catch(() => {});
+  }
+  if (coachChangeId && coachChangeResult) {
+    await notifyCoachChangeResult(coachChangeId, coachChangeResult).catch(() => {});
   }
 
   return Response.json({ ok: true });
