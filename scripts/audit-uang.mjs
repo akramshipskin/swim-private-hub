@@ -7,12 +7,15 @@
 import pg from "pg";
 
 const url = process.env.DATABASE_URL ?? "";
-if (!/@(localhost|127\.0\.0\.1)[:/]/.test(url)) {
-  console.error("Ditolak: hanya untuk database lokal.");
+// Production hanya dengan AUDIT_PROD=1 (dijalankan Hadi); semua kueri di dalam transaksi baca-saja.
+const local = /@(localhost|127\.0\.0\.1)[:/]/.test(url);
+if (!local && process.env.AUDIT_PROD !== "1") {
+  console.error("Ditolak: hanya untuk database lokal (production: set AUDIT_PROD=1).");
   process.exit(1);
 }
-const db = new pg.Client({ connectionString: url.replace(/\?.*$/, "") });
+const db = new pg.Client({ connectionString: url.replace(/\?.*$/, ""), ssl: local ? false : { rejectUnauthorized: false } });
 await db.connect();
+await db.query("BEGIN READ ONLY");
 const q = async (sql, args = []) => (await db.query(sql, args)).rows;
 const problems = [];
 const notes = [];
