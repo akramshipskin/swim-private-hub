@@ -54,7 +54,7 @@ export default async function ProfilPage() {
   // yang diurus lewat admin).
   const deletionAccount =
     session.user.role === "MEMBER"
-      ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { deletionRequestedAt: true } })
+      ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { deletionRequestedAt: true, memberBalance: true } })
       : null;
 
   // 2FA opsional untuk coach/member/pemilik kolam (admin wajib, diurus di
@@ -154,7 +154,10 @@ export default async function ProfilPage() {
             )}
 
             {deletionAccount && (
-              <DeleteAccountCard requestedAt={deletionAccount.deletionRequestedAt?.toISOString() ?? null} />
+              <DeleteAccountCard
+                requestedAt={deletionAccount.deletionRequestedAt?.toISOString() ?? null}
+                memberBalance={deletionAccount.memberBalance}
+              />
             )}
 
             {session.user.role === "MEMBER" && (

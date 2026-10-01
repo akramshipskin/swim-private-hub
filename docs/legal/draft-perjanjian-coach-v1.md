@@ -145,6 +145,8 @@ sepakat sebagai berikut.
    menyetorkannya atas nama Coach. Coach yang menyerahkan surat pernyataan
    peredaran bruto di bawah Rp500.000.000 setahun tidak dipotong sejak surat
    diterima SPH. Bukti potong diberikan [ISI HADI + akuntan: cara dan waktunya].
+   Kewajiban perpajakan Coach di luar potongan ini, termasuk kepemilikan
+   NPWP, menjadi tanggung jawab Coach (Hadi 2 Okt).
 5. **Penahanan pencairan.** Selama ada Peserta yang sudah 2 (dua) sesi
    Hadir atau lebih bersama Coach tanpa catatan perkembangan dari Coach
    (Pasal 3.7), Coach tidak dapat mengajukan pencairan baru atas **seluruh**

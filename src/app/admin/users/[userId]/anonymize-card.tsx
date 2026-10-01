@@ -5,17 +5,20 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { anonymizeMemberAction } from "../account-deletion-actions";
+import { formatRupiah } from "@/lib/format";
 
 export default function AnonymizeCard({
   userId,
   requestedAt,
   upcomingBookings,
   remainingSessions,
+  memberBalance,
 }: {
   userId: string;
   requestedAt: string;
   upcomingBookings: number;
   remainingSessions: number;
+  memberBalance: number;
 }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -42,6 +45,12 @@ export default function AnonymizeCard({
         <p className="mt-2 text-sm text-text">
           Ikut terdampak: <b>{upcomingBookings}</b> jadwal mendatang dibatalkan, <b>{remainingSessions}</b> sisa sesi paket hangus.
         </p>
+        {memberBalance > 0 && (
+          <p className="mt-2 rounded-md bg-warning-bg px-3 py-2 text-sm text-warning-text">
+            Member masih punya saldo <b>{formatRupiah(memberBalance)}</b>. Saldo ini boleh dipakai sampai habis lewat admin
+            sebelum akun ditutup: hubungi member dulu sebelum menyetujui.
+          </p>
+        )}
         <Button variant="danger" size="sm" className="mt-3" onClick={() => setOpen(true)}>
           Setujui &amp; hapus data
         </Button>

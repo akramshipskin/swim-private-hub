@@ -166,7 +166,8 @@ export default function SyaratKetentuanPage() {
           dalam Kebijakan Pengembalian; (b) otomatis dipakai lebih dulu saat Member membeli paket atau membayar selisih
           penggantian Coach, dan kekurangannya dibayar melalui Midtrans; (c) tidak dapat dicairkan, ditukar dengan
           uang, atau dipindahkan ke akun lain; (d) bila pembayaran yang memakai Saldo Member gagal atau kedaluwarsa,
-          Saldo Member yang terpakai dikembalikan.
+          Saldo Member yang terpakai dikembalikan; (e) bila Member mengajukan penghapusan akun, Saldo Member yang masih
+          ada dapat dipakai dengan bantuan administrator sampai habis sebelum akun ditutup.
         </li>
       </ol>
 

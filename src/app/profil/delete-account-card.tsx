@@ -5,8 +5,9 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { cancelDeletionAction, requestDeletionAction } from "./account-deletion-actions";
+import { formatRupiah } from "@/lib/format";
 
-export default function DeleteAccountCard({ requestedAt }: { requestedAt: string | null }) {
+export default function DeleteAccountCard({ requestedAt, memberBalance }: { requestedAt: string | null; memberBalance: number }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +42,12 @@ export default function DeleteAccountCard({ requestedAt }: { requestedAt: string
               Nama, nomor HP, email, dan nama peserta akan dihapus setelah disetujui admin. Sisa sesi paket ikut hangus
               dan jadwal yang belum berjalan dibatalkan. Riwayat transaksi tetap disimpan tanpa identitasmu.
             </p>
+            {memberBalance > 0 && (
+              <p className="mt-2 text-sm text-text">
+                Kamu masih punya saldo <b>{formatRupiah(memberBalance)}</b>. Pakai dulu untuk membeli paket, atau minta
+                bantuan admin memakainya sebelum akun ditutup.
+              </p>
+            )}
             <Button variant="danger" size="sm" className="mt-3" onClick={() => setOpen(true)}>
               Minta hapus akun
             </Button>

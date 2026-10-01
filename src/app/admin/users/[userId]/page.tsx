@@ -148,6 +148,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             requestedAt={user.deletionRequestedAt.toISOString()}
             upcomingBookings={deletion.upcomingBookings}
             remainingSessions={deletion.remainingSessions}
+            memberBalance={deletion.memberBalance}
           />
         )}
         <Card>

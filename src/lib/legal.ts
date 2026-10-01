@@ -6,7 +6,7 @@ export const TERMS_UPDATED_AT = "2 Oktober 2026";
 // yang disetujui reviewer hukum, batas tanggung jawab 100%, lalu pasal
 // afiliasi & trial). Nomor revisi membedakan keduanya di catatan
 // persetujuan; naikkan kalau S&K diubah lagi di hari yang sama.
-export const TERMS_REVISION = 1;
+export const TERMS_REVISION = 2;
 // 30 Sep 2026: menambah tanggal lahir peserta, catatan & sertifikat milestone,
 // kode afiliasi, data coach (tanggal lahir, tanda tangan), bagian data anak,
 // kunci login per akun. Teks ini belum ditinjau orang hukum.

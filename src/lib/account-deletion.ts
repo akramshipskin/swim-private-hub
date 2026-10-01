@@ -33,14 +33,21 @@ export async function cancelAccountDeletion(userId: string) {
 // Ringkasan untuk layar persetujuan admin: apa yang ikut hilang.
 export async function deletionImpact(userId: string) {
   const now = new Date();
-  const [upcomingBookings, usablePackages] = await Promise.all([
+  const [upcomingBookings, usablePackages, user] = await Promise.all([
     prisma.booking.count({ where: { memberId: userId, status: "BOOKED", attended: null, availability: { startTime: { gt: now } } } }),
     prisma.package.findMany({
       where: { memberId: userId, status: "ACTIVE", sisaSesi: { gt: 0 }, OR: [{ expiredDate: null }, { expiredDate: { gte: now } }] },
       select: { sisaSesi: true },
     }),
+    prisma.user.findUnique({ where: { id: userId }, select: { memberBalance: true } }),
   ]);
-  return { upcomingBookings, remainingSessions: usablePackages.reduce((n, p) => n + p.sisaSesi, 0) };
+  return {
+    upcomingBookings,
+    remainingSessions: usablePackages.reduce((n, p) => n + p.sisaSesi, 0),
+    // Hadi 2 Okt: saldo member bisa dipakai sampai habis lewat admin sebelum
+    // akun ditutup, jadi admin perlu melihatnya sebelum menyetujui.
+    memberBalance: user?.memberBalance ?? 0,
+  };
 }
 
 export async function anonymizeMember(userId: string) {
