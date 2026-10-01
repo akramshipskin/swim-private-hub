@@ -41,7 +41,7 @@
   --color-danger-text: #b91c1c;
 
   --color-disabled-bg: #dedbd0; /* abu hangat, sepalet dengan surface (dulu slate kebiruan) */
-  --color-disabled-text: #8e8a78;
+  --color-disabled-text: #6c6957; /* = text-subtle: tombol nonaktif tetap terbaca (>= 4.5:1 di surface) */
 
   /* Hijau WA versi gelap: teks putih di atasnya 5.4:1 (#25d366 asli cuma 2:1). */
   --color-whatsapp: #0f7a3c;
@@ -94,7 +94,7 @@
     --color-danger-text: #f29191;
 
     --color-disabled-bg: #3d3f39;
-    --color-disabled-text: #7c7e76;
+    --color-disabled-text: #a09d8f;
 
     /* Hijau WA asli (#25D366) kesaturasi terlalu tinggi buat nyala di
        atas bg gelap -- "pedes di mata" kalau dipake mentah kayak di
@@ -141,7 +141,7 @@
   --color-danger-text: #f29191;
 
   --color-disabled-bg: #3d3f39;
-  --color-disabled-text: #7c7e76;
+  --color-disabled-text: #a09d8f;
 
   --color-whatsapp: #0f7a3c;
   --color-whatsapp-text: #3fcf7c;

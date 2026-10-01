@@ -100,6 +100,9 @@ export default async function PoolDashboardPage() {
               <AffiliateCard owner={{ poolId: p.id }} name={p.name.replace(/^kolam( renang)?\s+/i, "")} className="md:col-span-6" />
 
               <BentoCard title={`Jam ramai hari ini · ${bookedToday} sesi les`} href="/pool/jadwal" linkLabel="Lihat jadwal" className="md:col-span-4">
+                {rows.every((r) => r.booked.length === 0 && r.open.length === 0) ? (
+                  <p className="text-sm text-text-muted">Belum ada les atau slot coach hari ini.</p>
+                ) : (
                 <ul className="flex flex-col gap-1">
                   {rows.map((r) => (
                     <li key={r.hour} className="flex items-center gap-3 text-sm">
@@ -113,6 +116,7 @@ export default async function PoolDashboardPage() {
                     </li>
                   ))}
                 </ul>
+                )}
               </BentoCard>
               <BentoCard title="Info kolam" href="/pool/info" linkLabel="Ubah" className="md:col-span-2">
                 <p className="text-sm text-text">Jam buka: {p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : "belum diisi"}</p>

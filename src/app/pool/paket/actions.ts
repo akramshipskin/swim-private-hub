@@ -22,6 +22,7 @@ async function notifyPackageProposal(poolId: string) {
 export async function createPoolTemplate(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await requireRole("POOL_OWNER");
   const poolId = formData.get("poolId")?.toString() ?? "";
+  if (!poolId) return { error: "Pilih kolam dulu." };
   if (!(await ownsPool(session.user.id, poolId))) return { error: "Kamu tidak punya akses ke kolam ini." };
   const res = await proposeNewTemplate(poolId, formData);
   if (res) return res;
