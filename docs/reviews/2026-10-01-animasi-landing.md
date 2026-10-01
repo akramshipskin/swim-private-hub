@@ -32,3 +32,17 @@ Lisensi Pexels: gratis dipakai termasuk komersial. Deskripsi "wajah tidak terlih
 1. https://www.pexels.com/video/a-person-swimming-in-the-pool-6012384/ — Tima Miroshnichenko, 20 dtik, 16:9, asli 2560×1440 (25,2 MB; versi 1080p 13,8 MB). Perenang dewasa dari bawah/pinggir kolam, wajah tak terlihat di bidikan utama. Rencana: dipadatkan ke 720p, target ≤2 MB (usulan).
 2. https://www.pexels.com/video/slow-motion-video-of-water-ripples-of-the-swimming-pool-6167679/ — Poolside Creative, 59 dtik, 1920×1080, permukaan air tanpa orang. Paling aman dari soal wajah dan kesan coach/kolam asli. Ukuran file belum dicek.
 3. https://www.pexels.com/video/a-man-swimming-in-the-pool-6011936/ — bidikan atas perenang, wajah tak terlihat, tapi vertikal 9:16 (40 MB), kurang cocok untuk latar lebar.
+
+## v2 (2 Okt, Opus): interaktif bertema air + video
+- Pembuka: judul muncul per baris dari balik "permukaan"; gelombang di bawah "pilih jamnya" (mengalir di desktop); riak air mengikuti kursor (desktop) dan saat diketuk (HP juga); layar HP miring mengikuti kursor; tombol Daftar magnetis.
+- Video: Pexels #6012384 (pilihan B Hadi), dipotong 2,2-19 dtk (detik 0-1,5 menampilkan wajah jelas, dibuang; dicek per 2 detik), 720p tanpa suara, WebM 1,40 MB / MP4 1,65 MB, hanya desktop, mulai 800 ms setelah halaman selesai dimuat.
+- Header: tali lintasan + perenang kecil maju seiring scroll. Isi: coretan "cara lama" + sapuan lime mengikuti scroll, parallax foto kolam, sorotan kursor di kartu coach, gelombang sebelum footer.
+- Sempat mundur lalu diperbaiki: paragraf pembuka dengan efek pudar + jeda membuat elemen terbesar HP 2,38 dtk dan video yang mulai terlalu awal membuat desktop 0,55 dtk. Perbaikan: paragraf hanya bergeser (tanpa pudar), video menunggu halaman selesai.
+
+| Lingkungan | Halaman | Sebelum v2 | Sesudah v2 |
+|---|---|---|---|
+| Laptop, versi jadi | HP | LCP 1160 ms, FCP 908 | LCP 896-960 ms, FCP 896-960 |
+| Laptop, versi jadi | Desktop | LCP 400 ms | LCP 364-384 ms (video ikut dimuat setelahnya, berat 2,0 MB) |
+| Situs asli (a6d8f22) | HP | (fe5de3a) LCP 1320 | LCP 932 ms (ulangan 912-1376) |
+| Situs asli (a6d8f22) | Desktop | (fe5de3a) LCP 376 | LCP 460 ms (ulangan 324-704, berisik) |
+

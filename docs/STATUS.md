@@ -11,19 +11,19 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - 1 Okt malam: brand v2 digabung dan tayang (8f067b8; GitHub hijau, Vercel selesai, 3 gambar sosial di situs asli identik dengan repo). Banner dirender ulang dengan tagline bertitik; foto profil = tanda saja; skrip render gambar sosial ada di repo.
 
 ## Sedang jalan
-- Hadi tidur: semua pekerjaan berurutan sudah dikerjakan; menunggu keputusan Hadi (daftar di bawah).
+- Tidak ada. Menunggu Hadi melihat animasi v2 di HP asli dan desktop.
 
-## Sudah selesai 1-2 Okt (live setelah push terakhir)
-- Tahap 2 animasi landing: bug bagian kosong saat "kurangi gerakan" diperbaiki; pembuka tanpa JavaScript; elemen terbesar di HP ±2,4 -> ±1,1-1,5 detik; judul hero = tagline resmi. Video: kode siap, KOSONG menunggu izin unduh. Laporan + angka: docs/reviews/2026-10-01-animasi-landing.md.
-- Tahap 3 animasi dalam aplikasi (4 peran), dialog, tombol.
-- Sweeping UI+sistem penuh (528 kunjungan tampilan, 59 halaman x 5 kondisi, 17 API, 68 aksi, ±160 pengiriman formulir): 7 kelompok perbaikan mekanis. Laporan: docs/reviews/2026-10-01-sweeping-ui-sistem.md.
-- Uji jalur Opus: asisten Opus berfungsi; skill sph-berisiko tampak memindahkan giliran ke Opus. Draf S&K v2 lama dirapikan (arsip). Alat: scripts/ukur-halaman, sweep-halaman, uji-hak-akses, uji-formulir, render-brand-social (semua hanya localhost/lokal).
+## Sudah selesai 1 Okt malam
+- Brand v2 (foto profil transparan), animasi landing tahap 2, animasi aplikasi tahap 3, sweeping UI+sistem pertama. docs/reviews/2026-10-01-sweeping-ui-sistem.md.
+
+## Sudah selesai 2 Okt (Opus, live setelah push terakhir)
+- Animasi landing v2 bertema air + video perenang desktop; HP elemen terbesar 0,93 dtk di situs asli. docs/reviews/2026-10-01-animasi-landing.md (bagian v2).
+- Kunci pembatas login + batas nama 100 di semua jalur akun/peserta (diperiksa Opus kedua). Audit buku besar + uji aksi uang + tes balapan: cocok/lulus. Sweeping ulang + konsistensi. docs/reviews/2026-10-02-sweeping-opus.md.
+- Alat: scripts/audit-uang.mjs (audit buku besar lokal) selain ukur-halaman, sweep-halaman, uji-hak-akses, uji-formulir.
 
 ## Tugas Claude berikutnya
-1. Pasang video hero setelah Hadi pilih dan izinkan unduh (kandidat di laporan animasi); ukur ulang sebelum/sesudah (alat: scripts/ukur-halaman.mjs).
-2. Kerjaan Opus hasil sweeping (login/akun): batas panjang kunci pembatas login; batas panjang nama di pendaftaran/createUser. Butuh Opus + pemeriksa Opus.
-3. Bagian sistem yang belum diuji (perlu Opus): rekonsiliasi ledger menyeluruh, hitungan PPN/bagi hasil, klik aksi yang mengubah uang/status.
-4. Cek GitHub Actions dan situs asli setelah tiap push (gh + scripts/ukur-halaman).
+1. Cek GitHub Actions dan situs asli setelah tiap push.
+2. Bila Hadi minta: audit buku besar di production (butuh Hadi menjalankan scripts/audit-uang.mjs dengan URL production, karena Claude tidak punya akses DB production; skrip sekarang menolak non-lokal).
 
 ## Tugas Hadi
 1. Jawab Pertanyaan di laporan (video hero mana; 7 butir "menunggu keputusan" di docs/reviews/2026-10-01-sweeping-ui-sistem.md bagian 4).

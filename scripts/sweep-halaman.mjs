@@ -65,6 +65,21 @@ const AUDIT = `(async () => {
   }
   o.smallText = small.slice(0,8); o.smallTextCount = small.length;
   low.sort((a,b) => a.r - b.r); o.lowContrast = low.slice(0,8); o.lowContrastCount = low.length;
+  // Gaya untuk cek konsistensi antar halaman (dibandingkan nanti per peran dan lebar layar).
+  const st = (e, props) => { if (!e) return null; const cs = getComputedStyle(e); return Object.fromEntries(props.map((p) => [p, cs[p]])); };
+  const h1 = document.querySelector("main h1, h1");
+  const main = document.querySelector("main");
+  const box = main ? [...main.querySelectorAll(":scope > div, :scope > section, :scope > *")].find((e) => e.getBoundingClientRect().width > 200) : null;
+  const card = [...document.querySelectorAll("main [class*='rounded-2xl'], main [class*='rounded-3xl'], main [class*='rounded-xl']")].find((e) => getComputedStyle(e).borderTopWidth !== "0px" || getComputedStyle(e).boxShadow !== "none");
+  const btn = [...document.querySelectorAll("main button, main a")].find((e) => /bg-brand-600|bg-fixed-lime|bg-fixed-ink/.test(String(e.className)) && e.getBoundingClientRect().width > 40);
+  o.gaya = {
+    h1: st(h1, ["fontSize", "fontWeight", "fontFamily", "letterSpacing", "lineHeight"]),
+    mainPadL: main ? getComputedStyle(main).paddingLeft : null,
+    boxLeft: box ? Math.round(box.getBoundingClientRect().left) : null,
+    boxWidth: box ? Math.round(box.getBoundingClientRect().width) : null,
+    card: st(card, ["borderTopLeftRadius", "boxShadow", "borderTopWidth"]),
+    btn: btn ? { ...st(btn, ["borderTopLeftRadius", "fontSize", "fontWeight"]), h: Math.round(btn.getBoundingClientRect().height) } : null,
+  };
   o.bodyText = document.body.innerText.slice(0, 6000);
   return o;
 })()`;
