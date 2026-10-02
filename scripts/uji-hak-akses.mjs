@@ -16,7 +16,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function loginCookies(role) {
   const PORT = 9100 + Math.floor(Math.random() * 400);
   const chrome = spawn(CHROME, ["--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "akses-"))}`, "--no-first-run", "--disable-gpu", "about:blank"], { stdio: "ignore" });
-  let ws; for (let i = 0; i < 50 && !ws; i++) { try { const l = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json(); const p = l.find((t) => t.type === "page"); if (p) ws = new WebSocket(p.webSocketDebuggerUrl); } catch { /* belum siap */ } if (!ws) await sleep(200); }
+  let ws; for (let i = 0; i < 150 && !ws; i++) { try { const l = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json(); const p = l.find((t) => t.type === "page"); if (p) ws = new WebSocket(p.webSocketDebuggerUrl); } catch { /* belum siap */ } if (!ws) await sleep(200); }
   await new Promise((r) => (ws.onopen = r));
   let id = 0; const w = new Map(); let ls = [];
   ws.onmessage = (m) => { const d = JSON.parse(m.data); if (d.id && w.has(d.id)) { w.get(d.id)(d); w.delete(d.id); } else ls.forEach((f) => f(d)); };

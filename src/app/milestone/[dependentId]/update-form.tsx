@@ -89,7 +89,7 @@ export function MilestoneUpdateForm({
           ))}
           {otherItems.length > 0 && (
             <details open={prior} className="rounded-lg border border-border px-3 py-2">
-              <summary className="cursor-pointer text-sm font-medium text-text-muted">Butir di level lain</summary>
+              <summary className="cursor-pointer text-sm font-medium text-text-muted max-sm:flex max-sm:min-h-[44px] max-sm:items-center">Butir di level lain</summary>
               <div className="mt-2 flex flex-col gap-3">
                 {otherItems.map((g) => (
                   <div key={g.label} className="flex flex-col gap-1.5">

@@ -19,7 +19,7 @@ const PORT = 9400 + Math.floor(Math.random() * 300);
 const chrome = spawn(CHROME, ["--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "sweep-"))}`, "--no-first-run", "--disable-gpu", "--mute-audio", "about:blank"], { stdio: "ignore" });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let ws;
-for (let i = 0; i < 50 && !ws; i++) { try { const l = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json(); const p = l.find((t) => t.type === "page"); if (p) ws = new WebSocket(p.webSocketDebuggerUrl); } catch { /* belum siap */ } if (!ws) await sleep(200); }
+for (let i = 0; i < 150 && !ws; i++) { try { const l = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json(); const p = l.find((t) => t.type === "page"); if (p) ws = new WebSocket(p.webSocketDebuggerUrl); } catch { /* belum siap */ } if (!ws) await sleep(200); }
 await new Promise((r) => (ws.onopen = r));
 let id = 0; const waiters = new Map(); let listeners = [];
 ws.onmessage = (m) => { const d = JSON.parse(m.data); if (d.id && waiters.has(d.id)) { waiters.get(d.id)(d); waiters.delete(d.id); } else listeners.forEach((f) => f(d)); };

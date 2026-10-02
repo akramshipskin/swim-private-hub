@@ -85,7 +85,7 @@ export default async function PoolDashboardPage() {
               <BentoCard title="Ringkasan bulan ini" href="/pool/laporan" className="md:col-span-4">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
                   <Stat label="Sesi dihadiri" value={pick(attended, p.id)?._count ?? 0} />
-                  <Stat label="Pendapatan kolam" value={formatRupiah(pick(revenue, p.id)?._sum.amount ?? 0)} />
+                  <Stat label="Bagian kolam" value={formatRupiah(pick(revenue, p.id)?._sum.amount ?? 0)} hint="Sebelum PPh 0,5%" />
                   <Stat label="Paket terjual" value={pick(sold, p.id)?._count ?? 0} />
                   <Stat label="Coach terdaftar" value={p._count.affiliations} />
                 </div>

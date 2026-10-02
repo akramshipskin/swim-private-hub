@@ -27,7 +27,7 @@ export default function ImportMembersForm({ pools }: { pools: PoolOption[] }) {
           href="/api/admin/import-template"
           className="mb-4 inline-block text-xs font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
         >
-          Download Template
+          Unduh template Excel
         </a>
         <form action={formAction} className="flex flex-wrap items-end gap-3">
           <Field label="Kolam tujuan">

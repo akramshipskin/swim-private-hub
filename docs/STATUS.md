@@ -25,13 +25,12 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Jalur bayar Midtrans diuji di laptop mode uji; di production belum ada pembayaran sungguhan.
 
 ## Tugas Claude berikutnya (urutan; model tiap butir ada di rencana gabungan)
-1. Tunggu aba-aba Hadi untuk sweeping sistem ulang (termasuk O6 dan cek mitra centang ulang perjanjian rev.2).
+1. Sweeping sistem total 2 Okt siang SELESAI (docs/reviews/2026-10-02-sweeping-sistem-total.md): tidak ada temuan berat/sedang, 3 perbaikan teks/tampilan kecil; O6 dijalankan (bayar -> Hadir -> Tidak Hadir -> audit cocok).
 2. Cek situs asli setelah deploy batch Opus (kartu afiliasi, halaman perjanjian rev.2, statistik landing).
 3. Cek event Meta (kode uji) bersama Hadi, lalu minta Hadi hapus META_TEST_EVENT_CODE.
 4. Ditunda sampai ada pemicu: rekening format lama (cek sebelum coach asli), audit buku besar production (setelah transaksi asli), kejadian Meta pendaftaran coach/kolam (iklan perekrutan), tombol stop jual paket kolam berakhir.
 
 ## Tugas Hadi
-1. Beri aba-aba sweeping ulang bila semua kerjaan dianggap beres.
 2. Cek event Meta: situs asli di jendela penyamaran (PageView), daftar satu member dummy (CompleteRegistration), lihat Test events; lalu hapus META_TEST_EVENT_CODE di Vercel.
 3. Teruskan butir asuransi, sengketa, keselamatan kolam, bukti potong, pajak afiliasi ke reviewer/akuntan.
 4. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif. Cek landing di HP asli + Safari.
