@@ -1,3 +1,4 @@
+import { poolHoursLabel } from "@/lib/pool-hours";
 import { requireRole } from "@/lib/require-role";
 import { SearchForm, matchesQuery } from "@/components/search-form";
 import { prisma } from "@/lib/prisma";
@@ -54,12 +55,12 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
     }),
     prisma.poolAffiliation.findMany({
       where: { coachId: session.user.id },
-      include: { pool: { select: { id: true, name: true } } },
+      include: { pool: { select: { id: true, name: true, openTime: true, closeTime: true } } },
       orderBy: { pool: { name: "asc" } },
     }),
   ]);
 
-  const myPools = myAffiliations.map((a) => a.pool);
+  const myPools = myAffiliations.map(({ pool }) => ({ id: pool.id, name: pool.name, hours: poolHoursLabel(pool) }));
   const now = new Date();
 
   // Slot kosong yang jamnya sudah lewat tidak bisa dibooking lagi --

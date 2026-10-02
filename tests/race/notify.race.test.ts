@@ -23,7 +23,7 @@ vi.mock("next/server", () => ({
 vi.mock("@/lib/policy", async (orig) => ({ ...(await orig<typeof import("@/lib/policy")>()), MILESTONE_HOLD_START: new Date(0) }));
 
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd } from "./fx";
+import { as, reset, ALL_DAY, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd } from "./fx";
 import { POST as registerCoach } from "@/app/api/register-coach/route";
 import { POST as registerPool } from "@/app/api/register-pool/route";
 import { POST as bookPOST } from "@/app/api/booking/route";
@@ -181,8 +181,8 @@ describe("NOTIFIKASI ke coach / pemilik kolam / member", () => {
   });
 
   it("N10: coach membuka slot -> hanya member yang punya paket aktif DI KOLAM ITU", async () => {
-    const pool = await mkPool();
-    const otherPool = await mkPool();
+    const pool = await mkPool({ hours: ALL_DAY });
+    const otherPool = await mkPool({ hours: ALL_DAY });
     const { m } = await mkMemberWithPackage(pool.id, coach.id);
     const { m: elsewhere } = await mkMemberWithPackage(otherPool.id, coach.id);
     await subscribe(m as U, elsewhere as U);

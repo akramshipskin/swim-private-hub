@@ -1,3 +1,4 @@
+import { poolHoursLabel, withinPoolHours } from "@/lib/pool-hours";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/push";
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
       // gak pernah berubah, jadi baca-dulu di sini aman dari race.
       const slot = await tx.availability.findUnique({
         where: { id: availabilityId },
-        select: { poolId: true, coachId: true, startTime: true, pool: { select: { isActive: true } } },
+        select: { poolId: true, coachId: true, startTime: true, endTime: true, pool: { select: { isActive: true, openTime: true, closeTime: true } } },
       });
       if (!slot) {
         throw new BookingError("Slot tidak ditemukan.", 404);
@@ -78,6 +79,12 @@ export async function POST(request: Request) {
       // ada gak disentuh (keputusan default, bisa diubah Hadi).
       if (!slot.pool.isActive) {
         throw new BookingError("Kolam ini sedang tidak aktif, belum bisa dibooking.", 409);
+      }
+      // Jam buka kolam (Hadi 2 Okt malam, #6): slot di luar jam buka (mis. slot
+      // lama setelah kolam mengganti jam bukanya) tidak bisa dibooking baru.
+      // Kolam tanpa jam buka tidak dibatasi (slot lama tetap bisa dibooking, #7).
+      if (!withinPoolHours(slot.pool, slot.startTime, slot.endTime)) {
+        throw new BookingError(`Jadwal ini di luar jam buka kolam (${poolHoursLabel(slot.pool)}). Pilih jadwal lain.`, 409);
       }
 
       // Paket harus masih berlaku SAAT SESINYA, bukan cuma hari ini (keputusan

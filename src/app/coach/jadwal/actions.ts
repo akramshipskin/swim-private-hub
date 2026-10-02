@@ -8,6 +8,9 @@ import { sendPushToUsers } from "@/lib/push";
 import { usablePackageConditions } from "@/lib/active-package";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
 import { removeOpenSlots } from "@/lib/availability";
+import { hasPoolHours, poolHoursLabel, withinPoolHours } from "@/lib/pool-hours";
+import { takeAttempt } from "@/lib/rate-limit";
+import { notifyUser } from "@/lib/notify";
 
 export type ActionState = { error?: string; warning?: string } | null;
 
@@ -36,10 +39,21 @@ export async function addAvailability(
   // sini (bukan cuma dropdown UI) karena formData bisa dipalsu.
   const affiliated = await prisma.poolAffiliation.findUnique({
     where: { poolId_coachId: { poolId, coachId: session.user.id } },
-    select: { pool: { select: { name: true } } },
+    select: { pool: { select: { name: true, openTime: true, closeTime: true } } },
   });
   if (!affiliated) {
     return { error: "Kamu tidak terafiliasi ke kolam ini." };
+  }
+  // Kolam tanpa jam buka tidak bisa dibuka slot barunya (Hadi 2 Okt malam,
+  // #6B); pemilik kolam diberi tahu, paling banyak sekali sehari per kolam.
+  if (!hasPoolHours(affiliated.pool)) {
+    if (await takeAttempt(`pool-hours-missing:${poolId}`, 1, 86_400_000)) {
+      const owners = await prisma.poolOwnership.findMany({ where: { poolId }, select: { ownerId: true } });
+      for (const o of owners) {
+        await notifyUser(o.ownerId, "Isi jam buka kolam", `Coach belum bisa membuka jadwal di ${affiliated.pool.name} karena jam buka kolam belum diisi.`, "/pool/info");
+      }
+    }
+    return { error: `Jam buka ${affiliated.pool.name} belum diisi, jadi slot baru belum bisa dibuka. Pemilik kolam sudah diberi tahu; coba lagi setelah jam bukanya diisi.` };
   }
 
   const startDateTime = wibDateTime(date, startTime);
@@ -73,6 +87,12 @@ export async function addAvailability(
   }
   if (chunks.length === 0) {
     return { error: "Tidak ada jam yang bisa dibuka di rentang ini (jam 12.00–13.00 adalah jam istirahat)." };
+  }
+  const outside = chunks.filter((c) => !withinPoolHours(affiliated.pool, c.startTime, c.endTime));
+  if (outside.length > 0) {
+    return {
+      error: `Jam ${outside.map((c) => `${formatTimeWib(c.startTime)}–${formatTimeWib(c.endTime)}`).join(", ")} di luar jam buka ${affiliated.pool.name} (${poolHoursLabel(affiliated.pool)}). Pilih jam di dalam jam buka.`,
+    };
   }
 
   // Cek dulu jam-jam yang udah pernah dibuka -- kalau createMany langsung

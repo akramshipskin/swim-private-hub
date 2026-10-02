@@ -9,7 +9,7 @@ import { AvailabilityDatePicker } from "@/components/availability-date-picker";
 import { Button } from "@/components/ui/button";
 import { todayWibDateString } from "@/lib/datetime";
 
-type PoolOption = { id: string; name: string };
+type PoolOption = { id: string; name: string; hours: string };
 
 export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
   const [state, formAction, pending] = useActionState(addAvailability, null);
@@ -37,7 +37,8 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
             <Select name="poolId" defaultValue={pools[0].id} className="w-full sm:w-60">
               {pools.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}
+                  {/* Slot hanya bisa dibuka di dalam jam buka kolam. */}
+                  {p.name} · buka {p.hours}
                 </option>
               ))}
             </Select>

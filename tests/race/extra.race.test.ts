@@ -14,7 +14,7 @@ vi.mock("@/lib/storage", async (orig) => ({
 }));
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, jitter, spread, tally } from "./fx";
+import { as, reset, ALL_DAY, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, jitter, spread, tally } from "./fx";
 import { checkInvariants } from "./invariants";
 import { splitPlatformTax } from "@/lib/policy";
 import { getPlatformBalance } from "@/lib/platform-wallet";
@@ -299,12 +299,37 @@ describe("AKUN & SESI LOGIN", () => {
 
 describe("JADWAL, NOTIFIKASI, CHAT", () => {
   it("E9: coach klik 'Tambah Slot' 4x barengan untuk jam yang sama -> tepat 3 slot (08-11), tidak ada error 500", async () => {
-    const pool = await mkPool(); const coach = await mkUser("COACH");
+    const pool = await mkPool({ hours: ALL_DAY }); const coach = await mkUser("COACH");
     await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
     const date = new Date(Date.now() + 3 * 86400e3).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
     const rs = await settle(Array.from({ length: 4 }, () => as({ id: coach.id, role: "COACH", name: "Coach Uji" }, () => addAvailability(null, fd({ date, startTime: "08:00", endTime: "11:00", poolId: pool.id })))));
     expect(thrownOf(rs)).toEqual([]);
     expect(await prisma.availability.count({ where: { coachId: coach.id } })).toBe(3);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  // P3 jam buka kolam (Hadi 2 Okt malam, #6/#7).
+  it("E9b: kolam tanpa jam buka -> slot baru ditolak, slot lama tetap bisa dibooking; slot di luar jam buka baru ditolak", async () => {
+    const pool = await mkPool({ hours: null }); const coach = await mkUser("COACH");
+    await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
+    const date = new Date(Date.now() + 3 * 86400e3).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+    const r = await as({ id: coach.id, role: "COACH", name: "Coach Uji" }, () => addAvailability(null, fd({ date, startTime: "08:00", endTime: "10:00", poolId: pool.id })));
+    expect(r?.error).toContain("belum diisi");
+    expect(await prisma.availability.count({ where: { coachId: coach.id } })).toBe(0);
+    // Slot lama (dibuat sebelum aturan) tetap bisa dibooking.
+    const old = await mkSlot(coach.id, pool.id, 72);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
+    const ok = await as({ id: m.id, role: "MEMBER" }, () => bookPOST(new Request("http://x/api/booking", { method: "POST", body: JSON.stringify({ availabilityId: old.id, packageId: pkg.id }) })));
+    expect(ok.status).toBe(201);
+    // Kolam lalu mengisi jam buka yang tidak mencakup slot lama berikutnya -> booking baru ditolak.
+    const old2 = await mkSlot(coach.id, pool.id, 96);
+    const h = Number(old2.startTime.toLocaleTimeString("en-GB", { hour: "2-digit", hour12: false, timeZone: "Asia/Jakarta" }));
+    const open = h >= 12 ? "00:00" : String(h + 2).padStart(2, "0") + ":00";
+    const close = h >= 12 ? String(h).padStart(2, "0") + ":00" : "23:00";
+    await prisma.pool.update({ where: { id: pool.id }, data: { openTime: open, closeTime: close } });
+    const no = await as({ id: m.id, role: "MEMBER" }, () => bookPOST(new Request("http://x/api/booking", { method: "POST", body: JSON.stringify({ availabilityId: old2.id, packageId: pkg.id }) })));
+    expect(no.status).toBe(409);
+    expect((await prisma.booking.findMany({ where: { memberId: m.id, status: "BOOKED" } })).length).toBe(1);
     expect(await checkInvariants()).toEqual([]);
   });
 

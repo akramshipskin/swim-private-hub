@@ -1,3 +1,4 @@
+import { hasPoolHours } from "@/lib/pool-hours";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
@@ -29,6 +30,11 @@ export default async function PoolInfoPage() {
             <Card key={p.id}>
               <CardBody>
                 <h2 className="mb-4 text-lg font-semibold text-text">{p.name}</h2>
+                {!hasPoolHours(p) && (
+                  <p role="status" className="mb-4 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+                    Jam buka belum diisi. Coach belum bisa membuka jadwal di kolam ini sampai jam buka &amp; jam tutup disimpan.
+                  </p>
+                )}
                 <PoolInfoForm pool={p} />
                 <div className="mt-6 border-t border-border pt-4">
                   <h3 className="mb-2 text-base font-semibold text-text">Foto kolam &amp; fasilitas</h3>

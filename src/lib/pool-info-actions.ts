@@ -4,9 +4,11 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
+import { hasPoolHours, poolHoursLabel, withinPoolHours } from "@/lib/pool-hours";
+import { notifyAdmins } from "@/lib/notify";
 import { PHOTO_BUCKET, extensionFor, isStorageConfigured, publicObjectUrl, uploadObject, validateUpload, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR } from "@/lib/storage";
 
-export type PoolInfoState = { error?: string; ok?: boolean } | null;
+export type PoolInfoState = { error?: string; ok?: boolean; warning?: string } | null;
 
 const MAX_POOL_PHOTOS = 6;
 
@@ -44,6 +46,9 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
   if ((openTime && !TIME.test(openTime)) || (closeTime && !TIME.test(closeTime))) {
     return { error: "Format jam harus JJ:MM, misal 06:00." };
   }
+  if (!!openTime !== !!closeTime || (openTime && closeTime && openTime >= closeTime)) {
+    return { error: "Isi jam buka dan jam tutup; jam tutup harus setelah jam buka." };
+  }
 
   const checked = formData
     .getAll("facilities")
@@ -70,8 +75,26 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
   });
   if (updated.count === 0) return { error: "Kolam tidak ditemukan." };
 
+  // Ganti jam buka saat sudah ada booking di luar jam baru (Hadi 2 Okt malam,
+  // #6): booking itu tetap jalan, kolam diberi tahu sekarang, admin dikabari
+  // untuk menghubungi member/coach. Booking baru di luar jam buka ditolak.
+  let warning: string | undefined;
+  const hours = { openTime: openTime || null, closeTime: closeTime || null };
+  if (hasPoolHours(hours)) {
+    const upcoming = await prisma.booking.findMany({
+      where: { status: "BOOKED", availability: { poolId, startTime: { gt: new Date() } } },
+      select: { availability: { select: { startTime: true, endTime: true } } },
+    });
+    const outside = upcoming.filter((b) => !withinPoolHours(hours, b.availability.startTime, b.availability.endTime)).length;
+    if (outside > 0) {
+      warning = `Jam buka tersimpan. Ada ${outside} booking mendatang di luar jam buka baru (${poolHoursLabel(hours)}); booking itu tetap berjalan dan admin SPH akan menghubungi member & coach-nya.`;
+      const pool = await prisma.pool.findUnique({ where: { id: poolId }, select: { name: true } });
+      await notifyAdmins("Booking di luar jam buka baru", `${pool?.name ?? "Kolam"}: ${outside} booking mendatang di luar jam buka ${poolHoursLabel(hours)}.`, "/admin/booking-overview");
+    }
+  }
+
   revalidatePath("/", "layout");
-  return { ok: true };
+  return { ok: true, warning };
 }
 
 // Foto fasilitas kolam. Disimpan di bucket publik yang sama dengan foto coach

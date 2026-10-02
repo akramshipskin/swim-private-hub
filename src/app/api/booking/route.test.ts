@@ -58,6 +58,20 @@ describe("POST /api/booking pool lock", () => {
     expect(where.AND).toContainEqual({ coachId: "coach-7" });
   });
 
+  // Jam buka kolam (Hadi 2 Okt malam, #6/#7).
+  it("menolak slot di luar jam buka kolam; kolam tanpa jam buka tidak dibatasi", async () => {
+    const start = new Date("2099-01-05T05:00:00+07:00");
+    const end = new Date("2099-01-05T06:00:00+07:00");
+    availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", coachId: "coach-7", startTime: start, endTime: end, pool: { isActive: true, openTime: "06:00", closeTime: "20:00" } });
+    const res = await POST(req());
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toContain("di luar jam buka kolam (06.00–20.00)");
+    expect(packageUpdateMany).not.toHaveBeenCalled();
+    availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", coachId: "coach-7", startTime: start, endTime: end, pool: { isActive: true, openTime: null, closeTime: null } });
+    packageUpdateMany.mockResolvedValue({ count: 1 });
+    expect((await POST(req())).status).toBe(201);
+  });
+
   it("rejects without touching the slot when the package is for another pool", async () => {
     availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", pool: { isActive: true } });
     packageUpdateMany.mockResolvedValue({ count: 0 });

@@ -72,6 +72,12 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
         )}
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
       </div>
+      {!state?.error && state?.warning && (
+        <p role="status" className="rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">{state.warning}</p>
+      )}
+      <p className="text-xs text-text-subtle">
+        Coach hanya bisa membuka jadwal di dalam jam buka, dan member hanya bisa booking di dalam jam buka.
+      </p>
     </form>
   );
 }

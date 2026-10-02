@@ -7,6 +7,11 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 // modul), yang meledak di test env karena env var VAPID gak keisi.
 const sendPushToUsers = vi.fn();
 vi.mock("@/lib/push", () => ({ sendPushToUsers: (...a: unknown[]) => sendPushToUsers(...a) }));
+const notifyUser = vi.fn();
+vi.mock("@/lib/notify", () => ({ notifyUser: (...a: unknown[]) => notifyUser(...a) }));
+const takeAttempt = vi.fn().mockResolvedValue("hit-1");
+vi.mock("@/lib/rate-limit", () => ({ takeAttempt: (...a: unknown[]) => takeAttempt(...a) }));
+const ownershipFindMany = vi.fn().mockResolvedValue([{ ownerId: "owner-1" }]);
 
 const cancelBooking = vi.fn();
 class MockCancelError extends Error {
@@ -31,6 +36,7 @@ vi.mock("@/lib/prisma", () => ({
     poolAffiliation: { findUnique: (...a: unknown[]) => affiliationFindUnique(...a) },
     availability: { createMany: (...a: unknown[]) => availabilityCreateMany(...a), findMany: (...a: unknown[]) => availabilityFindMany(...a), updateMany: (...a: unknown[]) => availabilityUpdateMany(...a) },
     user: { findMany: (...a: unknown[]) => userFindMany(...a) },
+    poolOwnership: { findMany: (...a: unknown[]) => ownershipFindMany(...a) },
   },
 }));
 
@@ -44,7 +50,7 @@ function formData(bookingId: string) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati" } });
+  affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: "06:00", closeTime: "21:00" } });
   availabilityFindMany.mockResolvedValue([]);
   availabilityCreateMany.mockResolvedValue({ count: 2 });
   userFindMany.mockResolvedValue([{ id: "m1" }, { id: "m2" }]);
@@ -181,6 +187,27 @@ describe("addAvailability new-slot notification", () => {
     const res = await addAvailability(null, slotForm({}));
     expect(res).toEqual({ warning: expect.stringContaining("Kolam Mawar") });
     expect(availabilityCreateMany).toHaveBeenCalledTimes(1);
+  });
+
+  // Jam buka kolam (Hadi 2 Okt malam, #6).
+  it("menolak jam di luar jam buka kolam tanpa membuat slot apa pun", async () => {
+    affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: "08:00", closeTime: "10:00" } });
+    const res = await addAvailability(null, slotForm({ startTime: "08:00", endTime: "11:00" }));
+    expect(res?.error).toContain("di luar jam buka Kolam Melati (08.00–10.00)");
+    expect(res?.error).toContain("10.00–11.00");
+    expect(availabilityCreateMany).not.toHaveBeenCalled();
+  });
+
+  it("kolam tanpa jam buka: slot baru ditolak, pemilik kolam diberi tahu (dibatasi sekali sehari)", async () => {
+    affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: null, closeTime: null } });
+    const res = await addAvailability(null, slotForm({}));
+    expect(res?.error).toContain("Jam buka Kolam Melati belum diisi");
+    expect(availabilityCreateMany).not.toHaveBeenCalled();
+    expect(notifyUser).toHaveBeenCalledWith("owner-1", "Isi jam buka kolam", expect.stringContaining("Kolam Melati"), "/pool/info");
+    notifyUser.mockClear();
+    takeAttempt.mockResolvedValueOnce(null);
+    await addAvailability(null, slotForm({}));
+    expect(notifyUser).not.toHaveBeenCalled();
   });
 
   it("refuses a pool the coach is not affiliated with, without notifying anyone", async () => {

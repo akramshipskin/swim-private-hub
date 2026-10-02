@@ -19,8 +19,14 @@ export async function reset() {
 let n = 0;
 const uid = () => `${Date.now()}${++n}${Math.floor(Math.random() * 1e6)}`;
 
-export async function mkPool(opts: { balance?: number; bank?: boolean } = {}) {
-  return prisma.pool.create({ data: { name: "Pool " + uid(), walletBalance: opts.balance ?? 0, ...(opts.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } });
+// Bawaan tanpa jam buka (booking tidak dibatasi jam, supaya slot uji yang jatuh
+// di jam berapa pun -- termasuk melewati tengah malam -- tetap bisa dibooking).
+// Tes yang memakai Tambah Slot coach wajib memberi jam buka (kolam tanpa jam
+// buka tidak bisa dibuka slot barunya).
+export const ALL_DAY: [string, string] = ["00:00", "23:59"];
+export async function mkPool(opts: { balance?: number; bank?: boolean; hours?: [string, string] | null } = {}) {
+  const hours = opts.hours ?? null;
+  return prisma.pool.create({ data: { name: "Pool " + uid(), walletBalance: opts.balance ?? 0, openTime: hours?.[0] ?? null, closeTime: hours?.[1] ?? null, ...(opts.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } });
 }
 export async function mkUser(role: Role, extra: { coachBalance?: number; bank?: boolean } = {}) {
   const u = await prisma.user.create({ data: { name: role + uid(), phone: "08" + uid().slice(-10), passwordHash: "x", role, ...(role === "COACH" ? { coachProfile: { create: { walletBalance: extra.coachBalance ?? 0, ...(extra.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } } } : {}) }, include: { coachProfile: true } });

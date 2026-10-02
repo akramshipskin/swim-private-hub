@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize, jitter, tally, spread } from "./fx";
+import { as, reset, ALL_DAY, mkPool, mkUser, mkMemberWithPackage, mkSlot, book, fd, settle, summarize, jitter, tally, spread } from "./fx";
 import { POST as bookPOST } from "@/app/api/booking/route";
 import { DELETE as cancelDELETE } from "@/app/api/booking/[id]/route";
 import { cancelBookingAsCoach, addAvailability, deleteAvailability } from "@/app/coach/jadwal/actions";
@@ -76,7 +76,7 @@ describe("BOOKING races", () => {
   });
 
   it("R5: 2 slot jam sama di 2 kolam beda gak bisa dibuat (coach gak bisa di 2 tempat) walau submit barengan", async () => {
-    const [p1, p2] = [await mkPool(), await mkPool()]; const coach = await mkUser("COACH");
+    const [p1, p2] = [await mkPool({ hours: ALL_DAY }), await mkPool({ hours: ALL_DAY })]; const coach = await mkUser("COACH");
     await prisma.poolAffiliation.createMany({ data: [{ poolId: p1.id, coachId: coach.id }, { poolId: p2.id, coachId: coach.id }] });
     const tomorrow = new Date(Date.now() + 2 * 86400e3).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
     const rs = await settle([p1, p2, p1, p2].map((p) => as({ id: coach.id, role: "COACH", name: "C" }, () => addAvailability(null, fd({ date: tomorrow, startTime: "08:00", endTime: "10:00", poolId: p.id })))));
@@ -249,7 +249,7 @@ describe("ATTENDANCE / WALLET races", () => {
   });
 
   it("R15: slot yang pernah dibooking lalu batal -> 'Hapus' cuma menutup (riwayat tetap), tidak bisa dibooking, bisa dibuka ulang di kolam yang sama", async () => {
-    const [p1, p2] = [await mkPool(), await mkPool()]; const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
+    const [p1, p2] = [await mkPool({ hours: ALL_DAY }), await mkPool({ hours: ALL_DAY })]; const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     await prisma.poolAffiliation.createMany({ data: [{ poolId: p1.id, coachId: coach.id }, { poolId: p2.id, coachId: coach.id }] });
     const day = new Date(Date.now() + 2 * 86400e3).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
     const add = (poolId: string) => as({ id: coach.id, role: "COACH", name: "C" }, () => addAvailability(null, fd({ date: day, startTime: "08:00", endTime: "10:00", poolId })));
