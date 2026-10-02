@@ -172,46 +172,6 @@ const GUIDES: Guide[] = [
       },
     ],
   },
-  {
-    key: "admin",
-    label: "Admin",
-    title: "Panduan Admin",
-    lead: "Kendali penuh atas user, kolam, paket, booking, pembayaran, dan pencairan.",
-    sections: [
-      {
-        heading: "1. Dashboard & pesan",
-        steps: [
-          { title: "Kondisi hari ini", body: "Sesi hari ini & besok, uang masuk, pendapatan platform & PPN, saldo mengendap, dan ringkasan tiap kolam." },
-          { title: "Perlu tindakan", body: "Pesan yang perlu dibalas, pencairan menunggu, sertifikat coach, kolam belum disetujui, dan sesi lewat yang belum ditandai." },
-          { title: "Menu Pesan", body: "Chat bantuan dari member, coach, dan pemilik kolam. Yang ditandai Perlu dibalas berarti asisten tidak bisa menjawabnya." },
-        ],
-      },
-      {
-        heading: "2. User",
-        steps: [
-          { title: "Tambah user baru", body: "Isi data, pilih peran. Untuk pemilik kolam bisa sekalian membuat kolam baru; untuk member bisa sekalian menentukan pesertanya." },
-          { title: "Info detail user", body: "Klik nama siapa pun untuk melihat halaman detail: data akun, paket & peserta, booking terakhir, profil coach, kolam yang dikelola, dan pencairan." },
-          { title: "Aksi cepat", body: "Hubungi lewat WhatsApp, reset password (menghasilkan password sementara), atau nonaktifkan akun." },
-        ],
-      },
-      {
-        heading: "3. Kolam, paket, dan booking",
-        steps: [
-          { title: "Tab Kolam", body: "Harga tiket paket, biaya layanan SPH (maks 6,9%), tanda bebas potongan PPh, saldo kolam, info & foto kolam, dan coach terafiliasi." },
-          { title: "Tab Paket", body: "Paket per member untuk koreksi manual (paket gratis diberikan dari halaman Pengguna). Harga & bebas potongan PPh coach diatur di halaman detail coach (Pengguna)." },
-          { title: "Tab Jadwal Booking", body: "Semua slot dikelompokkan per coach, tanggal, dan kolam. Admin bisa menandai kehadiran atau membatalkan booking siapa pun." },
-        ],
-      },
-      {
-        heading: "4. Keuangan",
-        steps: [
-          { title: "Uang Masuk", body: "Semua pembayaran paket dari member lewat Midtrans beserta statusnya." },
-          { title: "Bagi Hasil", body: "Rincian per kolam: komisi platform (termasuk PPN 11%), komisi kolam, dan komisi coach untuk tiap sesi Hadir." },
-          { title: "Pencairan Saldo", body: "Proses pengajuan dari kolam & coach (Tandai Dibayar / Tolak), dan catat penarikan pendapatan platform." },
-        ],
-      },
-    ],
-  },
 ];
 
 const INSTALL_STEPS: { platform: string; steps: string[] }[] = [
