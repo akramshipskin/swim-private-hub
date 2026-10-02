@@ -38,6 +38,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
           bookings: {
             where: { status: "BOOKED" },
             select: {
+              id: true,
               member: { select: { name: true } },
               package: { select: { dependent: { select: { name: true, isSelf: true } } } },
             },
@@ -82,10 +83,12 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
             endTime: a.endTime,
             booked: a.status === "BOOKED",
             coachName: a.coach.name,
+            // Kode booking sama dengan yang tampil di kartu "Booking hari ini" HP
+            // member, untuk dicocokkan di loket (Hadi 2 Okt malam, #18b).
             who: a.bookings[0]
-              ? a.bookings[0].package.dependent.isSelf
-                ? a.bookings[0].member.name
-                : `${a.bookings[0].package.dependent.name} (akun ${a.bookings[0].member.name})`
+              ? `${a.bookings[0].package.dependent.isSelf
+                  ? a.bookings[0].member.name
+                  : `${a.bookings[0].package.dependent.name} (akun ${a.bookings[0].member.name})`} · kode ${a.bookings[0].id.slice(-6).toUpperCase()}`
               : undefined,
           })),
           p.openTime,

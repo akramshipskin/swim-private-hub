@@ -1,3 +1,4 @@
+import { withinPoolHours } from "@/lib/pool-hours";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -22,7 +23,8 @@ export default async function Home() {
   const session = await auth();
 
   if (!session) {
-    const [pools, coaches, memberCount, attendedCount, packagesPerPool, sessionsPerCoach, testimonials] = await Promise.all([
+    const now = new Date();
+    const [pools, coaches, memberCount, attendedCount, packagesPerPool, sessionsPerCoach, testimonials, openSlots] = await Promise.all([
       prisma.pool.findMany({
         where: { isActive: true },
         orderBy: { name: "asc" },
@@ -78,6 +80,16 @@ export default async function Home() {
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
         select: { name: true, role: true, quote: true },
       }),
+      // Jam kosong 7 hari ke depan per kolam (Hadi 2 Okt malam, #17/#18a): semua
+      // kolam termasuk contoh; tampil di kartu bila >= LANDING_MIN_OPEN_SLOTS.
+      prisma.availability.findMany({
+        where: {
+          status: "AVAILABLE",
+          startTime: { gt: now, lt: new Date(now.getTime() + 7 * 86_400_000) },
+          coach: { isActive: true, coachProfile: { isActive: true } },
+        },
+        select: { poolId: true, startTime: true, endTime: true },
+      }),
     ]);
 
     const poolStats = new Map<string, { sold: number; members: Set<string> }>();
@@ -122,6 +134,7 @@ export default async function Home() {
           // Harga paket termurah di kolam itu (kolam + coach + biaya layanan), dari
           // semua coach yang mengajar di sana dan sudah memasang harga.
           fromPackage: cheapestPack(p),
+          openSlots7d: openSlots.filter((s) => s.poolId === p.id && withinPoolHours(p, s.startTime, s.endTime)).length,
         }))}
         coaches={topCoaches.map((c) => ({
           id: c.id,

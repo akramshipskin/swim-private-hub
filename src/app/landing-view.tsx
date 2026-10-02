@@ -32,6 +32,8 @@ type LandingPool = {
   hours: string | null;
   coachCount: number;
   fromPackage: { total: number; sessions: number } | null;
+  // Jam kosong (slot belum dibooking) 7 hari ke depan.
+  openSlots7d: number;
 };
 export type LandingCoach = {
   id: string;
@@ -242,6 +244,8 @@ const MIN_MEMBERS_TO_SHOW_STATS = 20;
 // Kartu kolam: "N member les di sini" baru tampil kalau kolam itu sudah punya
 // segini member (Hadi 29 Sep); di bawahnya baris itu dikosongkan.
 const MIN_POOL_MEMBERS_TO_SHOW = 15;
+// Angka jam kosong baru tampil kalau cukup banyak (Hadi 2 Okt malam, #17).
+const MIN_OPEN_SLOTS_TO_SHOW = 5;
 
 export default function LandingView({ stats, pools, coaches, testimonials }: { stats: LandingStats; pools: LandingPool[]; coaches: LandingCoach[]; testimonials: Testimonial[] }) {
   const showStats = stats.memberCount >= MIN_MEMBERS_TO_SHOW_STATS;
@@ -434,6 +438,11 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
                       {p.memberCount >= MIN_POOL_MEMBERS_TO_SHOW && (
                         <p className={`mt-1 text-sm ${p.photos[0] ? "text-white/85" : "text-fixed-muted"}`}>
                           {p.memberCount} member punya paket di sini
+                        </p>
+                      )}
+                      {p.openSlots7d >= MIN_OPEN_SLOTS_TO_SHOW && (
+                        <p className={`mt-1 text-sm font-medium ${p.photos[0] ? "text-white" : "text-fixed-ink"}`}>
+                          {p.openSlots7d} jam kosong 7 hari ke depan
                         </p>
                       )}
                     </div>

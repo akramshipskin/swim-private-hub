@@ -13,7 +13,17 @@ export default async function MemberDashboardPage() {
   const now = new Date();
 
   const startMonth = wibDateTime(`${todayWibDateString().slice(0, 7)}-01`, "00:00");
-  const [packages, upcoming, upcomingCount, attendedCount, attendedThisMonth, pesertaCount, spentThisMonth, favCoach] = await Promise.all([
+  const [todayBookings, packages, upcoming, upcomingCount, attendedCount, attendedThisMonth, pesertaCount, spentThisMonth, favCoach] = await Promise.all([
+    // Kartu "Booking hari ini" untuk ditunjukkan ke loket kolam (Hadi 2 Okt malam, #18b).
+    prisma.booking.findMany({
+      where: { memberId: session.user.id, status: "BOOKED", availability: { date: today, endTime: { gt: now } } },
+      orderBy: { availability: { startTime: "asc" } },
+      select: {
+        id: true,
+        availability: { select: { startTime: true, endTime: true, coach: { select: { name: true } }, pool: { select: { name: true } } } },
+        package: { select: { dependent: { select: { name: true } } } },
+      },
+    }),
     prisma.package.findMany({
       where: activePackageWhere(session.user.id),
       orderBy: { expiredDate: "asc" },
@@ -73,6 +83,27 @@ export default async function MemberDashboardPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Dashboard</h1>
       <p className="mt-1 text-sm text-text-muted">{formatDateLabel(today)}</p>
+
+      {todayBookings.length > 0 && (
+        <section aria-label="Booking hari ini" className="mt-6 rounded-2xl border-2 border-brand-600 bg-brand-50 p-4 sm:p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">Booking hari ini</p>
+          <p className="mt-0.5 text-sm text-text-muted">Tunjukkan layar ini ke loket kolam.</p>
+          <ul className="mt-3 flex flex-col gap-3">
+            {todayBookings.map((b) => (
+              <li key={b.id} className="rounded-xl bg-surface p-3">
+                <p className="text-2xl font-bold tabular-nums text-text">
+                  {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}
+                </p>
+                <p className="text-base font-semibold text-text">{b.package.dependent.name}</p>
+                <p className="text-sm text-text-muted">
+                  {b.availability.pool.name} · Coach {b.availability.coach.name}
+                </p>
+                <p className="mt-1 font-mono text-xs text-text-subtle">Kode booking {b.id.slice(-6).toUpperCase()}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <BentoCard title="Ringkasan" className="md:col-span-6">
