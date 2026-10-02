@@ -1,6 +1,13 @@
-# Rencana kerja gabungan, 2 Okt 2026 (dari validasi brief ChatGPT + antrean yang sudah ada)
+# Rencana kerja gabungan, 2 Okt 2026 (validasi brief ChatGPT + SELURUH antrean sebelumnya)
 
 Sumber: docs/reviews/2026-10-02-validasi-brief-chatgpt.md, jawaban Hadi 2 Okt siang (1-7 sudah dijawab A), catatan pemeriksa Opus kedua atas perjanjian/MOU. Model per butir = rekomendasi; Hadi yang memberi aba-aba "Opus dulu" atau "Sonnet dulu" dan mengganti modelnya.
+
+## Tanggapan atas dokumen ChatGPT (ringkas)
+
+- Arah dokumennya benar ("rapikan, kencangkan, validasi", bukan tulis ulang) dan cocok dengan hasil validasi Claude: 30 temuan, 4 benar dan penting, sisanya sebagian benar atau ditolak.
+- Yang tidak tepat: ECON-001 dan AUTH-002 disajikan seperti temuan baru padahal sudah diketahui dan dicatat (keputusan Hadi 2 Okt dan komentar di kode); dampak kunci akun ke admin tidak disebut; DOC-001 menyebut dokumen lama menjadi acuan, padahal isinya menolak lintas kolam di Fase 1; ADULT tidak tepat karena hero sudah "Anak atau kamu".
+- Yang tidak dilihat ChatGPT: perubahan hari ini (animasi, perjanjian, gerbang) dan temuan baru Claude (Komisi kolam, sesi coba jadi dasar komisi, sisa pembulatan, jumlah coach nonaktif).
+- Catatan jujur: validasi Claude belum penuh (lihat S15 dan O6).
 
 ## A. OPUS (uang, login, teks hukum mitra, tes balapan)
 
@@ -13,6 +20,10 @@ Sumber: docs/reviews/2026-10-02-validasi-brief-chatgpt.md, jawaban Hadi 2 Okt si
 | O5 | Tiga tes balapan baru: paket kedaluwarsa vs booking; coach/kolam dinonaktifkan di tengah booking; akun dihapus di tengah booking | BOOK-001 | Tes saja, tanpa ubah aturan |
 | O6 | Periksa ulang dengan dijalankan: webhook pembayaran, saldo member, ganti coach, paket versi lama, kedaluwarsa paket, wallet audit | Phase B brief | Hanya melapor; perbaikan hanya bila ada salah |
 | O7 | Sisa pembulatan paket (maks Rp7): dicatat sebagai diterima SPH, atau dikreditkan ke sesi terakhir | MATH-002 | Menunggu keputusan (Pertanyaan 5) |
+
+| O8 | Penjaga aturan yang tadinya hanya manual (jawaban Hadi 5B), dibatasi pada yang menyentuh uang: penanda pencairan yang lewat 7 hari kerja, dan unduhan rekap PPh bulanan per mitra untuk bukti potong. Potong saldo kolam saat refund dan tarik komisi curang tetap lewat Koreksi Saldo yang sudah ada (dicatat di dokumen aturan) | antrean 2 Okt (5B); pemeriksa #7 | Menunggu keputusan lingkup (Pertanyaan 8) |
+| O9 | Push perjanjian + MOU setelah O3 dan O4 (jawaban 1B) | antrean | Dikirim bersama batch |
+| O10 | Cek rekening format lama sebelum ada coach asli; audit buku besar production setelah ada transaksi asli | STATUS "Tugas Claude" | DEFER sampai ada coach/transaksi asli |
 
 Ditunda (tidak dikerjakan sekarang): kejadian Meta untuk pendaftaran coach/kolam (MKT-001, tunggu iklan perekrutan); tombol "stop jual paket baru" untuk kolam yang kerja samanya berakhir; menjaga gerbang perjanjian di /profil dan chat (tidak menyentuh uang).
 
@@ -53,6 +64,10 @@ Sudah selesai (tidak diulang): teks komisi di dasbor "dari jumlah yang dibayar m
 - Mengganti kerangka UI bersama (UI-001).
 
 ## E. Tugas Hadi (di luar kode)
+
+- Jawab Pertanyaan 1 sampai 8 dan beri aba-aba model.
+- Cek menu Paket (member) dan Ganti Coach (admin) di production; satu pembayaran sungguhan sampai paket aktif.
+- Matikan plugin/konektor yang tidak dipakai di aplikasi Desktop; akuntan: PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus; testimoni asli.
 
 - Cek event Meta di jendela penyamaran (PageView, CompleteRegistration), lalu hapus META_TEST_EVENT_CODE di Vercel.
 - Teruskan butir asuransi, sengketa, keselamatan kolam, bukti potong, pajak afiliasi ke reviewer/akuntan.
