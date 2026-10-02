@@ -20,7 +20,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 
 ## Sedang jalan
 - SIAP TAPI BELUM DI-PUSH (commit lokal 65c714e): teks final Perjanjian Coach (/perjanjian-coach) & MOU Kolam (/mou-kolam) dari 22 isian yang disetujui Hadi + centang persetujuan AKTIF (versi "Perjanjian Coach 2 Oktober 2026" / "MOU Kolam 2 Oktober 2026") + tombol Keluar di halaman persetujuan + gerbang di tandai-hadir coach & API tanggal jadwal. Diperiksa Opus kedua; tsc, 765 tes, build lulus. Ditahan sampai Hadi menjawab pertanyaan (butir reviewer belum diperiksa; kalau teks berubah, versi diganti dan semua mitra centang ulang). Catatan pemeriksa dan sisa: lihat KEPUTUSAN 2 Okt siang.
-- 2 Okt siang: validasi brief ChatGPT selesai (docs/reviews/2026-10-02-validasi-brief-chatgpt.md): 31 butir diberi label; benar penting = ekonomi afiliasi, kunci akun admin, angka landing, dokumen basi; tes balapan 161 lulus.
+- 2 Okt siang: validasi brief ChatGPT selesai (docs/reviews/2026-10-02-validasi-brief-chatgpt.md): 30 temuan + 1 baris gap produksi diberi label; benar penting = ekonomi afiliasi, kunci akun admin, angka landing, dokumen basi; tes balapan 161 lulus.
 - Menunggu Hadi: (0) pilih opsi ECON-001 (komisi afiliasi) dan AUTH-002 (kunci akun) dari laporan validasi; (1) aba-aba model: Opus dulu (batas tanggung jawab, keselamatan kolam, aturan batal longgar, push perjanjian) lalu Sonnet (angka/label landing, sitemap noindex, entry mitra di hero, dokumen aturan saat ini); (2) ID Pixel + token Conversions API (META_CAPI_TOKEN, diisi Hadi di Vercel).
 - Jalur bayar Midtrans diuji di laptop mode uji; di production belum ada pembayaran sungguhan.
 
