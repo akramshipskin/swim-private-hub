@@ -17,6 +17,13 @@ Dibuat Claude (Sonnet) dari keputusan Hadi di docs/KEPUTUSAN.md, rancangan docs/
 - Pencairan minimal Rp50.000, diproses manual admin, paling lambat 7 hari kerja.
 - Catatan perkembangan (milestone) wajib tiap 2 sesi Hadir per peserta; pencairan coach ditahan bila terlewat (berlaku untuk sesi sejak 1 Okt 2026).
 
+
+### Pembulatan (3 sumber, semua ke rupiah bulat)
+1. Biaya layanan SPH = (harga kolam + harga coach) x persen, dibulatkan ke rupiah terdekat saat beli.
+2. Per sesi: nilai sesi, bagian kolam, dan bagian coach masing-masing = harga ÷ jumlah sesi, dibulatkan ke bawah. Bagian coach saat Tidak Hadir = 50% dari bagiannya, dibulatkan ke bawah. Semua sisa jatuh ke SPH (sisa per paket maks Rp7 untuk paket 8 sesi), tanpa baris buku besar terpisah.
+3. PPN 11% di dalam bagian SPH dan PPh 0,5% kolam/coach dihitung per sesi, dibulatkan ke rupiah terdekat.
+- Contoh paket 8 sesi kolam Rp485.000 + coach Rp805.000: biaya layanan 6,5% = Rp83.850, member bayar Rp1.373.850. Nilai sesi Rp171.731 (sisa Rp2 per paket ke SPH). Kolam Rp60.625 - PPh Rp303, coach Rp100.625 - PPh Rp503, SPH Rp10.481 (bersih Rp9.442 + PPN Rp1.039).
+- Harga paket baru wajib kelipatan Rp1.000 (harga lama yang tidak diubah tetap berlaku).
 ## Afiliasi
 - Sekali per member yang mendaftar dengan kode coach/kolam, dari bagian SPH, cair setelah sesi Hadir pertama dari paket berbayar + 3 hari.
 - 50% dari biaya layanan SPH bersih (setelah PPN 11%) pada paket berbayar pertama; sesi coba dan pembayaran selisih ganti coach tidak dihitung. Contoh paket 8: biaya layanan Rp83.200 -> bersih Rp74.955 -> komisi Rp37.477.
