@@ -1,4 +1,4 @@
-# STATUS SPH (diperbarui 2 Okt 2026 siang)
+# STATUS SPH (diperbarui 2 Okt 2026 siang, sapu memori sebelum pindah sesi)
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
@@ -11,7 +11,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - 2 Okt (Opus): animasi landing v2 bertema air (riak, judul muncul dari air, gelombang, HP miring, perenang di lintasan, coretan cara lama, parallax, sorotan, tombol magnetis) + video perenang desktop. Situs asli: elemen terbesar HP 0,93 dtk (awal 2,37). docs/reviews/2026-10-01-animasi-landing.md bagian v2.
 - 2 Okt (Opus): kunci pembatas login diringkas; batas nama 100 di semua jalur akun/peserta (diperiksa Opus kedua); audit buku besar + aksi uang lewat tampilan + 146 tes balapan: cocok/lulus; sweeping ulang + konsistensi gaya. docs/reviews/2026-10-02-sweeping-opus.md.
 - 2 Okt (Opus): HARGA DARI COACH tahap 1+2 live. Kolam (tiket) & coach (jasa) pasang harga paket 4 sesi (60 hari, batal 2x) / 8 sesi (90 hari, batal 4x); member bayar + biaya layanan SPH 6,5% (maks 6,9%); sesi coba 7 hari, tidak bisa dibatalkan sendiri; eceran & kartu kredit dihapus; paket terikat coach; bagi uang per rupiah + PPh 0,5% (titipan, bukan pendapatan SPH); saldo member; ganti coach lewat pengajuan + admin (menu Ganti Coach); catat setor PPh (Bagi Hasil). Harga dummy production diisi (kolam 260/480rb, coach 440/800rb). Rancangan: docs/designs/harga-dari-coach.md.
-- 2 Okt: indeks email lama dicatat di schema (migrasi baru tidak lagi memunculkan DROP INDEX). Teks hukum harga-dari-coach disetujui orang hukum dan dipasang (+ S&K 4.5e saldo saat hapus akun; peringatan saldo di Profil member & layar persetujuan admin) (S&K, Pengembalian, Privasi; perjanjian coach & MOU kolam disesuaikan, masih ada [ISI HADI]).
+- 2 Okt: indeks email lama dicatat di schema (migrasi baru tidak lagi memunculkan DROP INDEX). Teks hukum harga-dari-coach disetujui orang hukum dan dipasang (+ S&K 4.5e saldo saat hapus akun; peringatan saldo di Profil member & layar persetujuan admin) (S&K, Pengembalian, Privasi; perjanjian coach & MOU kolam: teks final sudah jadi, lihat Sedang jalan).
 - 2 Okt malam (Opus): cek menyeluruh SEMUA fitur x 4 peran + publik di laptop (docs/reviews/2026-10-02-sweeping-sistem-semua-fitur.md). Diperbaiki: tombol Beli paket ditolak Midtrans (live 9efc7d8), error database mentah tampil ke pengguna (18 tempat), nomor rekening boleh huruf, kolom tgl lahir impor Excel, teks mekanis. Temuan menunggu keputusan Hadi ada di laporan.
 - 2 Okt dini hari (Opus, live): coach batal sakit = jam ditutup (+ tes balapan R9b); Laporan Kolam menampilkan Bagian Kolam / PPh 0,5% / Masuk Saldo; mekanisme centang perjanjian coach & MOU kolam (MATI sampai teks final, lihat Sedang jalan); Meta Pixel + Conversions API (MATI sampai ID/token). Opus kedua: tidak ada temuan berat, catatan diperbaiki.
 - 2 Okt pagi (Sonnet High, live): 8 perbaikan ringan sweeping, dialog konfirmasi admin untuk aksi uang, isian form dipertahankan saat ditolak, tgl lahir di tambah peserta admin, saldo/laporan kolam rapi di HP, tap target tablet, landing: animasi desktop per section + teks sesuai sistem harga-dari-coach + jawaban blind spot. Sweeping ulang penuh: docs/reviews/2026-10-02-sweeping-sonnet-high.md.
@@ -19,30 +19,32 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja, Hadi), isi-harga-dummy (production: HARGA_DUMMY_PROD=1, Hadi), render-brand-social.
 
 ## Sedang jalan
-- SIAP TAPI BELUM DI-PUSH (commit lokal 65c714e): teks final Perjanjian Coach (/perjanjian-coach) & MOU Kolam (/mou-kolam) dari 22 isian yang disetujui Hadi + centang persetujuan AKTIF (versi "Perjanjian Coach 2 Oktober 2026" / "MOU Kolam 2 Oktober 2026") + tombol Keluar di halaman persetujuan + gerbang di tandai-hadir coach & API tanggal jadwal. Diperiksa Opus kedua; tsc, 765 tes, build lulus. Ditahan sampai Hadi menjawab pertanyaan (butir reviewer belum diperiksa; kalau teks berubah, versi diganti dan semua mitra centang ulang). Catatan pemeriksa dan sisa: lihat KEPUTUSAN 2 Okt siang.
-- 2 Okt siang: validasi brief ChatGPT selesai (docs/reviews/2026-10-02-validasi-brief-chatgpt.md): 30 temuan + 1 baris gap produksi diberi label; benar penting = ekonomi afiliasi, kunci akun admin, angka landing, dokumen basi; tes balapan 161 lulus.
-- Menunggu Hadi: (0) pilih opsi ECON-001 (komisi afiliasi) dan AUTH-002 (kunci akun) dari laporan validasi; (1) aba-aba model: Opus dulu (batas tanggung jawab, keselamatan kolam, aturan batal longgar, push perjanjian) lalu Sonnet (angka/label landing, sitemap noindex, entry mitra di hero, dokumen aturan saat ini); (2) ID Pixel + token Conversions API (META_CAPI_TOKEN, diisi Hadi di Vercel).
+- **Antrean utama: docs/backlog/2026-10-02-rencana-kerja-gabungan.md** (tanggapan atas brief ChatGPT + seluruh antrean lama; Opus O1-O10, Sonnet S1-S16, Tidak dikerjakan, Tugas Hadi). Validasi brief: docs/reviews/2026-10-02-validasi-brief-chatgpt.md (30 temuan; benar penting: ekonomi afiliasi, kunci akun admin, angka landing, dokumen basi; tes balapan 161 lulus).
+- **8 commit lokal BELUM di-push** (dari 65c714e sampai 86c88a8, tanpa migrasi baru): teks final Perjanjian Coach (/perjanjian-coach) + MOU Kolam (/mou-kolam), centang persetujuan AKTIF (versi "Perjanjian Coach 2 Oktober 2026" / "MOU Kolam 2 Oktober 2026"), tombol Keluar di halaman persetujuan, gerbang di tandai-hadir coach + API tanggal jadwal, teks komisi dasbor, dokumen. tsc, 765 tes, build lulus; Opus kedua memeriksa. Hadi memilih push (1B) TAPI teks hukum akan berubah dulu (O3: batal coach longgar, batas tanggung jawab, keselamatan kolam = S&K 6.2, komisi 50% dari biaya layanan bersih), jadi push menunggu O1-O4 supaya mitra tidak centang dua kali.
+- Pixel Meta + token sudah diisi Hadi di Vercel (ID Pixel terlihat aktif di kode situs asli, 2311533866264108). Event masuk BELUM dicek (akses Meta Claude menolak ID itu; Hadi cek Test events).
+- **Menunggu Hadi (8 pertanyaan di chat 2 Okt siang):** dasar komisi (paket pertama saja?), komisi lama, angka kunci login (usul 3x per akun+jaringan, 10x per akun), 12 bulan tidak dimulai ulang, sisa pembulatan Rp7, subheadline hero, S15 ikut atau tidak, lingkup penjaga aturan (O8). Lalu aba-aba model: Opus dulu atau Sonnet dulu.
 - Jalur bayar Midtrans diuji di laptop mode uji; di production belum ada pembayaran sungguhan.
 
-## Tugas Claude berikutnya
-1. Setelah Hadi memutuskan: tambah batas tanggung jawab & samakan keselamatan kolam dengan S&K 6.2 bila disetujui, sesuaikan teks 'bukan dijaga sistem', lalu push + cek situs asli.
-2. Setelah ID Pixel & token: cek event masuk di Meta Events Manager (kode uji), lalu hapus kode uji.
-3. Nilai ulang komisi afiliasi 5% sebelum iklan jalan.
-4. Rekening format lama tidak dinormalisasi otomatis: cek sebelum ada coach asli.
-5. Audit buku besar production diulang setelah ada transaksi asli. Cek GitHub & situs asli setelah tiap push.
+## Tugas Claude berikutnya (urutan; model tiap butir ada di rencana gabungan)
+1. Setelah jawaban + aba-aba Hadi: Opus O1-O3, O5-O8, lalu pemeriksa Opus kedua (O4); Sonnet S1-S16 satu batch.
+2. Build, tes, push (termasuk 8 commit lokal), cek GitHub dan situs asli.
+3. Cek event Meta (kode uji) bersama Hadi, lalu minta Hadi hapus META_TEST_EVENT_CODE.
+4. Ditunda sampai ada pemicu: rekening format lama (cek sebelum coach asli), audit buku besar production (setelah transaksi asli), kejadian Meta pendaftaran coach/kolam (iklan perekrutan), tombol stop jual paket kolam berakhir.
 
 ## Tugas Hadi
-1. Putuskan pertanyaan perjanjian/MOU (di chat 2 Okt siang); teruskan butir asuransi, sengketa, keselamatan kolam, bukti potong, pajak afiliasi ke reviewer/akuntan.
-2. Kirim ID Pixel Meta (di chat), isi token Conversions API sendiri di Vercel dengan nama META_CAPI_TOKEN (jangan dikirim ke chat).
-3. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif. Cek landing di HP asli + Safari.
-4. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
-5. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; ukur waktu simpan milestone.
-6. Akuntan: setor PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus. Testimoni asli (testimoni baru kini tersembunyi sampai ditekan Tampilkan).
+1. Jawab 8 pertanyaan di chat dan beri aba-aba model (Opus dulu / Sonnet dulu; Hadi ganti modelnya sendiri).
+2. Cek event Meta: situs asli di jendela penyamaran (PageView), daftar satu member dummy (CompleteRegistration), lihat Test events; lalu hapus META_TEST_EVENT_CODE di Vercel.
+3. Teruskan butir asuransi, sengketa, keselamatan kolam, bukti potong, pajak afiliasi ke reviewer/akuntan.
+4. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif. Cek landing di HP asli + Safari.
+5. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
+6. Tes production yang butuh akun/perangkat Hadi: unggah foto, sertifikat, tanda tangan; email masuk dan keluar; notifikasi di HP; ukur waktu simpan milestone.
+7. Akuntan: setor PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus. Testimoni asli (testimoni baru tersembunyi sampai ditekan Tampilkan).
 
 ## Belum terverifikasi
 - HP asli dan Safari (landing, animasi, aplikasi); notifikasi push; unggah file ke penyimpanan asli; email; pembayaran asli sampai paket aktif; buku besar production; tampilan halaman yang butuh login di production.
 
 ## Catatan lingkungan lokal
-- Port 3100 di laptop dipakai server Next lain (bukan dari Claude, tidak dimatikan); uji Claude pakai konfigurasi swim-private-hub-dev-3102. Data uji harga-coach lokal: paket uji-hdc-*, saldo Member 8, pengajuan ganti coach Coach 4 -> Coach 5.
-- Sweep 2 Okt malam meninggalkan data uji lokal: akun 089977700002-05 (impor, daftar member/coach/kolam; 089977700003 terkunci 15 menit), paket & booking Member 12 / Anak Uji Sweep, saldo coach/kolam bergeser. Database lokal (db:dev) & penyimpanan tiruan (qa-storage) harus dinyalakan ulang setelah laptop tidur.
-- Akun admin lokal (089900000001) sekarang ber-2FA; kode lewat scripts/qa-otp.mts. Data uji lokal: Kolam Bahari 0/60 (uji 30 Sep), 5 sesi Hadir tanpa uang (pembayaran disisipkan belakangan), saldo kolam/coach berubah karena uji aksi uang 2 Okt.
+- Port 3100 di laptop dipakai server Next lain (bukan dari Claude, tidak dimatikan); uji Claude pakai konfigurasi swim-private-hub-dev-3102 (server ini dinyalakan ulang 2 Okt siang). Nyalakan lagi bila laptop tidur: `npm run db:dev` (port 54330), `node scripts/qa-storage.mjs` (54331), dan `npm run db:race` (54329, hanya untuk `npm run test:race`).
+- Gerbang perjanjian aktif di laptop: akun coach 089900000004/10 dan pemilik kolam 089900000002 diarahkan ke /perjanjian sampai mencentang (data setuju dikosongkan lagi setelah uji). Skrip sweeping/QA untuk peran itu berhenti di halaman itu; centang dulu atau kosongkan lewat skrip kecil.
+- Data uji lokal: paket uji-hdc-*, saldo Member 8, pengajuan ganti coach Coach 4 -> Coach 5; akun 089977700002-05 (impor/daftar uji); paket & booking Member 12 / Anak Uji Sweep; saldo coach/kolam bergeser karena uji uang; Kolam Bahari 0/60.
+- Akun admin lokal (089900000001) ber-2FA; kode lewat scripts/qa-otp.mts (satu kode tidak boleh dipakai dua kali dalam 30 detik).
