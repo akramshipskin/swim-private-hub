@@ -222,14 +222,14 @@ describe("TEMUAN PEMERIKSA KEDUA", () => {
     expect(await checkInvariants()).toEqual([]);
   });
 
-  it("F2: pembayaran yang menahan saldo tidak pernah dikabari 48 jam -> dibersihkan, saldo kembali; lunas belakangan -> paket aktif dan saldo ditarik lagi", async () => {
+  it("F2: pembayaran yang menahan saldo tidak pernah dikabari lewat 24 jam -> dibersihkan, saldo kembali; lunas belakangan -> paket aktif dan saldo ditarik lagi", async () => {
     const { pool, coach } = await mkPricedOffer();
     const m = await mkUser("MEMBER");
     const d = await prisma.dependent.create({ data: { memberId: m.id, name: "Anak" } });
     await giveSaldo(m.id, 300000);
     await as({ id: m.id, role: "MEMBER", name: "M" }, () => checkout(new Request("http://x", { method: "POST", body: JSON.stringify({ poolId: pool.id, coachId: coach.id, sesi: 4, dependentId: d.id }) })));
     const p = await prisma.package.findFirstOrThrow({ where: { dependentId: d.id }, include: { payments: true } });
-    await prisma.payment.update({ where: { id: p.payments[0].id }, data: { createdAt: new Date(Date.now() - 49 * 3600e3) } });
+    await prisma.payment.update({ where: { id: p.payments[0].id }, data: { createdAt: new Date(Date.now() - 25 * 3600e3) } });
     await settle([releaseStalePayments(), releaseStalePayments()]);
     expect((await prisma.package.findUniqueOrThrow({ where: { id: p.id } })).status).toBe("EXPIRED");
     expect((await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance).toBe(300000);
@@ -237,6 +237,33 @@ describe("TEMUAN PEMERIKSA KEDUA", () => {
     expect((await prisma.package.findUniqueOrThrow({ where: { id: p.id } })).status).toBe("ACTIVE");
     expect((await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance).toBe(0);
     expect(await checkInvariants()).toEqual([]);
+  });
+
+  // P2 (Hadi 2 Okt malam): lunas di menit terakhir. Pembersih dan notifikasi
+  // lunas datang bersamaan, tepat sebelum dan tepat sesudah batas 24 jam.
+  it("F2b: lunas di menit terakhir (23j59m dan 24j01m) bersamaan dengan pembersih (8 putaran) -> paket aktif, saldo terpakai tepat sekali", async () => {
+    const sebaran: Record<string, number> = {};
+    for (let i = 0; i < 8; i++) {
+      await reset();
+      const { pool, coach } = await mkPricedOffer();
+      const m = await mkUser("MEMBER");
+      const d = await prisma.dependent.create({ data: { memberId: m.id, name: "Anak" } });
+      await giveSaldo(m.id, 300000);
+      await as({ id: m.id, role: "MEMBER", name: "M" }, () => checkout(new Request("http://x", { method: "POST", body: JSON.stringify({ poolId: pool.id, coachId: coach.id, sesi: 4, dependentId: d.id }) })));
+      const p = await prisma.package.findFirstOrThrow({ where: { dependentId: d.id }, include: { payments: true } });
+      const ageMin = i % 2 ? 24 * 60 + 1 : 24 * 60 - 1;
+      await prisma.payment.update({ where: { id: p.payments[0].id }, data: { createdAt: new Date(Date.now() - ageMin * 60e3) } });
+      const order = i % 4 < 2;
+      const calls = [() => releaseStalePayments(), () => hook(p.payments[0].midtransOrderId, "settlement", p.payments[0].amount)];
+      await settle((order ? calls : calls.reverse()).map((c) => c()));
+      const pkg = await prisma.package.findUniqueOrThrow({ where: { id: p.id } });
+      const bal = (await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance;
+      expect(pkg.status).toBe("ACTIVE");
+      expect(bal).toBe(0);
+      expect(await checkInvariants()).toEqual([]);
+      sebaran[`${ageMin < 1440 ? "sebelum" : "sesudah"} batas`] = (sebaran[`${ageMin < 1440 ? "sebelum" : "sesudah"} batas`] ?? 0) + 1;
+    }
+    console.log("F2b", sebaran);
   });
 
   it("F3: paket kedaluwarsa tidak bisa disetujui ganti coach", async () => {

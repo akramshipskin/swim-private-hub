@@ -7,6 +7,12 @@ export const CANCEL_WINDOW_HOURS = 2;
 // Minimal nominal pencairan saldo (kolam & coach). Dipake server
 // (withdrawal.ts) DAN tombol "Cairkan" (saldo-view) biar sama persis.
 export const MIN_WITHDRAWAL = 50_000;
+
+// Batas waktu bayar (Hadi 2 Okt malam, #1): sama di semua tempat -- transaksi
+// Midtrans (expiry Snap), layar Paket & Riwayat Bayar, dan pembersih
+// pembayaran menggantung (saldo member kembali).
+export const PAYMENT_WINDOW_HOURS = 24;
+export const PAYMENT_WINDOW_MS = PAYMENT_WINDOW_HOURS * 60 * 60 * 1000;
 // Janji di Perjanjian Coach & MOU Kolam: transfer paling lambat sekian hari
 // kerja sejak pengajuan. Lewat dari itu, pengajuan ditandai di halaman admin.
 export const WITHDRAWAL_MAX_BUSINESS_DAYS = 7;

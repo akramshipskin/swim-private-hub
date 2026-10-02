@@ -1,3 +1,4 @@
+import { PAYMENT_WINDOW_MS } from "@/lib/policy";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import CheckoutButton from "./checkout-button";
@@ -34,9 +35,6 @@ function toDateLabelFromDate(d: Date) {
   });
 }
 
-// Batas waktu bayar Midtrans (24 jam). Dipakai untuk menyembunyikan paket
-// yang menunggu pembayaran tapi sudah tidak bisa dibayar lagi.
-const PAYMENT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export const metadata = { title: "Paket Saya | Swim Private Hub" };
 

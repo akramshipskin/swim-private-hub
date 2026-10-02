@@ -1,3 +1,4 @@
+import { PAYMENT_WINDOW_MS } from "@/lib/policy";
 import Link from "next/link";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
@@ -20,9 +21,6 @@ const statusLabel: Record<string, string> = {
 
 const statusTone = { SUCCESS: "success", PENDING: "warning", FAILED: "danger" } as const;
 
-// Batas waktu bayar Midtrans -- lewat ini transaksi tidak bisa dibayar lagi,
-// dan paketnya sudah tidak tampil di halaman Paket.
-const PAYMENT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function dateTimeLabel(d: Date) {
   return d.toLocaleString("id-ID", {

@@ -1,3 +1,4 @@
+import { PAYMENT_WINDOW_HOURS } from "@/lib/policy";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { snap } from "@/lib/midtrans";
@@ -70,6 +71,8 @@ export async function POST(request: Request) {
     const transaction = await snap.createTransaction({
       transaction_details: { order_id: prep.orderId, gross_amount: prep.cash },
       enabled_payments: [...NON_CARD_PAYMENTS],
+      // Batas bayar sama dengan layar & pembersih saldo (PAYMENT_WINDOW_HOURS).
+      expiry: { unit: "hours", duration: PAYMENT_WINDOW_HOURS },
       customer_details: { first_name: session.user.name ?? undefined, email: session.user.email ?? undefined },
       item_details: [{ id: `ganti-coach-${requestId}`, price: prep.cash, quantity: 1, name: `Tambah bayar ganti coach · ${prep.coachName}`.slice(0, 50) }],
       callbacks: { finish: `${origin}/member/paket`, unfinish: `${origin}/member/paket`, error: `${origin}/member/paket` },

@@ -1,12 +1,13 @@
 // Pembayaran Midtrans yang tidak pernah dikabari (member tidak memilih metode
-// bayar, Snap kedaluwarsa tanpa notifikasi): setelah 48 jam dianggap
+// bayar, Snap kedaluwarsa tanpa notifikasi): lewat batas bayar (24 jam) dianggap
 // kedaluwarsa supaya saldo member yang terpakai kembali dan pengajuan ganti
 // coach tidak tersangkut. Kalau ternyata lunas belakangan, webhook tetap
 // mengaktifkan paket / menyelesaikan ganti coach dan menarik saldo lagi.
 import { prisma } from "@/lib/prisma";
 import { refundMemberBalanceOnce } from "@/lib/member-wallet";
+import { PAYMENT_WINDOW_MS } from "@/lib/policy";
 
-export const STALE_PAYMENT_MS = 48 * 60 * 60 * 1000;
+export const STALE_PAYMENT_MS = PAYMENT_WINDOW_MS;
 
 export async function releaseStalePayments(now = new Date()) {
   const stale = await prisma.payment.findMany({

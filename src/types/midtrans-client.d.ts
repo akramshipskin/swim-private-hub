@@ -20,6 +20,8 @@ declare module "midtrans-client" {
     callbacks?: { finish?: string; unfinish?: string; error?: string };
     // Metode bayar yang ditawarkan (Snap); kosong = semua yang aktif di akun.
     enabled_payments?: string[];
+    // Batas bayar transaksi (Midtrans menolak satuan selain SECOND/MINUTE/HOUR/DAY).
+    expiry?: { unit: "minutes" | "hours" | "days"; duration: number };
   }
 
   interface TransactionResult {
