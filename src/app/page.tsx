@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import LandingView from "./landing-view";
 import { coachBioLine } from "@/lib/coach-bio";
 import { cheapestPackQuote } from "@/lib/pricing";
-import { rankLandingCoaches, rankLandingPools } from "@/lib/landing-rank";
+import { isDemoAccountEmail, isDemoPool, rankLandingCoaches, rankLandingPools } from "@/lib/landing-rank";
 import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
 function cheapestPack(p: {
@@ -15,6 +15,8 @@ function cheapestPack(p: {
 }) {
   return cheapestPackQuote(p, p.affiliations.flatMap(({ coach }) => (coach.coachProfile ? [coach.coachProfile] : [])));
 }
+
+const NOT_DEMO_EMAIL = { OR: [{ email: null }, { NOT: { email: { endsWith: "@example.com", mode: "insensitive" as const } } }] };
 
 export default async function Home() {
   const session = await auth();
@@ -54,8 +56,10 @@ export default async function Home() {
           poolAffiliations: { select: { pool: { select: { name: true } } } },
         },
       }),
-      prisma.user.count({ where: { role: "MEMBER", isActive: true } }),
-      prisma.booking.count({ where: { attended: true } }),
+      // Strip statistik hanya menghitung akun asli (Hadi 2 Okt): akun demo
+      // (@example.com) tidak dihitung. Email kosong (daftar pakai HP) = asli.
+      prisma.user.count({ where: { role: "MEMBER", isActive: true, ...NOT_DEMO_EMAIL } }),
+      prisma.booking.count({ where: { attended: true, member: NOT_DEMO_EMAIL } }),
       // Paket yang pernah aktif per kolam -> dasar "paling laris" + jumlah
       // member di kolam itu (member unik, bukan jumlah paket).
       prisma.package.findMany({
@@ -98,7 +102,12 @@ export default async function Home() {
     return (
       <LandingView
         testimonials={testimonials}
-        stats={{ poolCount: pools.length, coachCount: coaches.length, memberCount, attendedCount }}
+        stats={{
+          poolCount: pools.filter((p) => !isDemoPool({ name: p.name, ownerEmails: p.ownerships.map((o) => o.owner.email) })).length,
+          coachCount: coaches.filter((c) => !isDemoAccountEmail(c.email)).length,
+          memberCount,
+          attendedCount,
+        }}
         pools={topPools.map((p) => ({
           id: p.id,
           name: p.name,

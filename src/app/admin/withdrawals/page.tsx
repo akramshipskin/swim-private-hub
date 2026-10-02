@@ -9,6 +9,7 @@ import { getPlatformBalance } from "@/lib/platform-wallet";
 import { PLATFORM_HOLD_DAYS } from "@/lib/policy";
 import { isIrisConfigured } from "@/lib/disbursement";
 import { openSecret } from "@/lib/secret-box";
+import { isWithdrawalOverdue } from "@/lib/withdrawal-deadline";
 
 const STATUS_FILTERS = {
   waiting: { label: "Perlu diproses", statuses: ["PENDING", "PROCESSING"] },
@@ -161,6 +162,7 @@ export default async function AdminWithdrawalsPage({
                 amount: w.amount,
                 status: w.status,
                 requestedAt: w.requestedAt.toISOString(),
+                overdue: isWithdrawalOverdue(w),
                 processedAt: w.processedAt?.toISOString() ?? null,
                 failureReason: w.failureReason,
                 referenceId: w.midtransReferenceId ?? w.transferReference,

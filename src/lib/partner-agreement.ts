@@ -11,8 +11,8 @@
 // nama dokumen): kolom versinya satu, jadi pemilik kolam yang dulunya coach
 // (atau sebaliknya) tidak dianggap sudah setuju.
 export const PARTNER_AGREEMENTS = {
-  COACH: { version: "Perjanjian Coach 2 Oktober 2026" as string | null, title: "Perjanjian Kemitraan Coach", href: "/perjanjian-coach" },
-  POOL_OWNER: { version: "MOU Kolam 2 Oktober 2026" as string | null, title: "MOU Kolam Mitra", href: "/mou-kolam" },
+  COACH: { version: "Perjanjian Coach 2 Oktober 2026 rev.2" as string | null, title: "Perjanjian Kemitraan Coach", href: "/perjanjian-coach" },
+  POOL_OWNER: { version: "MOU Kolam 2 Oktober 2026 rev.2" as string | null, title: "MOU Kolam Mitra", href: "/mou-kolam" },
 };
 
 type PartnerRole = keyof typeof PARTNER_AGREEMENTS;

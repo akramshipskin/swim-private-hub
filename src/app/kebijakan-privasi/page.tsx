@@ -169,8 +169,9 @@ export default function KebijakanPrivasiPage() {
       <p>
         Kata sandi disimpan dalam bentuk terenkripsi (hash), bukan sebagai teks
         biasa. Nomor rekening dan kunci verifikasi dua langkah disimpan dalam
-        bentuk terenkripsi. Tiga kali salah memasukkan kata sandi pada satu akun
-        akan mengunci akun itu selama 15 menit, dan akun administrator
+        bentuk terenkripsi. Salah memasukkan kata sandi 3 kali dari jaringan yang
+        sama, atau 10 kali dari jaringan mana pun, menahan percobaan masuk ke akun
+        itu selama 15 menit, dan akun administrator
         dilindungi verifikasi dua langkah. Akses terhadap data dibatasi sesuai
         peran pengguna — member hanya dapat mengakses data peserta miliknya
         sendiri, coach hanya dapat mengakses jadwal dan peserta yang diajarnya,

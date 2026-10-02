@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
 import { AFFILIATE_PAYOUT_NOTE } from "@/lib/affiliate";
 import { formatBps } from "@/lib/pricing";
-import { formatDateLabel } from "@/lib/datetime";
+import { formatDateLabel, todayWibDateString } from "@/lib/datetime";
 import PphRemitForm from "./pph-remit-form";
 
 export const metadata: Metadata = {
@@ -184,6 +184,17 @@ export default async function KomisiPage() {
                 Titipan PPh 0,5% dari bagian kolam &amp; coach (bukan pendapatan SPH, wajib disetor atas nama mereka): {signed(pphHeld)} ·
                 sudah disetor {formatRupiah(pphPaid)} · <b className="text-text">belum disetor {signed(pphHeld - pphPaid)}</b>
               </p>
+              <p>
+                Rekap PPh per mitra (bahan bukti potong, kirim paling lambat tanggal 20 bulan berikutnya):{" "}
+                {recapMonths().map((m, i) => (
+                  <span key={m}>
+                    {i > 0 && " · "}
+                    <a href={`/api/admin/pph-rekap?bulan=${m}`} className="-my-3 inline-block py-3 font-medium text-brand-700 hover:underline">
+                      Unduh {m}
+                    </a>
+                  </span>
+                ))}
+              </p>
               {pphHeld - pphPaid > 0 && <PphRemitForm />}
               {remittances.length > 0 && (
                 <ul className="space-y-0.5">
@@ -341,4 +352,11 @@ export default async function KomisiPage() {
       </div>
     </main>
   );
+}
+
+// Bulan lalu dan bulan ini (WIB), format YYYY-MM, untuk tautan unduh rekap PPh.
+function recapMonths(): string[] {
+  const [y, m] = todayWibDateString().split("-").map(Number);
+  const prev = m === 1 ? `${y - 1}-12` : `${y}-${String(m - 1).padStart(2, "0")}`;
+  return [prev, `${y}-${String(m).padStart(2, "0")}`];
 }

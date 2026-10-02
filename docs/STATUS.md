@@ -20,19 +20,18 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 
 ## Sedang jalan
 - **Antrean utama: docs/backlog/2026-10-02-rencana-kerja-gabungan.md** (tanggapan atas brief ChatGPT + seluruh antrean lama; Opus O1-O10, Sonnet S1-S16, Tidak dikerjakan, Tugas Hadi). Validasi brief: docs/reviews/2026-10-02-validasi-brief-chatgpt.md (30 temuan; benar penting: ekonomi afiliasi, kunci akun admin, angka landing, dokumen basi; tes balapan 161 lulus).
-- **8 commit lokal BELUM di-push** (dari 65c714e sampai 86c88a8, tanpa migrasi baru): teks final Perjanjian Coach (/perjanjian-coach) + MOU Kolam (/mou-kolam), centang persetujuan AKTIF (versi "Perjanjian Coach 2 Oktober 2026" / "MOU Kolam 2 Oktober 2026"), tombol Keluar di halaman persetujuan, gerbang di tandai-hadir coach + API tanggal jadwal, teks komisi dasbor, dokumen. tsc, 765 tes, build lulus; Opus kedua memeriksa. Hadi memilih push (1B) TAPI teks hukum akan berubah dulu (O3: batal coach longgar, batas tanggung jawab, keselamatan kolam = S&K 6.2, komisi 50% dari biaya layanan bersih), jadi push menunggu O1-O4 supaya mitra tidak centang dua kali.
 - Pixel Meta + token sudah diisi Hadi di Vercel (ID Pixel terlihat aktif di kode situs asli, 2311533866264108). Event masuk BELUM dicek (akses Meta Claude menolak ID itu; Hadi cek Test events).
-- **Jawaban Hadi 2 Okt sore (8 pertanyaan) sudah masuk; detail di docs/KEPUTUSAN.md.** Sonnet S1-S16 SELESAI di laptop dan di-commit (belum push): landing, dokumen aturan-bisnis-saat-ini, kecepatan. Laporan: docs/reviews/2026-10-02-sonnet-batch-landing.md. Menunggu: Opus O1-O3, O7, O8, O4 (Hadi ganti model sendiri). O5 (3 tes balapan baru) ditunda sampai semua kerjaan selesai; sweeping ulang hanya atas permintaan Hadi.
+- 2 Okt sore: batch Sonnet S1-S16 (landing, dokumen aturan bisnis) LIVE 3304cb3. Batch Opus O1-O3, O5, O7, O8 + statistik landing akun asli selesai, diperiksa Opus kedua (2 putaran, temuan diperbaiki), di-push: laporan docs/reviews/2026-10-02-opus-batch-o1-o8.md. O6 belum dijalankan terpisah (usul masuk sweeping). Sweeping ulang menunggu aba-aba Hadi.
 - Jalur bayar Midtrans diuji di laptop mode uji; di production belum ada pembayaran sungguhan.
 
 ## Tugas Claude berikutnya (urutan; model tiap butir ada di rencana gabungan)
-1. Setelah Hadi memilih Opus: O1 komisi 50% (paket pertama berbayar, paket lama tetap 5%), O2 kunci login 3x/10x/20x, O3 teks perjanjian+MOU (12 bulan tidak dimulai ulang), O7 sisa pembulatan = pendapatan SPH, O8 (penanda pencairan >7 hari kerja + rekap PPh bulanan), lalu pemeriksa Opus kedua (O4). Sesudah itu O5 dan push.
-2. Build, tes, push (termasuk 8 commit lokal), cek GitHub dan situs asli.
+1. Tunggu aba-aba Hadi untuk sweeping sistem ulang (termasuk O6 dan cek mitra centang ulang perjanjian rev.2).
+2. Cek situs asli setelah deploy batch Opus (kartu afiliasi, halaman perjanjian rev.2, statistik landing).
 3. Cek event Meta (kode uji) bersama Hadi, lalu minta Hadi hapus META_TEST_EVENT_CODE.
 4. Ditunda sampai ada pemicu: rekening format lama (cek sebelum coach asli), audit buku besar production (setelah transaksi asli), kejadian Meta pendaftaran coach/kolam (iklan perekrutan), tombol stop jual paket kolam berakhir.
 
 ## Tugas Hadi
-1. Pilih model Opus di menu model saat siap lanjut O1-O8 (Sonnet S1-S16 sudah selesai).
+1. Beri aba-aba sweeping ulang bila semua kerjaan dianggap beres.
 2. Cek event Meta: situs asli di jendela penyamaran (PageView), daftar satu member dummy (CompleteRegistration), lihat Test events; lalu hapus META_TEST_EVENT_CODE di Vercel.
 3. Teruskan butir asuransi, sengketa, keselamatan kolam, bukti potong, pajak afiliasi ke reviewer/akuntan.
 4. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif. Cek landing di HP asli + Safari.

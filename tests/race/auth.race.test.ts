@@ -10,8 +10,8 @@ import { POST as registerCoach } from "@/app/api/register-coach/route";
 
 // Sweep keamanan 25 Sep (Antigravity + ChatGPT, dicek Claude): login tanpa batas
 // salah password, pendaftaran tanpa batas, belum ada 2FA admin, persetujuan
-// S&K hanya di browser. Keputusan Hadi: 3x salah per akun -> 15 menit (diperketat
-// 30 Sep dari "per akun+jaringan"), dengan hitung mundur di layar login.
+// S&K hanya di browser. Keputusan Hadi 2 Okt: 3x salah per akun+jaringan, 10x per
+// akun dari semua jaringan, 20x per jaringan -> 15 menit, dengan hitung mundur.
 
 beforeEach(reset);
 
@@ -78,18 +78,37 @@ describe("Batas salah password", () => {
     expect(await login("081234567890", "x4")).toBe("salah");
     expect(await login("081234567890", PASSWORD)).toBe("ok");
     expect(await prisma.rateLimitHit.count({ where: { key: { startsWith: "login:" } } })).toBe(0);
+    expect(await prisma.rateLimitHit.count({ where: { key: { startsWith: "login-net:" } } })).toBe(0);
     // Hitungan per-jaringan (batas 20) sengaja TIDAK dihapus oleh login yang
     // berhasil: kalau dihapus, penyerang yang punya 1 akun sah bisa me-reset-nya.
     expect(await prisma.rateLimitHit.count({ where: { key: { startsWith: "login-ip:" } } })).toBe(4);
   });
 
-  it("L3: kunci berlaku per AKUN (keputusan Hadi 30 Sep): 3x salah dari jaringan A -> password benar dari jaringan B pun terkunci; akun lain tidak ikut", async () => {
+  it("L3: kunci utama per AKUN+JARINGAN (Hadi 2 Okt): 3x salah dari jaringan A -> A terkunci, pemilik akun dari jaringan B tetap masuk; akun lain tidak ikut", async () => {
     await mkLoginUser();
     await mkLoginUser({ phone: "081234567891" });
     for (let k = 0; k < 3; k++) await login("081234567890", "iseng" + k, "6.6.6.6");
     expect(await login("081234567890", PASSWORD, "6.6.6.6")).toBe("locked");
-    expect(await login("081234567890", PASSWORD, "2.2.2.2")).toBe("locked");
-    expect(await login("081234567891", PASSWORD, "2.2.2.2")).toBe("ok");
+    expect(await login("081234567890", PASSWORD, "2.2.2.2")).toBe("ok");
+    expect(await login("081234567891", PASSWORD, "6.6.6.6")).toBe("ok");
+  });
+
+  it("L3c: penyerang memakai banyak jaringan -> setelah 10 salah total, akun terkunci dari jaringan mana pun (termasuk jaringan baru)", async () => {
+    await mkLoginUser({ role: "ADMIN" });
+    // 4 jaringan x 3 salah = 12 percobaan; yang ke-11 dan ke-12 sudah terkunci.
+    const vals: string[] = [];
+    for (let n = 0; n < 4; n++) for (let k = 0; k < 3; k++) vals.push(await login("081234567890", "tebak" + k, `9.9.9.${n}`));
+    expect(vals.filter((v) => v === "salah").length).toBe(10);
+    expect(vals.slice(10).every((v) => v === "locked")).toBe(true);
+    expect(await login("081234567890", PASSWORD, "3.3.3.3")).toBe("locked");
+  });
+
+  it("L3d: 10 tebakan salah barengan dari 10 jaringan berbeda -> tepat 10 dicek, tidak lebih", async () => {
+    await mkLoginUser();
+    const rs = await settle(Array.from({ length: 14 }, (_, k) => login("081234567890", "x" + k, `8.8.8.${k}`)));
+    const vals = rs.map((r) => (r.status === "fulfilled" ? r.value : "REJECT"));
+    expect(vals.filter((v) => v === "salah").length).toBe(10);
+    expect(vals.filter((v) => v === "locked").length).toBe(4);
   });
 
   it("L3b: pesan terkunci membawa sisa detik untuk hitung mundur (1..900) dan menyusut seiring waktu", async () => {
@@ -101,7 +120,7 @@ describe("Batas salah password", () => {
     expect(sec1).toBeGreaterThan(890);
     expect(sec1).toBeLessThanOrEqual(900);
     // Mundurkan semua catatan 5 menit -> sisa tunggu ~600 detik.
-    await prisma.rateLimitHit.updateMany({ where: { key: "login:081234567890" }, data: { createdAt: new Date(Date.now() - 5 * 60_000) } });
+    await prisma.rateLimitHit.updateMany({ where: { key: { in: ["login:081234567890", "login-net:1.1.1.1:081234567890"] } }, data: { createdAt: new Date(Date.now() - 5 * 60_000) } });
     const later = Number((await lockCode("081234567890", PASSWORD))!.split("_")[1]);
     expect(later).toBeGreaterThan(590);
     expect(later).toBeLessThanOrEqual(600);

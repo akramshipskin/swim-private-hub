@@ -13,6 +13,9 @@ export const DROP_IN_DURATION_DAYS = 14;
 // Minimal nominal pencairan saldo (kolam & coach). Dipake server
 // (withdrawal.ts) DAN tombol "Cairkan" (saldo-view) biar sama persis.
 export const MIN_WITHDRAWAL = 50_000;
+// Janji di Perjanjian Coach & MOU Kolam: transfer paling lambat sekian hari
+// kerja sejak pengajuan. Lewat dari itu, pengajuan ditandai di halaman admin.
+export const WITHDRAWAL_MAX_BUSINESS_DAYS = 7;
 
 // PPN atas komisi platform. Komisi dianggap SUDAH termasuk PPN:
 // komisi Rp11.100 = pendapatan bersih Rp10.000 + PPN Rp1.100.
@@ -66,3 +69,9 @@ export const MILESTONE_HOLD_START = new Date("2026-10-01T00:00:00+07:00");
 // member Hadir + sekian hari (sama dengan jendela laporan member).
 export const AFFILIATE_COMMISSION_PERCENT = 5;
 export const AFFILIATE_HOLD_DAYS = 3;
+// Aturan baru (Hadi 2 Okt, jawaban 1A/2A): untuk pembayaran paket sejak
+// AFFILIATE_V2_START, komisi = sekian persen dari biaya layanan SPH bersih
+// (setelah PPN) paket pertama berbayar; sesi coba tidak dihitung. Pembayaran
+// sebelum tanggal itu tetap AFFILIATE_COMMISSION_PERCENT dari jumlah dibayar.
+export const AFFILIATE_SERVICE_FEE_SHARE_PERCENT = 50;
+export const AFFILIATE_V2_START = new Date("2026-10-03T00:00:00+07:00");

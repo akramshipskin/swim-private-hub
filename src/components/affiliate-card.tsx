@@ -3,7 +3,7 @@ import { BentoCard } from "@/components/dashboard";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
 import { getOrCreateAffiliateCode } from "@/lib/affiliate";
-import { AFFILIATE_COMMISSION_PERCENT, AFFILIATE_HOLD_DAYS } from "@/lib/policy";
+import { AFFILIATE_HOLD_DAYS, AFFILIATE_SERVICE_FEE_SHARE_PERCENT } from "@/lib/policy";
 import CopyLinkButton from "@/app/profil/copy-link-button";
 
 const STATUS = {
@@ -35,7 +35,8 @@ export async function AffiliateCard({
     <BentoCard title="Kode afiliasi" className={className}>
       <p className="text-sm text-text-muted">
         Member baru yang mendaftar dengan kode <b className="text-text">{code}</b> memberimu komisi{" "}
-        {AFFILIATE_COMMISSION_PERCENT}% dari jumlah yang dibayar member untuk paket pertamanya, sekali per member. Komisi masuk saldo{" "}
+        {AFFILIATE_SERVICE_FEE_SHARE_PERCENT}% dari biaya layanan SPH (setelah PPN) pada paket berbayar pertamanya, sekali per member;
+        sesi coba tidak dihitung. Contoh: paket dengan biaya layanan Rp83.200 memberi komisi Rp37.477. Komisi masuk saldo{" "}
         {AFFILIATE_HOLD_DAYS} hari setelah sesi pertamanya ditandai Hadir.
       </p>
       <CopyLinkButton link={link} id={`affiliate-link-${code}`} />

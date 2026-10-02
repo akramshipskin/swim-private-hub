@@ -63,11 +63,16 @@ export async function forgetAttempts(where: { ids?: string[]; key?: string }) {
   if (where.key) await prisma.rateLimitHit.deleteMany({ where: { key: storedKey(where.key) } });
 }
 
-// Kebijakan (Hadi 25 Sep, diperketat 30 Sep): 3x salah login per AKUN (dari
-// jaringan mana pun) -> tunggu 15 menit, dengan hitung mundur di layar login.
-// Konsekuensi yang sudah diketahui: orang lain bisa mengunci akun seseorang
-// dengan sengaja salah 3x; pemilik akun cukup menunggu atau minta reset admin.
-export const LOGIN_FAILS_PER_ACCOUNT = 3;
+// Kebijakan (Hadi 2 Okt, menggantikan "3x per akun" 30 Sep): 3x salah per AKUN
+// dari JARINGAN yang sama -> jaringan itu tunggu 15 menit untuk akun itu (ada
+// hitung mundur di layar login). Dari semua jaringan digabung, akun baru
+// terkunci setelah 10x salah, supaya orang asing tidak mudah mengunci akun
+// orang lain (termasuk admin).
+export const LOGIN_FAILS_PER_ACCOUNT_NETWORK = 3;
+export const LOGIN_FAILS_PER_ACCOUNT = 10;
+// Konfirmasi password saat sudah masuk (pasang/lepas 2FA di /keamanan): tetap
+// 3x / 15 menit. Yang bisa mencoba di sini hanya pemegang sesi akun itu.
+export const PASSWORD_CONFIRM_FAILS = 3;
 // Satu jaringan menebak banyak akun sekaligus (credential stuffing).
 export const LOGIN_FAILS_PER_IP = 20;
 export const LOGIN_WINDOW_MS = 15 * 60_000;

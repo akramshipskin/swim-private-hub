@@ -32,7 +32,13 @@ describe("authorizeCredentials: identitas kepanjangan", () => {
 
   it("identitas wajar tetap lewat jalur biasa (percobaan dicatat, akun dicari)", async () => {
     await expect(authorizeCredentials({ identifier: "081234567890", password: "rahasia123" }, req)).resolves.toBeNull();
-    expect(takeAttempt).toHaveBeenCalledTimes(2);
+    // jaringan (20x), akun+jaringan (3x), akun dari semua jaringan (10x)
+    expect(takeAttempt).toHaveBeenCalledTimes(3);
+    expect((takeAttempt.mock.calls as unknown as [string, number][]).map(([k, n]) => [k, n])).toEqual([
+      ["login-ip:1.2.3.4", 20],
+      ["login-net:1.2.3.4:081234567890", 3],
+      ["login:081234567890", 10],
+    ]);
     expect(findFirst).toHaveBeenCalledOnce();
   });
 });

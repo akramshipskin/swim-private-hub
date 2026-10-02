@@ -186,8 +186,9 @@ export default function MouKolamPage() {
           berikutnya.
         </li>
         <li>
-          Untuk Sesi dari paket yang dibeli sebelum 2 Oktober 2026, bagi hasil mengikuti ketentuan yang berlaku saat
-          paket dibeli, yaitu persentase bagi hasil yang tercatat untuk Kolam Mitra tempat Sesi diajar.
+          Untuk Sesi dari paket yang dibeli sebelum 2 Oktober 2026, bagi hasil mengikuti ketentuan lama, yaitu
+          persentase bagi hasil yang tercatat untuk Kolam Mitra tempat Sesi diajar pada saat Sesi ditandai, tanpa
+          potongan PPh 0,5%.
         </li>
       </ol>
 
@@ -229,9 +230,10 @@ export default function MouKolamPage() {
       <h2>8. Keselamatan dan Tanggung Jawab</h2>
       <ol>
         <li>
-          Kolam Mitra bertanggung jawab atas kelayakan dan keselamatan fasilitas selama Sesi. Kolam Mitra menyediakan
-          penjaga atau petugas jaga kolam yang cakap dan perlengkapan P3K, serta menyesuaikan kedalaman kolam untuk
-          Peserta anak sesuai ketentuan keselamatan yang berlaku.
+          Kolam Mitra bertanggung jawab atas kelayakan, kebersihan, dan keselamatan fasilitas kolam, termasuk
+          ketersediaan petugas penyelamat (lifeguard) selama jam operasional, perlengkapan dan petugas pertolongan
+          pertama (P3K), rambu kedalaman air, kebersihan dan kualitas air, serta keamanan lantai dan area sekitar
+          kolam, sebagaimana juga tercantum dalam Syarat &amp; Ketentuan.
         </li>
         <li>
           Coach bertanggung jawab atas pengajaran dan pengawasan Peserta selama Sesi (diatur dalam Perjanjian
@@ -246,6 +248,11 @@ export default function MouKolamPage() {
         <li>
           SPH adalah penyelenggara platform dan bertanggung jawab atas pemesanan, jadwal, pencatatan, penerimaan
           pembayaran, dan pembagian dana. SPH tidak mengelola fasilitas kolam dan tidak mengajar.
+        </li>
+        <li>
+          Tanggung jawab SPH kepada Kolam Mitra terbatas pada pembayaran bagian Kolam Mitra dan komisi afiliasi yang
+          menjadi hak Kolam Mitra sesuai MOU ini. SPH tidak bertanggung jawab atas kerugian tidak langsung, termasuk
+          kehilangan pendapatan atau peluang, kecuali timbul karena kesengajaan atau kelalaian berat SPH.
         </li>
       </ol>
 
@@ -263,7 +270,8 @@ export default function MouKolamPage() {
       <h2>10. Jangka Waktu dan Pengakhiran</h2>
       <ol>
         <li>
-          MOU berlaku 12 (dua belas) bulan sejak disetujui dan diperpanjang otomatis setiap 12 (dua belas) bulan.
+          MOU berlaku 12 (dua belas) bulan sejak pertama kali disetujui dan diperpanjang otomatis setiap 12 (dua
+          belas) bulan. Persetujuan atas versi MOU yang diperbarui tidak memulai ulang jangka waktu ini.
         </li>
         <li>
           Pihak yang tidak ingin memperpanjang memberi tahu pihak lainnya secara tertulis paling lambat 30 (tiga
@@ -290,11 +298,13 @@ export default function MouKolamPage() {
           kodenya untuk dirinya sendiri.
         </li>
         <li>
-          Komisi afiliasi diberikan satu kali per Member baru (bukan komisi tiap Sesi), sebesar 5% dari jumlah yang
-          dibayar Member untuk paket pertamanya (contoh: Member membayar paket pertama Rp1.363.200, komisi Rp68.160;
-          besarnya sama untuk Coach dan Kolam Mitra). Komisi dikreditkan setelah Member menghadiri Sesi pertamanya
-          (ditandai Hadir) dan lewat masa laporan 3 (tiga) hari, supaya pendaftaran palsu tidak menghasilkan uang.
-          Sesi coba juga dihitung sebagai paket pertama.
+          Komisi afiliasi diberikan satu kali per Member baru (bukan komisi tiap Sesi), sebesar 50% dari Biaya Layanan SPH
+          setelah dikurangi PPN, pada paket berbayar pertama Member. Sesi coba tidak dihitung sebagai paket pertama.
+          Contoh: paket dengan Biaya Layanan Rp83.200 (Rp74.955 setelah PPN 11%) memberi komisi Rp37.477; besarnya
+          sama untuk Coach dan Kolam Mitra. Komisi dikreditkan setelah Member menghadiri Sesi pertamanya dari paket
+          berbayar (ditandai Hadir) dan lewat masa laporan 3 (tiga) hari, supaya pendaftaran palsu tidak menghasilkan
+          uang. Untuk paket yang dibayar sebelum 3 Oktober 2026, komisi tetap 5% dari jumlah yang dibayar Member untuk
+          paket pertamanya.
         </li>
         <li>
           Program tidak dibatasi waktu selama MOU berlaku. SPH dapat mengubah ketentuan afiliasi melalui pembaruan MOU

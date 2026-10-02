@@ -85,14 +85,14 @@ export default function PerjanjianCoachPage() {
           menandai, dan Sesi yang belum ditandai tidak menghasilkan bagi hasil sampai ditandai.
         </li>
         <li>
-          Bila berhalangan, Coach membatalkan Sesi melalui Aplikasi paling lambat 12 (dua belas) jam sebelum jadwal,
-          kecuali karena sakit atau keadaan darurat. Sesi otomatis kembali ke paket Peserta dan Peserta mendapat
-          notifikasi. Jam yang dibatalkan Coach ditutup sehingga tidak dapat dipesan Member lain; Coach dapat
+          Bila berhalangan, Coach membatalkan Sesi melalui Aplikasi sedini mungkin. Sesi otomatis kembali ke paket
+          Peserta dan Peserta mendapat notifikasi. Jam yang dibatalkan Coach ditutup sehingga tidak dapat dipesan Member lain; Coach dapat
           membukanya kembali melalui menu Jadwal (tombol Tambah Slot).
         </li>
         <li>
-          Bila Coach membatalkan Sesi lebih dari 2 (dua) kali dalam satu bulan, SPH memberi peringatan. Bila lebih
-          dari 4 (empat) kali dalam satu bulan, akun Coach dinonaktifkan sementara.
+          SPH memantau pembatalan oleh Coach. Pembatalan yang sering atau mendadak dapat diberi peringatan, dan bila
+          berulang SPH dapat menonaktifkan akun Coach untuk sementara. SPH menilai setiap kasus; pembatalan karena sakit
+          atau keadaan darurat tidak dihitung.
         </li>
         <li>
           Coach dilarang menandai Hadir untuk Sesi yang tidak terlaksana, dan dilarang menandai Peserta Tidak Hadir
@@ -168,8 +168,9 @@ export default function PerjanjianCoachPage() {
           dibayar dengan harga Coach sebelumnya. Coach tidak berhak atas sisa Sesi yang dipindahkan.
         </li>
         <li>
-          Untuk Sesi dari paket yang dibeli sebelum 2 Oktober 2026, bagi hasil mengikuti ketentuan yang berlaku saat
-          paket dibeli, yaitu persentase bagi hasil yang tercatat untuk Kolam Mitra tempat Sesi diajar.
+          Untuk Sesi dari paket yang dibeli sebelum 2 Oktober 2026, bagi hasil mengikuti ketentuan lama, yaitu
+          persentase bagi hasil yang tercatat untuk Kolam Mitra tempat Sesi diajar pada saat Sesi ditandai, tanpa
+          potongan PPh 0,5%.
         </li>
       </ol>
 
@@ -237,6 +238,11 @@ export default function PerjanjianCoachPage() {
           SPH adalah penyelenggara platform dan bertanggung jawab atas pemesanan, jadwal, pencatatan, penerimaan
           pembayaran, dan pembagian dana. SPH tidak mengelola fasilitas kolam dan tidak mengajar.
         </li>
+        <li>
+          Tanggung jawab SPH kepada Coach terbatas pada pembayaran bagian Coach dan komisi afiliasi yang menjadi hak
+          Coach sesuai Perjanjian ini. SPH tidak bertanggung jawab atas kerugian tidak langsung, termasuk kehilangan
+          pendapatan atau peluang, kecuali timbul karena kesengajaan atau kelalaian berat SPH.
+        </li>
       </ol>
 
       <h2>8. Data Pribadi</h2>
@@ -253,8 +259,8 @@ export default function PerjanjianCoachPage() {
       <h2>9. Jangka Waktu dan Pengakhiran</h2>
       <ol>
         <li>
-          Perjanjian berlaku 12 (dua belas) bulan sejak disetujui dan diperpanjang otomatis setiap 12 (dua belas)
-          bulan.
+          Perjanjian berlaku 12 (dua belas) bulan sejak pertama kali disetujui dan diperpanjang otomatis setiap 12
+          (dua belas) bulan. Persetujuan atas versi Perjanjian yang diperbarui tidak memulai ulang jangka waktu ini.
         </li>
         <li>
           Pihak yang tidak ingin memperpanjang memberi tahu pihak lainnya secara tertulis paling lambat 30 (tiga
@@ -281,11 +287,13 @@ export default function PerjanjianCoachPage() {
           kodenya untuk dirinya sendiri.
         </li>
         <li>
-          Komisi afiliasi diberikan satu kali per Member baru (bukan komisi tiap Sesi), sebesar 5% dari jumlah yang
-          dibayar Member untuk paket pertamanya (contoh: Member membayar paket pertama Rp1.363.200, komisi Rp68.160;
-          besarnya sama untuk Coach dan Kolam Mitra). Komisi dikreditkan setelah Member menghadiri Sesi pertamanya
-          (ditandai Hadir) dan lewat masa laporan 3 (tiga) hari, supaya pendaftaran palsu tidak menghasilkan uang.
-          Sesi coba juga dihitung sebagai paket pertama.
+          Komisi afiliasi diberikan satu kali per Member baru (bukan komisi tiap Sesi), sebesar 50% dari Biaya Layanan SPH
+          setelah dikurangi PPN, pada paket berbayar pertama Member. Sesi coba tidak dihitung sebagai paket pertama.
+          Contoh: paket dengan Biaya Layanan Rp83.200 (Rp74.955 setelah PPN 11%) memberi komisi Rp37.477; besarnya
+          sama untuk Coach dan Kolam Mitra. Komisi dikreditkan setelah Member menghadiri Sesi pertamanya dari paket
+          berbayar (ditandai Hadir) dan lewat masa laporan 3 (tiga) hari, supaya pendaftaran palsu tidak menghasilkan
+          uang. Untuk paket yang dibayar sebelum 3 Oktober 2026, komisi tetap 5% dari jumlah yang dibayar Member untuk
+          paket pertamanya.
         </li>
         <li>
           Program tidak dibatasi waktu selama Perjanjian berlaku; Coach dapat membawa Member kapan saja. SPH dapat

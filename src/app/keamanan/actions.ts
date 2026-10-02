@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { newTotpSecret, verifyTotp } from "@/lib/totp";
 import { openSecret, sealSecret } from "@/lib/secret-box";
-import { forgetAttempts, takeAttempt, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS } from "@/lib/rate-limit";
+import { forgetAttempts, takeAttempt, PASSWORD_CONFIRM_FAILS, LOGIN_WINDOW_MS } from "@/lib/rate-limit";
 
 export type TotpState = { error?: string } | null;
 
@@ -51,7 +51,7 @@ export async function confirmTotpSetup(_prev: TotpState, formData: FormData): Pr
   // sendiri dan pemilik akun terkunci di luar. Hanya password SALAH yang
   // dihitung (3x / 15 menit, sama dengan login); kode salah tidak.
   const key = `totp-on:${id}`;
-  const hit = await takeAttempt(key, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS);
+  const hit = await takeAttempt(key, PASSWORD_CONFIRM_FAILS, LOGIN_WINDOW_MS);
   if (!hit) return { error: "Terlalu banyak password salah. Tunggu 15 menit, lalu coba lagi." };
   if (!(await bcrypt.compare(password, user.passwordHash))) return { error: "Password salah." };
   await forgetAttempts({ ids: [hit] });
@@ -89,7 +89,7 @@ export async function disableTotp(_prev: TotpState, formData: FormData): Promise
   // Batas salah sama dengan login (3x / 15 menit), supaya form ini tidak
   // jadi jalan menebak password dari sesi yang tertinggal terbuka.
   const key = `totp-off:${id}`;
-  if (!(await takeAttempt(key, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS))) {
+  if (!(await takeAttempt(key, PASSWORD_CONFIRM_FAILS, LOGIN_WINDOW_MS))) {
     return { error: "Terlalu banyak percobaan salah. Tunggu 15 menit, lalu coba lagi." };
   }
 

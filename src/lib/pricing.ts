@@ -104,8 +104,13 @@ export function pack8SavingPercent(four: Quote, eight: Quote) {
 
 // Pembagian 1 sesi paket model baru. Nilai sesi = floor(bayar / totalSesi)
 // (sama dengan model lama); kolam & coach dapat floor(harga mereka /
-// totalSesi), sisanya (biaya layanan + sisa pembulatan) milik SPH. Tidak
-// hadir (sudah booking): kolam 0, coach 50% bagiannya, sisanya SPH.
+// totalSesi), sisanya (biaya layanan + pembulatan bagian kolam/coach) dicatat
+// sebagai bagian SPH per sesi. Tidak hadir (sudah booking): kolam 0, coach 50%
+// bagiannya, sisanya SPH.
+// Sisa `bayar mod totalSesi` (maks Rp3 paket 4, Rp7 paket 8) tidak masuk sesi
+// mana pun: uangnya tetap di rekening SPH sebagai pendapatan SPH (Hadi 2 Okt,
+// MATH-002), tetapi tidak dibuat baris buku besar terpisah, sama seperti nilai
+// sesi yang hangus. Akuntan membacanya dari selisih uang masuk vs bagi hasil.
 export function sessionSplit({
   paid,
   totalSesi,

@@ -13,7 +13,13 @@
 // sebelum pengajuan pencairan.
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
-import { AFFILIATE_COMMISSION_PERCENT, AFFILIATE_HOLD_DAYS } from "@/lib/policy";
+import {
+  AFFILIATE_COMMISSION_PERCENT,
+  AFFILIATE_HOLD_DAYS,
+  AFFILIATE_SERVICE_FEE_SHARE_PERCENT,
+  AFFILIATE_V2_START,
+  splitPlatformTax,
+} from "@/lib/policy";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -25,8 +31,15 @@ export function normalizeAffiliateCode(input: string) {
   return input.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
-export function commissionAmount(paymentAmount: number) {
-  return Math.floor((paymentAmount * AFFILIATE_COMMISSION_PERCENT) / 100);
+// Pembayaran sejak AFFILIATE_V2_START (paket model harga-dari-coach, punya
+// biaya layanan tersimpan): 50% dari biaya layanan bersih setelah PPN.
+// Contoh paket 8: biaya layanan Rp83.200 -> bersih Rp74.955 -> komisi Rp37.477.
+// Sebelumnya (paket lama): 5% dari jumlah dibayar.
+export function commissionAmount(payment: { amount: number; paidAt: Date; serviceFee: number | null }) {
+  if (payment.serviceFee != null && payment.paidAt >= AFFILIATE_V2_START) {
+    return Math.floor((splitPlatformTax(payment.serviceFee).net * AFFILIATE_SERVICE_FEE_SHARE_PERCENT) / 100);
+  }
+  return Math.floor((payment.amount * AFFILIATE_COMMISSION_PERCENT) / 100);
 }
 
 // "Nadia Putri" -> "NADIA" + 2 angka. Nama tanpa huruf latin -> "SPH".
@@ -74,12 +87,34 @@ async function qualify(tx: Prisma.TransactionClient, memberId: string, booking: 
   });
   const code = member?.referralCode;
   if (!code) return;
+  // Paket pertama BERBAYAR: sesi coba dan pembayaran selisih ganti coach tidak
+  // dihitung (Hadi 2 Okt, 1A). Member yang baru ikut sesi coba belum memicu
+  // komisi; komisi tercipta saat sesi Hadir dari paket berbayarnya.
   const firstPayment = await tx.payment.findFirst({
-    where: { status: "SUCCESS", package: { memberId } },
+    where: { status: "SUCCESS", coachChangeRequestId: null, package: { memberId, isTrial: false } },
     orderBy: [{ paidAt: "asc" }, { createdAt: "asc" }],
-    select: { id: true, amount: true },
+    select: {
+      id: true,
+      amount: true,
+      paidAt: true,
+      createdAt: true,
+      package: {
+        select: {
+          serviceFee: true,
+          // Ganti coach menimpa serviceFee paket; komisi memakai biaya layanan
+          // saat paket DIBELI (oldServiceFee dari ganti coach pertama).
+          coachChangeRequests: { where: { status: "COMPLETED" }, orderBy: { completedAt: "asc" }, take: 1, select: { oldServiceFee: true } },
+        },
+      },
+    },
   });
-  const amount = firstPayment ? commissionAmount(firstPayment.amount) : 0;
+  const amount = firstPayment
+    ? commissionAmount({
+        amount: firstPayment.amount,
+        paidAt: firstPayment.paidAt ?? firstPayment.createdAt,
+        serviceFee: firstPayment.package.coachChangeRequests[0]?.oldServiceFee ?? firstPayment.package.serviceFee,
+      })
+    : 0;
   if (!firstPayment || amount <= 0) return;
   // skipDuplicates: dua sesi member yang sama ditandai Hadir barengan tidak
   // boleh menggagalkan tandai hadir (unik per member).
@@ -104,9 +139,11 @@ async function qualify(tx: Prisma.TransactionClient, memberId: string, booking: 
 export async function onSessionAttended(tx: Prisma.TransactionClient, bookingId: string) {
   const b = await tx.booking.findUnique({
     where: { id: bookingId },
-    select: { memberId: true, availability: { select: { endTime: true } } },
+    select: { memberId: true, availability: { select: { endTime: true } }, package: { select: { isTrial: true } } },
   });
-  if (!b) return;
+  // Sesi coba Hadir tidak memicu komisi (Hadi 2 Okt, 1A): komisi menunggu sesi
+  // Hadir pertama dari paket berbayar.
+  if (!b || b.package.isTrial) return;
   await qualify(tx, b.memberId, { id: bookingId, endTime: b.availability.endTime });
 }
 
@@ -122,7 +159,7 @@ export async function onSessionUnattended(tx: Prisma.TransactionClient, bookingI
   const b = await tx.booking.findUnique({ where: { id: bookingId }, select: { memberId: true } });
   if (!b) return;
   const other = await tx.booking.findFirst({
-    where: { memberId: b.memberId, attended: true, status: "BOOKED", id: { not: bookingId } },
+    where: { memberId: b.memberId, attended: true, status: "BOOKED", id: { not: bookingId }, package: { isTrial: false } },
     orderBy: { availability: { startTime: "asc" } },
     select: { id: true, availability: { select: { endTime: true } } },
   });

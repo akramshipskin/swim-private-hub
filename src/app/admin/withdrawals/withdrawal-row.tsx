@@ -14,6 +14,8 @@ export type WithdrawalRowData = {
   amount: number;
   status: "PENDING" | "PROCESSING" | "PAID" | "FAILED";
   requestedAt: string;
+  // Belum selesai dan sudah lewat 7 hari kerja sejak pengajuan (janji di perjanjian/MOU).
+  overdue: boolean;
   bankName: string;
   bankAccountNumber: string;
   bankAccountName: string;
@@ -51,9 +53,12 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
             <p className="text-base font-semibold text-text">{w.holderName}</p>
             <p className="text-2xl font-bold text-text">{formatRupiah(w.amount)}</p>
           </div>
-          <Badge tone={w.status === "PAID" ? "success" : w.status === "FAILED" ? "danger" : "warning"}>
-            {w.status === "PENDING" ? "Menunggu" : w.status === "PROCESSING" ? "Diproses" : w.status === "PAID" ? "Sudah ditransfer" : "Gagal / ditolak"}
-          </Badge>
+          <div className="flex flex-col items-end gap-1">
+            <Badge tone={w.status === "PAID" ? "success" : w.status === "FAILED" ? "danger" : "warning"}>
+              {w.status === "PENDING" ? "Menunggu" : w.status === "PROCESSING" ? "Diproses" : w.status === "PAID" ? "Sudah ditransfer" : "Gagal / ditolak"}
+            </Badge>
+            {w.overdue && <Badge tone="danger">Lewat 7 hari kerja</Badge>}
+          </div>
         </div>
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm">
           <dt className="text-text-subtle">Rekening</dt>

@@ -2,7 +2,16 @@ import { CredentialsSignin } from "next-auth";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants } from "@/lib/format";
-import { clientIp, forgetAttempts, lockRemainingSeconds, takeAttempt, LOGIN_FAILS_PER_ACCOUNT, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS } from "@/lib/rate-limit";
+import {
+  clientIp,
+  forgetAttempts,
+  lockRemainingSeconds,
+  takeAttempt,
+  LOGIN_FAILS_PER_ACCOUNT,
+  LOGIN_FAILS_PER_ACCOUNT_NETWORK,
+  LOGIN_FAILS_PER_IP,
+  LOGIN_WINDOW_MS,
+} from "@/lib/rate-limit";
 import { verifyTotp } from "@/lib/totp";
 import { MAX_EMAIL } from "@/lib/register-input";
 import { openSecret } from "@/lib/secret-box";
@@ -36,21 +45,31 @@ export async function authorizeCredentials(credentials: Partial<Record<string, u
   const isPhone = isValidIndonesianPhone(rawIdentifier.replace(/[\s\-().]/g, ""));
   const identifier = isPhone ? normalizePhone(rawIdentifier) : (normalizeEmail(rawIdentifier) ?? rawIdentifier);
 
-  // Batas salah password (Hadi 25 Sep, diperketat 30 Sep): 3x per AKUN dari
-  // jaringan mana pun -> tunggu 15 menit; plus 20x per jaringan untuk semua
-  // akun. Percobaan dicatat SEBELUM cek password (request barengan tidak bisa
-  // menebak lebih dari batas), lalu dihapus lagi kalau ternyata berhasil.
+  // Batas salah password (Hadi 2 Okt, AUTH-002): kunci utama per AKUN +
+  // JARINGAN (3x / 15 menit), batas per akun dari semua jaringan jauh lebih
+  // tinggi (10x), plus 20x per jaringan untuk semua akun. Orang asing yang
+  // sengaja salah dari jaringannya hanya mengunci dirinya sendiri; pemilik akun
+  // (termasuk admin) dari jaringan lain tetap bisa masuk, kecuali penyerang
+  // memakai banyak jaringan sampai 10x. Percobaan dicatat SEBELUM cek password
+  // (request barengan tidak bisa menebak lebih dari batas), lalu dihapus lagi
+  // kalau ternyata bukan salah password.
   const ip = clientIp(request.headers);
-  const accountKey = `login:${identifier}`;
   const ipKey = `login-ip:${ip}`;
+  const netKey = `login-net:${ip}:${identifier}`;
+  const accountKey = `login:${identifier}`;
   const ipHit = await takeAttempt(ipKey, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS);
   if (!ipHit) throw new LockedError(await lockRemainingSeconds(ipKey, LOGIN_FAILS_PER_IP, LOGIN_WINDOW_MS));
+  const netHit = await takeAttempt(netKey, LOGIN_FAILS_PER_ACCOUNT_NETWORK, LOGIN_WINDOW_MS);
+  if (!netHit) {
+    await forgetAttempts({ ids: [ipHit] });
+    throw new LockedError(await lockRemainingSeconds(netKey, LOGIN_FAILS_PER_ACCOUNT_NETWORK, LOGIN_WINDOW_MS));
+  }
   const accountHit = await takeAttempt(accountKey, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS);
   if (!accountHit) {
-    await forgetAttempts({ ids: [ipHit] });
+    await forgetAttempts({ ids: [ipHit, netHit] });
     throw new LockedError(await lockRemainingSeconds(accountKey, LOGIN_FAILS_PER_ACCOUNT, LOGIN_WINDOW_MS));
   }
-  const notAFailure = () => forgetAttempts({ ids: [ipHit, accountHit] });
+  const notAFailure = () => forgetAttempts({ ids: [ipHit, netHit, accountHit] });
 
   const user = await prisma.user.findFirst({
     where: isPhone
@@ -89,7 +108,10 @@ export async function authorizeCredentials(credentials: Partial<Record<string, u
     if (claimed.count === 0) throw new OtpInvalidError();
   }
 
+  // Berhasil: hitungan akun (semua jaringan) dan akun+jaringan ini kembali nol.
+  // Hitungan per jaringan (20x) sengaja tidak dihapus.
   await forgetAttempts({ ids: [ipHit], key: accountKey });
+  await forgetAttempts({ key: netKey });
 
   return {
     id: user.id,

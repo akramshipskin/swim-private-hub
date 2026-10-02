@@ -7,6 +7,7 @@ import { usablePackageConditions } from "@/lib/active-package";
 import { todayWibDateString, dateLabel, addDaysToDateString, wibDateTime, formatDateLabel } from "@/lib/datetime";
 import { BentoCard, Stat, ActionRow, SessionList } from "@/components/dashboard";
 import { getPlatformBalance } from "@/lib/platform-wallet";
+import { isWithdrawalOverdue } from "@/lib/withdrawal-deadline";
 
 // Dashboard admin: kondisi bisnis hari ini dalam 1 layar. Semua angka query
 // langsung (bukan cache). Detail lengkap lewat tautan "Selengkapnya".
@@ -21,6 +22,11 @@ export default async function AdminDashboardPage() {
   const startToday = wibDateTime(todayStr, "00:00");
   const startMonth = wibDateTime(`${todayStr.slice(0, 7)}-01`, "00:00");
   const now = new Date();
+  const openWithdrawals = await prisma.withdrawalRequest.findMany({
+    where: { status: { in: ["PENDING", "PROCESSING"] } },
+    select: { status: true, requestedAt: true },
+  });
+  const overdueWithdrawals = openWithdrawals.filter((w) => isWithdrawalOverdue(w, now)).length;
   const deletionRequests = await prisma.user.findMany({
     where: { deletionRequestedAt: { not: null }, anonymizedAt: null },
     orderBy: { deletionRequestedAt: "asc" },
@@ -136,6 +142,12 @@ export default async function AdminDashboardPage() {
               count={pendingWithdrawals._count}
               href="/admin/withdrawals"
               detail={formatRupiah(pendingWithdrawals._sum.amount ?? 0)}
+            />
+            <ActionRow
+              label="Pencairan lewat 7 hari kerja"
+              count={overdueWithdrawals}
+              href="/admin/withdrawals"
+              detail="Janji transfer di perjanjian coach & MOU kolam"
             />
             <ActionRow label="Sertifikat coach menunggu" count={pendingCerts} href="/admin/users" />
             <ActionRow label="Usulan butir milestone" count={pendingMilestoneProposals} href="/admin/milestone" />
