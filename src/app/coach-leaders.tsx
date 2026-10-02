@@ -97,8 +97,23 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
     }
   };
   useEffect(() => () => clearAllTimers(), []);
+  // Layar sentuh (Hadi 2 Okt malam, #27): ketukan memicu mouseenter tiruan dan
+  // mouseleave baru terjadi saat mengetuk di tempat lain, jadi kartu bisa
+  // terbuka-tertutup tidak terduga. Di layar sentuh kartu dibuka/ditutup dengan
+  // ketukan (bukan hover), dan ketukan di luar kartu menutupnya.
+  const touch = useRef(false);
+  const liRef = useRef<HTMLLIElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" && liRef.current && !liRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [open]);
 
   const handleEnter = () => {
+    if (touch.current) return;
     clearAllTimers();
     setOpen(true);
   };
@@ -108,10 +123,12 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
   // Nutupnya dikasih jeda: kursor yang cuma lewat sekilas di tepi kartu
   // tidak memicu buka-tutup berulang.
   const handleLeave = () => {
+    if (touch.current) return;
     clearAllTimers();
     closeTimer.current = setTimeout(doClose, CLOSE_GRACE_MS);
   };
   const handleBlur = (e: React.FocusEvent) => {
+    if (touch.current) return;
     if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
       clearAllTimers();
       doClose();
@@ -121,7 +138,16 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
   return (
     <li
       style={{ minHeight: "36rem", "--dir": ENTER_DIR[index % ENTER_DIR.length], "--i": index % 5 } as React.CSSProperties}
+      ref={liRef}
       data-open={open}
+      onPointerDown={(e) => {
+        touch.current = e.pointerType !== "mouse";
+      }}
+      onClick={(e) => {
+        // Ketukan pada tautan tetap membuka profil; ketukan di bagian lain kartu = buka/tutup.
+        if (!touch.current || (e.target as HTMLElement).closest("a")) return;
+        setOpen((v) => !v);
+      }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onFocus={handleEnter}

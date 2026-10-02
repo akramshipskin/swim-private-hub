@@ -9,6 +9,7 @@ import { CANCEL_WINDOW_HOURS, MIN_WITHDRAWAL } from "@/lib/policy";
 import { AudienceTabs, FaqTabs, type AudienceSteps, type FaqGroup } from "./landing-tabs";
 import { CoachLeaders } from "./coach-leaders";
 import { LandingHeader } from "./landing-header";
+import { StickyCta } from "./landing-sticky-cta";
 import { Reveal } from "@/components/ui/reveal";
 import { HeroVideo } from "./hero-video";
 import { HeroFx, Magnetic } from "./landing-fx";
@@ -378,24 +379,8 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
         )}
       </section>
 
-      {/* Sub-navigasi tab: lompat ke info kolam / coach */}
-      <nav aria-label="Lompat ke bagian" className="sticky top-[61px] z-30 md:hidden border-b border-fixed-ink/10 bg-fixed-cream/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-2">
-          {[
-            ["#orang-tua", "Orang Tua"],
-            ["#untuk-coach", "Untuk Coach"],
-            ["#untuk-kolam", "Untuk Kolam"],
-            ["#kolam", "Info Kolam"],
-            ["#coach", "Info Coach"],
-            ["#cara-kerja", "Cara Kerja"],
-            ["#faq", "Pertanyaan Umum"],
-          ].map(([href, label]) => (
-            <a key={href} href={href} className="shrink-0 rounded-full border border-fixed-ink/15 bg-white px-4 py-2 text-sm font-semibold hover:bg-fixed-sand max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
-              {label}
-            </a>
-          ))}
-        </div>
-      </nav>
+      {/* HP: tombol daftar menempel di bawah setelah hero (pengganti baris lompat). */}
+      <StickyCta />
 
       <RolePicker />
       <BeforeAfter />
@@ -403,7 +388,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
       {/* Kolam: maksimal 5 kolam paling laris, lengkap dengan foto, fasilitas,
           dan jumlah member yang les di situ. */}
-      <section id="kolam" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-20">
+      <section id="kolam" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-20">
         <Reveal className="mb-10 text-center">
           <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kolam mitra</h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
@@ -504,7 +489,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       {/* Coach: maksimal 5 coach gaya referensi Stride "meet the leaders" --
           kartu polaroid agak miring, nyebar kiri-kanan, muncul satu per satu
           saat scroll vertikal. Info lengkap tiap coach ada di /pelatih/[id]. */}
-      <section id="coach" className="scroll-mt-36 md:scroll-mt-20 overflow-x-clip bg-fixed-sand py-20">
+      <section id="coach" className="scroll-mt-20 overflow-x-clip bg-fixed-sand py-20">
         <div className="mx-auto w-full max-w-6xl px-4">
           <Reveal className="mb-14 text-center">
             <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
@@ -524,7 +509,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       <PoolSection waLink={OWNER_WA_LINK} />
 
       {/* Cara kerja */}
-      <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-36 md:scroll-mt-20 px-4 py-14 sm:py-20">
+      <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-14 sm:py-20">
         <Reveal>
           <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">Cara kerjanya</h2>
           <p className="mt-3 max-w-xl text-base text-fixed-muted">Pilih peranmu untuk melihat langkahnya.</p>
@@ -546,7 +531,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       <TestimonialsSection items={testimonials} />
 
       {/* FAQ per peran */}
-      <section id="faq" className="mx-auto grid w-full max-w-6xl scroll-mt-36 gap-8 md:scroll-mt-20 px-4 pb-14 sm:pb-20 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14">
+      <section id="faq" className="mx-auto grid w-full max-w-6xl scroll-mt-20 gap-8 px-4 pb-14 sm:pb-20 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14">
         <Reveal>
           <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">Pertanyaan umum</h2>
           <p className="mt-3 max-w-sm text-base text-fixed-muted">Pilih peranmu, pertanyaannya beda-beda.</p>
@@ -565,13 +550,29 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
       {/* CTA + footer gelap */}
       <footer className="bg-fixed-ink text-white">
-        <Reveal className="mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 py-14 sm:flex-row sm:items-center sm:justify-between sm:py-20">
-          <h2 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">Mulai les renang minggu ini</h2>
-          <Magnetic>
-            <Link href="/register" className="fx-pulse inline-flex shrink-0 items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
-              Daftar gratis
-            </Link>
-          </Magnetic>
+        <Reveal className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
+          <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">Siap mulai les renang?</h2>
+            <Magnetic>
+              <Link href="/register" className="fx-pulse inline-flex shrink-0 items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
+                Daftar gratis
+              </Link>
+            </Magnetic>
+          </div>
+          {/* Alasan percaya (Hadi 2 Okt malam, #31): hanya fakta yang dijaga sistem. */}
+          <ul aria-label="Alasan percaya" className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Coach disetujui admin", "Badge Bersertifikat tampil setelah sertifikatnya diperiksa."],
+              ["Harga rinci sebelum bayar", "Tiket kolam, jasa coach, dan biaya layanan terlihat terpisah."],
+              ["Pembayaran lewat Midtrans", "Paket langsung aktif setelah pembayaran berhasil."],
+              ["Bisa batal sendiri", `Paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesi kembali ke paket sesuai jatah.`],
+            ].map(([t, d]) => (
+              <li key={t} className="rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/15">
+                <p className="font-semibold text-white">{t}</p>
+                <p className="mt-1 text-sm text-white/70">{d}</p>
+              </li>
+            ))}
+          </ul>
         </Reveal>
 
         {/* Metode pembayaran: semua logo dirender satu warna lime lewat CSS
@@ -644,7 +645,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           </div>
         </div>
 
-        <p className="pb-8 text-center text-xs text-white/50">© 2026 Swim Private Hub</p>
+        <p className="pb-24 text-center text-xs text-white/50 md:pb-8">© 2026 Swim Private Hub</p>
       </footer>
     </main>
   );

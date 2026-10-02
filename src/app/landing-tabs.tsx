@@ -1,6 +1,24 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, type KeyboardEvent } from "react";
+
+// Tombol panah kiri/kanan (dan Home/End) memindah tab, sesuai pola tab ARIA
+// (Hadi 2 Okt malam, #28). Hanya tab aktif yang bisa difokus lewat Tab.
+function arrowKeys(keys: string[], active: string, setActive: (k: string) => void, base: string) {
+  return (e: KeyboardEvent<HTMLDivElement>) => {
+    const i = keys.indexOf(active);
+    const next =
+      e.key === "ArrowRight" ? keys[(i + 1) % keys.length]
+      : e.key === "ArrowLeft" ? keys[(i - 1 + keys.length) % keys.length]
+      : e.key === "Home" ? keys[0]
+      : e.key === "End" ? keys[keys.length - 1]
+      : null;
+    if (!next) return;
+    e.preventDefault();
+    setActive(next);
+    document.getElementById(`${base}-tab-${next}`)?.focus();
+  };
+}
 
 export type AudienceSteps = { key: string; label: string; steps: { title: string; body: string }[] };
 
@@ -11,7 +29,7 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
   const base = useId();
   return (
     <div>
-      <div role="tablist" aria-label="Cara kerja untuk" className="mb-10 flex flex-wrap gap-2">
+      <div role="tablist" aria-label="Cara kerja untuk" className="mb-10 flex flex-wrap gap-2" onKeyDown={arrowKeys(audiences.map((a) => a.key), active, setActive, base)}>
         {audiences.map((a) => (
           <button
             key={a.key}
@@ -19,6 +37,7 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
             role="tab"
             type="button"
             aria-selected={a.key === active}
+            tabIndex={a.key === active ? 0 : -1}
             aria-controls={`${base}-panel`}
             onClick={() => setActive(a.key)}
             className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
@@ -57,7 +76,7 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
   const base = useId();
   return (
     <div>
-      <div role="tablist" aria-label="Pertanyaan umum untuk" className="mb-6 flex flex-wrap gap-2">
+      <div role="tablist" aria-label="Pertanyaan umum untuk" className="mb-6 flex flex-wrap gap-2" onKeyDown={arrowKeys(groups.map((g) => g.key), active, setActive, base)}>
         {groups.map((g) => (
           <button
             key={g.key}
@@ -65,6 +84,7 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
             role="tab"
             type="button"
             aria-selected={g.key === active}
+            tabIndex={g.key === active ? 0 : -1}
             aria-controls={`${base}-panel`}
             onClick={() => setActive(g.key)}
             className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${

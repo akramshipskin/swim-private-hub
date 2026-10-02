@@ -169,7 +169,7 @@ const PHONE_SHADOW = "shadow-[0_30px_60px_-24px_rgba(20,20,15,0.45)]";
 
 export function ParentSection() {
   return (
-    <section id="orang-tua" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-sand py-14 sm:py-20">
+    <section id="orang-tua" className="scroll-mt-20 bg-fixed-sand py-14 sm:py-20">
       <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-16">
         <Reveal className="min-w-0">
           <h2 className="max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
@@ -251,7 +251,7 @@ const COACH_CELLS: { title: string; body: string }[] = [
 export function CoachSection() {
   const [lead, schedule, free, ...rest] = COACH_CELLS;
   return (
-    <section id="untuk-coach" className="scroll-mt-36 md:scroll-mt-20 bg-fixed-ink py-14 text-white sm:py-20">
+    <section id="untuk-coach" className="scroll-mt-20 bg-fixed-ink py-14 text-white sm:py-20">
       <div className="mx-auto w-full max-w-6xl px-4">
         <Reveal>
           <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
@@ -365,7 +365,7 @@ const POOL_GROUPS: { heading: string; items: Point[] }[] = [
 
 export function PoolSection({ waLink }: { waLink: string }) {
   return (
-    <section id="untuk-kolam" className="scroll-mt-36 md:scroll-mt-20 mx-auto w-full max-w-6xl px-4 py-14 sm:py-20">
+    <section id="untuk-kolam" className="scroll-mt-20 mx-auto w-full max-w-6xl px-4 py-14 sm:py-20">
       <Reveal>
         <h2 className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
           Jam sepi kolammu, jadi les privat yang terjadwal.

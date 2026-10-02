@@ -143,7 +143,17 @@ export function MoonIcon({ className }: IconProps) {
   );
 }
 
+export function ChatIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 5.5h16v10H9l-5 4v-14Z" />
+    </svg>
+  );
+}
+
 export const ICONS = {
+  menu: MenuIcon,
+  chat: ChatIcon,
   users: UsersIcon,
   package: PackageIcon,
   "credit-card": CreditCardIcon,

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MobileBottomNav, type BottomNavLink } from "@/components/mobile-bottom-nav";
-import { SidebarNav, MobileNavStrip } from "@/components/sidebar-nav";
+import { SidebarNav } from "@/components/sidebar-nav";
 import { UserMenu } from "@/components/user-menu";
 import { Logotype } from "@/components/ui/logotype";
 import { ChatWidget } from "@/components/chat-widget";
-import { roleLabel } from "@/lib/nav-links";
+import { roleBottomNav, roleLabel } from "@/lib/nav-links";
 
 // Shell dashboard: header full-width (logo+user menu) di atas, sidebar kiri
 // (desktop) + konten di bawahnya -- gantiin pola lama (tab horizontal numpuk
@@ -13,9 +13,8 @@ import { roleLabel } from "@/lib/nav-links";
 // yang dirender misah di tiap layout file) biar sidebar & konten bisa 1 flex
 // row dari 1 sumber, gak perlu ubah struktur di 5 file layout satu-satu.
 //
-// >4 link (Admin) pake MobileNavStrip (scroll horizontal) di mobile --
-// MobileBottomNav (icon bar) numpuk kalau diisi 8 item. Role dengan link
-// pendek tetep pakai MobileBottomNav biasa.
+// HP: bilah bawah 4 menu utama + Lainnya/Menu untuk semua peran (Hadi 2 Okt
+// malam, #25/#32); menu utama per peran di roleBottomNav.
 export function NavBar({
   links,
   userName,
@@ -31,7 +30,8 @@ export function NavBar({
   avatarUrl?: string | null;
   children: React.ReactNode;
 }) {
-  const hasManyLinks = links.length > 5;
+  const roleKey = (Object.keys(roleLabel) as (keyof typeof roleLabel)[]).find((k) => roleLabel[k] === userRole);
+  const bottom = roleKey ? roleBottomNav[roleKey] : { primary: links.slice(0, 4), moreLabel: "Lainnya" };
 
   return (
     <div className="min-h-screen">
@@ -55,7 +55,6 @@ export function NavBar({
 
           <UserMenu userName={userName} userRole={userRole} avatarUrl={avatarUrl} />
         </div>
-        {links.length > 0 && hasManyLinks && <MobileNavStrip links={links} activePath={activePath} />}
       </header>
 
       <div className="flex w-full gap-6 px-4 lg:gap-8 lg:px-8">
@@ -65,7 +64,7 @@ export function NavBar({
         <div className="min-w-0 flex-1 pb-28 sm:pb-24">{children}</div>
       </div>
 
-      {links.length > 0 && !hasManyLinks && <MobileBottomNav links={links} activePath={activePath} />}
+      {links.length > 0 && <MobileBottomNav links={links} primary={bottom.primary} moreLabel={bottom.moreLabel} activePath={activePath} />}
       {userRole !== roleLabel.ADMIN && <ChatWidget />}
     </div>
   );

@@ -81,32 +81,3 @@ export function SidebarNav({
 // Mobile-only, cuma dipake buat role dengan link panjang (Admin) --
 // MobileBottomNav (icon bar 44px) numpuk banget kalau diisi >4 item, strip
 // scroll-horizontal lebih pas buat kategori sebanyak itu di layar sempit.
-export function MobileNavStrip({ links, activePath }: { links: BottomNavLink[]; activePath?: string }) {
-  const pathname = usePathname();
-  const currentPath = activePath ?? pathname;
-
-  return (
-    <nav
-      className="flex gap-1.5 overflow-x-auto border-t border-border px-4 py-2 sm:hidden"
-      aria-label="Navigasi"
-    >
-      {links.map((link) => {
-        // Exact match doang, sama alesan kayak SidebarNav (Ringkasan/admin
-        // adalah prefix dari semua link admin lain).
-        const active = currentPath === link.href;
-        return (
-          <Link
-            key={link.href}
-            href={link.href}
-            prefetch={active ? false : undefined}
-            className={`inline-flex min-h-[44px] shrink-0 items-center rounded-full px-4 text-xs font-semibold transition-colors ${
-              active ? "bg-brand-600 text-white" : "bg-surface-muted text-text-muted"
-            }`}
-          >
-            {link.label}
-          </Link>
-        );
-      })}
-    </nav>
-  );
-}
