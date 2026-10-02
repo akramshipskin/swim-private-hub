@@ -24,6 +24,8 @@ export const MAX_SERVICE_FEE_BPS = 690;
 export const PPH_WITHHOLD_BPS = 50;
 
 export const MAX_PACK_PRICE = 50_000_000;
+// Harga paket yang baru dipasang wajib kelipatan ini (Hadi 2 Okt malam, #8).
+export const PRICE_STEP = 1_000;
 
 export function isValidPackPrice(n: number) {
   return Number.isInteger(n) && n >= 1 && n <= MAX_PACK_PRICE;
@@ -149,6 +151,15 @@ export function parsePackPrices(formData: FormData): { pricePack4: number | null
   const pricePack8 = read("pricePack8");
   for (const v of [pricePack4, pricePack8]) {
     if (v !== null && !isValidPackPrice(v)) return { error: "Harga harus angka bulat Rp1 sampai Rp50.000.000, atau dikosongkan." };
+  }
+  // Harga baru wajib kelipatan Rp1.000 (Hadi 2 Okt malam, #8); harga lama yang
+  // tidak diubah (sama dengan nilai saat form dibuka) tetap diterima.
+  const orig = (key: string) => {
+    const raw = formData.get(key)?.toString().trim() ?? "";
+    return raw === "" ? null : Number(raw);
+  };
+  for (const [v, o] of [[pricePack4, orig("origPack4")], [pricePack8, orig("origPack8")]] as const) {
+    if (v !== null && v !== o && v % PRICE_STEP !== 0) return { error: "Harga harus kelipatan Rp1.000, misal Rp260.000." };
   }
   return { pricePack4, pricePack8 };
 }

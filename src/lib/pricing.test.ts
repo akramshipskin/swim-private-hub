@@ -122,6 +122,11 @@ describe("parsePackPrices", () => {
     expect(parsePackPrices(fd({ pricePack4: "1.5", pricePack8: "" }))).toHaveProperty("error");
     expect(parsePackPrices(fd({ pricePack4: "abc", pricePack8: "" }))).toHaveProperty("error");
   });
+  it("harga baru wajib kelipatan Rp1.000; harga lama yang tidak diubah tetap diterima", () => {
+    expect(parsePackPrices(fd({ pricePack4: "260500", pricePack8: "" }))).toEqual({ error: "Harga harus kelipatan Rp1.000, misal Rp260.000." });
+    expect(parsePackPrices(fd({ pricePack4: "260500", origPack4: "260500", pricePack8: "481000", origPack8: "480000" }))).toEqual({ pricePack4: 260_500, pricePack8: 481_000 });
+    expect(parsePackPrices(fd({ pricePack4: "260500", origPack4: "260000", pricePack8: "" }))).toHaveProperty("error");
+  });
 });
 
 describe("changedPackPrices", () => {
