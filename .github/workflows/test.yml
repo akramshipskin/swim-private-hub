@@ -53,3 +53,46 @@ jobs:
           DATABASE_URL: postgresql://qa:qa@localhost:54329/race
           DIRECT_URL: postgresql://qa:qa@localhost:54329/race
       - run: npm run test:race
+
+  # Uji alur penuh lewat browser (Hadi 2 Okt malam, #13): member daftar -> bayar
+  # (lunas dari saldo, Midtrans tidak dipanggil) -> booking -> batal; coach
+  # tandai Hadir -> saldo. Database kosong sendiri, kunci rahasia khusus uji.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: qa
+          POSTGRES_PASSWORD: qa
+          POSTGRES_DB: e2e
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U qa -d e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://qa:qa@localhost:54329/e2e
+      DIRECT_URL: postgresql://qa:qa@localhost:54329/e2e
+      AUTH_SECRET: e2e-auth-secret-only-for-ci-0123456789
+      AUTH_TRUST_HOST: "true"
+      SECRET_ENCRYPTION_KEY: BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=
+      MIDTRANS_SERVER_KEY: SB-e2e-tidak-dipakai
+      MIDTRANS_CLIENT_KEY: SB-e2e-tidak-dipakai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --no-audit --no-fund
+      - run: npx prisma migrate deploy
+      - run: npm run build
+      - run: |
+          npx next start -p 3120 > server.log 2>&1 &
+          for i in $(seq 1 60); do curl -s -o /dev/null http://localhost:3120/login && break; sleep 1; done
+          E2E_BASE=http://localhost:3120 npx tsx scripts/e2e.mts
+      - if: failure()
+        run: tail -100 server.log
