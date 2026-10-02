@@ -35,7 +35,7 @@ export async function AffiliateCard({
     <BentoCard title="Kode afiliasi" className={className}>
       <p className="text-sm text-text-muted">
         Member baru yang mendaftar dengan kode <b className="text-text">{code}</b> memberimu komisi{" "}
-        {AFFILIATE_COMMISSION_PERCENT}% dari harga paket pertamanya, sekali per member. Komisi masuk saldo{" "}
+        {AFFILIATE_COMMISSION_PERCENT}% dari jumlah yang dibayar member untuk paket pertamanya, sekali per member. Komisi masuk saldo{" "}
         {AFFILIATE_HOLD_DAYS} hari setelah sesi pertamanya ditandai Hadir.
       </p>
       <CopyLinkButton link={link} id={`affiliate-link-${code}`} />
