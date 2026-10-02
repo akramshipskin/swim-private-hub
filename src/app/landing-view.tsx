@@ -75,7 +75,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, unggah foto dan sertifikat (boleh lebih dari satu) untuk badge Bersertifikat." },
       { title: "Pasang harga & buka jadwal", body: "Tentukan harga paket 4 dan 8 sesimu sendiri, lalu buka tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
       { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi, lalu isi catatan perkembangan (milestone) peserta." },
-      { title: "Cairkan saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening." },
+      { title: "Cairkan saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening: secepatnya, paling lambat 7 hari kerja." },
     ],
   },
   {
@@ -85,7 +85,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Gabung jadi mitra", body: "Daftarkan kolam, lengkapi alamat, jam buka, dan fasilitas." },
       { title: "Pasang harga tiket", body: "Kolam memasang harga tiket untuk paket 4 dan 8 sesi; perubahan langsung berlaku untuk pembelian berikutnya." },
       { title: "Pantau jam ramai", body: "Lihat jam berapa kolam dipakai les privat, oleh coach siapa, setiap hari." },
-      { title: "Terima bagi hasil", body: "Bagian kolam (setelah PPh final 0,5%) masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening." },
+      { title: "Terima bagi hasil", body: "Bagian kolam (setelah PPh final 0,5%) masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening: secepatnya, paling lambat 7 hari kerja." },
     ],
   },
 ];
@@ -143,7 +143,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Apakah coach-nya bersertifikat?",
-        a: 'Coach bisa mengunggah satu atau beberapa sertifikat renang/lifeguard. Badge "Bersertifikat" hanya tampil setelah sertifikat diperiksa dan disetujui admin. Setiap coach juga disetujui admin sebelum tampil di aplikasi. SPH belum melakukan pemeriksaan latar belakang (background check) pribadi, jadi perhatikan profil dan sertifikatnya sebelum memilih.',
+        a: 'Coach bisa mengunggah satu atau beberapa sertifikat renang/lifeguard. Badge "Bersertifikat" hanya tampil setelah sertifikat diperiksa dan disetujui admin. Pemeriksaan berarti admin melihat isi file dan mencocokkan nama di sertifikat dengan nama coach; SPH tidak mengonfirmasi ke lembaga penerbitnya. Setiap coach juga disetujui admin sebelum tampil di aplikasi. SPH belum melakukan pemeriksaan latar belakang (background check) pribadi, jadi perhatikan profil dan sertifikatnya sebelum memilih.',
       },
       {
         q: "Umur berapa yang bisa ikut?",
@@ -173,7 +173,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Cara mencairkan saldo?",
-        a: `Isi rekening sekali di menu Saldo, lalu ajukan pencairan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Untuk saat ini pencairan diproses manual oleh admin, secepatnya, dan statusnya terlihat di riwayat pencairan.`,
+        a: `Isi rekening sekali di menu Saldo, lalu ajukan pencairan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Pencairan diproses admin secepatnya, paling lambat 7 hari kerja, dan statusnya terlihat di riwayat pencairan.`,
       },
       {
         q: "Kalau saya tidak bisa mengajar?",
@@ -433,7 +433,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
                       <p className="text-3xl font-semibold leading-tight">{p.name}</p>
                       {p.memberCount >= MIN_POOL_MEMBERS_TO_SHOW && (
                         <p className={`mt-1 text-sm ${p.photos[0] ? "text-white/85" : "text-fixed-muted"}`}>
-                          {p.memberCount} member pernah les di sini
+                          {p.memberCount} member punya paket di sini
                         </p>
                       )}
                     </div>

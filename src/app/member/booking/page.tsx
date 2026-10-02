@@ -30,6 +30,7 @@ export default async function MemberBookingPage() {
       poolId: true,
       sisaSesi: true,
       jatahCancel: true,
+      expiredDate: true,
       coachId: true,
       coach: { select: { name: true } },
       _count: { select: { bookings: { where: { status: "CANCELLED", cancelledBy: "MEMBER" } } } },
@@ -43,6 +44,8 @@ export default async function MemberBookingPage() {
     coachId: p.coachId,
     coachName: p.coach?.name ?? null,
     sisaSesi: p.sisaSesi,
+    // Tanggal terakhir (WIB) yang masih bisa dibooking dengan paket ini.
+    lastDate: p.expiredDate ? p.expiredDate.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }) : null,
     cancelRemaining: Math.max(0, p.jatahCancel - p._count.bookings),
   }));
 

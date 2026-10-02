@@ -100,7 +100,7 @@ const send = (method: string, params: object = {}) =>
     waiters.set(i, r);
     ws!.send(JSON.stringify({ id: i, method, params }));
   });
-const js = async <T = unknown>(expression: string): Promise<T> =>
+const js = async <T = unknown,>(expression: string): Promise<T> =>
   (await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true })).result?.result?.value as T;
 await send("Page.enable");
 await send("Runtime.enable");

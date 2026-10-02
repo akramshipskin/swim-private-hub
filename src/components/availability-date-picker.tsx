@@ -27,6 +27,7 @@ function parseKey(key: string) {
 // AVAILABLE per bulan yang lagi dibuka, terus kasih titik penanda.
 export function AvailabilityDatePicker({
   value,
+  maxDate,
   onChange,
   fetchUrl = "/api/availability/available-dates",
   legendLabel = "ada slot kosong",
@@ -38,6 +39,8 @@ export function AvailabilityDatePicker({
   fetchUrl?: string;
   /** Teks di bawah kalender buat jelasin arti titik penanda. */
   legendLabel?: string;
+  /** Tanggal terakhir yang boleh dipilih (YYYY-MM-DD), mis. paket berlaku sampai. Setelahnya abu-abu. */
+  maxDate?: string;
   /** Popup langsung kebuka pas mount -- dipake pas komponen ini dirender
    *  on-demand (misal fallback "kalender lain" di DateQuickPicker mobile),
    *  biar gak perlu 2x klik (klik buat munculin, klik lagi buat buka). */
@@ -157,7 +160,7 @@ export function AvailabilityDatePicker({
               const hasSlot = availableDates.has(key);
               const isSelected = key === value;
               const isToday = key === todayKey;
-              const isPast = key < todayKey;
+              const isPast = key < todayKey || (!!maxDate && key > maxDate);
 
               return (
                 <button

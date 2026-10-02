@@ -133,7 +133,7 @@ const GUIDES: Guide[] = [
         heading: "4. Saldo & profil",
         steps: [
           { title: "Isi rekening sekali", body: "Setelah tersimpan, rekening terkunci. Klik Edit kalau mau mengubah." },
-          { title: "Ajukan pencairan", body: `Minimal ${formatRupiah(MIN_WITHDRAWAL)}. Riwayat pencairan menampilkan status, tanggal, dan rekening tujuan.` },
+          { title: "Ajukan pencairan", body: `Minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja. Riwayat pencairan menampilkan status, tanggal, dan rekening tujuan.` },
           { title: "Lengkapi profil", body: "Tanggal lahir, jenis kelamin, bio, keahlian, foto, dan sertifikat. Orang tua sering memilih coach dari informasi ini." },
         ],
         note: 'Badge "Bersertifikat" baru tampil setelah sertifikat kamu diperiksa dan disetujui admin.',
@@ -166,7 +166,7 @@ const GUIDES: Guide[] = [
         heading: "3. Saldo & laporan",
         steps: [
           { title: "Saldo kolam", body: "Bertambah setiap sesi yang ditandai Hadir oleh coach." },
-          { title: "Ajukan pencairan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat Edit), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Admin memproses transfernya.` },
+          { title: "Ajukan pencairan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat Edit), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja.` },
           { title: "Laporan", body: "Rincian bagian kolam (setelah PPh final 0,5%) per sesi yang benar-benar Hadir, bisa disaring per rentang tanggal." },
         ],
       },

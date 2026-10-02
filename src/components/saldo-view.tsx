@@ -146,6 +146,7 @@ export default function SaldoView({
               <p className="text-sm text-text-subtle">Saldo belum mencapai minimal pencairan {formatRupiah(MIN_WITHDRAWAL)}.</p>
             )
           )}
+          <p className="text-xs text-text-subtle">Pencairan ditransfer secepatnya, paling lambat 7 hari kerja sejak diajukan.</p>
           {cairState?.error && <p role="alert" className="text-sm text-danger-text">{cairState.error}</p>}
           {cairState?.ok && <p role="status" className="text-sm text-success-text">Pengajuan pencairan berhasil dibuat.</p>}
         </CardBody>

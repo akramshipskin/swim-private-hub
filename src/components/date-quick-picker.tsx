@@ -22,11 +22,14 @@ export function DateQuickPicker({
   onChange,
   days = 8,
   fetchUrl = "/api/availability/available-dates",
+  maxDate,
 }: {
   value: string;
   onChange: (date: string) => void;
   days?: number;
   fetchUrl?: string;
+  /** Tanggal terakhir yang boleh dipilih (YYYY-MM-DD); setelahnya abu-abu dan tidak bisa dipilih. */
+  maxDate?: string;
 }) {
   const todayKey = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
   const [ty, tm, td] = todayKey.split("-").map(Number);
@@ -67,13 +70,18 @@ export function DateQuickPicker({
     <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {options.map((o) => {
         const isSelected = o.key === value;
+        const beyond = !!maxDate && o.key > maxDate;
         return (
           <button
             key={o.key}
             type="button"
+            disabled={beyond}
+            aria-disabled={beyond}
             onClick={() => onChange(o.key)}
             className={`relative flex h-16 w-14 shrink-0 flex-col items-center justify-center gap-0.5 rounded-xl border text-xs transition-colors ${
-              isSelected
+              beyond
+                ? "cursor-not-allowed border-border bg-surface-muted text-text-subtle/50"
+                : isSelected
                 ? "border-brand-600 bg-brand-600 text-white"
                 : "border-border bg-surface text-text hover:bg-surface-muted"
             }`}

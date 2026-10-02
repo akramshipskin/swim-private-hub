@@ -20,10 +20,12 @@ type PackageOption = {
   packageName: string;
   dependentId: string;
   poolId: string;
-  // Paket model harga-dari-coach hanya untuk coach ini; null = paket lama (coach mana pun).
+  // Paket hanya untuk coach ini (paket tanpa coach tidak dikirim ke sini).
   coachId: string | null;
   coachName: string | null;
   sisaSesi: number;
+  // YYYY-MM-DD terakhir paket masih berlaku; null = tanpa batas.
+  lastDate: string | null;
   cancelRemaining: number;
 };
 
@@ -189,10 +191,10 @@ export default function BookingBoard({
 
   const groupedByCoach = useMemo(() => {
     if (!slots) return [];
-    const map = new Map<string, { coachName: string; photoUrl: string | null; slots: Slot[] }>();
+    const map = new Map<string, { coachId: string; coachName: string; photoUrl: string | null; slots: Slot[] }>();
     for (const s of slots) {
       if (!map.has(s.coach.id)) {
-        map.set(s.coach.id, { coachName: s.coach.name, photoUrl: s.coach.photoUrl, slots: [] });
+        map.set(s.coach.id, { coachId: s.coach.id, coachName: s.coach.name, photoUrl: s.coach.photoUrl, slots: [] });
       }
       map.get(s.coach.id)!.slots.push(s);
     }
@@ -295,6 +297,9 @@ export default function BookingBoard({
           {selectedPkg && (
             <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-border pt-2">
               <Badge tone="brand">Sisa sesi: {selectedPkg.sisaSesi}</Badge>
+              {selectedPkg.lastDate && (
+                <Badge tone="neutral">Paket berlaku sampai {formatFullDate(`${selectedPkg.lastDate}T12:00:00+07:00`)}</Badge>
+              )}
               <Badge tone={selectedPkg.cancelRemaining <= 1 ? "warning" : "neutral"}>
                 Sisa jatah batal: {selectedPkg.cancelRemaining}
               </Badge>
@@ -362,6 +367,7 @@ export default function BookingBoard({
                 <div className="mb-2">
                   <AvailabilityDatePicker
                     fetchUrl={`/api/availability/available-dates?poolId=${poolId}`}
+                    maxDate={selectedPkg?.lastDate ?? undefined}
                     value={date}
                     onChange={(d) => {
                       setDate(d);
@@ -375,11 +381,13 @@ export default function BookingBoard({
                 value={date}
                 onChange={setDate}
                 days={8}
+                maxDate={selectedPkg?.lastDate ?? undefined}
                 fetchUrl={`/api/availability/available-dates?poolId=${poolId}`}
               />
             </div>
             <div className="hidden sm:block">
               <AvailabilityDatePicker
+                maxDate={selectedPkg?.lastDate ?? undefined}
                 value={date}
                 onChange={setDate}
                 fetchUrl={`/api/availability/available-dates?poolId=${poolId}`}
@@ -480,9 +488,13 @@ export default function BookingBoard({
           </CardBody>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
-          {groupedByCoach.map((group) => (
-            <div key={group.coachName}>
+        <div className="flex flex-col gap-6">
+          {/* Coach paket peserta ini di atas; coach lain dilipat (Hadi 2 Okt malam, #29). */}
+          {(() => {
+            const mine = groupedByCoach.filter((g) => poolPkgs.some((p) => p.coachId === g.coachId));
+            const others = groupedByCoach.filter((g) => !mine.includes(g));
+            const renderGroup = (group: (typeof groupedByCoach)[number]) => (
+            <div key={group.coachId}>
               <div className="mb-2 flex items-center gap-2">
                 <Avatar src={group.photoUrl} className="h-8 w-8" />
                 <h2 className="text-base font-semibold text-text">{group.coachName}</h2>
@@ -551,7 +563,26 @@ export default function BookingBoard({
                 ))}
               </ul>
             </div>
-          ))}
+            );
+            return (
+              <>
+                {mine.length > 0 && (
+                  <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">{mine.map(renderGroup)}</div>
+                )}
+                {others.length > 0 &&
+                  (mine.length === 0 ? (
+                    <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">{others.map(renderGroup)}</div>
+                  ) : (
+                    <details className="rounded-xl border border-border bg-surface px-4 py-3">
+                      <summary className="cursor-pointer text-sm font-medium text-text max-sm:min-h-[44px] max-sm:py-3">
+                        Jadwal coach lain ({others.length}) · tidak bisa dibooking dengan paket ini
+                      </summary>
+                      <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">{others.map(renderGroup)}</div>
+                    </details>
+                  ))}
+              </>
+            );
+          })()}
         </div>
       )}
 
