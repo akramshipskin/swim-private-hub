@@ -132,3 +132,6 @@ tujuannya, dan backup dulu keadaan sekarang.
   penyedia non-AWS; workflow sudah mematikannya
   (`AWS_REQUEST_CHECKSUM_CALCULATION=when_required`), tapi belum dicoba ke
   R2/B2 asli.
+
+## Uji pulih (tiap bulan)
+Tab Actions -> **Uji Pulih Backup** -> Run workflow. Mengambil backup terbaru, membuka enkripsinya, memulihkannya ke database kosong di mesin GitHub (bukan production), lalu membandingkan jumlah baris tiap tabel dengan production (hanya membaca). Hijau = backup bisa dipakai. Otomatis jalan tiap tanggal 1 jam 03:00 WIB; jalankan manual sekali setelah dipasang.

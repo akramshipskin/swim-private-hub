@@ -1,0 +1,100 @@
+name: Uji Pulih Backup
+
+# Uji pulih backup database (Hadi 2 Okt malam, #14): ambil backup terbaru dari
+# penyimpanan, buka enkripsinya, pulihkan ke database KOSONG baru (di mesin
+# GitHub, bukan production), lalu bandingkan jumlah baris tiap tabel dengan
+# production (hanya membaca). Lulus = backup benar-benar bisa dipakai.
+# Jalankan: tab Actions -> Uji Pulih Backup -> Run workflow. Otomatis tiap
+# tanggal 1 jam 03:00 WIB.
+on:
+  schedule:
+    - cron: "0 20 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  restore-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PG_MAJOR: "17"
+      PREFIX: db
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: qa
+          POSTGRES_PASSWORD: qa
+          POSTGRES_DB: pulih
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U qa -d pulih"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Pasang alat Postgres ${{ env.PG_MAJOR }}
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "postgresql-client-${PG_MAJOR}"
+          echo "/usr/lib/postgresql/${PG_MAJOR}/bin" >> "$GITHUB_PATH"
+
+      - name: Unduh backup terbaru
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION || 'auto' }}
+          ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+          BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        run: |
+          set -euo pipefail
+          ENDPOINT="$(printf '%s' "$ENDPOINT" | tr -d '[:space:]')"
+          case "$ENDPOINT" in http://*|https://*) ;; *) ENDPOINT="https://$ENDPOINT" ;; esac
+          ENDPOINT="$(printf '%s' "$ENDPOINT" | sed -E 's#^(https?://[^/]+).*#\1#')"
+          BUCKET="$(printf '%s' "$BUCKET" | tr -d '[:space:]')"
+          KEY="$(aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$PREFIX/" --endpoint-url "$ENDPOINT" --query 'Contents[].Key' --output text \
+            | tr '\t' '\n' | grep -E "^$PREFIX/swim-[0-9]{8}T[0-9]{6}Z\.dump\.gpg$" | sort | tail -1)"
+          test -n "$KEY" || { echo "Belum ada backup di penyimpanan"; exit 1; }
+          echo "Backup terbaru: $KEY"
+          aws s3 cp "s3://$BUCKET/$KEY" backup.dump.gpg --endpoint-url "$ENDPOINT" --only-show-errors
+
+      - name: Buka enkripsi + pulihkan ke database kosong
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          gpg --batch --quiet --decrypt --passphrase-fd 3 --output backup.dump backup.dump.gpg 3<<< "$BACKUP_PASSPHRASE"
+          pg_restore --no-owner --no-privileges --exit-on-error -d postgresql://qa:qa@localhost:5432/pulih backup.dump
+          echo "Pulih selesai."
+
+      - name: Bandingkan jumlah baris dengan production (baca saja)
+        env:
+          PROD_URL: ${{ secrets.PROD_DIRECT_URL }}
+        run: |
+          set -euo pipefail
+          Q="SELECT string_agg(format('%s=%s', t, (xpath('/row/c/text()', query_to_xml(format('SELECT count(*) AS c FROM public.%I', t), false, true, '')))[1]::text), E'\n' ORDER BY t)
+             FROM (SELECT tablename AS t FROM pg_tables WHERE schemaname = 'public') s"
+          psql -At "postgresql://qa:qa@localhost:5432/pulih" -c "$Q" > pulih.txt
+          PGOPTIONS="-c default_transaction_read_only=on" psql -At "$PROD_URL" -c "$Q" > prod.txt
+          echo "Tabel di backup: $(wc -l < pulih.txt)"
+          # Backup dibuat paling lama ~1 hari lalu: tabel yang bertambah sejak itu
+          # wajar lebih banyak di production. Yang gagal: tabel hilang, atau
+          # backup berisi LEBIH banyak baris dari production (salah database).
+          FAIL=0
+          while IFS='=' read -r t prod; do
+            b="$(grep -E "^$t=" pulih.txt | cut -d= -f2 || true)"
+            if [ -z "$b" ]; then echo "HILANG di backup: $t"; FAIL=1;
+            elif [ "$b" -gt "$prod" ]; then echo "ANEH: $t backup $b > production $prod"; FAIL=1;
+            else echo "$t: backup $b / production $prod"; fi
+          done < prod.txt
+          grep -q '^User=' pulih.txt || { echo "Tabel User tidak terpulihkan"; FAIL=1; }
+          exit $FAIL
