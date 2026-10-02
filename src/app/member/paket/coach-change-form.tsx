@@ -15,7 +15,7 @@ export function CoachChangeForm({ packageId, coaches }: { packageId: string; coa
   if (state?.ok) return <p className="text-sm text-success-text">Pengajuan terkirim. Admin akan memeriksa alasannya.</p>;
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="text-sm font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+      <button type="button" onClick={() => setOpen(true)} className="text-sm font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
         Ajukan ganti coach
       </button>
     );

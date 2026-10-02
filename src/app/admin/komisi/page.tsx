@@ -134,7 +134,7 @@ export default async function KomisiPage() {
           <p className="text-sm font-semibold text-text">Total komisi platform (semua kolam)</p>
           <Link
             href="/admin/withdrawals"
-            className="order-3 inline-flex items-center rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:opacity-90 max-sm:min-h-[44px] sm:order-none"
+            className="order-3 inline-flex items-center rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:opacity-90 max-lg:min-h-[44px] sm:order-none"
           >
             Cairkan saldo →
           </Link>
@@ -220,7 +220,7 @@ export default async function KomisiPage() {
                       Biaya layanan {formatBps(pool.serviceFeeBps)}
                     </p>
                   </div>
-                  <Link href={`/admin/withdrawals?pool=${pool.id}`} className="shrink-0 text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                  <Link href={`/admin/withdrawals?pool=${pool.id}`} className="shrink-0 text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                     Riwayat pencairan &rarr;
                   </Link>
                 </div>

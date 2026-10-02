@@ -12,7 +12,7 @@ export function LogoutButton() {
   }
   return (
     <form action={handleLogout} className="mt-4 text-center">
-      <button type="submit" className="text-sm font-medium text-text-muted hover:text-brand-700 hover:underline max-sm:min-h-[44px]">
+      <button type="submit" className="text-sm font-medium text-text-muted hover:text-brand-700 hover:underline max-lg:min-h-[44px]">
         Keluar
       </button>
     </form>

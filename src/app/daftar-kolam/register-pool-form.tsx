@@ -134,7 +134,7 @@ export default function RegisterPoolForm() {
                       type="button"
                       aria-pressed={active}
                       onClick={() => setFacilities((prev) => (active ? prev.filter((x) => x !== f) : [...prev, f]))}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-medium max-sm:min-h-[44px] ${active ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border bg-surface text-text-muted"}`}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium max-lg:min-h-[44px] ${active ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border bg-surface text-text-muted"}`}
                     >
                       {f}
                     </button>
@@ -176,7 +176,7 @@ export default function RegisterPoolForm() {
               />
             </Field>
 
-            <label className="flex items-start gap-2 text-xs text-text-muted max-sm:min-h-[44px] max-sm:py-1">
+            <label className="flex items-start gap-2 text-xs text-text-muted max-lg:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
                 checked={agreed}
@@ -218,7 +218,7 @@ export default function RegisterPoolForm() {
 
           <p className="mt-5 text-center text-sm text-text-muted">
             Sudah punya akun?{" "}
-            <a href="/login" className="font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <a href="/login" className="font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               Masuk
             </a>
           </p>

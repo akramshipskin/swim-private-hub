@@ -158,7 +158,7 @@ export default async function MemberPaketPage() {
           <span>Pengajuan ganti ke {req.toCoach.name} menunggu keputusan admin.</span>
           <form action={withdrawCoachChange}>
             <input type="hidden" name="requestId" value={req.id} />
-            <button type="submit" className="font-medium underline max-sm:min-h-[44px]">Batalkan pengajuan</button>
+            <button type="submit" className="font-medium underline max-lg:min-h-[44px]">Batalkan pengajuan</button>
           </form>
         </div>
       );
@@ -176,7 +176,7 @@ export default async function MemberPaketPage() {
             {req.payments.length === 0 && (
               <form action={withdrawCoachChange}>
                 <input type="hidden" name="requestId" value={req.id} />
-                <button type="submit" className="font-medium underline max-sm:min-h-[44px]">Batalkan pengajuan</button>
+                <button type="submit" className="font-medium underline max-lg:min-h-[44px]">Batalkan pengajuan</button>
               </form>
             )}
           </div>
@@ -348,7 +348,7 @@ export default async function MemberPaketPage() {
                             <p className="text-sm text-text-muted">{coach.coachProfile!.specialties.join(" · ")}</p>
                           )}
                         </div>
-                        <a href={`/pelatih/${coach.id}`} className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                        <a href={`/pelatih/${coach.id}`} className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                           Lihat profil coach
                         </a>
                       </div>

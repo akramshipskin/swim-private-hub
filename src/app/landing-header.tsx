@@ -26,7 +26,7 @@ export function LandingHeader() {
       }`}
     >
       <div className={`mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 transition-[padding] duration-200 sm:gap-4 ${scrolled ? "py-2 sm:py-3" : "py-5"}`}>
-        <Link href="/" className="flex shrink-0 items-center gap-2 text-white max-sm:min-h-[44px]">
+        <Link href="/" className="flex shrink-0 items-center gap-2 text-white max-lg:min-h-[44px]">
           <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
           <Logotype className="text-sm sm:text-xl" />
         </Link>
@@ -37,8 +37,8 @@ export function LandingHeader() {
           <a href="#faq" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">FAQ</a>
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Masuk</Link>
-          <Link href="/register" className="rounded-full bg-white px-2.5 py-2 text-sm font-semibold text-fixed-ink hover:bg-fixed-lime-100 sm:px-4 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar</Link>
+          <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Masuk</Link>
+          <Link href="/register" className="rounded-full bg-white px-2.5 py-2 text-sm font-semibold text-fixed-ink hover:bg-fixed-lime-100 sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Daftar</Link>
         </div>
       </div>
       {/* Tali lintasan kolam di bawah header; perenang kecil maju sesuai posisi

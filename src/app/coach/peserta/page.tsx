@@ -76,7 +76,7 @@ export default async function CoachPesertaPage() {
                     Akun {r.memberName} · Sesi terakhir {formatMilestoneDate(r.lastSession)} · Catatan terakhirmu{" "}
                     {lastNote ? formatMilestoneDate(lastNote) : "belum ada"}
                   </p>
-                  <Link href={`/milestone/${r.id}`} className="text-sm font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                  <Link href={`/milestone/${r.id}`} className="text-sm font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                     Update milestone →
                   </Link>
                 </CardBody>

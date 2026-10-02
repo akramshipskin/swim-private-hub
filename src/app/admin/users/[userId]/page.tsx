@@ -110,7 +110,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <Link href="/admin/users" className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+      <Link href="/admin/users" className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
         ← Kembali ke Kelola Pengguna
       </Link>
 
@@ -263,7 +263,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               </div>
               <Link
                 href={`/pelatih/${user.id}`}
-                className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+                className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
               >
                 Lihat profil publik →
               </Link>
@@ -308,7 +308,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                       <p className="text-sm text-text">Saldo kolam: {formatRupiah(pool.walletBalance)}</p>
                       <Link
                         href={`/admin/koreksi-saldo?target=pool:${pool.id}`}
-                        className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+                        className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
                       >
                         Koreksi saldo →
                       </Link>

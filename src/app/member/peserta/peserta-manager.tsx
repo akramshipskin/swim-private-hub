@@ -68,7 +68,7 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
 
                   {c.birthDate === null && <BirthDateForm dependentId={c.id} />}
 
-                  <Link href={`/milestone/${c.id}`} className="text-sm font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                  <Link href={`/milestone/${c.id}`} className="text-sm font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                     Lihat perkembangan (milestone)
                   </Link>
 
@@ -92,7 +92,7 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                   <button
                     type="button"
                     onClick={() => setConfirming(c)}
-                    className="mt-auto self-start text-sm font-medium text-danger-text hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+                    className="mt-auto self-start text-sm font-medium text-danger-text hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
                   >
                     Nonaktifkan peserta
                   </button>
@@ -115,11 +115,11 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                 <form action={formAction} className="flex flex-col gap-4">
                   <fieldset className="flex flex-col gap-2">
                     <legend className="mb-1 text-sm font-medium text-text">Peserta ini siapa?</legend>
-                    <label className="flex items-center gap-2 text-sm text-text max-sm:min-h-[44px]">
+                    <label className="flex items-center gap-2 text-sm text-text max-lg:min-h-[44px]">
                       <input type="radio" name="type" value="child" checked={type === "child"} onChange={() => setType("child")} />
                       Anak saya
                     </label>
-                    <label className="flex items-center gap-2 text-sm text-text max-sm:min-h-[44px]">
+                    <label className="flex items-center gap-2 text-sm text-text max-lg:min-h-[44px]">
                       <input
                         type="radio"
                         name="type"

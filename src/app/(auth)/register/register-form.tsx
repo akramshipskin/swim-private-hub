@@ -223,13 +223,13 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
               <button
                 type="button"
                 onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "", birthDate: "" }])}
-                className="self-start text-sm font-medium text-brand-700 hover:underline max-sm:min-h-[44px]"
+                className="self-start text-sm font-medium text-brand-700 hover:underline max-lg:min-h-[44px]"
               >
                 + Tambah peserta lain
               </button>
             </div>
 
-            <label className="flex items-start gap-2 text-xs text-text-muted max-sm:min-h-[44px] max-sm:py-1">
+            <label className="flex items-start gap-2 text-xs text-text-muted max-lg:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
                 checked={agreed}
@@ -263,7 +263,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
 
           <p className="mt-5 text-center text-sm text-text-muted">
             Sudah punya akun?{" "}
-            <a href="/login" className="font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <a href="/login" className="font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               Masuk
             </a>
           </p>

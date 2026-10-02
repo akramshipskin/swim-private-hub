@@ -129,7 +129,7 @@ export function AvailabilityDatePicker({
             <button
               type="button"
               onClick={prevMonth}
-              className="rounded-md p-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]"
+              className="rounded-md p-1 text-text-muted hover:bg-surface-muted max-lg:min-h-[44px] max-sm:min-w-[44px]"
               aria-label="Bulan sebelumnya"
             >
               ‹
@@ -140,7 +140,7 @@ export function AvailabilityDatePicker({
             <button
               type="button"
               onClick={nextMonth}
-              className="rounded-md p-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]"
+              className="rounded-md p-1 text-text-muted hover:bg-surface-muted max-lg:min-h-[44px] max-sm:min-w-[44px]"
               aria-label="Bulan berikutnya"
             >
               ›

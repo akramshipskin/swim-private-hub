@@ -114,7 +114,7 @@ export default async function CoachShortcutPage({
                   )
                 ) : (
                   c.filePath && (
-                    <Link href="/register" className="font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                    <Link href="/register" className="font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                       Lihat sertifikat (daftar dulu)
                     </Link>
                   )
@@ -202,7 +202,7 @@ export default async function CoachShortcutPage({
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/" className="inline-flex items-center gap-2 max-sm:min-h-[44px]">
+          <Link href="/" className="inline-flex items-center gap-2 max-lg:min-h-[44px]">
             <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-contain" />
             <Logotype className="text-lg" />
           </Link>

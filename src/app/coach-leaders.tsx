@@ -176,7 +176,7 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
               <div className="coach-face">
                 <div className="px-2 pb-2 pt-4">
                   <CoachHeading c={c} />
-                  <Link href={`/pelatih/${c.id}`} className="mt-2 inline-block text-sm font-semibold text-fixed-ink underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                  <Link href={`/pelatih/${c.id}`} className="mt-2 inline-block text-sm font-semibold text-fixed-ink underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                     Lihat profil lengkap
                   </Link>
                 </div>
@@ -198,7 +198,7 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
                 <p className="mt-3 text-sm text-fixed-muted">
                   Mengajar di: <span className="font-semibold text-fixed-ink">{c.pools.join(", ") || "-"}</span>
                 </p>
-                <Link href={`/pelatih/${c.id}`} className="fx-coach-link mt-2 inline-block text-sm font-semibold text-fixed-ink underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                <Link href={`/pelatih/${c.id}`} className="fx-coach-link mt-2 inline-block text-sm font-semibold text-fixed-ink underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                   Lihat profil lengkap
                 </Link>
               </div>

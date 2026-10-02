@@ -40,7 +40,7 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
             tabIndex={a.key === active ? 0 : -1}
             aria-controls={`${base}-panel`}
             onClick={() => setActive(a.key)}
-            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-lg:min-h-[44px] ${
               a.key === active ? "bg-fixed-ink text-white" : "border border-fixed-ink/15 bg-white text-fixed-ink hover:bg-fixed-sand"
             }`}
           >
@@ -87,7 +87,7 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
             tabIndex={g.key === active ? 0 : -1}
             aria-controls={`${base}-panel`}
             onClick={() => setActive(g.key)}
-            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
+            className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-lg:min-h-[44px] ${
               g.key === active
                 ? "bg-fixed-ink text-white"
                 : "border border-fixed-ink/15 bg-white text-fixed-ink hover:bg-fixed-sand"
@@ -100,7 +100,7 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
       <div id={`${base}-panel`} role="tabpanel" aria-labelledby={`${base}-tab-${active}`} className="flex flex-col divide-y divide-fixed-ink/10 border-y border-fixed-ink/10">
         {current.items.map((item) => (
           <details key={item.q} className="fx-faq group py-5">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold marker:content-none max-sm:min-h-[44px]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold marker:content-none max-lg:min-h-[44px]">
               {item.q}
               <span aria-hidden="true" className="text-2xl leading-none transition-transform group-open:rotate-45">
                 +

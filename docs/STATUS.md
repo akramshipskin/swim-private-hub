@@ -1,8 +1,8 @@
-# STATUS SPH (diperbarui 2 Okt 2026 malam, sapu memori sebelum compact)
+# STATUS SPH (diperbarui 3 Okt 2026 dini hari, mode tidur: rencana ChatGPT ke-2 dikerjakan)
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: e86cb24 / 6e9ce0b dokumen (2 Okt malam; GitHub hijau, Vercel sukses). Kode aplikasi terakhir: af7bbc1 (sweeping total). Tanpa migrasi baru.
+## Terakhir live: aec5c68 (3 Okt dini hari; GitHub hijau termasuk uji alur penuh, Vercel sukses). Tanpa migrasi baru.
 
 ## Sudah selesai dan live
 - Per 30 Sep: tanggal lahir di semua form daftar; notifikasi admin pendaftar baru; testimoni; CSP aktif; PPN komisi 11%; landing dirombak; backup database dan storage hijau.
@@ -20,24 +20,25 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 
 - 2 Okt sore (live): batch Sonnet S1-S16 (3304cb3) + batch Opus O1-O8 (5bc6b97: komisi afiliasi 50% biaya layanan bersih sejak 3 Okt, kunci login 3x/10x/20x, perjanjian+MOU rev.2 DISETUJUI orang hukum, tanda pencairan >7 hari kerja, rekap PPh, statistik landing akun asli). Laporan docs/reviews/2026-10-02-opus-batch-o1-o8.md.
 - 2 Okt siang-sore (live af7bbc1): sweeping sistem total + O6 (bayar -> Hadir -> Tidak Hadir -> audit cocok), 0 temuan berat/sedang. docs/reviews/2026-10-02-sweeping-sistem-total.md.
+- 3 Okt dini hari (Opus, live): rencana sweeping ChatGPT ke-2 P1-P7 + P9 + S1-S19 (rinci di docs/reviews/2026-10-03-validasi-rencana-chatgpt-2.md): model lama dihapus total, admin "Berikan paket" model baru tanpa bagi hasil, batas bayar 24 jam, jam buka kolam dijaga, harga kelipatan Rp1.000, verifikasi sertifikat DB (siap, belum aktif), uji alur penuh di GitHub, tombol Uji Pulih Backup, bilah bawah HP semua peran, menu admin 4 kelompok, halaman masuk/daftar baru, dst. Pemeriksa Opus kedua: 0 berat.
+
 ## Sedang jalan
-- **Antrean utama: docs/backlog/2026-10-02-rencana-sweeping-chatgpt-2.md** (32 temuan sweeping ChatGPT ke-2, SEMUA sudah diputuskan Hadi 2 Okt malam, rincian di KEPUTUSAN.md "2 Okt malam"). Opus P1-P9, Sonnet S1-S19, daftar "tidak dikerjakan". BELUM dikerjakan; Hadi memilih compact dulu lalu mulai.
-- Inti keputusan: hapus model lama total (data dummy; kolom DB tidak di-drop dulu), batas bayar 24 jam di semua tempat, jam buka kolam dijaga di slot+booking, harga kelipatan Rp1.000, verifikasi sertifikat DB, uji alur penuh di GitHub, uji pulih backup, reset password via email terkonfirmasi (setelah email prod terbukti), navigasi HP bilah bawah, menu admin 4 kelompok.
-- Koreksi Claude 2 Okt malam: (1) klaim "tidak ada sisa model lintas-kolam di kode" salah (cari "lintas kolam" tanpa tanda hubung); README + komentar saldo/skema masih lama -> S1. (2) Label "pernah les" (S1 pagi) tidak cocok dengan dasar hitung paket -> S2.
-- Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek (Hadi cek Test events). Pembayaran asli di production belum pernah ada.
+- Sweeping total 3 Okt selesai: 420 tangkapan layar, 0 bocor akses, 0 error server, audit cocok, 3 perbaikan mekanis (docs/reviews/2026-10-03-sweeping-total.md).
+- Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Setelah aba-aba Hadi (sesi baru): Opus P1 (hapus model lama) -> P2-P5 -> pemeriksa Opus kedua + tes balapan -> push; skrip production (paket lama berakhir) dijalankan Hadi.
-2. Sonnet S1-S19 satu batch (S5, S12, S19 sesudah P1); lalu Opus P6 (uji alur penuh), P7 (uji pulih backup); P8 setelah email production terbukti.
-3. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB lama (sebulan setelah P1).
+1. Tunggu jawaban Hadi atas pertanyaan di laporan 3 Okt (teks hukum komisi 5%/peralihan, sesi paket lama, ganti coach paket gratis, uji pulih lewat GitHub).
+2. P8 (reset password via email) setelah email production terbukti.
+3. Pantau rilis stabil next-auth v5 (sekarang dikunci 5.0.0-beta.32).
+4. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi).
 
 ## Tugas Hadi
-1. Beri aba-aba mulai rencana sweeping ChatGPT ke-2 (sesi baru, Opus dulu).
-2. Cek event Meta (jendela penyamaran: PageView, daftar 1 member dummy), lalu hapus META_TEST_EVENT_CODE di Vercel.
-3. Cek landing + aplikasi di HP asli + Safari; satu pembayaran sungguhan sampai paket aktif; menu Paket (member) & Ganti Coach (admin).
-4. Tes production butuh akun/perangkat Hadi: unggah foto/sertifikat/tanda tangan, email masuk & keluar (syarat P8), notifikasi HP.
-5. Akuntan: PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus. Testimoni asli.
-6. Matikan plugin/konektor tak terpakai di aplikasi Desktop.
+1. Production: jalankan skrip akhiri-paket-lama (lihat dulu, lalu --apply) dan isi-harga-dummy (mengisi jam buka kolam yang kosong; tanpa jam buka coach tidak bisa buka jadwal).
+2. Jalankan sekali tombol GitHub Actions > Uji Pulih Backup.
+3. P5: isi DATABASE_CA_CERT (sertifikat CA dari Supabase) di pratinjau Vercel dulu, cek situs pratinjau jalan, baru production.
+4. Cek event Meta (jendela penyamaran), lalu hapus META_TEST_EVENT_CODE di Vercel.
+5. Cek HP asli + Safari; satu pembayaran sungguhan sampai paket aktif; unggah foto/sertifikat, email, notifikasi HP.
+6. Akuntan: PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus. Testimoni asli. Matikan plugin tak terpakai.
 
 ## Belum terverifikasi
 - HP asli dan Safari (landing, animasi, aplikasi); notifikasi push; unggah file ke penyimpanan asli; email; pembayaran asli sampai paket aktif; buku besar production; tampilan halaman yang butuh login di production.

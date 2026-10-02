@@ -82,20 +82,20 @@ export function MilestoneUpdateForm({
             {set?.currentLevelLabel ? ` — ${set.currentLevelLabel}` : ""}
           </p>
           {currentItems.map((it) => (
-            <label key={it.id} className="flex items-start gap-2 text-sm text-text max-sm:min-h-[44px]">
+            <label key={it.id} className="flex items-start gap-2 text-sm text-text max-lg:min-h-[44px]">
               <input type="checkbox" name="achieved" value={it.id} className={checkbox} />
               <span>{it.text}</span>
             </label>
           ))}
           {otherItems.length > 0 && (
             <details open={prior} className="rounded-lg border border-border px-3 py-2">
-              <summary className="cursor-pointer text-sm font-medium text-text-muted max-sm:flex max-sm:min-h-[44px] max-sm:items-center">Butir di level lain</summary>
+              <summary className="cursor-pointer text-sm font-medium text-text-muted max-sm:flex max-lg:min-h-[44px] max-lg:items-center">Butir di level lain</summary>
               <div className="mt-2 flex flex-col gap-3">
                 {otherItems.map((g) => (
                   <div key={g.label} className="flex flex-col gap-1.5">
                     <p className="text-xs font-semibold text-text-muted">{g.label}</p>
                     {g.items.map((it) => (
-                      <label key={it.id} className="flex items-start gap-2 text-sm text-text max-sm:min-h-[44px]">
+                      <label key={it.id} className="flex items-start gap-2 text-sm text-text max-lg:min-h-[44px]">
                         <input type="checkbox" name="achieved" value={it.id} className={checkbox} />
                         <span>{it.text}</span>
                       </label>
@@ -163,7 +163,7 @@ export function AddItemForm({ dependentId, levels }: { dependentId: string; leve
           ))}
         </Select>
       </Field>
-      <label className="flex items-start gap-2 text-sm text-text max-sm:min-h-[44px]">
+      <label className="flex items-start gap-2 text-sm text-text max-lg:min-h-[44px]">
         <input type="checkbox" name="propose" className={checkbox} />
         <span>
           Usulkan jadi butir standar SPH

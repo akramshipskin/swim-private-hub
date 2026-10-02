@@ -619,10 +619,10 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Hubungi kami</p>
-            <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               WhatsApp +62 821-1717-3124
             </a>
-            <a href="mailto:hello@swimprivatehub.biz.id" className="hover:text-white hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+            <a href="mailto:hello@swimprivatehub.biz.id" className="hover:text-white hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               hello@swimprivatehub.biz.id
             </a>
             <p>{BUSINESS_ADDRESS}</p>
@@ -630,18 +630,18 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Gabung</p>
-            <Link href="/register" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar sebagai member</Link>
-            <Link href="/daftar-coach" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftar jadi coach</Link>
-            <Link href="/daftar-kolam" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Daftarkan kolam</Link>
-            <Link href="/panduan" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Panduan pemakaian</Link>
+            <Link href="/register" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Daftar sebagai member</Link>
+            <Link href="/daftar-coach" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Daftar jadi coach</Link>
+            <Link href="/daftar-kolam" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Daftarkan kolam</Link>
+            <Link href="/panduan" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Panduan pemakaian</Link>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Ketentuan</p>
-            <Link href="/syarat-ketentuan" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Syarat &amp; Ketentuan</Link>
-            <Link href="/kebijakan-privasi" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Privasi</Link>
-            <Link href="/kebijakan-pengembalian" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Pengembalian</Link>
-            <Link href="/kebijakan-cookie" className="fx-link hover:text-white max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">Kebijakan Cookie</Link>
+            <Link href="/syarat-ketentuan" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Syarat &amp; Ketentuan</Link>
+            <Link href="/kebijakan-privasi" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Kebijakan Privasi</Link>
+            <Link href="/kebijakan-pengembalian" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Kebijakan Pengembalian</Link>
+            <Link href="/kebijakan-cookie" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Kebijakan Cookie</Link>
           </div>
         </div>
 

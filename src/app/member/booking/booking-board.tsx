@@ -286,7 +286,7 @@ export default function BookingBoard({
                 key={pool.id}
                 type="button"
                 onClick={() => setPoolId(pool.id)}
-                className={`rounded-full border px-3 py-1 text-sm font-semibold max-sm:min-h-[44px] ${pool.id === poolId ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border text-text hover:bg-surface-muted"}`}
+                className={`rounded-full border px-3 py-1 text-sm font-semibold max-lg:min-h-[44px] ${pool.id === poolId ? "border-brand-600 bg-brand-50 text-brand-700" : "border-border text-text hover:bg-surface-muted"}`}
               >
                 {pool.name} · sisa {sisa} sesi
               </button>
@@ -353,7 +353,7 @@ export default function BookingBoard({
                 <button
                   type="button"
                   onClick={() => setShowFullCalendar((v) => !v)}
-                  className="font-medium text-brand-700 underline underline-offset-2 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+                  className="font-medium text-brand-700 underline underline-offset-2 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
                 >
                   {showFullCalendar ? "Tutup kalender" : "Pilih tanggal lain"}
                 </button>
@@ -404,7 +404,7 @@ export default function BookingBoard({
             {dependentPoolNames.length > 0 && <> Paketnya berlaku di: {dependentPoolNames.join(", ")}.</>}
             {" "}Beli paket dulu agar bisa booking.
           </p>
-          <Link href="/member/paket" className="shrink-0 font-medium underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+          <Link href="/member/paket" className="shrink-0 font-medium underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
             Lihat paket
           </Link>
         </div>
@@ -541,7 +541,7 @@ export default function BookingBoard({
                               })}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 max-sm:min-h-[44px]"
+                              className="inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 max-lg:min-h-[44px]"
                             >
                               Hubungi Admin (WA)
                             </a>
@@ -574,7 +574,7 @@ export default function BookingBoard({
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">{others.map(renderGroup)}</div>
                   ) : (
                     <details className="rounded-xl border border-border bg-surface px-4 py-3">
-                      <summary className="cursor-pointer text-sm font-medium text-text max-sm:min-h-[44px] max-sm:py-3">
+                      <summary className="cursor-pointer text-sm font-medium text-text max-lg:min-h-[44px] max-lg:py-3">
                         Jadwal coach lain ({others.length}) · tidak bisa dibooking dengan paket ini
                       </summary>
                       <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2 xl:grid-cols-3">{others.map(renderGroup)}</div>

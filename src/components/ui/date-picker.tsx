@@ -150,7 +150,7 @@ export function DatePicker({
             <button
               type="button"
               onClick={prevMonth}
-              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]"
+              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted max-lg:min-h-[44px] max-sm:min-w-[44px]"
               aria-label="Bulan sebelumnya"
             >
               ‹
@@ -184,7 +184,7 @@ export function DatePicker({
             <button
               type="button"
               onClick={nextMonth}
-              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]"
+              className="shrink-0 rounded-md px-1.5 py-1 text-text-muted hover:bg-surface-muted max-lg:min-h-[44px] max-sm:min-w-[44px]"
               aria-label="Bulan berikutnya"
             >
               ›

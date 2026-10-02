@@ -54,7 +54,7 @@ export default function AffiliateCoachForm({
                 type="button"
                 onClick={() => setRemoving(a)}
                 aria-label={`Lepas ${a.coachName} dari kolam ini`}
-                className="rounded-full px-1.5 text-lg leading-none text-text-subtle hover:bg-danger-bg hover:text-danger-text max-sm:inline-flex max-sm:h-11 max-sm:w-11 max-sm:items-center max-sm:justify-center"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-lg leading-none text-text-subtle hover:bg-danger-bg hover:text-danger-text max-lg:h-11 max-lg:w-11"
               >
                 ×
               </button>

@@ -132,7 +132,7 @@ export default async function AdminKoreksiSaldoPage({ searchParams }: { searchPa
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-lg font-semibold text-text">{selected ? `Riwayat koreksi ${selected.name}` : "Riwayat semua koreksi"}</h2>
             {selected && (
-              <Link href="/admin/koreksi-saldo" className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+              <Link href="/admin/koreksi-saldo" className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                 Lihat semua
               </Link>
             )}

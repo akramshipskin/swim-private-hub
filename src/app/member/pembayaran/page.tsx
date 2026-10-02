@@ -96,7 +96,7 @@ export default async function MemberPembayaranPage() {
                       {expired ? (
                         <>
                           <Badge tone="neutral">Kedaluwarsa</Badge>
-                          <Link href="/member/paket" className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                          <Link href="/member/paket" className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                             Beli lagi &rarr;
                           </Link>
                         </>
@@ -108,7 +108,7 @@ export default async function MemberPembayaranPage() {
                           {p.status === "PENDING" && p.snapRedirectUrl && (
                             <a
                               href={p.snapRedirectUrl}
-                              className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+                              className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
                             >
                               Lanjut bayar &rarr;
                             </a>

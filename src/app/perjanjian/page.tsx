@@ -54,7 +54,7 @@ export default async function PerjanjianPage({ searchParams }: { searchParams: P
           </p>
           <form action={acceptPartnerAgreement} className="flex flex-col gap-4">
             <input type="hidden" name="version" value={doc.version} />
-            <label className="flex items-start gap-2 text-sm text-text-muted max-sm:min-h-[44px] max-sm:py-1">
+            <label className="flex items-start gap-2 text-sm text-text-muted max-lg:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
                 name="agree"

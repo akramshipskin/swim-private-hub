@@ -53,7 +53,7 @@ export function PesertaList({ items }: { items: PesertaRow[] }) {
   const activeCount = items.filter((p) => p.pkg).length;
   return (
     <details>
-      <summary className="cursor-pointer list-none text-text marker:content-none [&::-webkit-details-marker]:hidden max-sm:flex max-sm:min-h-[44px] max-sm:items-center">
+      <summary className="cursor-pointer list-none text-text marker:content-none [&::-webkit-details-marker]:hidden max-sm:flex max-lg:min-h-[44px] max-lg:items-center">
         <span className="inline-flex items-center gap-1">
           {items.length} peserta · {activeCount} aktif
           <svg
@@ -92,7 +92,7 @@ export function UserActions({
           href={buildContactWaLink(user.phone, user.name)}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-md px-2 py-1.5 text-sm font-medium text-whatsapp-text hover:bg-whatsapp/10 max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+          className="rounded-md px-2 py-1.5 text-sm font-medium text-whatsapp-text hover:bg-whatsapp/10 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
         >
           Hubungi
         </a>

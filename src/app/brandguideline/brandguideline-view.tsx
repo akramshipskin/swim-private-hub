@@ -110,13 +110,13 @@ export default function BrandGuidelineView() {
     <main className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <Link href="/" className="flex items-center gap-2 max-sm:min-h-[44px]">
+          <Link href="/" className="flex items-center gap-2 max-lg:min-h-[44px]">
             <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-lg object-contain" />
             <Logotype className="text-sm" />
           </Link>
           <Link
             href="/"
-            className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+            className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
           >
             ← Beranda
           </Link>
@@ -146,7 +146,7 @@ export default function BrandGuidelineView() {
             <a
               key={item.href}
               href={item.href}
-              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-muted hover:border-brand-500 hover:text-text max-sm:min-h-[44px] max-sm:inline-flex max-sm:items-center"
+              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-muted hover:border-brand-500 hover:text-text max-lg:min-h-[44px] max-lg:inline-flex max-lg:items-center"
             >
               {item.label}
             </a>
@@ -417,7 +417,7 @@ export default function BrandGuidelineView() {
           </div>
           <p className="text-xs text-text-subtle">
             Area sentuh minimum di HP (di bawah 640px): <b className="text-text">44 × 44px</b> untuk tombol, tautan
-            mandiri, dan kolom isian (kelas <code>max-sm:min-h-[44px]</code>). Tautan di tengah kalimat dikecualikan.
+            mandiri, dan kolom isian (kelas <code>max-lg:min-h-[44px]</code>). Tautan di tengah kalimat dikecualikan.
           </p>
         </Section>
 

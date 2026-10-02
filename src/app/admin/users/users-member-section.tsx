@@ -67,7 +67,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                   {filtered.map((u) => (
                     <tr key={u.id} className="border-b border-border last:border-0">
                       <td className="px-5 py-4">
-                        <Link href={`/admin/users/${u.id}`} className="font-medium text-text hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                        <Link href={`/admin/users/${u.id}`} className="font-medium text-text hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                           {u.name}
                         </Link>
                         {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
@@ -85,7 +85,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/admin/users/${u.id}`}
-                            className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-text hover:bg-surface-muted max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center"
+                            className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-text hover:bg-surface-muted max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
                           >
                             Info detail
                           </Link>

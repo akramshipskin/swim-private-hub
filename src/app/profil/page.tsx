@@ -121,7 +121,7 @@ export default async function ProfilPage() {
                       ? "Aktif — setiap masuk kamu diminta kode dari Google Authenticator."
                       : "Belum aktif. Tambahan pengaman: selain password, masuk juga butuh kode dari HP-mu."}
                   </p>
-                  <a href="/keamanan" className="inline-block text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                  <a href="/keamanan" className="inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                     {totp.totpEnabledAt ? "Kelola 2FA →" : "Pasang 2FA →"}
                   </a>
                 </CardBody>

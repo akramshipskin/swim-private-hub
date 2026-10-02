@@ -71,7 +71,7 @@ export function ChatWidget() {
                 <a href="/kebijakan-privasi" target="_blank" className="underline">Kebijakan Privasi</a>.
               </p>
             </div>
-            <button type="button" onClick={() => setOpen(false)} aria-label="Tutup chat" className="rounded-md px-2 py-1 text-text-muted hover:bg-surface-muted max-sm:min-h-[44px] max-sm:min-w-[44px]">
+            <button type="button" onClick={() => setOpen(false)} aria-label="Tutup chat" className="rounded-md px-2 py-1 text-text-muted hover:bg-surface-muted max-lg:min-h-[44px] max-sm:min-w-[44px]">
               ✕
             </button>
           </div>

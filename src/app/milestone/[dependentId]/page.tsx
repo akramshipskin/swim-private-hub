@@ -95,7 +95,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
     >
       <main className="w-full px-4 pb-16 py-6 sm:pb-8 sm:py-8">
         {back && (
-          <Link href={back.href} className="text-sm font-medium text-brand-700 hover:underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+          <Link href={back.href} className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
             {back.label}
           </Link>
         )}
@@ -153,7 +153,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
                               <Badge>Belum</Badge>
                             )}
                             {done?.withCertificate && (
-                              <Link href={`/milestone/${dependentId}/sertifikat/${done.id}`} className="text-sm font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                              <Link href={`/milestone/${dependentId}/sertifikat/${done.id}`} className="text-sm font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                                 Sertifikat
                               </Link>
                             )}
@@ -204,7 +204,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
                       <li key={c.id} className="flex flex-wrap items-center gap-2 text-sm text-text">
                         {levelLabel(c.group as MilestoneGroup, c.level)} · {formatMilestoneDate(c.completedAt)}
                         {c.withCertificate && (
-                          <Link href={`/milestone/${dependentId}/sertifikat/${c.id}`} className="font-medium text-brand-700 underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                          <Link href={`/milestone/${dependentId}/sertifikat/${c.id}`} className="font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                             Sertifikat
                           </Link>
                         )}
