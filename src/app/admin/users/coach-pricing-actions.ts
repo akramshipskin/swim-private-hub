@@ -11,7 +11,9 @@ import type { PackPriceState } from "@/components/pack-price-form";
 export async function updateCoachPricing(_prev: PackPriceState, formData: FormData): Promise<PackPriceState> {
   await requireRole("ADMIN");
   const userId = formData.get("userId")?.toString() ?? "";
-  const prices = parsePackPrices(formData);
+  const current = await prisma.coachProfile.findUnique({ where: { userId }, select: { pricePack4: true, pricePack8: true } });
+  if (!current) return { error: "Profil coach tidak ditemukan." };
+  const prices = parsePackPrices(formData, current);
   if ("error" in prices) return prices;
   const res = await prisma.coachProfile.updateMany({
     where: { userId },

@@ -142,7 +142,12 @@ export function pphAmount(gross: number, exempt: boolean) {
 }
 
 // Isian form harga paket (coach/kolam/admin). Kosong = tidak menjual ukuran itu.
-export function parsePackPrices(formData: FormData): { pricePack4: number | null; pricePack8: number | null } | { error: string } {
+// current = harga yang tersimpan di database sekarang (bukan dari form: isian
+// tersembunyi bisa dipalsukan); harga yang sama dengan itu boleh bukan kelipatan.
+export function parsePackPrices(
+  formData: FormData,
+  current: { pricePack4: number | null; pricePack8: number | null } | null,
+): { pricePack4: number | null; pricePack8: number | null } | { error: string } {
   const read = (key: string) => {
     const raw = formData.get(key)?.toString().trim() ?? "";
     return raw === "" ? null : Number(raw);
@@ -153,12 +158,8 @@ export function parsePackPrices(formData: FormData): { pricePack4: number | null
     if (v !== null && !isValidPackPrice(v)) return { error: "Harga harus angka bulat Rp1 sampai Rp50.000.000, atau dikosongkan." };
   }
   // Harga baru wajib kelipatan Rp1.000 (Hadi 2 Okt malam, #8); harga lama yang
-  // tidak diubah (sama dengan nilai saat form dibuka) tetap diterima.
-  const orig = (key: string) => {
-    const raw = formData.get(key)?.toString().trim() ?? "";
-    return raw === "" ? null : Number(raw);
-  };
-  for (const [v, o] of [[pricePack4, orig("origPack4")], [pricePack8, orig("origPack8")]] as const) {
+  // tidak diubah (sama dengan yang tersimpan) tetap diterima.
+  for (const [v, o] of [[pricePack4, current?.pricePack4 ?? null], [pricePack8, current?.pricePack8 ?? null]] as const) {
     if (v !== null && v !== o && v % PRICE_STEP !== 0) return { error: "Harga harus kelipatan Rp1.000, misal Rp260.000." };
   }
   return { pricePack4, pricePack8 };

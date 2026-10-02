@@ -7,7 +7,10 @@ import { prisma } from "@/lib/prisma";
 import { refundMemberBalanceOnce } from "@/lib/member-wallet";
 import { PAYMENT_WINDOW_MS } from "@/lib/policy";
 
-export const STALE_PAYMENT_MS = PAYMENT_WINDOW_MS;
+// Jeda aman 15 menit di atas batas bayar: transaksi Midtrans dibuat beberapa
+// detik setelah Payment, dan notifikasi lunas bisa datang sedikit terlambat.
+// Batas yang dilihat member tetap 24 jam (expiry Snap).
+export const STALE_PAYMENT_MS = PAYMENT_WINDOW_MS + 15 * 60 * 1000;
 
 export async function releaseStalePayments(now = new Date()) {
   const stale = await prisma.payment.findMany({

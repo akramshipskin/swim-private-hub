@@ -96,7 +96,9 @@ export async function updatePoolPricing(_prev: PackPriceState, formData: FormDat
   await requireRole("ADMIN");
   const poolId = formData.get("poolId")?.toString() ?? "";
   if (!poolId) return { error: "Kolam tidak valid." };
-  const prices = parsePackPrices(formData);
+  const current = await prisma.pool.findUnique({ where: { id: poolId }, select: { pricePack4: true, pricePack8: true } });
+  if (!current) return { error: "Kolam tidak ditemukan." };
+  const prices = parsePackPrices(formData, current);
   if ("error" in prices) return prices;
   const feeRaw = formData.get("serviceFeePercent")?.toString().trim().replace(",", ".") ?? "";
   const serviceFeeBps = feeRaw === "" ? NaN : Math.round(Number(feeRaw) * 100);

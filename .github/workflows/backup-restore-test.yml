@@ -73,6 +73,8 @@ jobs:
         run: |
           set -euo pipefail
           gpg --batch --quiet --decrypt --passphrase-fd 3 --output backup.dump backup.dump.gpg 3<<< "$BACKUP_PASSPHRASE"
+          # Backup berisi CREATE SCHEMA public; database baru sudah punya skema itu.
+          psql "postgresql://qa:qa@localhost:5432/pulih" -c 'DROP SCHEMA public CASCADE'
           pg_restore --no-owner --no-privileges --exit-on-error -d postgresql://qa:qa@localhost:5432/pulih backup.dump
           echo "Pulih selesai."
 
@@ -86,14 +88,16 @@ jobs:
           psql -At "postgresql://qa:qa@localhost:5432/pulih" -c "$Q" > pulih.txt
           PGOPTIONS="-c default_transaction_read_only=on" psql -At "$PROD_URL" -c "$Q" > prod.txt
           echo "Tabel di backup: $(wc -l < pulih.txt)"
-          # Backup dibuat paling lama ~1 hari lalu: tabel yang bertambah sejak itu
-          # wajar lebih banyak di production. Yang gagal: tabel hilang, atau
-          # backup berisi LEBIH banyak baris dari production (salah database).
+          # Backup dibuat paling lama ~1 hari lalu, jadi angka wajar berbeda. Yang
+          # gagal: tabel hilang dari backup, atau tabel yang barisnya tidak pernah
+          # dihapus (uang, akun, paket) berisi LEBIH banyak di backup daripada
+          # production (tanda salah database). Tabel lain hanya dilaporkan.
+          KEEP="User Package Payment WalletTransaction MemberWalletTransaction Booking WithdrawalRequest _prisma_migrations"
           FAIL=0
           while IFS='=' read -r t prod; do
             b="$(grep -E "^$t=" pulih.txt | cut -d= -f2 || true)"
             if [ -z "$b" ]; then echo "HILANG di backup: $t"; FAIL=1;
-            elif [ "$b" -gt "$prod" ]; then echo "ANEH: $t backup $b > production $prod"; FAIL=1;
+            elif [ "$b" -gt "$prod" ] && [[ " $KEEP " == *" $t "* ]]; then echo "ANEH: $t backup $b > production $prod"; FAIL=1;
             else echo "$t: backup $b / production $prod"; fi
           done < prod.txt
           grep -q '^User=' pulih.txt || { echo "Tabel User tidak terpulihkan"; FAIL=1; }

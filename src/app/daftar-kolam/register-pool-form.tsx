@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { PartnerSteps } from "@/components/partner-steps";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import { isValidIndonesianPhone } from "@/lib/format";
@@ -236,6 +237,7 @@ export default function RegisterPoolForm() {
           </p>
         </CardBody>
       </Card>
+      <PartnerSteps kind="kolam" />
     </main>
   );
 }

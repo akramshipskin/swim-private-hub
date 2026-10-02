@@ -7,7 +7,7 @@ const poolUpdate = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     poolOwnership: { count: (...a: unknown[]) => ownershipCount(...a) },
-    pool: { update: (...a: unknown[]) => poolUpdate(...a) },
+    pool: { update: (...a: unknown[]) => poolUpdate(...a), findUnique: vi.fn().mockResolvedValue({ pricePack4: null, pricePack8: null }) },
   },
 }));
 

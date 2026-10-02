@@ -58,6 +58,12 @@ if (apply && ids.length) {
     await db.query(`UPDATE "Availability" SET status = 'AVAILABLE' WHERE id = ANY($1) AND status = 'BOOKED'`, [upcoming.rows.map((r) => r.availabilityId)]);
   }
   await db.query(`UPDATE "Package" SET status = 'EXPIRED' WHERE id = ANY($1)`, [ids]);
+  // Pembayaran yang masih menunggu ikut ditandai kedaluwarsa. Kalau Midtrans tetap
+  // mengabarkan lunas (uang sungguhan masuk), notifikasi itu tetap dihormati dan
+  // paket aktif lagi; paket lama tidak bisa dibooking, jadi admin memberi paket
+  // model baru sebagai gantinya.
+  const pays = await db.query(`UPDATE "Payment" SET status = 'EXPIRED' WHERE "packageId" = ANY($1) AND status = 'PENDING'`, [ids]);
+  console.log(`Pembayaran menunggu ditandai kedaluwarsa: ${pays.rowCount}`);
   await db.query("COMMIT");
   console.log("Selesai: paket ditandai Berakhir.");
 } else {

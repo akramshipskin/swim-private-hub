@@ -300,10 +300,17 @@ export function CoachSection() {
           ))}
         </Spotlight>
 
-        <p className="mt-8 max-w-2xl text-sm text-white/70">
-          Satu kewajiban yang perlu kamu tahu: mulai 1 Oktober 2026, catatan perkembangan peserta diisi setiap 2 sesi
-          Hadir.
-        </p>
+        {/* Kartu "Satu syarat pencairan" (Hadi 2 Okt malam, #19). */}
+        <Reveal>
+          <div className="mt-8 max-w-2xl rounded-3xl border border-fixed-lime/40 bg-white/[0.04] p-6">
+            <p className="text-xs font-semibold uppercase tracking-wide text-fixed-lime">Satu syarat pencairan</p>
+            <p className="mt-2 text-lg font-semibold leading-snug">Isi catatan perkembangan peserta setiap 2 sesi Hadir.</p>
+            <p className="mt-2 text-sm text-white/75">
+              Berlaku untuk sesi sejak 1 Oktober 2026. Selama ada catatan yang belum diisi, pengajuan pencairan baru ditahan
+              dulu; saldomu tetap tersimpan dan bisa dicairkan setelah catatannya diisi.
+            </p>
+          </div>
+        </Reveal>
         <Link href="/daftar-coach" className="mt-6 inline-flex items-center rounded-full bg-fixed-lime px-6 py-3 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
           Daftar jadi coach
         </Link>

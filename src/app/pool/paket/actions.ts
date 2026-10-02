@@ -16,7 +16,9 @@ export async function updatePoolPrices(_prev: PackPriceState, formData: FormData
   const session = await requireRole("POOL_OWNER");
   const poolId = formData.get("poolId")?.toString() ?? "";
   if (!poolId || !(await ownsPool(session.user.id, poolId))) return { error: "Kamu tidak punya akses ke kolam ini." };
-  const prices = parsePackPrices(formData);
+  const current = await prisma.pool.findUnique({ where: { id: poolId }, select: { pricePack4: true, pricePack8: true } });
+  if (!current) return { error: "Kolam tidak ditemukan." };
+  const prices = parsePackPrices(formData, current);
   if ("error" in prices) return prices;
   await prisma.pool.update({ where: { id: poolId }, data: prices });
   revalidatePath("/pool/paket");

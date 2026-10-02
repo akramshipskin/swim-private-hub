@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Logotype } from "@/components/ui/logotype";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { PartnerSteps } from "@/components/partner-steps";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { isValidIndonesianPhone } from "@/lib/format";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
@@ -259,6 +260,7 @@ export default function RegisterCoachForm() {
           </p>
         </CardBody>
       </Card>
+      <PartnerSteps kind="coach" />
     </main>
   );
 }
