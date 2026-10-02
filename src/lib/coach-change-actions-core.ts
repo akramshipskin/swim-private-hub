@@ -34,7 +34,10 @@ export async function submitCoachChange(memberId: string, input: { packageId: st
   const reason = input.reason.trim();
   if (reason.length < MIN_REASON_LENGTH) return { error: `Tulis alasannya minimal ${MIN_REASON_LENGTH} huruf.` };
   if (reason.length > MAX_REASON_LENGTH) return { error: `Alasan maksimal ${MAX_REASON_LENGTH} huruf.` };
-  const pkg = await prisma.package.findFirst({ where: { id: input.packageId, memberId } });
+  // Paket pemberian manual admin (tanpa pembayaran) tidak bisa ganti coach lewat
+  // pengajuan: ganti ke coach lebih murah akan mengkredit selisih sebagai saldo
+  // uang padahal paketnya tidak dibayar. Admin memberi paket baru saja.
+  const pkg = await prisma.package.findFirst({ where: { id: input.packageId, memberId, payments: { some: { status: "SUCCESS" } } } });
   if (!pkg || !pkg.coachId || pkg.poolPrice == null || pkg.isTrial) return { error: "Paket ini tidak bisa diganti coach-nya." };
   if (!isUsablePackage(pkg) && (await remainingSessions(prisma, pkg.id, 0)) === 0) {
     return { error: "Paket ini sudah tidak punya sisa sesi atau sudah kedaluwarsa." };

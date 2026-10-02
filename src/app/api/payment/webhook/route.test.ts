@@ -40,27 +40,27 @@ const DAY = 24 * 60 * 60 * 1000;
 beforeEach(() => vi.clearAllMocks());
 
 describe("webhook package validity", () => {
-  it("activates a 1-session package for 14 days, ignoring any template duration", async () => {
+  it("uses the duration stored on the package (8 sesi = 90 hari)", async () => {
     paymentFindUnique.mockResolvedValue({
       id: "pay-1",
       status: "PENDING",
       amount: 135000,
       packageId: "pkg-1",
-      package: { isSingleSession: true, template: null },
+      package: { durationDays: 90 },
     });
     await POST(settlement());
     const data = packageUpdate.mock.calls[0][0].data;
     expect(data.status).toBe("ACTIVE");
-    expect(Math.round((data.expiredDate - data.startDate) / DAY)).toBe(14);
+    expect(Math.round((data.expiredDate - data.startDate) / DAY)).toBe(90);
   });
 
-  it("uses the template duration for a regular package", async () => {
+  it("falls back to 60 days for old data without a stored duration", async () => {
     paymentFindUnique.mockResolvedValue({
       id: "pay-2",
       status: "PENDING",
       amount: 135000,
       packageId: "pkg-2",
-      package: { isSingleSession: false, template: { durationDays: 60 } },
+      package: { durationDays: null },
     });
     await POST(settlement());
     const data = packageUpdate.mock.calls[0][0].data;
@@ -84,7 +84,7 @@ describe("webhook fraud_status on card capture", () => {
       status: "PENDING",
       amount: 135000,
       packageId: "pkg-3",
-      package: { isSingleSession: false, template: { durationDays: 60 } },
+      package: { durationDays: 60 },
     });
   });
 
@@ -130,7 +130,7 @@ describe("webhook push notification", () => {
       status: "PENDING",
       amount: 135000,
       packageId: "pkg-9",
-      package: { memberId: "member-9", name: "Private 4x", isSingleSession: false, durationDays: null, template: { name: "Private 4x", durationDays: 30 } },
+      package: { memberId: "member-9", name: "Private 4x", durationDays: 30 },
       ...over,
     };
   }
@@ -182,7 +182,7 @@ describe("webhook amount check", () => {
       status: "PENDING",
       amount: 150000,
       packageId: "pkg-7",
-      package: { memberId: "m-7", isSingleSession: false, template: { durationDays: 60 } },
+      package: { memberId: "m-7", durationDays: 60 },
     });
     const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     await POST(settlement());
@@ -199,7 +199,7 @@ describe("webhook amount check", () => {
       status: "PENDING",
       amount: 135000,
       packageId: "pkg-8",
-      package: { memberId: "m-8", isSingleSession: false, template: { durationDays: 60 } },
+      package: { memberId: "m-8", durationDays: 60 },
     });
     await POST(settlement());
     const data = tx.payment.updateMany.mock.calls.at(-1)![0].data;
@@ -215,7 +215,7 @@ describe("webhook: pelacak iklan Meta (Purchase)", () => {
     amount: 135000,
     packageId: "pkg-m",
     metaTracking: { fbp: "fb.1.1.1", ua: "UA" },
-    package: { memberId: "member-m", name: "Paket 4 sesi", saldoUsed: 0, isSingleSession: false, durationDays: 60, template: null },
+    package: { memberId: "member-m", name: "Paket 4 sesi", saldoUsed: 0, durationDays: 60 },
     ...over,
   });
 

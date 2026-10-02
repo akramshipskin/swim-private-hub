@@ -24,6 +24,17 @@
         "3102"
       ],
       "port": 3102
+    },
+    {
+      "name": "swim-private-hub-start-3110",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "next",
+        "start",
+        "-p",
+        "3110"
+      ],
+      "port": 3110
     }
   ]
 }

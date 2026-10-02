@@ -251,6 +251,23 @@ describe("TEMUAN PEMERIKSA KEDUA", () => {
     expect((await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance).toBe(0);
   });
 
+  // P1 (Hadi 2 Okt malam): paket pemberian admin tidak dibayar; ganti ke coach
+  // lebih murah tidak boleh menghasilkan saldo uang untuk member.
+  it("F3b: paket pemberian admin (tanpa pembayaran) tidak bisa diajukan ganti coach, dan pengajuan yang terlanjur ada tidak bisa disetujui", async () => {
+    const { pool, m, pkg } = await activePackage();
+    await prisma.payment.deleteMany({ where: { packageId: pkg.id } });
+    const b = await otherCoach(pool.id, 380000, 640000);
+    const admin = await mkUser("ADMIN");
+    const r = await as({ id: m.id, role: "MEMBER", name: "M" }, () => requestCoachChange(null, fd({ packageId: pkg.id, toCoachId: b.id, reason: "Anak kurang cocok dengan coach" })));
+    expect(r).toEqual({ error: "Paket ini tidak bisa diganti coach-nya." });
+    // Pengajuan yang dibuat sebelum aturan ini (atau lewat jalur lain) juga ditolak saat disetujui.
+    const req = await prisma.coachChangeRequest.create({ data: { packageId: pkg.id, memberId: m.id, fromCoachId: pkg.coachId!, toCoachId: b.id, reason: "uji" } });
+    const ok = await as({ id: admin.id, role: "ADMIN" }, () => approveAction(null, fd({ requestId: req.id })));
+    expect(ok?.error).toBe("Paket pemberian admin tidak bisa diganti coach lewat pengajuan.");
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance).toBe(0);
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).coachId).toBe(pkg.coachId);
+  });
+
   it("F4: A -> B -> A (harga A naik di antaranya): sesi A periode pertama tetap dibagi harga A lama", async () => {
     const { pool, coach, m, pkg } = await activePackage();
     const b = await otherCoach(pool.id, 380000, 640000);

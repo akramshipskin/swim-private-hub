@@ -19,8 +19,8 @@ export async function reset() {
 let n = 0;
 const uid = () => `${Date.now()}${++n}${Math.floor(Math.random() * 1e6)}`;
 
-export async function mkPool(opts: { commission?: number; coachShare?: number; balance?: number; bank?: boolean } = {}) {
-  return prisma.pool.create({ data: { name: "Pool " + uid(), commissionPercent: opts.commission ?? 15, coachSharePercent: opts.coachShare ?? 55, walletBalance: opts.balance ?? 0, ...(opts.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } });
+export async function mkPool(opts: { balance?: number; bank?: boolean } = {}) {
+  return prisma.pool.create({ data: { name: "Pool " + uid(), walletBalance: opts.balance ?? 0, ...(opts.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } });
 }
 export async function mkUser(role: Role, extra: { coachBalance?: number; bank?: boolean } = {}) {
   const u = await prisma.user.create({ data: { name: role + uid(), phone: "08" + uid().slice(-10), passwordHash: "x", role, ...(role === "COACH" ? { coachProfile: { create: { walletBalance: extra.coachBalance ?? 0, ...(extra.bank ? { bankName: "BCA", bankAccountNumber: "1", bankAccountName: "X" } : {}) } } } : {}) }, include: { coachProfile: true } });
@@ -34,11 +34,29 @@ export async function mkPricedOffer() {
   await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
   return { pool, coach };
 }
-export async function mkMemberWithPackage(poolId: string, opts: { sisa?: number; total?: number; jatah?: number; price?: number | null; expired?: Date | null } = {}) {
+// Paket model harga-dari-coach (satu-satunya model sejak Hadi 2 Okt malam):
+// terikat ke coachId, harga disalin ke paket. Harga dibagi kolam 50% / coach
+// 40% / biaya layanan 10% dari `price` (contoh 800.000 = 400rb + 320rb + 80rb).
+// price null = paket pemberian admin (tanpa Payment, sesinya tidak membagi uang).
+export async function mkMemberWithPackage(
+  poolId: string,
+  coachId: string,
+  opts: { sisa?: number; total?: number; jatah?: number; price?: number | null; expired?: Date | null } = {}
+) {
   const m = await mkUser("MEMBER");
   const dep = await prisma.dependent.create({ data: { memberId: m.id, name: "Anak" + uid() } });
-  const pkg = await prisma.package.create({ data: { memberId: m.id, dependentId: dep.id, poolId, name: "P", totalSesi: opts.total ?? 8, sisaSesi: opts.sisa ?? 8, jatahCancel: opts.jatah ?? 2, status: "ACTIVE", startDate: new Date(), expiredDate: opts.expired ?? null } });
-  if (opts.price !== null) await prisma.payment.create({ data: { packageId: pkg.id, midtransOrderId: "ORD-" + uid(), amount: opts.price ?? 800000, status: "SUCCESS" } });
+  const total = opts.price ?? 800000;
+  const poolPrice = Math.round(total * 0.5);
+  const coachPrice = Math.round(total * 0.4);
+  const pkg = await prisma.package.create({
+    data: {
+      memberId: m.id, dependentId: dep.id, poolId, coachId, name: "P",
+      totalSesi: opts.total ?? 8, sisaSesi: opts.sisa ?? 8, jatahCancel: opts.jatah ?? 2,
+      poolPrice, coachPrice, serviceFee: total - poolPrice - coachPrice,
+      status: "ACTIVE", startDate: new Date(), expiredDate: opts.expired ?? null,
+    },
+  });
+  if (opts.price !== null) await prisma.payment.create({ data: { packageId: pkg.id, midtransOrderId: "ORD-" + uid(), amount: total, status: "SUCCESS", paidAt: new Date() } });
   return { m, dep, pkg };
 }
 export async function mkSlot(coachId: string, poolId: string, hoursFromNow: number) {

@@ -182,7 +182,7 @@ const GUIDES: Guide[] = [
         heading: "1. Dashboard & pesan",
         steps: [
           { title: "Kondisi hari ini", body: "Sesi hari ini & besok, uang masuk, pendapatan platform & PPN, saldo mengendap, dan ringkasan tiap kolam." },
-          { title: "Perlu tindakan", body: "Pesan yang perlu dibalas, pencairan menunggu, sertifikat coach, usulan paket kolam, kolam belum disetujui, dan sesi lewat yang belum ditandai." },
+          { title: "Perlu tindakan", body: "Pesan yang perlu dibalas, pencairan menunggu, sertifikat coach, kolam belum disetujui, dan sesi lewat yang belum ditandai." },
           { title: "Menu Pesan", body: "Chat bantuan dari member, coach, dan pemilik kolam. Yang ditandai Perlu dibalas berarti asisten tidak bisa menjawabnya." },
         ],
       },
@@ -192,14 +192,13 @@ const GUIDES: Guide[] = [
           { title: "Tambah user baru", body: "Isi data, pilih peran. Untuk pemilik kolam bisa sekalian membuat kolam baru; untuk member bisa sekalian menentukan pesertanya." },
           { title: "Info detail user", body: "Klik nama siapa pun untuk melihat halaman detail: data akun, paket & peserta, booking terakhir, profil coach, kolam yang dikelola, dan pencairan." },
           { title: "Aksi cepat", body: "Hubungi lewat WhatsApp, reset password (menghasilkan password sementara), atau nonaktifkan akun." },
-          { title: "Import massal", body: "Dipakai saat kolam baru bergabung membawa data member lama. Ada template dan petunjuknya di halaman Users." },
         ],
       },
       {
         heading: "3. Kolam, paket, dan booking",
         steps: [
-          { title: "Tab Kolam", body: "Harga tiket paket, biaya layanan SPH (maks 6,9%), tanda bebas potongan PPh, saldo kolam, pembagian komisi paket lama, info & foto kolam, dan coach terafiliasi." },
-          { title: "Tab Paket", body: "Katalog paket lama untuk pemberian paket manual, dan paket per member untuk koreksi manual. Harga & bebas potongan PPh coach diatur di halaman detail coach (Pengguna)." },
+          { title: "Tab Kolam", body: "Harga tiket paket, biaya layanan SPH (maks 6,9%), tanda bebas potongan PPh, saldo kolam, info & foto kolam, dan coach terafiliasi." },
+          { title: "Tab Paket", body: "Paket per member untuk koreksi manual (paket gratis diberikan dari halaman Pengguna). Harga & bebas potongan PPh coach diatur di halaman detail coach (Pengguna)." },
           { title: "Tab Jadwal Booking", body: "Semua slot dikelompokkan per coach, tanggal, dan kolam. Admin bisa menandai kehadiran atau membatalkan booking siapa pun." },
         ],
       },

@@ -98,14 +98,13 @@ export default function BookingBoard({
     packageOptions[0]?.dependentId ?? dependents[0]?.id ?? ""
   );
   const [poolId, setPoolId] = useState(packageOptions[0]?.poolId ?? pools[0]?.id ?? "");
-  // Paket cuma berlaku di kolam tempat beli, dan paket model harga-dari-coach
-  // cuma untuk coach-nya. Paket yang dipakai untuk slot = paket aktif paling
-  // lama milik anak ini di kolam ini untuk coach slot itu (atau paket lama
-  // yang boleh coach mana pun).
+  // Paket cuma berlaku di kolam tempat beli dan cuma untuk coach-nya. Paket yang
+  // dipakai untuk slot = paket aktif paling lama milik anak ini di kolam ini
+  // untuk coach slot itu.
   const poolPkgs = packageOptions.filter((p) => p.dependentId === dependentId && p.poolId === poolId);
   const selectedPkg = poolPkgs[0] ?? null;
   const pkgForCoach = (coachId: string) =>
-    poolPkgs.find((p) => p.coachId === coachId) ?? poolPkgs.find((p) => p.coachId === null) ?? null;
+    poolPkgs.find((p) => p.coachId === coachId) ?? null;
   const pkgCoachNames = [...new Set(poolPkgs.map((p) => p.coachName).filter(Boolean))];
   const selectedPool = pools.find((p) => p.id === poolId) ?? null;
   const dependentPoolNames = [
@@ -403,7 +402,7 @@ export default function BookingBoard({
         </div>
       )}
 
-      {selectedPkg && pkgCoachNames.length > 0 && !poolPkgs.some((p) => p.coachId === null) && (
+      {selectedPkg && pkgCoachNames.length > 0 && (
         <p className="mb-4 text-sm text-text-muted">
           Paket peserta ini untuk coach {pkgCoachNames.join(", ")}. Jadwal coach lain bisa dilihat, tapi tidak bisa dibooking dengan paket ini.
         </p>

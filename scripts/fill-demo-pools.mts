@@ -66,12 +66,9 @@ if (apply) {
         openTime: "06:00",
         closeTime: "20:00",
         photos: [POOL_PHOTO(pools.length + i)],
-        packageTemplates: {
-          create: [
-            { name: "Private 4x", totalSesi: 4, price: 400_000, durationDays: 60, jatahCancel: 1 },
-            { name: "Private 8x Renang", totalSesi: 8, price: 750_000, durationDays: 60, jatahCancel: 2 },
-          ],
-        },
+        // Harga tiket contoh, sama dengan scripts/isi-harga-dummy.
+        pricePack4: 260_000,
+        pricePack8: 480_000,
       },
       select: { id: true },
     });

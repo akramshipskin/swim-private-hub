@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { activePackageWhere } from "@/lib/active-package";
 import { todayWibDateString, dateLabel, formatDateLabel, formatTimeLeft, formatTimeWib, wibDateTime } from "@/lib/datetime";
 import { BentoCard, Stat, SessionList } from "@/components/dashboard";
-import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
 
 export const metadata = { title: "Dashboard | Swim Private Hub" };
@@ -25,7 +24,6 @@ export default async function MemberDashboardPage() {
         totalSesi: true,
         jatahCancel: true,
         expiredDate: true,
-        isSingleSession: true,
         pool: { select: { name: true } },
         dependent: { select: { name: true } },
         _count: { select: { bookings: { where: { status: "CANCELLED", cancelledBy: "MEMBER" } } } },
@@ -107,7 +105,6 @@ export default async function MemberDashboardPage() {
                 <li key={p.id} className="py-2">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-brand-700">{p.pool.name}</p>
-                    {p.isSingleSession && <Badge tone="neutral">1 sesi</Badge>}
                   </div>
                   <p className="text-sm text-text">
                     {p.dependent.name} · {p.name}

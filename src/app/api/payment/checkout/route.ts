@@ -43,8 +43,7 @@ export async function POST(request: Request) {
 
   // Model harga-dari-coach (Hadi 2 Okt): yang dibeli = kolam + coach + ukuran
   // paket (4/8 sesi, atau 1 = sesi coba). Harga dihitung server dari harga
-  // kolam & coach saat ini, tidak pernah dipercaya dari browser. Paket katalog
-  // lama dan beli 1 sesi eceran tidak dijual lagi.
+  // kolam & coach saat ini, tidak pernah dipercaya dari browser.
   if (!poolId || !coachId || (sesi !== 1 && sesi !== 4 && sesi !== 8)) {
     return Response.json({ error: "Pilih kolam, coach, dan paket dulu." }, { status: 400 });
   }
@@ -70,17 +69,14 @@ export async function POST(request: Request) {
   }
   const item = {
     poolId: pool.id,
-    templateId: null,
     name: `${quote.isTrial ? "Sesi coba" : `Paket ${quote.totalSesi} sesi`} · ${coach.name}`,
     totalSesi: quote.totalSesi,
     jatahCancel: quote.jatahCancel,
     price: quote.total,
-    isSingleSession: false,
     isTrial: quote.isTrial,
   };
 
-  // Form katalog sekarang nolak harga < Rp1, tapi data lama bisa aja
-  // udah terlanjur Rp0 -- jangan sampai jadi paket gratis lewat checkout.
+  // Jaga-jaga: harga Rp0 tidak boleh jadi paket gratis lewat checkout.
   if (!Number.isInteger(item.price) || item.price < 1) {
     return Response.json({ error: "Harga paket ini belum valid. Hubungi admin." }, { status: 400 });
   }
@@ -117,12 +113,10 @@ export async function POST(request: Request) {
         memberId: session.user.id,
         dependentId,
         poolId: item.poolId,
-        templateId: item.templateId,
         name: item.name,
         totalSesi: item.totalSesi,
         sisaSesi: item.totalSesi,
         jatahCancel: item.jatahCancel,
-        isSingleSession: item.isSingleSession,
         isTrial: item.isTrial,
         coachId,
         poolPrice: quote.poolPrice,

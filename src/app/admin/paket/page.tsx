@@ -1,9 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
-import CreateTemplateForm from "./create-template-form";
-import TemplateEditForm from "./template-edit-form";
 import PaketPerMemberList from "./paket-per-member-list";
-import PendingTemplateChanges from "./pending-template-changes";
 import { packagesToShow } from "@/lib/active-package";
 
 function toInputDate(d: Date | null) {
@@ -26,11 +23,7 @@ export default async function AdminPaketPage() {
   await requireRole("ADMIN");
   const now = new Date();
 
-  const [templates, members, pools] = await Promise.all([
-    prisma.packageTemplate.findMany({
-      orderBy: [{ pool: { name: "asc" } }, { totalSesi: "asc" }],
-      include: { pool: { select: { name: true } } },
-    }),
+  const [members] = await Promise.all([
     // Grup per member (bukan per paket) -- 1 member bisa punya >1 peserta,
     // masing-masing punya paketnya sendiri. Cuma member yang punya
     // >=1 paket yang muncul di sini (member polos tanpa paket sama sekali
@@ -68,7 +61,6 @@ export default async function AdminPaketPage() {
         },
       },
     }),
-    prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
   const allPackageIds = members.flatMap((m) => m.packages.map((p) => p.id));
@@ -86,40 +78,9 @@ export default async function AdminPaketPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola Paket</h1>
 
-      <PendingTemplateChanges />
-
-      {/* --- Katalog Paket --- */}
-      <h2 className="mb-3 text-lg font-semibold text-text">Katalog Paket</h2>
-      <p className="mb-3 text-sm text-text-muted">
-        Paket model lama, hanya untuk pemberian paket manual dari admin. Member membeli paket dari harga
-        kolam + harga coach (diatur di menu Kolam dan oleh coach), bukan dari katalog ini.
-      </p>
-
-      <CreateTemplateForm pools={pools} allowTrial />
-
-      {/* 2 kolom = 2 KOLAM sejajar, paketnya numpuk ke bawah di dalam
-          kolomnya masing-masing (Hadi 18 Sep v3). Sebelumnya kebalik:
-          1 kolam sebaris penuh, paketnya yang melebar ke samping. */}
-      <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {[...new Set(templates.map((t) => t.pool.name))].map((poolName) => (
-          <section key={poolName}>
-            <h3 className="mb-2 text-base font-semibold text-brand-700">{poolName}</h3>
-            <ul className="flex flex-col gap-3">
-              {templates
-                .filter((t) => t.pool.name === poolName)
-                .map((t) => (
-                  <li key={t.id}>
-                    <TemplateEditForm template={t} />
-                  </li>
-                ))}
-            </ul>
-          </section>
-        ))}
-      </div>
-
       {/* --- List member + paket, advanced --- */}
       <p className="mb-3 text-xs text-text-subtle">
-        Mau tambah peserta atau assign paket khusus ke member? Sekarang ada di
+        Mau tambah peserta atau memberi paket gratis ke member? Ada di
         tab <span className="font-medium text-text-muted">Kelola Pengguna</span>.
       </p>
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>

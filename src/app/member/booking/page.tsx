@@ -20,7 +20,8 @@ export default async function MemberBookingPage() {
   // punya beberapa paket aktif di kolam beda. BookingBoard milih paket
   // dari kombinasi (anak, kolam) yang dipilih ortu.
   const usable = await prisma.package.findMany({
-    where: activePackageWhere(session.user.id),
+    // Paket tanpa coach (model lama) tidak bisa dibooking lagi.
+    where: { ...activePackageWhere(session.user.id), coachId: { not: null } },
     orderBy: { createdAt: "asc" },
     select: {
       id: true,

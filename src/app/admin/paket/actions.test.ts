@@ -3,24 +3,18 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ user: { id: "admin-1" } }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-const templateCreate = vi.fn().mockResolvedValue({});
-const templateUpdate = vi.fn().mockResolvedValue({});
-const templateFindUnique = vi.fn();
+const poolFindFirst = vi.fn();
+const userFindFirst = vi.fn();
 const dependentFindUnique = vi.fn();
 const packageCreate = vi.fn().mockResolvedValue({});
 const packageFindUnique = vi.fn();
 const packageUpdate = vi.fn().mockResolvedValue({ count: 1 });
-const templateCount = vi.fn().mockResolvedValue(0);
 const packageCount = vi.fn().mockResolvedValue(0);
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    packageTemplate: {
-      create: (...args: unknown[]) => templateCreate(...args),
-      update: (...args: unknown[]) => templateUpdate(...args),
-      findUnique: (...args: unknown[]) => templateFindUnique(...args),
-      count: (...args: unknown[]) => templateCount(...args),
-    },
+    pool: { findFirst: (...args: unknown[]) => poolFindFirst(...args) },
+    user: { findFirst: (...args: unknown[]) => userFindFirst(...args) },
     dependent: { findUnique: (...args: unknown[]) => dependentFindUnique(...args) },
     package: {
       create: (...args: unknown[]) => packageCreate(...args),
@@ -43,7 +37,7 @@ vi.mock("@/lib/dependents", () => ({
   createSelfDependent: (...args: unknown[]) => createSelfDependent(...args),
 }));
 
-const { createTemplate, updateTemplate, addChildForMember, assignPackageToMember, updatePackage } = await import(
+const { addChildForMember, assignPackageToMember, updatePackage } = await import(
   "./actions"
 );
 
@@ -55,85 +49,6 @@ function formData(entries: Record<string, string>) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-});
-
-describe("createTemplate duplicate name", () => {
-  it("refuses a second template with the same name in the same pool", async () => {
-    templateCount.mockResolvedValueOnce(1);
-    const fd = new FormData();
-    for (const [k, v] of Object.entries({ poolId: "p1", name: "Paket A", totalSesi: "8", price: "100", durationDays: "60", jatahCancel: "2" })) fd.set(k, v);
-    const res = await createTemplate(null, fd);
-    expect(res?.error).toMatch(/sudah ada/);
-    expect(templateCreate).not.toHaveBeenCalled();
-  });
-});
-
-describe("createTemplate", () => {
-  const valid = { poolId: "pool-1", name: "Private 8x", totalSesi: "8", price: "750000", durationDays: "60", jatahCancel: "2" };
-
-  it("creates when all fields are valid", async () => {
-    const result = await createTemplate(null, formData(valid));
-    expect(result).toBeNull();
-    expect(templateCreate).toHaveBeenCalledWith({
-      data: expect.objectContaining({ poolId: "pool-1", name: "Private 8x", totalSesi: 8, price: 750000, durationDays: 60, jatahCancel: 2, isActive: true }),
-    });
-  });
-
-  it("rejects totalSesi below 1", async () => {
-    const result = await createTemplate(null, formData({ ...valid, totalSesi: "0" }));
-    expect(result?.error).toBeTruthy();
-    expect(templateCreate).not.toHaveBeenCalled();
-  });
-
-  it("rejects a negative price", async () => {
-    const result = await createTemplate(null, formData({ ...valid, price: "-1" }));
-    expect(result?.error).toBeTruthy();
-    expect(templateCreate).not.toHaveBeenCalled();
-  });
-
-  it("rejects durationDays below 1", async () => {
-    const result = await createTemplate(null, formData({ ...valid, durationDays: "0" }));
-    expect(result?.error).toBeTruthy();
-    expect(templateCreate).not.toHaveBeenCalled();
-  });
-
-  it("rejects a negative jatahCancel", async () => {
-    const result = await createTemplate(null, formData({ ...valid, jatahCancel: "-1" }));
-    expect(result?.error).toBeTruthy();
-    expect(templateCreate).not.toHaveBeenCalled();
-  });
-
-  it("rejects a blank name", async () => {
-    const result = await createTemplate(null, formData({ ...valid, name: "   " }));
-    expect(result?.error).toBeTruthy();
-    expect(templateCreate).not.toHaveBeenCalled();
-  });
-});
-
-describe("updateTemplate", () => {
-  it("updates including the isActive checkbox state", async () => {
-    const fd = formData({
-      templateId: "tpl-1",
-      name: "Private 8x",
-      totalSesi: "8",
-      price: "750000",
-      durationDays: "60",
-      jatahCancel: "2",
-    });
-    fd.set("isActive", "on");
-    const result = await updateTemplate(null, fd);
-    expect(result).toBeNull();
-    expect(templateUpdate).toHaveBeenCalledWith({
-      where: { id: "tpl-1" },
-      data: expect.objectContaining({ name: "Private 8x", totalSesi: 8, price: 750000, durationDays: 60, jatahCancel: 2, isActive: true }),
-    });
-  });
-
-  it("treats a missing isActive field as false (unchecked checkbox)", async () => {
-    const fd = formData({ templateId: "tpl-1", name: "X", totalSesi: "1", price: "1", durationDays: "1", jatahCancel: "0" });
-    await updateTemplate(null, fd);
-    expect(templateUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ isActive: false }) }));
-  });
 });
 
 describe("addChildForMember", () => {
@@ -171,14 +86,14 @@ describe("addChildForMember", () => {
   });
 });
 
-describe("assignPackageToMember", () => {
-  const base = {
-    memberId: "member-1",
-    dependentId: "dep-1",
-    name: "Private 8x",
-    totalSesi: "8",
-    jatahCancel: "2",
-    expiredDate: "",
+describe("assignPackageToMember (model harga-dari-coach, tanpa bagi hasil)", () => {
+  const base = { memberId: "member-1", dependentId: "dep-1", poolId: "pool-1", coachId: "coach-1", sesi: "8" };
+  const pool = { id: "pool-1", pricePack4: 260_000, pricePack8: 480_000, serviceFeeBps: 650 };
+  const coach = { name: "Coach Budi", coachProfile: { isActive: true, pricePack4: 440_000, pricePack8: 800_000 } };
+  const ready = () => {
+    dependentFindUnique.mockResolvedValueOnce({ memberId: "member-1", isActive: true });
+    poolFindFirst.mockResolvedValueOnce(pool);
+    userFindFirst.mockResolvedValueOnce(coach);
   };
 
   it("requires memberId", async () => {
@@ -191,41 +106,62 @@ describe("assignPackageToMember", () => {
     expect(result?.error).toContain("Tambah Peserta");
   });
 
+  it("requires pool, coach, and a 4 or 8 session pack", async () => {
+    expect(await assignPackageToMember(null, formData({ ...base, coachId: "" }))).toEqual({ error: "Pilih kolam dan coach dulu" });
+    expect(await assignPackageToMember(null, formData({ ...base, sesi: "5" }))).toEqual({ error: "Pilih paket 4 atau 8 sesi" });
+    expect(packageCreate).not.toHaveBeenCalled();
+  });
+
   // IDOR guard: dependentId dikirim client, HARUS diverifikasi punya
   // memberId yang sama sebelum dipake -- jangan percaya form begitu aja.
   it("rejects when the dependent belongs to a different member (IDOR)", async () => {
-    dependentFindUnique.mockResolvedValueOnce({ memberId: "someone-else" });
-    const result = await assignPackageToMember(null, formData({ ...base, poolId: "pool-1" }));
-    expect(result).toEqual({ error: "Anak tidak ditemukan atau bukan milik member ini" });
+    dependentFindUnique.mockResolvedValueOnce({ memberId: "someone-else", isActive: true });
+    const result = await assignPackageToMember(null, formData(base));
+    expect(result).toEqual({ error: "Peserta tidak ditemukan atau bukan milik member ini" });
     expect(packageCreate).not.toHaveBeenCalled();
   });
 
-  it("takes poolId from the template when templateId is set, ignoring a mismatched form poolId", async () => {
-    dependentFindUnique.mockResolvedValueOnce({ memberId: "member-1" });
-    templateFindUnique.mockResolvedValueOnce({ poolId: "pool-from-template" });
-    const result = await assignPackageToMember(
-      null,
-      formData({ ...base, templateId: "tpl-1", poolId: "pool-from-form" })
-    );
-    expect(result).toEqual({ success: expect.stringContaining("di-assign") });
-    expect(packageCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ poolId: "pool-from-template" }) })
-    );
-  });
-
-  it("requires an explicit poolId when not assigning from a catalog template", async () => {
-    dependentFindUnique.mockResolvedValueOnce({ memberId: "member-1" });
-    const result = await assignPackageToMember(null, formData({ ...base, poolId: "" }));
-    expect(result).toEqual({ error: "Kolam wajib dipilih (kalau bukan dari katalog paket)" });
+  it("rejects a coach who does not teach at the pool or a pool/coach without prices", async () => {
+    dependentFindUnique.mockResolvedValueOnce({ memberId: "member-1", isActive: true });
+    poolFindFirst.mockResolvedValueOnce(pool);
+    userFindFirst.mockResolvedValueOnce(null);
+    expect((await assignPackageToMember(null, formData(base)))?.error).toMatch(/tidak mengajar di kolam ini/);
+    dependentFindUnique.mockResolvedValueOnce({ memberId: "member-1", isActive: true });
+    poolFindFirst.mockResolvedValueOnce({ ...pool, pricePack8: null });
+    userFindFirst.mockResolvedValueOnce(coach);
+    expect((await assignPackageToMember(null, formData(base)))?.error).toMatch(/belum dipasang/);
     expect(packageCreate).not.toHaveBeenCalled();
   });
 
-  it("sets sisaSesi equal to totalSesi for a brand-new package", async () => {
-    dependentFindUnique.mockResolvedValueOnce({ memberId: "member-1" });
-    await assignPackageToMember(null, formData({ ...base, poolId: "pool-1" }));
-    expect(packageCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ totalSesi: 8, sisaSesi: 8 }) })
-    );
+  it("copies the current pool + coach prices, active now for the pack duration, no payment", async () => {
+    ready();
+    const before = Date.now();
+    const result = await assignPackageToMember(null, formData(base));
+    expect(result?.success).toContain("Paket 8 sesi · Coach Budi");
+    const data = packageCreate.mock.calls[0][0].data;
+    expect(data).toMatchObject({
+      memberId: "member-1",
+      dependentId: "dep-1",
+      poolId: "pool-1",
+      coachId: "coach-1",
+      totalSesi: 8,
+      sisaSesi: 8,
+      jatahCancel: 4,
+      poolPrice: 480_000,
+      coachPrice: 800_000,
+      serviceFee: 83_200,
+      durationDays: 90,
+      status: "ACTIVE",
+    });
+    expect(data.expiredDate.getTime() - data.startDate.getTime()).toBe(90 * 86_400_000);
+    expect(data.startDate.getTime()).toBeGreaterThanOrEqual(before);
+  });
+
+  it("refuses a duplicate within 30 seconds (double click)", async () => {
+    ready();
+    packageCount.mockResolvedValueOnce(1);
+    expect(await assignPackageToMember(null, formData(base))).toEqual({ error: "Paket yang sama baru saja diberikan ke peserta ini." });
+    expect(packageCreate).not.toHaveBeenCalled();
   });
 });
 

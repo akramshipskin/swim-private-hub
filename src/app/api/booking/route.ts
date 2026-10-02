@@ -87,11 +87,10 @@ export async function POST(request: Request) {
           AND: [
             activePackageWhere(session.user.id),
             { id: packageId, poolId: slot.poolId },
-            // Paket model harga-dari-coach terikat ke 1 coach (harganya
-            // harga coach itu); paket lama (tanpa harga tersalin) boleh coach
-            // mana pun. Paket model baru yang coach-nya hilang (akun dihapus,
-            // coachId jadi null) TIDAK boleh dipakai coach lain.
-            { OR: [{ coachId: null, poolPrice: null }, { coachId: slot.coachId }] },
+            // Paket terikat ke 1 coach (harganya harga coach itu). Paket tanpa
+            // coach (model lama yang sudah dihapus, atau coach-nya hilang karena
+            // akun dihapus) tidak bisa dipakai booking.
+            { coachId: slot.coachId },
             { OR: [{ expiredDate: null }, { expiredDate: { gt: slot.startTime } }] },
           ],
         },

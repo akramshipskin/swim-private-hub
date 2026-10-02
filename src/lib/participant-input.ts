@@ -44,23 +44,3 @@ export function readParticipants(formData: FormData, now: Date = new Date()): Pa
   });
   return { wantsSelf, selfBirthDate, children };
 }
-
-// Kolom "Tanggal Lahir" di impor Excel (opsional): terima 2019-05-17,
-// 17/05/2019, 17-05-2019, atau angka tanggal Excel (43602). Kosong atau tidak
-// terbaca -> null; pemanggil melaporkan supaya member melengkapinya sendiri.
-export function parseImportBirthDate(raw: string | null | undefined, now: Date = new Date()): Date | null {
-  const s = raw?.trim();
-  if (!s) return null;
-  const pad = (n: string) => n.padStart(2, "0");
-  let iso: string | null = null;
-  let m: RegExpExecArray | null;
-  if ((m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s))) iso = `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
-  else if ((m = /^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/.exec(s))) iso = `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
-  else if (/^\d{4,6}$/.test(s)) iso = new Date(Date.UTC(1899, 11, 30) + Number(s) * 86_400_000).toISOString().slice(0, 10);
-  if (!iso) return null;
-  try {
-    return parseParticipantBirthDate(iso, now);
-  } catch {
-    return null;
-  }
-}

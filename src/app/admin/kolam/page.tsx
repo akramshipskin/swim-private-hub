@@ -4,7 +4,6 @@ import { formatRupiah } from "@/lib/format";
 import { dateLabel, todayWibDateString } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import PoolShareForm from "./pool-share-form";
 import PoolPricingForm from "./pool-pricing-form";
 import AffiliateCoachForm from "./affiliate-coach-form";
 import PoolActiveToggle from "./pool-active-toggle";
@@ -24,8 +23,6 @@ export default async function AdminKolamPage() {
         id: true,
         name: true,
         isActive: true,
-        commissionPercent: true,
-        coachSharePercent: true,
         pricePack4: true,
         pricePack8: true,
         serviceFeeBps: true,
@@ -42,10 +39,6 @@ export default async function AdminKolamPage() {
           select: { owner: { select: { name: true, phone: true } } },
           orderBy: { createdAt: "asc" },
         },
-        packageTemplates: {
-          orderBy: { totalSesi: "asc" },
-          select: { id: true, name: true, price: true, totalSesi: true, durationDays: true, isActive: true },
-        },
         affiliations: {
           select: { id: true, coachId: true, coach: { select: { name: true, coachProfile: { select: { photoUrl: true } } } } },
           orderBy: { coach: { name: "asc" } },
@@ -61,9 +54,8 @@ export default async function AdminKolamPage() {
     }),
   ]);
 
-  // Rincian asal saldo per kolam: pendapatan sesi dipisah menurut jenis paket
-  // yang dipakai (paket kolam ini / beli 1 sesi / paket kolam lain dari masa
-  // lintas-kolam sebelum 17 Sep 2026), lalu dikurangi pencairan.
+  // Rincian asal saldo per kolam: pendapatan sesi (termasuk riwayat paket model
+  // lama, yang tetap tercatat di buku besar), koreksi manual, lalu pencairan.
   const [revenueTxns, paidOut, processing, pphByPool, affiliateByPool] = await Promise.all([
     prisma.walletTransaction.findMany({
       where: { type: "SESSION_REVENUE", poolId: { not: null } },
@@ -93,24 +85,19 @@ export default async function AdminKolamPage() {
     stuckByPool.set(b.availability.poolId, (stuckByPool.get(b.availability.poolId) ?? 0) + 1);
   }
   const bookingIds = [...new Set(revenueTxns.map((t) => t.bookingId).filter((id): id is string => !!id))];
-  const bookingPkgs = await prisma.booking.findMany({
-    where: { id: { in: bookingIds } },
-    select: { id: true, package: { select: { poolId: true, isSingleSession: true } } },
-  });
-  const pkgByBooking = new Map(bookingPkgs.map((b) => [b.id, b.package]));
+  const existingBookings = new Set(
+    (await prisma.booking.findMany({ where: { id: { in: bookingIds } }, select: { id: true } })).map((b) => b.id)
+  );
   // Baris tanpa sesi (bookingId kosong / sesinya tidak ada lagi) = koreksi
   // manual langsung di DB -- aplikasi sendiri selalu mencatat bookingId.
   // Dulu ikut masuk "Dari paket kolam ini" dan membingungkan; sekarang baris
   // tersendiri. Hanya pelabelan: jumlah semua baris tetap sama.
   function revenueBreakdown(poolId: string) {
-    const out = { own: 0, single: 0, legacy: 0, manual: 0 };
+    const out = { sessions: 0, manual: 0 };
     for (const t of revenueTxns) {
       if (t.poolId !== poolId) continue;
-      const pkg = t.bookingId ? pkgByBooking.get(t.bookingId) : undefined;
-      if (!pkg) out.manual += t.amount;
-      else if (pkg.isSingleSession) out.single += t.amount;
-      else if (pkg.poolId !== poolId) out.legacy += t.amount;
-      else out.own += t.amount;
+      if (t.bookingId && existingBookings.has(t.bookingId)) out.sessions += t.amount;
+      else out.manual += t.amount;
     }
     return out;
   }
@@ -119,8 +106,7 @@ export default async function AdminKolamPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Kelola Kolam</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Harga tiket paket, biaya layanan SPH, dan tanda bebas PPh per kolam. Persentase pembagian di
-        bawahnya hanya untuk paket model lama.
+        Harga tiket paket, biaya layanan SPH, dan tanda bebas PPh per kolam.
       </p>
 
       {pools.length === 0 ? (
@@ -156,24 +142,7 @@ export default async function AdminKolamPage() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  <div className="rounded-xl bg-surface-muted p-3">
-                    <p className="text-sm font-semibold text-text">Katalog paket lama (untuk pemberian paket manual)</p>
-                    {p.packageTemplates.length === 0 ? (
-                      <p className="text-sm text-warning-text">Belum ada paket di katalog.</p>
-                    ) : (
-                      <ul className="mt-1 flex flex-col gap-1">
-                        {p.packageTemplates.map((t) => (
-                          <li key={t.id} className="flex justify-between gap-2 text-sm">
-                            <span className={t.isActive ? "text-text" : "text-text-subtle line-through"}>
-                              {t.name} · {t.totalSesi} sesi · {t.durationDays} hari
-                            </span>
-                            <span className="font-semibold text-text">{formatRupiah(t.price)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {(() => {
                     const r = revenueBreakdown(p.id);
                     const paid = paidOut.find((x) => x.poolId === p.id)?._sum.amount ?? 0;
@@ -186,11 +155,9 @@ export default async function AdminKolamPage() {
                           <p className="text-sm font-semibold text-text">Saldo kolam (bisa dicairkan)</p>
                           <p className="text-lg font-bold text-text">{formatRupiah(p.walletBalance)}</p>
                         </div>
-                        <p className="text-xs text-text-subtle">Komisi kolam dari tiap sesi yang ditandai Hadir, dikurangi pencairan.</p>
+                        <p className="text-xs text-text-subtle">Bagian kolam dari tiap sesi yang ditandai Hadir, dikurangi PPh dan pencairan.</p>
                         <dl className="mt-2 grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5 text-sm">
-                          <dt className="text-text-muted">Dari paket kolam ini</dt><dd className="text-right text-text">{formatRupiah(r.own)}</dd>
-                          <dt className="text-text-muted">Dari beli 1 sesi (member kolam lain)</dt><dd className="text-right text-text">{formatRupiah(r.single)}</dd>
-                          {r.legacy > 0 && (<><dt className="text-text-muted">Paket kolam lain (sebelum 17 Sep)</dt><dd className="text-right text-text">{formatRupiah(r.legacy)}</dd></>)}
+                          <dt className="text-text-muted">Bagian kolam dari sesi</dt><dd className="text-right text-text">{formatRupiah(r.sessions)}</dd>
                           {r.manual !== 0 && (<><dt className="text-text-muted">Koreksi manual (tanpa sesi)</dt><dd className="text-right text-text">{r.manual < 0 ? "−" : ""}{formatRupiah(Math.abs(r.manual))}</dd></>)}
                           {affiliate !== 0 && (<><dt className="text-text-muted">Komisi afiliasi</dt><dd className="text-right text-text">{formatRupiah(affiliate)}</dd></>)}
                           {pph !== 0 && (<><dt className="text-text-muted">Potongan PPh 0,5% (disetor SPH)</dt><dd className="text-right text-text">−{formatRupiah(-pph)}</dd></>)}
@@ -212,14 +179,6 @@ export default async function AdminKolamPage() {
                     <p className="mt-2 text-xs text-text-subtle">
                       Dipakai paket baru (pilih kolam + coach). Biaya layanan dibayar member di atas harga kolam + coach.
                     </p>
-                  </div>
-                  <div className="rounded-xl bg-surface-muted p-3">
-                    <p className="mb-2 text-sm font-semibold text-text">Pembagian komisi paket lama</p>
-                    <PoolShareForm
-                      poolId={p.id}
-                      commissionPercent={p.commissionPercent}
-                      coachSharePercent={p.coachSharePercent}
-                    />
                   </div>
                 </div>
                 <details className="rounded-lg border border-border px-3 py-2">

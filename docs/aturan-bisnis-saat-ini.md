@@ -19,13 +19,17 @@ Dibuat Claude (Sonnet) dari keputusan Hadi di docs/KEPUTUSAN.md, rancangan docs/
 
 ## Afiliasi
 - Sekali per member yang mendaftar dengan kode coach/kolam, dari bagian SPH, cair setelah sesi Hadir pertama dari paket berbayar + 3 hari.
-- Paket dibayar sejak 3 Okt 2026 00:00 WIB: 50% dari biaya layanan SPH bersih (setelah PPN 11%) pada paket berbayar pertama; sesi coba dan pembayaran selisih ganti coach tidak dihitung. Contoh paket 8: biaya layanan Rp83.200 -> bersih Rp74.955 -> komisi Rp37.477.
-- Paket dibayar sebelum itu: tetap 5% dari jumlah dibayar. Komisi yang sudah tercatat tidak dihitung ulang.
+- 50% dari biaya layanan SPH bersih (setelah PPN 11%) pada paket berbayar pertama; sesi coba dan pembayaran selisih ganti coach tidak dihitung. Contoh paket 8: biaya layanan Rp83.200 -> bersih Rp74.955 -> komisi Rp37.477.
+- Aturan lama 5% dari jumlah dibayar dihapus (2 Okt malam); komisi yang sudah tercatat tidak dihitung ulang. Paket pertama model lama (tanpa biaya layanan tersimpan) tidak menghasilkan komisi.
 
 ## Login dan perjanjian mitra
 - Salah password ditahan 15 menit: 3x dari jaringan yang sama untuk satu akun, 10x dari semua jaringan untuk satu akun, 20x per jaringan untuk semua akun. Konfirmasi password di menu Keamanan tetap 3x.
 - Coach dan pemilik kolam wajib mencentang Perjanjian Kemitraan Coach / MOU Kolam (versi "2 Oktober 2026 rev.2") sebelum memakai fitur utama. Batal oleh coach: pedoman longgar (peringatan, admin menilai, sakit/darurat tidak dihitung); berlaku 12 bulan sejak pertama disetujui, tidak dimulai ulang saat versi baru.
 - Pencairan yang lewat 7 hari kerja ditandai di halaman Pencairan dan dasbor admin (libur nasional belum dihitung). Rekap PPh per mitra per bulan bisa diunduh dari halaman Bagi Hasil.
 
+## Paket pemberian admin
+- Admin memberi paket gratis lewat Pengguna > Berikan Paket: peserta + kolam + coach + 4/8 sesi. Harga kolam & coach saat itu disalin (masa berlaku dan jatah batal sama dengan paket beli), tanpa pembayaran, jadi sesinya tidak membagi uang ke kolam, coach, atau SPH. Paket ini tidak bisa diganti coach lewat pengajuan (supaya selisih harga tidak jadi saldo uang member); admin memberi paket baru saja.
+
 ## Tidak berlaku lagi (jangan jadi acuan)
-- Bagi hasil persen tetap 40/50/10 per kolam dan harga paket yang ditentukan admin lewat template (dokumen lama: marketplace-pivot, simulasi-pendapatan-kolam).
+- Model lama DIHAPUS dari kode (Hadi 2 Okt malam, #9): bagi hasil persen per kolam (commissionPercent/coachSharePercent), katalog/template paket, usulan paket dari pemilik kolam, beli 1 sesi eceran, impor Excel member, komisi afiliasi 5%. Kolom database lamanya belum dihapus (menyusul). Riwayat buku besar & saldo model lama tetap, tidak dihitung ulang; paket lama yang masih aktif ditandai Berakhir lewat skrip akhiri-paket-lama. Tandai hadir paket berbayar model lama ditolak sistem (koreksi lewat admin).
+- Dokumen lama marketplace-pivot dan simulasi-pendapatan-kolam.

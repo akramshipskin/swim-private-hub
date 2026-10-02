@@ -1,5 +1,4 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import * as XLSX from "xlsx";
 
 vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ user: { id: "admin-1" } }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
@@ -9,7 +8,6 @@ const userFindFirst = vi.fn();
 const userCreate = vi.fn();
 const dependentCreateMany = vi.fn().mockResolvedValue({});
 const dependentUpdate = vi.fn().mockResolvedValue({});
-const packageTemplateFindMany = vi.fn().mockResolvedValue([]);
 const packageCreate = vi.fn().mockResolvedValue({});
 const userUpdate = vi.fn().mockResolvedValue({});
 const userUpdateMany = vi.fn().mockResolvedValue({ count: 1 });
@@ -39,7 +37,6 @@ vi.mock("@/lib/prisma", () => ({
       update: (...args: unknown[]) => userUpdate(...args),
       updateMany: (...args: unknown[]) => userUpdateMany(...args),
     },
-    packageTemplate: { findMany: (...args: unknown[]) => packageTemplateFindMany(...args) },
     pool: { count: (...args: unknown[]) => poolCount(...args), updateMany: (...args: unknown[]) => poolUpdateMany(...args) },
   },
 }));
@@ -51,7 +48,7 @@ vi.mock("@/lib/dependents", () => ({
   createDependent: (...args: unknown[]) => createDependent(...args),
 }));
 
-const { createUser, importMembersXlsx, toggleUserActive, resetUserPassword } = await import("./actions");
+const { createUser, toggleUserActive, resetUserPassword } = await import("./actions");
 
 function formData(entries: Record<string, string | string[]>) {
   const fd = new FormData();
@@ -65,7 +62,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   userFindFirst.mockResolvedValue(null);
   userCreate.mockResolvedValue({ id: "user-1" });
-  packageTemplateFindMany.mockResolvedValue([]);
 });
 
 describe("createUser", () => {
@@ -243,180 +239,3 @@ describe("resetUserPassword", () => {
   });
 });
 
-function xlsxFile(rows: Record<string, string | number>[]) {
-  const sheet = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, sheet, "Sheet1");
-  const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" }) as Buffer;
-  return new File([new Uint8Array(buf)], "members.xlsx", {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
-}
-
-function importFormData(rows: Record<string, string | number>[], poolId = "pool-1") {
-  const fd = new FormData();
-  fd.set("poolId", poolId);
-  fd.set("file", xlsxFile(rows));
-  return fd;
-}
-
-describe("importMembersXlsx", () => {
-  it("requires a destination pool", async () => {
-    const fd = new FormData();
-    fd.set("file", xlsxFile([{ "Nama Member": "Budi", "No HP": "081200000001" }]));
-    const result = await importMembersXlsx(null, fd);
-    expect(result?.error).toBeTruthy();
-  });
-
-  it("requires a file", async () => {
-    const fd = new FormData();
-    fd.set("poolId", "pool-1");
-    const result = await importMembersXlsx(null, fd);
-    expect(result?.error).toBeTruthy();
-  });
-
-  it("imports one member with one participant and one package from flexible Indonesian headers", async () => {
-    const result = await importMembersXlsx(
-      null,
-      importFormData([
-        {
-          "Nama Member": "budi santoso",
-          "No HP": "081200000001",
-          "Nama Peserta/Anak": "Budi Jr",
-          "Paket Aktif": "Private 8x",
-          "Sisa Sesi": 5,
-        },
-      ])
-    );
-    expect(result?.result).toContain("1 member, 1 peserta, 1 paket berhasil diimport");
-    expect(userCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ name: "Budi Santoso", phone: "081200000001", mustChangePassword: true }) })
-    );
-    expect(packageCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ sisaSesi: 5, totalSesi: 5 }) })
-    );
-  });
-
-  it("membaca kolom Tanggal Lahir, dan melaporkan peserta yang kosong/tidak terbaca", async () => {
-    const result = await importMembersXlsx(
-      null,
-      importFormData([
-        { "Nama Member": "siti", "No HP": "081200000002", "Nama Peserta/Anak": "Rafi", "Tanggal Lahir": "05/07/2018" },
-        { "Nama Member": "siti", "No HP": "081200000002", "Nama Peserta/Anak": "Nadia" },
-      ])
-    );
-    expect(createDependent).toHaveBeenNthCalledWith(1, "user-1", "Rafi", expect.anything(), new Date("2018-07-05T00:00:00Z"));
-    expect(createDependent).toHaveBeenNthCalledWith(2, "user-1", "Nadia", expect.anything(), null);
-    expect(result?.result).toContain("1 peserta belum punya tanggal lahir");
-  });
-
-  it("kolom \"Tanggal Lahir (opsional)\" (nama di teks petunjuk) juga terbaca (sweep 2 Okt)", async () => {
-    await importMembersXlsx(
-      null,
-      importFormData([{ "Nama Member": "siti", "No HP": "081200000002", "Nama Peserta/Anak": "Rafi", "Tanggal Lahir (opsional)": "2018-07-05" }])
-    );
-    expect(createDependent).toHaveBeenCalledWith("user-1", "Rafi", expect.anything(), new Date("2018-07-05T00:00:00Z"));
-  });
-
-  it("groups multiple rows with the same phone number into one member with multiple participants", async () => {
-    const result = await importMembersXlsx(
-      null,
-      importFormData([
-        { "Nama Member": "Dedi", "No HP": "081200000002", "Nama Peserta/Anak": "Anak Satu" },
-        { "Nama Member": "Dedi", "No HP": "081200000002", "Nama Peserta/Anak": "Anak Dua" },
-      ])
-    );
-    expect(userCreate).toHaveBeenCalledTimes(1);
-    expect(dependentCreateMany).not.toHaveBeenCalled(); // pakai createDependent per baris, bukan createMany
-    expect(createDependent).toHaveBeenCalledTimes(2);
-    expect(result?.result).toContain("1 member, 2 peserta");
-  });
-
-  it("clamps sisaSesi to the catalog template's totalSesi when the sheet says more than the template allows", async () => {
-    packageTemplateFindMany.mockResolvedValue([{ id: "tpl-1", name: "Private 8x", totalSesi: 8, jatahCancel: 2, durationDays: 60 }]);
-    await importMembersXlsx(
-      null,
-      importFormData([
-        { "Nama Member": "Budi", "No HP": "081200000003", "Nama Peserta/Anak": "Budi Jr", "Paket": "Private 8x", "Sisa Sesi": 20 },
-      ])
-    );
-    expect(packageCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ totalSesi: 8, sisaSesi: 8, templateId: "tpl-1" }) })
-    );
-  });
-
-  // Temuan sweep keamanan 25 Sep: dulu semua member import dapat password sama
-  // ("renang2026") -- siapa pun yang tahu No HP member baru bisa masuk.
-  it("gives every imported member a different random temporary password, shown once to the admin", async () => {
-    const result = await importMembersXlsx(
-      null,
-      importFormData([
-        { "Nama Member": "Ani", "No HP": "+62 812-0000-0011" },
-        { "Nama Member": "Beni", "No HP": "081200000012" },
-      ])
-    );
-    const creds = result?.credentials ?? [];
-    expect(creds.map((c) => c.phone)).toEqual(["081200000011", "081200000012"]);
-    expect(creds[0].password).toMatch(/^[a-z2-9]{10}$/);
-    expect(creds[0].password).not.toBe(creds[1].password);
-    expect(result?.result).not.toContain("renang2026");
-    // Nomor disimpan dalam bentuk baku.
-    expect(userCreate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ phone: "081200000011" }) }));
-  });
-
-  it("does not list a member whose import failed among the credentials", async () => {
-    userCreate.mockRejectedValueOnce(Object.assign(new Error("dup"), { code: "P2002" }));
-    const result = await importMembersXlsx(null, importFormData([{ "Nama Member": "Ani", "No HP": "081200000013" }]));
-    expect(result?.credentials).toEqual([]);
-  });
-
-  // Sweep keamanan 25 Sep: batas ukuran file & jumlah baris import.
-  it("refuses a file bigger than 2MB before parsing it", async () => {
-    const fd = new FormData();
-    fd.set("poolId", "pool-1");
-    fd.set("file", new File([new Uint8Array(2 * 1024 * 1024 + 1)], "besar.xlsx"));
-    const result = await importMembersXlsx(null, fd);
-    expect(result?.error).toContain("2MB");
-    expect(userCreate).not.toHaveBeenCalled();
-  });
-
-  it("refuses more than 500 rows", async () => {
-    const rows = Array.from({ length: 501 }, (_, i) => ({ "Nama Member": `M${i}`, "No HP": `0812${String(i).padStart(8, "0")}` }));
-    const result = await importMembersXlsx(null, importFormData(rows));
-    expect(result?.error).toContain("500");
-    expect(userCreate).not.toHaveBeenCalled();
-  });
-
-  it("skips a row with no phone number instead of failing the whole import", async () => {
-    const result = await importMembersXlsx(null, importFormData([{ "Nama Member": "Tanpa HP" }]));
-    expect(userCreate).not.toHaveBeenCalled();
-    expect(result?.result).toContain("dilewati");
-  });
-
-  it("skips a member whose phone/email is already registered", async () => {
-    userFindFirst.mockResolvedValue({ id: "existing" });
-    const result = await importMembersXlsx(null, importFormData([{ "Nama Member": "Budi", "No HP": "081200000001" }]));
-    expect(userCreate).not.toHaveBeenCalled();
-    expect(result?.result).toContain("sudah terdaftar");
-  });
-
-  it("skips a package with a non-numeric Sisa Sesi but still creates the member and participant", async () => {
-    const result = await importMembersXlsx(
-      null,
-      importFormData([
-        { "Nama Member": "Budi", "No HP": "081200000004", "Nama Peserta/Anak": "Budi Jr", "Paket": "Private 8x", "Sisa Sesi": "abc" },
-      ])
-    );
-    expect(userCreate).toHaveBeenCalled();
-    expect(packageCreate).not.toHaveBeenCalled();
-    expect(result?.result).toContain("Sisa Sesi tidak valid");
-  });
-
-  it("creates a bare member with no participant/package when the row has neither", async () => {
-    const result = await importMembersXlsx(null, importFormData([{ "Nama Member": "Budi Polos", "No HP": "081200000005" }]));
-    expect(userCreate).toHaveBeenCalled();
-    expect(createDependent).not.toHaveBeenCalled();
-    expect(createSelfDependent).not.toHaveBeenCalled();
-    expect(result?.result).toContain("1 member, 0 peserta, 0 paket");
-  });
-});

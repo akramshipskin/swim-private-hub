@@ -20,7 +20,7 @@ describe("PLATFORM: pembalikan setelah saldo ditarik", () => {
     const pool = await mkPool();
     const coach = await mkUser("COACH");
     const admin = await mkUser("ADMIN");
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
     const b1 = await book(m.id, (await mkSlot(coach.id, pool.id, -5)).id, pkg.id);
     const b2 = await book(m.id, (await mkSlot(coach.id, pool.id, -4)).id, pkg.id);
 
@@ -52,7 +52,7 @@ describe("PLATFORM: pembalikan setelah saldo ditarik", () => {
       const pool = await mkPool();
       const coach = await mkUser("COACH");
       const [a1, a2] = [await mkUser("ADMIN"), await mkUser("ADMIN")];
-      const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+      const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
       await mark(coach, (await book(m.id, (await mkSlot(coach.id, pool.id, -5)).id, pkg.id)).id, true);
       await matureAll();
       const all = (await getPlatformBalance()).availableRevenue;
@@ -74,7 +74,7 @@ describe("PLATFORM: angka 'boleh ditarik' saat koreksi dalam masa tahan", () => 
   it("P3: sesi baru (masih ditahan) dikoreksi Hadir -> Tidak Hadir: dana matang sesi lama tidak berkurang", async () => {
     const pool = await mkPool();
     const coach = await mkUser("COACH");
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
     const old = await book(m.id, (await mkSlot(coach.id, pool.id, -8)).id, pkg.id);
     const fresh = await book(m.id, (await mkSlot(coach.id, pool.id, -5)).id, pkg.id);
 
@@ -96,7 +96,7 @@ describe("PLATFORM: angka 'boleh ditarik' saat koreksi dalam masa tahan", () => 
   it("P4: kredit yang SUDAH matang dikoreksi -> dana matang itu memang berkurang penuh (tidak melebihi yang aman)", async () => {
     const pool = await mkPool();
     const coach = await mkUser("COACH");
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
     const b = await book(m.id, (await mkSlot(coach.id, pool.id, -8)).id, pkg.id);
 
     await mark(coach, b.id, true);
@@ -114,7 +114,7 @@ describe("PLATFORM: angka 'boleh ditarik' saat koreksi dalam masa tahan", () => 
   it("P5: koreksi manual (tanpa bookingId) bernilai negatif langsung memotong yang boleh ditarik", async () => {
     const pool = await mkPool();
     const coach = await mkUser("COACH");
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
     const b = await book(m.id, (await mkSlot(coach.id, pool.id, -8)).id, pkg.id);
     await mark(coach, b.id, true);
     await matureBooking(b.id);

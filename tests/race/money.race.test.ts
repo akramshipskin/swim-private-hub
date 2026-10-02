@@ -13,10 +13,9 @@ import { POST as register } from "@/app/api/register/route";
 import { POST as registerCoach } from "@/app/api/register-coach/route";
 import { POST as registerPool } from "@/app/api/register-pool/route";
 import { addChild } from "@/app/profil/actions";
-import { createUser, importMembersXlsx } from "@/app/admin/users/actions";
-import { assignPackageToMember, createTemplate } from "@/app/admin/paket/actions";
-import { affiliateCoach, updatePoolShares } from "@/app/admin/kolam/actions";
-import * as XLSX from "xlsx";
+import { createUser } from "@/app/admin/users/actions";
+import { assignPackageToMember } from "@/app/admin/paket/actions";
+import { affiliateCoach, updatePoolPricing } from "@/app/admin/kolam/actions";
 
 beforeEach(reset);
 
@@ -90,7 +89,7 @@ describe("WITHDRAWAL races", () => {
     const pool = await mkPool(); const coach = await mkUser("COACH", { coachBalance: 60000, bank: true }); const admin = await mkUser("ADMIN");
     await prisma.walletTransaction.create({ data: { type: "SESSION_PAYOUT", coachProfileId: coach.coachProfile!.id, amount: 60000 } });
     const slot = await mkSlot(coach.id, pool.id, -3);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
     const b = await book(m.id, slot.id, pkg.id);
     const rs = await settle([
       as({ id: coach.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "100000" }))),
@@ -99,7 +98,8 @@ describe("WITHDRAWAL races", () => {
     const cp = await prisma.coachProfile.findUniqueOrThrow({ where: { id: coach.coachProfile!.id } });
     const withdrawn = (await prisma.withdrawalRequest.aggregate({ _sum: { amount: true } }))._sum.amount ?? 0;
     console.log("W5", summarize(rs), { saldo: cp.walletBalance, withdrawn });
-    expect(cp.walletBalance + withdrawn).toBe(60000 + 55000);
+    // Bagian coach 40.000 - PPh 200 (paket 800.000/8 sesi).
+    expect(cp.walletBalance + withdrawn).toBe(60000 + 39800);
     expect(await ledgerCheck()).toEqual([]);
   });
 });
@@ -203,46 +203,37 @@ describe("REGISTRATION / ACCOUNT races", () => {
     expect(await prisma.user.count({ where: { phone: "081277777777" } })).toBe(1);
     expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
   });
-  it("A5: admin import xlsx yang sama 2x barengan -> gak ada member/paket dobel", async () => {
-    const admin = await mkUser("ADMIN"); const pool = await mkPool();
-    const ws = XLSX.utils.aoa_to_sheet([["Nama Member", "No HP", "Email (opsional)", "Nama Peserta/Anak", "Paket Aktif", "Sisa Sesi"], ["Budi", "081211111111", "", "Rafi", "8x", "5"], ["Budi", "081211111111", "", "Nadia", "8x", "3"]]);
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
-    const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
-    const mk = () => { const f = new FormData(); f.append("poolId", pool.id); f.append("file", new File([buf], "a.xlsx")); return f; };
-    const rs = await settle([0, 1].map(() => as({ id: admin.id, role: "ADMIN" }, () => importMembersXlsx(null, mk()))));
-    console.log("A5", summarize(rs));
-    expect(await prisma.user.count({ where: { phone: "081211111111" } })).toBe(1);
-    expect(await prisma.package.count()).toBe(2);
-  });
-  it("A6: admin double-klik Assign Paket -> berapa paket kebikin?", async () => {
-    const admin = await mkUser("ADMIN"); const pool = await mkPool(); const m = await mkUser("MEMBER");
+  it("A6: admin double-klik Berikan Paket -> 1 paket, harga kolam+coach tersalin, tanpa pembayaran", async () => {
+    const admin = await mkUser("ADMIN"); const { pool, coach } = await mkPricedOffer(); const m = await mkUser("MEMBER");
     const dep = await prisma.dependent.create({ data: { memberId: m.id, name: "A" } });
-    const rs = await settle(Array.from({ length: 3 }, () => as({ id: admin.id, role: "ADMIN" }, () => assignPackageToMember(null, fd({ memberId: m.id, dependentId: dep.id, poolId: pool.id, name: "Promo", totalSesi: "4", jatahCancel: "1", expiredDate: "" })))));
-    const n = await prisma.package.count({ where: { memberId: m.id } });
-    console.log("A6", summarize(rs), "packages:", n);
-    expect(n).toBe(1);
+    const rs = await settle(Array.from({ length: 3 }, () => as({ id: admin.id, role: "ADMIN" }, () => assignPackageToMember(null, fd({ memberId: m.id, dependentId: dep.id, poolId: pool.id, coachId: coach.id, sesi: "4" })))));
+    const pkgs = await prisma.package.findMany({ where: { memberId: m.id }, include: { payments: true } });
+    console.log("A6", summarize(rs), "packages:", pkgs.length);
+    expect(pkgs).toHaveLength(1);
+    expect(pkgs[0]).toMatchObject({ coachId: coach.id, totalSesi: 4, poolPrice: 260000, coachPrice: 440000, status: "ACTIVE" });
+    expect(pkgs[0].payments).toHaveLength(0);
   });
-  it("A7: admin double-klik Tambah Katalog & Tambah coach ke kolam", async () => {
+  it("A7: admin double-klik Tambah coach ke kolam", async () => {
     const admin = await mkUser("ADMIN"); const pool = await mkPool(); const coach = await mkUser("COACH");
-    const rs1 = await settle(Array.from({ length: 3 }, () => as({ id: admin.id, role: "ADMIN" }, () => createTemplate(null, fd({ poolId: pool.id, name: "Paket A", totalSesi: "8", price: "100", durationDays: "60", jatahCancel: "2" })))));
     const rs2 = await settle(Array.from({ length: 4 }, () => as({ id: admin.id, role: "ADMIN" }, () => affiliateCoach(null, fd({ poolId: pool.id, coachId: coach.id })))));
-    const t = await prisma.packageTemplate.count(); const a = await prisma.poolAffiliation.count();
-    console.log("A7", summarize(rs1), summarize(rs2), { templates: t, affiliations: a });
+    const a = await prisma.poolAffiliation.count();
+    console.log("A7", summarize(rs2), { affiliations: a });
     expect(a).toBe(1); expect(rs2.every((r) => r.status === "fulfilled")).toBe(true);
-    expect(t).toBe(1);
   });
-  it("A8: admin ganti persen komisi pas Hadir lagi dikredit -> total kredit gak lebih dari harga sesi", async () => {
-    const pool = await mkPool({ commission: 15, coachShare: 55 }); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
+  it("A8: admin ganti harga kolam pas Hadir lagi dikredit -> kredit tetap dari harga tersimpan di paket", async () => {
+    const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, -3);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
     const b = await book(m.id, slot.id, pkg.id);
     const rs = await settle([
       as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" }))),
-      as({ id: admin.id, role: "ADMIN" }, () => updatePoolShares(null, fd({ poolId: pool.id, commissionPercent: "10", coachSharePercent: "80" }))),
+      as({ id: admin.id, role: "ADMIN" }, () => updatePoolPricing(null, fd({ poolId: pool.id, pricePack4: "900000", pricePack8: "1800000", serviceFeePercent: "6,9" }))),
     ]);
-    const sum = (await prisma.walletTransaction.aggregate({ _sum: { amount: true } }))._sum.amount ?? 0;
-    console.log("A8", summarize(rs), { credited: sum });
-    expect(sum).toBeLessThanOrEqual(100000);
+    const rows = await prisma.walletTransaction.findMany({ where: { bookingId: b.id } });
+    const nonPph = rows.filter((r) => r.type !== "PPH_WITHHELD").reduce((n, r) => n + r.amount, 0);
+    console.log("A8", summarize(rs), { credited: nonPph });
+    expect(nonPph).toBe(100000);
+    expect(rows.find((r) => r.type === "SESSION_REVENUE")?.amount).toBe(50000);
   });
 });
 
@@ -250,7 +241,7 @@ describe("REGISTRATION / ACCOUNT races", () => {
 describe("PAKET PILIH COACH", () => {
   async function pricedBooking(hoursFromNow = -3) {
     const { pool, coach } = await mkPricedOffer();
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 1363200 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 1363200 });
     await prisma.package.update({ where: { id: pkg.id }, data: { coachId: coach.id, poolPrice: 480000, coachPrice: 800000, serviceFee: 83200, durationDays: 90 } });
     const slot = await mkSlot(coach.id, pool.id, hoursFromNow);
     const b = await book(m.id, slot.id, pkg.id);

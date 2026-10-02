@@ -11,7 +11,7 @@ describe("CAS batal vs absen", () => {
       await reset();
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
       const slot = await mkSlot(coach.id, pool.id, -3);
-      const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+      const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
       const b = await book(m.id, slot.id, pkg.id);
       const calls = [
         () => as({ id: admin.id, role: "ADMIN" }, () => adminCancelBooking(null, fd({ bookingId: b.id }))),
@@ -23,7 +23,7 @@ describe("CAS batal vs absen", () => {
       const p = await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } });
       if (bb.status === "CANCELLED" && cp.walletBalance > 0) bad++;
       if (bb.status === "CANCELLED" && p.sisaSesi !== 8) bad++;
-      if (bb.status === "BOOKED" && (p.sisaSesi !== 7 || (bb.attended && cp.walletBalance !== 55000))) bad++;
+      if (bb.status === "BOOKED" && (p.sisaSesi !== 7 || (bb.attended && cp.walletBalance !== 39800))) bad++;
       const k = `${bb.status}/attended=${bb.attended}/coach=${cp.walletBalance}/sisa=${p.sisaSesi}`; tally[k] = (tally[k] ?? 0) + 1;
     }
     console.log("R13b", tally);

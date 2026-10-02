@@ -1,14 +1,8 @@
-// Jatah self-cancel sekarang disimpen per-paket (Package.jatahCancel),
-// bukan konstanta global -- lihat PackageTemplate.jatahCancel &
-// src/lib/cancel-eligibility.ts.
+// Jatah self-cancel disimpan per-paket (Package.jatahCancel, dari
+// PACK_CANCEL_QUOTA di src/lib/pricing.ts) -- lihat src/lib/cancel-eligibility.ts.
 
 // Minimal jam sebelum jadwal buat member masih bisa cancel sendiri.
 export const CANCEL_WINDOW_HOURS = 2;
-
-// Masa berlaku paket 1 sesi eceran lama (hari, dihitung dari pembayaran
-// sukses). Eceran tidak dijual lagi sejak 2 Okt; tetap dipakai webhook untuk
-// pembayaran paket eceran lama yang masih menunggu.
-export const DROP_IN_DURATION_DAYS = 14;
 
 // Minimal nominal pencairan saldo (kolam & coach). Dipake server
 // (withdrawal.ts) DAN tombol "Cairkan" (saldo-view) biar sama persis.
@@ -63,15 +57,11 @@ export function memberCanReportAttendance(endTime: Date, now: Date = new Date())
 export const MILESTONE_NOTE_EVERY_SESSIONS = 2;
 export const MILESTONE_HOLD_START = new Date("2026-10-01T00:00:00+07:00");
 
-// Afiliasi (Hadi 29 Sep): pemilik kode (coach atau kolam) dapat sekian persen
-// dari pembayaran paket PERTAMA member yang mendaftar dengan kodenya, sekali
-// per member, dibayar dari bagian SPH. Cair ke saldo setelah sesi pertama
-// member Hadir + sekian hari (sama dengan jendela laporan member).
-export const AFFILIATE_COMMISSION_PERCENT = 5;
-export const AFFILIATE_HOLD_DAYS = 3;
-// Aturan baru (Hadi 2 Okt, jawaban 1A/2A): untuk pembayaran paket sejak
-// AFFILIATE_V2_START, komisi = sekian persen dari biaya layanan SPH bersih
-// (setelah PPN) paket pertama berbayar; sesi coba tidak dihitung. Pembayaran
-// sebelum tanggal itu tetap AFFILIATE_COMMISSION_PERCENT dari jumlah dibayar.
+// Afiliasi (Hadi 29 Sep, diubah 2 Okt): pemilik kode (coach atau kolam) dapat
+// sekian persen dari biaya layanan SPH bersih (setelah PPN) paket PERTAMA
+// berbayar member yang mendaftar dengan kodenya, sekali per member, dibayar
+// dari bagian SPH; sesi coba tidak dihitung. Aturan lama 5% dari jumlah dibayar
+// dihapus (Hadi 2 Okt malam, #9); komisi yang sudah tercatat tidak diubah.
+// Cair ke saldo setelah sesi pertama member Hadir + sekian hari.
 export const AFFILIATE_SERVICE_FEE_SHARE_PERCENT = 50;
-export const AFFILIATE_V2_START = new Date("2026-10-03T00:00:00+07:00");
+export const AFFILIATE_HOLD_DAYS = 3;

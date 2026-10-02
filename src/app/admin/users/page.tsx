@@ -3,7 +3,6 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { usablePackageConditions } from "@/lib/active-package";
 import CreateUserForm from "./create-user-form";
-import ImportMembersForm from "./import-members-form";
 import AddChildForm from "../paket/add-child-form";
 import AssignPackageForm from "../paket/assign-package-form";
 import UsersMemberSection from "./users-member-section";
@@ -28,7 +27,7 @@ export const metadata = { title: "Kelola Pengguna | Swim Private Hub" };
 export default async function AdminUsersPage() {
   const session = await requireRole("ADMIN");
 
-  const [users, templates, dependents, pools] = await Promise.all([
+  const [users, dependents, pools] = await Promise.all([
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       include: {
@@ -49,19 +48,22 @@ export default async function AdminUsersPage() {
         poolOwnerships: { select: { pool: { select: { id: true, name: true, walletBalance: true } } } },
       },
     }),
-    prisma.packageTemplate.findMany({ orderBy: { totalSesi: "asc" } }),
     prisma.dependent.findMany({
       where: { isActive: true },
       orderBy: { name: "asc" },
       select: { id: true, name: true, memberId: true, isSelf: true },
     }),
-    prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    prisma.pool.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, isActive: true } }),
   ]);
 
   const members = users.filter((u) => u.role === "MEMBER");
   // Yang dikirim ke komponen client HANYA field ini. Baris User utuh dulu
   // ikut ter-serialisasi ke browser (hash password & kunci 2FA semua member).
   // Akun yang sudah dihapus (dianonimkan) tidak ditawarkan di pilihan assign paket / tambah peserta.
+  // Coach aktif + kolam tempat mengajar, untuk pilihan coach di form Berikan Paket.
+  const coachOptions = users
+    .filter((u) => u.role === "COACH" && u.isActive && !u.anonymizedAt)
+    .map((u) => ({ id: u.id, name: u.name, poolIds: u.poolAffiliations.map((a) => a.pool.id) }));
   const memberOptions = members.filter((u) => !u.anonymizedAt).map((u) => ({ id: u.id, name: u.name, email: u.email, phone: u.phone }));
 
   return (
@@ -70,21 +72,10 @@ export default async function AdminUsersPage() {
 
       <PendingCertificates />
 
-      {/* Kolom kanan diisi migrasi + Tambah Peserta supaya tidak ada ruang
-          kosong di sebelah form Tambah User Baru yang tinggi (Hadi 18 Sep). */}
+      {/* Kolom kanan diisi Tambah Peserta di sebelah form Tambah User Baru (Hadi 18 Sep). */}
       <div className="mb-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-        <CreateUserForm pools={pools} />
+        <CreateUserForm pools={pools.map(({ id, name }) => ({ id, name }))} />
         <div className="flex flex-col gap-4">
-          <details className="rounded-2xl border border-border bg-surface p-4">
-            <summary className="cursor-pointer text-sm font-semibold text-text max-sm:py-3">
-              Migrasi data: import member dari Excel (.xlsx)
-            </summary>
-            <p className="mt-2 text-sm text-text-muted">Dipakai saat kolam baru bergabung dan membawa data member lama.</p>
-            <div className="mt-3">
-              <ImportMembersForm pools={pools} />
-            </div>
-          </details>
-
           {/* Tambah peserta (anak atau diri sendiri) -- dibutuhkan sebelum
               bisa assign paket. */}
           <div className="rounded-2xl border border-border bg-surface p-4">
@@ -101,10 +92,15 @@ export default async function AdminUsersPage() {
       {/* --- Assign paket khusus ke member --- */}
       <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Berikan Paket ke Peserta</h2>
       <p className="mb-3 text-sm text-text-muted">
-        Buat paket khusus untuk 1 peserta tertentu (koreksi, promo, atau kasus di luar
-        alur beli-online).
+        Beri paket gratis untuk 1 peserta (koreksi, promo, atau kasus di luar alur beli online).
       </p>
-      <AssignPackageForm members={memberOptions} templates={templates.map((t) => ({ id: t.id, name: t.name, totalSesi: t.totalSesi, jatahCancel: t.jatahCancel, poolId: t.poolId }))} dependents={dependents} pools={pools} />
+      <AssignPackageForm
+        members={memberOptions}
+        dependents={dependents}
+        // Hanya kolam aktif yang punya coach aktif (server juga menolak kolam nonaktif).
+        pools={pools.filter((p) => p.isActive && coachOptions.some((c) => c.poolIds.includes(p.id))).map(({ id, name }) => ({ id, name }))}
+        coaches={coachOptions}
+      />
 
       <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua User</h2>
 

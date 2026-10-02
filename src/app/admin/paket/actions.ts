@@ -3,49 +3,15 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { withDedupeLock } from "@/lib/dedupe-lock";
-import { createTemplateRecord, updateTemplateRecord, reviewTemplateChange } from "@/lib/package-template";
 import { createDependent, createSelfDependent } from "@/lib/dependents";
 import { parseParticipantBirthDate } from "@/lib/participant-input";
-import { formNumber, toProperCase } from "@/lib/format";
+import { formNumber } from "@/lib/format";
+import { packQuote } from "@/lib/pricing";
 import { resolveExpiredDate } from "@/lib/datetime";
 import { revalidatePath } from "next/cache";
 import { userErrorMessage } from "@/lib/user-error";
 
 export type ActionState = { error?: string; success?: string } | null;
-
-// --- Katalog paket (PackageTemplate) -- gak nempel ke member manapun ---
-
-export async function createTemplate(
-  _prevState: ActionState,
-  formData: FormData
-): Promise<ActionState> {
-  await requireRole("ADMIN");
-  const res = await createTemplateRecord(formData);
-  if (res) return res;
-  revalidatePath("/admin/paket");
-  revalidatePath("/pool/paket");
-  return null;
-}
-
-export async function reviewTemplate(templateId: string, approve: boolean) {
-  await requireRole("ADMIN");
-  await reviewTemplateChange(templateId, approve);
-  revalidatePath("/admin", "layout");
-  revalidatePath("/pool/paket");
-  revalidatePath("/member/paket");
-}
-
-export async function updateTemplate(
-  _prevState: ActionState,
-  formData: FormData
-): Promise<ActionState> {
-  await requireRole("ADMIN");
-  const res = await updateTemplateRecord(formData);
-  if (res) return res;
-  revalidatePath("/admin/paket");
-  revalidatePath("/pool/paket");
-  return null;
-}
 
 // --- Tambah anak buat member (admin) -- nutup gap: admin bikin member
 // baru terus mau langsung assign paket di sesi yang sama, padahal anak
@@ -87,103 +53,87 @@ export async function addChildForMember(
   return { success: "Peserta ditambahkan." };
 }
 
-// --- Assign paket ke member (custom, boleh dari katalog atau bebas) ---
-
+// --- Berikan paket manual ke peserta (Hadi 2 Okt malam, #9) ---
+// Model harga-dari-coach: admin memilih peserta + kolam + coach + paket 4/8 sesi.
+// Harga kolam & coach saat ini disalin ke paket (sama seperti pembelian), tapi
+// TIDAK ada pembayaran, jadi sesi-sesinya tidak membagi uang (lihat
+// markAttendance: kredit hanya untuk paket ber-Payment SUCCESS).
 export async function assignPackageToMember(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
   await requireRole("ADMIN");
 
-  const memberId = formData.get("memberId") as string;
-  const dependentId = formData.get("dependentId") as string;
-  const templateId = formData.get("templateId") as string | null;
-  const poolIdRaw = formData.get("poolId") as string | null;
-  const name = toProperCase(formData.get("name")?.toString().trim() ?? "");
-  const totalSesi = Number(formData.get("totalSesi"));
-  const jatahCancelRaw = formData.get("jatahCancel");
-  const jatahCancel = jatahCancelRaw ? Number(jatahCancelRaw) : 2;
-  const expiredDateRaw = formData.get("expiredDate") as string;
+  const memberId = formData.get("memberId")?.toString() ?? "";
+  const dependentId = formData.get("dependentId")?.toString() ?? "";
+  const poolId = formData.get("poolId")?.toString() ?? "";
+  const coachId = formData.get("coachId")?.toString() ?? "";
+  const sesi = Number(formData.get("sesi"));
 
-  // Pesan spesifik per kondisi -- sebelumnya 1 pesan gabungan bikin bingung
-  // (misal semua kolom keisi bener tapi tetep muncul "wajib diisi" karena
-  // dependentId kosong -- member belum punya peserta terdaftar sama sekali).
-  if (!memberId) {
-    return { error: "Pilih member dulu" };
-  }
+  if (!memberId) return { error: "Pilih member dulu" };
   if (!dependentId) {
     return {
-      error: "Member ini belum punya peserta terdaftar — tambahkan dulu di bagian \"Tambah Peserta\" sebelum assign paket.",
+      error: "Member ini belum punya peserta terdaftar — tambahkan dulu di bagian \"Tambah Peserta\" sebelum memberi paket.",
     };
   }
-  if (!name) {
-    return { error: "Nama paket wajib diisi" };
-  }
-  if (!Number.isInteger(totalSesi) || totalSesi < 1) {
-    return { error: "Total sesi minimal 1" };
-  }
-  if (!Number.isInteger(jatahCancel) || jatahCancel < 0) {
-    return { error: "Jatah batal tidak boleh negatif" };
-  }
+  if (!poolId || !coachId) return { error: "Pilih kolam dan coach dulu" };
+  if (sesi !== 4 && sesi !== 8) return { error: "Pilih paket 4 atau 8 sesi" };
 
-  // Anak yang dipilih harus emang punya member ini -- dropdown di form
-  // udah discope per-member, tapi tetep divalidasi ulang di server (IDOR
-  // guard, jangan percaya begitu aja apa yang dikirim client).
-  const dependent = await prisma.dependent.findUnique({
-    where: { id: dependentId },
-    select: { memberId: true },
-  });
-  if (!dependent || dependent.memberId !== memberId) {
-    return { error: "Anak tidak ditemukan atau bukan milik member ini" };
+  // Peserta harus milik member ini (dropdown sudah dibatasi, tetap dicek ulang
+  // di server: jangan percaya yang dikirim browser).
+  const dependent = await prisma.dependent.findUnique({ where: { id: dependentId }, select: { memberId: true, isActive: true } });
+  if (!dependent || dependent.memberId !== memberId || !dependent.isActive) {
+    return { error: "Peserta tidak ditemukan atau bukan milik member ini" };
   }
+  const [pool, coach] = await Promise.all([
+    prisma.pool.findFirst({
+      where: { id: poolId, isActive: true },
+      select: { id: true, pricePack4: true, pricePack8: true, serviceFeeBps: true },
+    }),
+    prisma.user.findFirst({
+      where: { id: coachId, role: "COACH", isActive: true, poolAffiliations: { some: { poolId } } },
+      select: { name: true, coachProfile: { select: { isActive: true, pricePack4: true, pricePack8: true } } },
+    }),
+  ]);
+  if (!pool) return { error: "Kolam tidak ditemukan atau sedang tidak aktif." };
+  if (!coach?.coachProfile?.isActive) return { error: "Coach ini tidak mengajar di kolam ini atau sedang tidak aktif." };
+  const quote = packQuote(pool, coach.coachProfile, sesi);
+  if (!quote) return { error: `Harga paket ${sesi} sesi belum dipasang kolam atau coach ini.` };
 
-  // Paket wajib pin ke 1 kolam (locked /plan-eng-review 2026-09-12) --
-  // kalau assign dari katalog, poolId ikut template-nya; kalau custom
-  // (gak pake template), admin wajib pilih kolam eksplisit di form.
-  let poolId = poolIdRaw;
-  if (templateId) {
-    const template = await prisma.packageTemplate.findUnique({
-      where: { id: templateId },
-      select: { poolId: true },
-    });
-    if (!template) {
-      return { error: "Template paket tidak ditemukan" };
-    }
-    poolId = template.poolId;
-  }
-  if (!poolId) {
-    return { error: "Kolam wajib dipilih (kalau bukan dari katalog paket)" };
-  }
-
-  // Klik ganda Assign: paket yang sama (nama & kolam) untuk peserta yang sama
-  // dalam 30 detik terakhir dianggap duplikat.
+  const name = `Paket ${quote.totalSesi} sesi · ${coach.name}`;
+  // Klik ganda: paket yang sama untuk peserta yang sama dalam 30 detik = duplikat.
   const assigned = await withDedupeLock(`assign:${dependentId}`, async (tx) => {
     const dup = await tx.package.count({
-      where: { dependentId, poolId, name, createdAt: { gte: new Date(Date.now() - 30_000) } },
+      where: { dependentId, poolId, coachId, totalSesi: quote.totalSesi, createdAt: { gte: new Date(Date.now() - 30_000) } },
     });
     if (dup > 0) return false;
+    const now = new Date();
     await tx.package.create({
-    data: {
-      memberId,
-      dependentId,
-      poolId,
-      templateId: templateId || null,
-      name,
-      totalSesi,
-      sisaSesi: totalSesi,
-      jatahCancel,
-      status: "ACTIVE",
-      startDate: new Date(),
-      expiredDate: expiredDateRaw ? new Date(`${expiredDateRaw}T23:59:59+07:00`) : null,
-    },
+      data: {
+        memberId,
+        dependentId,
+        poolId,
+        coachId,
+        name,
+        totalSesi: quote.totalSesi,
+        sisaSesi: quote.totalSesi,
+        jatahCancel: quote.jatahCancel,
+        poolPrice: quote.poolPrice,
+        coachPrice: quote.coachPrice,
+        serviceFee: quote.serviceFee,
+        durationDays: quote.durationDays,
+        status: "ACTIVE",
+        startDate: now,
+        expiredDate: new Date(now.getTime() + quote.durationDays * 86_400_000),
+      },
     });
     return true;
   });
-  if (!assigned) return { error: "Paket yang sama baru saja di-assign ke peserta ini." };
+  if (!assigned) return { error: "Paket yang sama baru saja diberikan ke peserta ini." };
 
   revalidatePath("/admin/paket");
   revalidatePath("/admin/users");
-  return { success: `Paket "${name}" (${totalSesi} sesi) di-assign.` };
+  return { success: `${name} diberikan (aktif ${quote.durationDays} hari, tanpa bagi hasil).` };
 }
 
 // --- Edit paket milik member (sisa sesi, status, masa berlaku) ---

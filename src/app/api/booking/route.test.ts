@@ -49,13 +49,13 @@ describe("POST /api/booking pool lock", () => {
   });
 
   // Model harga-dari-coach (Hadi 2 Okt): paket terikat ke coach-nya; paket lama
-  // (coachId null) tetap boleh coach mana pun.
-  it("only claims a package bound to the slot's coach (or a legacy package)", async () => {
+  // tanpa coach tidak bisa dipakai lagi (model lama dihapus, Hadi 2 Okt malam).
+  it("only claims a package bound to the slot's coach", async () => {
     availabilityFindUnique.mockResolvedValue({ poolId: "pool-B", coachId: "coach-7", pool: { isActive: true } });
     packageUpdateMany.mockResolvedValue({ count: 1 });
     await POST(req());
     const where = packageUpdateMany.mock.calls[0][0].where;
-    expect(where.AND).toContainEqual({ OR: [{ coachId: null, poolPrice: null }, { coachId: "coach-7" }] });
+    expect(where.AND).toContainEqual({ coachId: "coach-7" });
   });
 
   it("rejects without touching the slot when the package is for another pool", async () => {

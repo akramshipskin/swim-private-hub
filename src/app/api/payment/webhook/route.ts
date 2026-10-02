@@ -2,7 +2,6 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { platformServerKey } from "@/lib/midtrans";
 import type { Prisma } from "@/generated/prisma/client";
-import { DROP_IN_DURATION_DAYS } from "@/lib/policy";
 import { sendPushToUser } from "@/lib/push";
 import { completeCoachChange, notifyCoachChangeResult } from "@/lib/coach-change";
 import { creditMember, reclaimRefundedBalance, refundMemberBalanceOnce } from "@/lib/member-wallet";
@@ -70,7 +69,7 @@ export async function POST(request: Request) {
 
   const payment = await prisma.payment.findUnique({
     where: { midtransOrderId: orderId },
-    include: { package: { include: { template: true } } },
+    include: { package: true },
   });
 
   if (!payment) {
@@ -133,10 +132,9 @@ export async function POST(request: Request) {
     packageStatus = null;
   }
 
-  // Paket model harga-dari-coach menyimpan masa berlakunya sendiri.
-  const durationDays =
-    payment.package.durationDays ??
-    (payment.package.isSingleSession ? DROP_IN_DURATION_DAYS : (payment.package.template?.durationDays ?? 60));
+  // Paket menyimpan masa berlakunya sendiri (model harga-dari-coach); 60 hari
+  // hanya cadangan untuk data lama tanpa nilai ini.
+  const durationDays = payment.package.durationDays ?? 60;
   const now = new Date();
   const expiredDate = new Date(now);
   expiredDate.setDate(expiredDate.getDate() + durationDays);

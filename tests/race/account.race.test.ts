@@ -17,7 +17,7 @@ const bookReq = (body: unknown) => new Request("http://x/api/booking", { method:
 describe("Hapus akun member", () => {
   it("D1: disetujui -> identitas hilang, tidak bisa login, jadwal mendatang batal, riwayat & pembayaran tetap", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
-    const { m, pkg } = await mkMemberWithPackage(pool.id);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
     await prisma.user.update({ where: { id: m.id }, data: { email: "Ani@Example.com", passwordHash: await bcrypt.hash("rahasia123", 4) } });
     const future = await book(m.id, (await mkSlot(coach.id, pool.id, 48)).id, pkg.id);
     const past = await book(m.id, (await mkSlot(coach.id, pool.id, -5)).id, pkg.id);
@@ -48,7 +48,7 @@ describe("Hapus akun member", () => {
   });
 
   it("D2: nomor HP & email yang dihapus boleh dipakai daftar lagi", async () => {
-    const { m } = await mkMemberWithPackage((await mkPool()).id);
+    const { m } = await mkMemberWithPackage((await mkPool()).id, (await mkUser("COACH")).id);
     const phone = "081277770001";
     await prisma.user.update({ where: { id: m.id }, data: { phone } });
     await requestAccountDeletion(m.id);
@@ -58,9 +58,9 @@ describe("Hapus akun member", () => {
   });
 
   it("D3: tanpa pengajuan member, akun non-member, atau sudah dihapus -> ditolak; pengajuan bisa dibatalkan", async () => {
-    const { m } = await mkMemberWithPackage((await mkPool()).id);
-    await expect(anonymizeMember(m.id)).rejects.toBeInstanceOf(AccountDeletionError);
     const coach = await mkUser("COACH");
+    const { m } = await mkMemberWithPackage((await mkPool()).id, coach.id);
+    await expect(anonymizeMember(m.id)).rejects.toBeInstanceOf(AccountDeletionError);
     expect(await requestAccountDeletion(coach.id)).toBe(false);
     await requestAccountDeletion(m.id);
     expect(await cancelAccountDeletion(m.id)).toBe(true);
@@ -76,7 +76,7 @@ describe("Hapus akun member", () => {
       await reset();
       const w = i * 12;
       const pool = await mkPool(); const coach = await mkUser("COACH");
-      const { m, pkg } = await mkMemberWithPackage(pool.id);
+      const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
       const slots = await Promise.all(Array.from({ length: 5 }, () => mkSlot(coach.id, pool.id, 48)));
       await requestAccountDeletion(m.id);
       const rs = await settle([

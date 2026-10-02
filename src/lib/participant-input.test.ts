@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseImportBirthDate, parseParticipantBirthDate, readParticipants } from "./participant-input";
+import { parseParticipantBirthDate, readParticipants } from "./participant-input";
 
 const NOW = new Date("2026-09-30T05:00:00Z");
 
@@ -32,21 +32,6 @@ describe("readParticipants", () => {
   });
 });
 
-describe("parseImportBirthDate", () => {
-  const expected = new Date("2018-07-05T00:00:00Z");
-  it("menerima ISO, dd/mm/yyyy, dd-mm-yyyy, dan angka tanggal Excel", () => {
-    expect(parseImportBirthDate("2018-07-05", NOW)).toEqual(expected);
-    expect(parseImportBirthDate("05/07/2018", NOW)).toEqual(expected);
-    expect(parseImportBirthDate("5-7-2018", NOW)).toEqual(expected);
-    expect(parseImportBirthDate("43286", NOW)).toEqual(expected);
-  });
-  it("kosong, sampah, masa depan, atau tidak masuk akal -> null", () => {
-    for (const raw of [null, undefined, "", "  ", "kemarin", "2030-01-01", "1800-01-01", "2019"]) {
-      expect(parseImportBirthDate(raw, NOW)).toBeNull();
-    }
-  });
-});
-
 describe("parseParticipantBirthDate (dipindah ke modul ini)", () => {
   it("tetap menolak format salah", () => {
     expect(() => parseParticipantBirthDate("17-05-2019", NOW)).toThrow("Isi tanggal lahir");
@@ -65,4 +50,3 @@ describe("readParticipants: batas nama", () => {
     expect(readParticipants(fd("a".repeat(MAX_NAME))).children).toHaveLength(1);
   });
 });
-

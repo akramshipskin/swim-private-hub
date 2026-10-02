@@ -15,7 +15,11 @@ const bookingFindUnique = vi.fn();
 const bookingUpdateMany = vi.fn();
 
 function makeTx() {
-  return { booking: { updateMany: (...args: unknown[]) => bookingUpdateMany(...args) } };
+  return {
+    booking: { updateMany: (...args: unknown[]) => bookingUpdateMany(...args) },
+    // pricesForSessionCoach: tidak ada ganti coach yang selesai.
+    coachChangeRequest: { findFirst: vi.fn().mockResolvedValue(null) },
+  };
 }
 
 vi.mock("@/lib/prisma", () => ({
@@ -56,8 +60,13 @@ function baseBooking(overrides: Record<string, unknown> = {}) {
       coach: { coachProfile: { id: "coachprofile-1" } },
     },
     package: {
+      id: "pkg-1",
       totalSesi: 8,
-      payments: [{ amount: 750_000 }],
+      coachId: "coach-1",
+      poolPrice: 480_000,
+      coachPrice: 800_000,
+      serviceFee: 83_200,
+      payments: [{ amount: 1_363_200 }],
     },
     ...overrides,
   };
@@ -132,7 +141,7 @@ describe("markAttendance", () => {
     expect(bookingUpdateMany).not.toHaveBeenCalled();
   });
 
-  it("credits the wallet using perSessionValue = payment amount / totalSesi when newly marked Hadir", async () => {
+  it("credits the wallet from the prices stored on the package when newly marked Hadir", async () => {
     bookingFindUnique.mockResolvedValue(baseBooking({ attended: null }));
     const result = await markAttendance(null, formData("booking-1", "true"));
     expect(result).toBeNull();
@@ -140,21 +149,22 @@ describe("markAttendance", () => {
       poolId: "pool-1",
       coachProfileId: "coachprofile-1",
       bookingId: "booking-1",
-      perSessionValue: 93_750, // 750000 / 8
       attended: true,
+      pricing: { paid: 1_363_200, totalSesi: 8, poolPrice: 480_000, coachPrice: 800_000 },
     });
     expect(reverseSessionRevenue).not.toHaveBeenCalled();
   });
 
-  it("never lets the per-session value sum above the amount actually paid", async () => {
-    // Regression: 100000/6 dulu di-round jadi 16667 -> 6 sesi = 100.002.
+  // Model bagi hasil persen lama dihapus (Hadi 2 Okt malam): paket berbayar
+  // tanpa harga tersimpan tidak dibagi otomatis, tanda tidak tersimpan.
+  it("refuses with a clear message when a paid package has no stored prices (old model)", async () => {
     bookingFindUnique.mockResolvedValue(
-      baseBooking({ attended: null, package: { totalSesi: 6, payments: [{ amount: 100_000 }] } })
+      baseBooking({ attended: null, package: { id: "pkg-old", totalSesi: 8, coachId: null, poolPrice: null, coachPrice: null, serviceFee: null, payments: [{ amount: 750_000 }] } })
     );
-    await markAttendance(null, formData("booking-1", "true"));
-    const { perSessionValue } = vi.mocked(creditSessionRevenue).mock.calls[0][1];
-    expect(perSessionValue).toBe(16_666);
-    expect(perSessionValue * 6).toBeLessThanOrEqual(100_000);
+    const result = await markAttendance(null, formData("booking-1", "true"));
+    expect(result).toEqual({ error: "Harga sesi ini tidak ditemukan. Hubungi admin." });
+    expect(creditSessionRevenue).not.toHaveBeenCalled();
+    expect(reverseSessionRevenue).not.toHaveBeenCalled();
   });
 
   it("Hadir -> Tidak Hadir: balik bagi hasil Hadir, lalu catat bagi hasil tidak datang", async () => {
@@ -171,7 +181,7 @@ describe("markAttendance", () => {
     const result = await markAttendance(null, formData("booking-1", "false"));
     expect(result).toBeNull();
     expect(reverseSessionRevenue).not.toHaveBeenCalled();
-    expect(creditSessionRevenue).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ attended: false, perSessionValue: 93_750 }));
+    expect(creditSessionRevenue).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ attended: false, pricing: expect.objectContaining({ paid: 1_363_200 }) }));
   });
 
   it("Tidak Hadir -> Hadir (misal setelah laporan member): balik yang lama, catat pembagian normal", async () => {
@@ -221,7 +231,7 @@ describe("markAttendance", () => {
   // Paket yang di-assign manual/gratis (admin) gak punya Payment SUCCESS --
   // attendance tetep bisa ditandai, tapi TIDAK ada duit beneran buat dibagi.
   it("marks attendance without crediting anything when the package has no successful payment", async () => {
-    bookingFindUnique.mockResolvedValue(baseBooking({ attended: null, package: { totalSesi: 8, payments: [] } }));
+    bookingFindUnique.mockResolvedValue(baseBooking({ attended: null, package: { ...baseBooking().package, payments: [] } }));
     const result = await markAttendance(null, formData("booking-1", "true"));
     expect(result).toBeNull();
     expect(bookingUpdateMany).toHaveBeenCalled();

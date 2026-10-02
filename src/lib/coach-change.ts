@@ -49,7 +49,7 @@ export async function remainingSessions(tx: Prisma.TransactionClient, packageId:
 // paket sebelum ganti itu (harus diajar coach lama saat itu); sesi setelah
 // ganti coach terakhir memakai harga paket sekarang. Booking coach lama yang
 // belum mulai dibatalkan saat ganti coach selesai, jadi tiap sesi jatuh tepat
-// di satu periode. null = paket lama (bagi hasil persen kolam) atau coach sesi
+// di satu periode. null = paket tanpa harga tersimpan (model lama) atau coach sesi
 // tidak cocok dengan periodenya.
 export async function pricesForSessionCoach(
   tx: Prisma.TransactionClient,
@@ -102,6 +102,10 @@ export async function completeCoachChange(
   }
   if (pkg.status !== "ACTIVE" || (pkg.expiredDate && pkg.expiredDate < now)) {
     return { ok: false, error: "Paket ini sudah tidak aktif atau sudah kedaluwarsa." };
+  }
+  // Lihat submitCoachChange: paket tanpa pembayaran (pemberian admin) tidak ikut.
+  if ((await tx.payment.count({ where: { packageId: pkg.id, status: "SUCCESS" } })) === 0) {
+    return { ok: false, error: "Paket pemberian admin tidak bisa diganti coach lewat pengajuan." };
   }
   const toCoach = await tx.user.findFirst({
     where: { id: req.toCoachId, role: "COACH", isActive: true, coachProfile: { isActive: true }, poolAffiliations: { some: { poolId: pkg.poolId } } },

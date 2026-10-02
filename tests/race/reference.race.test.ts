@@ -21,7 +21,7 @@ describe("REFERENSI", () => {
       await reset();
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
       const slots = await Promise.all(Array.from({ length: 8 }, () => mkSlot(coach.id, pool.id, 48)));
-      const members = await Promise.all(slots.map(() => mkMemberWithPackage(pool.id)));
+      const members = await Promise.all(slots.map(() => mkMemberWithPackage(pool.id, coach.id)));
       const rs = await settle([
         (async () => { await jitter(6); return as({ id: admin.id, role: "ADMIN" }, () => togglePoolActive(pool.id, false)); })(),
         ...members.map(({ m, pkg }, k) => as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slots[k].id, packageId: pkg.id })))),

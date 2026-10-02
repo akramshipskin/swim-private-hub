@@ -80,34 +80,26 @@ export async function markAttendance(
         throw new Error("Booking ini baru saja diubah di tempat lain (dibatalkan/ditandai). Muat ulang halaman dulu.");
       }
 
-      // Kredit wallet cuma jalan kalau paket ini beneran dibeli lewat
-      // Midtrans (ada Payment SUCCESS) -- paket yang di-assign manual/gratis
-      // sama admin gak punya uang beneran buat dibagi. coachProfile null
-      // (harusnya gak mungkin tapi dicek jaga-jaga) juga skip.
-      //
-      // PENTING (revisi 2026-09-12, paket lintas-kolam): kolam yang
-      // dikredit itu Booking.availability.poolId -- kolam TEMPAT SESI INI
-      // BENERAN DIAJAR -- bukan booking.package.poolId (kolam tempat
-      // paket dibeli, bisa beda kolam sekarang).
+      // Kredit wallet cuma jalan kalau paket ini beneran dibayar (ada Payment
+      // SUCCESS, termasuk lunas dari saldo member) -- paket yang diberikan
+      // manual oleh admin tidak punya uang untuk dibagi. Kolam yang dikredit =
+      // kolam tempat sesi diajar (Booking.availability.poolId).
       const successPayment = booking.package.payments[0];
       const coachProfile = booking.availability.coach.coachProfile;
       if (!successPayment || !coachProfile) return;
-
-      // floor, bukan round: round bisa bikin total semua sesi > harga
-      // paket (100.000/6 -> 16.667 x 6 = 100.002), artinya kredit uang
-      // yang gak pernah dibayar. floor bikin sisanya (< totalSesi rupiah
-      // per paket) tetap di platform, sesuai aturan sisa pembulatan.
-      const perSessionValue = Math.floor(successPayment.amount / booking.package.totalSesi);
 
       // Bagi hasil mengikuti tanda terbaru: Hadir = pembagian normal, Tidak
       // Hadir = bagian coach 50% (kolam Rp0). Ganti tanda = balik yang lama
       // (jumlah persis yang dulu dicatat) lalu catat yang baru. Tanda sama
       // dikirim ulang = tidak ada perubahan uang.
       if (booking.attended === attended) return;
+      // Dibagi dari harga paket yang tersimpan (kolam + coach + layanan), bukan
+      // Payment.amount -- sebagian harga bisa dibayar dari saldo member. Setelah
+      // ganti coach, sesi yang diajar coach lama tetap memakai harga lama.
+      // Tanpa harga tersimpan (paket model bagi hasil persen lama, sudah
+      // dihapus Hadi 2 Okt malam) uang tidak dibagi otomatis: koreksi lewat admin.
       const sessionPrices = await pricesForSessionCoach(tx, booking.package, booking.availability.coachId, booking.availability.startTime);
-      // Paket model baru tanpa harga untuk coach sesi ini (tidak seharusnya
-      // terjadi): jangan jatuh ke bagi hasil persen kolam.
-      if (booking.package.poolPrice != null && !sessionPrices) {
+      if (!sessionPrices) {
         throw new Error("Harga sesi ini tidak ditemukan. Hubungi admin.");
       }
       if (booking.attended !== null) await reverseSessionRevenue(tx, { bookingId });
@@ -115,24 +107,17 @@ export async function markAttendance(
         poolId: booking.availability.poolId,
         coachProfileId: coachProfile.id,
         bookingId,
-        perSessionValue,
         attended,
-        // Paket model harga-dari-coach: dibagi dari harga paket yang tersimpan
-        // (kolam + coach + layanan), bukan Payment.amount -- sebagian harga bisa
-        // dibayar dari saldo member. Setelah ganti coach, sesi yang diajar coach
-        // lama tetap memakai harga lama.
-        pricing: sessionPrices
-          ? {
-              paid: sessionPrices.poolPrice + sessionPrices.coachPrice + sessionPrices.serviceFee,
-              totalSesi: booking.package.totalSesi,
-              poolPrice: sessionPrices.poolPrice,
-              coachPrice: sessionPrices.coachPrice,
-            }
-          : undefined,
+        pricing: {
+          paid: sessionPrices.poolPrice + sessionPrices.coachPrice + sessionPrices.serviceFee,
+          totalSesi: booking.package.totalSesi,
+          poolPrice: sessionPrices.poolPrice,
+          coachPrice: sessionPrices.coachPrice,
+        },
       });
     });
   } catch (err) {
-    if (err instanceof Error && err.message.includes("baru saja diubah")) {
+    if (err instanceof Error && (err.message.includes("baru saja diubah") || err.message.includes("Harga sesi ini tidak ditemukan"))) {
       return { error: err.message };
     }
     throw err;

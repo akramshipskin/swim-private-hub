@@ -21,7 +21,7 @@ describe("BOOKING races", () => {
   it("R1: 12 member beda rebutan 1 slot yang sama -> tepat 1 menang, sisa sesi cuma kepotong di pemenang", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 48);
-    const members = await Promise.all(Array.from({ length: N }, () => mkMemberWithPackage(pool.id)));
+    const members = await Promise.all(Array.from({ length: N }, () => mkMemberWithPackage(pool.id, coach.id)));
     const rs = await settle(members.map(({ m, pkg }) => as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: slot.id, packageId: pkg.id })))));
     const codes = summarize(rs); console.log("R1", codes);
     const active = await prisma.booking.count({ where: { availabilityId: slot.id, status: "BOOKED" } });
@@ -35,7 +35,7 @@ describe("BOOKING races", () => {
   it("R2: 1 paket sisa 2 sesi, booking 12 slot beda barengan -> maks 2 sukses, sisa gak negatif", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slots = await Promise.all(Array.from({ length: N }, () => mkSlot(coach.id, pool.id, 48)));
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { sisa: 2 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { sisa: 2 });
     const rs = await settle(slots.map((s) => as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: s.id, packageId: pkg.id })))));
     console.log("R2", summarize(rs));
     const p = await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } });
@@ -48,7 +48,7 @@ describe("BOOKING races", () => {
   it("R3: double-klik booking slot sama pake paket sama -> 1 booking, sisa kepotong 1", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 48);
-    const { m, pkg } = await mkMemberWithPackage(pool.id);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
     const rs = await settle(Array.from({ length: 5 }, () => as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: slot.id, packageId: pkg.id })))));
     console.log("R3", summarize(rs));
     expect(await prisma.booking.count({ where: { availabilityId: slot.id } })).toBe(1);
@@ -61,7 +61,7 @@ describe("BOOKING races", () => {
     const results: string[] = [];
     for (let i = 0; i < 10; i++) {
       const slot = await mkSlot(coach.id, pool.id, 48);
-      const { m, pkg } = await mkMemberWithPackage(pool.id);
+      const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
       const rs = await settle([
         as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: slot.id, packageId: pkg.id }))),
         as({ id: coach.id, role: "COACH" }, () => deleteAvailability(slot.id)),
@@ -91,7 +91,7 @@ describe("CANCEL races", () => {
   it("R6: member double-klik batal booking sama -> sisa sesi balik +1 sekali doang", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 48);
-    const { m, pkg } = await mkMemberWithPackage(pool.id);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
     const b = await book(m.id, slot.id, pkg.id);
     const rs = await settle(Array.from({ length: 6 }, () => as({ id: m.id, role: "MEMBER" }, () => cancelDELETE(new Request("http://x"), { params: Promise.resolve({ id: b.id }) }))));
     console.log("R6", summarize(rs));
@@ -100,7 +100,7 @@ describe("CANCEL races", () => {
 
   it("R7: jatah batal 2, member batalin 8 booking beda barengan -> maks 2 lolos", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { jatah: 2 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { jatah: 2 });
     const bs = [];
     for (let i = 0; i < 8; i++) { const s = await mkSlot(coach.id, pool.id, 48); bs.push(await book(m.id, s.id, pkg.id)); }
     const rs = await settle(bs.map((b) => as({ id: m.id, role: "MEMBER" }, () => cancelDELETE(new Request("http://x"), { params: Promise.resolve({ id: b.id }) }))));
@@ -114,7 +114,7 @@ describe("CANCEL races", () => {
   it("R8: member batal + coach batal + admin batal booking sama barengan -> 1 menang, sisa +1 sekali", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, 48);
-    const { m, pkg } = await mkMemberWithPackage(pool.id);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
     const b = await book(m.id, slot.id, pkg.id);
     const rs = await settle([
       as({ id: m.id, role: "MEMBER" }, () => cancelDELETE(new Request("http://x"), { params: Promise.resolve({ id: b.id }) })),
@@ -128,8 +128,8 @@ describe("CANCEL races", () => {
   it("R9: cancel vs booking ulang slot yang sama barengan -> max 1 booking aktif per slot", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 48);
-    const a = await mkMemberWithPackage(pool.id);
-    const others = await Promise.all(Array.from({ length: 6 }, () => mkMemberWithPackage(pool.id)));
+    const a = await mkMemberWithPackage(pool.id, coach.id);
+    const others = await Promise.all(Array.from({ length: 6 }, () => mkMemberWithPackage(pool.id, coach.id)));
     const b = await book(a.m.id, slot.id, a.pkg.id);
     const rs = await settle([
       as({ id: a.m.id, role: "MEMBER" }, () => cancelDELETE(new Request("http://x"), { params: Promise.resolve({ id: b.id }) })),
@@ -148,8 +148,8 @@ describe("CANCEL races", () => {
   it("R9b: coach batal (sakit) vs member lain booking slot yang sama barengan -> slot tertutup, tidak ada booking baru", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 48);
-    const a = await mkMemberWithPackage(pool.id);
-    const others = await Promise.all(Array.from({ length: 6 }, () => mkMemberWithPackage(pool.id)));
+    const a = await mkMemberWithPackage(pool.id, coach.id);
+    const others = await Promise.all(Array.from({ length: 6 }, () => mkMemberWithPackage(pool.id, coach.id)));
     const b = await book(a.m.id, slot.id, a.pkg.id);
     const rs = await settle([
       as({ id: coach.id, role: "COACH" }, () => cancelBookingAsCoach(null, fd({ bookingId: b.id }))),
@@ -168,7 +168,7 @@ describe("ATTENDANCE / WALLET races", () => {
   async function pastBooking(price = 800000) {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, -3);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price });
     const b = await book(m.id, slot.id, pkg.id);
     return { pool, coach, admin, slot, m, pkg, b };
   }
@@ -186,7 +186,8 @@ describe("ATTENDANCE / WALLET races", () => {
     console.log("R10", summarize(rs));
     const w = await wallet(x.pool.id, x.coach.coachProfile!.id);
     console.log("R10 wallet", w);
-    expect(w.coach).toBe(55000); expect(w.pool).toBe(30000);
+    // Paket 800.000/8 sesi: coach 40.000 - PPh 200, kolam 50.000 - PPh 250.
+    expect(w.coach).toBe(39800); expect(w.pool).toBe(49750);
     expect(w.ledgerPool).toBe(w.pool); expect(w.ledgerCoach).toBe(w.coach);
   });
 
@@ -197,8 +198,8 @@ describe("ATTENDANCE / WALLET races", () => {
     const b = await prisma.booking.findUniqueOrThrow({ where: { id: x.b.id } });
     const w = await wallet(x.pool.id, x.coach.coachProfile!.id);
     console.log("R11 final attended", b.attended, w);
-    // Sejak 29 Sep: Tidak Hadir = coach 50% dari 55.000, kolam 0.
-    expect([w.coach, w.pool]).toEqual(b.attended === true ? [55000, 30000] : b.attended === false ? [27500, 0] : [0, 0]);
+    // Tidak Hadir = coach 50% dari 40.000 (20.000 - PPh 100), kolam 0.
+    expect([w.coach, w.pool]).toEqual(b.attended === true ? [39800, 49750] : b.attended === false ? [19900, 0] : [0, 0]);
     expect(w.ledgerCoach).toBe(w.coach); expect(w.ledgerPool).toBe(w.pool);
   });
 
@@ -235,7 +236,7 @@ describe("ATTENDANCE / WALLET races", () => {
 
   it("R14: admin edit sisa sesi (form lama) vs member booking barengan -> sisa sesi + booking aktif harus konsisten", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { sisa: 5 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { sisa: 5 });
     const slots = await Promise.all(Array.from({ length: 3 }, () => mkSlot(coach.id, pool.id, 48)));
     const rs = await settle([
       ...slots.map((s) => as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: s.id, packageId: pkg.id })))),
@@ -254,7 +255,7 @@ describe("ATTENDANCE / WALLET races", () => {
     const add = (poolId: string) => as({ id: coach.id, role: "COACH", name: "C" }, () => addAvailability(null, fd({ date: day, startTime: "08:00", endTime: "10:00", poolId })));
     await add(p1.id);
     const [s8, s9] = await prisma.availability.findMany({ where: { coachId: coach.id }, orderBy: { startTime: "asc" } });
-    const { m, pkg } = await mkMemberWithPackage(p1.id);
+    const { m, pkg } = await mkMemberWithPackage(p1.id, coach.id);
     const b = await book(m.id, s8.id, pkg.id);
     await cancelBooking({ bookingId: b.id, actor: { role: "ADMIN" } });
 
@@ -295,9 +296,9 @@ describe("ATTENDANCE / WALLET races", () => {
       await reset();
       const pool = await mkPool(); const coach = await mkUser("COACH");
       const slot = await mkSlot(coach.id, pool.id, 48);
-      const old = await mkMemberWithPackage(pool.id);
+      const old = await mkMemberWithPackage(pool.id, coach.id);
       await cancelBooking({ bookingId: (await book(old.m.id, slot.id, old.pkg.id)).id, actor: { role: "ADMIN" } });
-      const { m, pkg } = await mkMemberWithPackage(pool.id);
+      const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
       const w = i * 0.8;
       const rs = await settle([
         as({ id: m.id, role: "MEMBER" }, () => bookPOST(req({ availabilityId: slot.id, packageId: pkg.id }))),

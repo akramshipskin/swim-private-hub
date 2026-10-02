@@ -81,8 +81,6 @@ describe("checkout paket pilih coach", () => {
         serviceFee: 83_200,
         durationDays: 90,
         isTrial: false,
-        isSingleSession: false,
-        templateId: null,
         name: "Paket 8 sesi · Coach Budi",
       }),
     });

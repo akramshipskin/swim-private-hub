@@ -8,20 +8,21 @@ import { releaseDueCommissions, getOrCreateAffiliateCode } from "@/lib/affiliate
 import { getPlatformBalance } from "@/lib/platform-wallet";
 import { POST as checkout } from "@/app/api/payment/checkout/route";
 import { POST as register } from "@/app/api/register/route";
-import { proposeTemplateUpdate } from "@/lib/package-template";
 
 const thrownOf = (rs: PromiseSettledResult<unknown>[]) =>
   rs.filter((r) => r.status === "rejected").map((r) => String((r as PromiseRejectedResult).reason?.message ?? (r as PromiseRejectedResult).reason));
 const DAY = 86400e3;
 
-// Member yang mendaftar dengan kode coach "rujukan", paket 800.000 (8 sesi),
-// n sesi lampau dengan coach pengajar (belum ditandai).
+// Member yang mendaftar dengan kode coach "rujukan", paket 800.000 (8 sesi,
+// biaya layanan 80.000 -> komisi 50% dari bersih 72.072 = 36.036), n sesi lampau
+// dengan coach pengajar (belum ditandai).
+const COMMISSION = 36036;
 async function setup(sessions = 1) {
   const pool = await mkPool();
   const teacher = await mkUser("COACH");
   const referrer = await mkUser("COACH");
   const code = await getOrCreateAffiliateCode({ coachProfileId: referrer.coachProfile!.id }, "Rujuk");
-  const { m, dep, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+  const { m, dep, pkg } = await mkMemberWithPackage(pool.id, teacher.id, { price: 800000 });
   await prisma.user.update({ where: { id: m.id }, data: { referralCode: { connect: { code } } } });
   const bookings = [];
   for (let i = 0; i < sessions; i++) bookings.push(await book(m.id, (await mkSlot(teacher.id, pool.id, -5 + i * 0.01)).id, pkg.id));
@@ -33,17 +34,17 @@ const mark = (coach: { id: string }, bookingId: string, attended: boolean) =>
 beforeEach(reset);
 
 describe("AFILIASI", () => {
-  it("F1: sesi pertama Hadir -> komisi 5% menunggu; belum cair sebelum 3 hari; setelah 3 hari masuk saldo pengrujuk & mengurangi pendapatan SPH", async () => {
+  it("F1: sesi pertama Hadir -> komisi 50% biaya layanan bersih menunggu; belum cair sebelum 3 hari; setelah 3 hari masuk saldo pengrujuk & mengurangi pendapatan SPH", async () => {
     const { teacher, referrer, m, bookings } = await setup();
     await mark(teacher, bookings[0].id, true);
     const c = await prisma.affiliateCommission.findUniqueOrThrow({ where: { memberId: m.id } });
-    expect(c).toMatchObject({ status: "PENDING", amount: 40000, coachProfileId: referrer.coachProfile!.id, bookingId: bookings[0].id });
+    expect(c).toMatchObject({ status: "PENDING", amount: COMMISSION, coachProfileId: referrer.coachProfile!.id, bookingId: bookings[0].id });
 
     const platformBefore = (await getPlatformBalance()).revenue;
     expect(await releaseDueCommissions(new Date(Date.now() + 2 * DAY))).toBe(0);
     expect(await releaseDueCommissions(new Date(Date.now() + 4 * DAY))).toBe(1);
-    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { id: referrer.coachProfile!.id } })).walletBalance).toBe(40000);
-    expect((await getPlatformBalance()).revenue).toBe(platformBefore - 40000);
+    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { id: referrer.coachProfile!.id } })).walletBalance).toBe(COMMISSION);
+    expect((await getPlatformBalance()).revenue).toBe(platformBefore - COMMISSION);
     expect(await checkInvariants()).toEqual([]);
   });
 
@@ -68,7 +69,7 @@ describe("AFILIASI", () => {
   it("F4: member tanpa kode / paket gratis -> tidak ada komisi", async () => {
     const pool = await mkPool();
     const teacher = await mkUser("COACH");
-    const { m, pkg } = await mkMemberWithPackage(pool.id);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, teacher.id);
     const b = await book(m.id, (await mkSlot(teacher.id, pool.id, -5)).id, pkg.id);
     await mark(teacher, b.id, true);
     expect(await prisma.affiliateCommission.count()).toBe(0);
@@ -94,7 +95,7 @@ describe("AFILIASI", () => {
     const later = new Date(Date.now() + 4 * DAY);
     const rs = await settle(Array.from({ length: 5 }, () => releaseDueCommissions(later)));
     expect(thrownOf(rs)).toEqual([]);
-    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { id: referrer.coachProfile!.id } })).walletBalance).toBe(40000);
+    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { id: referrer.coachProfile!.id } })).walletBalance).toBe(COMMISSION);
     expect(await prisma.walletTransaction.count({ where: { type: "AFFILIATE_COMMISSION" } })).toBe(1);
     expect(await checkInvariants()).toEqual([]);
   });
@@ -121,8 +122,6 @@ describe("AFILIASI", () => {
 describe("TRIAL", () => {
   async function trialSetup() {
     const { pool, coach } = await mkPricedOffer();
-    // Template trial lama masih dipakai T3 (pemilik kolam tidak bisa mengubahnya).
-    const t = await prisma.packageTemplate.create({ data: { poolId: pool.id, name: "Trial", totalSesi: 1, price: 50000, isTrial: true } });
     const m = await mkUser("MEMBER");
     const dep = await prisma.dependent.create({ data: { memberId: m.id, name: "Anak" } });
     // Sesi coba model harga-dari-coach = sesi: 1.
@@ -130,7 +129,7 @@ describe("TRIAL", () => {
       as({ id: m.id, role: "MEMBER", name: "M" }, () =>
         checkout(new Request("http://x/api/payment/checkout", { method: "POST", body: JSON.stringify({ poolId: pool.id, coachId: coach.id, sesi: 1, dependentId }) })),
       );
-    return { pool, t, m, dep, buy };
+    return { pool, m, dep, buy };
   }
 
   it("T1: klik beli trial 5x barengan -> tepat 1 paket trial", async () => {
@@ -148,11 +147,5 @@ describe("TRIAL", () => {
     const r = await buy(undefined, adik.id);
     expect(r.status).toBe(200);
     expect(await prisma.package.count({ where: { dependentId: adik.id, isTrial: true } })).toBe(1);
-  });
-
-  it("T3: pemilik kolam tidak bisa mengusulkan perubahan paket trial", async () => {
-    const { t } = await trialSetup();
-    const res = await proposeTemplateUpdate(t.id, fd({ name: "Trial", totalSesi: "1", price: "1000", durationDays: "14", jatahCancel: "0" }));
-    expect(res).toEqual({ error: "Paket trial diatur SPH. Hubungi admin untuk mengubahnya." });
   });
 });

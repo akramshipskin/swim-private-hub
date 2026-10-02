@@ -109,7 +109,7 @@ describe("NOTIFIKASI ke admin (butuh tindakan admin)", () => {
 
   it("N6: coach mengusulkan butir milestone -> admin dapat; catatan biasa (bukan usulan) -> tidak ada", async () => {
     const pool = await mkPool();
-    const { m, dep, pkg } = await mkMemberWithPackage(pool.id);
+    const { m, dep, pkg } = await mkMemberWithPackage(pool.id, coach.id);
     await prisma.dependent.update({ where: { id: dep.id }, data: { birthDate: new Date(Date.UTC(new Date().getUTCFullYear() - 9, 0, 1)) } });
     await prisma.milestoneItem.create({ data: { id: "i_c1_1", group: "C", level: 1, sortOrder: 1, text: "Mengapung" } });
     const b = await book(m.id, (await mkSlot(coach.id, pool.id, -48)).id, pkg.id);
@@ -160,7 +160,7 @@ describe("NOTIFIKASI ke coach / pemilik kolam / member", () => {
 
   it("N9: member booking -> member DAN coach dapat; coach membatalkan -> member dikabari; orang lain tidak", async () => {
     const pool = await mkPool();
-    const { m, pkg } = await mkMemberWithPackage(pool.id);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
     await subscribe(m as U);
     const slot = await mkSlot(coach.id, pool.id, 48);
     const res = await as({ id: m.id, role: "MEMBER", name: "Member Uji" }, () => bookPOST(new Request("http://x", { method: "POST", body: JSON.stringify({ availabilityId: slot.id, packageId: pkg.id }) })));
@@ -183,8 +183,8 @@ describe("NOTIFIKASI ke coach / pemilik kolam / member", () => {
   it("N10: coach membuka slot -> hanya member yang punya paket aktif DI KOLAM ITU", async () => {
     const pool = await mkPool();
     const otherPool = await mkPool();
-    const { m } = await mkMemberWithPackage(pool.id);
-    const { m: elsewhere } = await mkMemberWithPackage(otherPool.id);
+    const { m } = await mkMemberWithPackage(pool.id, coach.id);
+    const { m: elsewhere } = await mkMemberWithPackage(otherPool.id, coach.id);
     await subscribe(m as U, elsewhere as U);
     await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
     const day = new Date(Date.now() + 3 * 86400e3).toISOString().slice(0, 10);

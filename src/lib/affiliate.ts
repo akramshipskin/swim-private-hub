@@ -13,13 +13,7 @@
 // sebelum pengajuan pencairan.
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
-import {
-  AFFILIATE_COMMISSION_PERCENT,
-  AFFILIATE_HOLD_DAYS,
-  AFFILIATE_SERVICE_FEE_SHARE_PERCENT,
-  AFFILIATE_V2_START,
-  splitPlatformTax,
-} from "@/lib/policy";
+import { AFFILIATE_HOLD_DAYS, AFFILIATE_SERVICE_FEE_SHARE_PERCENT, splitPlatformTax } from "@/lib/policy";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -31,15 +25,12 @@ export function normalizeAffiliateCode(input: string) {
   return input.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 
-// Pembayaran sejak AFFILIATE_V2_START (paket model harga-dari-coach, punya
-// biaya layanan tersimpan): 50% dari biaya layanan bersih setelah PPN.
-// Contoh paket 8: biaya layanan Rp83.200 -> bersih Rp74.955 -> komisi Rp37.477.
-// Sebelumnya (paket lama): 5% dari jumlah dibayar.
-export function commissionAmount(payment: { amount: number; paidAt: Date; serviceFee: number | null }) {
-  if (payment.serviceFee != null && payment.paidAt >= AFFILIATE_V2_START) {
-    return Math.floor((splitPlatformTax(payment.serviceFee).net * AFFILIATE_SERVICE_FEE_SHARE_PERCENT) / 100);
-  }
-  return Math.floor((payment.amount * AFFILIATE_COMMISSION_PERCENT) / 100);
+// 50% dari biaya layanan bersih setelah PPN. Contoh paket 8: biaya layanan
+// Rp83.200 -> bersih Rp74.955 -> komisi Rp37.477. Tanpa biaya layanan tersimpan
+// (paket model lama) = 0, tidak ada komisi.
+export function commissionAmount(payment: { serviceFee: number | null }) {
+  if (payment.serviceFee == null) return 0;
+  return Math.floor((splitPlatformTax(payment.serviceFee).net * AFFILIATE_SERVICE_FEE_SHARE_PERCENT) / 100);
 }
 
 // "Nadia Putri" -> "NADIA" + 2 angka. Nama tanpa huruf latin -> "SPH".
@@ -95,9 +86,6 @@ async function qualify(tx: Prisma.TransactionClient, memberId: string, booking: 
     orderBy: [{ paidAt: "asc" }, { createdAt: "asc" }],
     select: {
       id: true,
-      amount: true,
-      paidAt: true,
-      createdAt: true,
       package: {
         select: {
           serviceFee: true,
@@ -110,8 +98,6 @@ async function qualify(tx: Prisma.TransactionClient, memberId: string, booking: 
   });
   const amount = firstPayment
     ? commissionAmount({
-        amount: firstPayment.amount,
-        paidAt: firstPayment.paidAt ?? firstPayment.createdAt,
         serviceFee: firstPayment.package.coachChangeRequests[0]?.oldServiceFee ?? firstPayment.package.serviceFee,
       })
     : 0;

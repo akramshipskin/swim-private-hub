@@ -23,7 +23,7 @@ describe("Booking di tepi aturan", () => {
       const w = i * 2;
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
       const slots = await Promise.all(Array.from({ length: 9 }, () => mkSlot(coach.id, pool.id, 48)));
-      const members = await Promise.all(slots.map(() => mkMemberWithPackage(pool.id)));
+      const members = await Promise.all(slots.map(() => mkMemberWithPackage(pool.id, coach.id)));
       const rs = await settle([
         (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => togglePoolActive(pool.id, false)); })(),
         ...members.slice(0, 8).map(({ m, pkg }, k) => (async () => { await jitter(w); return as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slots[k].id, packageId: pkg.id }))); })()),
@@ -48,7 +48,7 @@ describe("Booking di tepi aturan", () => {
   it("B2: paket yang masa berlakunya baru saja habis, 6 booking barengan -> semua ditolak, sisa sesi utuh", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slots = await Promise.all(Array.from({ length: 6 }, () => mkSlot(coach.id, pool.id, 2)));
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { expired: new Date(Date.now() - 1000) });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { expired: new Date(Date.now() - 1000) });
     const rs = await settle(slots.map((s) => as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: s.id, packageId: pkg.id })))));
     expect(summarize(rs).every((c) => c === "HTTP409")).toBe(true);
     expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).sisaSesi).toBe(8);
@@ -64,7 +64,7 @@ describe("Booking di tepi aturan", () => {
       const { pool, coach } = await mkPricedOffer();
       const admin = await mkUser("ADMIN");
       const slots = await Promise.all(Array.from({ length: 4 }, () => mkSlot(coach.id, pool.id, 48)));
-      const { m, pkg } = await mkMemberWithPackage(pool.id);
+      const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
       await prisma.package.update({ where: { id: pkg.id }, data: { coachId: coach.id, poolPrice: 480000, coachPrice: 800000, serviceFee: 83200 } });
       const rs = await settle([
         (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => toggleUserActive(coach.id, false)); })(),

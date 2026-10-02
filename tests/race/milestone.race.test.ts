@@ -32,7 +32,7 @@ async function setup(sessions = 1) {
   const pool = await mkPool();
   const coach = await mkUser("COACH", { coachBalance: 100000, bank: true });
   await prisma.walletTransaction.create({ data: { type: "SESSION_PAYOUT", coachProfileId: coach.coachProfile!.id, amount: 100000 } });
-  const { m, dep, pkg } = await mkMemberWithPackage(pool.id);
+  const { m, dep, pkg } = await mkMemberWithPackage(pool.id, coach.id);
   await prisma.dependent.update({ where: { id: dep.id }, data: { birthDate: new Date(Date.UTC(new Date().getUTCFullYear() - 9, 0, 1)) } });
   for (let i = 0; i < sessions; i++) {
     const slot = await mkSlot(coach.id, pool.id, -48 + i);

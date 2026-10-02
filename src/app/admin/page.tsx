@@ -1,6 +1,5 @@
 import { PENDING_APPROVAL_WHERE } from "@/lib/pending-approval";
 import { requireRole } from "@/lib/require-role";
-import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import { usablePackageConditions } from "@/lib/active-package";
@@ -51,7 +50,6 @@ export default async function AdminDashboardPage() {
     coachWallets,
     platformMonth,
     platformBalance,
-    pendingTemplates,
     pendingAccounts,
   ] = await Promise.all([
     prisma.booking.findMany({
@@ -87,7 +85,6 @@ export default async function AdminDashboardPage() {
       _sum: { amount: true },
     }),
     getPlatformBalance(),
-    prisma.packageTemplate.count({ where: { pendingChanges: { not: Prisma.DbNull } } }),
     prisma.user.count({ where: PENDING_APPROVAL_WHERE }),
   ]);
   const monthSum = (t: string) => platformMonth.find((r) => r.type === t)?._sum.amount ?? 0;
@@ -151,7 +148,6 @@ export default async function AdminDashboardPage() {
             />
             <ActionRow label="Sertifikat coach menunggu" count={pendingCerts} href="/admin/users" />
             <ActionRow label="Usulan butir milestone" count={pendingMilestoneProposals} href="/admin/milestone" />
-            <ActionRow label="Usulan paket/harga kolam" count={pendingTemplates} href="/admin/paket" />
             <ActionRow label="Coach/pemilik kolam baru menunggu persetujuan" count={pendingAccounts} href="/admin/users" />
             <ActionRow label="Kolam belum disetujui" count={pools.length - activePools.length} href="/admin/kolam" />
             <ActionRow label="Sesi lewat belum ditandai hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach baru masuk setelah ditandai hadir" />

@@ -30,7 +30,7 @@ const txMock = {
   user: { updateMany: (...args: unknown[]) => userUpdateMany(...args) },
 };
 
-const { updatePoolShares, affiliateCoach, removeAffiliation, togglePoolActive } = await import("./actions");
+const { affiliateCoach, removeAffiliation, togglePoolActive } = await import("./actions");
 
 function formData(entries: Record<string, string>) {
   const fd = new FormData();
@@ -42,57 +42,6 @@ beforeEach(() => {
   poolUpdate.mockClear();
   affiliationUpsert.mockClear();
   affiliationDelete.mockClear();
-});
-
-describe("updatePoolShares", () => {
-  it("saves when commission + coach share is under 100%", async () => {
-    const result = await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "15", coachSharePercent: "55" }));
-    expect(result).toBeNull();
-    expect(poolUpdate).toHaveBeenCalledWith({
-      where: { id: "pool-1" },
-      data: { commissionPercent: 15, coachSharePercent: 55 },
-    });
-  });
-
-  it("allows commission + coach share to sum to exactly 100%", async () => {
-    const result = await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "50", coachSharePercent: "50" }));
-    expect(result).toBeNull();
-    expect(poolUpdate).toHaveBeenCalled();
-  });
-
-  // Kalo lolos, kolam gak dapet bagian sama sekali dari harga sesi -- itu
-  // jelas input yang salah, bukan konfigurasi valid.
-  it("rejects when commission + coach share exceeds 100%, leaving nothing for the pool", async () => {
-    const result = await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "60", coachSharePercent: "50" }));
-    expect(result).toEqual({ error: "Total komisi platform + komisi coach tidak boleh lebih dari 100%." });
-    expect(poolUpdate).not.toHaveBeenCalled();
-  });
-
-  it("rejects a negative percent", async () => {
-    const result = await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "-5", coachSharePercent: "50" }));
-    expect(result).toEqual({ error: "Persentase harus angka 0-100." });
-    expect(poolUpdate).not.toHaveBeenCalled();
-  });
-
-  // Number("") = 0: tanpa penjagaan, kolom kosong/tidak terkirim tersimpan
-  // sebagai komisi platform 0% tanpa ada yang sadar.
-  it("rejects a blank or missing percent instead of saving 0%", async () => {
-    expect(await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "", coachSharePercent: "55" }))).toEqual({ error: "Persentase harus angka 0-100." });
-    expect(await updatePoolShares(null, formData({ poolId: "pool-1", coachSharePercent: "55" }))).toEqual({ error: "Persentase harus angka 0-100." });
-    expect(poolUpdate).not.toHaveBeenCalled();
-  });
-
-  it("rejects a percent over 100", async () => {
-    const result = await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "15", coachSharePercent: "101" }));
-    expect(result).toEqual({ error: "Persentase harus angka 0-100." });
-    expect(poolUpdate).not.toHaveBeenCalled();
-  });
-
-  it("rejects a non-integer percent", async () => {
-    const result = await updatePoolShares(null, formData({ poolId: "pool-1", commissionPercent: "15.5", coachSharePercent: "50" }));
-    expect(result).toEqual({ error: "Persentase harus angka 0-100." });
-    expect(poolUpdate).not.toHaveBeenCalled();
-  });
 });
 
 describe("affiliateCoach", () => {

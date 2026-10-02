@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 // jelas" tapi sampe sekarang pool owner cuma punya halaman Saldo (angka
 // akhir doang, gak ada rincian per sesi). Halaman ini nutup gap itu.
 //
-// Nilai sesi = harga paket berbayar / totalSesi. Bagian kolam & coach diambil
+// Nilai sesi, bagian kolam & coach diambil
 // dari ledger (yang benar-benar dikredit), sama seperti halaman Bagi Hasil admin.
 export const metadata = { title: "Laporan Kolam | Swim Private Hub" };
 
@@ -58,10 +58,8 @@ export default async function PoolLaporanPage({
           },
           package: {
             select: {
-              totalSesi: true,
-              poolPrice: true,
               dependent: { select: { name: true } },
-              payments: { where: { status: "SUCCESS" }, select: { amount: true }, take: 1 },
+              payments: { where: { status: "SUCCESS" }, select: { id: true }, take: 1 },
             },
           },
         },
@@ -121,18 +119,14 @@ export default async function PoolLaporanPage({
           const bookings = bookingsByPool[i];
           const rows = bookings
             .map((b) => {
-              const payment = b.package.payments[0];
-              if (!payment) return null;
-              // floor, sama dengan dompet (src/app/coach/riwayat-sesi/actions.ts).
-              // Paket pilih coach: nilai sesi = yang benar-benar dibagi di buku besar
-              // (sebagian bisa dibayar saldo member, harga bisa berubah setelah ganti coach).
+              if (!b.package.payments[0]) return null;
+              // Nilai sesi = yang benar-benar dibagi di buku besar (sebagian bisa
+              // dibayar saldo member, harga bisa berubah setelah ganti coach; sesi
+              // riwayat model bagi hasil persen lama juga tercatat dengan cara sama).
               const perSessionValue =
-                b.package.poolPrice != null
-                  ? credited(b.id, "SESSION_REVENUE") + credited(b.id, "SESSION_PAYOUT") + credited(b.id, "PLATFORM_REVENUE") + credited(b.id, "PLATFORM_TAX")
-                  : Math.floor(payment.amount / b.package.totalSesi);
+                credited(b.id, "SESSION_REVENUE") + credited(b.id, "SESSION_PAYOUT") + credited(b.id, "PLATFORM_REVENUE") + credited(b.id, "PLATFORM_TAX");
               // Angka kolam & coach dari pembukuan (yang benar-benar dikredit saat
-              // sesi ditandai Hadir, dengan persen yang berlaku saat itu), bukan
-              // dihitung ulang dari persen sekarang. Platform = sisanya.
+              // sesi ditandai Hadir), bukan dihitung ulang. Platform = sisanya.
               const poolAmount = credited(b.id, "SESSION_REVENUE");
               const coachAmount = credited(b.id, "SESSION_PAYOUT");
               const platformAmount = perSessionValue - poolAmount - coachAmount;

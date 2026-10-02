@@ -16,8 +16,6 @@ import { POST as register } from "@/app/api/register/route";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 import { requestWithdrawal as coachWithdraw } from "@/app/coach/saldo/actions";
 import { toggleUserActive } from "@/app/admin/users/actions";
-import { reviewTemplate } from "@/app/admin/paket/actions";
-import { proposeTemplateUpdate } from "@/lib/package-template";
 
 // Semua bug di file ini sudah diperbaiki (tesnya sudah `it`). Untuk bug baru
 // yang belum diperbaiki, pasang lagi:
@@ -32,7 +30,7 @@ describe("S1 / D1: jadwal harus ada sebelum paket kedaluwarsa", () => {
   it("K1: paket berlaku sampai besok, slot 30 hari lagi -> booking ditolak 409, sesi tidak terpotong", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 30 * 24);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { expired: new Date(Date.now() + 24 * HOUR) });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { expired: new Date(Date.now() + 24 * HOUR) });
     const res = await as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slot.id, packageId: pkg.id })));
     expect(res.status).toBe(409);
     expect(await prisma.booking.count()).toBe(0);
@@ -43,7 +41,7 @@ describe("S1 / D1: jadwal harus ada sebelum paket kedaluwarsa", () => {
   it("K1b: slot 12 jam lagi, paket berlaku 24 jam lagi -> booking tetap boleh (201)", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 12);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { expired: new Date(Date.now() + 24 * HOUR) });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { expired: new Date(Date.now() + 24 * HOUR) });
     const res = await as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slot.id, packageId: pkg.id })));
     expect(res.status).toBe(201);
   });
@@ -51,7 +49,7 @@ describe("S1 / D1: jadwal harus ada sebelum paket kedaluwarsa", () => {
   it("K1c: paket tanpa batas waktu -> booking jauh ke depan tetap boleh (201)", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     const slot = await mkSlot(coach.id, pool.id, 60 * 24);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { expired: null });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { expired: null });
     const res = await as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slot.id, packageId: pkg.id })));
     expect(res.status).toBe(201);
   });
@@ -63,7 +61,7 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
     const pool = await mkPool(); const coach = await mkUser("COACH");
     await prisma.user.update({ where: { id: coach.id }, data: { isActive: false } });
     const slot = await mkSlot(coach.id, pool.id, 48);
-    const { m, pkg } = await mkMemberWithPackage(pool.id);
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
     const res = await as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slot.id, packageId: pkg.id })));
     expect(res.status).toBe(409);
     expect(await prisma.booking.count()).toBe(0);
@@ -74,8 +72,8 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const future = await mkSlot(coach.id, pool.id, 48);
     const past = await mkSlot(coach.id, pool.id, -5);
-    const a = await mkMemberWithPackage(pool.id);
-    const b = await mkMemberWithPackage(pool.id);
+    const a = await mkMemberWithPackage(pool.id, coach.id);
+    const b = await mkMemberWithPackage(pool.id, coach.id);
     const futureBooking = await book(a.m.id, future.id, a.pkg.id);
     const pastBooking = await book(b.m.id, past.id, b.pkg.id);
     await as({ id: admin.id, role: "ADMIN" }, () => toggleUserActive(coach.id, false));
@@ -95,7 +93,7 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
       const w = i * 2;
       const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
       const slots = await Promise.all(Array.from({ length: 10 }, () => mkSlot(coach.id, pool.id, 48)));
-      const members = await Promise.all(slots.map(() => mkMemberWithPackage(pool.id)));
+      const members = await Promise.all(slots.map(() => mkMemberWithPackage(pool.id, coach.id)));
       const rs = await settle([
         (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => toggleUserActive(coach.id, false)); })(),
         ...members.map(({ m, pkg }, k) => (async () => { await jitter(w); return as({ id: m.id, role: "MEMBER" }, () => bookPOST(bookReq({ availabilityId: slots[k].id, packageId: pkg.id }))); })()),
@@ -114,7 +112,7 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
   it("K2c: menonaktifkan 1 coach tidak membatalkan booking coach lain", async () => {
     const pool = await mkPool(); const coachA = await mkUser("COACH"); const coachB = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const slotB = await mkSlot(coachB.id, pool.id, 48);
-    const x = await mkMemberWithPackage(pool.id);
+    const x = await mkMemberWithPackage(pool.id, coachB.id);
     const bk = await book(x.m.id, slotB.id, x.pkg.id);
     await as({ id: admin.id, role: "ADMIN" }, () => toggleUserActive(coachA.id, false));
     expect((await prisma.booking.findUniqueOrThrow({ where: { id: bk.id } })).status).toBe("BOOKED");
@@ -122,27 +120,28 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
 });
 
 describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairkan, saldo boleh minus", () => {
-  // Nilai sesi 100.000; bagian normal: coach 55% = 55.000, kolam 30% = 30.000.
-  // Tidak datang: coach 50% dari 55.000 = 27.500, kolam 0.
+  // Paket 1.600.000 / 8 sesi: kolam 100.000 - PPh 500 = 99.500, coach 80.000 -
+  // PPh 400 = 79.600 (di atas minimal pencairan 50.000). Tidak datang: coach 50%
+  // = 40.000 - PPh 200 = 39.800, kolam 0.
   async function creditedThenWithdrawn() {
     const pool = await mkPool(); const coach = await mkUser("COACH", { bank: true }); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, -3);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 1600000 });
     const b = await book(m.id, slot.id, pkg.id);
     await as({ id: coach.id, role: "COACH" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" })));
     const cp = await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } });
-    expect(cp.walletBalance).toBe(55000);
-    await as({ id: coach.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "55000" })));
+    expect(cp.walletBalance).toBe(79600);
+    await as({ id: coach.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "79600" })));
     expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance).toBe(0);
     return { pool, coach, admin, b };
   }
 
-  it("K3a: Hadir sudah dicairkan, lalu diubah jadi Tidak Hadir -> BERHASIL, saldo coach -27.500, catatan uang cocok", async () => {
+  it("K3a: Hadir sudah dicairkan, lalu diubah jadi Tidak Hadir -> BERHASIL, saldo coach -39.800, catatan uang cocok", async () => {
     const x = await creditedThenWithdrawn();
     const res = await as({ id: x.admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: x.b.id, attended: "false" })));
     expect(res).toBeNull();
     expect((await prisma.booking.findUniqueOrThrow({ where: { id: x.b.id } })).attended).toBe(false);
-    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: x.coach.id } })).walletBalance).toBe(-27500);
+    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: x.coach.id } })).walletBalance).toBe(-39800);
     expect((await prisma.pool.findUniqueOrThrow({ where: { id: x.pool.id } })).walletBalance).toBe(0);
     expect(await checkInvariants()).toEqual([]);
   });
@@ -154,11 +153,11 @@ describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairka
       const w = i * 3;
       const pool = await mkPool(); const coach = await mkUser("COACH", { bank: true }); const admin = await mkUser("ADMIN");
       const slot = await mkSlot(coach.id, pool.id, -3);
-      const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+      const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 1600000 });
       const b = await book(m.id, slot.id, pkg.id);
       await as({ id: coach.id, role: "COACH" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" })));
       const rs = await settle([
-        (async () => { await jitter(w); return as({ id: coach.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "55000" }))); })(),
+        (async () => { await jitter(w); return as({ id: coach.id, role: "COACH" }, () => coachWithdraw(null, fd({ amount: "79600" }))); })(),
         (async () => { await jitter(w); return as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "false" }))); })(),
       ]);
       expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
@@ -166,23 +165,23 @@ describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairka
       expect((await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).attended).toBe(false);
       const bal = (await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance;
       const withdrawn = await prisma.withdrawalRequest.count();
-      // Cair duluan: saldo 0 lalu dibalik -> -27.500. Ubah duluan: saldo 27.500, cair 55.000 ditolak.
-      expect((withdrawn === 1 && bal === -27500) || (withdrawn === 0 && bal === 27500)).toBe(true);
+      // Cair duluan: saldo 0 lalu dibalik -> -39.800. Ubah duluan: saldo 39.800, cair 79.600 ditolak.
+      expect((withdrawn === 1 && bal === -39800) || (withdrawn === 0 && bal === 39800)).toBe(true);
       tally(sebaran, withdrawn ? "cair duluan (saldo minus)" : "ubah duluan (cair ditolak)");
     }
     spread("K3c", sebaran);
   });
 
-  it("K3b: Hadir belum dicairkan, diubah jadi Tidak Hadir -> saldo coach 27.500 (50%), kolam 0", async () => {
+  it("K3b: Hadir belum dicairkan, diubah jadi Tidak Hadir -> saldo coach 39.800 (50% - PPh), kolam 0", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, -3);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 1600000 });
     const b = await book(m.id, slot.id, pkg.id);
     await as({ id: coach.id, role: "COACH" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "true" })));
     const res = await as({ id: admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: b.id, attended: "false" })));
     expect(res).toBeNull();
     expect((await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).attended).toBe(false);
-    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance).toBe(27500);
+    expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance).toBe(39800);
     expect((await prisma.pool.findUniqueOrThrow({ where: { id: pool.id } })).walletBalance).toBe(0);
     expect(await checkInvariants()).toEqual([]);
   });
@@ -190,7 +189,7 @@ describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairka
   it("K3d: 8 toggle Hadir/Tidak Hadir barengan -> bagi hasil akhir cocok dengan tanda terakhir, tidak dobel", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, -3);
-    const { m, pkg } = await mkMemberWithPackage(pool.id, { price: 800000 });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 1600000 });
     const b = await book(m.id, slot.id, pkg.id);
     await settle(Array.from({ length: 8 }, (_, i) => (async () => {
       await jitter(i * 2);
@@ -200,7 +199,7 @@ describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairka
     const att = (await prisma.booking.findUniqueOrThrow({ where: { id: b.id } })).attended;
     const bal = (await prisma.coachProfile.findUniqueOrThrow({ where: { userId: coach.id } })).walletBalance;
     const poolBal = (await prisma.pool.findUniqueOrThrow({ where: { id: pool.id } })).walletBalance;
-    expect([bal, poolBal]).toEqual(att === true ? [55000, 30000] : [27500, 0]);
+    expect([bal, poolBal]).toEqual(att === true ? [79600, 99500] : [39800, 0]);
   });
 });
 
@@ -247,40 +246,5 @@ describe("S4 / D4: nomor HP dan email dibakukan", () => {
     expect((await reg({ phone: "081234567893" })).status).toBe(201);
     expect((await reg({ phone: "081234567894" })).status).toBe(201);
     expect(await prisma.user.count()).toBe(2);
-  });
-});
-
-describe("Kehilangan usulan harga (lost update)", () => {
-  it("K5: pemilik kolam mengusulkan perubahan harga pas admin menyetujui usulan sebelumnya (200 putaran, jeda acak) -> usulan baru tidak boleh hilang diam-diam", async () => {
-    // BUG TERBUKTI (24 Sep, ~5 dari 120 putaran): reviewTemplateChange membaca usulan lalu menulis
-    // tanpa mengunci baris. Pemilik menimpa usulan di antaranya -> admin menerapkan usulan LAMA
-    // dan menghapus usulan BARU. Perbaikan (Claude): kunci baris (FOR UPDATE) SEBELUM membaca.
-    // Peluang muncul ~4% per putaran, jadi 200 putaran (peluang lolos tanpa bug < 0,1%).
-    const outcomes: Record<string, number> = {};
-    let lost = 0;
-    for (let i = 0; i < 200; i++) {
-      await reset();
-      const pool = await mkPool(); const owner = await mkUser("POOL_OWNER"); const admin = await mkUser("ADMIN");
-      await prisma.poolOwnership.create({ data: { poolId: pool.id, ownerId: owner.id } });
-      const t = await prisma.packageTemplate.create({
-        data: {
-          poolId: pool.id, name: "T", totalSesi: 8, price: 800000, durationDays: 60, jatahCancel: 2, isActive: true,
-          pendingChanges: { name: "T", totalSesi: 8, price: 900000, durationDays: 60, jatahCancel: 2, isActive: true, isNew: false, submittedAt: new Date().toISOString() },
-        },
-      });
-      await settle([
-        (async () => { await jitter(14); return as({ id: admin.id, role: "ADMIN" }, () => reviewTemplate(t.id, true)); })(),
-        proposeTemplateUpdate(t.id, fd({ templateId: t.id, name: "T", totalSesi: "8", price: "950000", durationDays: "60", jatahCancel: "2", isActive: "on" })),
-      ]);
-      const after = await prisma.packageTemplate.findUniqueOrThrow({ where: { id: t.id } });
-      const pending = after.pendingChanges as { price?: number } | null;
-      const key = `harga=${after.price} usulan=${pending ? pending.price : "kosong"}`;
-      outcomes[key] = (outcomes[key] ?? 0) + 1;
-      // Boleh: (harga 900000, usulan 950000) atau (harga 950000, usulan kosong).
-      // SALAH (usulan 950000 hilang): harga 900000 dan usulan kosong.
-      if (after.price === 900000 && pending === null) lost++;
-    }
-    console.log("N6", outcomes);
-    expect(lost).toBe(0);
   });
 });
