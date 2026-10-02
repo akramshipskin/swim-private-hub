@@ -96,7 +96,7 @@ export default async function MemberDashboardPage() {
                 </p>
                 <p className="text-base font-semibold text-text">{b.package.dependent.name}</p>
                 <p className="text-sm text-text-muted">
-                  {b.availability.pool.name} · Coach {b.availability.coach.name}
+                  {b.availability.pool.name} · dengan {b.availability.coach.name}
                 </p>
                 <p className="mt-1 font-mono text-xs text-text-subtle">Kode booking {b.id.slice(-6).toUpperCase()}</p>
               </li>
