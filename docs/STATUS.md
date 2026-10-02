@@ -1,8 +1,8 @@
-# STATUS SPH (diperbarui 2 Okt 2026 pagi, sapu memori)
+# STATUS SPH (diperbarui 2 Okt 2026 siang)
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: 513a498 (2 Okt pagi; GitHub hijau, situs asli memuat landing baru; 2 migrasi baru sudah dijalankan Hadi di production). Kecepatan HP landing: elemen terbesar 0,94 dtk (tidak turun).
+## Terakhir live: 4c715bd (2 Okt siang; GitHub hijau, situs asli memuat animasi coach baru; 2 migrasi sudah dijalankan Hadi di production). Kecepatan HP landing belum diukur ulang setelah animasi coach (HP tidak kena animasi ini; dicek lebar 375: tanpa animasi, tanpa geser samping).
 
 ## Sudah selesai dan live
 - Per 30 Sep: tanggal lahir di semua form daftar; notifikasi admin pendaftar baru; testimoni; CSP aktif; PPN komisi 11%; landing dirombak; backup database dan storage hijau.
@@ -15,21 +15,23 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - 2 Okt malam (Opus): cek menyeluruh SEMUA fitur x 4 peran + publik di laptop (docs/reviews/2026-10-02-sweeping-sistem-semua-fitur.md). Diperbaiki: tombol Beli paket ditolak Midtrans (live 9efc7d8), error database mentah tampil ke pengguna (18 tempat), nomor rekening boleh huruf, kolom tgl lahir impor Excel, teks mekanis. Temuan menunggu keputusan Hadi ada di laporan.
 - 2 Okt dini hari (Opus, live): coach batal sakit = jam ditutup (+ tes balapan R9b); Laporan Kolam menampilkan Bagian Kolam / PPh 0,5% / Masuk Saldo; mekanisme centang perjanjian coach & MOU kolam (MATI sampai teks final, lihat Sedang jalan); Meta Pixel + Conversions API (MATI sampai ID/token). Opus kedua: tidak ada temuan berat, catatan diperbaiki.
 - 2 Okt pagi (Sonnet High, live): 8 perbaikan ringan sweeping, dialog konfirmasi admin untuk aksi uang, isian form dipertahankan saat ditolak, tgl lahir di tambah peserta admin, saldo/laporan kolam rapi di HP, tap target tablet, landing: animasi desktop per section + teks sesuai sistem harga-dari-coach + jawaban blind spot. Sweeping ulang penuh: docs/reviews/2026-10-02-sweeping-sonnet-high.md.
+- 2 Okt siang (Sonnet High, live 4c715bd): animasi desktop "Kenalan dengan coach" (tali lintasan berkelok tergambar saat scroll, kartu masuk dari sisinya + melayang, foto bergeser, isi panel muncul bergiliran, kilau label sertifikat); susunan kartu tidak diubah (Hadi: B).
 - Alat di scripts/ (hanya lokal kecuali disebut): ukur-halaman (kecepatan, boleh situs asli), sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja, Hadi), isi-harga-dummy (production: HARGA_DUMMY_PROD=1, Hadi), render-brand-social.
 
 ## Sedang jalan
-- Menunggu Hadi: (1) jawaban 22 isian [ISI HADI] perjanjian coach & MOU kolam (daftar usulan di chat 2 Okt; centang perjanjian tetap mati, versi null di partner-agreement.ts, tes memaksa halaman teksnya ada sebelum diaktifkan); (2) ID Pixel + token Conversions API (META_CAPI_TOKEN, diisi Hadi di Vercel); (3) apakah susunan "Kenalan dengan coach" desktop mau dirapatkan (A/B).
+- SIAP TAPI BELUM DI-PUSH (commit lokal 65c714e): teks final Perjanjian Coach (/perjanjian-coach) & MOU Kolam (/mou-kolam) dari 22 isian yang disetujui Hadi + centang persetujuan AKTIF (versi "Perjanjian Coach 2 Oktober 2026" / "MOU Kolam 2 Oktober 2026") + tombol Keluar di halaman persetujuan + gerbang di tandai-hadir coach & API tanggal jadwal. Diperiksa Opus kedua; tsc, 765 tes, build lulus. Ditahan sampai Hadi menjawab pertanyaan (butir reviewer belum diperiksa; kalau teks berubah, versi diganti dan semua mitra centang ulang). Catatan pemeriksa dan sisa: lihat KEPUTUSAN 2 Okt siang.
+- Menunggu Hadi: (1) keputusan push perjanjian+MOU (lihat di atas); (2) ID Pixel + token Conversions API (META_CAPI_TOKEN, diisi Hadi di Vercel).
 - Jalur bayar Midtrans diuji di laptop mode uji; di production belum ada pembayaran sungguhan.
 
 ## Tugas Claude berikutnya
-1. Setelah jawaban [ISI HADI]: rapikan perjanjian + MOU, buat halaman teksnya (/perjanjian-coach, /mou-kolam), isi versi di partner-agreement.ts lalu aktifkan centang.
+1. Setelah Hadi memutuskan: tambah batas tanggung jawab & samakan keselamatan kolam dengan S&K 6.2 bila disetujui, sesuaikan teks 'bukan dijaga sistem', lalu push + cek situs asli.
 2. Setelah ID Pixel & token: cek event masuk di Meta Events Manager (kode uji), lalu hapus kode uji.
 3. Nilai ulang komisi afiliasi 5% sebelum iklan jalan.
 4. Rekening format lama tidak dinormalisasi otomatis: cek sebelum ada coach asli.
 5. Audit buku besar production diulang setelah ada transaksi asli. Cek GitHub & situs asli setelah tiap push.
 
 ## Tugas Hadi
-1. Jawab 22 isian [ISI HADI] (perjanjian coach & MOU kolam); sebagian perlu reviewer/akuntan.
+1. Putuskan pertanyaan perjanjian/MOU (di chat 2 Okt siang); teruskan butir asuransi, sengketa, keselamatan kolam, bukti potong, pajak afiliasi ke reviewer/akuntan.
 2. Kirim ID Pixel Meta (di chat), isi token Conversions API sendiri di Vercel dengan nama META_CAPI_TOKEN (jangan dikirim ke chat).
 3. Cek menu Paket (member) & Ganti Coach (admin) di production; coba satu pembayaran sampai paket aktif. Cek landing di HP asli + Safari.
 4. Matikan plugin dan konektor tak terpakai di aplikasi Desktop: Sales, Finance, Marketing, Productivity, Engineering, Design, Cowork.
