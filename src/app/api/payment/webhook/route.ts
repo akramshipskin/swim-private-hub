@@ -175,10 +175,9 @@ export async function POST(request: Request) {
       });
     }
 
-    // Gak ada kredit wallet di sini -- paket lintas-kolam (revisi
-    // 2026-09-12) artinya kolam mana yang dikredit baru ketauan pas
-    // tiap sesi BENERAN dipake (lihat src/lib/wallet.ts, dipanggil dari
-    // markAttendance). Payment sukses cuma bikin Package aktif.
+    // Tidak ada kredit saldo di sini: kolam & coach dikredit per sesi saat
+    // ditandai Hadir (src/lib/wallet.ts, dipanggil dari markAttendance).
+    // Payment sukses cuma membuat Package aktif.
     activated = packageStatus === "ACTIVE";
 
     // Saldo member yang terpakai dikembalikan kalau pembayaran gagal/kedaluwarsa.

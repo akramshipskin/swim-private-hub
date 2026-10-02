@@ -77,10 +77,9 @@ describe("reverseSessionRevenue", () => {
   });
 
   it("reverses the amount that was actually credited, not a freshly recomputed one", async () => {
-    // Kalo commissionPercent/coachSharePercent kolam berubah SETELAH kredit
-    // awal, reversal tetep harus balikin angka LAMA (dari ledger), bukan
-    // hitung ulang pake persentase yang baru -- tesnya: findFirst return
-    // amount yang beda dari apa yang bakal keluar kalo dihitung ulang.
+    // Harga (atau persen model lama) bisa berubah SETELAH kredit awal;
+    // reversal tetep harus balikin angka LAMA (dari ledger), bukan hitung
+    // ulang -- tesnya: ledger berisi angka yang beda dari hitungan ulang.
     const tx = createMockTx({
       walletTxns: [
         { type: "SESSION_REVENUE", poolId: "pool-1", amount: 999 },

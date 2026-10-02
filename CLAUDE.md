@@ -4,6 +4,9 @@
 
 Aturan umum (jujur, mode jaga/tidur, format jawaban, sweeping, catatan) ada di ~/.claude/CLAUDE.md. File ini hanya untuk SPH, dan bila bertentangan dengan memori otomatis, file ini yang berlaku. Kondisi terkini ada di docs/STATUS.md (dimuat otomatis di awal sesi; bila tidak muncul, baca sendiri sebelum kerja). Daftar kerjaan sisa: docs/backlog/sph-backlog-gabungan-2026-09-29.md, bagian paling bawah (status terbaru); buka dulu sebelum menjawab soal landing atau kerjaan sisa.
 
+## Urutan acuan aturan bisnis (Hadi 2 Okt malam, #2)
+Bila sumber saling bertentangan, yang berlaku: (1) kode, (2) docs/aturan-bisnis-saat-ini.md, (3) docs/KEPUTUSAN.md, (4) brand-kit/MESSAGING.md, (5) dokumen lama di docs/designs/ dan README. Dokumen lama (marketplace-pivot, simulasi-pendapatan-kolam) tidak boleh jadi acuan. Kode yang menyimpang dari keputusan Hadi tetap dilaporkan, bukan diikuti diam-diam.
+
 ## Produk dan pembagian peran
 - Marketplace les renang privat: member (orang tua), coach, pemilik kolam, admin. Penyelenggara: PT Makna Krabat Indonesia (fakta ini hanya di dokumen hukum dan memori SPH; jangan dipakai di materi Chivas atau agency).
 - Hadi memutuskan APA (produk, bisnis, tampilan). Claude memutuskan BAGAIMANA dan memilih cara teknis yang aman.

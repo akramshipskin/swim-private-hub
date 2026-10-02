@@ -15,7 +15,7 @@ enum Role {
   COACH
   MEMBER
   // Pemilik kolam -- akses cuma ke wallet & pengajuan pencairan kolamnya
-  // SENDIRI (lihat requireRole/proxy.ts), gak ada akses admin lintas-kolam.
+  // SENDIRI (lihat requireRole/proxy.ts), tidak ada akses ke kolam lain.
   // Ditambah pas fitur wallet (2026-09-12); sebelumnya owner yang
   // dimigrasi diturunin ke MEMBER (gak ada UI apapun buat mereka) --
   // sekarang butuh role sendiri karena mereka perlu liat saldo & cairin.
@@ -23,11 +23,11 @@ enum Role {
 }
 
 enum WalletTransactionType {
-  // Kredit ke Pool TEMPAT SESI BENERAN DIAJAR (Booking.availability.poolId),
-  // bukan pool tempat Package dibeli -- paket sekarang lintas-kolam
-  // (revisi 2026-09-12), jadi kredit ditunda sampai tau pasti kolam mana
-  // yang beneran ngasih fasilitas buat sesi itu. Dicatat bareng
-  // SESSION_PAYOUT (coach), share bookingId yang sama.
+  // Kredit ke Pool TEMPAT SESI DIAJAR (Booking.availability.poolId) saat sesi
+  // ditandai Hadir (harga kolam ÷ jumlah sesi). Paket hanya bisa dipakai di
+  // kolam tempat beli, jadi sama dengan Package.poolId; baris riwayat masa
+  // paket lintas kolam (Sep 2026) tetap ada. Dicatat bareng SESSION_PAYOUT
+  // (coach), share bookingId yang sama.
   SESSION_REVENUE
   // Kredit ke Coach buat 1 sesi yang ditandai Hadir.
   SESSION_PAYOUT
@@ -275,8 +275,8 @@ model CoachProfile {
   // umur sebagai angka: basi tiap tahun).
   birthDate         DateTime?
   gender            Gender?
-  // Saldo coach ini dari bagian per-sesi (Pool.coachSharePercent),
-  // dikredit pas booking ditandai Hadir. Lihat Pool.walletBalance buat
+  // Saldo coach ini dari bagian per-sesi (harga coach ÷ jumlah sesi, dipotong
+  // PPh 0,5%), dikredit pas booking ditandai Hadir. Lihat Pool.walletBalance buat
   // catatan yang sama soal cache-vs-ledger.
   walletBalance     Int      @default(0)
   bankName          String?
@@ -431,12 +431,9 @@ model Dependent {
   @@index([memberId])
 }
 
-// Katalog paket (harga/durasi) per KOLAM (locked /plan-eng-review
-// 2026-09-12) -- tiap kolam pasang harga sendiri (kenyataan: kolam yang
-// udah gabung sebelumnya emang udah punya harga masing-masing lewat
-// Excel/WA, gak dipaksa 1 harga platform). poolId JUGA yang nentuin
-// checkout Midtrans ini routing ke akun kolam mana (connector posture --
-// platform gak pernah pegang dana, lihat Payment/Pool).
+// TIDAK DIPAKAI LAGI (model lama dihapus dari kode, Hadi 2 Okt malam #9).
+// Dulu katalog paket per kolam; harga sekarang dari Pool.pricePack4/8 +
+// CoachProfile.pricePack4/8. Tabel dibiarkan untuk riwayat, drop menyusul.
 model PackageTemplate {
   id           String   @id @default(cuid())
   poolId       String
@@ -498,8 +495,8 @@ model Package {
   // Model harga-dari-coach (Hadi 2 Okt): paket terikat ke 1 coach. Harga
   // kolam, harga coach, dan biaya layanan SPH disalin saat dibeli -- dasar
   // pembagian uang tiap sesi (src/lib/pricing.ts), tidak ikut berubah kalau
-  // harga diubah belakangan. Semua null = paket model lama (katalog kolam,
-  // bagi hasil persen kolam, boleh coach mana pun di kolam itu).
+  // harga diubah belakangan. Semua null = paket model lama (sudah dihapus dari
+  // kode; tidak bisa dibooking, tandai hadir berbayar ditolak).
   coachId      String?
   coach        User?           @relation("PackageCoach", fields: [coachId], references: [id])
   poolPrice    Int?
@@ -608,9 +605,9 @@ model Pool {
   contactPhone       String?
   // Jam operasional harian (format "HH:mm", misal "06:00"/"21:00").
   // Satu jam buka-tutup buat semua hari -- MVP, belum per-hari (Senin
-  // beda jam sama Minggu dst). Ditampilin di profil kolam, BUKAN
-  // constraint yang nge-block coach buka slot di luar jam ini (belum
-  // divalidasi di action layer, murni informasional buat sekarang).
+  // beda jam sama Minggu dst). Dijaga di server (src/lib/pool-hours.ts):
+  // slot baru di luar jam ini ditolak, booking di luar jam ini ditolak, kolam
+  // tanpa jam buka tidak bisa dibuka slot barunya (Hadi 2 Okt malam, #6/#7).
   openTime           String?
   closeTime          String?
   // Deskripsi & fasilitas kolam (warung, mushola, toilet, dst) -- diisi
@@ -620,15 +617,10 @@ model Pool {
   // Foto fasilitas kolam (URL publik Supabase Storage), diunggah pemilik
   // kolam/admin. Urutan array = urutan tampil; foto pertama jadi sampul.
   photos             String[] @default([])
-  // Persentase komisi platform, di-set platform (bukan per-coach). Bawaan
-  // kolam baru 10% (keputusan Hadi 29-30 Sep: contoh sesi Rp100.000 = kolam
-  // 50.000, coach 40.000, SPH 10.000); disetel per kolam di Admin > Bagi Hasil.
+  // TIDAK DIPAKAI LAGI: commissionPercent & coachSharePercent = model bagi
+  // hasil persen lama (dihapus dari kode, Hadi 2 Okt malam #9). Kolom
+  // dibiarkan sampai drop menyusul.
   commissionPercent  Int      @default(10)
-  // Persentase dari HARGA PAKET (bukan dari sisa abis komisi) yang jadi
-  // bagian coach per sesi -- dikredit ke walletBalance coach BARENGAN
-  // sama walletBalance kolam sendiri dikredit, pas booking ditandai
-  // Hadir (lihat src/lib/wallet.ts). commissionPercent + coachSharePercent
-  // harus <=100 (sisanya buat kolam), dicek di action layer pas admin edit.
   coachSharePercent  Int      @default(40)
   // Model harga-dari-coach (Hadi 2 Okt): harga tiket kolam untuk paket 4 dan
   // 8 sesi (1 coach + 1 peserta + 1 pendamping per sesi), diubah pemilik
@@ -640,10 +632,8 @@ model Pool {
   serviceFeeBps      Int      @default(650)
   // Lihat CoachProfile.pphExempt.
   pphExempt          Boolean  @default(false)
-  // Saldo kolam ini dari sesi-sesi yang BENERAN diajar di kolam ini
-  // (dikredit pas Booking ditandai Hadir, bukan pas Package dibeli --
-  // revisi 2026-09-12: paket lintas-kolam, kolam yang kredit itu kolam
-  // TEMPAT SESI, bukan kolam tempat paket dibeli). Cache, lihat
+  // Saldo kolam ini dari sesi-sesi yang diajar di kolam ini (dikredit pas
+  // Booking ditandai Hadir, bukan pas Package dibeli). Cache, lihat
   // WalletTransaction buat sumber kebenaran.
   walletBalance      Int      @default(0)
   // Tujuan pencairan (WithdrawalRequest). Nullable -- kolam yang belum
