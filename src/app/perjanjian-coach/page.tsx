@@ -6,6 +6,8 @@ import { PARTNER_AGREEMENTS } from "@/lib/partner-agreement";
 export const metadata: Metadata = {
   title: "Perjanjian Kemitraan Coach | Swim Private Hub",
   description: "Perjanjian kemitraan antara Swim Private Hub dan coach renang mitra, disetujui lewat centang di aplikasi.",
+  // Hanya untuk mitra: tidak masuk mesin pencari (juga sudah keluar dari peta situs).
+  robots: { index: false, follow: false },
 };
 
 // Teks = docs/legal/draft-perjanjian-coach-v1.md (perubahan harga-dari-coach

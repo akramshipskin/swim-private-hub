@@ -324,7 +324,7 @@ const POOL_GROUPS: { heading: string; items: Point[] }[] = [
       },
       {
         title: "Bagi hasil setiap sesi Hadir",
-        body: "Bagian kolam masuk ke saldo otomatis setiap sesi ditandai Hadir, dipotong PPh final 0,5% yang disetor SPH atas nama kolam, dan semua pihak melihat angka yang sama.",
+        body: "Bagian kolam masuk ke saldo otomatis setiap sesi ditandai Hadir, dipotong PPh final 0,5% yang disetor SPH atas nama kolam, dan semua pihak melihat angka yang sama. Contoh (angka ilustrasi): bagian kolam Rp60.000 masuk saldo Rp59.700 setelah PPh Rp300.",
       },
     ],
   },

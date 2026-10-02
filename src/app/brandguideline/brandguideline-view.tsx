@@ -165,7 +165,7 @@ export default function BrandGuidelineView() {
           id="esensi"
           eyebrow="01 · Esensi Brand"
           title="Platform renang privat yang tenang, modern, dan bisa dipercaya"
-          lede="Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya. Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi."
+          lede="Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya. Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub. Perkembangan tercatat, pembayaran jelas."
         >
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px] text-sm">
@@ -721,7 +721,7 @@ export default function BrandGuidelineView() {
             <Card className="sm:col-span-2"><CardBody>
               <h4 className="font-medium text-text">Headline, subheadline &amp; tagline resmi</h4>
               <p className="mt-2 text-lg font-semibold text-text">Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya.</p>
-              <p className="mt-1 text-sm text-text-muted">Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi.</p>
+              <p className="mt-1 text-sm text-text-muted">Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub. Perkembangan tercatat, pembayaran jelas.</p>
               <p className="mt-2 text-xs text-text-subtle">
                 Satu sumber, dipakai identik (tidak dipersingkat) di landing, panduan, footer, halaman masuk/daftar, gambar berbagi, dan banner. &quot;Pilih jam&quot; berarti dari jam
                 kosong coach — jangan tulis &quot;bebas pilih jadwal&quot;, dan jangan pakai &quot;pertama/nomor 1&quot;.

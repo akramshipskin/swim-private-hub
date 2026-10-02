@@ -31,7 +31,7 @@ type LandingPool = {
   memberCount: number;
   hours: string | null;
   coachCount: number;
-  fromPackagePrice: number | null;
+  fromPackage: { total: number; sessions: number } | null;
 };
 export type LandingCoach = {
   id: string;
@@ -85,7 +85,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Gabung jadi mitra", body: "Daftarkan kolam, lengkapi alamat, jam buka, dan fasilitas." },
       { title: "Pasang harga tiket", body: "Kolam memasang harga tiket untuk paket 4 dan 8 sesi; perubahan langsung berlaku untuk pembelian berikutnya." },
       { title: "Pantau jam ramai", body: "Lihat jam berapa kolam dipakai les privat, oleh coach siapa, setiap hari." },
-      { title: "Terima bagi hasil", body: "Komisi kolam masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening." },
+      { title: "Terima bagi hasil", body: "Bagian kolam (setelah PPh final 0,5%) masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening." },
     ],
   },
 ];
@@ -301,7 +301,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
               </span>
             </h1>
             <p className="hero-slide mt-6 max-w-lg text-base text-white/85 sm:text-lg" style={heroDelay(300)}>
-              Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam dekat rumah. Perkembangan tercatat, pembayaran jelas.
+              Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub. Perkembangan tercatat, pembayaran jelas.
             </p>
             <div className="hero-rise mt-8 flex flex-wrap gap-3" style={heroDelay(480)}>
               <Magnetic>
@@ -313,6 +313,12 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
                 Lihat kolam
               </a>
             </div>
+            <p className="hero-rise mt-5 text-sm text-white/75" style={heroDelay(600)}>
+              Coach atau punya kolam? Gabung sebagai mitra:{" "}
+              <Link href="/daftar-coach" prefetch={false} className="-my-3 inline-block py-3 font-semibold text-white underline underline-offset-4 hover:text-fixed-lime">Daftar jadi coach</Link>
+              {" · "}
+              <Link href="/daftar-kolam" prefetch={false} className="-my-3 inline-block py-3 font-semibold text-white underline underline-offset-4 hover:text-fixed-lime">Daftarkan kolam</Link>
+            </p>
           </div>
 
           <div aria-hidden="true" data-tilt className="hero-tilt relative hidden h-[34rem] lg:-mr-10 lg:block">
@@ -427,7 +433,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
                       <p className="text-3xl font-semibold leading-tight">{p.name}</p>
                       {p.memberCount >= MIN_POOL_MEMBERS_TO_SHOW && (
                         <p className={`mt-1 text-sm ${p.photos[0] ? "text-white/85" : "text-fixed-muted"}`}>
-                          {p.memberCount} member les di sini
+                          {p.memberCount} member pernah les di sini
                         </p>
                       )}
                     </div>
@@ -448,8 +454,8 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
                         <dd className="font-semibold">{p.hours ?? "Hubungi admin"}</dd>
                       </div>
                       <div>
-                        <dt className="text-fixed-muted">Harga mulai</dt>
-                        <dd className="font-semibold">{p.fromPackagePrice ? `${formatRupiah(p.fromPackagePrice)}/paket` : "Segera hadir"}</dd>
+                        <dt className="text-fixed-muted">Harga paket</dt>
+                        <dd className="font-semibold">{p.fromPackage ? `${p.fromPackage.sessions} sesi mulai ${formatRupiah(p.fromPackage.total)}` : "Segera hadir"}</dd>
                       </div>
                       <div>
                         <dt className="text-fixed-muted">Coach</dt>
@@ -494,8 +500,8 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           <Reveal className="mb-14 text-center">
             <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">Kenalan dengan coach</h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-fixed-muted">
-              Lihat umur, keahlian, sertifikat yang sudah diperiksa admin, dan kolam tempat mengajar. Jadwal dan profil
-              lengkapnya terbuka setelah kamu mendaftar.
+              Lihat umur, keahlian, label sertifikat yang sudah diperiksa admin, dan kolam tempat mengajar. Jadwal, fasilitas
+              kolam, dan file sertifikat terbuka setelah kamu mendaftar.
             </p>
           </Reveal>
           {coaches.length === 0 ? (
@@ -562,7 +568,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
         {/* Metode pembayaran: semua logo dirender satu warna lime lewat CSS
             mask, jadi rapi walau warna asli tiap logo beda-beda. */}
         <div className="mx-auto max-w-6xl border-t border-white/15 px-4 py-8">
-          <p className="mb-4 text-center text-sm text-white/70">Pembayaran aman lewat Midtrans</p>
+          <p className="mb-4 text-center text-sm text-white/70">Pembayaran diproses lewat Midtrans</p>
           <ul className="mx-auto flex max-w-[42rem] flex-wrap items-center justify-center gap-x-8 gap-y-5">
             {PAYMENT_METHODS.map((m) =>
               m.logo ? (

@@ -68,7 +68,9 @@ describe("POST /api/register-coach: perjanjian kemitraan (Hadi 2 Okt, 3A)", () =
       expect(userCreate.mock.calls[1][0].data).toMatchObject({ partnerAgreementVersion: "Perjanjian Coach v1", partnerAgreementAcceptedAt: expect.any(Date) });
 
       userCreate.mockClear();
-      expect((await POST(req({ acceptedTerms: false }))).status).toBe(400);
+      const refused = await POST(req({ acceptedTerms: false }));
+      expect(refused.status).toBe(400);
+      expect((await refused.json()).error).toContain("Perjanjian Kemitraan Coach");
       expect(userCreate).not.toHaveBeenCalled();
     } finally {
       PARTNER_AGREEMENTS.COACH.version = original;

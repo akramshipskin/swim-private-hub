@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   changedPackPrices,
+  cheapestPackQuote,
   formatBps,
   isValidPackPrice,
   isValidServiceFeeBps,
@@ -133,5 +134,16 @@ describe("changedPackPrices", () => {
     expect(changedPackPrices(fd({ origPack4: "800000", origPack8: "" }), { pricePack4: 800_000, pricePack8: 1_500_000 })).toEqual({ pricePack8: 1_500_000 });
     expect(changedPackPrices(fd({ origPack4: "800000", origPack8: "1500000" }), { pricePack4: 800_000, pricePack8: 1_500_000 })).toEqual({});
     expect(changedPackPrices(fd({ origPack4: "800000", origPack8: "" }), { pricePack4: null, pricePack8: null })).toEqual({ pricePack4: null });
+  });
+});
+
+describe("cheapestPackQuote", () => {
+  it("memilih total termurah dan menyebut ukuran paketnya", () => {
+    expect(cheapestPackQuote(pool, [coach, { pricePack4: 300_000, pricePack8: 900_000 }])).toEqual({ total: 596_400, sessions: 4 });
+  });
+  it("coach tanpa harga dilewati; tanpa coach berharga = null", () => {
+    expect(cheapestPackQuote(pool, [{ pricePack4: null, pricePack8: null }])).toBeNull();
+    expect(cheapestPackQuote(pool, [])).toBeNull();
+    expect(cheapestPackQuote({ ...pool, pricePack4: null }, [coach])).toEqual({ total: 1_363_200, sessions: 8 });
   });
 });

@@ -74,6 +74,20 @@ export function packQuote(pool: PackPrices & { serviceFeeBps: number }, coach: P
   return build(size, p, c, pool.serviceFeeBps, false);
 }
 
+// Paket termurah di sebuah kolam di antara semua coach yang mengajar di sana
+// dan sudah memasang harga (dipakai kartu kolam di landing: "4 sesi mulai Rp...").
+export function cheapestPackQuote(
+  pool: PackPrices & { serviceFeeBps: number },
+  coaches: PackPrices[],
+): { total: number; sessions: number } | null {
+  const quotes = coaches
+    .flatMap((c) => PACK_SIZES.map((n) => packQuote(pool, c, n)))
+    .filter((q): q is Quote => q != null);
+  if (!quotes.length) return null;
+  const cheapest = quotes.reduce((a, b) => (b.total < a.total ? b : a));
+  return { total: cheapest.total, sessions: cheapest.totalSesi };
+}
+
 // Sesi coba (Hadi 2 Okt): harga per sesi paket 4 kolam + coach, + biaya layanan, tanpa diskon.
 export function trialQuote(pool: PackPrices & { serviceFeeBps: number }, coach: PackPrices): Quote | null {
   const four = packQuote(pool, coach, 4);

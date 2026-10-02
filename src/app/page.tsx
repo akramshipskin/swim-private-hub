@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import LandingView from "./landing-view";
 import { coachBioLine } from "@/lib/coach-bio";
-import { PACK_SIZES, packQuote } from "@/lib/pricing";
+import { cheapestPackQuote } from "@/lib/pricing";
 import { rankLandingCoaches, rankLandingPools } from "@/lib/landing-rank";
 import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 
@@ -13,10 +13,7 @@ function cheapestPack(p: {
   serviceFeeBps: number;
   affiliations: { coach: { coachProfile: { pricePack4: number | null; pricePack8: number | null } | null } }[];
 }) {
-  const totals = p.affiliations
-    .flatMap(({ coach }) => (coach.coachProfile ? PACK_SIZES.map((n) => packQuote(p, coach.coachProfile!, n)?.total) : []))
-    .filter((t): t is number => t != null);
-  return totals.length ? Math.min(...totals) : null;
+  return cheapestPackQuote(p, p.affiliations.flatMap(({ coach }) => (coach.coachProfile ? [coach.coachProfile] : [])));
 }
 
 export default async function Home() {
@@ -44,7 +41,6 @@ export default async function Home() {
             select: { coach: { select: { coachProfile: { select: { pricePack4: true, pricePack8: true } } } } },
           },
           ownerships: { select: { owner: { select: { email: true } } } },
-          _count: { select: { affiliations: true } },
         },
       }),
       prisma.user.findMany({
@@ -58,7 +54,7 @@ export default async function Home() {
           poolAffiliations: { select: { pool: { select: { name: true } } } },
         },
       }),
-      prisma.user.count({ where: { role: "MEMBER" } }),
+      prisma.user.count({ where: { role: "MEMBER", isActive: true } }),
       prisma.booking.count({ where: { attended: true } }),
       // Paket yang pernah aktif per kolam -> dasar "paling laris" + jumlah
       // member di kolam itu (member unik, bukan jumlah paket).
@@ -112,10 +108,11 @@ export default async function Home() {
           photos: p.photos,
           memberCount: poolStats.get(p.id)?.members.size ?? 0,
           hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
-          coachCount: p._count.affiliations,
+          // Hanya coach aktif (afiliasi sudah disaring di query), sama dengan daftar coach.
+          coachCount: p.affiliations.length,
           // Harga paket termurah di kolam itu (kolam + coach + biaya layanan), dari
           // semua coach yang mengajar di sana dan sudah memasang harga.
-          fromPackagePrice: cheapestPack(p),
+          fromPackage: cheapestPack(p),
         }))}
         coaches={topCoaches.map((c) => ({
           id: c.id,

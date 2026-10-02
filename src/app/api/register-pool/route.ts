@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { notifyAdmins } from "@/lib/notify";
 import { prisma } from "@/lib/prisma";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
-import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
+import { consentData, PARTNER_CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { partnerAgreementData } from "@/lib/partner-agreement";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, isStringArrayOrMissing, MAX_ADDRESS, MAX_EMAIL, MAX_NAME, MAX_PASSWORD, MAX_POOL_NAME, readJsonObject } from "@/lib/register-input";
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
   // (Hadi 2 Okt, 3A); {} bila belum aktif.
   const agreement = partnerAgreementData("POOL_OWNER", acceptedTerms);
   if (!consent || !agreement) {
-    return Response.json({ error: CONSENT_REQUIRED_ERROR }, { status: 400 });
+    return Response.json({ error: PARTNER_CONSENT_REQUIRED_ERROR.POOL_OWNER }, { status: 400 });
   }
 
   // Bentuk baku (08xxxxxxxxxx, email huruf kecil) -- lihat /api/register.

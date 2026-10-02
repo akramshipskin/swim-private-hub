@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 export type AudienceSteps = { key: string; label: string; steps: { title: string; body: string }[] };
 
@@ -8,15 +8,18 @@ export type AudienceSteps = { key: string; label: string; steps: { title: string
 export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
   const [active, setActive] = useState(audiences[0].key);
   const current = audiences.find((a) => a.key === active)!;
+  const base = useId();
   return (
     <div>
       <div role="tablist" aria-label="Cara kerja untuk" className="mb-10 flex flex-wrap gap-2">
         {audiences.map((a) => (
           <button
             key={a.key}
+            id={`${base}-tab-${a.key}`}
             role="tab"
             type="button"
             aria-selected={a.key === active}
+            aria-controls={`${base}-panel`}
             onClick={() => setActive(a.key)}
             className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
               a.key === active ? "bg-fixed-ink text-white" : "border border-fixed-ink/15 bg-white text-fixed-ink hover:bg-fixed-sand"
@@ -26,7 +29,7 @@ export function AudienceTabs({ audiences }: { audiences: AudienceSteps[] }) {
           </button>
         ))}
       </div>
-      <ol role="tabpanel" className="grid gap-0 lg:grid-cols-4 lg:gap-8">
+      <ol id={`${base}-panel`} role="tabpanel" aria-labelledby={`${base}-tab-${active}`} className="grid gap-0 lg:grid-cols-4 lg:gap-8">
         {current.steps.map((s, i) => (
           <li key={s.title} className="fx-step relative pb-9 pl-14 last:pb-0 lg:pb-0 lg:pl-0 lg:pt-14">
             <span className="absolute left-0 top-0 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-fixed-lime-500 text-sm font-bold text-fixed-ink">
@@ -51,15 +54,18 @@ export type FaqGroup = { key: string; label: string; items: { q: string; a: stri
 export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
   const [active, setActive] = useState(groups[0].key);
   const current = groups.find((g) => g.key === active)!;
+  const base = useId();
   return (
     <div>
       <div role="tablist" aria-label="Pertanyaan umum untuk" className="mb-6 flex flex-wrap gap-2">
         {groups.map((g) => (
           <button
             key={g.key}
+            id={`${base}-tab-${g.key}`}
             role="tab"
             type="button"
             aria-selected={g.key === active}
+            aria-controls={`${base}-panel`}
             onClick={() => setActive(g.key)}
             className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors max-sm:min-h-[44px] ${
               g.key === active
@@ -71,7 +77,7 @@ export function FaqTabs({ groups }: { groups: FaqGroup[] }) {
           </button>
         ))}
       </div>
-      <div role="tabpanel" className="flex flex-col divide-y divide-fixed-ink/10 border-y border-fixed-ink/10">
+      <div id={`${base}-panel`} role="tabpanel" aria-labelledby={`${base}-tab-${active}`} className="flex flex-col divide-y divide-fixed-ink/10 border-y border-fixed-ink/10">
         {current.items.map((item) => (
           <details key={item.q} className="fx-faq group py-5">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold marker:content-none max-sm:min-h-[44px]">

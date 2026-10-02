@@ -27,3 +27,9 @@ export function consentData(acceptedTerms: unknown) {
 }
 
 export const CONSENT_REQUIRED_ERROR = "Setujui Syarat & Ketentuan dan Kebijakan Privasi dulu";
+
+// Pendaftaran coach/kolam: centang yang sama juga menyetujui perjanjian/MOU mitra.
+export const PARTNER_CONSENT_REQUIRED_ERROR = {
+  COACH: "Setujui Syarat & Ketentuan, Kebijakan Privasi, dan Perjanjian Kemitraan Coach dulu",
+  POOL_OWNER: "Setujui Syarat & Ketentuan, Kebijakan Privasi, dan MOU Kolam Mitra dulu",
+} as const;

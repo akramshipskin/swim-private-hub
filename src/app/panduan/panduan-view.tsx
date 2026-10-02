@@ -144,7 +144,7 @@ const GUIDES: Guide[] = [
     key: "kolam",
     label: "Pemilik Kolam",
     title: "Panduan Pemilik Kolam",
-    lead: "Pantau pemakaian kolam, atur paket & info kolam, dan cairkan komisi kolam.",
+    lead: "Pantau pemakaian kolam, atur harga tiket & info kolam, dan cairkan bagian kolam.",
     sections: [
       {
         heading: "1. Dashboard & jadwal",
@@ -167,7 +167,7 @@ const GUIDES: Guide[] = [
         steps: [
           { title: "Saldo kolam", body: "Bertambah setiap sesi yang ditandai Hadir oleh coach." },
           { title: "Ajukan pencairan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat Edit), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Admin memproses transfernya.` },
-          { title: "Laporan", body: "Rincian komisi kolam per sesi yang benar-benar Hadir, bisa disaring per rentang tanggal." },
+          { title: "Laporan", body: "Rincian bagian kolam (setelah PPh final 0,5%) per sesi yang benar-benar Hadir, bisa disaring per rentang tanggal." },
         ],
       },
     ],
@@ -325,7 +325,7 @@ export default function PanduanView() {
               <span className="block">dan pilih jamnya.</span>
             </h1>
             <p className="mt-5 max-w-2xl text-lg text-fixed-ink-soft">
-              Buat anak atau kamu sendiri yang baru mau belajar. Coach kelola jadwal sendiri, kolam lihat pemakaian harian, semua dalam satu aplikasi.
+              Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub. Perkembangan tercatat, pembayaran jelas.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold hover:bg-fixed-lime-100">

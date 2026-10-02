@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
-import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
+import { consentData, PARTNER_CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { partnerAgreementData } from "@/lib/partner-agreement";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 import { notifyAdmins } from "@/lib/notify";
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
   // (Hadi 2 Okt, 3A); {} bila belum aktif.
   const agreement = partnerAgreementData("COACH", acceptedTerms);
   if (!consent || !agreement) {
-    return Response.json({ error: CONSENT_REQUIRED_ERROR }, { status: 400 });
+    return Response.json({ error: PARTNER_CONSENT_REQUIRED_ERROR.COACH }, { status: 400 });
   }
 
   // Bentuk baku (08xxxxxxxxxx, email huruf kecil) -- lihat /api/register.

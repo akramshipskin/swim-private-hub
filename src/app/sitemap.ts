@@ -16,8 +16,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/syarat-ketentuan", priority: 0.3 },
     { path: "/kebijakan-pengembalian", priority: 0.3 },
     { path: "/kebijakan-cookie", priority: 0.3 },
-    { path: "/perjanjian-coach", priority: 0.3 },
-    { path: "/mou-kolam", priority: 0.3 },
   ];
 
   return routes.map(({ path, priority }) => ({

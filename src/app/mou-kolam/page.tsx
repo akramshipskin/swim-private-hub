@@ -6,6 +6,8 @@ import { PARTNER_AGREEMENTS } from "@/lib/partner-agreement";
 export const metadata: Metadata = {
   title: "MOU Kolam Mitra | Swim Private Hub",
   description: "Perjanjian kerja sama antara Swim Private Hub dan kolam renang mitra, disetujui lewat centang di aplikasi.",
+  // Hanya untuk mitra: tidak masuk mesin pencari (juga sudah keluar dari peta situs).
+  robots: { index: false, follow: false },
 };
 
 // Teks = docs/legal/draft-mou-kolam-v1.md (perubahan harga-dari-coach v3

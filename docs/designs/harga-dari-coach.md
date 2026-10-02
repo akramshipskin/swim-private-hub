@@ -1,4 +1,4 @@
-# Rancangan: harga dari coach (2 Okt 2026, draf, menunggu "lanjut" Hadi)
+# Rancangan: harga dari coach (2 Okt 2026, LIVE; aturan terkini ada di docs/aturan-bisnis-saat-ini.md)
 
 Keputusan yang mendasari ada di docs/KEPUTUSAN.md tanggal 2 Okt. Dikerjakan Opus (uang, booking, skema).
 

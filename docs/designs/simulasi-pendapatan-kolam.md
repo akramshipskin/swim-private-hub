@@ -1,3 +1,5 @@
+> **SUPERSEDED (2 Okt 2026):** contoh di bawah memakai bagi hasil persen tetap 40/50/10 yang sudah diganti. Sekarang kolam dan coach memasang harga sendiri, dan uang dibagi per rupiah (lihat docs/aturan-bisnis-saat-ini.md). Jangan dipakai sebagai angka ke kolam.
+
 # Simulasi pendapatan kolam (bahan bicara dengan kolam)
 
 Dibuat Claude 29 Sep 2026. **Semua angka adalah ilustrasi, bukan janji dan bukan
