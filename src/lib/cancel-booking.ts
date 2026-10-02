@@ -133,7 +133,7 @@ export async function cancelBooking({
 
         // Coach batal (sakit/darurat) = jam itu coach memang tidak bisa
         // mengajar, jadi slot ditutup, bukan dibuka lagi untuk member lain
-        // (Hadi 2 Okt, 1A). Coach bisa membukanya lagi lewat Tambah Jadwal
+        // (Hadi 2 Okt, 1A). Coach bisa membukanya lagi lewat Tambah Slot
         // (slot CLOSED di jam yang sama dibuka ulang). Member/admin batal =
         // slot kembali kosong seperti biasa.
         await tx.availability.update({

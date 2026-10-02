@@ -197,7 +197,7 @@ export type CancelBookingActionState = { error?: string } | null;
 // window & jatah kuota mandiri member (lihat komentar cancelBooking),
 // beda dari deleteAvailability yang cuma bisa hapus slot yang MASIH
 // kosong. Sisa sesi member otomatis balik, slotnya DITUTUP (tidak bisa
-// dibooking member lain; coach bisa membukanya lagi lewat Tambah Jadwal),
+// dibooking member lain; coach bisa membukanya lagi lewat Tambah Slot),
 // member dapet notif.
 export async function cancelBookingAsCoach(
   _prevState: CancelBookingActionState,

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { needsPartnerAgreement, partnerAgreementFor } from "@/lib/partner-agreement";
 import { prisma } from "@/lib/prisma";
 import { acceptPartnerAgreement } from "./actions";
+import { LogoutButton } from "./logout-button";
 
 export const metadata: Metadata = {
   title: "Perjanjian Kemitraan | Swim Private Hub",
@@ -75,6 +76,7 @@ export default async function PerjanjianPage({ searchParams }: { searchParams: P
             )}
             <Button type="submit">Setuju dan lanjut</Button>
           </form>
+          <LogoutButton />
         </CardBody>
       </Card>
     </main>

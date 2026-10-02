@@ -39,6 +39,24 @@ describe("perjanjian kemitraan", () => {
     expect(partnerAgreementData("POOL_OWNER", true, now)).toEqual({ partnerAgreementAcceptedAt: now, partnerAgreementVersion: "MOU Kolam v1" });
   });
 
+  // Aktif sejak 2 Okt: versi asli terisi, berbeda per peran, diawali nama
+  // dokumen; akun yang dulunya peran lain (versi peran lain) tetap diminta.
+  it("versi yang berlaku: terisi, berbeda, coach tidak dianggap setuju MOU (dan sebaliknya)", () => {
+    const coach = original.coach;
+    const pool = original.pool;
+    expect(coach).toMatch(/^Perjanjian Coach /);
+    expect(pool).toMatch(/^MOU Kolam /);
+    expect(coach).not.toBe(pool);
+    expect(needsPartnerAgreement("COACH", null)).toBe(true);
+    expect(needsPartnerAgreement("POOL_OWNER", null)).toBe(true);
+    expect(needsPartnerAgreement("COACH", coach)).toBe(false);
+    expect(needsPartnerAgreement("POOL_OWNER", pool)).toBe(false);
+    expect(needsPartnerAgreement("POOL_OWNER", coach)).toBe(true);
+    expect(needsPartnerAgreement("COACH", pool)).toBe(true);
+    expect(partnerAgreementData("COACH", true)).toMatchObject({ partnerAgreementVersion: coach });
+    expect(partnerAgreementData("COACH", undefined)).toBeNull();
+  });
+
   // Pemeriksa 2 Okt: versi diisi sebelum halaman teksnya ada = orang menyetujui
   // dokumen yang tidak bisa dibuka (404). Tes ini gagal kalau itu terjadi.
   it("perjanjian yang sudah aktif punya halaman teksnya", () => {

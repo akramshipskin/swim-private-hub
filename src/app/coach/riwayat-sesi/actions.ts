@@ -7,6 +7,7 @@ import { pricesForSessionCoach } from "@/lib/coach-change";
 import { ATTENDANCE_MARK_WINDOW_HOURS, coachCanMarkAttendance } from "@/lib/policy";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { PARTNER_AGREEMENT_REQUIRED_ERROR } from "@/lib/partner-agreement";
 
 export type ActionState = { error?: string } | null;
 
@@ -22,6 +23,11 @@ export async function markAttendance(
   if (!session) redirect("/login");
   if (session.user.role !== "COACH" && session.user.role !== "ADMIN") {
     return { error: "Tidak punya akses." };
+  }
+  // Aksi ini mengkredit saldo; server action bisa dipanggil lewat alamat yang
+  // tidak melewati pagar halaman, jadi gerbang perjanjian dicek di sini juga.
+  if (session.user.role === "COACH" && session.user.needsPartnerAgreement) {
+    return { error: PARTNER_AGREEMENT_REQUIRED_ERROR };
   }
 
   const bookingId = formData.get("bookingId") as string;

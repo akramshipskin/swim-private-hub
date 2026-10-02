@@ -7,7 +7,9 @@ import { NOT_CLOSED } from "@/lib/availability";
 // di tanggal itu). Dipake date picker di halaman "Tambah Slot".
 export async function GET(request: Request) {
   const session = await auth();
-  if (!session || session.user.role !== "COACH") {
+  // Coach yang belum menyetujui perjanjian kemitraan ditolak juga (rute ini
+  // di luar matcher proxy.ts).
+  if (!session || session.user.role !== "COACH" || session.user.needsPartnerAgreement) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

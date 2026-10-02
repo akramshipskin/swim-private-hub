@@ -83,6 +83,21 @@ describe("markAttendance", () => {
     expect(bookingFindUnique).not.toHaveBeenCalled();
   });
 
+  it("coach yang belum setuju perjanjian kemitraan ditolak sebelum menyentuh booking atau saldo", async () => {
+    auth.mockResolvedValue({ user: { id: "coach-1", role: "COACH", needsPartnerAgreement: true } });
+    const result = await markAttendance(null, formData("booking-1", "true"));
+    expect(result).toEqual({ error: "Setujui perjanjian kemitraan dulu" });
+    expect(bookingFindUnique).not.toHaveBeenCalled();
+    expect(creditSessionRevenue).not.toHaveBeenCalled();
+  });
+
+  it("admin tidak terkena gerbang perjanjian kemitraan", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN", needsPartnerAgreement: false } });
+    bookingFindUnique.mockResolvedValue(null);
+    const result = await markAttendance(null, formData("booking-1", "true"));
+    expect(result).toEqual({ error: "Booking tidak ditemukan atau sudah dibatalkan." });
+  });
+
   it("errors when the booking doesn't exist", async () => {
     bookingFindUnique.mockResolvedValue(null);
     const result = await markAttendance(null, formData("gone", "true"));
