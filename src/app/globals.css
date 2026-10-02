@@ -906,3 +906,132 @@ body {
     }
   }
 }
+
+/* ===== Gerak "Kenalan dengan coach" (2 Okt, Sonnet): desktop saja =====
+   Tata letak kartu tidak berubah. Ditambah: tali lintasan berkelok di
+   belakang kartu yang tergambar saat scroll, kartu masuk dari sisinya dan
+   melayang pelan seperti papan apung, foto bergeser halus, dan isi panel
+   muncul bergiliran saat kartu dibuka. Hanya transform/opacity/clip-path. */
+@keyframes sph-bob {
+  to {
+    translate: 0 -7px;
+  }
+}
+@keyframes sph-coach-in {
+  from {
+    translate: calc(var(--dir, 0) * 150px) calc(70px - var(--dir, 0) * var(--dir, 0) * 30px);
+    rotate: calc(var(--dir, 0) * 6deg);
+  }
+}
+@keyframes sph-lane-draw {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes sph-coach-rise {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+@keyframes sph-coach-chip {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+@keyframes sph-badge-shine {
+  from {
+    background-position: 160% 0;
+  }
+  to {
+    background-position: -60% 0;
+  }
+}
+/* Tali lintasan: titik-titik tetap (selalu tampil di desktop). */
+.fx-coach-lane path {
+  stroke: rgb(20 20 15 / 0.32);
+  stroke-width: 4px;
+  stroke-dasharray: 0.1 15;
+  stroke-linecap: round;
+}
+.fx-coach-lane-draw {
+  display: none !important;
+}
+.fx-coach-lane-draw path {
+  stroke: var(--color-fixed-lime-500);
+  stroke-width: 4px;
+  stroke-linecap: round;
+}
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* Melayang pelan, tiap kartu beda tempo; berhenti saat kartu dibuka. */
+  .fx-coach {
+    animation: sph-bob calc(5.5s + var(--i, 0) * 1.2s) ease-in-out calc(var(--i, 0) * -1.7s) infinite alternate;
+  }
+  .fx-coach[data-open="true"] {
+    animation-play-state: paused;
+  }
+  /* Tombol profil: panah bergeser saat disorot. */
+  .fx-coach-link::after {
+    content: "→";
+    display: inline-block;
+    margin-left: 0.35rem;
+    transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fx-coach-link:hover::after {
+    translate: 6px 0;
+  }
+  /* Isi panel muncul bergiliran tiap kali kartu dibuka. */
+  .coach-card[data-open="true"] .fx-coach-pane > :not(ul) {
+    animation: sph-coach-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .coach-card[data-open="true"] .fx-coach-pane > :nth-child(1) { animation-delay: 0.12s; }
+  .coach-card[data-open="true"] .fx-coach-pane > :nth-child(2) { animation-delay: 0.18s; }
+  .coach-card[data-open="true"] .fx-coach-pane > :nth-child(3) { animation-delay: 0.24s; }
+  .coach-card[data-open="true"] .fx-coach-pane > :nth-child(4) { animation-delay: 0.3s; }
+  .coach-card[data-open="true"] .fx-coach-pane > :nth-child(5) { animation-delay: 0.42s; }
+  .coach-card[data-open="true"] .fx-coach-pane > :nth-child(6) { animation-delay: 0.5s; }
+  .coach-card[data-open="true"] .fx-coach-pane > :nth-child(7) { animation-delay: 0.56s; }
+  .coach-card[data-open="true"] .fx-coach-pane > :nth-child(n + 8) { animation-delay: 0.64s; }
+  .coach-card[data-open="true"] .fx-coach-pane ul li {
+    animation: sph-coach-chip 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .coach-card[data-open="true"] .fx-coach-pane ul li:nth-child(1) { animation-delay: 0.4s; }
+  .coach-card[data-open="true"] .fx-coach-pane ul li:nth-child(2) { animation-delay: 0.46s; }
+  .coach-card[data-open="true"] .fx-coach-pane ul li:nth-child(3) { animation-delay: 0.52s; }
+  .coach-card[data-open="true"] .fx-coach-pane ul li:nth-child(4) { animation-delay: 0.58s; }
+  .coach-card[data-open="true"] .fx-coach-pane ul li:nth-child(n + 5) { animation-delay: 0.64s; }
+  /* Label sertifikat: kilau lewat sekali saat panel dibuka. */
+  .coach-card[data-open="true"] .fx-coach-pane .fx-coach-badge {
+    background-image: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.85) 50%, transparent 70%);
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+    animation: sph-badge-shine 0.9s ease-out 0.45s both;
+  }
+}
+/* Terhubung ke scroll (browser yang mendukung saja). */
+@supports (animation-timeline: view()) {
+  @media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+    /* Kartu masuk dari sisinya sambil meluruskan diri. */
+    .fx-coach-art {
+      animation: sph-coach-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 85%;
+    }
+    /* Foto bergeser halus di dalam bingkainya. */
+    .fx-coach-photo {
+      animation: sph-parallax linear both;
+      animation-timeline: view();
+    }
+    /* Garis lime tergambar dari atas ke bawah mengikuti scroll. */
+    .fx-coach-lane-draw {
+      display: block !important;
+      animation: sph-lane-draw linear both;
+      animation-timeline: view();
+      animation-range: cover 3% cover 85%;
+    }
+  }
+}

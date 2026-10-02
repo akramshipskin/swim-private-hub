@@ -39,7 +39,7 @@ function CoachHeading({ c }: { c: LandingCoach }) {
       {c.bioLine && <p className="mt-0.5 text-sm text-fixed-muted">{c.bioLine}</p>}
       {c.certifiedLabel && (
         <p className="mt-2">
-          <span className="box-decoration-clone rounded-full bg-fixed-lime-100 px-3 py-1 text-xs font-semibold leading-[1.9] text-fixed-ink">
+          <span className="fx-coach-badge box-decoration-clone rounded-full bg-fixed-lime-100 px-3 py-1 text-xs font-semibold leading-[1.9] text-fixed-ink">
             {c.certifiedLabel}
           </span>
         </p>
@@ -53,6 +53,31 @@ const SPOTS = [
   "self-end sm:mr-10 rotate-[2deg]",
   "self-center rotate-[-1deg]",
 ];
+
+// Arah masuk tiap kartu (desktop): kiri, kanan, tengah (naik dari bawah),
+// sesuai posisinya di SPOTS. Dipakai CSS lewat --dir.
+const ENTER_DIR = [-1, 1, 0];
+
+// Jalur tali lintasan di belakang kartu (desktop): kurva S yang melewati
+// pusat tiap kartu (kiri ~18%, kanan ~82%, tengah 50% dari lebar daftar) dan
+// berkelok di antaranya. Sumbu y dalam rem: tiap kartu 36rem + jarak 5rem.
+const SPOT_X = [18, 82, 50];
+const CARD_REM = 36;
+const GAP_REM = 5;
+export function lanePath(n: number) {
+  const height = n * CARD_REM + (n - 1) * GAP_REM;
+  const pts: [number, number][] = [[50, 0]];
+  for (let i = 0; i < n; i++) pts.push([SPOT_X[i % SPOT_X.length], i * (CARD_REM + GAP_REM) + CARD_REM / 2]);
+  pts.push([50, height]);
+  let d = `M ${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [xa, ya] = pts[i - 1];
+    const [xb, yb] = pts[i];
+    const mid = (ya + yb) / 2;
+    d += ` C ${xa} ${mid}, ${xb} ${mid}, ${xb} ${yb}`;
+  }
+  return { d, height };
+}
 
 const CLOSE_GRACE_MS = 250;
 
@@ -95,17 +120,17 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
 
   return (
     <li
-      style={{ minHeight: "36rem" }}
+      style={{ minHeight: "36rem", "--dir": ENTER_DIR[index % ENTER_DIR.length], "--i": index % 5 } as React.CSSProperties}
       data-open={open}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onFocus={handleEnter}
       onBlur={handleBlur}
-      className={`coach-card relative w-72 before:absolute before:-inset-3 before:content-[""] sm:w-80 ${SPOTS[index % SPOTS.length]}`}
+      className={`coach-card fx-coach relative w-72 before:absolute before:-inset-3 before:content-[""] sm:w-80 ${SPOTS[index % SPOTS.length]}`}
     >
       <Reveal delay={(index % 3) * 90}>
         <article
-          className="relative rounded-3xl bg-white p-3 shadow-[0_8px_30px_rgba(20,20,15,0.08)]"
+          className="fx-coach-art relative rounded-3xl bg-white p-3 shadow-[0_8px_30px_rgba(20,20,15,0.08)]"
         >
           <div className="flex flex-col sm:flex-row">
             {/* Wajah kartu: max-w diset pas 296px (18.5rem) supaya di state
@@ -115,7 +140,7 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
               <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-fixed-lime-100">
                 {c.photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={c.photoUrl} alt={`Foto ${c.name}`} className="h-full w-full object-cover" />
+                  <img src={c.photoUrl} alt={`Foto ${c.name}`} className="fx-coach-photo h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
                     <span className="text-7xl font-semibold tracking-tight text-fixed-ink/60">{initials(c.name)}</span>
@@ -134,7 +159,7 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
             {/* Panel info: di HP di bawah wajah, di desktop jadi kolom
                 kanan dalam box yang sama. */}
             <div className="coach-panel">
-              <div className="sm:max-h-[22.5rem] sm:w-[22rem] sm:shrink-0 sm:overflow-y-auto sm:pl-6 sm:pr-3 sm:pt-2">
+              <div className="fx-coach-pane sm:max-h-[22.5rem] sm:w-[22rem] sm:shrink-0 sm:overflow-y-auto sm:pl-6 sm:pr-3 sm:pt-2">
                 <CoachHeading c={c} />
                 {c.bio && <p className="mt-3 text-base leading-relaxed text-fixed-ink-soft">{c.bio}</p>}
                 {c.specialties.length > 0 && (
@@ -147,7 +172,7 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
                 <p className="mt-3 text-sm text-fixed-muted">
                   Mengajar di: <span className="font-semibold text-fixed-ink">{c.pools.join(", ") || "-"}</span>
                 </p>
-                <Link href={`/pelatih/${c.id}`} className="mt-2 inline-block text-sm font-semibold text-fixed-ink underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
+                <Link href={`/pelatih/${c.id}`} className="fx-coach-link mt-2 inline-block text-sm font-semibold text-fixed-ink underline max-sm:inline-flex max-sm:min-h-[44px] max-sm:items-center">
                   Lihat profil lengkap
                 </Link>
               </div>
@@ -160,11 +185,22 @@ function CoachCard({ c, index }: { c: LandingCoach; index: number }) {
 }
 
 export function CoachLeaders({ coaches }: { coaches: LandingCoach[] }) {
+  const lane = lanePath(coaches.length);
+  const laneSvg = (cls: string) => (
+    <svg aria-hidden="true" viewBox={`0 0 100 ${lane.height}`} preserveAspectRatio="none" className={`${cls} pointer-events-none absolute inset-0 hidden h-full w-full lg:block`}>
+      <path d={lane.d} fill="none" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
   return (
-    <ul className="flex flex-col items-center gap-14 sm:gap-20">
-      {coaches.map((c, i) => (
-        <CoachCard key={c.id} c={c} index={i} />
-      ))}
-    </ul>
+    <div className="relative">
+      {/* Tali lintasan: garis putus-putus tetap, garis lime penuh tergambar mengikuti scroll (desktop). */}
+      {laneSvg("fx-coach-lane")}
+      {laneSvg("fx-coach-lane-draw")}
+      <ul className="relative flex flex-col items-center gap-14 sm:gap-20">
+        {coaches.map((c, i) => (
+          <CoachCard key={c.id} c={c} index={i} />
+        ))}
+      </ul>
+    </div>
   );
 }
