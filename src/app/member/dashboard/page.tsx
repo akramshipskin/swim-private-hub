@@ -2,7 +2,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { activePackageWhere } from "@/lib/active-package";
 import { todayWibDateString, dateLabel, formatDateLabel, formatTimeLeft, formatTimeWib, wibDateTime } from "@/lib/datetime";
-import { BentoCard, Stat, SessionList } from "@/components/dashboard";
+import { BentoCard, NextStepCard, Stat, SessionList } from "@/components/dashboard";
 import { formatRupiah } from "@/lib/format";
 
 export const metadata = { title: "Dashboard | Swim Private Hub" };
@@ -79,6 +79,12 @@ export default async function MemberDashboardPage() {
   const nearest = expiringSoon[0];
   const nearestLeft = nearest?.expiredDate ? formatTimeLeft(nearest.expiredDate.getTime() - now.getTime()) : "";
 
+  // Satu langkah berikutnya untuk member (rombak UI 4 Okt): jadwal terdekat,
+  // atau sisa sesi yang belum dijadwalkan, atau beli paket.
+  const next = upcoming[0];
+  const unscheduled = Math.max(0, totalSisa);
+  const dayLabel = (d: Date) => d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Dashboard</h1>
@@ -103,6 +109,35 @@ export default async function MemberDashboardPage() {
             ))}
           </ul>
         </section>
+      )}
+
+      {todayBookings.length === 0 && (
+        <div className="mt-6">
+          {next ? (
+            <NextStepCard
+              eyebrow="Jadwal berikutnya"
+              title={`${dayLabel(next.availability.date)}, ${formatTimeWib(next.availability.startTime)}–${formatTimeWib(next.availability.endTime)}`}
+              body={`${next.package.dependent.name} · ${next.availability.pool.name} · dengan ${next.availability.coach.name}`}
+              href={unscheduled > 0 ? "/member/booking" : undefined}
+              cta={unscheduled > 0 ? `Booking sesi lain (${unscheduled} tersisa)` : undefined}
+              secondary={{ href: "/member/riwayat", label: "Semua jadwal" }}
+            />
+          ) : unscheduled > 0 ? (
+            <NextStepCard
+              title={`${unscheduled} sesi belum dijadwalkan`}
+              body="Pilih tanggal dan jam dengan coach-mu sebelum paket berakhir."
+              href="/member/booking"
+              cta="Booking sekarang"
+            />
+          ) : (
+            <NextStepCard
+              title={packages.length === 0 ? "Belum ada paket aktif" : "Semua sesi paketmu sudah dipakai"}
+              body="Pilih kolam dan coach di kotamu, lalu booking jam yang masih kosong."
+              href="/member/paket"
+              cta="Beli paket"
+            />
+          )}
+        </div>
       )}
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">

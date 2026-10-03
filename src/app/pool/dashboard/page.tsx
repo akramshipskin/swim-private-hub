@@ -2,9 +2,9 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { NOT_CLOSED } from "@/lib/availability";
 import { formatRupiah } from "@/lib/format";
-import { todayWibDateString, dateLabel, wibDateTime, formatDateLabel } from "@/lib/datetime";
+import { todayWibDateString, dateLabel, wibDateTime, formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { groupByHour } from "@/lib/pool-occupancy";
-import { BentoCard, Stat } from "@/components/dashboard";
+import { BentoCard, NextStepCard, Stat } from "@/components/dashboard";
 import { AffiliateCard } from "@/components/affiliate-card";
 import { releaseDueCommissions } from "@/lib/affiliate";
 
@@ -78,9 +78,24 @@ export default async function PoolDashboardPage() {
         const bookedToday = slots.filter((s) => s.booked).length;
         const rows = groupByHour(slots, p.openTime, p.closeTime);
         const busiest = Math.max(1, ...rows.map((r) => r.booked.length));
+        // Satu langkah berikutnya per kolam (rombak UI 4 Okt).
+        const now = new Date();
+        const nextLes = slots.find((x) => x.booked && x.endTime > now);
+        const step = !p.openTime || !p.closeTime
+          ? { title: "Isi jam buka kolam", body: "Coach belum bisa membuka jadwal di kolammu sebelum jam buka diisi.", href: "/pool/info", cta: "Isi jam buka" }
+          : p._count.affiliations === 0
+            ? { title: "Belum ada coach di kolammu", body: "Coach memilih sendiri kolam tempat mengajar. Lengkapi foto, fasilitas, dan deskripsi supaya kolammu menarik dipilih.", href: "/pool/info", cta: "Lengkapi info kolam" }
+            : nextLes
+              ? { eyebrow: "Les berikutnya hari ini", title: `${formatTimeWib(nextLes.startTime)}–${formatTimeWib(nextLes.endTime)} · ${nextLes.who ?? "Peserta"}`, body: `Dengan ${nextLes.coachName}. Total ${bookedToday} sesi les hari ini.`, secondary: { href: "/pool/jadwal", label: "Lihat jadwal" } }
+              : !p.description || p.facilities.length === 0
+                ? { title: "Lengkapi info kolam", body: "Deskripsi dan fasilitas membantu member memilih kolammu.", href: "/pool/info", cta: "Lengkapi info" }
+                : { title: "Tidak ada les lagi hari ini", body: `Saldo bisa dicairkan ${formatRupiah(p.walletBalance)}.`, secondary: { href: "/pool/saldo", label: "Lihat saldo" } };
         return (
           <section key={p.id} className="mt-6">
             {pools.length > 1 && <h2 className="mb-3 text-xl font-semibold text-text">{p.name}</h2>}
+            <div className="mb-4">
+              <NextStepCard {...step} />
+            </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
               <BentoCard title="Ringkasan bulan ini" href="/pool/laporan" className="md:col-span-4">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
@@ -96,8 +111,6 @@ export default async function PoolDashboardPage() {
                   Dalam proses pencairan: {formatRupiah(pick(pendingWithdrawals, p.id)?._sum.amount ?? 0)}
                 </p>
               </BentoCard>
-
-              <AffiliateCard owner={{ poolId: p.id }} name={p.name.replace(/^kolam( renang)?\s+/i, "")} className="md:col-span-6" />
 
               <BentoCard title={`Jam ramai hari ini · ${bookedToday} sesi les`} href="/pool/jadwal" linkLabel="Lihat jadwal" className="md:col-span-4">
                 {rows.every((r) => r.booked.length === 0 && r.open.length === 0) ? (
@@ -125,6 +138,8 @@ export default async function PoolDashboardPage() {
                 </p>
                 {!p.description && <p className="mt-2 text-sm text-warning-text">Deskripsi kolam belum diisi.</p>}
               </BentoCard>
+
+              <AffiliateCard owner={{ poolId: p.id }} name={p.name.replace(/^kolam( renang)?\s+/i, "")} className="md:col-span-6" />
             </div>
           </section>
         );

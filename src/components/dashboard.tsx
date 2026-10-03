@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { Card, CardBody } from "@/components/ui/card";
 import { formatTimeWib } from "@/lib/datetime";
+import { buttonClass } from "@/components/ui/button";
 
 // Kotak bento dashboard: judul, isi ringkas, tautan "Selengkapnya".
 export function BentoCard({
@@ -102,5 +103,45 @@ export function SessionList({ items, empty, limit = 6 }: { items: SessionItem[];
       ))}
       {items.length > limit && <li className="py-2 text-xs text-text-subtle">+{items.length - limit} sesi lainnya</li>}
     </ul>
+  );
+}
+
+// Kartu "Langkah berikutnya" di puncak dasbor (rombak UI 4 Okt, opsi A): satu
+// tindakan utama per peran, supaya pengguna langsung tahu harus apa.
+export function NextStepCard({
+  eyebrow = "Langkah berikutnya",
+  title,
+  body,
+  href,
+  cta,
+  secondary,
+}: {
+  eyebrow?: string;
+  title: string;
+  body?: React.ReactNode;
+  href?: string;
+  cta?: string;
+  secondary?: { href: string; label: string };
+}) {
+  return (
+    <section aria-label={eyebrow} className="rounded-2xl border border-brand-600/40 bg-brand-50 p-4 sm:p-5">
+      <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">{eyebrow}</p>
+      <p className="mt-1 text-lg font-semibold text-text sm:text-xl">{title}</p>
+      {body && <div className="mt-1 text-sm text-text-muted">{body}</div>}
+      {(href || secondary) && (
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          {href && cta && (
+            <Link href={href} className={buttonClass({ className: "max-sm:w-full" })}>
+              {cta}
+            </Link>
+          )}
+          {secondary && (
+            <Link href={secondary.href} className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+              {secondary.label} &rarr;
+            </Link>
+          )}
+        </div>
+      )}
+    </section>
   );
 }

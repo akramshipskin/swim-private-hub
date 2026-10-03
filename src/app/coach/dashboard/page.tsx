@@ -1,8 +1,8 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
-import { todayWibDateString, dateLabel, addDaysToDateString, formatDateLabel } from "@/lib/datetime";
-import { BentoCard, Stat, SessionList } from "@/components/dashboard";
+import { todayWibDateString, dateLabel, addDaysToDateString, formatDateLabel, formatTimeWib } from "@/lib/datetime";
+import { BentoCard, NextStepCard, Stat, SessionList } from "@/components/dashboard";
 import { getOverdueParticipants } from "@/lib/milestone-hold";
 import { releaseDueCommissions } from "@/lib/affiliate";
 import { AffiliateCard } from "@/components/affiliate-card";
@@ -67,10 +67,29 @@ export default async function CoachDashboardPage() {
     who: s.bookings[0]?.package.dependent.name,
   });
 
+  // Satu langkah berikutnya untuk coach (rombak UI 4 Okt), urut dari yang
+  // paling berdampak ke saldo/member.
+  const nextToday = slots.find((s) => s.date.getTime() === today.getTime() && s.endTime > now);
+  const step = unmarked.length > 0
+    ? { title: `${unmarked.length} sesi belum ditandai Hadir`, body: "Bagianmu masuk saldo setelah sesi ditandai. Lewat 24 jam setelah sesi selesai, hanya admin yang bisa menandai.", href: "/coach/riwayat-sesi", cta: "Tandai sekarang" }
+    : owedBlocked.length > 0
+      ? { title: `${owedBlocked.length} member belum bisa booking`, body: "Buka jam kosong di kolam mereka supaya sesinya tidak tertunda.", href: "/coach/jadwal", cta: "Buka jadwal" }
+      : pools.length === 0
+        ? { title: "Pilih kolam tempat kamu mengajar", body: "Member baru bisa membeli paket denganmu setelah kamu memilih kolam dan membuka jam kosong.", href: "/coach/kolam", cta: "Pilih kolam" }
+        : nextToday
+          ? { eyebrow: "Sesi berikutnya hari ini", title: `${formatTimeWib(nextToday.startTime)}–${formatTimeWib(nextToday.endTime)} · ${nextToday.pool.name}`, body: nextToday.bookings[0]?.package.dependent.name, secondary: { href: "/coach/jadwal", label: "Lihat jadwal" } }
+          : openThisWeek < 4
+            ? { title: "Buka jam kosong minggu ini", body: "Coach dengan minimal 4 jam kosong dalam 14 hari ke depan tampil di halaman beli paket member.", href: "/coach/jadwal", cta: "Buka jadwal" }
+            : { title: "Semua beres", body: `${openThisWeek} jam kosong 7 hari ke depan siap dibooking member.`, secondary: { href: "/coach/jadwal", label: "Lihat jadwal" } };
+
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Dashboard</h1>
       <p className="mt-1 text-sm text-text-muted">{formatDateLabel(today)}</p>
+
+      <div className="mt-6">
+        <NextStepCard {...step} />
+      </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         {overdue.length > 0 && (
@@ -139,10 +158,6 @@ export default async function CoachDashboardPage() {
           <SessionList items={slots.filter((s) => s.date.getTime() === tomorrow.getTime()).map(toItem)} empty="Belum ada sesi yang dibooking besok." />
         </BentoCard>
 
-        {profile && (
-          <AffiliateCard owner={{ coachProfileId: profile.id }} name={session.user.name ?? "Coach"} className="md:col-span-6" />
-        )}
-
         {!profile?.certificates.length && (
           <BentoCard title="Lengkapi profil" href="/profil" linkLabel="Buka profil" className="md:col-span-6">
             <p className="text-sm text-text-muted">
@@ -150,6 +165,10 @@ export default async function CoachDashboardPage() {
               &quot;Bersertifikat&quot; muncul setelah sertifikat disetujui admin.
             </p>
           </BentoCard>
+        )}
+
+        {profile && (
+          <AffiliateCard owner={{ coachProfileId: profile.id }} name={session.user.name ?? "Coach"} className="md:col-span-6" />
         )}
       </div>
     </main>
