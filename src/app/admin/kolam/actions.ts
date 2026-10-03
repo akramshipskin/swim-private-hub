@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { removeOpenSlots } from "@/lib/availability";
 import { PENDING_APPROVAL_WHERE } from "@/lib/pending-approval";
+import { notifyWaitlistForPool } from "@/lib/coach-pools";
 import { changedPackPrices, isValidServiceFeeBps, MAX_SERVICE_FEE_BPS, parsePackPrices } from "@/lib/pricing";
 import type { PackPriceState } from "@/components/pack-price-form";
 
@@ -38,6 +39,7 @@ export async function affiliateCoach(
     .catch((err: { code?: string }) => {
       if (err?.code !== "P2002") throw err;
     });
+  await notifyWaitlistForPool(poolId);
 
   revalidatePath("/admin/kolam");
   return null;
@@ -84,6 +86,7 @@ export async function togglePoolActive(poolId: string, nextActive: boolean) {
       });
     }
   });
+  if (nextActive) await notifyWaitlistForPool(poolId);
 
   revalidatePath("/admin/kolam");
   revalidatePath("/admin/users");
@@ -108,6 +111,7 @@ export async function updatePoolPricing(_prev: PackPriceState, formData: FormDat
     data: { ...changedPackPrices(formData, prices), serviceFeeBps, pphExempt: formData.get("pphExempt") === "on" },
   });
   if (res.count === 0) return { error: "Kolam tidak ditemukan." };
+  await notifyWaitlistForPool(poolId);
   revalidatePath("/admin/kolam");
   revalidatePath("/member/paket");
   revalidatePath("/");

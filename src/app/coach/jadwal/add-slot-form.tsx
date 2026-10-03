@@ -19,7 +19,9 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
     return (
       <Card className="mb-8 mt-5">
         <CardBody className="py-6 text-center text-sm text-text-muted">
-          Kamu belum terafiliasi ke kolam mana pun. Hubungi admin agar bisa buka jadwal.
+          Kamu belum memilih kolam tempat mengajar.{" "}
+          <a href="/coach/kolam" className="font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Pilih kolam di menu Kolam Saya</a>{" "}
+          supaya bisa membuka jadwal.
         </CardBody>
       </Card>
     );

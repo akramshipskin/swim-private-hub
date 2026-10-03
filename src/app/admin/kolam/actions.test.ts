@@ -9,10 +9,12 @@ const affiliationDelete = vi.fn().mockResolvedValue({ count: 1 });
 const affiliationFindUnique = vi.fn();
 const userFindFirst = vi.fn().mockResolvedValue({ id: "coach-1" });
 const removeOpenSlots = vi.fn().mockResolvedValue({ deleted: 0, closed: 0 });
+const notifyWaitlistForPool = vi.fn().mockResolvedValue(0);
+vi.mock("@/lib/coach-pools", () => ({ notifyWaitlistForPool: (...a: unknown[]) => notifyWaitlistForPool(...a) }));
 vi.mock("@/lib/availability", () => ({ removeOpenSlots: (...args: unknown[]) => removeOpenSlots(...args) }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    pool: { update: (...args: unknown[]) => poolUpdate(...args) },
+    pool: { update: (...args: unknown[]) => poolUpdate(...args), findUnique: vi.fn().mockResolvedValue({ city: "Jakarta" }) },
     user: { findFirst: (...args: unknown[]) => userFindFirst(...args) },
     poolAffiliation: {
       upsert: (...args: unknown[]) => affiliationUpsert(...args),
@@ -79,12 +81,16 @@ describe("togglePoolActive", () => {
   it("approves a pending pool by setting isActive true", async () => {
     await togglePoolActive("pool-1", true);
     expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: true } });
+    // Kolam aktif bisa membuka paket pertama di kotanya: daftar tunggu dicek.
+    expect(notifyWaitlistForPool).toHaveBeenCalledWith("pool-1");
   });
 
   it("deactivates an active pool", async () => {
     userUpdateMany.mockClear();
+    notifyWaitlistForPool.mockClear();
     await togglePoolActive("pool-1", false);
     expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: false } });
+    expect(notifyWaitlistForPool).not.toHaveBeenCalled();
     expect(userUpdateMany).not.toHaveBeenCalled();
   });
 

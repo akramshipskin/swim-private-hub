@@ -195,7 +195,7 @@ describe("2FA admin", () => {
 describe("Pendaftaran", () => {
   const ago = Date.now() - 10000;
   const regReq = (body: Record<string, unknown>, ip = "3.3.3.3") =>
-    new Request("http://x", { method: "POST", headers: { "x-forwarded-for": ip }, body: JSON.stringify({ name: "a b", password: "12345678", acceptedTerms: true, wantsSelf: true, selfBirthDate: "1990-05-05", birthDate: "1990-05-05", formRenderedAt: ago, ...body }) });
+    new Request("http://x", { method: "POST", headers: { "x-forwarded-for": ip }, body: JSON.stringify({ name: "a b", password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, wantsSelf: true, selfBirthDate: "1990-05-05", birthDate: "1990-05-05", formRenderedAt: ago, ...body }) });
 
   it("R1: 12 pendaftaran member dari 1 jaringan dalam 1 jam -> 10 berhasil, 2 ditolak 429; jaringan lain tetap bisa", async () => {
     const codes: number[] = [];

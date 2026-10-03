@@ -35,6 +35,8 @@ export default async function AdminKolamPage() {
         closeTime: true,
         facilities: true,
         photos: true,
+        city: true,
+        dailyCapacity: true,
         ownerships: {
           select: { owner: { select: { name: true, phone: true } } },
           orderBy: { createdAt: "asc" },

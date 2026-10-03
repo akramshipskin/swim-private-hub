@@ -180,3 +180,32 @@ export function changedPackPrices(
     ...(prices.pricePack8 !== orig("origPack8") ? { pricePack8: prices.pricePack8 } : {}),
   };
 }
+
+// Harga paket saat daftar coach/kolam (Hadi 3 Okt): minimal satu ukuran diisi,
+// kelipatan Rp1.000. Isian JSON boleh angka atau teks angka; kosong = tidak
+// menjual ukuran itu.
+export function parseRegisterPrices(
+  raw4: unknown,
+  raw8: unknown,
+): { pricePack4: number | null; pricePack8: number | null } | { error: string } {
+  const read = (v: unknown) => (v == null || v === "" ? null : typeof v === "number" || typeof v === "string" ? Number(v) : NaN);
+  const pricePack4 = read(raw4);
+  const pricePack8 = read(raw8);
+  if (pricePack4 === null && pricePack8 === null) return { error: "Isi harga paket 4 sesi atau 8 sesi (boleh keduanya)." };
+  for (const v of [pricePack4, pricePack8]) {
+    if (v === null) continue;
+    if (!isValidPackPrice(v)) return { error: "Harga harus angka bulat Rp1.000 sampai Rp50.000.000." };
+    if (v % PRICE_STEP !== 0) return { error: "Harga harus kelipatan Rp1.000, misal Rp260.000." };
+  }
+  return { pricePack4, pricePack8 };
+}
+
+// Kapasitas harian kolam khusus pelanggan SPH (Hadi 3 Okt): 1-500 sesi per hari.
+export const MAX_DAILY_CAPACITY = 500;
+export function parseDailyCapacity(v: unknown): number | { error: string } {
+  const n = typeof v === "number" || typeof v === "string" ? Number(v) : NaN;
+  if (!Number.isInteger(n) || n < 1 || n > MAX_DAILY_CAPACITY) {
+    return { error: `Kapasitas harian harus angka bulat 1 sampai ${MAX_DAILY_CAPACITY} sesi.` };
+  }
+  return n;
+}

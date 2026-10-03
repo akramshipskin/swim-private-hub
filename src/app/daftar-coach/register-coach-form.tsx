@@ -8,6 +8,8 @@ import { Card, CardBody } from "@/components/ui/card";
 import { PartnerSteps } from "@/components/partner-steps";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { isValidIndonesianPhone } from "@/lib/format";
+import { CitySelect } from "@/components/city-select";
+import { PriceInput } from "@/components/ui/price-input";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 import { partnerAgreementFor } from "@/lib/partner-agreement";
 
@@ -27,6 +29,7 @@ export default function RegisterCoachForm() {
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [hasCertification, setHasCertification] = useState(false);
   const [certificationNote, setCertificationNote] = useState("");
+  const [city, setCity] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,6 +51,7 @@ export default function RegisterCoachForm() {
       return;
     }
 
+    const form = new FormData(e.currentTarget as HTMLFormElement);
     setLoading(true);
 
     const res = await fetch("/api/register-coach", {
@@ -64,6 +68,9 @@ export default function RegisterCoachForm() {
         specialties,
         hasCertification,
         certificationNote,
+        city,
+        pricePack4: form.get("pricePack4"),
+        pricePack8: form.get("pricePack8"),
         website,
         formRenderedAt,
       }),
@@ -141,6 +148,23 @@ export default function RegisterCoachForm() {
                 autoComplete="new-password"
               />
             </Field>
+            <Field label="Kota domisili">
+              <CitySelect value={city} onChange={(e) => setCity(e.target.value)} />
+            </Field>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium text-text">Harga jasa kamu</p>
+              <p className="text-xs text-text-subtle">
+                Satu harga untuk semua kolam. Isi minimal satu, kelipatan Rp1.000. Member membayar harga ini + harga kolam + biaya layanan SPH. Bisa diubah nanti.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Paket 4 sesi (Rp)">
+                  <PriceInput name="pricePack4" />
+                </Field>
+                <Field label="Paket 8 sesi (Rp)">
+                  <PriceInput name="pricePack8" />
+                </Field>
+              </div>
+            </div>
             <Field label="Bio singkat (opsional)">
               <Textarea
                 value={bio}

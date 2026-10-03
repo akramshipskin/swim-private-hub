@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { requireRole } from "@/lib/require-role";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import { NavBar } from "@/components/nav-bar";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { roleNavLinks, roleLabel } from "@/lib/nav-links";
@@ -15,6 +17,9 @@ export default async function MemberLayout({
   children: React.ReactNode;
 }) {
   const session = await requireRole("MEMBER");
+  // Akun lama tanpa kota domisili memilih kota sekali (Hadi 3 Okt).
+  const me = await prisma.user.findUnique({ where: { id: session.user.id }, select: { city: true } });
+  if (!me?.city) redirect("/kota");
 
   return (
     <NavBar

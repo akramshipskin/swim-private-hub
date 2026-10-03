@@ -213,7 +213,7 @@ describe("addAvailability new-slot notification", () => {
   it("refuses a pool the coach is not affiliated with, without notifying anyone", async () => {
     affiliationFindUnique.mockResolvedValue(null);
     const res = await addAvailability(null, slotForm({}));
-    expect(res?.error).toBe("Kamu tidak terafiliasi ke kolam ini.");
+    expect(res?.error).toBe("Kamu belum memilih kolam ini. Pilih dulu di menu Kolam Saya.");
     expect(availabilityCreateMany).not.toHaveBeenCalled();
     expect(sendPushToUsers).not.toHaveBeenCalled();
   });

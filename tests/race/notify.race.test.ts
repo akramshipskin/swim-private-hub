@@ -74,14 +74,14 @@ beforeEach(async () => {
 
 describe("NOTIFIKASI ke admin (butuh tindakan admin)", () => {
   it("N1: coach mendaftar -> semua admin AKTIF dapat; admin nonaktif, coach, member, pemilik kolam tidak", async () => {
-    const res = await registerCoach(new Request("http://x", { method: "POST", headers: { "x-forwarded-for": "9.9.9.1" }, body: JSON.stringify({ name: "coach baru", phone: "081200011122", password: "12345678", acceptedTerms: true, specialties: ["Gaya bebas"], birthDate: "1995-06-15", formRenderedAt: ago }) }));
+    const res = await registerCoach(new Request("http://x", { method: "POST", headers: { "x-forwarded-for": "9.9.9.1" }, body: JSON.stringify({ name: "coach baru", phone: "081200011122", password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, specialties: ["Gaya bebas"], birthDate: "1995-06-15", formRenderedAt: ago }) }));
     expect(res.status).toBe(201);
     expect(await inbox()).toEqual({ [admin1.id]: ["Pendaftaran coach baru"], [admin2.id]: ["Pendaftaran coach baru"] });
     expect(last()).toMatchObject({ body: "Coach Baru menunggu persetujuan", url: "/admin/users" });
   });
 
   it("N2: pemilik kolam mendaftar -> admin aktif dapat, menyebut nama kolam", async () => {
-    const res = await registerPool(new Request("http://x", { method: "POST", headers: { "x-forwarded-for": "9.9.9.2" }, body: JSON.stringify({ name: "a", ownerName: "budi pemilik", phone: "081200011133", password: "12345678", acceptedTerms: true, poolName: "kolam bahari", address: "Jl. Uji 1", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago }) }));
+    const res = await registerPool(new Request("http://x", { method: "POST", headers: { "x-forwarded-for": "9.9.9.2" }, body: JSON.stringify({ name: "a", ownerName: "budi pemilik", phone: "081200011133", password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, poolName: "kolam bahari", address: "Jl. Uji 1", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago }) }));
     expect(res.status).toBe(201);
     expect(await inbox()).toEqual({ [admin1.id]: ["Pendaftaran kolam baru"], [admin2.id]: ["Pendaftaran kolam baru"] });
     expect(last()?.body).toBe("Kolam Bahari (Budi Pemilik) menunggu persetujuan");

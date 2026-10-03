@@ -23,6 +23,7 @@ const paymentDeleteMany = vi.fn().mockResolvedValue({ count: 1 });
 const paymentUpdate = vi.fn().mockResolvedValue({});
 const packageDelete = vi.fn().mockResolvedValue({});
 const packageUpdate = vi.fn().mockResolvedValue({});
+const affiliationLock = vi.fn().mockResolvedValue([{ id: "aff1" }]);
 vi.mock("@/lib/prisma", () => {
   const prisma: Record<string, unknown> = {
     package: { count: (...a: unknown[]) => packageCount(...a), findFirst: packageFindFirst, create: packageCreate, update: (...a: unknown[]) => packageUpdate(...a), delete: (...a: unknown[]) => packageDelete(...a) },
@@ -30,6 +31,8 @@ vi.mock("@/lib/prisma", () => {
     user: { findFirst: userFindFirst, findUnique: (...a: unknown[]) => userFindUnique(...a) },
     payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a), update: (...a: unknown[]) => paymentUpdate(...a) },
   };
+  // Kunci tautan coach-kolam di dalam transaksi checkout (src/lib/coach-pools.ts).
+  prisma.$queryRaw = (...a: unknown[]) => affiliationLock(...a);
   prisma.$transaction = (arg: unknown) => (typeof arg === "function" ? arg(prisma) : Promise.all(arg as Promise<unknown>[]));
   return { prisma };
 });
@@ -99,6 +102,15 @@ describe("checkout paket pilih coach", () => {
     const res = await POST(buy());
     expect(res.status).toBe(400);
     expect(packageCreate).not.toHaveBeenCalled();
+  });
+
+  it("coach melepas kolam bersamaan dengan pembelian: tautan hilang di dalam kunci = ditolak, paket tidak dibuat", async () => {
+    affiliationLock.mockResolvedValueOnce([]);
+    const res = await POST(buy());
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/tidak mengajar di kolam ini/);
+    expect(packageCreate).not.toHaveBeenCalled();
+    expect(createTransaction).not.toHaveBeenCalled();
   });
 
   it("menolak ukuran paket selain 1/4/8 dan kolam tidak aktif", async () => {

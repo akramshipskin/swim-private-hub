@@ -19,7 +19,7 @@ function req(over: Record<string, unknown> = {}) {
     method: "POST",
     body: JSON.stringify({
       name: "coach baru", phone: "081211112222", password: "12345678", acceptedTerms: true,
-      specialties: ["Gaya bebas"], birthDate: "1995-06-15", formRenderedAt: Date.now() - 10_000, ...over,
+      specialties: ["Gaya bebas"], birthDate: "1995-06-15", city: "Bandung", pricePack4: 440000, pricePack8: "800000", formRenderedAt: Date.now() - 10_000, ...over,
     }),
   });
 }
@@ -75,5 +75,23 @@ describe("POST /api/register-coach: perjanjian kemitraan (Hadi 2 Okt, 3A)", () =
     } finally {
       PARTNER_AGREEMENTS.COACH.version = original;
     }
+  });
+});
+
+describe("POST /api/register-coach: kota & harga (Hadi 3 Okt)", () => {
+  it("menyimpan kota domisili dan harga paket", async () => {
+    const res = await POST(req());
+    expect(res.status).toBe(201);
+    const data = userCreate.mock.calls[0][0].data;
+    expect(data.city).toBe("Bandung");
+    expect(data.coachProfile.create).toMatchObject({ pricePack4: 440_000, pricePack8: 800_000 });
+  });
+
+  it("menolak kota di luar daftar, harga kosong semua, dan harga bukan kelipatan Rp1.000", async () => {
+    expect((await POST(req({ city: "Semarang" }))).status).toBe(400);
+    expect((await POST(req({ city: undefined }))).status).toBe(400);
+    expect((await POST(req({ pricePack4: null, pricePack8: "" }))).status).toBe(400);
+    expect((await POST(req({ pricePack4: 440500 }))).status).toBe(400);
+    expect(userCreate).not.toHaveBeenCalled();
   });
 });

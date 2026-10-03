@@ -24,6 +24,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/admin/ganti-coach", label: "Ganti Coach", icon: "users", group: "Operasional" },
     { href: "/admin/users", label: "Pengguna", icon: "users", group: "Mitra & Member" },
     { href: "/admin/kolam", label: "Kolam", icon: "package", group: "Mitra & Member" },
+    { href: "/admin/peminat-kota", label: "Peminat per Kota", icon: "users", group: "Mitra & Member" },
     { href: "/admin/paket", label: "Paket", icon: "package", group: "Mitra & Member" },
     { href: "/admin/kinerja-coach", label: "Kinerja Coach", icon: "bar-chart", group: "Mitra & Member" },
     { href: "/admin/milestone", label: "Milestone", icon: "clipboard-check", group: "Mitra & Member" },
@@ -40,6 +41,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
   COACH: [
     { href: "/coach/dashboard", label: "Dashboard", icon: "bar-chart" },
     { href: "/coach/jadwal", label: "Jadwal", icon: "calendar" },
+    { href: "/coach/kolam", label: "Kolam Saya", icon: "package" },
     { href: "/coach/riwayat-sesi", label: "Riwayat Sesi", icon: "clipboard-check" },
     { href: "/coach/peserta", label: "Peserta", icon: "users" },
     { href: "/coach/harga", label: "Harga", icon: "package" },

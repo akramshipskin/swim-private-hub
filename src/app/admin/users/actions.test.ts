@@ -3,6 +3,8 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ user: { id: "admin-1" } }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("bcryptjs", () => ({ default: { hash: vi.fn().mockResolvedValue("hashed") } }));
+const notifyWaitlistForCoach = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/coach-pools", () => ({ notifyWaitlistForCoach: (...a: unknown[]) => notifyWaitlistForCoach(...a) }));
 
 const userFindFirst = vi.fn();
 const userCreate = vi.fn();

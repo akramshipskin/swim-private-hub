@@ -104,6 +104,12 @@ export async function POST(request: Request) {
       select: { id: true },
     });
     if (recentDuplicate) return null;
+    // Tautan coach-kolam dikunci bersama (FOR SHARE) sampai paket tercatat:
+    // coach yang melepas kolam bersamaan menunggu dan melihat paket ini, atau
+    // tautannya sudah hilang dan pembelian ditolak (src/lib/coach-pools.ts).
+    const affiliation = await tx.$queryRaw<{ id: string }[]>`
+      SELECT id FROM "PoolAffiliation" WHERE "poolId" = ${item.poolId} AND "coachId" = ${coachId} FOR SHARE`;
+    if (affiliation.length === 0) return "NOT_AFFILIATED" as const;
     // Trial 1x per peserta, dicek di dalam kunci yang sama supaya klik beli
     // barengan tidak menghasilkan dua trial.
     if (item.isTrial && (await tx.package.count({ where: { dependentId, ...trialBlockingPackageWhere() } })) > 0) {
@@ -152,6 +158,9 @@ export async function POST(request: Request) {
     });
     return { ...created, cash: 0, orderId: "" };
   });
+  if (pkg === "NOT_AFFILIATED") {
+    return Response.json({ error: "Coach ini sudah tidak mengajar di kolam ini. Pilih coach lain." }, { status: 400 });
+  }
   if (pkg === "TRIAL_USED") {
     return Response.json(
       { error: "Paket trial hanya untuk peserta yang belum pernah punya paket, satu kali per peserta." },

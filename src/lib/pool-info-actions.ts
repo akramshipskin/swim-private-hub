@@ -6,6 +6,9 @@ import { revalidatePath } from "next/cache";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import { hasPoolHours, poolHoursLabel, withinPoolHours } from "@/lib/pool-hours";
 import { notifyAdmins } from "@/lib/notify";
+import { notifyWaitlistForPool } from "@/lib/coach-pools";
+import { isCity } from "@/lib/cities";
+import { parseDailyCapacity } from "@/lib/pricing";
 import { PHOTO_BUCKET, extensionFor, isStorageConfigured, publicObjectUrl, uploadObject, validateUpload, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR } from "@/lib/storage";
 
 export type PoolInfoState = { error?: string; ok?: boolean; warning?: string } | null;
@@ -50,6 +53,24 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
     return { error: "Isi jam buka dan jam tutup; jam tutup harus setelah jam buka." };
   }
 
+  // Kota & kapasitas harian (Hadi 3 Okt). Hanya diubah bila isiannya dikirim
+  // form; isian kosong ditolak supaya kolam tidak keluar dari saringan kota.
+  const extraData: { city?: string; dailyCapacity?: number | null } = {};
+  if (formData.has("city")) {
+    const city = str("city");
+    if (!isCity(city)) return { error: "Pilih kota kolam dari daftar." };
+    extraData.city = city;
+  }
+  // Kapasitas kosong = tanpa batas (sama seperti kolam lama yang belum mengisi).
+  if (formData.has("dailyCapacity")) {
+    if (str("dailyCapacity") === "") extraData.dailyCapacity = null;
+    else {
+      const capacity = parseDailyCapacity(str("dailyCapacity"));
+      if (typeof capacity !== "number") return { error: capacity.error };
+      extraData.dailyCapacity = capacity;
+    }
+  }
+
   const checked = formData
     .getAll("facilities")
     .map(String)
@@ -71,9 +92,11 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
       openTime: openTime || null,
       closeTime: closeTime || null,
       facilities: [...new Set([...checked, ...extra])],
+      ...extraData,
     },
   });
   if (updated.count === 0) return { error: "Kolam tidak ditemukan." };
+  if (extraData.city) await notifyWaitlistForPool(poolId);
 
   // Ganti jam buka saat sudah ada booking di luar jam baru (Hadi 2 Okt malam,
   // #6): booking itu tetap jalan, kolam diberi tahu sekarang, admin dikabari

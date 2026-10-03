@@ -7,6 +7,7 @@ import { Field, Input, Textarea } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEditLock } from "@/hooks/use-edit-lock";
 import { TimeSelect } from "@/components/ui/time-select";
+import { CitySelect } from "@/components/city-select";
 
 export type PoolInfo = {
   id: string;
@@ -16,6 +17,8 @@ export type PoolInfo = {
   openTime: string | null;
   closeTime: string | null;
   facilities: string[];
+  city: string | null;
+  dailyCapacity: number | null;
 };
 
 export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
@@ -30,9 +33,20 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
         <Field label="Deskripsi kolam">
           <Textarea name="description" rows={3} maxLength={1000} defaultValue={pool.description ?? ""} placeholder="Ukuran kolam, kedalaman, suasana, dll." />
         </Field>
-        <Field label="Alamat">
-          <Input name="address" defaultValue={pool.address ?? ""} />
+        <Field label="Alamat lengkap">
+          <Input name="address" defaultValue={pool.address ?? ""} placeholder="Jalan, nomor, kelurahan, kecamatan" />
         </Field>
+        <Field label="Kota">
+          <CitySelect defaultValue={pool.city ?? ""} />
+        </Field>
+        <div className="flex flex-col gap-1.5">
+          <Field label="Kapasitas harian untuk pelanggan SPH (sesi per hari)">
+            <Input name="dailyCapacity" type="number" inputMode="numeric" min={1} max={500} defaultValue={pool.dailyCapacity ?? ""} placeholder="Misal: 10" />
+          </Field>
+          <p className="text-xs text-text-subtle">
+            Berapa sesi les dari SPH yang masih bisa kolam terima per hari, dihitung dari keramaian harian kolam. 1 sesi = 1 coach + 1 peserta + 1 pendamping. Kosongkan bila tidak ingin dibatasi.
+          </p>
+        </div>
         {/* Jam buka & jam tutup ukurannya ikut isi (auto), bukan 1/3 lebar
             baris masing-masing -- dengan 3 kolom sama rata, dua dropdown
             jam yang cuma ~150px ketarik berjauhan di layar lebar

@@ -10,6 +10,8 @@ import { Field, Input, Textarea } from "@/components/ui/input";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import { isValidIndonesianPhone } from "@/lib/format";
 import { TimeSelect } from "@/components/ui/time-select";
+import { CitySelect } from "@/components/city-select";
+import { PriceInput } from "@/components/ui/price-input";
 import { partnerAgreementFor } from "@/lib/partner-agreement";
 
 // Satu centang untuk S&K, Privasi, dan perjanjian kemitraan (bila sudah aktif).
@@ -21,6 +23,8 @@ export default function RegisterPoolForm() {
   const [website, setWebsite] = useState("");
   const [poolName, setPoolName] = useState("");
   const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [dailyCapacity, setDailyCapacity] = useState("");
   const [openTime, setOpenTime] = useState("06:00");
   const [closeTime, setCloseTime] = useState("21:00");
   const [description, setDescription] = useState("");
@@ -46,6 +50,7 @@ export default function RegisterPoolForm() {
       return;
     }
 
+    const form = new FormData(e.currentTarget as HTMLFormElement);
     setLoading(true);
 
     const res = await fetch("/api/register-pool", {
@@ -63,6 +68,10 @@ export default function RegisterPoolForm() {
         closeTime,
         description: description || undefined,
         facilities,
+        city,
+        pricePack4: form.get("pricePack4"),
+        pricePack8: form.get("pricePack8"),
+        dailyCapacity,
         website,
         formRenderedAt,
       }),
@@ -106,12 +115,52 @@ export default function RegisterPoolForm() {
             <Field label="Nama Kolam">
               <Input value={poolName} onChange={(e) => setPoolName(e.target.value)} required />
             </Field>
-            <Field label="Alamat">
-              <Input value={address} onChange={(e) => setAddress(e.target.value)} required />
+            <Field label="Kota">
+              <CitySelect value={city} onChange={(e) => setCity(e.target.value)} />
+            </Field>
+            <Field label="Alamat lengkap">
+              <Input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+                placeholder="Jalan, nomor, kelurahan, kecamatan"
+              />
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <TimeSelect name="openTime" label="Jam Buka" defaultValue={openTime} onChange={setOpenTime} />
               <TimeSelect name="closeTime" label="Jam Tutup" defaultValue={closeTime} onChange={setCloseTime} />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium text-text">Harga tiket paket</p>
+              <p className="text-xs text-text-subtle">
+                Tiket masuk untuk 1 coach + 1 peserta + 1 pendamping per sesi. Isi minimal satu, kelipatan Rp1.000. Bisa diubah nanti.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Paket 4 sesi (Rp)">
+                  <PriceInput name="pricePack4" />
+                </Field>
+                <Field label="Paket 8 sesi (Rp)">
+                  <PriceInput name="pricePack8" />
+                </Field>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Field label="Kapasitas harian untuk pelanggan SPH (sesi per hari)">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={500}
+                  value={dailyCapacity}
+                  onChange={(e) => setDailyCapacity(e.target.value)}
+                  required
+                  placeholder="Misal: 10"
+                />
+              </Field>
+              <p className="text-xs text-text-subtle">
+                Hitung dari keramaian harian kolam: berapa sesi les dari SPH yang masih bisa kolam terima per hari. 1 sesi = 1 coach + 1 peserta + 1 pendamping. Bisa diubah kapan saja.
+              </p>
             </div>
 
             <Field label="Deskripsi kolam (opsional)">

@@ -109,7 +109,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
               {q
                 ? "Coba kata lain, atau tekan Reset untuk melihat semua slot."
                 : myPools.length === 0
-                  ? "Slot bisa ditambahkan setelah admin memasukkan kamu ke kolam."
+                  ? "Slot bisa ditambahkan setelah kamu memilih kolam di menu Kolam Saya."
                   : "Tambah slot pertamamu di atas."}
             </p>
           </CardBody>

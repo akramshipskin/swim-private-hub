@@ -29,7 +29,7 @@ export const POLICY = {
   RateLimitHit: null,
 
   User: {
-    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "partnerAgreementAcceptedAt", "partnerAgreementVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId", "memberBalance"),
+    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "partnerAgreementAcceptedAt", "partnerAgreementVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId", "memberBalance", "city"),
     name: (r, i) => `${ROLE_LABEL[r.role] ?? "User"} ${i}`,
     phone: (r, i) => `0899${pad(i, 8)}`,
     email: (r, i) => (r.email == null ? null : `user${i}@dev.invalid`),
@@ -69,10 +69,12 @@ export const POLICY = {
   AffiliateCode: keep("id", "code", "coachProfileId", "poolId", "createdAt"),
   AffiliateCommission: keep("id", "memberId", "coachProfileId", "poolId", "paymentId", "amount", "status", "bookingId", "releaseAt", "releasedAt", "createdAt"),
   // Testimoni: teks publik di landing (nama & peran sudah izin tampil).
+  // Kota saja (tingkat kota, bukan alamat), disalin apa adanya.
+  CityWaitlist: keep("id", "userId", "city", "createdAt", "notifiedAt"),
   Testimonial: keep("id", "name", "role", "quote", "consentNote", "isPublished", "sortOrder", "createdAt"),
   CoachCertificate: keep("id", "coachProfileId", "name", "filePath", "status", "reviewedAt", "createdAt"),
   Pool: {
-    ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "pricePack4", "pricePack8", "serviceFeeBps", "pphExempt", "walletBalance", "isActive", "createdAt"),
+    ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "pricePack4", "pricePack8", "serviceFeeBps", "pphExempt", "walletBalance", "isActive", "createdAt", "city", "dailyCapacity"),
     contactPhone: (r, i) => (r.contactPhone == null ? null : `0898${pad(i, 8)}`),
     ...BANK,
   },

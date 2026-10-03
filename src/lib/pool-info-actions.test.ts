@@ -8,6 +8,8 @@ const poolUpdateMany = vi.fn().mockResolvedValue({ count: 1 });
 const bookingFindMany = vi.fn().mockResolvedValue([]);
 const notifyAdmins = vi.fn();
 vi.mock("@/lib/notify", () => ({ notifyAdmins: (...a: unknown[]) => notifyAdmins(...a) }));
+const notifyWaitlistForPool = vi.fn().mockResolvedValue(0);
+vi.mock("@/lib/coach-pools", () => ({ notifyWaitlistForPool: (...a: unknown[]) => notifyWaitlistForPool(...a) }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     poolOwnership: { count: (...a: unknown[]) => ownershipCount(...a) },
@@ -58,6 +60,27 @@ describe("updatePoolInfo", () => {
       where: { id: "p1" },
       data: expect.objectContaining({ facilities: ["Mushola", "Gazebo"], openTime: "06:00" }),
     });
+  });
+
+  it("kota & kapasitas harian (Hadi 3 Okt): disimpan bila valid, ditolak bila kosong/di luar daftar, tidak disentuh bila tidak dikirim", async () => {
+    auth.mockResolvedValue({ user: { id: "a1", role: "ADMIN" } });
+    const base: [string, string][] = [["poolId", "p1"], ["openTime", "06:00"], ["closeTime", "21:00"]];
+    expect(await updatePoolInfo(null, fd([...base, ["city", "Bogor"], ["dailyCapacity", "12"]]))).toEqual({ ok: true, warning: undefined });
+    expect(poolUpdateMany).toHaveBeenLastCalledWith({ where: { id: "p1" }, data: expect.objectContaining({ city: "Bogor", dailyCapacity: 12 }) });
+    // Kota baru bisa membuka paket pertama di kota itu: daftar tunggu dicek.
+    expect(notifyWaitlistForPool).toHaveBeenCalledWith("p1");
+    // Kapasitas dikosongkan = kembali tanpa batas.
+    await updatePoolInfo(null, fd([...base, ["dailyCapacity", ""]]));
+    expect(poolUpdateMany).toHaveBeenLastCalledWith({ where: { id: "p1" }, data: expect.objectContaining({ dailyCapacity: null }) });
+    poolUpdateMany.mockClear();
+    for (const bad of [[["city", ""]], [["city", "Semarang"]], [["dailyCapacity", "0"]], [["dailyCapacity", "abc"]]] as [string, string][][]) {
+      expect((await updatePoolInfo(null, fd([...base, ...bad])))?.error).toBeTruthy();
+    }
+    expect(poolUpdateMany).not.toHaveBeenCalled();
+    await updatePoolInfo(null, fd(base));
+    const data = poolUpdateMany.mock.calls[0][0].data;
+    expect(data).not.toHaveProperty("city");
+    expect(data).not.toHaveProperty("dailyCapacity");
   });
 
   it("rejects an invalid time", async () => {

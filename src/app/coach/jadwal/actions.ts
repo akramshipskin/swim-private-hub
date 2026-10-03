@@ -42,7 +42,7 @@ export async function addAvailability(
     select: { pool: { select: { name: true, openTime: true, closeTime: true } } },
   });
   if (!affiliated) {
-    return { error: "Kamu tidak terafiliasi ke kolam ini." };
+    return { error: "Kamu belum memilih kolam ini. Pilih dulu di menu Kolam Saya." };
   }
   // Kolam tanpa jam buka tidak bisa dibuka slot barunya (Hadi 2 Okt malam,
   // #6B); pemilik kolam diberi tahu, paling banyak sekali sehari per kolam.

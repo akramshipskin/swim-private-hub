@@ -53,7 +53,7 @@ describe("Hapus akun member", () => {
     await prisma.user.update({ where: { id: m.id }, data: { phone } });
     await requestAccountDeletion(m.id);
     await anonymizeMember(m.id);
-    const res = await register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone, password: "12345678", acceptedTerms: true, wantsSelf: true, selfBirthDate: "1990-05-05", formRenderedAt: Date.now() - 10000 }) }));
+    const res = await register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone, password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, wantsSelf: true, selfBirthDate: "1990-05-05", formRenderedAt: Date.now() - 10000 }) }));
     expect(res.status).toBe(201);
   });
 

@@ -13,7 +13,7 @@ export default async function PoolInfoPage() {
   const pools = await prisma.pool.findMany({
     where: { ownerships: { some: { ownerId: session.user.id } } },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, description: true, address: true, contactPhone: true, openTime: true, closeTime: true, facilities: true, photos: true },
+    select: { id: true, name: true, description: true, address: true, contactPhone: true, openTime: true, closeTime: true, facilities: true, photos: true, city: true, dailyCapacity: true },
   });
 
   return (
@@ -33,6 +33,12 @@ export default async function PoolInfoPage() {
                 {!hasPoolHours(p) && (
                   <p role="status" className="mb-4 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
                     Jam buka belum diisi. Coach belum bisa membuka jadwal di kolam ini sampai jam buka &amp; jam tutup disimpan.
+                  </p>
+                )}
+                {(!p.city || p.dailyCapacity == null) && (
+                  <p role="status" className="mb-4 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+                    {!p.city ? "Kota kolam belum diisi, jadi kolam ini belum tampil di pilihan kota member dan coach. " : ""}
+                    {p.dailyCapacity == null ? "Kapasitas harian belum diisi; sampai diisi, jumlah sesi SPH per hari tidak dibatasi." : ""}
                   </p>
                 )}
                 <PoolInfoForm pool={p} />

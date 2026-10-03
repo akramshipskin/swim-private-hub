@@ -4,6 +4,8 @@ vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 const ownershipCount = vi.fn();
 const poolUpdate = vi.fn().mockResolvedValue({});
+const notifyWaitlistForPool = vi.fn().mockResolvedValue(0);
+vi.mock("@/lib/coach-pools", () => ({ notifyWaitlistForPool: (...a: unknown[]) => notifyWaitlistForPool(...a) }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     poolOwnership: { count: (...a: unknown[]) => ownershipCount(...a) },
@@ -37,5 +39,7 @@ describe("harga paket kolam", () => {
     ownershipCount.mockResolvedValue(1);
     expect(await updatePoolPrices(null, fd({ poolId: "mine", pricePack4: "260000", pricePack8: "" }))).toEqual({ ok: true });
     expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "mine" }, data: { pricePack4: 260_000, pricePack8: null } });
+    // Harga baru bisa membuka paket pertama di kota itu: daftar tunggu dicek.
+    expect(notifyWaitlistForPool).toHaveBeenCalledWith("mine");
   });
 });

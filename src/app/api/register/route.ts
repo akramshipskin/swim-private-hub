@@ -7,6 +7,7 @@ import { normalizeAffiliateCode } from "@/lib/affiliate";
 import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, MAX_EMAIL, MAX_NAME, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
 import { userErrorMessage } from "@/lib/user-error";
+import { isCity } from "@/lib/cities";
 import { sendMetaEvent, trackingFromRequest } from "@/lib/meta-capi";
 
 // Batas jumlah anak per pendaftaran (wajar untuk satu keluarga; mencegah body raksasa).
@@ -23,6 +24,7 @@ export async function POST(request: Request) {
     referralCode: { max: 30, label: "Kode afiliasi" },
     selfBirthDate: { max: 10, label: "Tanggal lahir" },
     entryReferrer: { max: 500, label: "Sumber pendaftaran" },
+    city: { max: 30, label: "Kota" },
   });
   if (shapeError) return Response.json({ error: shapeError }, { status: 400 });
   if (body.children !== undefined && body.children !== null) {
@@ -37,7 +39,7 @@ export async function POST(request: Request) {
   }
   const registeredIp =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-  const { name, phone: rawPhone, email: rawEmail, password, acceptedTerms, children, wantsSelf, selfBirthDate, entryReferrer, referralCode, website, formRenderedAt } =
+  const { name, phone: rawPhone, email: rawEmail, password, acceptedTerms, children, wantsSelf, selfBirthDate, entryReferrer, referralCode, city, website, formRenderedAt } =
     body as {
       name?: string;
       phone?: string;
@@ -49,6 +51,7 @@ export async function POST(request: Request) {
       selfBirthDate?: string;
       entryReferrer?: string | null;
       referralCode?: string;
+      city?: string;
       website?: string;
       formRenderedAt?: number;
     };
@@ -114,6 +117,11 @@ export async function POST(request: Request) {
     );
   }
 
+  // Kota domisili wajib (Hadi 3 Okt): member disuguhi kolam & coach kotanya.
+  if (!isCity(city)) {
+    return Response.json({ error: "Pilih kota domisili dari daftar" }, { status: 400 });
+  }
+
   const consent = consentData(acceptedTerms);
   if (!consent) {
     return Response.json({ error: CONSENT_REQUIRED_ERROR }, { status: 400 });
@@ -165,6 +173,7 @@ export async function POST(request: Request) {
           email,
           passwordHash,
           role: "MEMBER",
+          city,
           ...consent,
           registeredReferer,
           registeredIp,

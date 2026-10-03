@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
 import { isValidIndonesianPhone } from "@/lib/format";
+import { CitySelect } from "@/components/city-select";
 
 type Participant = { type: "self" | "child"; name: string; birthDate: string };
 
@@ -24,6 +25,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
   ]);
   const [agreed, setAgreed] = useState(false);
   const [referralCode, setReferralCode] = useState(initialReferralCode);
+  const [city, setCity] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -64,6 +66,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
         selfBirthDate: participants.find((p) => p.type === "self")?.birthDate,
         entryReferrer,
         referralCode: referralCode.trim() || undefined,
+        city,
         website,
         formRenderedAt,
       }),
@@ -156,6 +159,10 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
                 minLength={8}
                 autoComplete="new-password"
               />
+            </Field>
+
+            <Field label="Kota domisili">
+              <CitySelect value={city} onChange={(e) => setCity(e.target.value)} />
             </Field>
 
             <Field label="Kode afiliasi coach/kolam (opsional)">

@@ -176,6 +176,11 @@ model User {
   // akunnya). Null + nonaktif + COACH/POOL_OWNER = pendaftar mandiri yang
   // MENUNGGU persetujuan -- beda dari akun yang sengaja dinonaktifkan.
   approvedAt          DateTime?
+  // Kota domisili (member & coach) dari daftar tetap src/lib/cities.ts (Hadi
+  // 3 Okt). Member disuguhi kolam & coach kota ini; coach memilih kolam di
+  // kota ini (kota lain boleh, dengan peringatan). Null = akun lama, diminta
+  // mengisi saat masuk.
+  city                String?
   // Kode afiliasi yang diisi member saat mendaftar (opsional). Komisi dibayar
   // sekali per member -- lihat AffiliateCommission.
   referralCodeId      String?
@@ -196,6 +201,7 @@ model User {
   poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
   poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
   chatThread          ChatThread?
+  cityWaitlist        CityWaitlist[]
 
   milestoneItemsCreated     MilestoneItem[]            @relation("MilestoneItemCreator")
   milestoneAchievements     MilestoneAchievement[]     @relation("MilestoneAchievementCoach")
@@ -602,6 +608,13 @@ model Pool {
   id                 String   @id @default(cuid())
   name               String
   address            String?
+  // Kota kolam dari daftar tetap src/lib/cities.ts (Hadi 3 Okt). Null = kolam
+  // lama yang belum diisi (tidak tampil di saringan kota sampai diisi).
+  city               String?
+  // Kapasitas harian khusus pelanggan SPH yang diisi pemilik kolam (jumlah
+  // sesi per hari, 1 sesi = 1 coach + 1 peserta + 1 pendamping), bisa diubah
+  // kapan saja. Null = belum diisi = tanpa batas (Hadi 3 Okt).
+  dailyCapacity      Int?
   contactPhone       String?
   // Jam operasional harian (format "HH:mm", misal "06:00"/"21:00").
   // Satu jam buka-tutup buat semua hari -- MVP, belum per-hari (Senin
@@ -1031,4 +1044,18 @@ model PphRemittance {
   note        String?
   createdById String
   createdAt   DateTime @default(now())
+}
+
+// Daftar tunggu member di kota yang belum punya pasangan coach-kolam (Hadi 3
+// Okt). notifiedAt terisi saat member sudah dikabari paket pertama tersedia.
+model CityWaitlist {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  city       String
+  createdAt  DateTime  @default(now())
+  notifiedAt DateTime?
+
+  @@unique([userId, city])
+  @@index([city, notifiedAt])
 }

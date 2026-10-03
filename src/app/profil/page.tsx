@@ -12,13 +12,16 @@ import EditCoachProfileForm from "./edit-coach-profile-form";
 import CoachMediaForm from "./coach-media-form";
 import { isStorageConfigured, signedObjectUrl, CERT_BUCKET } from "@/lib/storage";
 import DeleteAccountCard from "./delete-account-card";
+import { CitySelect } from "@/components/city-select";
+import { Button } from "@/components/ui/button";
+import { saveMyCity } from "@/app/kota/actions";
 
 export const metadata: Metadata = {
   title: "Profil | Swim Private Hub",
   robots: { index: false, follow: false },
 };
 
-export default async function ProfilPage() {
+export default async function ProfilPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.mustChangePassword) redirect("/ganti-password");
@@ -64,6 +67,13 @@ export default async function ProfilPage() {
       ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { totpEnabledAt: true } })
       : null;
 
+  // Kota domisili member & coach (Hadi 3 Okt), bisa diganti di sini.
+  const cityUser =
+    session.user.role === "MEMBER" || session.user.role === "COACH"
+      ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { city: true } })
+      : null;
+  const { error } = await searchParams;
+
   return (
     <NavBar
       userName={session.user.name ?? ""}
@@ -88,6 +98,25 @@ export default async function ProfilPage() {
                 />
               </CardBody>
             </Card>
+
+            {cityUser && (
+              <Card>
+                <CardBody>
+                  <h2 className="mb-1 text-lg font-semibold text-text">Kota domisili</h2>
+                  <p className="mb-3 text-sm text-text-muted">
+                    {session.user.role === "COACH"
+                      ? "Kolam di kota ini tampil lebih dulu di menu Kolam Saya."
+                      : "Kolam dan coach di kota ini tampil lebih dulu saat membeli paket."}
+                  </p>
+                  <form action={saveMyCity} className="flex flex-wrap items-end gap-3">
+                    <input type="hidden" name="from" value="profil" />
+                    <CitySelect defaultValue={cityUser.city ?? ""} aria-label="Kota domisili" className="min-w-48 flex-1" />
+                    <Button type="submit" variant="secondary">Simpan kota</Button>
+                  </form>
+                  {error === "kota" && <p role="alert" className="mt-2 text-sm text-danger-text">Pilih kota dari daftar.</p>}
+                </CardBody>
+              </Card>
+            )}
 
             {coachProfile && (
               <Card>

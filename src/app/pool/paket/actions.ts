@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { parsePackPrices } from "@/lib/pricing";
+import { notifyWaitlistForPool } from "@/lib/coach-pools";
 import type { PackPriceState } from "@/components/pack-price-form";
 
 async function ownsPool(userId: string, poolId: string) {
@@ -21,6 +22,7 @@ export async function updatePoolPrices(_prev: PackPriceState, formData: FormData
   const prices = parsePackPrices(formData, current);
   if ("error" in prices) return prices;
   await prisma.pool.update({ where: { id: poolId }, data: prices });
+  await notifyWaitlistForPool(poolId);
   revalidatePath("/pool/paket");
   revalidatePath("/member/paket");
   revalidatePath("/");

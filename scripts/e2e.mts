@@ -30,11 +30,11 @@ const ymd = (d: Date) => wib(d).toISOString().slice(0, 10);
 async function seed() {
   const hash = await bcrypt.hash(PASSWORD, 10);
   const pool = await prisma.pool.create({
-    data: { name: "Kolam Uji Alur", pricePack4: 260_000, pricePack8: 480_000, openTime: "06:00", closeTime: "21:00", isActive: true },
+    data: { name: "Kolam Uji Alur", city: "Jakarta", pricePack4: 260_000, pricePack8: 480_000, openTime: "06:00", closeTime: "21:00", isActive: true },
   });
   const coach = await prisma.user.create({
     data: {
-      name: "Coach Uji Alur", phone: "089911110001", passwordHash: hash, role: "COACH", approvedAt: new Date(),
+      name: "Coach Uji Alur", phone: "089911110001", passwordHash: hash, role: "COACH", city: "Jakarta", approvedAt: new Date(),
       termsAcceptedAt: new Date(), partnerAgreementAcceptedAt: new Date(), partnerAgreementVersion: PARTNER_AGREEMENTS.COACH.version,
       coachProfile: { create: { pricePack4: 440_000, pricePack8: 800_000 } },
     },
@@ -168,6 +168,7 @@ try {
   await fill('input[placeholder="0812xxxxxxx"]', "089911110003");
   await fill('input[placeholder="Minimal 8 karakter"]', PASSWORD);
   await fill('input[aria-label="Peserta 1: tanggal lahir"]', "1990-05-05");
+  await fill('select[name="city"]', "Jakarta");
   await fill('input[type="checkbox"][required]', "on");
   await sleep(3500); // formulir yang dikirim terlalu cepat ditolak (penangkal bot)
   await clickText("Daftar");

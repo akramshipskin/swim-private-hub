@@ -1,6 +1,7 @@
 "use server";
 
 import { requireRole } from "@/lib/require-role";
+import { notifyWaitlistForCoach } from "@/lib/coach-pools";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { identityTakenWhere, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
@@ -146,6 +147,9 @@ export async function toggleUserActive(userId: string, nextActive: boolean) {
       revalidatePath("/admin/kolam");
     }
   }
+
+  // Coach diaktifkan bisa membuka paket pertama di kota kolamnya (daftar tunggu).
+  if (nextActive && user.role === "COACH") await notifyWaitlistForCoach(userId);
 
   // Coach dinonaktifkan: booking yang BELUM dimulai dibatalkan otomatis
   // sebagai pembatalan admin (keputusan Hadi D2) -- sesi member kembali dan

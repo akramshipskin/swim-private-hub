@@ -50,8 +50,15 @@ describe("POST /api/register (member): batas input", () => {
     const res = await post(registerMember, json({ ...memberOk, children: [{ name: "B".repeat(101), birthDate: "2020-01-01" }] }));
     expect(res.status).toBe(400);
   });
+  it("menolak kota kosong atau di luar daftar (Hadi 3 Okt)", async () => {
+    for (const city of [undefined, "", "Semarang", 5]) {
+      const res = await post(registerMember, json({ ...memberOk, city }));
+      expect(res.status).toBe(400);
+    }
+    expect((await (await post(registerMember, json({ ...memberOk, city: "Paris" }))).json()).error).toBe("Pilih kota domisili dari daftar");
+  });
   it("menolak email yang bentuknya jelas salah (sebelum cek DB)", async () => {
-    const res = await post(registerMember, json({ ...memberOk, email: "bukan-email" }));
+    const res = await post(registerMember, json({ ...memberOk, city: "Jakarta", email: "bukan-email" }));
     expect(res.status).toBe(400);
     expect((await res.json()).error).toBe("Format email tidak valid");
   });
@@ -72,6 +79,12 @@ describe("POST /api/register-coach dan register-pool: batas input", () => {
   it("kolam: alamat & nama kolam terlalu panjang ditolak", async () => {
     expect((await post(registerPool, json({ ...poolOk, address: "a".repeat(301) }))).status).toBe(400);
     expect((await post(registerPool, json({ ...poolOk, poolName: "k".repeat(101) }))).status).toBe(400);
+  });
+  it("kolam: kota, harga, dan kapasitas harian wajib valid (Hadi 3 Okt)", async () => {
+    const ok = { ...poolOk, city: "Depok", pricePack4: 260000, dailyCapacity: 10 };
+    for (const bad of [{ city: "Semarang" }, { city: undefined }, { pricePack4: null }, { pricePack4: 260500 }, { dailyCapacity: 0 }, { dailyCapacity: "x" }, { dailyCapacity: undefined }]) {
+      expect((await post(registerPool, json({ ...ok, ...bad }))).status).toBe(400);
+    }
   });
   it("kolam: field teks berupa objek ditolak, bukan 500", async () => {
     expect((await post(registerPool, json({ ...poolOk, address: { a: 1 } }))).status).toBe(400);

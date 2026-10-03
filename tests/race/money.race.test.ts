@@ -163,7 +163,7 @@ describe("PAYMENT webhook races", () => {
 describe("REGISTRATION / ACCOUNT races", () => {
   const ago = Date.now() - 10000;
   it("A1: daftar member No HP sama 6x barengan -> 1 akun, sisanya 409 (bukan 500)", async () => {
-    const rs = await settle(Array.from({ length: 6 }, () => register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone: "081234567890", password: "12345678", acceptedTerms: true, wantsSelf: true, selfBirthDate: "1990-05-05", formRenderedAt: ago }) }))));
+    const rs = await settle(Array.from({ length: 6 }, () => register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone: "081234567890", password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, wantsSelf: true, selfBirthDate: "1990-05-05", formRenderedAt: ago }) }))));
     console.log("A1", summarize(rs));
     expect(await prisma.user.count({ where: { phone: "081234567890" } })).toBe(1);
     expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
@@ -171,7 +171,7 @@ describe("REGISTRATION / ACCOUNT races", () => {
   });
   it("A1b: tanggal lahir peserta wajib: tanpa tanggal / tanggal masa depan / anak tanpa tanggal ditolak 400; lengkap tersimpan", async () => {
     const post = (extra: object, phone: string) =>
-      register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone, password: "12345678", acceptedTerms: true, formRenderedAt: ago, ...extra }) }));
+      register(new Request("http://x", { method: "POST", body: JSON.stringify({ name: "a b", phone, password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, formRenderedAt: ago, ...extra }) }));
     expect((await post({ wantsSelf: true }, "081234567801")).status).toBe(400);
     expect((await post({ children: [{ name: "Adik" }] }, "081234567802")).status).toBe(400);
     expect((await post({ children: [{ name: "Adik", birthDate: "2999-01-01" }] }, "081234567803")).status).toBe(400);
@@ -182,7 +182,7 @@ describe("REGISTRATION / ACCOUNT races", () => {
     expect(deps.map((d) => [d.isSelf, d.birthDate?.toISOString().slice(0, 10)])).toEqual([[false, "2019-03-04"], [true, "1990-05-05"]]);
   });
   it("A2: daftar coach & daftar kolam No HP sama barengan -> 1 akun, gak ada 500 / kolam yatim", async () => {
-    const body = { name: "a", ownerName: "a", birthDate: "1990-05-05", phone: "081299999999", password: "12345678", acceptedTerms: true, specialties: ["Gaya bebas"], poolName: "K", address: "J", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago };
+    const body = { name: "a", ownerName: "a", birthDate: "1990-05-05", phone: "081299999999", password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, specialties: ["Gaya bebas"], poolName: "K", address: "J", openTime: "06:00", closeTime: "20:00", formRenderedAt: ago };
     const rs = await settle([0, 1, 2].flatMap(() => [registerCoach(new Request("http://x", { method: "POST", body: JSON.stringify(body) })), registerPool(new Request("http://x", { method: "POST", body: JSON.stringify(body) }))]));
     console.log("A2", summarize(rs));
     expect(await prisma.user.count({ where: { phone: "081299999999" } })).toBe(1);

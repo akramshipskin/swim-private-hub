@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { parsePackPrices } from "@/lib/pricing";
+import { notifyWaitlistForCoach } from "@/lib/coach-pools";
 import type { PackPriceState } from "@/components/pack-price-form";
 
 // Coach memasang harga jasanya sendiri (Hadi 2 Okt): langsung berlaku,
@@ -16,6 +17,7 @@ export async function updateCoachPrices(_prev: PackPriceState, formData: FormDat
   if ("error" in prices) return prices;
   const res = await prisma.coachProfile.updateMany({ where: { userId: session.user.id }, data: prices });
   if (res.count === 0) return { error: "Profil coach tidak ditemukan. Hubungi admin." };
+  await notifyWaitlistForCoach(session.user.id);
   revalidatePath("/coach/harga");
   revalidatePath("/member/paket");
   return { ok: true };

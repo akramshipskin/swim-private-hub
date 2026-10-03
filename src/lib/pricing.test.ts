@@ -7,7 +7,9 @@ import {
   isValidServiceFeeBps,
   pack8SavingPercent,
   packQuote,
+  parseDailyCapacity,
   parsePackPrices,
+  parseRegisterPrices,
   pphAmount,
   sessionSplit,
   trialQuote,
@@ -152,5 +154,29 @@ describe("cheapestPackQuote", () => {
     expect(cheapestPackQuote(pool, [{ pricePack4: null, pricePack8: null }])).toBeNull();
     expect(cheapestPackQuote(pool, [])).toBeNull();
     expect(cheapestPackQuote({ ...pool, pricePack4: null }, [coach])).toEqual({ total: 1_363_200, sessions: 8 });
+  });
+});
+
+describe("parseRegisterPrices", () => {
+  it("menerima satu atau dua ukuran, angka atau teks", () => {
+    expect(parseRegisterPrices(260000, "480000")).toEqual({ pricePack4: 260_000, pricePack8: 480_000 });
+    expect(parseRegisterPrices("", 480000)).toEqual({ pricePack4: null, pricePack8: 480_000 });
+  });
+  it("menolak kosong semua, bukan kelipatan Rp1.000, dan isian aneh", () => {
+    expect(parseRegisterPrices(null, undefined)).toHaveProperty("error");
+    expect(parseRegisterPrices(260500, null)).toHaveProperty("error");
+    expect(parseRegisterPrices(0, null)).toHaveProperty("error");
+    expect(parseRegisterPrices({}, null)).toHaveProperty("error");
+    expect(parseRegisterPrices(60_000_000, null)).toHaveProperty("error");
+  });
+});
+
+describe("parseDailyCapacity", () => {
+  it("menerima 1-500", () => {
+    expect(parseDailyCapacity("10")).toBe(10);
+    expect(parseDailyCapacity(500)).toBe(500);
+  });
+  it("menolak 0, pecahan, dan isian aneh", () => {
+    for (const v of [0, 1.5, 501, "", null, "abc"]) expect(parseDailyCapacity(v)).toHaveProperty("error");
   });
 });

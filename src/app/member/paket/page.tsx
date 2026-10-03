@@ -13,6 +13,9 @@ import { CoachChangeForm, PayDifferenceButton } from "./coach-change-form";
 import { withdrawCoachChange } from "./coach-change-actions";
 import { formatRupiah } from "@/lib/format";
 import { formatBps, pack8SavingPercent, packQuote, trialQuote } from "@/lib/pricing";
+import { CITIES, isCity, NEARBY_CITIES, OTHER_CITY_WARNING } from "@/lib/cities";
+import { joinCityWaitlist } from "./waitlist-actions";
+import { Button } from "@/components/ui/button";
 
 const statusTone = {
   PENDING_PAYMENT: "warning",
@@ -38,14 +41,14 @@ function toDateLabelFromDate(d: Date) {
 
 export const metadata = { title: "Paket Saya | Swim Private Hub" };
 
-export default async function MemberPaketPage() {
+export default async function MemberPaketPage({ searchParams }: { searchParams: Promise<{ kota?: string }> }) {
   const session = await requireRole("MEMBER");
   const now = new Date();
   const paymentCutoff = new Date(now.getTime() - PAYMENT_WINDOW_MS);
 
   await releaseStalePayments(now);
   await expireStaleCoachChanges(now);
-  const [packages, pools, children, wallet] = await Promise.all([
+  const [packages, pools, children, wallet, me] = await Promise.all([
     prisma.package.findMany({
       where: {
         memberId: session.user.id,
@@ -83,6 +86,7 @@ export default async function MemberPaketPage() {
         id: true,
         name: true,
         address: true,
+        city: true,
         description: true,
         facilities: true,
         photos: true,
@@ -109,6 +113,10 @@ export default async function MemberPaketPage() {
       where: { id: session.user.id },
       select: { memberBalance: true, memberWalletTransactions: { orderBy: { createdAt: "desc" }, take: 5, select: { id: true, amount: true, note: true, type: true, createdAt: true } } },
     }),
+    prisma.user.findUniqueOrThrow({
+      where: { id: session.user.id },
+      select: { city: true, cityWaitlist: { select: { city: true, notifiedAt: true } } },
+    }),
   ]);
   // Coach pengganti per kolam (yang sudah memasang harga), untuk form ganti coach.
   const coachesByPool = new Map(pools.map((pool) => [pool.id, pool.affiliations.map((a) => a.coach)]));
@@ -116,7 +124,7 @@ export default async function MemberPaketPage() {
   const trialChildren = children.filter((c) => c._count.packages === 0);
 
   // Kombinasi kolam + coach yang bisa dibeli (keduanya sudah memasang harga).
-  const offers = pools
+  const allOffers = pools
     .map((pool) => ({
       pool,
       coaches: pool.affiliations
@@ -129,6 +137,16 @@ export default async function MemberPaketPage() {
         .filter((c) => c.four || c.eight),
     }))
     .filter((o) => o.coaches.length > 0);
+  // Saringan kota (Hadi 3 Okt): bawaan kota domisili member; kota lain boleh
+  // dengan peringatan. Kolam tanpa kota tidak tampil sampai kotanya diisi.
+  const { kota } = await searchParams;
+  const homeCity = me.city;
+  const city = isCity(kota) ? kota : homeCity;
+  const offers = allOffers.filter((o) => o.pool.city === city);
+  const offerCount = new Map<string, number>();
+  for (const o of allOffers) if (o.pool.city) offerCount.set(o.pool.city, (offerCount.get(o.pool.city) ?? 0) + 1);
+  const waitlisted = me.cityWaitlist.find((w) => w.city === city && !w.notifiedAt);
+  const nearby = city && isCity(city) ? NEARBY_CITIES[city].filter((c) => offerCount.has(c)) : [];
 
   // "Member" cuma valid begitu paket pernah aktif (beli/diassign) --
   // sebelum itu dia masih pengunjung biasa, jangan diklaim member.
@@ -289,19 +307,68 @@ export default async function MemberPaketPage() {
         </div>
       )}
 
-      <h2 className="mb-1 text-xl font-semibold text-text">Beli Paket Baru</h2>
+      <h2 id="beli" className="mb-1 scroll-mt-20 text-xl font-semibold text-text">Beli Paket Baru</h2>
       <p className="mb-4 text-sm text-text-muted">
         Pilih kolam, lalu coach. Paket berlaku untuk coach dan kolam yang kamu pilih. Harga sudah termasuk tiket masuk
         untuk 1 peserta, 1 pendamping, dan coach-nya, plus biaya layanan SPH di bawah 7%.
         {wallet && wallet.memberBalance > 0 && <> Saldomu {formatRupiah(wallet.memberBalance)} otomatis dipakai dulu, sisanya dibayar lewat Midtrans.</>}
       </p>
+      <form method="get" action="#beli" className="mb-3 flex flex-wrap items-end gap-2">
+        <label className="flex min-w-48 flex-1 flex-col gap-1.5 text-sm font-medium text-text sm:flex-none">
+          Kota
+          <select
+            name="kota"
+            defaultValue={city ?? ""}
+            className="min-h-[44px] rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          >
+            {CITIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+                {c === homeCity ? " (domisili)" : ""}
+                {offerCount.has(c) ? ` · ${offerCount.get(c)} kolam` : " · belum tersedia"}
+              </option>
+            ))}
+          </select>
+        </label>
+        <Button type="submit" variant="secondary">Tampilkan</Button>
+      </form>
+      {city && homeCity && city !== homeCity && (
+        <p role="status" className="mb-4 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+          {OTHER_CITY_WARNING.MEMBER} Domisili kamu: {homeCity}.
+        </p>
+      )}
       {children.length === 0 ? (
         <p className="text-sm text-text-muted">
           Belum ada peserta terdaftar. Tambah peserta dulu di menu{" "}
           <a href="/member/peserta" className="font-medium text-brand-700 underline">Peserta</a> sebelum beli paket.
         </p>
       ) : offers.length === 0 ? (
-        <p className="text-sm text-text-muted">Belum ada paket yang bisa dibeli. Kolam dan coach sedang menyiapkan harganya.</p>
+        <Card>
+          <CardBody className="flex flex-col gap-3">
+            <p className="text-base font-semibold text-text">Belum tersedia di {city}</p>
+            <p className="text-sm text-text-muted">
+              Kami sedang mencari kolam dan coach di {city}. Tekan Kabari saya, nanti kamu diberi tahu lewat notifikasi HP (kalau notifikasi aktif) begitu paket pertama di {city} bisa dibeli. Halaman ini juga langsung menampilkannya.
+            </p>
+            {city && isCity(city) && (waitlisted ? (
+              <p role="status" className="rounded-lg bg-success-bg px-3 py-2 text-sm text-success-text">Kamu sudah masuk daftar tunggu {city}.</p>
+            ) : (
+              <form action={joinCityWaitlist.bind(null, city)}>
+                <Button type="submit">Kabari saya</Button>
+              </form>
+            ))}
+            {nearby.length > 0 && (
+              <p className="text-sm text-text-muted">
+                Kota terdekat yang sudah tersedia:{" "}
+                {nearby.map((c, i) => (
+                  <span key={c}>
+                    {i > 0 && ", "}
+                    <a href={`/member/paket?kota=${encodeURIComponent(c)}#beli`} className="font-medium text-brand-700 underline">{c}</a>
+                  </span>
+                ))}
+              </p>
+            )}
+          </CardBody>
+        </Card>
       ) : (
         <div className="flex flex-col gap-4">
           {offers.map(({ pool, coaches }) => (

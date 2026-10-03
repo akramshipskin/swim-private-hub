@@ -1,4 +1,6 @@
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
+import { isCity } from "@/lib/cities";
+import { parseDailyCapacity, parseRegisterPrices } from "@/lib/pricing";
 import bcrypt from "bcryptjs";
 import { notifyAdmins } from "@/lib/notify";
 import { prisma } from "@/lib/prisma";
@@ -20,6 +22,7 @@ export async function POST(request: Request) {
     address: { max: MAX_ADDRESS, label: "Alamat" },
     openTime: { max: 5, label: "Jam buka" },
     closeTime: { max: 5, label: "Jam tutup" },
+    city: { max: 30, label: "Kota" },
   });
   if (shapeError || !isStringArrayOrMissing(body.facilities) || (body.description != null && typeof body.description !== "string")) {
     return Response.json({ error: shapeError ?? INVALID_BODY_ERROR }, { status: 400 });
@@ -36,6 +39,10 @@ export async function POST(request: Request) {
     closeTime,
     description,
     facilities,
+    city,
+    pricePack4,
+    pricePack8,
+    dailyCapacity,
     website,
     formRenderedAt,
   } = body as {
@@ -50,6 +57,10 @@ export async function POST(request: Request) {
     closeTime?: string;
     description?: string;
     facilities?: string[];
+    city?: string;
+    pricePack4?: unknown;
+    pricePack8?: unknown;
+    dailyCapacity?: unknown;
     website?: string;
     formRenderedAt?: number;
   };
@@ -83,6 +94,14 @@ export async function POST(request: Request) {
   if (closeTime <= openTime) {
     return Response.json({ error: "Jam tutup harus setelah jam buka" }, { status: 400 });
   }
+  // Kota, harga paket, dan kapasitas harian diisi saat daftar (Hadi 3 Okt).
+  if (!isCity(city)) {
+    return Response.json({ error: "Pilih kota kolam dari daftar" }, { status: 400 });
+  }
+  const prices = parseRegisterPrices(pricePack4, pricePack8);
+  if ("error" in prices) return Response.json({ error: prices.error }, { status: 400 });
+  const capacity = parseDailyCapacity(dailyCapacity);
+  if (typeof capacity !== "number") return Response.json({ error: capacity.error }, { status: 400 });
 
   const consent = consentData(acceptedTerms);
   // Centang yang sama juga menyetujui MOU kolam bila sudah aktif
@@ -135,6 +154,9 @@ export async function POST(request: Request) {
         data: {
           name: toProperCase(poolName.trim()),
           address: address.trim(),
+          city,
+          ...prices,
+          dailyCapacity: capacity,
           contactPhone: phone,
           openTime,
           closeTime,

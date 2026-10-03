@@ -9,6 +9,8 @@ import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 import { parseCoachBirthDate } from "@/lib/coach-bio";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, isStringArrayOrMissing, MAX_BIO, MAX_EMAIL, MAX_NAME, MAX_NOTE, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
 import { userErrorMessage } from "@/lib/user-error";
+import { isCity } from "@/lib/cities";
+import { parseRegisterPrices } from "@/lib/pricing";
 
 export async function POST(request: Request) {
   const body = await readJsonObject(request);
@@ -21,6 +23,7 @@ export async function POST(request: Request) {
     password: { max: MAX_PASSWORD, label: "Password" },
     bio: { max: MAX_BIO, label: "Bio" },
     certificationNote: { max: MAX_NOTE, label: "Catatan sertifikasi" },
+    city: { max: 30, label: "Kota" },
   });
   if (shapeError || !isStringArrayOrMissing(body.specialties)) {
     return Response.json({ error: shapeError ?? INVALID_BODY_ERROR }, { status: 400 });
@@ -36,6 +39,9 @@ export async function POST(request: Request) {
     specialties,
     hasCertification,
     certificationNote,
+    city,
+    pricePack4,
+    pricePack8,
     website,
     formRenderedAt,
   } = body as {
@@ -49,6 +55,9 @@ export async function POST(request: Request) {
     specialties?: string[];
     hasCertification?: boolean;
     certificationNote?: string;
+    city?: string;
+    pricePack4?: unknown;
+    pricePack8?: unknown;
     website?: string;
     formRenderedAt?: number;
   };
@@ -87,6 +96,13 @@ export async function POST(request: Request) {
     return Response.json({ error: "Pilih minimal 1 keahlian" }, { status: 400 });
   }
 
+  // Kota domisili & harga jasa diisi saat daftar (Hadi 3 Okt).
+  if (!isCity(city)) {
+    return Response.json({ error: "Pilih kota domisili dari daftar" }, { status: 400 });
+  }
+  const prices = parseRegisterPrices(pricePack4, pricePack8);
+  if ("error" in prices) return Response.json({ error: prices.error }, { status: 400 });
+
   const consent = consentData(acceptedTerms);
   // Centang yang sama juga menyetujui perjanjian kemitraan bila sudah aktif
   // (Hadi 2 Okt, 3A); {} bila belum aktif.
@@ -124,6 +140,7 @@ export async function POST(request: Request) {
         ...consent,
         ...agreement,
         role: "COACH",
+        city,
         // Coach yang daftar sendiri gak langsung bisa login/keliatan --
         // nunggu admin approve dulu (toggle isActive di /admin/users).
         // Gak ada vetting kualitas sebelum ini, siapa aja yang isi form
@@ -134,6 +151,7 @@ export async function POST(request: Request) {
             bio: bio?.trim() || null,
             birthDate,
             specialties: cleanSpecialties,
+            ...prices,
             hasCertification: !!hasCertification,
             certificationNote: hasCertification ? certificationNote?.trim() || null : null,
           },

@@ -164,7 +164,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: "Bagaimana cara gabung jadi coach?",
-        a: "Daftar lewat halaman Daftar Coach, isi profil dan keahlian. Setelah akun disetujui admin, admin yang akan mengafiliasikanmu ke kolam mitra yang sesuai.",
+        a: "Daftar lewat halaman Daftar Coach, isi profil dan keahlian. Setelah akun disetujui admin, kamu memilih sendiri kolam mitra tempat mengajar di menu Kolam Saya.",
       },
       {
         q: "Bisa mengajar di lebih dari satu kolam?",
