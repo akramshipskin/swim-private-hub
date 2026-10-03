@@ -276,7 +276,14 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
     <main className="w-full px-4 py-6 sm:py-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-semibold tracking-tight text-text">Paket</h1>
-        {membershipBadge}
+        <div className="flex flex-wrap items-center gap-3">
+          {membershipBadge}
+          {/* Rombak UI 4 Okt: bagian beli ada di bawah daftar paket; tautan
+              langsung supaya tidak perlu menggulir jauh di HP. */}
+          <a href="#beli" className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+            Beli paket baru &darr;
+          </a>
+        </div>
       </div>
 
       {ganti === "ok" && (

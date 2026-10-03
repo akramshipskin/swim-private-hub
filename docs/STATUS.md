@@ -1,8 +1,8 @@
-# STATUS SPH (diperbarui 3 Okt 2026 sore, setelah kota + rev.3 live dan Hadi menjawab)
+# STATUS SPH (diperbarui 4 Okt 2026 dini hari, mode tidur Opus)
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: 91e5881 (3 Okt; GitHub hijau: tes, tes balapan, uji alur penuh; Vercel sukses). Catatan terakhir eaeb9dd. Migrasi production sudah dijalankan Hadi (kota + penjaga jadwal).
+## Terakhir dikirim: lihat git log main (4 Okt dini hari: 4c350eb sweeping, 49bb1b0 keputusan 1-9 + sweeping kata, b26498f rombak UI A1, lalu A2). Tidak ada migrasi baru sejak kota.
 
 ## Sudah selesai dan live (ringkas; rinci di docs/reviews/ dan docs/KEPUTUSAN.md)
 - Per 30 Sep-1 Okt: tanggal lahir di semua form daftar, testimoni, CSP, PPN komisi 11%, landing dirombak, backup DB+storage hijau, Vercel Singapura, brand v2, animasi landing + dalam aplikasi.
@@ -14,15 +14,16 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 
 ## Sedang jalan
 - Sweeping sistem total ulang SELESAI 3 Okt malam (Opus): 474 kunjungan, hak akses 445 sel 0 bocor, formulir 174 kiriman 0 error, audit uang cocok, 4 pemeriksa Opus 0 berat. 14 kelompok perbaikan (laporan docs/reviews/2026-10-03-sweeping-sistem-malam.md). 8 hal menunggu keputusan Hadi (bagian "Menunggu keputusan Hadi" di laporan). 3 catatan orang hukum: dibiarkan (S&K tidak diubah).
+- 4 Okt dini hari (mode tidur, Opus): 9 keputusan Hadi dikerjakan (pelanggaran per kejadian coach, kolam nonaktif bukan salah coach + hitungan dimulai ulang, tolak batal sesi sebelum ganti coach, Cari Coach berkolam+kota, tolak beli/booking saat hapus akun & peserta nonaktif, milestone setelah sesi Hadir, rupiah "Rp 1.000", nama menu = judul halaman, sweeping kata ±300 potongan). Rombak UI tahap A (docs/designs/rombak-ui-aplikasi.md): kartu "Langkah berikutnya" di dasbor member/coach/kolam, kebijakan batal di bawah papan booking, tautan beli paket. Kecepatan: server cepat (8-65 md lokal); lambat = server Vercel "bangun tidur" (0,8-2,3 dtk kunjungan pertama).
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Kerjakan jawaban Hadi atas 8 keputusan sweeping 3 Okt malam (pelanggaran per paket/coach, kolam nonaktif/penuh, hari ke-10, batal sesi lama setelah ganti coach, No HP coach ke kolam, Cari Coach, 3 hal tak tertulis, format rupiah & istilah menu).
+1. Rombak UI tahap A lanjutan (navigasi HP satu sumber, tombol utama menempel di HP untuk halaman panjang) setelah Hadi melihat tahap A1-A2; opsi C (rombak alur total) tunggu data pemakaian.
 2. P8 (reset password via email) setelah email production terbukti. Pantau next-auth v5 stabil (dikunci 5.0.0-beta.32).
 3. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi), (aturan kota/ganti gratis/pelanggaran sudah ditulis di docs/aturan-bisnis-saat-ini.md 3 Okt malam).
 
 ## Tugas Hadi
-1. CRON_SECRET sudah dipasang + Redeploy (3 Okt malam). Besok (4 Okt) setelah 06.00 WIB cek Vercel > Logs /api/cron/harian: 200 = jalan, 401 = kunci tidak cocok.
+1. CRON_SECRET sudah dipasang + Redeploy (3 Okt malam). 4 Okt setelah 06.00 WIB cek Vercel > Logs /api/cron/harian: 200 = jalan, 401 = kunci tidak cocok. Sekalian cek Settings > Functions: Fluid Compute aktif? (mengurangi server "bangun tidur").
 2. **14 Okt 2026 (INGATKAN Hadi di awal sesi pada/sesudah tanggal ini):** jalankan ulang isi-jadwal-dummy --apply di production (jam kosong contoh habis sekitar 13 Okt; tanpa itu coach contoh hilang dari halaman beli paket). Pengingat cukup catatan ini (Hadi pilih A, bukan kalender).
 3. Production: akhiri-paket-lama (lihat dulu, lalu --apply); belum tercatat sudah dijalankan.
 4. Tombol GitHub Actions > Uji Pulih Backup sekali.

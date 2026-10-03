@@ -105,13 +105,17 @@ export default async function MemberBookingPage() {
         </div>
       )}
 
-      {/* Mobile: collapse -- biar ada ruang buat elemen lain di atas
-          BookingBoard (misal date picker), teks kebijakan lengkap gak
-          wajib kebaca tiap buka halaman, tinggal tap kalau perlu.
-          Desktop: tetep full text, ruang gak jadi masalah di layar lebar. */}
-      <details className="mb-6 rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:hidden">
+      <BookingBoard
+        dependents={children.map((c) => ({ id: c.id, name: c.name }))}
+        packageOptions={packageOptions}
+        pools={pools}
+      />
+      {/* Rombak UI 4 Okt: kebijakan pembatalan di bawah papan booking (bukan di
+          atas) supaya pilihan peserta/kolam/jam langsung terlihat; tetap bisa
+          dibuka kapan saja. */}
+      <details className="mt-6 rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted">
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between font-medium text-text marker:content-none [&::-webkit-details-marker]:hidden">
-          KEBIJAKAN PEMBATALAN
+          Kebijakan pembatalan
           <svg
             viewBox="0 0 20 20"
             fill="currentColor"
@@ -126,25 +130,10 @@ export default async function MemberBookingPage() {
         </summary>
         <p className="mt-2">
           Pembatalan booking paling lambat {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
-          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan: sesi tetap terpakai dan
+          batal paket (tertera di atas). Tidak hadir tanpa pembatalan: sesi tetap terpakai dan
           tidak dikembalikan. Jatah habis? Hubungi admin lewat WhatsApp.
         </p>
       </details>
-
-      <div className="mb-6 hidden rounded-lg border border-border bg-surface-muted px-4 py-3 text-xs text-text-muted sm:block">
-        <p className="mb-1 font-medium text-text">KEBIJAKAN PEMBATALAN</p>
-        <p>
-          Pembatalan booking paling lambat {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
-          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan: sesi tetap terpakai dan
-          tidak dikembalikan. Jatah habis? Hubungi admin lewat WhatsApp.
-        </p>
-      </div>
-
-      <BookingBoard
-        dependents={children.map((c) => ({ id: c.id, name: c.name }))}
-        packageOptions={packageOptions}
-        pools={pools}
-      />
     </main>
   );
 }
