@@ -22,6 +22,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/admin/booking-overview", label: "Jadwal Booking", icon: "calendar", group: "Operasional" },
     { href: "/admin/laporan-kehadiran", label: "Laporan Kehadiran", icon: "clipboard-check", group: "Operasional" },
     { href: "/admin/ganti-coach", label: "Ganti Coach", icon: "users", group: "Operasional" },
+    { href: "/admin/coach-tanpa-jadwal", label: "Coach Tanpa Jadwal", icon: "clock", group: "Operasional" },
     { href: "/admin/users", label: "Pengguna", icon: "users", group: "Mitra & Member" },
     { href: "/admin/kolam", label: "Kolam", icon: "package", group: "Mitra & Member" },
     { href: "/admin/peminat-kota", label: "Peminat per Kota", icon: "users", group: "Mitra & Member" },

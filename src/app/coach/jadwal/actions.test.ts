@@ -9,6 +9,7 @@ const sendPushToUsers = vi.fn();
 vi.mock("@/lib/push", () => ({ sendPushToUsers: (...a: unknown[]) => sendPushToUsers(...a) }));
 const notifyUser = vi.fn();
 vi.mock("@/lib/notify", () => ({ notifyUser: (...a: unknown[]) => notifyUser(...a) }));
+vi.mock("@/lib/coach-pools", () => ({ notifyWaitlistForPool: vi.fn().mockResolvedValue(0) }));
 const takeAttempt = vi.fn().mockResolvedValue("hit-1");
 vi.mock("@/lib/rate-limit", () => ({ takeAttempt: (...a: unknown[]) => takeAttempt(...a) }));
 const ownershipFindMany = vi.fn().mockResolvedValue([{ ownerId: "owner-1" }]);

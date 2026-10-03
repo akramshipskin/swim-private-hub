@@ -1,6 +1,6 @@
 # Draf rev.3: Perjanjian Coach, MOU Kolam, S&K, Kebijakan Pengembalian (3 Okt 2026)
 
-Status: DRAF untuk orang hukum. Disusun Claude dari keputusan Hadi 3 Okt (docs/KEPUTUSAN.md) dan rancangan docs/designs/kota-coach-kolam.md. Belum dipasang di aplikasi. Teks LAMA = teks yang tayang sekarang (rev.2 / S&K 2 Oktober 2026).
+Status: DRAF untuk orang hukum (direvisi 3 Okt sore: pengajuan ganti coach biasa tetap di kolam yang sama; syarat 4 jam kosong; kapasitas boleh dikosongkan). Disusun Claude dari keputusan Hadi 3 Okt (docs/KEPUTUSAN.md) dan rancangan docs/designs/kota-coach-kolam.md. Belum dipasang di aplikasi. Teks LAMA = teks yang tayang sekarang (rev.2 / S&K 2 Oktober 2026).
 
 Cara baca: tiap butir berisi LAMA (teks sekarang), BARU (usulan), dan ALASAN. Butir yang tidak disebut tidak berubah.
 
@@ -31,9 +31,9 @@ ALASAN: perlindungan member dari coach yang tidak membuka jadwal (keputusan 3 Ok
 LAMA: Member dapat dipindahkan ke Coach lain di Kolam Mitra yang sama atas pengajuan Member yang disetujui SPH. Coach sebelumnya diberi tahu, jadwal yang belum berlangsung dibatalkan, dan Sesi yang sudah diajar tetap dibayar dengan harga Coach sebelumnya. Coach tidak berhak atas sisa Sesi yang dipindahkan.
 (nomor butir mengikuti urutan di halaman; ini butir "Member dapat dipindahkan ...")
 
-BARU: Member dapat dipindahkan ke Coach lain, di Kolam Mitra yang sama atau Kolam Mitra lain di kota yang sama, atas pengajuan Member yang disetujui SPH, atau tanpa persetujuan SPH dalam keadaan Pasal 3 butir [kewajiban menyediakan jadwal] huruf b. Coach sebelumnya diberi tahu, jadwal yang belum berlangsung dibatalkan, dan Sesi yang sudah diajar tetap dibayar dengan harga Coach sebelumnya. Coach tidak berhak atas sisa Sesi yang dipindahkan.
+BARU: Member dapat dipindahkan ke Coach lain di Kolam Mitra yang sama atas pengajuan Member yang disetujui SPH, atau, dalam keadaan Pasal 3 butir [kewajiban menyediakan jadwal] huruf b, tanpa persetujuan SPH ke Coach di Kolam Mitra yang sama atau Kolam Mitra lain di kota yang sama. Coach sebelumnya diberi tahu, jadwal yang belum berlangsung dibatalkan, dan Sesi yang sudah diajar tetap dibayar dengan harga Coach sebelumnya. Coach tidak berhak atas sisa Sesi yang dipindahkan.
 
-ALASAN: ganti coach boleh ke kolam lain sekota; ganti gratis hari ke-10.
+ALASAN: ganti coach tanpa biaya hari ke-10 boleh ke kolam lain sekota (pengajuan biasa tetap di kolam yang sama).
 
 ### A4. Pasal 4, butir peralihan paket lama (DIHAPUS)
 LAMA: Untuk Sesi dari paket yang dibeli sebelum 2 Oktober 2026, bagi hasil mengikuti ketentuan lama, yaitu persentase bagi hasil yang tercatat untuk Kolam Mitra tempat Sesi diajar pada saat Sesi ditandai, tanpa potongan PPh 0,5%.
@@ -56,7 +56,7 @@ ALASAN: aturan 5% dihapus dari aplikasi (2 Okt malam).
 ### B1. Pasal 1 butir 6 (kapasitas)
 LAMA: SPH tidak menetapkan batas jumlah les yang berjalan bersamaan di Kolam Mitra. Bila kapasitas kolam terganggu, Kolam Mitra memberi tahu SPH, dan SPH menyesuaikan jadwal yang tampil di Aplikasi paling lambat 1x24 (satu kali dua puluh empat) jam sejak pemberitahuan diterima.
 
-BARU: Kolam Mitra menetapkan sendiri kapasitas harian untuk Sesi melalui Aplikasi, yaitu jumlah Sesi dari SPH yang masih dapat diterima kolam dalam satu hari, dengan memperhitungkan pengunjung kolam dari sumber lain. Satu Sesi terdiri atas 1 (satu) Coach, 1 (satu) Peserta, dan 1 (satu) pendamping. Kolam Mitra dapat mengubah kapasitas ini kapan saja. Bila kapasitas suatu hari sudah terpenuhi, Aplikasi tidak menerima pemesanan baru di Kolam Mitra itu untuk hari tersebut. Penurunan kapasitas tidak membatalkan Sesi yang sudah dipesan. Selama kapasitas belum diisi, Aplikasi tidak membatasi jumlah Sesi per hari.
+BARU: Kolam Mitra menetapkan sendiri kapasitas harian untuk Sesi melalui Aplikasi, yaitu jumlah Sesi dari SPH yang masih dapat diterima kolam dalam satu hari, dengan memperhitungkan pengunjung kolam dari sumber lain. Satu Sesi terdiri atas 1 (satu) Coach, 1 (satu) Peserta, dan 1 (satu) pendamping. Kolam Mitra dapat mengubah kapasitas ini kapan saja. Bila kapasitas suatu hari sudah terpenuhi, Aplikasi tidak menerima pemesanan baru di Kolam Mitra itu untuk hari tersebut. Penurunan kapasitas tidak membatalkan Sesi yang sudah dipesan. Selama kapasitas belum diisi atau dikosongkan, Aplikasi tidak membatasi jumlah Sesi per hari.
 
 ALASAN: kapasitas harian dari SPH (keputusan 3 Okt, per hari; kolam lama tanpa isian = tanpa batas).
 
@@ -84,6 +84,9 @@ BARU: (dihapus). ALASAN: sama dengan A4.
 LAMA: Untuk paket yang dibayar sebelum 3 Oktober 2026, komisi tetap 5% dari jumlah yang dibayar Member untuk paket pertamanya.
 BARU: (dihapus). ALASAN: sama dengan A5.
 
+### B7. Butir baru: syarat tampil coach (S&K, Paket)
+BARU: "Coach tampil untuk dibeli bila memiliki minimal 4 (empat) jam kosong yang dapat dipesan dalam 14 (empat belas) hari ke depan di Kolam Mitra tersebut."
+
 ### B6. Pasal 5 (bagi hasil), butir baru tentang pindah kolam
 BARU: "Bila Member berpindah Coach ke Kolam Mitra lain sesuai Syarat & Ketentuan, Sesi yang sudah berlangsung di Kolam Mitra tetap dibayar sesuai harga Kolam Mitra dalam paket; Kolam Mitra tidak berhak atas sisa Sesi yang dipindahkan."
 
@@ -103,7 +106,7 @@ BARU: "Member mencantumkan kota domisili. Aplikasi menampilkan Kolam Mitra dan C
 ### C3. Butir penggantian Coach
 LAMA: Member dapat mengajukan penggantian Coach untuk sisa Sesi paket melalui Aplikasi dengan menyebutkan alasan. Penggantian hanya ke Coach lain yang mengajar di Kolam Mitra yang sama dan memasang harga untuk ukuran paket tersebut, dan berlaku setelah disetujui administrator; ... (sisanya tetap)
 
-BARU: Member dapat mengajukan penggantian Coach untuk sisa Sesi paket melalui Aplikasi dengan menyebutkan alasan. Penggantian ke Coach lain yang mengajar di Kolam Mitra yang sama atau Kolam Mitra lain di kota yang sama dan memasang harga untuk ukuran paket tersebut, dan berlaku setelah disetujui administrator; ... (sisanya tetap: hitung ulang harga kolam dan Coach baru beserta Biaya Layanannya, lebih murah = Saldo Member, lebih mahal = bayar selisih 24 jam).
+BARU: tidak berubah (pengajuan biasa tetap hanya ke Coach di Kolam Mitra yang sama).
 
 Ditambah butir baru:
 "Penggantian Coach tanpa biaya. Bila selama 10 (sepuluh) hari berturut-turut Coach tidak membuka jadwal yang dapat dipesan Member padahal paket masih memiliki Sesi belum terjadwal, Aplikasi memberi tahu Member dan Member dapat langsung mengganti Coach tanpa persetujuan administrator ke Coach di kota yang sama yang memiliki jadwal tersedia, selama harga sisa Sesi dengan Coach dan Kolam Mitra baru sama atau lebih murah. Selisih yang lebih murah masuk ke Saldo Member. Penggantian ke Coach yang lebih mahal mengikuti pengajuan biasa. Masa berlaku paket tidak diperpanjang."

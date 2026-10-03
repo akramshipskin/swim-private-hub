@@ -11,10 +11,13 @@ import { releaseStalePayments } from "@/lib/stale-payments";
 import { COACH_CHANGE_PAY_WINDOW_MS } from "@/lib/coach-change-rules";
 import { CoachChangeForm, PayDifferenceButton } from "./coach-change-form";
 import { withdrawCoachChange } from "./coach-change-actions";
+import { FreeChangeButton } from "./free-change-button";
+import { freeChangePrices, sessionValue } from "@/lib/coach-change";
 import { formatRupiah } from "@/lib/format";
 import { formatBps, pack8SavingPercent, packQuote, trialQuote } from "@/lib/pricing";
 import { CITIES, isCity, NEARBY_CITIES, OTHER_CITY_WARNING } from "@/lib/cities";
 import { joinCityWaitlist } from "./waitlist-actions";
+import { meetsOpenSlotRule, openSlotStats, pairKey } from "@/lib/coach-open-slots";
 import { Button } from "@/components/ui/button";
 
 const statusTone = {
@@ -41,7 +44,7 @@ function toDateLabelFromDate(d: Date) {
 
 export const metadata = { title: "Paket Saya | Swim Private Hub" };
 
-export default async function MemberPaketPage({ searchParams }: { searchParams: Promise<{ kota?: string }> }) {
+export default async function MemberPaketPage({ searchParams }: { searchParams: Promise<{ kota?: string; ganti?: string }> }) {
   const session = await requireRole("MEMBER");
   const now = new Date();
   const paymentCutoff = new Date(now.getTime() - PAYMENT_WINDOW_MS);
@@ -63,7 +66,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
       orderBy: { createdAt: "desc" },
       include: {
         dependent: { select: { name: true, isSelf: true } },
-        pool: { select: { id: true, name: true } },
+        pool: { select: { id: true, name: true, city: true } },
         // Sesi yang sudah dijadwalkan tapi belum berjalan: bedakan "semua sesi
         // sudah dijadwalkan" dari "sesi habis" (temuan sweeping 2 Okt, no. 8).
         _count: { select: { bookings: { where: { status: "BOOKED", attended: null } } } },
@@ -123,6 +126,8 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
   // Peserta yang masih boleh beli trial (belum pernah punya paket).
   const trialChildren = children.filter((c) => c._count.packages === 0);
 
+  // Syarat tampil (Hadi 3 Okt): coach minimal 4 jam kosong dalam 14 hari di kolam itu.
+  const slotStats = await openSlotStats(pools.flatMap((p) => p.affiliations.map((a) => ({ coachId: a.coach.id, poolId: p.id }))), now);
   // Kombinasi kolam + coach yang bisa dibeli (keduanya sudah memasang harga).
   const allOffers = pools
     .map((pool) => ({
@@ -134,12 +139,13 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
           const eight = packQuote(pool, prices, 8);
           return { coach, four, eight, trial: trialQuote(pool, prices), saving: four && eight ? pack8SavingPercent(four, eight) : 0 };
         })
-        .filter((c) => c.four || c.eight),
+        .filter((c) => (c.four || c.eight) && meetsOpenSlotRule(slotStats.get(pairKey(c.coach.id, pool.id))))
+        .map((c) => ({ ...c, nearest: slotStats.get(pairKey(c.coach.id, pool.id))!.nearest! })),
     }))
     .filter((o) => o.coaches.length > 0);
   // Saringan kota (Hadi 3 Okt): bawaan kota domisili member; kota lain boleh
   // dengan peringatan. Kolam tanpa kota tidak tampil sampai kotanya diisi.
-  const { kota } = await searchParams;
+  const { kota, ganti } = await searchParams;
   const homeCity = me.city;
   const city = isCity(kota) ? kota : homeCity;
   const offers = allOffers.filter((o) => o.pool.city === city);
@@ -167,6 +173,60 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
   ) : (
     <Badge tone="neutral">Belum ada paket</Badge>
   );
+
+  // Ganti coach tanpa biaya hari ke-10 (Hadi 3 Okt): coach di kolam sama atau
+  // kolam lain sekota yang lolos syarat jadwal, harga per sesi sama/lebih murah.
+  function renderFreeChange(p: (typeof packages)[number]) {
+    if (!p.freeCoachChangeAt || p.poolPrice == null || p.coachPrice == null || p.serviceFee == null) return null;
+    // Pengajuan ganti coach biasa yang masih berjalan harus selesai/dibatalkan dulu (server menolak).
+    if (p.coachChangeRequests.length > 0) return null;
+    const old = { totalSesi: p.totalSesi, poolPrice: p.poolPrice, coachPrice: p.coachPrice, serviceFee: p.serviceFee };
+    const size = p.totalSesi;
+    const options = pools
+      .filter((pool) => pool.id === p.pool.id || (p.pool.city && pool.city === p.pool.city))
+      .flatMap((pool) =>
+        pool.affiliations
+          .filter(({ coach }) => coach.id !== p.coachId && meetsOpenSlotRule(slotStats.get(pairKey(coach.id, pool.id))))
+          .map(({ coach }) => {
+            const poolPrice = size === 4 ? pool.pricePack4 : size === 8 ? pool.pricePack8 : null;
+            const coachPrice = size === 4 ? coach.coachProfile?.pricePack4 : size === 8 ? coach.coachProfile?.pricePack8 : null;
+            if (poolPrice == null || coachPrice == null) return null;
+            const diff = sessionValue(freeChangePrices(old, poolPrice, coachPrice)) - sessionValue(old);
+            return diff > 0 ? null : { pool, coach, diff };
+          }),
+      )
+      .filter((o): o is NonNullable<typeof o> => o !== null)
+      .sort((a, b) => a.diff - b.diff);
+    return (
+      <div className="flex flex-col gap-2 rounded-lg bg-warning-bg px-3 py-3 text-sm text-warning-text">
+        <p>
+          Coach kamu belum membuka jadwal. Paket tetap berlaku sampai {p.expiredDate ? formatDateLabel(p.expiredDate) : "-"} dan tidak diperpanjang. Ganti coach tanpa biaya sekarang supaya sesimu tidak hangus.
+        </p>
+        {options.length === 0 ? (
+          <p>Belum ada coach di kotamu dengan harga sama atau lebih murah yang sedang membuka jadwal. Kamu tetap bisa mengajukan ganti coach di bawah, atau hubungi admin.</p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-warning-text/15">
+            {options.map(({ pool, coach, diff }) => (
+              <li key={pool.id + coach.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <span className="min-w-0">
+                  <b>{coach.name}</b> · {pool.name}
+                  {pool.id !== p.pool.id && " (kolam lain)"}
+                  {diff < 0 ? ` · ${formatRupiah(-diff)} lebih murah per sesi, selisihnya masuk saldo` : " · harga sama"}
+                </span>
+                <FreeChangeButton
+                  packageId={p.id}
+                  toCoachId={coach.id}
+                  toPoolId={pool.id}
+                  title={`Pindah ke ${coach.name}?`}
+                  description={`Sisa sesi pindah ke ${coach.name} di ${pool.name}. Jadwal yang belum berjalan dengan coach lama dibatalkan dan sesinya kembali ke paket.${diff < 0 ? " Selisih harga masuk ke saldomu." : ""}`}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  }
 
   function renderCoachChange(p: (typeof packages)[number]) {
     const req = p.coachChangeRequests[0];
@@ -219,6 +279,9 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
         {membershipBadge}
       </div>
 
+      {ganti === "ok" && (
+        <p role="status" className="mb-4 rounded-lg bg-success-bg px-3 py-2 text-sm text-success-text">Coach berhasil diganti. Booking ulang jadwalmu di menu Booking.</p>
+      )}
       {wallet && (wallet.memberBalance > 0 || wallet.memberWalletTransactions.length > 0) && (
         <Card className="mb-6">
           <CardBody className="flex flex-col gap-2">
@@ -295,7 +358,10 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                             <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
                           )}
                           {p.status === "ACTIVE" && !expired && p.coachId && p.poolPrice != null && !p.isTrial && (
-                            <div className="w-full">{renderCoachChange(p)}</div>
+                            <div className="flex w-full flex-col gap-2">
+                              {renderFreeChange(p)}
+                              {renderCoachChange(p)}
+                            </div>
                           )}
                         </li>
                       );
@@ -405,7 +471,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                 </div>
 
                 <ul className="flex flex-col gap-3">
-                  {coaches.map(({ coach, four, eight, trial, saving }) => (
+                  {coaches.map(({ coach, four, eight, trial, saving, nearest }) => (
                     <li key={coach.id} className="rounded-xl border border-border bg-surface-muted p-4">
                       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
                         <div className="min-w-0">
@@ -414,6 +480,9 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                           {coach.coachProfile!.specialties.length > 0 && (
                             <p className="text-sm text-text-muted">{coach.coachProfile!.specialties.join(" · ")}</p>
                           )}
+                          <p className="text-sm text-text-muted">
+                            Jadwal terdekat: <b className="text-text">{nearest.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "short", timeZone: "Asia/Jakarta" })}, {formatTimeWib(nearest)} WIB</b>
+                          </p>
                         </div>
                         <a href={`/pelatih/${coach.id}`} className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                           Lihat profil coach

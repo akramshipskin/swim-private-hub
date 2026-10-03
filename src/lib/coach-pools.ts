@@ -7,6 +7,7 @@ import { removeOpenSlots } from "@/lib/availability";
 import { STALE_PAYMENT_MS } from "@/lib/stale-payments";
 import { notifyUser } from "@/lib/notify";
 import { PACK_SIZES, packQuote } from "@/lib/pricing";
+import { meetsOpenSlotRule, openSlotStats, pairKey } from "@/lib/coach-open-slots";
 
 export type PickResult = "OK" | "POOL_UNAVAILABLE" | "COACH_INACTIVE";
 export type ReleaseResult = "OK" | "NOT_PICKED" | "HAS_MEMBERS";
@@ -79,8 +80,9 @@ export async function releaseCoachPool(coachId: string, poolId: string, now = ne
 // tahu sekali, begitu kota itu punya paket yang bisa dibeli: kolam aktif + coach
 // aktif yang memilih kolam itu, dengan harga ukuran paket YANG SAMA (aturan
 // packQuote, sama dengan halaman Paket member). Dipanggil di semua jalur yang
-// bisa membuka paket pertama: coach memilih kolam, harga coach/kolam diubah,
-// kota kolam diisi, admin menautkan coach, admin mengaktifkan kolam/coach.
+// bisa membuka paket pertama: coach memilih kolam, coach menambah jam kosong,
+// harga coach/kolam diubah, kota kolam diisi, admin menautkan coach, admin
+// mengaktifkan kolam/coach.
 // ponytail: push dikirim berurutan di dalam permintaan pemicu; bila daftar
 // tunggu ratusan orang, pindahkan ke pekerjaan latar.
 export async function cityHasOffer(city: string) {
@@ -90,11 +92,16 @@ export async function cityHasOffer(city: string) {
       coach: { role: "COACH", isActive: true, coachProfile: { isActive: true } },
     },
     select: {
+      poolId: true,
+      coachId: true,
       pool: { select: { name: true, pricePack4: true, pricePack8: true, serviceFeeBps: true } },
       coach: { select: { coachProfile: { select: { pricePack4: true, pricePack8: true } } } },
     },
   });
-  return pairs.find(({ pool, coach }) => PACK_SIZES.some((size) => packQuote(pool, coach.coachProfile!, size)))?.pool ?? null;
+  const priced = pairs.filter(({ pool, coach }) => PACK_SIZES.some((size) => packQuote(pool, coach.coachProfile!, size)));
+  // Sama dengan halaman Paket: coach juga harus punya cukup jam kosong.
+  const stats = await openSlotStats(priced.map(({ coachId, poolId }) => ({ coachId, poolId })));
+  return priced.find(({ coachId, poolId }) => meetsOpenSlotRule(stats.get(pairKey(coachId, poolId))))?.pool ?? null;
 }
 
 export async function notifyCityWaitlist(city: string) {

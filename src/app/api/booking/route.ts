@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       // gak pernah berubah, jadi baca-dulu di sini aman dari race.
       const slot = await tx.availability.findUnique({
         where: { id: availabilityId },
-        select: { poolId: true, coachId: true, startTime: true, endTime: true, pool: { select: { isActive: true, openTime: true, closeTime: true } } },
+        select: { poolId: true, coachId: true, date: true, startTime: true, endTime: true, pool: { select: { isActive: true, openTime: true, closeTime: true, dailyCapacity: true } } },
       });
       if (!slot) {
         throw new BookingError("Slot tidak ditemukan.", 404);
@@ -85,6 +85,19 @@ export async function POST(request: Request) {
       // Kolam tanpa jam buka tidak dibatasi (slot lama tetap bisa dibooking, #7).
       if (!withinPoolHours(slot.pool, slot.startTime, slot.endTime)) {
         throw new BookingError(`Jadwal ini di luar jam buka kolam (${poolHoursLabel(slot.pool)}). Pilih jadwal lain.`, 409);
+      }
+
+      // Kapasitas harian kolam untuk pelanggan SPH (Hadi 3 Okt): booking baru
+      // ditolak bila hari itu sudah penuh; booking lama tidak disentuh saat
+      // kapasitas diturunkan. Kunci per kolam-per tanggal supaya dua booking
+      // bersamaan tidak sama-sama lolos di kursi terakhir. null = tanpa batas.
+      if (slot.pool.dailyCapacity != null) {
+        const day = slot.date.toISOString().slice(0, 10);
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`pool-day:${slot.poolId}:${day}`}))`;
+        const taken = await tx.booking.count({ where: { status: "BOOKED", availability: { poolId: slot.poolId, date: slot.date } } });
+        if (taken >= slot.pool.dailyCapacity) {
+          throw new BookingError("Kolam ini sudah penuh untuk tanggal tersebut. Pilih tanggal lain.", 409);
+        }
       }
 
       // Paket harus masih berlaku SAAT SESINYA, bukan cuma hari ini (keputusan

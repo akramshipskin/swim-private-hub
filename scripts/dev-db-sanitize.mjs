@@ -125,7 +125,8 @@ export const POLICY = {
   },
   WalletTransaction: keep("id", "type", "poolId", "coachProfileId", "amount", "paymentId", "bookingId", "withdrawalRequestId", "note", "createdById", "idempotencyKey", "createdAt"),
   PackageTemplate: keep("id", "poolId", "name", "totalSesi", "price", "durationDays", "jatahCancel", "isTrial", "isActive", "pendingChanges", "createdAt"),
-  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt", "coachId", "poolPrice", "coachPrice", "serviceFee", "durationDays", "saldoUsed"),
+  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt", "coachId", "poolPrice", "coachPrice", "serviceFee", "durationDays", "saldoUsed", "noSlotSince", "freeCoachChangeAt"),
+  CoachViolation: keep("id", "coachId", "packageId", "episodeStart", "createdAt"),
   Availability: keep("id", "coachId", "poolId", "date", "startTime", "endTime", "kapasitas", "status", "recurrenceRule", "createdAt"),
   PoolOwnership: keep("id", "poolId", "ownerId", "createdAt"),
   PoolAffiliation: keep("id", "poolId", "coachId", "createdAt"),
@@ -133,7 +134,7 @@ export const POLICY = {
   // Saldo member & ganti coach (Hadi 2 Okt): angka disalin; teks bebas disamarkan.
   MemberWalletTransaction: keep("id", "memberId", "type", "amount", "packageId", "coachChangeRequestId", "note", "createdAt"),
   CoachChangeRequest: {
-    ...keep("id", "packageId", "memberId", "fromCoachId", "toCoachId", "status", "sessions", "amount", "newCoachPrice", "oldCoachPrice", "oldServiceFee", "saldoUsed", "decidedAt", "completedAt", "createdAt"),
+    ...keep("id", "packageId", "memberId", "fromCoachId", "toCoachId", "status", "sessions", "amount", "newCoachPrice", "oldCoachPrice", "oldServiceFee", "fromPoolId", "oldPoolPrice", "free", "saldoUsed", "decidedAt", "completedAt", "createdAt"),
     reason: () => "Alasan ganti coach (disamarkan)",
     adminNote: (r) => (r.adminNote == null ? null : "Catatan admin (disamarkan)"),
   },

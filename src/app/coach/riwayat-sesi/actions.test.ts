@@ -18,7 +18,7 @@ function makeTx() {
   return {
     booking: { updateMany: (...args: unknown[]) => bookingUpdateMany(...args) },
     // pricesForSessionCoach: tidak ada ganti coach yang selesai.
-    coachChangeRequest: { findFirst: vi.fn().mockResolvedValue(null) },
+    coachChangeRequest: { findMany: vi.fn().mockResolvedValue([]) },
   };
 }
 

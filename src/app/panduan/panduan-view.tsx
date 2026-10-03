@@ -64,7 +64,7 @@ const GUIDES: Guide[] = [
       {
         heading: "2. Beli paket",
         steps: [
-          { title: "Pilih kolam dan coach", body: "Setiap kolam menampilkan alamat, jam buka, fasilitas, foto, dan coach yang mengajar di sana. Paket hanya berlaku untuk coach itu di kolam itu." },
+          { title: "Pilih kota, kolam, dan coach", body: "Kolam di kota domisilimu tampil lebih dulu (kota lain tetap bisa dipilih). Setiap kolam menampilkan alamat, jam buka, fasilitas, foto, dan coach yang mengajar di sana beserta jadwal terdekatnya. Paket hanya berlaku untuk coach itu di kolam itu." },
           { title: "Pilih paket dan pesertanya", body: "Paket 4 atau 8 sesi, dengan rincian harga kolam, coach, dan biaya layanan SPH. Peserta yang belum pernah punya paket bisa beli 1 sesi coba." },
           { title: "Bayar lewat Midtrans", body: "Virtual account, QRIS, atau e-wallet. Paket aktif otomatis setelah pembayaran masuk, dan semua transaksi tercatat di menu Riwayat Bayar." },
         ],
@@ -106,7 +106,7 @@ const GUIDES: Guide[] = [
       {
         heading: "1. Buka jadwal",
         steps: [
-          { title: "Pilih kolam dan tanggal", body: "Kolam yang muncul hanya kolam tempat kamu terdaftar." },
+          { title: "Pilih kolam dan tanggal", body: "Kolam yang muncul hanya kolam yang kamu pilih di menu Kolam Saya." },
           { title: "Pilih jam mulai dan selesai", body: "Rentang jam otomatis dipecah jadi slot per jam. Misalnya 08.00–10.00 jadi dua slot: 08–09 dan 09–10." },
           { title: "Klik Tambah Slot", body: "Slot langsung bisa dibooking member. Member aktif yang sudah menyalakan notifikasi otomatis diberi tahu." },
         ],

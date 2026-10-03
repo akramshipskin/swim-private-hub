@@ -2,17 +2,17 @@
 // Isinya mengikuti alur sistem yang berjalan sekarang, bukan janji baru.
 const STEPS = {
   coach: [
-    "Isi formulir ini dan setujui Perjanjian Kemitraan Coach.",
+    "Isi formulir ini (termasuk kota dan harga paketmu) dan setujui Perjanjian Kemitraan Coach.",
     "Admin SPH meninjau dan menyetujui akunmu.",
-    "Lengkapi foto, sertifikat, dan harga paket 4 & 8 sesimu.",
-    "Admin menghubungkanmu ke kolam mitra, lalu kamu buka jadwal di dalam jam buka kolam.",
+    "Lengkapi foto dan sertifikat, lalu pilih sendiri kolam mitra tempat mengajar di menu Kolam Saya.",
+    "Buka jadwal di dalam jam buka kolam; member bisa membeli paket denganmu setelah ada minimal 4 jam kosong dalam 14 hari.",
     "Mengajar, tandai kehadiran, isi catatan perkembangan. Bagianmu masuk saldo dan cair paling lambat 7 hari kerja.",
   ],
   kolam: [
-    "Isi formulir ini dan setujui MOU Kolam Mitra.",
+    "Isi formulir ini (alamat lengkap, harga tiket, kapasitas harian) dan setujui MOU Kolam Mitra.",
     "Admin SPH meninjau dan menyetujui kolammu.",
-    "Lengkapi info, jam buka, foto, dan harga tiket paket 4 & 8 sesi.",
-    "Admin menghubungkan coach ke kolammu; coach membuka jadwal di dalam jam buka.",
+    "Lengkapi info dan foto kolam; kapasitas harian bisa diubah kapan saja.",
+    "Coach di kotamu memilih kolammu dan membuka jadwal di dalam jam buka.",
     "Bagian kolam masuk saldo setiap sesi Hadir dan cair paling lambat 7 hari kerja.",
   ],
 } as const;

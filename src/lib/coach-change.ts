@@ -58,16 +58,21 @@ export async function pricesForSessionCoach(
   sessionStart: Date
 ) {
   if (pkg.poolPrice == null || pkg.coachPrice == null || pkg.serviceFee == null) return null;
-  const next = await tx.coachChangeRequest.findFirst({
+  const later = await tx.coachChangeRequest.findMany({
     // gte: booking yang mulai TEPAT saat ganti coach selesai tidak dibatalkan
     // (pembatalan hanya startTime > sekarang), jadi masih milik coach lama.
     where: { packageId: pkg.id, status: "COMPLETED", completedAt: { gte: sessionStart } },
     orderBy: { completedAt: "asc" },
-    select: { fromCoachId: true, oldCoachPrice: true, oldServiceFee: true },
+    select: { fromCoachId: true, oldCoachPrice: true, oldServiceFee: true, oldPoolPrice: true },
   });
+  const next = later[0];
   if (next) {
     if (next.fromCoachId !== coachId || next.oldCoachPrice == null || next.oldServiceFee == null) return null;
-    return { poolPrice: pkg.poolPrice, coachPrice: next.oldCoachPrice, serviceFee: next.oldServiceFee };
+    // Harga kolam periode itu: harga sebelum pindah kolam pertama setelah sesi
+    // (ganti coach tanpa biaya bisa pindah kolam, Hadi 3 Okt). Pengajuan lama
+    // tanpa catatan harga kolam = kolam tidak berubah di ganti itu.
+    const poolPrice = later.find((c) => c.oldPoolPrice != null)?.oldPoolPrice ?? pkg.poolPrice;
+    return { poolPrice, coachPrice: next.oldCoachPrice, serviceFee: next.oldServiceFee };
   }
   if (pkg.coachId !== coachId) return null;
   return { poolPrice: pkg.poolPrice, coachPrice: pkg.coachPrice, serviceFee: pkg.serviceFee };
@@ -127,20 +132,7 @@ export async function completeCoachChange(
     return { ok: false, error: "Sisa sesi berubah sejak disetujui. Ajukan ulang supaya selisihnya dihitung ulang." };
   }
 
-  // Booking yang belum mulai dengan coach lama: dibatalkan, sesi kembali.
-  const future = await tx.booking.findMany({
-    where: { packageId: pkg.id, status: "BOOKED", attended: null, availability: { startTime: { gt: now } } },
-    select: { id: true, availabilityId: true },
-  });
-  for (const b of future) {
-    const c = await tx.booking.updateMany({
-      where: { id: b.id, status: "BOOKED", attended: null },
-      data: { status: "CANCELLED", cancelledBy: "ADMIN", cancelledAt: now },
-    });
-    if (c.count === 0) continue;
-    await tx.availability.update({ where: { id: b.availabilityId }, data: { status: "AVAILABLE" } });
-    await tx.package.update({ where: { id: pkg.id }, data: { sisaSesi: { increment: 1 } } });
-  }
+  await cancelFutureBookings(tx, pkg.id, now);
 
   await tx.package.update({
     where: { id: pkg.id },
@@ -148,6 +140,10 @@ export async function completeCoachChange(
       coachId: req.toCoachId,
       coachPrice: newPrices.coachPrice,
       serviceFee: newPrices.serviceFee,
+      // Coach baru mulai dari nol: kejadian "tanpa jadwal" coach lama selesai,
+      // dan hak ganti tanpa biaya dianggap sudah dipakai (Hadi 3 Okt, dikonfirmasi).
+      noSlotSince: null,
+      freeCoachChangeAt: null,
       name: `${pkg.isTrial ? "Sesi coba" : `Paket ${pkg.totalSesi} sesi`} · ${toCoach.name}`,
     },
   });
@@ -166,9 +162,143 @@ export async function completeCoachChange(
   }
   await tx.coachChangeRequest.update({
     where: { id: req.id },
-    data: { status: "COMPLETED", completedAt: now, sessions: sessionsNow, oldCoachPrice: pkg.coachPrice, oldServiceFee: pkg.serviceFee },
+    data: { status: "COMPLETED", completedAt: now, sessions: sessionsNow, oldCoachPrice: pkg.coachPrice, oldServiceFee: pkg.serviceFee, oldPoolPrice: pkg.poolPrice, fromPoolId: pkg.poolId },
   });
   return { ok: true, credited };
+}
+
+// Booking yang belum mulai dengan coach lama: dibatalkan, sesi kembali ke paket.
+async function cancelFutureBookings(tx: Prisma.TransactionClient, packageId: string, now: Date) {
+  const future = await tx.booking.findMany({
+    where: { packageId, status: "BOOKED", attended: null, availability: { startTime: { gt: now } } },
+    select: { id: true, availabilityId: true },
+  });
+  for (const b of future) {
+    const c = await tx.booking.updateMany({
+      where: { id: b.id, status: "BOOKED", attended: null },
+      data: { status: "CANCELLED", cancelledBy: "ADMIN", cancelledAt: now },
+    });
+    if (c.count === 0) continue;
+    await tx.availability.update({ where: { id: b.availabilityId }, data: { status: "AVAILABLE" } });
+    await tx.package.update({ where: { id: packageId }, data: { sisaSesi: { increment: 1 } } });
+  }
+}
+
+// Ganti coach tanpa biaya (Hadi 3 Okt): setelah 10 hari coach tidak membuka
+// jadwal (Package.freeCoachChangeAt, src/lib/coach-slot-watch.ts), member boleh
+// langsung pindah tanpa persetujuan admin ke coach di kolam yang sama ATAU
+// kolam lain sekota, selama harga per sesi baru (kolam + coach + biaya layanan
+// dengan tarif saat beli) SAMA atau LEBIH MURAH. Lebih murah = selisih sisa
+// sesi ke saldo member. Lebih mahal = pengajuan biasa lewat admin.
+export function freeChangePrices(p: PkgPrices, newPoolPrice: number, newCoachPrice: number): PkgPrices {
+  const oldBase = p.poolPrice + p.coachPrice;
+  const serviceFee = oldBase > 0 ? Math.round((p.serviceFee * (newPoolPrice + newCoachPrice)) / oldBase) : 0;
+  return { ...p, poolPrice: newPoolPrice, coachPrice: newCoachPrice, serviceFee };
+}
+
+export type FreeChangeResult = { ok: true; requestId: string; credited: number } | { ok: false; error: string };
+
+export async function freeCoachChange(
+  tx: Prisma.TransactionClient,
+  input: { memberId: string; packageId: string; toCoachId: string; toPoolId: string },
+  isEligibleCoach: (coachId: string, poolId: string) => Promise<boolean>,
+  now = new Date(),
+): Promise<FreeChangeResult> {
+  // Urutan kunci sama dengan booking (akun member dulu, baru paket) supaya
+  // booking dan ganti coach bersamaan tidak saling mengunci (deadlock):
+  // kredit saldo di bawah mengubah baris akun member.
+  await tx.$executeRaw`SELECT 1 FROM "User" WHERE id = ${input.memberId} FOR NO KEY UPDATE`;
+  // Kunci paket: tanda hadir, booking, pembatalan, dan klik ganda antre di sini.
+  await tx.$executeRaw`SELECT 1 FROM "Package" WHERE id = ${input.packageId} FOR UPDATE`;
+  const pkg = await tx.package.findFirst({
+    where: { id: input.packageId, memberId: input.memberId },
+    include: { pool: { select: { city: true } } },
+  });
+  if (!pkg) return { ok: false, error: "Paket tidak ditemukan." };
+  if (!pkg.freeCoachChangeAt) return { ok: false, error: "Paket ini belum berhak ganti coach tanpa biaya." };
+  if (pkg.status !== "ACTIVE" || (pkg.expiredDate && pkg.expiredDate <= now)) return { ok: false, error: "Paket ini sudah tidak aktif atau sudah kedaluwarsa." };
+  if (pkg.isTrial || pkg.coachId == null || pkg.poolPrice == null || pkg.coachPrice == null || pkg.serviceFee == null) {
+    return { ok: false, error: "Paket ini tidak bisa diganti coach-nya. Hubungi admin." };
+  }
+  // Paket pemberian admin (tanpa pembayaran): selisih harga tidak boleh jadi saldo uang.
+  if ((await tx.payment.count({ where: { packageId: pkg.id, status: "SUCCESS" } })) === 0) {
+    return { ok: false, error: "Paket pemberian admin: hubungi admin untuk ganti coach." };
+  }
+  if (input.toCoachId === pkg.coachId) return { ok: false, error: "Pilih coach lain." };
+  if ((await tx.coachChangeRequest.count({ where: { packageId: pkg.id, status: { in: ["PENDING", "AWAITING_PAYMENT"] } } })) > 0) {
+    return { ok: false, error: "Masih ada pengajuan ganti coach yang berjalan untuk paket ini. Batalkan dulu pengajuannya." };
+  }
+  // Tautan coach-kolam tujuan dikunci bersama, seperti checkout (coach-pools.ts).
+  const link = await tx.$queryRaw<{ id: string }[]>`
+    SELECT id FROM "PoolAffiliation" WHERE "poolId" = ${input.toPoolId} AND "coachId" = ${input.toCoachId} FOR SHARE`;
+  if (link.length === 0) return { ok: false, error: "Coach itu tidak mengajar di kolam ini." };
+  const [toPool, toCoach] = await Promise.all([
+    tx.pool.findFirst({ where: { id: input.toPoolId, isActive: true }, select: { city: true, pricePack4: true, pricePack8: true } }),
+    tx.user.findFirst({
+      where: { id: input.toCoachId, role: "COACH", isActive: true, coachProfile: { isActive: true } },
+      select: { name: true, coachProfile: { select: { pricePack4: true, pricePack8: true } } },
+    }),
+  ]);
+  if (!toPool || !toCoach?.coachProfile) return { ok: false, error: "Kolam atau coach tujuan sedang tidak aktif." };
+  if (input.toPoolId !== pkg.poolId && (!pkg.pool.city || toPool.city !== pkg.pool.city)) {
+    return { ok: false, error: "Ganti tanpa biaya hanya ke kolam di kota yang sama." };
+  }
+  const size = pkg.totalSesi;
+  const newPoolPrice = size === 4 ? toPool.pricePack4 : size === 8 ? toPool.pricePack8 : null;
+  const newCoachPrice = size === 4 ? toCoach.coachProfile.pricePack4 : size === 8 ? toCoach.coachProfile.pricePack8 : null;
+  if (newPoolPrice == null || newCoachPrice == null) return { ok: false, error: `Coach atau kolam itu belum memasang harga paket ${size} sesi.` };
+  if (!(await isEligibleCoach(input.toCoachId, input.toPoolId))) {
+    return { ok: false, error: "Coach itu belum membuka cukup jadwal. Pilih coach lain." };
+  }
+  const prices = { totalSesi: pkg.totalSesi, poolPrice: pkg.poolPrice, coachPrice: pkg.coachPrice, serviceFee: pkg.serviceFee };
+  const newPrices = freeChangePrices(prices, newPoolPrice, newCoachPrice);
+  const perSession = sessionValue(newPrices) - sessionValue(prices);
+  if (perSession > 0) return { ok: false, error: "Coach itu lebih mahal. Ganti tanpa biaya hanya ke harga yang sama atau lebih murah; ajukan lewat Ajukan ganti coach." };
+
+  await cancelFutureBookings(tx, pkg.id, now);
+  const sessionsNow = (await tx.package.findUniqueOrThrow({ where: { id: pkg.id }, select: { sisaSesi: true } })).sisaSesi;
+  await tx.package.update({
+    where: { id: pkg.id },
+    data: {
+      coachId: input.toCoachId,
+      poolId: input.toPoolId,
+      poolPrice: newPrices.poolPrice,
+      coachPrice: newPrices.coachPrice,
+      serviceFee: newPrices.serviceFee,
+      name: `Paket ${pkg.totalSesi} sesi · ${toCoach.name}`,
+      freeCoachChangeAt: null,
+      noSlotSince: null,
+    },
+  });
+  const credited = -perSession * sessionsNow;
+  const req = await tx.coachChangeRequest.create({
+    data: {
+      packageId: pkg.id,
+      memberId: input.memberId,
+      fromCoachId: pkg.coachId,
+      toCoachId: input.toCoachId,
+      reason: "Ganti coach tanpa biaya: coach sebelumnya tidak membuka jadwal 10 hari.",
+      status: "COMPLETED",
+      free: true,
+      sessions: sessionsNow,
+      amount: -credited || 0,
+      newCoachPrice,
+      oldCoachPrice: pkg.coachPrice,
+      oldServiceFee: pkg.serviceFee,
+      oldPoolPrice: pkg.poolPrice,
+      fromPoolId: pkg.poolId,
+      decidedAt: now,
+      completedAt: now,
+    },
+  });
+  if (credited > 0) {
+    await creditMember(tx, input.memberId, credited, "COACH_CHANGE_CREDIT", {
+      packageId: pkg.id,
+      coachChangeRequestId: req.id,
+      note: "Selisih ganti coach tanpa biaya ke harga lebih murah",
+    });
+  }
+  return { ok: true, requestId: req.id, credited };
 }
 
 // Pemberitahuan setelah transaksi selesai (gagal kirim tidak menggagalkan apa pun).

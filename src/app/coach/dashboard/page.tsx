@@ -7,6 +7,7 @@ import { getOverdueParticipants } from "@/lib/milestone-hold";
 import { releaseDueCommissions } from "@/lib/affiliate";
 import { AffiliateCard } from "@/components/affiliate-card";
 import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
+import { packagesWithBookableSlot, watchedPackageWhere, daysWithoutSlot, FREE_CHANGE_AFTER_DAYS } from "@/lib/coach-slot-watch";
 
 export const metadata = { title: "Dashboard Coach | Swim Private Hub" };
 
@@ -20,7 +21,7 @@ export default async function CoachDashboardPage() {
 
   await releaseDueCommissions();
   const overdue = await getOverdueParticipants(session.user.id);
-  const [profile, slots, unmarked, openThisWeek, pools] = await Promise.all([
+  const [profile, slots, unmarked, openThisWeek, pools, owed] = await Promise.all([
     prisma.coachProfile.findUnique({ where: { userId: session.user.id }, select: { id: true, walletBalance: true, certificates: { where: { status: "APPROVED" }, select: { id: true }, take: 1 } } }),
     prisma.availability.findMany({
       where: { coachId: session.user.id, date: { in: [today, tomorrow] }, status: "BOOKED" },
@@ -47,7 +48,16 @@ export default async function CoachDashboardPage() {
       where: { coachId: session.user.id, status: "AVAILABLE", startTime: { gt: now }, date: { lt: weekEnd } },
     }),
     prisma.poolAffiliation.findMany({ where: { coachId: session.user.id }, select: { pool: { select: { name: true } } } }),
+    // Sesi yang harus disediakan (Hadi 3 Okt): sisa sesi member aktif yang belum terjadwal.
+    prisma.package.findMany({
+      where: watchedPackageWhere(now, session.user.id),
+      orderBy: { expiredDate: "asc" },
+      select: { id: true, coachId: true, poolId: true, sisaSesi: true, expiredDate: true, noSlotSince: true, dependent: { select: { name: true } }, pool: { select: { name: true } } },
+    }),
   ]);
+  const owedBookable = await packagesWithBookableSlot(owed, now);
+  const owedTotal = owed.reduce((n, p) => n + p.sisaSesi, 0);
+  const owedBlocked = owed.filter((p) => !owedBookable.has(p.id));
 
   const toItem = (s: (typeof slots)[number]) => ({
     id: s.id,
@@ -69,6 +79,35 @@ export default async function CoachDashboardPage() {
               {overdue.map((o) => o.name).join(", ")} sudah {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir atau lebih tanpa catatan
               milestone darimu. Isi catatannya supaya saldo bisa dicairkan lagi.
             </p>
+          </BentoCard>
+        )}
+        {owed.length > 0 && (
+          <BentoCard title="Sesi yang harus kamu sediakan" href="/coach/jadwal" linkLabel="Buka jadwal" className="md:col-span-6">
+            <p className={`text-sm ${owedBlocked.length > 0 ? "text-danger-text" : "text-text-muted"}`}>
+              <b>{owedTotal} sesi</b> dari {owed.length} paket member belum terjadwal.
+              {owedBlocked.length > 0
+                ? ` ${owedBlocked.length} member belum bisa booking karena kamu belum membuka jam kosong di kolamnya. ${FREE_CHANGE_AFTER_DAYS} hari tanpa jadwal = member boleh pindah coach tanpa biaya dan tercatat pelanggaran.`
+                : " Semua member ini sudah bisa booking jam kosongmu."}
+            </p>
+            <ul className="mt-3 flex flex-col divide-y divide-border text-sm">
+              {owed.map((p) => {
+                const blocked = !owedBookable.has(p.id);
+                const daysLeft = p.expiredDate ? Math.max(0, Math.ceil((p.expiredDate.getTime() - now.getTime()) / 86_400_000)) : null;
+                return (
+                  <li key={p.id} className="flex flex-wrap items-baseline justify-between gap-2 py-2">
+                    <span className="min-w-0 text-text">
+                      <b>{p.dependent.name}</b> · {p.pool.name} · {p.sisaSesi} sesi belum terjadwal
+                      {daysLeft != null && ` · paket berakhir ${daysLeft} hari lagi`}
+                    </span>
+                    {blocked && (
+                      <span className="text-xs font-medium text-danger-text">
+                        Belum ada jam kosong{p.noSlotSince ? ` (hari ke-${daysWithoutSlot(p.noSlotSince, now)})` : ""}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           </BentoCard>
         )}
         <BentoCard title="Ringkasan" className="md:col-span-6">

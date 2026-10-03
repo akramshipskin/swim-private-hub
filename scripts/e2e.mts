@@ -47,6 +47,12 @@ async function seed() {
   await prisma.availability.create({
     data: { coachId: coach.id, poolId: pool.id, date: new Date(`${tomorrow}T00:00:00Z`), startTime: start, endTime: new Date(start.getTime() + 3600e3) },
   });
+  // Syarat coach bisa dibeli (Hadi 3 Okt): minimal 4 jam kosong dalam 14 hari.
+  for (const d of [2, 3, 4]) {
+    const day = ymd(new Date(Date.now() + d * 86_400_000));
+    const st = new Date(`${day}T10:00:00+07:00`);
+    await prisma.availability.create({ data: { coachId: coach.id, poolId: pool.id, date: new Date(`${day}T00:00:00Z`), startTime: st, endTime: new Date(st.getTime() + 3600e3) } });
+  }
   // Sesi 3 jam lalu milik member lain dengan paket 8 sesi yang sudah lunas, untuk jalur coach.
   const other = await prisma.user.create({ data: { name: "Member Lama Uji", phone: "089911110002", passwordHash: hash, role: "MEMBER", approvedAt: new Date() } });
   const dep = await prisma.dependent.create({ data: { memberId: other.id, name: "Anak Lama Uji" } });

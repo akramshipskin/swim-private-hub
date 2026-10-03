@@ -197,6 +197,7 @@ model User {
   coachChangeRequests      CoachChangeRequest[] @relation("CoachChangeMember")
   coachChangesFrom         CoachChangeRequest[] @relation("CoachChangeFrom")
   coachChangesTo           CoachChangeRequest[] @relation("CoachChangeTo")
+  coachViolations          CoachViolation[]
   pushSubscriptions   PushSubscription[]
   poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
   poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
@@ -510,10 +511,18 @@ model Package {
   serviceFee   Int?
   // Masa berlaku (hari) sejak aktif; null = ikut template/aturan lama.
   durationDays Int?
+  // Penjaga jadwal coach (Hadi 3 Okt, src/lib/coach-slot-watch.ts): sejak kapan
+  // paket aktif ini punya sesi belum terjadwal tetapi coach-nya tidak membuka
+  // jam yang bisa dibooking sebelum paket berakhir (null = aman). Hari ke-2
+  // coach diperingatkan tiap hari; hari ke-10 member boleh ganti coach tanpa
+  // biaya (freeCoachChangeAt) dan coach dapat catatan pelanggaran.
+  noSlotSince       DateTime?
+  freeCoachChangeAt DateTime?
   // Bagian harga yang dibayar dari saldo member (sisanya lewat Midtrans,
   // Payment.amount). Total harga paket model baru = poolPrice + coachPrice + serviceFee.
   saldoUsed    Int              @default(0)
   coachChangeRequests CoachChangeRequest[]
+  coachViolations     CoachViolation[]
   // Paket eceran 1 sesi buat renang di kolam selain kolam paket utama.
   // Cuma bisa dibeli member yang masih punya paket biasa (bukan 1 sesi)
   // yang aktif -- dan paket 1 sesi sendiri gak ngitung sebagai syarat itu.
@@ -1022,6 +1031,12 @@ model CoachChangeRequest {
   // tanda hadirnya diubah setelah pindah coach.
   oldCoachPrice Int?
   oldServiceFee Int?
+  // Ganti coach tanpa biaya hari ke-10 (Hadi 3 Okt) boleh pindah ke kolam lain
+  // sekota: kolam & harga kolam sebelum pindah (diisi saat selesai) supaya sesi
+  // lama tetap dibagi dengan harga kolam lama. free = jalur tanpa biaya.
+  fromPoolId    String?
+  oldPoolPrice  Int?
+  free          Boolean @default(false)
   // Bagian tambah bayar yang diambil dari saldo member.
   saldoUsed   Int               @default(0)
   adminNote   String?
@@ -1058,4 +1073,21 @@ model CityWaitlist {
 
   @@unique([userId, city])
   @@index([city, notifiedAt])
+}
+
+// Catatan pelanggaran coach (Hadi 3 Okt): 10 hari berturut-turut tidak membuka
+// jam yang bisa dibooking member berpaket aktif. Satu per paket per kejadian
+// (episodeStart = Package.noSlotSince saat itu). 3 dalam 6 bulan = admin
+// diberi tahu untuk menilai penonaktifan.
+model CoachViolation {
+  id           String   @id @default(cuid())
+  coachId      String
+  coach        User     @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  packageId    String
+  package      Package  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  episodeStart DateTime
+  createdAt    DateTime @default(now())
+
+  @@unique([packageId, episodeStart])
+  @@index([coachId, createdAt])
 }

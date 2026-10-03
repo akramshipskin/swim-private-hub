@@ -32,6 +32,7 @@ export default async function Home() {
           id: true,
           name: true,
           address: true,
+          city: true,
           description: true,
           facilities: true,
           photos: true,
@@ -123,7 +124,7 @@ export default async function Home() {
         pools={topPools.map((p) => ({
           id: p.id,
           name: p.name,
-          address: p.address,
+          address: p.city && p.address ? `${p.address}, ${p.city}` : p.address ?? p.city,
           description: p.description,
           facilities: p.facilities,
           photos: p.photos,

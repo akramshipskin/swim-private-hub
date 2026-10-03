@@ -38,7 +38,13 @@ export async function mkPricedOffer() {
   const pool = await prisma.pool.create({ data: { name: "Pool " + uid(), pricePack4: 260000, pricePack8: 480000, serviceFeeBps: 650 } });
   const coach = await prisma.user.create({ data: { name: "COACH" + uid(), phone: "08" + uid().slice(-10), passwordHash: "x", role: "COACH", coachProfile: { create: { pricePack4: 440000, pricePack8: 800000 } } }, include: { coachProfile: true } });
   await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
+  // Syarat coach bisa dibeli (Hadi 3 Okt): minimal 4 jam kosong dalam 14 hari.
+  await openSlots(coach.id, pool.id);
   return { pool, coach };
+}
+// Jam kosong 3-6 hari ke depan (memenuhi syarat 4 jam kosong / 14 hari).
+export async function openSlots(coachId: string, poolId: string, n = 4) {
+  for (let i = 0; i < n; i++) await mkSlot(coachId, poolId, 72 + i * 24);
 }
 // Paket model harga-dari-coach (satu-satunya model sejak Hadi 2 Okt malam):
 // terikat ke coachId, harga disalin ke paket. Harga dibagi kolam 50% / coach

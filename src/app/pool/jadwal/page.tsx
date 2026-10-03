@@ -27,6 +27,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
       name: true,
       openTime: true,
       closeTime: true,
+      dailyCapacity: true,
       availabilities: {
         where: { date: dateLabel(dateStr), ...NOT_CLOSED },
         orderBy: { startTime: "asc" },
@@ -97,7 +98,13 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
         return (
           <Card key={p.id} className="mt-4 w-full">
             <CardBody>
-              <h2 className="mb-3 text-lg font-semibold text-text">{p.name}</h2>
+              <h2 className="text-lg font-semibold text-text">{p.name}</h2>
+              {/* Kapasitas harian pelanggan SPH (Hadi 3 Okt): booking baru ditolak bila penuh. */}
+              <p className="mb-3 text-sm text-text-muted">
+                {p.dailyCapacity == null
+                  ? `${p.availabilities.reduce((n, a) => n + a.bookings.length, 0)} sesi SPH dibooking di tanggal ini · kapasitas harian belum diisi (tidak dibatasi)`
+                  : `${p.availabilities.reduce((n, a) => n + a.bookings.length, 0)} dari kapasitas ${p.dailyCapacity} sesi SPH terpakai`}
+              </p>
               <ul className="flex flex-col divide-y divide-border">
                 {rows.map((r) => (
                   <li key={r.hour} className="flex flex-col gap-1 py-2 sm:flex-row sm:items-start sm:gap-4">

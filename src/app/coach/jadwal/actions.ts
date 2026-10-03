@@ -3,6 +3,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { notifyWaitlistForPool } from "@/lib/coach-pools";
 import { wibDateTime, dateLabel, formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { sendPushToUsers } from "@/lib/push";
 import { usablePackageConditions } from "@/lib/active-package";
@@ -190,6 +191,9 @@ export async function addAvailability(
       // notifikasi bukan bagian dari penyimpanan slot
     }
   }
+  // Jam kosong baru bisa membuat coach ini memenuhi syarat tampil dan membuka
+  // paket pertama di kota kolam itu (daftar tunggu, Hadi 3 Okt).
+  await notifyWaitlistForPool(poolId).catch(() => {});
 
   revalidatePath("/coach/jadwal");
 

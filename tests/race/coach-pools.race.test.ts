@@ -1,7 +1,7 @@
 // Coach memilih / melepas kolam sendiri + daftar tunggu kota (Hadi 3 Okt).
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkUser, mkSlot, book, settle, mkPricedOffer, mkMemberWithPackage } from "./fx";
+import { as, reset, mkUser, mkSlot, book, settle, mkPricedOffer, mkMemberWithPackage, openSlots } from "./fx";
 import { POST as checkout } from "@/app/api/payment/checkout/route";
 import { pickPool, releasePool } from "@/app/coach/kolam/actions";
 import { joinCityWaitlist } from "@/app/member/paket/waitlist-actions";
@@ -134,6 +134,7 @@ describe("DAFTAR TUNGGU KOTA", () => {
     await expect(as({ id: m.id, role: "MEMBER" }, () => joinCityWaitlist("Bandung"))).rejects.toThrow("REDIRECT:");
     expect(await prisma.cityWaitlist.count({ where: { userId: m.id } })).toBe(1);
     const coaches = await Promise.all([1, 2].map(() => prisma.user.create({ data: { name: "C", phone: "08" + Math.random().toString().slice(2, 12), passwordHash: "x", role: "COACH", city: "Bandung", coachProfile: { create: { pricePack4: 440000 } } } })));
+    for (const c of coaches) await openSlots(c.id, pool.id);
     await settle(coaches.map((c) => pickCoachPool(c.id, pool.id)));
     expect(spy.mock.calls.filter(([uid]) => uid === m.id)).toHaveLength(1);
     expect((await prisma.cityWaitlist.findFirstOrThrow({ where: { userId: m.id } })).notifiedAt).not.toBeNull();
@@ -146,6 +147,7 @@ describe("DAFTAR TUNGGU KOTA", () => {
     const m = await mkUser("MEMBER");
     await prisma.cityWaitlist.create({ data: { userId: m.id, city: "Bogor" } });
     const c = await prisma.user.create({ data: { name: "C", phone: "08" + Math.random().toString().slice(2, 12), passwordHash: "x", role: "COACH", coachProfile: { create: { pricePack8: 800000 } } } });
+    await openSlots(c.id, pool.id);
     await pickCoachPool(c.id, pool.id);
     expect(spy).not.toHaveBeenCalled();
     expect((await prisma.cityWaitlist.findFirstOrThrow({ where: { userId: m.id } })).notifiedAt).toBeNull();

@@ -11,6 +11,7 @@ import { trialBlockingPackageWhere } from "@/lib/trial";
 import { userErrorMessage } from "@/lib/user-error";
 import { metaCapiEnabled, sendMetaEvent, trackingFromRequest } from "@/lib/meta-capi";
 import { clientIp } from "@/lib/rate-limit";
+import { coachMeetsOpenSlotRule, MIN_OPEN_SLOTS, OPEN_SLOT_WINDOW_DAYS } from "@/lib/coach-open-slots";
 
 
 export async function POST(request: Request) {
@@ -67,6 +68,13 @@ export async function POST(request: Request) {
   const quote = sesi === 1 ? trialQuote(pool, coach.coachProfile) : packQuote(pool, coach.coachProfile, sesi);
   if (!quote) {
     return Response.json({ error: "Harga paket ini belum dipasang kolam atau coach." }, { status: 400 });
+  }
+  // Coach hanya bisa dibeli bila punya cukup jam kosong (Hadi 3 Okt).
+  if (!(await coachMeetsOpenSlotRule(coachId, pool.id))) {
+    return Response.json(
+      { error: `Coach ini belum membuka cukup jadwal (minimal ${MIN_OPEN_SLOTS} jam kosong dalam ${OPEN_SLOT_WINDOW_DAYS} hari ke depan). Pilih coach lain atau coba lagi nanti.` },
+      { status: 409 }
+    );
   }
   const item = {
     poolId: pool.id,

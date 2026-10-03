@@ -24,6 +24,8 @@ const paymentUpdate = vi.fn().mockResolvedValue({});
 const packageDelete = vi.fn().mockResolvedValue({});
 const packageUpdate = vi.fn().mockResolvedValue({});
 const affiliationLock = vi.fn().mockResolvedValue([{ id: "aff1" }]);
+const meetsSlots = vi.fn().mockResolvedValue(true);
+vi.mock("@/lib/coach-open-slots", () => ({ coachMeetsOpenSlotRule: (...a: unknown[]) => meetsSlots(...a), MIN_OPEN_SLOTS: 4, OPEN_SLOT_WINDOW_DAYS: 14 }));
 vi.mock("@/lib/prisma", () => {
   const prisma: Record<string, unknown> = {
     package: { count: (...a: unknown[]) => packageCount(...a), findFirst: packageFindFirst, create: packageCreate, update: (...a: unknown[]) => packageUpdate(...a), delete: (...a: unknown[]) => packageDelete(...a) },
@@ -111,6 +113,14 @@ describe("checkout paket pilih coach", () => {
     expect((await res.json()).error).toMatch(/tidak mengajar di kolam ini/);
     expect(packageCreate).not.toHaveBeenCalled();
     expect(createTransaction).not.toHaveBeenCalled();
+  });
+
+  it("coach dengan jam kosong kurang dari 4 dalam 14 hari tidak bisa dibeli (Hadi 3 Okt)", async () => {
+    meetsSlots.mockResolvedValueOnce(false);
+    const res = await POST(buy());
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toMatch(/minimal 4 jam kosong/);
+    expect(packageCreate).not.toHaveBeenCalled();
   });
 
   it("menolak ukuran paket selain 1/4/8 dan kolam tidak aktif", async () => {
