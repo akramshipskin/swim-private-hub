@@ -27,13 +27,13 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Kota tahap 1 LIVE (2f1cddc). Tahap 2-5 SELESAI di laptop, commit belum di-push (ada migrasi penjaga_jadwal_coach): kapasitas harian, syarat 4 jam kosong/14 hari, penjaga jadwal + ganti coach tanpa biaya, kartu tanggungan sesi, admin Coach Tanpa Jadwal, teks. Menunggu Hadi: migrasi production + CRON_SECRET di Vercel, lalu push. Rev.3 draf (docs/legal/draft-rev3-kota-coach-kolam.md) menunggu orang hukum.
+1. KOTA + COACH MEMILIH KOLAM LIVE (91e5881, 3 Okt; GitHub hijau, Vercel sukses): kota di 3 formulir daftar, akun lama pilih kota, Kolam Saya, saringan kota + daftar tunggu, kapasitas harian dijaga saat booking, coach tampil bila >=4 jam kosong/14 hari, penjaga jadwal harian (cron 06.00 WIB), ganti coach tanpa biaya hari ke-10, tanggungan sesi coach, admin Peminat per Kota & Coach Tanpa Jadwal. Rev.3 perjanjian coach/MOU kolam/S&K/Pengembalian dipasang (disetujui orang hukum): semua coach & pemilik kolam diminta centang ulang. Sweeping alur baru lokal: 5 peran x HP/tablet/desktop x terang/gelap, 0 halaman rusak. Rancangan: docs/designs/kota-coach-kolam.md.
 2. P8 (reset password via email) setelah email production terbukti.
 3. Pantau rilis stabil next-auth v5 (sekarang dikunci 5.0.0-beta.32).
 4. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi).
 
 ## Tugas Hadi
-0. SEBELUM push kota tahap 2-5: (a) migrasi production, (b) isi CRON_SECRET (teks acak panjang) di Vercel Production. Tanpa (b) pemeriksa harian tidak jalan (aman, tapi peringatan coach tidak terkirim).
+0. Production: jalankan skrip isi-jadwal-dummy (lihat dulu tanpa --apply; hanya coach @example.com di 5 kolam contoh), supaya coach contoh lolos syarat 4 jam kosong. Cek CRON_SECRET sudah terisi di Vercel (pemeriksa harian jalan 06.00 WIB; cek lognya besok pagi). Kirim ke orang hukum 3 catatan di KEPUTUSAN.md (S&K butir paket lama, pengecualian paket admin, kapasitas penuh).
 1. Production: jalankan skrip akhiri-paket-lama (lihat dulu, lalu --apply) dan isi-harga-dummy (mengisi jam buka kolam yang kosong; tanpa jam buka coach tidak bisa buka jadwal).
 2. Jalankan sekali tombol GitHub Actions > Uji Pulih Backup.
 3. P5: isi DATABASE_CA_CERT (sertifikat CA dari Supabase) di pratinjau Vercel dulu, cek situs pratinjau jalan, baru production.
