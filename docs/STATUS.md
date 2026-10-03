@@ -33,7 +33,8 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 4. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi).
 
 ## Tugas Hadi
-0. Production: jalankan skrip isi-jadwal-dummy (lihat dulu tanpa --apply; hanya coach @example.com di 5 kolam contoh), supaya coach contoh lolos syarat 4 jam kosong. Cek CRON_SECRET sudah terisi di Vercel (pemeriksa harian jalan 06.00 WIB; cek lognya besok pagi). Kirim ke orang hukum 3 catatan di KEPUTUSAN.md (S&K butir paket lama, pengecualian paket admin, kapasitas penuh).
+0a. **14 Okt 2026 (INGATKAN Hadi di awal sesi pada/ sesudah tanggal ini):** jalankan ulang skrip isi-jadwal-dummy dengan --apply di production (jam kosong contoh yang diisi 3 Okt habis sekitar 13 Okt; tanpa ini coach contoh hilang dari halaman beli paket).
+0. Production: skrip isi-jadwal-dummy SUDAH dijalankan 3 Okt (98 jam kosong). Cek CRON_SECRET terisi di Vercel + Logs pemeriksa harian 06.00 WIB. Kirim ke orang hukum 3 catatan di KEPUTUSAN.md (S&K butir paket lama, pengecualian paket admin, kapasitas penuh).
 1. Production: jalankan skrip akhiri-paket-lama (lihat dulu, lalu --apply) dan isi-harga-dummy (mengisi jam buka kolam yang kosong; tanpa jam buka coach tidak bisa buka jadwal).
 2. Jalankan sekali tombol GitHub Actions > Uji Pulih Backup.
 3. P5: isi DATABASE_CA_CERT (sertifikat CA dari Supabase) di pratinjau Vercel dulu, cek situs pratinjau jalan, baru production.
