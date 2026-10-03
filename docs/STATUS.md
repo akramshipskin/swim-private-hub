@@ -27,13 +27,13 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Kota tahap 1 SELESAI di laptop, commit cf85edd BELUM di-push (ada migrasi): kota di daftar 3 peran, akun lama pilih kota, coach memilih/melepas kolam sendiri, saringan kota + daftar tunggu, peminat per kota. Menunggu Hadi: migrasi production + isi kota kolam, lalu push. Berikutnya tahap 2 (kapasitas harian dijaga saat booking), 3 (syarat 4 jam kosong/14 hari), 4 (tanggungan sesi + ganti coach gratis), 5 (teks/landing), draf rev.3 sudah di docs/legal/draft-rev3-kota-coach-kolam.md (Hadi kirim ke orang hukum).
+1. Kota tahap 1 LIVE (2f1cddc). Tahap 2-5 SELESAI di laptop, commit belum di-push (ada migrasi penjaga_jadwal_coach): kapasitas harian, syarat 4 jam kosong/14 hari, penjaga jadwal + ganti coach tanpa biaya, kartu tanggungan sesi, admin Coach Tanpa Jadwal, teks. Menunggu Hadi: migrasi production + CRON_SECRET di Vercel, lalu push. Rev.3 draf (docs/legal/draft-rev3-kota-coach-kolam.md) menunggu orang hukum.
 2. P8 (reset password via email) setelah email production terbukti.
 3. Pantau rilis stabil next-auth v5 (sekarang dikunci 5.0.0-beta.32).
 4. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi).
 
 ## Tugas Hadi
-0. SEBELUM push kota tahap 1: (a) migrasi production, (b) jalankan isi-harga-dummy di production (mengisi kota semua kolam = Jakarta). Tanpa (b) semua member melihat "Belum tersedia".
+0. SEBELUM push kota tahap 2-5: (a) migrasi production, (b) isi CRON_SECRET (teks acak panjang) di Vercel Production. Tanpa (b) pemeriksa harian tidak jalan (aman, tapi peringatan coach tidak terkirim).
 1. Production: jalankan skrip akhiri-paket-lama (lihat dulu, lalu --apply) dan isi-harga-dummy (mengisi jam buka kolam yang kosong; tanpa jam buka coach tidak bisa buka jadwal).
 2. Jalankan sekali tombol GitHub Actions > Uji Pulih Backup.
 3. P5: isi DATABASE_CA_CERT (sertifikat CA dari Supabase) di pratinjau Vercel dulu, cek situs pratinjau jalan, baru production.
