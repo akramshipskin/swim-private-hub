@@ -31,4 +31,25 @@ describe("GET /api/availability", () => {
       expect(findMany.mock.calls[0][0].where.pool).toEqual({ isActive: true });
     }
   });
+
+  it("menyembunyikan slot kosong di luar jam buka atau di tanggal kolam yang sudah penuh; slot milik sendiri tetap tampil", async () => {
+    const date = new Date("2099-01-05T00:00:00Z");
+    const slot = (id: string, hour: number, cap: number | null, booked = false) => ({
+      id, poolId: "p1", date, status: booked ? "BOOKED" : "AVAILABLE",
+      startTime: new Date(`2099-01-05T${String(hour).padStart(2, "0")}:00:00+07:00`),
+      endTime: new Date(`2099-01-05T${String(hour + 1).padStart(2, "0")}:00:00+07:00`),
+      pool: { openTime: "06:00", closeTime: "18:00", dailyCapacity: cap },
+      coach: { id: "c1", name: "C", coachProfile: null },
+      bookings: booked ? [{ id: "b1", memberId: "m2", packageId: "k1", status: "BOOKED", package: { dependent: { name: "A", isSelf: false } } }] : [],
+    });
+    // Kapasitas 1: sudah ada 1 booking hari itu -> slot kosong lain disembunyikan.
+    findMany.mockResolvedValueOnce([slot("full", 8, 1), slot("late", 19, null), slot("other", 9, 1, true)]);
+    findMany.mockResolvedValueOnce([{ poolId: "p1", date }]);
+    const res = await GET(new Request("http://x/api/availability?date=2099-01-05&poolId=p1"));
+    const ids = (await res.json()).availabilities.map((a: { id: string }) => a.id);
+    expect(ids).toEqual(["other"]);
+    findMany.mockResolvedValueOnce([slot("open", 8, 2)]);
+    findMany.mockResolvedValueOnce([{ poolId: "p1", date }]);
+    expect((await (await GET(new Request("http://x/api/availability?date=2099-01-05&poolId=p1"))).json()).availabilities.map((a: { id: string }) => a.id)).toEqual(["open"]);
+  });
 });

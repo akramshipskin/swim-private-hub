@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatRupiah } from "@/lib/format";
-import { formatDateLabel } from "@/lib/datetime";
+import { formatDateWib } from "@/lib/datetime";
 import { coachChangeAmount, remainingSessions } from "@/lib/coach-change";
 import { expireStaleCoachChanges } from "@/lib/coach-change-actions-core";
 import { releaseStalePayments } from "@/lib/stale-payments";
@@ -75,7 +75,7 @@ export default async function AdminGantiCoachPage() {
                         {r.package.dependent.name} <span className="font-normal text-text-muted">· akun {r.member.name}</span>
                       </p>
                       <p className="text-sm text-text-muted">
-                        {r.package.pool.name} · {r.package.name} · diajukan {formatDateLabel(r.createdAt)}
+                        {r.package.pool.name} · {r.package.name} · diajukan {formatDateWib(r.createdAt)}
                       </p>
                     </div>
                     <p className="text-sm text-text">
@@ -113,7 +113,7 @@ export default async function AdminGantiCoachPage() {
               <span className="min-w-0 text-text">
                 {r.package.dependent.name} · {r.fromCoach.name} → {r.toCoach.name}
                 {r.amount != null && r.amount !== 0 && (
-                  <span className="text-text-muted"> · {r.amount > 0 ? `tambah bayar ${formatRupiah(r.amount)}` : `saldo ${formatRupiah(-r.amount)}`}</span>
+                  <span className="text-text-muted"> · {r.amount > 0 ? `tambah bayar ${formatRupiah(r.amount)}` : `${formatRupiah(-r.amount)} masuk saldo member`}</span>
                 )}
                 {r.adminNote && <span className="block text-xs text-text-subtle">Catatan: {r.adminNote}</span>}
               </span>

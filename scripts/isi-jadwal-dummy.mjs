@@ -55,7 +55,8 @@ for (const pr of pairs) {
   let need = NEED - have;
   if (need <= 0) continue;
   // Jam mulai 09:00 + nomor kolam coach itu, harus muat di jam buka kolam.
-  const hour = 9 + Number(pr.idx);
+  // Jam 12.00 dilewati (jam istirahat, sama dengan aplikasi coach).
+  const hour = 9 + Number(pr.idx) + (9 + Number(pr.idx) >= 12 ? 1 : 0);
   const hh = String(hour).padStart(2, "0");
   if (`${hh}:00` < pr.openTime || `${String(hour + 1).padStart(2, "0")}:00` > pr.closeTime) {
     console.log(`  - ${pr.coach} · ${pr.pool}: jam ${hh}:00 di luar jam buka ${pr.openTime}-${pr.closeTime}, dilewati`);

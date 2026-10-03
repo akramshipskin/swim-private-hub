@@ -133,8 +133,8 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                       .map((a) => (
                         <Card key={a.id}>
                           <CardBody className="flex items-center justify-between gap-3 py-3">
-                            <div>
-                              <p className="text-base font-semibold text-text tabular-nums">
+                            <div className="min-w-0 flex-1">
+                              <p className="whitespace-nowrap text-base font-semibold text-text tabular-nums">
                                 {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
                               </p>
                               {a.status === "BOOKED" && a.bookings[0] ? (
@@ -148,7 +148,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                               )}
                             </div>
                             {a.status === "BOOKED" && a.bookings[0] && a.startTime <= now ? (
-                              <span className="shrink-0 text-right text-sm text-text-subtle">
+                              <span className="max-w-[50%] text-right text-sm text-text-subtle">
                                 {a.bookings[0].attended === null
                                   ? "Sudah mulai — tandai di Riwayat Sesi"
                                   : a.bookings[0].attended

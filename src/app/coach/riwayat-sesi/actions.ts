@@ -29,6 +29,8 @@ export async function markAttendance(
   if (session.user.role === "COACH" && session.user.needsPartnerAgreement) {
     return { error: PARTNER_AGREEMENT_REQUIRED_ERROR };
   }
+  if (session.user.mustChangePassword) return { error: "Ganti password sementara dulu." };
+  if (session.user.needsTotpSetup) return { error: "Pasang verifikasi 2 langkah dulu di menu Keamanan." };
 
   const bookingId = formData.get("bookingId") as string;
   const attended = formData.get("attended") === "true";

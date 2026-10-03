@@ -40,10 +40,14 @@ export async function addAvailability(
   // sini (bukan cuma dropdown UI) karena formData bisa dipalsu.
   const affiliated = await prisma.poolAffiliation.findUnique({
     where: { poolId_coachId: { poolId, coachId: session.user.id } },
-    select: { pool: { select: { name: true, openTime: true, closeTime: true } } },
+    select: { pool: { select: { name: true, openTime: true, closeTime: true, isActive: true } } },
   });
   if (!affiliated) {
     return { error: "Kamu belum memilih kolam ini. Pilih dulu di menu Kolam Saya." };
+  }
+  // Kolam nonaktif tidak bisa dibooking member, jadi slot baru di sana tidak dibuka.
+  if (!affiliated.pool.isActive) {
+    return { error: `${affiliated.pool.name} sedang tidak aktif, jadi jadwal baru belum bisa dibuka di sana.` };
   }
   // Kolam tanpa jam buka tidak bisa dibuka slot barunya (Hadi 2 Okt malam,
   // #6B); pemilik kolam diberi tahu, paling banyak sekali sehari per kolam.

@@ -99,6 +99,9 @@ export async function completeCoachChange(
   if (req.status === "COMPLETED" || req.status === "REJECTED" || req.status === "CANCELLED") {
     return { ok: false, error: "Pengajuan ini sudah selesai/ditolak/dibatalkan." };
   }
+  // Urutan kunci sama dengan booking (akun member dulu, baru paket): kredit
+  // saldo di bawah mengubah baris akun member, tanpa ini bisa saling mengunci.
+  await tx.$executeRaw`SELECT 1 FROM "User" WHERE id = ${req.memberId} FOR NO KEY UPDATE`;
   // Kunci paket: tanda hadir, booking, dan pembatalan antre di belakang ini.
   await tx.$executeRaw`SELECT 1 FROM "Package" WHERE id = ${req.packageId} FOR UPDATE`;
   const pkg = await tx.package.findUniqueOrThrow({ where: { id: req.packageId } });

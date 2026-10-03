@@ -5,7 +5,7 @@ import CheckoutButton from "./checkout-button";
 import { trialBlockingPackageWhere } from "@/lib/trial";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
+import { formatTimeWib, formatDateWib } from "@/lib/datetime";
 import { expireStaleCoachChanges } from "@/lib/coach-change-actions-core";
 import { releaseStalePayments } from "@/lib/stale-payments";
 import { COACH_CHANGE_PAY_WINDOW_MS } from "@/lib/coach-change-rules";
@@ -200,7 +200,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
     return (
       <div className="flex flex-col gap-2 rounded-lg bg-warning-bg px-3 py-3 text-sm text-warning-text">
         <p>
-          Coach kamu belum membuka jadwal. Paket tetap berlaku sampai {p.expiredDate ? formatDateLabel(p.expiredDate) : "-"} dan tidak diperpanjang. Ganti coach tanpa biaya sekarang supaya sesimu tidak hangus.
+          Coach kamu belum membuka jadwal. Paket tetap berlaku sampai {p.expiredDate ? formatDateWib(p.expiredDate) : "-"} dan tidak diperpanjang. Ganti coach tanpa biaya sekarang supaya sesimu tidak hangus.
         </p>
         {options.length === 0 ? (
           <p>Belum ada coach di kotamu dengan harga sama atau lebih murah yang sedang membuka jadwal. Kamu tetap bisa mengajukan ganti coach di bawah, atau hubungi admin.</p>
@@ -247,7 +247,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
         <div className="flex flex-col gap-2 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
           <span>
             Ganti ke {req.toCoach.name} disetujui. Tambah bayar {formatRupiah(req.amount)} untuk {req.sessions} sesi sisa, paling lambat{" "}
-            {formatDateLabel(deadline)} pukul {formatTimeWib(deadline)} WIB. Saldo dipakai dulu kalau ada.
+            {formatDateWib(deadline)} pukul {formatTimeWib(deadline)} WIB. Saldo dipakai dulu kalau ada.
           </span>
           <div className="flex flex-wrap items-center gap-3">
             <PayDifferenceButton requestId={req.id} label={req.payments.length ? "Lanjut bayar" : `Bayar ${formatRupiah(req.amount)}`} />
@@ -295,7 +295,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                 {wallet.memberWalletTransactions.map((t) => (
                   <li key={t.id} className="flex justify-between gap-3">
                     <span>
-                      {formatDateLabel(t.createdAt)} · {t.note ?? (t.type === "PURCHASE" ? "Dipakai membeli" : "Masuk")}
+                      {formatDateWib(t.createdAt)} · {t.note ?? (t.type === "PURCHASE" ? "Dipakai membeli" : "Masuk")}
                     </span>
                     <span className={t.amount > 0 ? "text-success-text" : "text-text"}>
                       {t.amount > 0 ? "+" : "−"}
@@ -337,7 +337,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                             <p className="text-sm text-text">{p.name}</p>
                             <p className="text-sm text-text-muted">
                               Sisa <b className="text-text">{p.sisaSesi}</b> dari {p.totalSesi} sesi
-                              {p.expiredDate && <> · berlaku s.d. {formatDateLabel(p.expiredDate)}</>}
+                              {p.expiredDate && <> · berlaku s.d. {formatDateWib(p.expiredDate)}</>}
                             </p>
                           </div>
                           {used ? (
@@ -385,7 +385,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
           <select
             name="kota"
             defaultValue={city ?? ""}
-            className="min-h-[44px] rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="min-h-[44px] w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           >
             {CITIES.map((c) => (
               <option key={c} value={c}>
@@ -413,7 +413,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
           <CardBody className="flex flex-col gap-3">
             <p className="text-base font-semibold text-text">Belum tersedia di {city}</p>
             <p className="text-sm text-text-muted">
-              Kami sedang mencari kolam dan coach di {city}. Tekan Kabari saya, nanti kamu diberi tahu lewat notifikasi HP (kalau notifikasi aktif) begitu paket pertama di {city} bisa dibeli. Halaman ini juga langsung menampilkannya.
+              Kami sedang mencari kolam dan coach di {city}. Tekan Kabari saya: begitu paket pertama di {city} bisa dibeli, kami kabari lewat notifikasi HP (bila notifikasi aktif) dan paketnya langsung muncul di halaman ini.
             </p>
             {city && isCity(city) && (waitlisted ? (
               <p role="status" className="rounded-lg bg-success-bg px-3 py-2 text-sm text-success-text">Kamu sudah masuk daftar tunggu {city}.</p>

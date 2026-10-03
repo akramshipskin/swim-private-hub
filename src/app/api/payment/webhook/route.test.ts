@@ -1,7 +1,8 @@
 import crypto from "crypto";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-vi.mock("@/lib/midtrans", () => ({ platformServerKey: () => "server-key" }));
+let serverKey = "server-key";
+vi.mock("@/lib/midtrans", () => ({ platformServerKey: () => serverKey }));
 
 const sendPushToUser = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/lib/push", () => ({ sendPushToUser: (...a: unknown[]) => sendPushToUser(...a) }));
@@ -120,6 +121,23 @@ describe("webhook signature check", () => {
       expect((await res.json()).error).toBe("Signature tidak valid");
     }
     expect(paymentFindUnique).not.toHaveBeenCalled();
+  });
+
+  it("kunci server kosong: semua notifikasi ditolak (tanda tangan dari teks kosong/undefined tidak diterima)", async () => {
+    serverKey = "";
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      for (const k of ["", "undefined"]) {
+        const body = { order_id: "PKG-1", status_code: "200", gross_amount: "135000.00", transaction_status: "settlement" };
+        const signature_key = crypto.createHash("sha512").update(body.order_id + body.status_code + body.gross_amount + k).digest("hex");
+        const res = await POST(new Request("http://x/api/payment/webhook", { method: "POST", body: JSON.stringify({ ...body, signature_key }) }));
+        expect((await res.json()).error).toBe("Signature tidak valid");
+      }
+      expect(paymentFindUnique).not.toHaveBeenCalled();
+    } finally {
+      serverKey = "server-key";
+      errors.mockRestore();
+    }
   });
 });
 

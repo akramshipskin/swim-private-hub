@@ -2,6 +2,7 @@ import { withinPoolHours } from "@/lib/pool-hours";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { meetsOpenSlotRule, openSlotStats, pairKey } from "@/lib/coach-open-slots";
 import LandingView from "./landing-view";
 import { coachBioLine } from "@/lib/coach-bio";
 import { cheapestPackQuote } from "@/lib/pricing";
@@ -12,9 +13,9 @@ function cheapestPack(p: {
   pricePack4: number | null;
   pricePack8: number | null;
   serviceFeeBps: number;
-  affiliations: { coach: { coachProfile: { pricePack4: number | null; pricePack8: number | null } | null } }[];
-}) {
-  return cheapestPackQuote(p, p.affiliations.flatMap(({ coach }) => (coach.coachProfile ? [coach.coachProfile] : [])));
+  affiliations: { coach: { id: string; coachProfile: { pricePack4: number | null; pricePack8: number | null } | null } }[];
+}, buyable: (coachId: string) => boolean) {
+  return cheapestPackQuote(p, p.affiliations.flatMap(({ coach }) => (coach.coachProfile && buyable(coach.id) ? [coach.coachProfile] : [])));
 }
 
 const NOT_DEMO_EMAIL = { OR: [{ email: null }, { NOT: { email: { endsWith: "@example.com", mode: "insensitive" as const } } }] };
@@ -43,7 +44,7 @@ export default async function Home() {
           serviceFeeBps: true,
           affiliations: {
             where: { coach: { role: "COACH", isActive: true, coachProfile: { isActive: true } } },
-            select: { coach: { select: { coachProfile: { select: { pricePack4: true, pricePack8: true } } } } },
+            select: { coach: { select: { id: true, coachProfile: { select: { pricePack4: true, pricePack8: true } } } } },
           },
           ownerships: { select: { owner: { select: { email: true } } } },
         },
@@ -107,6 +108,10 @@ export default async function Home() {
       new Map([...poolStats].map(([id, s]) => [id, s.sold])),
     );
 
+    // "Mulai Rp..." hanya dari coach yang bisa dibeli (syarat 4 jam kosong / 14 hari),
+    // sama dengan halaman beli paket.
+    const slotStats = await openSlotStats(topPools.flatMap((p) => p.affiliations.map((a) => ({ coachId: a.coach.id, poolId: p.id }))), now);
+
     const coachSessions = new Map(sessionsPerCoach.map((r) => [r.coachId, r._count._all]));
     // Landing menampilkan maksimal 5 coach: coach asli dulu (akun demo hanya
     // mengisi slot kosong), lalu sesi Hadir terbanyak.
@@ -130,11 +135,11 @@ export default async function Home() {
           photos: p.photos,
           memberCount: poolStats.get(p.id)?.members.size ?? 0,
           hours: p.openTime && p.closeTime ? `${p.openTime}–${p.closeTime}` : null,
-          // Hanya coach aktif (afiliasi sudah disaring di query), sama dengan daftar coach.
-          coachCount: p.affiliations.length,
+          // Hanya coach aktif yang bisa dibeli (syarat 4 jam kosong), sama dengan "mulai Rp...".
+          coachCount: p.affiliations.filter((a) => meetsOpenSlotRule(slotStats.get(pairKey(a.coach.id, p.id)))).length,
           // Harga paket termurah di kolam itu (kolam + coach + biaya layanan), dari
           // semua coach yang mengajar di sana dan sudah memasang harga.
-          fromPackage: cheapestPack(p),
+          fromPackage: cheapestPack(p, (coachId) => meetsOpenSlotRule(slotStats.get(pairKey(coachId, p.id)))),
           openSlots7d: openSlots.filter((s) => s.poolId === p.id && withinPoolHours(p, s.startTime, s.endTime)).length,
         }))}
         coaches={topCoaches.map((c) => ({

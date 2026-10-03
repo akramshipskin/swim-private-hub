@@ -2,7 +2,7 @@ import { poolHoursLabel, withinPoolHours } from "@/lib/pool-hours";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendPushToUser } from "@/lib/push";
-import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
+import { formatDateLabel, formatTimeWib, formatDateWib } from "@/lib/datetime";
 import { activePackageWhere } from "@/lib/active-package";
 
 class BookingError extends Error {
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
         const pkg = await tx.package.findUnique({ where: { id: packageId }, select: { memberId: true, expiredDate: true } });
         if (pkg?.memberId === session.user.id && pkg.expiredDate && pkg.expiredDate <= slot.startTime && pkg.expiredDate >= new Date()) {
           throw new BookingError(
-            `Paket ini berlaku sampai ${formatDateLabel(pkg.expiredDate)}, sedangkan jadwal ini setelahnya. Pilih jadwal sebelum paket berakhir.`,
+            `Paket ini berlaku sampai ${formatDateWib(pkg.expiredDate)}, sedangkan jadwal ini setelahnya. Pilih jadwal sebelum paket berakhir.`,
             409
           );
         }

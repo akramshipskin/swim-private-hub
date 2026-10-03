@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { NOT_CLOSED } from "@/lib/availability";
+import { withinPoolHours } from "@/lib/pool-hours";
+import { fullPoolDays, isFullDay } from "@/lib/coach-open-slots";
 import { dateLabel, todayWibDateString } from "@/lib/datetime";
 import { checkCancelEligibility } from "@/lib/cancel-eligibility";
 
@@ -32,6 +34,9 @@ export async function GET(request: Request) {
       startTime: true,
       endTime: true,
       status: true,
+      poolId: true,
+      date: true,
+      pool: { select: { openTime: true, closeTime: true, dailyCapacity: true } },
       coach: { select: { id: true, name: true, coachProfile: { select: { photoUrl: true } } } },
       // Availability bisa punya banyak Booking historis (pernah
       // dibatalkan lalu dibooking lagi) -- yang relevan buat status
@@ -52,13 +57,16 @@ export async function GET(request: Request) {
   });
 
   const now = new Date();
+  // Slot kosong di tanggal yang kapasitas harian kolamnya sudah penuh pasti ditolak saat booking.
+  const full = await fullPoolDays(availabilities.filter((a) => a.bookings.length === 0));
 
   const result = await Promise.all(
     availabilities
       // Slot kosong (belum ada yang book) yang jamnya udah lewat gak
       // relevan lagi buat member -- hide total. Slot yang UDAH dibooking
       // tetep ditampilin (biar member masih liat booking-nya sendiri).
-      .filter((a) => a.bookings.length > 0 || a.startTime > now)
+      // Slot kosong di luar jam buka kolam pasti ditolak saat booking: tidak ditampilkan.
+      .filter((a) => a.bookings.length > 0 || (a.startTime > now && withinPoolHours(a.pool, a.startTime, a.endTime) && !isFullDay(full, a)))
       .map(async (a) => {
         const activeBooking = a.bookings[0];
         const bookedByMe = activeBooking?.memberId === session.user.id;

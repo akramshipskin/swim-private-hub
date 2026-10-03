@@ -16,6 +16,12 @@ function verifySignature(
   grossAmount: string,
   signatureKey: string
 ) {
+  // Kunci kosong (mis. lingkungan pratinjau tanpa kunci) = tolak semua: tanpa
+  // ini tanda tangan bisa dihitung siapa saja dengan teks "undefined".
+  if (!platformServerKey()) {
+    console.error("[webhook] MIDTRANS_SERVER_KEY kosong, notifikasi ditolak");
+    return false;
+  }
   const expected = crypto
     .createHash("sha512")
     .update(orderId + statusCode + grossAmount + platformServerKey())

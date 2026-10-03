@@ -1,7 +1,7 @@
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { Card, CardBody } from "@/components/ui/card";
-import { formatDateLabel } from "@/lib/datetime";
+import { formatDateWib } from "@/lib/datetime";
 import { daysWithoutSlot, FREE_CHANGE_AFTER_DAYS, VIOLATION_LIMIT, VIOLATION_WINDOW_DAYS } from "@/lib/coach-slot-watch";
 
 export const metadata = { title: "Coach Tanpa Jadwal | Swim Private Hub" };
@@ -39,7 +39,7 @@ export default async function CoachTanpaJadwalPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Coach Tanpa Jadwal</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
-        Diperiksa otomatis tiap pagi. Hari ke-2: coach diingatkan. Hari ke-{FREE_CHANGE_AFTER_DAYS}: member boleh ganti coach tanpa biaya dan coach tercatat 1 pelanggaran. {VIOLATION_LIMIT} pelanggaran dalam 6 bulan: nilai penonaktifan di menu Pengguna.
+        Diperiksa otomatis tiap pagi. Hari ke-2: coach diingatkan. Hari ke-{FREE_CHANGE_AFTER_DAYS}: member boleh ganti coach tanpa biaya dan coach tercatat 1 pelanggaran. {VIOLATION_LIMIT} pelanggaran dalam 6 bulan: pertimbangkan menonaktifkan coach lewat menu Pengguna.
       </p>
       <Card className="mb-4">
         <CardBody>
@@ -52,7 +52,7 @@ export default async function CoachTanpaJadwalPage() {
                 <li key={p.id} className="flex flex-wrap justify-between gap-2 py-2">
                   <span className="text-text">
                     <b>{p.coach?.name ?? "-"}</b> · {p.pool.name} · {p.dependent.name} ({p.member.name}) · sisa {p.sisaSesi} sesi
-                    {p.expiredDate && ` · paket s.d. ${formatDateLabel(p.expiredDate)}`}
+                    {p.expiredDate && ` · paket s.d. ${formatDateWib(p.expiredDate)}`}
                   </span>
                   <span className={p.freeCoachChangeAt ? "font-medium text-danger-text" : "text-warning-text"}>
                     Hari ke-{daysWithoutSlot(p.noSlotSince!, now)}
@@ -77,7 +77,7 @@ export default async function CoachTanpaJadwalPage() {
                   <li key={v.coachId} className="flex justify-between gap-2 py-2">
                     <span className="text-text">{coachNames.get(v.coachId) ?? v.coachId}</span>
                     <span className={v._count._all >= VIOLATION_LIMIT ? "font-semibold text-danger-text" : "text-text"}>
-                      {v._count._all}x{v._count._all >= VIOLATION_LIMIT ? " · nilai penonaktifan" : ""}
+                      {v._count._all}x{v._count._all >= VIOLATION_LIMIT ? " · pertimbangkan nonaktifkan" : ""}
                     </span>
                   </li>
                 ))}

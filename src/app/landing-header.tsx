@@ -34,7 +34,7 @@ export function LandingHeader() {
           <a href="#kolam" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">Kolam</a>
           <a href="#coach" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">Coach</a>
           <a href="#cara-kerja" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">Cara Kerja</a>
-          <a href="#faq" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:items-center">FAQ</a>
+          <a href="#faq" className="fx-nav md:max-lg:inline-flex md:max-lg:min-h-[44px] md:max-lg:min-w-[44px] md:max-lg:items-center md:max-lg:justify-center">FAQ</a>
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-white/10 sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Masuk</Link>

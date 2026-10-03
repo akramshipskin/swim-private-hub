@@ -13,28 +13,26 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Alat di scripts/ (lokal kecuali disebut): ukur-halaman, sweep-halaman, uji-hak-akses, uji-formulir, audit-uang (production: AUDIT_PROD=1, baca-saja), isi-harga-dummy (HARGA_DUMMY_PROD=1; juga mengisi kota kolam), isi-jadwal-dummy (JADWAL_DUMMY_PROD=1), akhiri-paket-lama (AKHIRI_PAKET_LAMA_PROD=1), render-brand-social.
 
 ## Sedang jalan
-- Hadi akan compact konteks dulu, lalu minta sweeping sistem total ulang (dia sudah bilang "ya"). Sweeping khusus alur baru (174 kunjungan lokal, 5 peran, HP/tablet/desktop, terang/gelap) sudah bersih.
+- Sweeping sistem total ulang SELESAI 3 Okt malam (Opus): 474 kunjungan, hak akses 445 sel 0 bocor, formulir 174 kiriman 0 error, audit uang cocok, 4 pemeriksa Opus 0 berat. 14 kelompok perbaikan (laporan docs/reviews/2026-10-03-sweeping-sistem-malam.md). 8 hal menunggu keputusan Hadi (bagian "Menunggu keputusan Hadi" di laporan). 3 catatan orang hukum: dibiarkan (S&K tidak diubah).
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Sweeping sistem total ulang setelah update kota (skill sweeping): semua 65 halaman x 5 peran, uji-hak-akses termasuk alamat baru (/coach/kolam, /kota, /admin/peminat-kota, /admin/coach-tanpa-jadwal, /api/cron/harian), uji-formulir untuk formulir baru, audit buku besar lokal. Bagian uang/hak akses di Opus (Hadi pilih lewat menu model), tampilan di Sonnet High. Laporan tabel cakupan lengkap.
-2. Revisi S&K dari 3 catatan ke orang hukum: Hadi bilang "approved" tapi teks hasilnya belum ada di Claude; JANGAN mengubah S&K sebelum Hadi memberi teks/penjelasan (catatan: S&K Pasal 2 butir 10 paket sebelum 2 Okt, pengecualian paket admin pada hak ganti gratis, kapasitas penuh menolak pemesanan).
-3. P8 (reset password via email) setelah email production terbukti. Pantau next-auth v5 stabil (dikunci 5.0.0-beta.32).
-4. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi), docs/aturan-bisnis-saat-ini.md belum memuat aturan kota/ganti coach gratis/pelanggaran (tulis saat sweeping).
+1. Kerjakan jawaban Hadi atas 8 keputusan sweeping 3 Okt malam (pelanggaran per paket/coach, kolam nonaktif/penuh, hari ke-10, batal sesi lama setelah ganti coach, No HP coach ke kolam, Cari Coach, 3 hal tak tertulis, format rupiah & istilah menu).
+2. P8 (reset password via email) setelah email production terbukti. Pantau next-auth v5 stabil (dikunci 5.0.0-beta.32).
+3. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi), (aturan kota/ganti gratis/pelanggaran sudah ditulis di docs/aturan-bisnis-saat-ini.md 3 Okt malam).
 
 ## Tugas Hadi
-1. CRON_SECRET: boleh dicek/diisi SEKARANG (tidak perlu menunggu pagi). Vercel > Settings > Environment Variables > Production, nama `CRON_SECRET`, isi teks acak panjang buatan sendiri (`openssl rand -hex 32` di terminal; jangan kirim ke Claude). Lalu Redeploy. Besok setelah 06.00 WIB cek Logs /api/cron/harian: 200 = jalan, 401 = belum terisi.
+1. CRON_SECRET sudah dipasang + Redeploy (3 Okt malam). Besok (4 Okt) setelah 06.00 WIB cek Vercel > Logs /api/cron/harian: 200 = jalan, 401 = kunci tidak cocok.
 2. **14 Okt 2026 (INGATKAN Hadi di awal sesi pada/sesudah tanggal ini):** jalankan ulang isi-jadwal-dummy --apply di production (jam kosong contoh habis sekitar 13 Okt; tanpa itu coach contoh hilang dari halaman beli paket). Pengingat cukup catatan ini (Hadi pilih A, bukan kalender).
-3. Beri tahu Claude arti "approved" dari orang hukum atas 3 catatan: ada teks revisi S&K yang harus dipasang, atau catatan disetujui untuk dibiarkan.
-4. Production: akhiri-paket-lama (lihat dulu, lalu --apply); belum tercatat sudah dijalankan.
-5. Tombol GitHub Actions > Uji Pulih Backup sekali.
-6. P5: isi DATABASE_CA_CERT di pratinjau Vercel dulu, cek jalan, baru production.
-7. Event Meta (jendela penyamaran), lalu hapus META_TEST_EVENT_CODE di Vercel.
-8. HP asli + Safari (alur kota, Kolam Saya, notifikasi daftar tunggu); satu pembayaran sungguhan sampai paket aktif; unggah foto/sertifikat, email, notifikasi HP.
-9. Akuntan: PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus (+ saldo dari ganti coach ke coach lebih murah). Testimoni asli. Matikan plugin tak terpakai.
+3. Production: akhiri-paket-lama (lihat dulu, lalu --apply); belum tercatat sudah dijalankan.
+4. Tombol GitHub Actions > Uji Pulih Backup sekali.
+5. P5: isi DATABASE_CA_CERT di pratinjau Vercel dulu, cek jalan, baru production.
+6. Event Meta (jendela penyamaran), lalu hapus META_TEST_EVENT_CODE di Vercel.
+7. HP asli + Safari (alur kota, Kolam Saya, notifikasi daftar tunggu); satu pembayaran sungguhan sampai paket aktif; unggah foto/sertifikat, email, notifikasi HP.
+8. Akuntan: PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus (+ saldo dari ganti coach ke coach lebih murah). Testimoni asli. Matikan plugin tak terpakai.
 
 ## Belum terverifikasi
-- HP asli dan Safari; notifikasi push; unggah file ke penyimpanan asli; email; pembayaran asli sampai paket aktif; buku besar production; halaman login di production; pemeriksa harian di Vercel (belum terbukti jalan); uji hak akses/formulir/audit uang setelah update kota (lihat Tugas Claude 1).
+- HP asli dan Safari; notifikasi push; unggah file ke penyimpanan asli; email; pembayaran asli sampai paket aktif; buku besar production; halaman login di production; pemeriksa harian di Vercel (belum terbukti jalan); tablet 768 hanya pemeriksa otomatis.
 
 ## Catatan lingkungan lokal
 - Nyalakan lagi bila laptop tidur: `npm run db:dev` (54330), `node scripts/qa-storage.mjs` (54331), `npm run db:race` (54329, untuk `npm run test:race`; bila gagal "postmaster.pid", jalankan `prisma migrate deploy` ke 54329 langsung). Server uji versi jadi: konfigurasi swim-private-hub-start-3110 (`npx next start -p 3110`; bangun ulang dulu).

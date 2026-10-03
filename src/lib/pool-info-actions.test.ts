@@ -37,6 +37,17 @@ describe("updatePoolInfo", () => {
     expect(poolUpdateMany).not.toHaveBeenCalled();
   });
 
+  it("menolak pemilik kolam yang belum menyetujui MOU terbaru / password sementara (panggilan langsung)", async () => {
+    ownershipCount.mockResolvedValue(1);
+    for (const flag of [{ needsPartnerAgreement: true }, { mustChangePassword: true }]) {
+      auth.mockResolvedValue({ user: { id: "o1", role: "POOL_OWNER", ...flag } });
+      expect((await updatePoolInfo(null, fd([["poolId", "p1"]])))?.error).toBeTruthy();
+    }
+    auth.mockResolvedValue({ user: { id: "a1", role: "ADMIN", needsTotpSetup: true } });
+    expect((await updatePoolInfo(null, fd([["poolId", "p1"]])))?.error).toBeTruthy();
+    expect(poolUpdateMany).not.toHaveBeenCalled();
+  });
+
   it("refuses members and coaches", async () => {
     auth.mockResolvedValue({ user: { id: "m1", role: "MEMBER" } });
     expect((await updatePoolInfo(null, fd([["poolId", "p1"]])))?.error).toBeTruthy();

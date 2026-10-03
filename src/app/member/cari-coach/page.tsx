@@ -15,6 +15,7 @@ import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-cert
 // search engine -- tetep proporsional sama skala data sekarang (hitungan
 // puluhan coach, bukan ribuan).
 export const metadata = {
+  title: "Cari Coach | Swim Private Hub",
   robots: { index: false, follow: false },
 };
 

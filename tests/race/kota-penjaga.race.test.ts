@@ -87,6 +87,31 @@ describe("SYARAT 4 JAM KOSONG", () => {
     await mkSlot(c.id, pool.id, 5 * 24);
     expect((await buy()).status).toBe(200);
   });
+  it("SJ2: jam kosong di tanggal yang kapasitas kolamnya sudah penuh tidak dihitung untuk syarat beli (penjaga jadwal tetap menganggap coach membuka jam)", async () => {
+    const { pool, coach: other } = await mkPricedOffer();
+    const c = await prisma.user.create({ data: { name: "C", phone: "08" + Math.random().toString().slice(2, 12), passwordHash: "x", role: "COACH", coachProfile: { create: { pricePack4: 440000, pricePack8: 800000 } } } });
+    await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: c.id } });
+    const mine = [];
+    for (let i = 0; i < 4; i++) mine.push(await mkSlot(c.id, pool.id, 30));
+    const busy = await mkSlot(other.id, pool.id, 30);
+    expect(mine.every((s) => s.date.getTime() === busy.date.getTime())).toBe(true);
+    const m = await mkUser("MEMBER");
+    const dep = await prisma.dependent.create({ data: { memberId: m.id, name: "Anak" } });
+    const buy = () => as({ id: m.id, role: "MEMBER" }, () => checkout(new Request("http://x", { method: "POST", body: JSON.stringify({ poolId: pool.id, coachId: c.id, sesi: 4, dependentId: dep.id }) })));
+    expect((await buy()).status).toBe(200);
+    await prisma.payment.deleteMany({ where: { package: { memberId: m.id } } });
+    await prisma.package.deleteMany({ where: { memberId: m.id } });
+    // Kapasitas 1 dan sudah terisi booking member lain di tanggal yang sama.
+    await prisma.pool.update({ where: { id: pool.id }, data: { dailyCapacity: 1 } });
+    const p0 = await paidPackage(pool.id, other.id);
+    expect((await bookAs(p0.m.id, busy.id, p0.pkg.id)).status).toBe(201);
+    expect((await buy()).status).toBe(409);
+    const { pkg } = await paidPackage(pool.id, c.id);
+    // Penjaga jadwal (pelanggaran coach) sengaja tidak memakai kapasitas: kolam
+    // penuh karena member lain bukan kelalaian coach (menunggu keputusan Hadi).
+    await runCoachSlotWatch(new Date());
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).noSlotSince).toBeNull();
+  });
 });
 
 describe("PENJAGA JADWAL COACH", () => {

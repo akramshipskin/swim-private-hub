@@ -23,6 +23,7 @@ import Image from "next/image";
 // Publik, gak perlu login -- orang tua yang tau nama coach bisa cari
 // lewat link ini (dishare manual/WA), gak lewat UI browse.
 export const metadata: Metadata = {
+  title: "Profil Coach | Swim Private Hub",
   robots: { index: false, follow: false },
 };
 
@@ -52,6 +53,7 @@ export default async function CoachShortcutPage({
         },
       },
       poolAffiliations: {
+        where: { pool: { isActive: true } },
         select: {
           pool: { select: { id: true, name: true, address: true, openTime: true, closeTime: true, facilities: true, photos: true } },
         },
@@ -77,7 +79,7 @@ export default async function CoachShortcutPage({
   const content = (
     // Login: samain container sama halaman role lain (judul gak loncat pas
     // pindah dari Cari Coach). Anonim: tengah, sejajar header publik.
-    <main className={session ? "w-full px-4 py-6 sm:py-8" : "w-full px-4 py-8"}>
+    <main className={session ? "w-full px-4 py-6 sm:py-8" : "mx-auto w-full max-w-6xl px-4 py-8"}>
       <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
       <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
         <Avatar src={profile?.photoUrl} alt={`Foto ${coach.name}`} className="h-24 w-24 sm:h-28 sm:w-28" />

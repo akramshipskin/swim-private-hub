@@ -16,7 +16,7 @@ export function AuthShell({
   children: ReactNode;
 }) {
   return (
-    <main className="grid min-h-screen bg-background lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+    <main className="grid min-h-screen grid-cols-[minmax(0,1fr)] bg-background lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <aside className="relative isolate hidden overflow-hidden bg-fixed-night text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
         <Image src="/images/landing/hero-swim.jpg" alt="" fill sizes="45vw" className="-z-10 object-cover object-[60%_30%] opacity-60" priority />
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-fixed-night via-fixed-night/70 to-fixed-night/30" />

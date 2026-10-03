@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
 import { AFFILIATE_PAYOUT_NOTE } from "@/lib/affiliate";
 import { formatBps } from "@/lib/pricing";
-import { formatDateLabel, todayWibDateString } from "@/lib/datetime";
+import { todayWibDateString, formatDateWib } from "@/lib/datetime";
 import PphRemitForm from "./pph-remit-form";
 
 export const metadata: Metadata = {
@@ -166,7 +166,7 @@ export default async function KomisiPage() {
                 <ul className="space-y-0.5">
                   {remittances.map((r) => (
                     <li key={r.id}>
-                      {formatDateLabel(r.createdAt)} · {formatRupiah(r.amount)} · {r.reference}
+                      {formatDateWib(r.createdAt)} · {formatRupiah(r.amount)} · {r.reference}
                       {r.note ? ` · ${r.note}` : ""}
                     </li>
                   ))}

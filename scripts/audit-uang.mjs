@@ -32,7 +32,12 @@ for (const [label, table, col] of [["kolam", "Pool", "poolId"], ["coach", "Coach
 // 3. Pembagian per sesi.
 const bookings = await q(`
   SELECT b.id, b.status, b.attended, p."totalSesi", p."isTrial", p."isSingleSession",
-    p."poolPrice" AS poolprice,
+    -- Harga kolam periode sesi: harga sebelum pindah kolam pertama setelah sesi
+    -- (ganti coach tanpa biaya bisa pindah kolam); sama dengan pricesForSessionCoach.
+    COALESCE((SELECT c2."oldPoolPrice" FROM "CoachChangeRequest" c2 WHERE c2."packageId" = p.id AND c2.status = 'COMPLETED'
+      AND c2."completedAt" >= a."startTime" AND c2."oldPoolPrice" IS NOT NULL ORDER BY c2."completedAt" LIMIT 1), p."poolPrice") AS poolprice,
+    a."coachId" AS slotcoach,
+    COALESCE(bool_and(w."poolId" = a."poolId") FILTER (WHERE w."poolId" IS NOT NULL), true) AS poolok,
     -- Harga menurut WAKTU sesi: sesi sebelum sebuah ganti coach selesai memakai harga
     -- sebelum ganti itu (dan harus diajar coach lama); sesudahnya harga paket sekarang.
     CASE WHEN nx.id IS NOT NULL THEN (CASE WHEN nx."fromCoachId" = a."coachId" THEN nx."oldCoachPrice" END)
@@ -77,6 +82,7 @@ for (const b of bookings) {
     : Math.floor(b.paid / b.totalSesi);
   if (total !== v) bad("sesi", `${b.id}: total dibagi ${total} != nilai sesi ${v} (bayar ${b.paid}, ${b.totalSesi} sesi)`);
   if (b.pool < 0 || b.coach < 0 || b.net < 0 || b.tax < 0) bad("sesi", `${b.id}: ada bagian negatif (kolam ${b.pool}, coach ${b.coach}, platform ${b.net}, PPN ${b.tax})`);
+  if (!b.poolok) bad("sesi", `${b.id}: uang kolam masuk ke kolam lain, bukan kolam tempat sesi berlangsung`);
   if (b.attended === false && b.pool !== 0) bad("sesi", `${b.id}: Tidak Hadir tapi kolam dapat ${b.pool}`);
   // Model harga-dari-coach (2 Okt): bagian tetap per sesi dari harga yang disalin saat beli,
   // potongan PPh 0,5% (atau 0 bila bebas), dan sesi hanya dengan coach paketnya.
@@ -101,6 +107,12 @@ for (const b of bookings) {
   else if (b.tax !== t11 && b.taxat && new Date(b.taxat) >= PPN_11_SINCE) bad("PPN", `${b.id}: dicatat ${b.taxat.toISOString?.() ?? b.taxat} memakai 12% padahal sejak 30 Sep 11%`);
 }
 notes.push(`sesi: ${bookings.length} booking, ${checked} bertanda dan berbayar dicek pembagiannya`);
+
+// 3b. Ganti coach tanpa biaya: saldo member yang dikredit = selisih yang tercatat (sekali).
+const fc = await q(`SELECT c.id, c.amount, COALESCE((SELECT SUM(m.amount) FROM "MemberWalletTransaction" m WHERE m."coachChangeRequestId" = c.id AND m.type = 'COACH_CHANGE_CREDIT'),0)::int AS credited
+  FROM "CoachChangeRequest" c WHERE c.free = true AND c.status = 'COMPLETED'`);
+for (const c of fc) if (c.credited !== Math.max(0, -(c.amount ?? 0))) bad("ganti gratis", `${c.id}: saldo member dikredit ${c.credited}, harusnya ${Math.max(0, -(c.amount ?? 0))}`);
+notes.push(`ganti coach tanpa biaya: ${fc.length} dicek`);
 
 // 4. Afiliasi: tiap komisi yang cair punya pasangan pengurang platform senilai sama.
 const aff = await q(`SELECT

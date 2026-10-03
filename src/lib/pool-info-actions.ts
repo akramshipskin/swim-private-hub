@@ -9,6 +9,7 @@ import { notifyAdmins } from "@/lib/notify";
 import { notifyWaitlistForPool } from "@/lib/coach-pools";
 import { isCity } from "@/lib/cities";
 import { parseDailyCapacity } from "@/lib/pricing";
+import { PARTNER_AGREEMENT_REQUIRED_ERROR } from "@/lib/partner-agreement";
 import { PHOTO_BUCKET, extensionFor, isStorageConfigured, publicObjectUrl, uploadObject, validateUpload, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR } from "@/lib/storage";
 
 export type PoolInfoState = { error?: string; ok?: boolean; warning?: string } | null;
@@ -19,6 +20,10 @@ const MAX_POOL_PHOTOS = 6;
 async function canEditPool(poolId: string) {
   const session = await auth();
   if (!session) return { error: "Sesi habis, silakan masuk lagi." as const };
+  // Gerbang yang sama dengan requireRole: server action bisa dipanggil langsung.
+  if (session.user.mustChangePassword) return { error: "Ganti password sementara dulu sebelum mengubah info kolam." as const };
+  if (session.user.needsTotpSetup) return { error: "Pasang verifikasi 2 langkah dulu di menu Keamanan." as const };
+  if (session.user.needsPartnerAgreement) return { error: PARTNER_AGREEMENT_REQUIRED_ERROR };
   const allowed =
     session.user.role === "ADMIN" ||
     (session.user.role === "POOL_OWNER" &&

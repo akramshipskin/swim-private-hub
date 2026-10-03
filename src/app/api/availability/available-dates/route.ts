@@ -1,5 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { withinPoolHours } from "@/lib/pool-hours";
+import { fullPoolDays, isFullDay } from "@/lib/coach-open-slots";
 
 // Buat kasih tau date picker member tanggal mana yang ada slot AVAILABLE
 // (bisa dibooking) -- 1 request per bulan yang lagi dibuka, bukan per hari.
@@ -29,13 +31,17 @@ export async function GET(request: Request) {
       date: { gte: from, lt: to },
       status: "AVAILABLE",
       startTime: { gt: new Date() },
+      // Sama dengan syarat booking: coach & kolam aktif, di dalam jam buka.
+      coach: { isActive: true },
+      pool: { isActive: true },
       ...(poolId ? { poolId } : {}),
     },
-    select: { date: true },
-    distinct: ["date"],
+    select: { poolId: true, date: true, startTime: true, endTime: true, pool: { select: { openTime: true, closeTime: true, dailyCapacity: true } } },
   });
+  // Tanggal yang kapasitas harian kolamnya sudah penuh juga tidak ditandai.
+  const full = await fullPoolDays(rows);
 
-  const dates = rows.map((r) => r.date.toISOString().slice(0, 10));
+  const dates = [...new Set(rows.filter((r) => withinPoolHours(r.pool, r.startTime, r.endTime) && !isFullDay(full, r)).map((r) => r.date.toISOString().slice(0, 10)))];
 
   return Response.json({ dates });
 }

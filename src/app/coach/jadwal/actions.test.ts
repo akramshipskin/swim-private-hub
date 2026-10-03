@@ -51,7 +51,7 @@ function formData(bookingId: string) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: "06:00", closeTime: "21:00" } });
+  affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: "06:00", closeTime: "21:00", isActive: true } });
   availabilityFindMany.mockResolvedValue([]);
   availabilityCreateMany.mockResolvedValue({ count: 2 });
   userFindMany.mockResolvedValue([{ id: "m1" }, { id: "m2" }]);
@@ -192,7 +192,7 @@ describe("addAvailability new-slot notification", () => {
 
   // Jam buka kolam (Hadi 2 Okt malam, #6).
   it("menolak jam di luar jam buka kolam tanpa membuat slot apa pun", async () => {
-    affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: "08:00", closeTime: "10:00" } });
+    affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: "08:00", closeTime: "10:00", isActive: true } });
     const res = await addAvailability(null, slotForm({ startTime: "08:00", endTime: "11:00" }));
     expect(res?.error).toContain("di luar jam buka Kolam Melati (08.00–10.00)");
     expect(res?.error).toContain("10.00–11.00");
@@ -200,7 +200,7 @@ describe("addAvailability new-slot notification", () => {
   });
 
   it("kolam tanpa jam buka: slot baru ditolak, pemilik kolam diberi tahu (dibatasi sekali sehari)", async () => {
-    affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: null, closeTime: null } });
+    affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: null, closeTime: null, isActive: true } });
     const res = await addAvailability(null, slotForm({}));
     expect(res?.error).toContain("Jam buka Kolam Melati belum diisi");
     expect(availabilityCreateMany).not.toHaveBeenCalled();
@@ -209,6 +209,13 @@ describe("addAvailability new-slot notification", () => {
     takeAttempt.mockResolvedValueOnce(null);
     await addAvailability(null, slotForm({}));
     expect(notifyUser).not.toHaveBeenCalled();
+  });
+
+  it("kolam nonaktif: slot baru ditolak", async () => {
+    affiliationFindUnique.mockResolvedValue({ pool: { name: "Kolam Melati", openTime: "06:00", closeTime: "21:00", isActive: false } });
+    const res = await addAvailability(null, slotForm({}));
+    expect(res?.error).toContain("Kolam Melati sedang tidak aktif");
+    expect(availabilityCreateMany).not.toHaveBeenCalled();
   });
 
   it("refuses a pool the coach is not affiliated with, without notifying anyone", async () => {

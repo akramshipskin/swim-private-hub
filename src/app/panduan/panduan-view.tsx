@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Logotype } from "@/components/ui/logotype";
-import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
 import { CANCEL_WINDOW_HOURS, MIN_WITHDRAWAL } from "@/lib/policy";
 import { formatRupiah } from "@/lib/format";
 
@@ -12,7 +11,6 @@ import { formatRupiah } from "@/lib/format";
 // warna sendiri (Manrope/Inter), jadi terasa produk lain dibanding landing.
 // Sekarang komponen React biasa, lebar dan warnanya sama dengan landing page.
 
-const OWNER_WA_LINK = buildOwnerInquiryWaLink();
 
 type Step = { title: string; body: string };
 type Section = { heading: string; intro?: string; steps: Step[]; note?: string };
@@ -290,14 +288,12 @@ export default function PanduanView() {
               <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold hover:bg-fixed-lime-100">
                 Daftar gratis
               </Link>
-              <a
-                href={OWNER_WA_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/daftar-kolam"
                 className="rounded-full border border-fixed-ink/20 px-6 py-3 text-base font-semibold hover:bg-fixed-sand"
               >
-                Punya kolam renang? Hubungi kami
-              </a>
+                Punya kolam renang? Daftarkan kolam
+              </Link>
             </div>
           </section>
 

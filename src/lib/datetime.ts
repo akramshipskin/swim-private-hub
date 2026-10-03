@@ -27,6 +27,13 @@ export function formatDateLabel(d: Date): string {
   });
 }
 
+// Untuk titik waktu (expiredDate, createdAt, batas bayar), bukan kolom `date`:
+// tanggal kalendernya dihitung di WIB. formatDateLabel (UTC) pada titik waktu
+// menggeser tanggal mundur sehari untuk jam 00.00-06.59 WIB.
+export function formatDateWib(d: Date): string {
+  return d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" });
+}
+
 // Tanggal "hari ini" versi WIB, format YYYY-MM-DD, dipakai buat filter
 // query "upcoming" biar gak bergantung timezone server.
 export function todayWibDateString(): string {

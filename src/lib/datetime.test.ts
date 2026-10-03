@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
-import { resolveDateRange, formatTimeLeft, resolveExpiredDate } from "./datetime";
+import { resolveDateRange, formatTimeLeft, resolveExpiredDate, formatDateWib, formatDateLabel } from "./datetime";
 
 afterEach(() => vi.useRealTimers());
 
@@ -69,5 +69,14 @@ describe("resolveExpiredDate", () => {
   it("clears the expiry when the field is emptied", () => {
     expect(resolveExpiredDate("", new Date("2026-09-25T07:32:00Z"))).toBeNull();
     expect(resolveExpiredDate("", null)).toBeNull();
+  });
+});
+
+describe("formatDateWib", () => {
+  // Regresi: paket berakhir 2 Des 01.00 WIB (= 1 Des 18.00 UTC) dulu tertulis "1 Desember".
+  it("memakai tanggal kalender WIB untuk titik waktu dini hari", () => {
+    const d = new Date("2026-12-02T01:00:00+07:00");
+    expect(formatDateWib(d)).toContain("2 Desember 2026");
+    expect(formatDateLabel(d)).toContain("1 Desember 2026");
   });
 });
