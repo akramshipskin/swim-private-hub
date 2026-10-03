@@ -1,6 +1,6 @@
 # Rancangan: kota, coach memilih kolam, kapasitas kolam, tanggungan sesi coach (3 Okt 2026)
 
-Status: RANCANGAN, menunggu persetujuan Hadi. Belum ada kode. Sumber keputusan: docs/KEPUTUSAN.md entri "3 Okt" (brainstorm penautan coach-kolam). Ditulis Claude (Opus).
+Status: DISETUJUI Hadi 3 Okt. Dikerjakan bertahap (bagian 7). Sumber keputusan: docs/KEPUTUSAN.md entri "3 Okt" (brainstorm penautan coach-kolam). Ditulis Claude (Opus).
 
 ## 1. Tujuan
 Aplikasi siap dipakai di banyak kota tanpa admin menautkan coach ke kolam satu per satu, dan member terlindungi dari coach yang tidak membuka jadwal setelah paketnya dibeli.
@@ -79,8 +79,8 @@ Aplikasi siap dipakai di banyak kota tanpa admin menautkan coach ke kolam satu p
 6. Draf rev.3 (Sonnet untuk teks, Opus memeriksa kesesuaian dengan kode).
 Tiap tahap: tes otomatis, tes balapan, Opus kedua memeriksa. Migrasi dijalankan Hadi di production sebelum kirim ke GitHub.
 
-## 8. Yang masih perlu keputusan Hadi
-1. Ganti coach gratis: coach di kolam yang sama saja, atau boleh kolam lain di kota sama selama total harga (kolam + coach) sama/lebih murah?
-2. Kolam lama yang belum mengisi kapasitas: tanpa batas sampai diisi (+ spanduk pengingat), atau tidak bisa dibooking sampai diisi?
-3. Pelanggaran berapa kali sampai coach dinonaktifkan, dalam rentang berapa lama?
-4. Coach lama tanpa kota: diminta mengisi saat masuk (sama dengan member)?
+## 8. Keputusan tambahan (Hadi 3 Okt, rancangan DISETUJUI)
+1. Ganti coach gratis: coach di kolam sama ATAU kolam lain sekota, selama total harga sisa sesi (kolam + coach) sama/lebih murah.
+2. Kolam lama tanpa kapasitas: tetap bisa dibooking tanpa batas + spanduk pengingat ke pemilik.
+3. Coach dinonaktifkan setelah 3 pelanggaran dalam 6 bulan (admin tetap menilai).
+4. Coach lama tanpa kota diminta mengisi saat masuk (sama dengan member).
