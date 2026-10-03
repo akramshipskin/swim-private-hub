@@ -13,8 +13,8 @@ class CoachChangeError extends Error {}
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session || session.user.role !== "MEMBER") return Response.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.user.mustChangePassword) return Response.json({ error: "Ganti password sementara dulu." }, { status: 403 });
+  if (!session || session.user.role !== "MEMBER") return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
+  if (session.user.mustChangePassword) return Response.json({ error: "Ganti password sementaramu dulu sebelum melanjutkan." }, { status: 403 });
 
   let body: { requestId?: string };
   try {
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     if (req.payments[0]) return { redirectUrl: req.payments[0].snapRedirectUrl } as const;
     if (Date.now() - req.decidedAt.getTime() > COACH_CHANGE_PAY_WINDOW_MS) {
       await tx.coachChangeRequest.update({ where: { id: req.id }, data: { status: "EXPIRED" } });
-      return { error: "Batas 24 jam untuk tambah bayar sudah lewat, pengajuan batal. Ajukan ulang kalau masih ingin ganti coach." } as const;
+      return { error: "Batas 24 jam untuk tambah bayar sudah lewat, jadi pengajuan dibatalkan. Ajukan ulang bila masih ingin ganti coach." } as const;
     }
     const used = await spendMemberBalance(tx, memberId, req.amount, { packageId: req.packageId, coachChangeRequestId: req.id });
     await tx.coachChangeRequest.update({ where: { id: req.id }, data: { saldoUsed: used } });

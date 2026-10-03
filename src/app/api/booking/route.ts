@@ -16,7 +16,7 @@ class BookingError extends Error {
 export async function POST(request: Request) {
   const session = await auth();
   if (!session || session.user.role !== "MEMBER") {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
   }
   // Proxy cuma nge-redirect halaman; API ini di luar matcher-nya, jadi
   // akun berpassword sementara dicegat di sini juga.
@@ -71,9 +71,14 @@ export async function POST(request: Request) {
       // Sama untuk akun member: akun yang sedang dihapus/dinonaktifkan admin
       // (src/lib/account-deletion.ts) menunggu booking ini selesai lalu ikut
       // membatalkannya; booking setelahnya ditolak.
-      const [member] = await tx.$queryRaw<{ isActive: boolean }[]>`SELECT "isActive" FROM "User" WHERE id = ${session.user.id} FOR SHARE`;
+      const [member] = await tx.$queryRaw<{ isActive: boolean; deletionRequestedAt: Date | null }[]>`SELECT "isActive", "deletionRequestedAt" FROM "User" WHERE id = ${session.user.id} FOR SHARE`;
       if (!member?.isActive) {
         throw new BookingError("Akun ini sudah tidak aktif.", 403);
+      }
+      // Member yang sedang mengajukan hapus akun tidak bisa booking baru
+      // (Hadi 3 Okt malam, #8A); batalkan pengajuannya di Profil dulu.
+      if (member.deletionRequestedAt) {
+        throw new BookingError("Kamu sedang mengajukan penghapusan akun. Batalkan pengajuannya di Profil dulu untuk booking lagi.", 409);
       }
       // Kolam dinonaktifin admin: booking BARU ditolak. Booking yang udah
       // ada gak disentuh (keputusan default, bisa diubah Hadi).

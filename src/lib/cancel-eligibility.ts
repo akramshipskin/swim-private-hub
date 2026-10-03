@@ -41,7 +41,7 @@ export function evaluateCancelEligibility({
   if (quota === 0) {
     return {
       canCancel: false,
-      reason: "Sesi coba tidak bisa dibatalkan sendiri; tidak hadir = sesi hangus. Hubungi admin kalau ada keadaan khusus.",
+      reason: "Sesi coba tidak bisa dibatalkan sendiri. Bila tidak hadir, sesi hangus. Hubungi admin kalau ada keadaan khusus.",
       used,
       quota,
     };

@@ -23,15 +23,19 @@ export default async function CariCoachPage() {
   await requireRole("MEMBER");
 
   const coaches = await prisma.user.findMany({
-    where: { role: "COACH", isActive: true, coachProfile: { isActive: true } },
+    // Hanya coach yang sudah memilih minimal 1 kolam aktif (Hadi 3 Okt malam,
+    // #7A): coach tanpa kolam belum bisa dibeli.
+    where: { role: "COACH", isActive: true, coachProfile: { isActive: true }, poolAffiliations: { some: { pool: { isActive: true } } } },
     select: {
       id: true,
       name: true,
+      city: true,
       coachProfile: {
         select: { bio: true, specialties: true, photoUrl: true, birthDate: true, gender: true, certificates: approvedCertificatesSelect },
       },
       poolAffiliations: {
-        select: { pool: { select: { id: true, name: true, address: true } } },
+        where: { pool: { isActive: true } },
+        select: { pool: { select: { id: true, name: true, address: true, city: true } } },
         orderBy: { pool: { name: "asc" } },
       },
     },
@@ -42,8 +46,8 @@ export default async function CariCoachPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Cari Coach</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Semua coach aktif, lintas kolam. Paket dibeli per coach dan kolam lewat menu Paket, dan hanya berlaku
-        untuk coach itu di kolam itu.
+        Semua coach aktif beserta kolam tempat mereka mengajar. Paket dibeli per coach dan kolam lewat menu Paket,
+        dan hanya berlaku untuk coach itu di kolam itu.
       </p>
 
       {coaches.length === 0 ? (
@@ -61,8 +65,10 @@ export default async function CariCoachPage() {
                       <Badge tone="success">{certifiedBadgeText(coach.coachProfile?.certificates)}</Badge>
                     )}
                   </div>
-                  {coachBioLine(coach.coachProfile) && (
-                    <p className="mt-0.5 text-xs text-text-subtle">{coachBioLine(coach.coachProfile)}</p>
+                  {(coach.city || coachBioLine(coach.coachProfile)) && (
+                    <p className="mt-0.5 text-xs text-text-subtle">
+                      {[coach.city && `Domisili ${coach.city}`, coachBioLine(coach.coachProfile)].filter(Boolean).join(" · ")}
+                    </p>
                   )}
                   {coach.coachProfile?.bio && <p className="mt-1 line-clamp-2 text-sm text-text-muted">{coach.coachProfile.bio}</p>}
                   {coach.coachProfile && coach.coachProfile.specialties.length > 0 && (
@@ -74,18 +80,16 @@ export default async function CariCoachPage() {
                   )}
                   <div className="mt-3">
                     <p className="text-sm font-medium text-text">Mengajar di</p>
-                    {coach.poolAffiliations.length === 0 ? (
-                      <p className="text-sm text-text-muted">Belum terdaftar di kolam mana pun.</p>
-                    ) : (
-                      <ul className="mt-1 flex flex-col gap-1">
-                        {coach.poolAffiliations.map(({ pool }) => (
-                          <li key={pool.id} className="text-sm text-text">
-                            <span className="font-medium">{pool.name}</span>
-                            {pool.address && <span className="text-text-muted"> · {pool.address}</span>}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <ul className="mt-1 flex flex-col gap-1">
+                      {coach.poolAffiliations.map(({ pool }) => (
+                        <li key={pool.id} className="text-sm text-text">
+                          <span className="font-medium">{pool.name}</span>
+                          {(pool.address || pool.city) && (
+                            <span className="text-text-muted"> · {[pool.address, pool.city].filter(Boolean).join(", ")}</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                   <Link href={`/pelatih/${coach.id}`} className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                     Lihat profil lengkap &rarr;

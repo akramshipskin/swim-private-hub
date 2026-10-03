@@ -28,16 +28,16 @@ export function PendingApprovalScreen({ roleLabel }: { roleLabel: string }) {
         <CardBody className="flex flex-col items-center gap-3 text-center">
           <h1 className="text-xl font-semibold text-text">Pendaftaran diterima</h1>
           <p className="text-sm text-text-muted">
-            Akun {roleLabel} kamu lagi direview admin. Kamu baru bisa login setelah akunnya
-            diaktifkan admin. Mau dipercepat? Kabari admin lewat tombol di bawah.
+            Akun {roleLabel} kamu sedang ditinjau admin. Kamu baru bisa masuk setelah akunnya
+            diaktifkan admin. Ingin lebih cepat? Kabari admin lewat tombol di bawah.
           </p>
           <a
-            href={buildAdminWaLink(`Halo admin, saya baru daftar sebagai ${roleLabel} di Swim Private Hub. Mohon dicek ya.`)}
+            href={buildAdminWaLink(`Halo admin, saya baru daftar sebagai ${roleLabel} di Swim Private Hub. Mohon dicek.`)}
             target="_blank"
             rel="noopener noreferrer"
             className={buttonClass({ className: "w-full" })}
           >
-            Kabari Admin via WhatsApp
+            Kabari Admin lewat WhatsApp
           </a>
           <Link href="/" className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
             Kembali ke Beranda

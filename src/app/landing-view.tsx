@@ -67,8 +67,8 @@ const AUDIENCES: AudienceSteps[] = [
     steps: [
       { title: "Daftar & tambah peserta", body: "Satu akun untuk kamu sendiri dan/atau beberapa anak. Setiap peserta punya paket dan sisa sesi sendiri." },
       { title: "Pilih coach & kolam, lalu beli paket", body: "Harga tampil rinci sebelum bayar: tiket kolam, jasa coach, dan biaya layanan SPH. Belum yakin? Mulai dari 1 sesi coba. Bayar online lewat Midtrans (saldo di akunmu dipakai dulu), paket langsung aktif." },
-      { title: "Booking jam yang masih kosong", body: "Pilih jam dari jadwal coach pilihanmu. Slot yang sudah diambil orang lain otomatis terkunci." },
-      { title: "Datang & les", body: `Tidak bisa datang? Batalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelumnya, sesi kembali ke paket. Perkembangan anak dicatat coach setelah sesi.` },
+      { title: "Booking jam yang masih kosong", body: "Pilih jam dari jadwal coach pilihanmu. Jam yang sudah diambil orang lain otomatis terkunci." },
+      { title: "Datang & les", body: `Tidak bisa datang? Batalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelumnya, sesi kembali ke paket. Perkembangan peserta dicatat coach setelah sesi.` },
     ],
   },
   {
@@ -85,7 +85,7 @@ const AUDIENCES: AudienceSteps[] = [
     key: "kolam",
     label: "Pemilik kolam",
     steps: [
-      { title: "Gabung jadi mitra", body: "Daftarkan kolam, lengkapi alamat, jam buka, dan fasilitas." },
+      { title: "Gabung sebagai mitra", body: "Daftarkan kolam, lengkapi alamat, jam buka, dan fasilitas." },
       { title: "Pasang harga tiket", body: "Kolam memasang harga tiket untuk paket 4 dan 8 sesi; perubahan langsung berlaku untuk pembelian berikutnya." },
       { title: "Pantau jam ramai", body: "Lihat jam berapa kolam dipakai les privat, oleh coach siapa, setiap hari." },
       { title: "Terima bagi hasil", body: "Bagian kolam (setelah PPh final 0,5%) masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening: secepatnya, paling lambat 7 hari kerja." },
@@ -106,7 +106,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Berapa biayanya, dan apa saja yang dibayar?",
-        a: "Harga paket = tiket masuk kolam + jasa coach + biaya layanan SPH (di bawah 7%). Rinciannya tampil sebelum kamu bayar. Paket 4 sesi berlaku 60 hari, paket 8 sesi berlaku 90 hari (lebih hemat per sesi).",
+        a: "Harga paket terdiri dari tiket masuk kolam, jasa coach, dan biaya layanan SPH (di bawah 7%). Rinciannya tampil sebelum kamu bayar. Paket 4 sesi berlaku 60 hari, paket 8 sesi berlaku 90 hari (lebih hemat per sesi).",
       },
       {
         q: "Bisa coba 1 sesi dulu?",
@@ -134,7 +134,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kalau coach berhalangan, sesinya hangus?",
-        a: "Tidak. Coach yang membatalkan sesi otomatis mengembalikan sisa sesi ke paket peserta, dan kamu dapat notifikasi pembatalannya.",
+        a: "Tidak. Coach yang membatalkan sesi otomatis mengembalikan sisa sesi ke paket peserta, dan kamu mendapat notifikasi pembatalannya.",
       },
       {
         q: "Pembayarannya lewat apa?",
@@ -163,7 +163,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     label: "Coach",
     items: [
       {
-        q: "Bagaimana cara gabung jadi coach?",
+        q: "Bagaimana cara bergabung sebagai coach?",
         a: "Daftar lewat halaman Daftar Coach, isi profil dan keahlian. Setelah akun disetujui admin, kamu memilih sendiri kolam mitra tempat mengajar di menu Kolam Saya.",
       },
       {
@@ -172,7 +172,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kapan bagian saya masuk?",
-        a: "Tandai kehadiran paling lambat 24 jam setelah sesi selesai. Sesi Hadir langsung menambah saldo kamu sebesar harga paketmu dibagi jumlah sesinya. Kalau peserta sudah booking tapi tidak datang, tandai Tidak Hadir: kamu tetap dapat 50% dari bagianmu. Bagianmu dipotong PPh final 0,5% yang disetor SPH atas namamu, kecuali kamu menyerahkan surat pernyataan omzet di bawah Rp500 juta setahun.",
+        a: "Tandai kehadiran paling lambat 24 jam setelah sesi selesai. Sesi Hadir langsung menambah saldo kamu sebesar harga paketmu dibagi jumlah sesinya. Kalau peserta sudah booking tapi tidak datang, tandai Tidak Hadir: kamu tetap mendapat 50% dari bagianmu. Bagianmu dipotong PPh final 0,5% yang disetor SPH atas namamu, kecuali kamu menyerahkan surat pernyataan omzet di bawah Rp 500 juta setahun.",
       },
       {
         q: "Cara mencairkan saldo?",
@@ -184,7 +184,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Saya bisa menentukan tarif saya sendiri?",
-        a: "Bisa. Kamu memasang harga paket 4 dan 8 sesi di menu Harga, satu harga untuk semua kolam tempat kamu mengajar. Member membayar harga kolam + hargamu + biaya layanan SPH. Paket yang sudah dibeli tidak ikut berubah saat kamu mengganti harga.",
+        a: "Bisa. Kamu memasang harga paket 4 dan 8 sesi di menu Harga, satu harga untuk semua kolam tempat kamu mengajar. Member membayar harga kolam ditambah hargamu dan biaya layanan SPH. Paket yang sudah dibeli tidak ikut berubah saat kamu mengganti harga.",
       },
       {
         q: "Ada biaya untuk bergabung?",
@@ -196,7 +196,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Apa untungnya dibanding cari peserta sendiri?",
-        a: "Calon peserta menemukan dan memilihmu dari profil di aplikasi, tanpa janji jumlah peserta. Jadwal, kehadiran, sisa sesi, dan pembayaran diurus sistem, jadi tidak ada tagih-menagih. Murid yang sudah kamu punya juga bisa didaftarkan lewat kode afiliasimu.",
+        a: "Calon peserta menemukan dan memilihmu dari profil di aplikasi, tanpa janji jumlah peserta. Jadwal, kehadiran, sisa sesi, dan pembayaran diurus sistem, jadi tidak ada tagih-menagih. Peserta yang sudah kamu latih sebelumnya juga bisa didaftarkan lewat kode afiliasimu.",
       },
       {
         q: "Wajib isi catatan perkembangan peserta?",
@@ -209,7 +209,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     label: "Pemilik kolam",
     items: [
       {
-        q: "Apa untungnya buat kolam saya?",
+        q: "Apa untungnya untuk kolam saya?",
         a: "Kamu bisa membuka jam kosong untuk les privat satuan (1 coach, 1 peserta, bukan sewa club), dan setiap sesi yang terlaksana memberi bagian ke kolam secara otomatis. Kamu juga bisa melihat jam ramai kolam setiap hari. Kolammu tetap kolam umum: pengunjung dari mana pun tetap bisa masuk.",
       },
       {
@@ -218,7 +218,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Bagaimana pembagian hasilnya?",
-        a: "Setiap sesi yang ditandai Hadir, kolam menerima harga tiket paketnya dibagi jumlah sesi, coach menerima harga jasanya dibagi jumlah sesi, dan biaya layanan menjadi bagian SPH. Bagian kolam dan coach dipotong PPh 0,5% kecuali sudah menyerahkan surat pernyataan omzet di bawah Rp500 juta.",
+        a: "Setiap sesi yang ditandai Hadir, kolam menerima harga tiket paketnya dibagi jumlah sesi, coach menerima harga jasanya dibagi jumlah sesi, dan biaya layanan menjadi bagian SPH. Bagian kolam dan coach dipotong PPh 0,5% kecuali sudah menyerahkan surat pernyataan omzet di bawah Rp 500 juta.",
       },
       {
         q: "Ada biaya untuk bergabung?",
@@ -229,7 +229,7 @@ const FAQ_GROUPS: FaqGroup[] = [
         a: "Tidak harus. Coach yang sudah terdaftar di platform bisa diafiliasikan ke kolam kamu; kamu tetap bisa memakai coach sendiri kalau punya.",
       },
       {
-        q: "Cara gabung jadi mitra?",
+        q: "Bagaimana cara bergabung sebagai mitra?",
         a: "Daftar lewat halaman Daftarkan Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin (diperiksa paling lambat 1×24 jam), kolam kamu langsung bisa menerima booking. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
       },
     ],
@@ -320,7 +320,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
             </div>
             <p className="hero-rise mt-5 text-sm text-white/75" style={heroDelay(600)}>
               Coach atau punya kolam? Gabung sebagai mitra:{" "}
-              <Link href="/daftar-coach" prefetch={false} className="-my-3 inline-block py-3 font-semibold text-white underline underline-offset-4 hover:text-fixed-lime">Daftar jadi coach</Link>
+              <Link href="/daftar-coach" prefetch={false} className="-my-3 inline-block py-3 font-semibold text-white underline underline-offset-4 hover:text-fixed-lime">Daftar sebagai coach</Link>
               {" · "}
               <Link href="/daftar-kolam" prefetch={false} className="-my-3 inline-block py-3 font-semibold text-white underline underline-offset-4 hover:text-fixed-lime">Daftarkan kolam</Link>
             </p>
@@ -534,7 +534,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       <section id="faq" className="mx-auto grid w-full max-w-6xl scroll-mt-20 gap-8 px-4 pb-14 sm:pb-20 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14">
         <Reveal>
           <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-5xl">Pertanyaan umum</h2>
-          <p className="mt-3 max-w-sm text-base text-fixed-muted">Pilih peranmu, pertanyaannya beda-beda.</p>
+          <p className="mt-3 max-w-sm text-base text-fixed-muted">Pilih peranmu, pertanyaannya berbeda-beda.</p>
         </Reveal>
         <Reveal delay={100}>
           <FaqTabs groups={FAQ_GROUPS} />
@@ -631,7 +631,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Gabung</p>
             <Link href="/register" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Daftar sebagai member</Link>
-            <Link href="/daftar-coach" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Daftar jadi coach</Link>
+            <Link href="/daftar-coach" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Daftar sebagai coach</Link>
             <Link href="/daftar-kolam" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Daftarkan kolam</Link>
             <Link href="/panduan" className="fx-link hover:text-white max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Panduan pemakaian</Link>
           </div>

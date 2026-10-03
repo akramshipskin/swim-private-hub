@@ -155,12 +155,12 @@ export function parsePackPrices(
   const pricePack4 = read("pricePack4");
   const pricePack8 = read("pricePack8");
   for (const v of [pricePack4, pricePack8]) {
-    if (v !== null && !isValidPackPrice(v)) return { error: "Harga harus angka bulat Rp1 sampai Rp50.000.000, atau dikosongkan." };
+    if (v !== null && !isValidPackPrice(v)) return { error: "Harga harus angka bulat Rp 1 sampai Rp 50.000.000, atau dikosongkan." };
   }
   // Harga baru wajib kelipatan Rp1.000 (Hadi 2 Okt malam, #8); harga lama yang
   // tidak diubah (sama dengan yang tersimpan) tetap diterima.
   for (const [v, o] of [[pricePack4, current?.pricePack4 ?? null], [pricePack8, current?.pricePack8 ?? null]] as const) {
-    if (v !== null && v !== o && v % PRICE_STEP !== 0) return { error: "Harga harus kelipatan Rp1.000, misal Rp260.000." };
+    if (v !== null && v !== o && v % PRICE_STEP !== 0) return { error: "Harga harus kelipatan Rp 1.000, contoh Rp 260.000." };
   }
   return { pricePack4, pricePack8 };
 }
@@ -194,8 +194,8 @@ export function parseRegisterPrices(
   if (pricePack4 === null && pricePack8 === null) return { error: "Isi harga paket 4 sesi atau 8 sesi (boleh keduanya)." };
   for (const v of [pricePack4, pricePack8]) {
     if (v === null) continue;
-    if (!isValidPackPrice(v)) return { error: "Harga harus angka bulat Rp1.000 sampai Rp50.000.000." };
-    if (v % PRICE_STEP !== 0) return { error: "Harga harus kelipatan Rp1.000, misal Rp260.000." };
+    if (!isValidPackPrice(v)) return { error: "Harga harus angka bulat Rp 1.000 sampai Rp 50.000.000." };
+    if (v % PRICE_STEP !== 0) return { error: "Harga harus kelipatan Rp 1.000, contoh Rp 260.000." };
   }
   return { pricePack4, pricePack8 };
 }

@@ -9,13 +9,13 @@ import { checkCancelEligibility } from "@/lib/cancel-eligibility";
 export async function GET(request: Request) {
   const session = await auth();
   if (!session) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date") ?? todayWibDateString();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(dateLabel(date).getTime())) {
-    return Response.json({ error: "Format tanggal harus YYYY-MM-DD" }, { status: 400 });
+    return Response.json({ error: "Tanggal tidak valid. Pilih ulang tanggalnya." }, { status: 400 });
   }
   // Pool-first browse (locked /plan-eng-review 2026-09-12): member
   // selalu tau kolamnya lewat paket/anak yang dipilih. poolId dibiarin

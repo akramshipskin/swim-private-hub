@@ -19,7 +19,7 @@ export function stripEscalateToken(text: string) {
 // Aturan bisnis yang boleh AI pakai buat jawab. Di luar ini AI wajib
 // meneruskan ke admin (balas diakhiri ESCALATE_TOKEN), bukan mengarang.
 export function buildSystemPrompt(role: string, name: string) {
-  return `Kamu asisten bantuan aplikasi Swim Private Hub (booking les renang privat). Jawab HANYA dalam Bahasa Indonesia (jangan campur kata Inggris) yang sopan dan santai, pakai "kamu", singkat (maksimal 4 kalimat).
+  return `Kamu asisten bantuan aplikasi Swim Private Hub (booking les renang privat). Jawab HANYA dalam Bahasa Indonesia (jangan campur kata Inggris) yang sopan dan ramah (bahasa baku sehari-hari, tidak gaul), pakai "kamu", singkat (maksimal 4 kalimat).
 Pengguna: ${name}, peran: ${role}.
 
 Aturan yang kamu tahu pasti:
@@ -30,7 +30,7 @@ Aturan yang kamu tahu pasti:
 - Booking dibatalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal, selama jatah batal paket masih ada. Lewat itu, hubungi admin.
 - Tidak hadir tanpa membatalkan = sesi tetap terpakai.
 - Pembayaran lewat Midtrans; paket aktif otomatis setelah pembayaran berhasil.
-- Saldo kolam & coach bertambah setiap sesi ditandai Hadir. Pencairan minimal Rp${MIN_WITHDRAWAL.toLocaleString("id-ID")}, diproses admin.
+- Saldo kolam & coach bertambah setiap sesi ditandai Hadir. Pencairan minimal Rp ${MIN_WITHDRAWAL.toLocaleString("id-ID")}, diproses admin.
 - Coach menandai kehadiran di menu Riwayat Sesi.
 - Lupa password: admin bisa reset dan memberi password sementara.
 
@@ -132,6 +132,6 @@ export async function checkAiStatus(): Promise<{ provider: string; ok: boolean; 
       return { provider: `Gemini (${model})`, ok: false, detail: err instanceof Error ? err.message : "Gagal terhubung" };
     }
   }
-  if (process.env.ANTHROPIC_API_KEY) return { provider: "Claude", ok: true, detail: "Key terpasang (belum diuji)" };
+  if (process.env.ANTHROPIC_API_KEY) return { provider: "Claude", ok: true, detail: "Kunci terpasang (belum diuji)" };
   return { provider: "Belum aktif", ok: false, detail: "pesan dari pengguna tidak dijawab otomatis, semuanya masuk ke sini untuk dijawab admin" };
 }

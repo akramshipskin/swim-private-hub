@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   if (!body) return Response.json({ error: INVALID_BODY_ERROR }, { status: 400 });
   const shapeError = checkTextFields(body, {
     ownerName: { max: MAX_NAME, label: "Nama pemilik" },
-    phone: { max: 20, label: "No HP" },
+    phone: { max: 20, label: "Nomor HP" },
     email: { max: MAX_EMAIL, label: "Email" },
     password: { max: MAX_PASSWORD, label: "Password" },
     poolName: { max: MAX_POOL_NAME, label: "Nama kolam" },
@@ -67,36 +67,36 @@ export async function POST(request: Request) {
 
   // Anti-spam sama persis pola /api/register (honeypot + minimum waktu isi).
   if (website) {
-    return Response.json({ error: "Registrasi gagal" }, { status: 400 });
+    return Response.json({ error: "Pendaftaran gagal. Coba lagi." }, { status: 400 });
   }
   if (typeof formRenderedAt === "number" && Date.now() - formRenderedAt < 1500) {
-    return Response.json({ error: "Registrasi gagal, coba lagi" }, { status: 400 });
+    return Response.json({ error: "Pendaftaran gagal. Tunggu sebentar, lalu kirim lagi." }, { status: 400 });
   }
 
   if (!ownerName || !rawPhone || !password || !poolName || !address || !openTime || !closeTime) {
     return Response.json(
-      { error: "Semua field wajib diisi (nama pemilik, No HP, password, nama kolam, alamat, jam buka & tutup)" },
+      { error: "Semua kolom wajib diisi: nama pemilik, Nomor HP, password, nama kolam, alamat, jam buka, dan jam tutup." },
       { status: 400 }
     );
   }
   if (!isValidIndonesianPhone(rawPhone)) {
-    return Response.json({ error: "Format No HP tidak valid (contoh: 0812xxxxxxx)" }, { status: 400 });
+    return Response.json({ error: "Format Nomor HP tidak valid (contoh: 0812xxxxxxx)" }, { status: 400 });
   }
   if (password.length < 8) {
-    return Response.json({ error: "Password minimal 8 karakter" }, { status: 400 });
+    return Response.json({ error: "Password minimal 8 karakter." }, { status: 400 });
   }
   // Form udah validasi closeTime > openTime di client, tapi request API
   // bisa dipalsu langsung (bukan cuma dropdown UI) -- validasi ulang di
   // sini, sama pola kayak affiliasi coach di addAvailability.
   if (!/^\d{2}:\d{2}$/.test(openTime) || !/^\d{2}:\d{2}$/.test(closeTime)) {
-    return Response.json({ error: "Format jam buka/tutup tidak valid" }, { status: 400 });
+    return Response.json({ error: "Format jam buka atau jam tutup tidak valid. Pilih ulang jamnya." }, { status: 400 });
   }
   if (closeTime <= openTime) {
-    return Response.json({ error: "Jam tutup harus setelah jam buka" }, { status: 400 });
+    return Response.json({ error: "Jam tutup harus setelah jam buka." }, { status: 400 });
   }
   // Kota, harga paket, dan kapasitas harian diisi saat daftar (Hadi 3 Okt).
   if (!isCity(city)) {
-    return Response.json({ error: "Pilih kota kolam dari daftar" }, { status: 400 });
+    return Response.json({ error: "Pilih kota kolam dari daftar." }, { status: 400 });
   }
   const prices = parseRegisterPrices(pricePack4, pricePack8);
   if ("error" in prices) return Response.json({ error: prices.error }, { status: 400 });
@@ -115,12 +115,12 @@ export async function POST(request: Request) {
   const phone = normalizePhone(rawPhone);
   const email = normalizeEmail(rawEmail);
   if (email && !isPlausibleEmail(email)) {
-    return Response.json({ error: "Format email tidak valid" }, { status: 400 });
+    return Response.json({ error: "Format email tidak valid." }, { status: 400 });
   }
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
-    return Response.json({ error: "No HP atau email sudah terdaftar" }, { status: 409 });
+    return Response.json({ error: "Nomor HP atau email sudah terdaftar." }, { status: 409 });
   }
 
   const registerHit = await takeAttempt(`register-staff:${clientIp(request.headers)}`, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS);
@@ -176,7 +176,7 @@ export async function POST(request: Request) {
     );
   } catch (err) {
     if (err instanceof Error && "code" in err && (err as { code?: string }).code === "P2002") {
-      return Response.json({ error: "No HP atau email sudah terdaftar" }, { status: 409 });
+      return Response.json({ error: "Nomor HP atau email sudah terdaftar." }, { status: 409 });
     }
     throw err;
   }

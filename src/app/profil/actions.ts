@@ -104,7 +104,7 @@ export async function addChild(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, silakan masuk lagi." };
-  if (session.user.role !== "MEMBER") return { error: "Hanya member yang bisa menambah anak." };
+  if (session.user.role !== "MEMBER") return { error: "Hanya member yang bisa menambah peserta." };
 
   const type = formData.get("type")?.toString();
   const name = formData.get("name")?.toString() ?? "";
@@ -168,7 +168,7 @@ export async function updateCoachProfile(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, silakan masuk lagi." };
-  if (session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
+  if (session.user.role !== "COACH") return { error: "Hanya untuk akun coach." };
 
   const bio = formData.get("bio")?.toString().trim() ?? "";
   const specialties = formData
@@ -215,7 +215,7 @@ export async function updateCoachProfile(
 
 export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
-  if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
+  if (!session || session.user.role !== "COACH") return { error: "Hanya untuk akun coach." };
   if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("photo") as File | null;
   const invalid = validateUpload(file, "photo");
@@ -237,14 +237,14 @@ export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): 
   return { success: true };
 }
 
-const LIMIT_ERROR = `Maksimal ${MAX_CERTIFICATES_PER_COACH} sertifikat. Hapus yang lama dulu.`;
+const LIMIT_ERROR = `Maksimal ${MAX_CERTIFICATES_PER_COACH} sertifikat. Hapus sertifikat lama lebih dulu.`;
 
 // Tambah 1 sertifikat (coach bisa punya banyak, maks MAX_CERTIFICATES_PER_COACH).
 // Selalu masuk PENDING -- badge "Bersertifikat" baru tampil setelah admin
 // menyetujui minimal satu (lihat admin/users/certificate-actions.ts).
 export async function uploadCoachCertificate(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
-  if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
+  if (!session || session.user.role !== "COACH") return { error: "Hanya untuk akun coach." };
   if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("certificate") as File | null;
   const name = formData.get("certificateName")?.toString().trim().slice(0, 120) ?? "";
@@ -306,7 +306,7 @@ export async function deleteCoachCertificate(certificateId: string): Promise<voi
 // (unggah ulang = mengganti). Bucket privat; dibuka lewat signed URL.
 export async function uploadCoachSignature(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
-  if (!session || session.user.role !== "COACH") return { error: "Hanya buat akun coach." };
+  if (!session || session.user.role !== "COACH") return { error: "Hanya untuk akun coach." };
   if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("signature") as File | null;
   const invalid = validateUpload(file, "photo");

@@ -82,7 +82,7 @@ export function RolePicker() {
 const COMPARE = [
   {
     before: "Tanya jadwal kosong lewat WhatsApp, lalu menunggu balasan.",
-    after: "Pilih coach, kolam, dan jam yang masih kosong. Slot yang sudah diambil otomatis terkunci.",
+    after: "Pilih coach, kolam, dan jam yang masih kosong. Jam yang sudah diambil otomatis terkunci.",
   },
   {
     before: "Transfer manual, kirim bukti, menunggu dikonfirmasi.",
@@ -312,7 +312,7 @@ export function CoachSection() {
           </div>
         </Reveal>
         <Link href="/daftar-coach" className="mt-6 inline-flex items-center rounded-full bg-fixed-lime px-6 py-3 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
-          Daftar jadi coach
+          Daftar sebagai coach
         </Link>
       </div>
     </section>
@@ -331,7 +331,7 @@ const POOL_GROUPS: { heading: string; items: Point[] }[] = [
       },
       {
         title: "Bagi hasil setiap sesi Hadir",
-        body: "Bagian kolam masuk ke saldo otomatis setiap sesi ditandai Hadir, dipotong PPh final 0,5% yang disetor SPH atas nama kolam, dan semua pihak melihat angka yang sama. Contoh (angka ilustrasi): bagian kolam Rp60.000 masuk saldo Rp59.700 setelah PPh Rp300.",
+        body: "Bagian kolam masuk ke saldo otomatis setiap sesi ditandai Hadir, dipotong PPh final 0,5% yang disetor SPH atas nama kolam, dan semua pihak melihat angka yang sama. Contoh (angka ilustrasi): bagian kolam Rp 60.000 masuk saldo Rp 59.700 setelah PPh Rp 300.",
       },
     ],
   },
@@ -357,7 +357,7 @@ const POOL_GROUPS: { heading: string; items: Point[] }[] = [
       },
       {
         title: "Pembagian tanggung jawab jelas",
-        body: "Kolam menjaga keselamatan fasilitas, coach bertanggung jawab atas pengajaran, SPH mengurus pemesanan dan pembayaran.",
+        body: "Kolam menjaga keselamatan fasilitas, coach bertanggung jawab atas pengajaran, SPH mengurus booking dan pembayaran.",
       },
     ],
   },

@@ -45,7 +45,7 @@ export async function replyToEmailThread(_prev: ReplyState, formData: FormData):
       },
     },
   });
-  if (!thread) return { error: "Thread tidak ditemukan." };
+  if (!thread) return { error: "Percakapan email tidak ditemukan." };
 
   const replySubject = thread.subject.startsWith("Re: ") ? thread.subject : `Re: ${thread.subject}`;
   const replyFrom = thread.messages[0]?.toAddress || INBOX_FROM_ADDRESS;
@@ -63,7 +63,7 @@ export async function replyToEmailThread(_prev: ReplyState, formData: FormData):
       inReplyToMessageId: thread.messages[0]?.resendId ?? null,
     });
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal kirim email.") };
+    return { error: userErrorMessage(err, "Gagal mengirim email. Coba lagi.") };
   }
 
   await prisma.$transaction([
@@ -109,7 +109,7 @@ export async function composeEmail(_prev: ReplyState, formData: FormData): Promi
   try {
     sent = await sendReplyEmail({ from, to, subject, text: content });
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal kirim email.") };
+    return { error: userErrorMessage(err, "Gagal mengirim email. Coba lagi.") };
   }
 
   const thread = await prisma.emailThread.upsert({

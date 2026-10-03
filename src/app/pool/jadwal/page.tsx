@@ -120,7 +120,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
                         </Badge>
                       ))}
                       {r.open.map((s, i) => (
-                        <Badge key={`o${i}`} tone="neutral">Slot kosong: {s.coachName}</Badge>
+                        <Badge key={`o${i}`} tone="neutral">Jam kosong: {s.coachName}</Badge>
                       ))}
                     </div>
                   </li>

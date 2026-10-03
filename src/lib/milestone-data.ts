@@ -18,7 +18,7 @@ export async function milestoneAccess(viewer: Viewer, dependentId: string) {
   }
   if (viewer.role === "COACH") {
     const taught = await coachTeachesDependent(viewer.id, dependentId);
-    return { canView: taught, canEdit: taught };
+    return { canView: taught, canEdit: taught && (await coachHasTaughtDependent(viewer.id, dependentId)) };
   }
   return { canView: false, canEdit: false };
 }
@@ -26,6 +26,15 @@ export async function milestoneAccess(viewer: Viewer, dependentId: string) {
 export async function coachTeachesDependent(coachUserId: string, dependentId: string) {
   const n = await prisma.booking.count({
     where: { status: "BOOKED", availability: { coachId: coachUserId }, package: { dependentId } },
+  });
+  return n > 0;
+}
+
+// Menulis milestone (catatan, butir, sertifikat) baru boleh setelah minimal 1
+// sesi peserta ini dengan coach tersebut ditandai Hadir (Hadi 3 Okt malam, #8A).
+export async function coachHasTaughtDependent(coachUserId: string, dependentId: string) {
+  const n = await prisma.booking.count({
+    where: { status: "BOOKED", attended: true, availability: { coachId: coachUserId }, package: { dependentId } },
   });
   return n > 0;
 }

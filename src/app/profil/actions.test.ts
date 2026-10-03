@@ -89,7 +89,7 @@ describe("updateCoachProfile", () => {
         ["birthDate", "2020-01-01"],
       ])
     );
-    expect(tooYoung).toEqual({ error: "Tanggal lahir tidak masuk akal (umur 17-80 tahun)." });
+    expect(tooYoung).toEqual({ error: "Tanggal lahir tidak masuk akal (usia 17–80 tahun)." });
 
     const badGender = await updateCoachProfile(
       null,

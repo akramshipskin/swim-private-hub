@@ -16,7 +16,7 @@ import { formatCountdown, isLockedCode, lockSecondsFromCode } from "@/lib/login-
 export function loginErrorMessage(code: string | undefined): string {
   if (isLockedCode(code)) return "Terlalu banyak percobaan salah. Tunggu 15 menit, lalu coba lagi.";
   if (code === "otp_invalid") return "Kode 2FA salah atau sudah dipakai. Tunggu kode berikutnya di aplikasi.";
-  return "No HP/Email atau password salah — atau akunmu (coach/pemilik kolam yang baru daftar) belum diaktifkan admin.";
+  return "Nomor HP/email atau password salah. Bila kamu coach atau pemilik kolam yang baru daftar, akunmu mungkin belum diaktifkan admin.";
 }
 
 export default function LoginForm() {
@@ -100,7 +100,7 @@ export default function LoginForm() {
           <h1 className="mb-5 text-xl font-semibold text-text">Masuk ke akunmu</h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field label="No HP atau Email">
+            <Field label="Nomor HP atau Email">
               <Input
                 type="text"
                 name="username"
@@ -164,7 +164,7 @@ export default function LoginForm() {
           <p className="mt-4 text-center text-sm text-text-muted">
             Lupa password?{" "}
             <a
-              href={buildAdminWaLink("Halo Admin Swim Private Hub, saya lupa password akun saya. No HP akun saya: ")}
+              href={buildAdminWaLink("Halo Admin Swim Private Hub, saya lupa password akun saya. Nomor HP akun saya: ")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block -my-3 py-3 font-medium text-brand-700 hover:underline"

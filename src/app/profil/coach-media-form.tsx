@@ -123,7 +123,7 @@ export default function CoachMediaForm({
               <Input
                 name="certificateName"
                 defaultValue={certificates.length === 0 ? defaultCertificateName ?? "" : ""}
-                placeholder="Misal: Sertifikasi Pelatih Renang FASI"
+                placeholder="Contoh: Sertifikasi Pelatih Renang FASI"
                 maxLength={120}
                 disabled={!storageReady}
                 required

@@ -44,6 +44,6 @@ export function parseCoachBirthDate(raw: string, now: Date = new Date()): Date {
   const parsed = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? new Date(`${raw}T00:00:00+07:00`) : new Date(NaN);
   if (Number.isNaN(parsed.getTime())) throw new Error("Tanggal lahir tidak valid.");
   const age = ageFromBirthDate(parsed, now);
-  if (age === null || age < 17 || age > 80) throw new Error("Tanggal lahir tidak masuk akal (umur 17-80 tahun).");
+  if (age === null || age < 17 || age > 80) throw new Error("Tanggal lahir tidak masuk akal (usia 17–80 tahun).");
   return parsed;
 }

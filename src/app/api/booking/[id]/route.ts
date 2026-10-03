@@ -7,7 +7,7 @@ export async function DELETE(
 ) {
   const session = await auth();
   if (!session || session.user.role !== "MEMBER") {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
   }
 
   const { id } = await params;

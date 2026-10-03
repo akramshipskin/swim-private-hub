@@ -37,7 +37,7 @@ export default async function PendingCertificates() {
                     Lihat file sertifikat
                   </a>
                 ) : (
-                  <p className="text-sm text-warning-text">File tidak bisa dibuka (storage belum aktif atau file hilang).</p>
+                  <p className="text-sm text-warning-text">File tidak bisa dibuka (penyimpanan file belum aktif atau file hilang).</p>
                 )}
               </div>
               <div className="flex gap-2">

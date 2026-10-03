@@ -28,7 +28,7 @@ export async function processWithdrawal(
   if (!isIrisConfigured()) {
     return {
       error:
-        "Midtrans Iris belum dikonfigurasi — transfer manual dulu, lalu klik \"Tandai Dibayar\".",
+        "Pencairan otomatis (Midtrans Iris) belum aktif. Lakukan transfer manual dulu, lalu klik \"Tandai Dibayar\".",
     };
   }
 

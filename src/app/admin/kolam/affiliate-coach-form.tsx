@@ -84,7 +84,7 @@ export default function AffiliateCoachForm({
       <ConfirmDialog
         open={removing !== null}
         title={`Lepas ${removing?.coachName ?? "coach"} dari kolam ini?`}
-        description="Semua slot kosong coach ini di kolam ini mulai sekarang akan dihapus. Sesi yang sudah dibooking tetap berjalan."
+        description="Semua jam kosong coach ini di kolam ini mulai sekarang akan dihapus. Sesi yang sudah dibooking tetap berjalan."
         confirmLabel="Ya, lepas"
         onCancel={() => setRemoving(null)}
         onConfirm={() => {

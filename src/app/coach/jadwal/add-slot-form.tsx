@@ -51,7 +51,7 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
                 value={date}
                 onChange={setDate}
                 fetchUrl="/api/coach/schedule-dates"
-                legendLabel="sudah ada slot"
+                legendLabel="sudah ada jadwal"
               />
             </div>
             <input type="hidden" name="date" value={date} />
@@ -75,9 +75,9 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
           </p>
         )}
         <p className="mt-2 text-xs text-text-subtle">
-          Slot otomatis dipecah per jam — misalnya 08.00–10.00 menjadi 2 slot terpisah (08–09,
-          09–10), masing-masing bisa dibooking member yang berbeda. Jam 12.00–13.00 (istirahat) tidak
-          dijadikan slot.
+          Rentang jam otomatis dipecah per jam. Misalnya 08.00–10.00 menjadi 2 jam terpisah (08.00–09.00
+          dan 09.00–10.00), masing-masing bisa dibooking member yang berbeda. Jam 12.00–13.00 (istirahat)
+          tidak dibuka.
         </p>
       </CardBody>
     </Card>

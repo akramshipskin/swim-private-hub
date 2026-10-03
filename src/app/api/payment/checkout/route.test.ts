@@ -11,6 +11,7 @@ const packageCreate = vi.fn().mockResolvedValue({ id: "pkg-new" });
 const poolFindFirst = vi.fn();
 const userFindFirst = vi.fn();
 const userFindUnique = vi.fn().mockResolvedValue({ phone: "081200000001", email: null });
+const depFindUnique = vi.fn().mockResolvedValue({ isActive: true });
 const sendMetaEvent = vi.fn().mockResolvedValue(undefined);
 let metaEnabled = false;
 vi.mock("@/lib/meta-capi", () => ({
@@ -30,6 +31,7 @@ vi.mock("@/lib/prisma", () => {
   const prisma: Record<string, unknown> = {
     package: { count: (...a: unknown[]) => packageCount(...a), findFirst: packageFindFirst, create: packageCreate, update: (...a: unknown[]) => packageUpdate(...a), delete: (...a: unknown[]) => packageDelete(...a) },
     pool: { findFirst: poolFindFirst },
+    dependent: { findUnique: (...a: unknown[]) => depFindUnique(...a) },
     user: { findFirst: userFindFirst, findUnique: (...a: unknown[]) => userFindUnique(...a) },
     payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a), update: (...a: unknown[]) => paymentUpdate(...a) },
   };
@@ -239,7 +241,8 @@ describe("checkout dengan saldo member", () => {
       expect(sendMetaEvent).toHaveBeenCalledTimes(1);
       expect(sendMetaEvent.mock.calls[0][0]).toMatchObject({ eventName: "Purchase", eventId: "SALDO-pkg-new", value: 1_363_200 });
 
-      userFindUnique.mockRejectedValueOnce(new Error("db down"));
+      // Panggilan pertama = cek pengajuan hapus akun; kedua = data member untuk Meta.
+      userFindUnique.mockResolvedValueOnce({ deletionRequestedAt: null }).mockRejectedValueOnce(new Error("db down"));
       expect((await POST(buy())).status).toBe(200);
 
       // Tunai lewat Midtrans: Purchase menunggu notifikasi lunas, cookie disimpan di Payment.
@@ -271,6 +274,20 @@ describe("checkout double submit", () => {
     expect(packageFindFirst).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ coachId: "c1", totalSesi: 8, isTrial: false, poolId: "pool-A" }) })
     );
+    expect(packageCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe("checkout ditolak (Hadi 3 Okt malam #8A)", () => {
+  it("menolak peserta nonaktif dan akun yang sedang diajukan hapus, tanpa membuat paket", async () => {
+    depFindUnique.mockResolvedValueOnce({ isActive: false });
+    const r1 = await POST(req({ poolId: "p1", coachId: "c1", sesi: 4, dependentId: "d1" }));
+    expect(r1.status).toBe(409);
+    expect((await r1.json()).error).toContain("dinonaktifkan");
+    userFindUnique.mockResolvedValueOnce({ deletionRequestedAt: new Date() });
+    const r2 = await POST(req({ poolId: "p1", coachId: "c1", sesi: 4, dependentId: "d1" }));
+    expect(r2.status).toBe(409);
+    expect((await r2.json()).error).toContain("penghapusan akun");
     expect(packageCreate).not.toHaveBeenCalled();
   });
 });

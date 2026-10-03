@@ -21,7 +21,7 @@ export default function DecideForm({ requestId, approveLabel }: { requestId: str
         <ConfirmDialog
           open={confirming}
           title="Setujui ganti coach?"
-          description="Sisa sesi dipindah ke coach baru dan selisih harganya langsung dicatat ke saldo member. Keputusan ini tidak bisa dibatalkan."
+          description="Sisa sesi dipindahkan ke coach baru dan selisih harganya langsung dicatat ke saldo member. Keputusan ini tidak bisa dibatalkan."
           confirmLabel="Ya, setujui"
           confirmVariant="primary"
           onCancel={() => setConfirming(false)}

@@ -6,7 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { formatRupiah } from "@/lib/format";
 import { formatBps, pack8SavingPercent, packQuote, PACK_DURATION_DAYS } from "@/lib/pricing";
 
-export const metadata = { title: "Harga Saya | Swim Private Hub" };
+export const metadata = { title: "Harga | Swim Private Hub" };
 
 export default async function CoachHargaPage() {
   const session = await requireRole("COACH");
@@ -24,19 +24,19 @@ export default async function CoachHargaPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-text">Harga Saya</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-text">Harga</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
         Pasang harga jasamu untuk paket 4 sesi (berlaku {PACK_DURATION_DAYS[4] / 30} bulan) dan 8 sesi (berlaku{" "}
         {PACK_DURATION_DAYS[8] / 30} bulan). Satu harga untuk semua kolam. Harga baru langsung berlaku untuk pembelian
         berikutnya; paket yang sudah dibeli tidak berubah. Biasanya paket 8 sesi dibuat lebih murah per sesinya supaya
-        member tertarik ambil yang lebih panjang.
+        member tertarik mengambil paket yang lebih panjang.
       </p>
       <Card className="mb-6">
         <CardBody>
           <PackPriceForm action={updateCoachPrices} pricePack4={profile.pricePack4} pricePack8={profile.pricePack8} />
           <p className="mt-3 text-xs text-text-subtle">
             Kosongkan salah satu kalau kamu tidak menjual paket itu. Bagianmu per sesi = harga paket ÷ jumlah sesi, dipotong
-            PPh 0,5% kecuali kamu sudah menyerahkan surat pernyataan omzet di bawah Rp500 juta ke admin.
+            PPh 0,5% kecuali kamu sudah menyerahkan surat pernyataan omzet di bawah Rp 500 juta ke admin.
           </p>
         </CardBody>
       </Card>

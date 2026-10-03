@@ -35,7 +35,7 @@ export default function ChangePasswordForm({
 
       {isMember && (
         <div className="flex flex-col gap-2">
-          <p className="text-sm font-medium text-text">Siapa yang mau les?</p>
+          <p className="text-sm font-medium text-text">Siapa yang akan ikut les?</p>
           <p className="text-xs text-text-subtle">
             Bisa diri sendiri, bisa anak, bisa keduanya. Tanggal lahir wajib diisi untuk menentukan level belajar. Bisa ditambah lagi nanti.
           </p>

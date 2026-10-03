@@ -8,7 +8,7 @@ import { fullPoolDays, isFullDay } from "@/lib/coach-open-slots";
 export async function GET(request: Request) {
   const session = await auth();
   if (!session) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const month = Number(searchParams.get("month")); // 1-12
 
   if (!year || !month || month < 1 || month > 12) {
-    return Response.json({ error: "year/month tidak valid" }, { status: 400 });
+    return Response.json({ error: "Bulan tidak valid. Muat ulang halaman, lalu coba lagi." }, { status: 400 });
   }
 
   const from = new Date(Date.UTC(year, month - 1, 1));

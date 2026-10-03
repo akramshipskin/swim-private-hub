@@ -35,14 +35,14 @@ export function CookieConsentBanner() {
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
         <p className="text-xs text-text-muted sm:text-sm">
           {process.env.NEXT_PUBLIC_META_PIXEL_ID
-            ? "Kami pakai cookie agar aplikasi ini jalan dan untuk mengukur iklan kami di Meta."
-            : "Kami pakai cookie sesi masuk dan penyimpanan tema seperlunya agar aplikasi ini jalan."}{" "}
+            ? "Kami memakai cookie agar aplikasi ini berjalan dan untuk mengukur iklan kami di Meta."
+            : "Kami memakai cookie sesi masuk dan penyimpanan tema seperlunya agar aplikasi ini berjalan."}{" "}
           <a href="/kebijakan-cookie" className="-my-3.5 inline-block py-3.5 font-medium text-brand-700 hover:underline">
             Kebijakan Cookie
           </a>
         </p>
         <Button size="sm" onClick={dismiss} className="shrink-0">
-          Oke, Mengerti
+          Mengerti
         </Button>
       </div>
     </div>

@@ -24,7 +24,7 @@ export async function affiliateCoach(
   }
   const coach = await prisma.user.findFirst({ where: { id: coachId, role: "COACH", isActive: true }, select: { id: true } });
   if (!coach) {
-    return { error: "Coach tidak ditemukan atau belum aktif. Aktifkan dulu di Kelola Pengguna." };
+    return { error: "Coach tidak ditemukan atau belum aktif. Aktifkan dulu di menu Pengguna." };
   }
 
   // upsert Prisma bukan atomic di DB -- 2 submit barengan bisa dua-duanya
@@ -39,6 +39,8 @@ export async function affiliateCoach(
     .catch((err: { code?: string }) => {
       if (err?.code !== "P2002") throw err;
     });
+  // Coach ditautkan lagi: hari tanpa tautan bukan salah coach, hitungan dimulai ulang.
+  await prisma.package.updateMany({ where: { poolId, coachId, noSlotSince: { not: null } }, data: { noSlotSince: null } });
   await notifyWaitlistForPool(poolId);
 
   revalidatePath("/admin/kolam");
@@ -80,6 +82,9 @@ export async function togglePoolActive(poolId: string, nextActive: boolean) {
     // pemiliknya -- HANYA pendaftar baru yang belum pernah disetujui. Pemilik
     // yang sengaja dinonaktifkan (sudah punya approvedAt) tidak disentuh.
     if (nextActive) {
+      // Hari tanpa jadwal saat kolam nonaktif bukan salah coach (Hadi 3 Okt
+      // malam #2A): hitungan penjaga jadwal dimulai ulang dari pemeriksaan berikutnya.
+      await tx.package.updateMany({ where: { poolId, noSlotSince: { not: null } }, data: { noSlotSince: null } });
       await tx.user.updateMany({
         where: { ...PENDING_APPROVAL_WHERE, role: "POOL_OWNER", poolOwnerships: { some: { poolId } } },
         data: { isActive: true, approvedAt: new Date() },

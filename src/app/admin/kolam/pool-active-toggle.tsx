@@ -40,7 +40,7 @@ export default function PoolActiveToggle({
       <ConfirmDialog
         open={open}
         title={`Nonaktifkan ${poolName}?`}
-        description="Kolam ini akan hilang dari dropdown booking member sampai diaktifkan ulang."
+        description="Kolam ini tidak bisa dipilih member saat booking sampai diaktifkan ulang."
         confirmLabel="Ya, nonaktifkan"
         loading={loading}
         onConfirm={handleToggle}

@@ -38,7 +38,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
     setError(null);
 
     if (!isValidIndonesianPhone(phone)) {
-      setError("Format No HP tidak valid (contoh: 0812xxxxxxx)");
+      setError("Format Nomor HP tidak valid (contoh: 0812xxxxxxx)");
       return;
     }
 
@@ -74,7 +74,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
 
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error ?? "Registrasi gagal");
+      setError(data.error ?? "Pendaftaran gagal. Coba lagi.");
       setLoading(false);
       return;
     }
@@ -130,7 +130,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
                 autoComplete="name"
               />
             </Field>
-            <Field label="No HP">
+            <Field label="Nomor HP">
               <Input
                 type="tel"
                 placeholder="0812xxxxxxx"
@@ -167,7 +167,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
 
             <Field label="Kode afiliasi coach/kolam (opsional)">
               <Input
-                placeholder="Misal: NADIA27"
+                placeholder="Contoh: NADIA27"
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
                 maxLength={20}
@@ -176,7 +176,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
             </Field>
 
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium text-text">Siapa yang mau les?</p>
+              <p className="text-sm font-medium text-text">Siapa yang akan ikut les?</p>
               <p className="text-xs text-text-subtle">
                 Bisa diri sendiri, bisa anak, bisa keduanya. Tanggal lahir wajib diisi untuk menentukan level belajar. Bisa ditambah lagi nanti.
               </p>
@@ -203,7 +203,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
                   </Select>
                   {p.type === "self" ? (
                     <p className="flex min-h-[44px] min-w-0 flex-1 items-center truncate rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
-                      {name || "(isi nama lengkap dulu)"}
+                      {name || "(isi nama lengkap lebih dulu)"}
                     </p>
                   ) : (
                     <Input

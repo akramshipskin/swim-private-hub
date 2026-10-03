@@ -16,7 +16,7 @@ describe("LoginForm 2FA", () => {
   it("otp_required -> kolom kode muncul tanpa pesan salah; kode dikirim di percobaan berikutnya; otp_invalid -> pesan kode salah", async () => {
     const user = userEvent.setup();
     render(<LoginForm />);
-    await user.type(screen.getByLabelText("No HP atau Email"), "081200000001");
+    await user.type(screen.getByLabelText("Nomor HP atau Email"), "081200000001");
     await user.type(screen.getByLabelText("Password"), "rahasia123");
 
     signIn.mockResolvedValueOnce({ error: "CredentialsSignin", code: "otp_required" });
@@ -34,7 +34,7 @@ describe("LoginForm 2FA", () => {
   it("tanpa 2FA: salah password -> pesan umum, kolom kode tidak muncul", async () => {
     const user = userEvent.setup();
     render(<LoginForm />);
-    await user.type(screen.getByLabelText("No HP atau Email"), "081200000001");
+    await user.type(screen.getByLabelText("Nomor HP atau Email"), "081200000001");
     await user.type(screen.getByLabelText("Password"), "salah");
     signIn.mockResolvedValueOnce({ error: "CredentialsSignin", code: "credentials" });
     await user.click(screen.getByRole("button", { name: "Masuk" }));

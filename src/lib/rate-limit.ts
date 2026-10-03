@@ -82,4 +82,4 @@ export const REGISTER_MEMBER_PER_IP = 10;
 export const REGISTER_STAFF_PER_IP = 3;
 export const REGISTER_WINDOW_MS = 60 * 60_000;
 
-export const RATE_LIMIT_REGISTER_ERROR = "Terlalu banyak pendaftaran dari jaringan ini. Coba lagi 1 jam lagi.";
+export const RATE_LIMIT_REGISTER_ERROR = "Terlalu banyak pendaftaran dari jaringan ini. Coba lagi dalam 1 jam.";

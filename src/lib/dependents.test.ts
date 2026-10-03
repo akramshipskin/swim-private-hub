@@ -53,6 +53,6 @@ describe("createDependent: batas jumlah peserta", () => {
 
   it("nama kosong ditolak sebelum cek batas", async () => {
     const { db } = fakeDb(0);
-    await expect(createDependent("m", "  ", db)).rejects.toThrow("Nama anak");
+    await expect(createDependent("m", "  ", db)).rejects.toThrow("Nama peserta");
   });
 });

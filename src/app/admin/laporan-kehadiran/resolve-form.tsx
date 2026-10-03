@@ -17,7 +17,7 @@ export default function ResolveForm({ reportId }: { reportId: string }) {
         maxLength={500}
         rows={2}
         aria-label="Hasil pemeriksaan"
-        placeholder="Hasil pemeriksaan, tampil ke member. Misal: sudah dicek dengan coach, status diubah jadi Hadir."
+        placeholder="Hasil pemeriksaan, tampil ke member. Contoh: sudah dicek dengan coach, status diubah menjadi Hadir."
       />
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="sm" loading={pending}>Tutup laporan</Button>

@@ -12,7 +12,7 @@ export const MAX_DEPENDENTS_PER_MEMBER = 10;
 
 export async function createDependent(memberId: string, name: string, db: Db = prisma, birthDate: Date | null = null) {
   const trimmed = toProperCase(name.trim());
-  if (!trimmed) throw new Error("Nama anak tidak boleh kosong");
+  if (!trimmed) throw new Error("Nama peserta tidak boleh kosong.");
   if (trimmed.length > MAX_NAME) throw new Error(`Nama maksimal ${MAX_NAME} karakter.`);
   // Batas sama dengan pendaftaran (maks 10 peserta per akun), supaya satu akun
   // tidak bisa menumpuk ribuan peserta lewat form Profil/admin.
@@ -62,7 +62,7 @@ export async function assertPackageOwnedByMember(packageId: string, memberId: st
     select: { memberId: true },
   });
   if (!pkg || pkg.memberId !== memberId) {
-    throw new Error("Paket tidak ditemukan atau bukan milik kamu");
+    throw new Error("Paket tidak ditemukan atau bukan milik akunmu.");
   }
 }
 
@@ -72,7 +72,7 @@ export async function assertDependentOwnedByMember(dependentId: string, memberId
     select: { memberId: true },
   });
   if (!dep || dep.memberId !== memberId) {
-    throw new Error("Anak tidak ditemukan atau bukan milik kamu");
+    throw new Error("Peserta tidak ditemukan atau bukan milik akunmu.");
   }
 }
 

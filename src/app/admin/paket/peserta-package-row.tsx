@@ -73,7 +73,7 @@ export default function PesertaPackageRow({
               <input type="hidden" name="packageId" value={pkg.id} />
               <input type="hidden" name="expectedSisaSesi" value={pkg.sisaSesi} />
               <div className="grid grid-cols-2 gap-3 sm:contents">
-                <Field label="Sisa Sesi">
+                <Field label="Sisa sesi">
                   <Input
                     type="number"
                     name="sisaSesi"
@@ -108,7 +108,7 @@ export default function PesertaPackageRow({
                     className="w-full sm:w-20"
                   />
                 </Field>
-                <Field label="Berlaku Sampai">
+                <Field label="Berlaku sampai">
                   <DatePicker
                     name="expiredDate"
                     defaultValue={pkg.expiredDateInput}

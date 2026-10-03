@@ -40,8 +40,8 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
           <CitySelect defaultValue={pool.city ?? ""} />
         </Field>
         <div className="flex flex-col gap-1.5">
-          <Field label="Kapasitas harian untuk pelanggan SPH (sesi per hari)">
-            <Input name="dailyCapacity" type="number" inputMode="numeric" min={1} max={500} defaultValue={pool.dailyCapacity ?? ""} placeholder="Misal: 10" />
+          <Field label="Kapasitas harian untuk member SPH (sesi per hari)">
+            <Input name="dailyCapacity" type="number" inputMode="numeric" min={1} max={500} defaultValue={pool.dailyCapacity ?? ""} placeholder="Contoh: 10" />
           </Field>
           <p className="text-xs text-text-subtle">
             Berapa sesi les dari SPH yang masih bisa kolam terima per hari, dihitung dari keramaian harian kolam. 1 sesi = 1 coach + 1 peserta + 1 pendamping. Kosongkan bila tidak ingin dibatasi.
@@ -72,7 +72,7 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
           </div>
         </div>
         <Field label="Fasilitas lain (pisahkan dengan koma)">
-          <Input name="extraFacilities" defaultValue={extra.join(", ")} placeholder="Misal: Gazebo, Ruang laktasi" />
+          <Input name="extraFacilities" defaultValue={extra.join(", ")} placeholder="Contoh: Gazebo, Ruang laktasi" />
         </Field>
       </fieldset>
       <div className="flex flex-wrap items-center gap-2">

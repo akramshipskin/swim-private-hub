@@ -82,7 +82,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
       avatarUrl={coachProfile?.photoUrl}
     >
       <main className="w-full px-4 pb-16 py-6 sm:pb-8 sm:py-8">
-        <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Edit Profil</h1>
+        <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Profil Saya</h1>
 
         {/* Dua kolom eksplisit (bukan grid auto): kartu "Nama" pendek, jadi
             kalau pakai grid biasa muncul lubang besar di bawahnya sebelum
@@ -174,8 +174,8 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
                 <CardBody>
                   <h2 className="mb-1 text-lg font-semibold text-text">Link Profil Publik</h2>
                   <p className="mb-3 text-sm text-text-muted">
-                    Kirim link ini ke calon member yang bertanya jadwal/kolam kamu — bisa dibuka siapa saja tanpa perlu
-                    masuk.
+                    Kirim link ini ke calon member yang menanyakan jadwal atau kolammu. Link ini bisa dibuka siapa saja
+                    tanpa perlu masuk.
                   </p>
                   <CopyLinkButton link={publicProfileLink} />
                 </CardBody>

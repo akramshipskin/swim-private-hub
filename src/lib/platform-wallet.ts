@@ -88,12 +88,12 @@ export async function withdrawPlatformBalance({
     const balance = await getPlatformBalance(tx);
     if (revenueAmount > balance.availableRevenue) {
       throw new PlatformWithdrawalError(
-        `Nominal melebihi saldo pendapatan yang sudah boleh ditarik (dana sesi ditahan ${PLATFORM_HOLD_DAYS} hari).`
+        `Nominal melebihi saldo pendapatan yang sudah bisa dicairkan (dana sesi ditahan ${PLATFORM_HOLD_DAYS} hari).`
       );
     }
     const taxAmount = includeTax ? Math.max(0, balance.availableTax) : 0;
     if (revenueAmount === 0 && taxAmount === 0) {
-      throw new PlatformWithdrawalError("Tidak ada saldo yang ditarik.");
+      throw new PlatformWithdrawalError("Tidak ada saldo yang dicairkan.");
     }
     return tx.platformWithdrawal.create({
       data: { revenueAmount, taxAmount, note, transferReference: reference, createdById: adminId },

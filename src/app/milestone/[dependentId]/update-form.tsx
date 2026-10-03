@@ -127,7 +127,7 @@ export function MilestoneUpdateForm({
           rows={3}
           maxLength={1000}
           required
-          placeholder="Misal: Sudah berani membenamkan wajah, napas samping masih tersendat. Minggu depan latihan meluncur."
+          placeholder="Contoh: Sudah berani membenamkan wajah, napas samping masih tersendat. Minggu depan latihan meluncur."
         />
       </Field>
 
@@ -152,7 +152,7 @@ export function AddItemForm({ dependentId, levels }: { dependentId: string; leve
   return (
     <form ref={form} action={action} className="flex flex-col gap-3">
       <Field label="Butir keterampilan tambahan">
-        <Input name="text" maxLength={200} required placeholder="Misal: Meluncur telentang dari dinding sejauh 2 meter" />
+        <Input name="text" maxLength={200} required placeholder="Contoh: Meluncur telentang dari dinding sejauh 2 meter" />
       </Field>
       <Field label="Masuk ke level">
         <Select name="level" defaultValue={levels[0]?.value}>
@@ -172,7 +172,7 @@ export function AddItemForm({ dependentId, levels }: { dependentId: string; leve
       </label>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="sm" variant="secondary" loading={pending}>
-          Tambah Butir
+          Tambah butir
         </Button>
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
         {state?.success && <p role="status" className="text-sm text-success-text">Butir ditambahkan.</p>}

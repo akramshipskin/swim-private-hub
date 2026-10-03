@@ -28,7 +28,7 @@ export async function updateBankInfo(
   const bankAccountName = (formData.get("bankAccountName") as string)?.trim();
 
   if (!bankName || !bankAccountNumber || !bankAccountName) {
-    return { error: "Semua field rekening wajib diisi." };
+    return { error: "Semua data rekening wajib diisi." };
   }
   const bankError = validateBankName(bankName);
   if (bankError) return { error: bankError };
@@ -43,7 +43,7 @@ export async function updateBankInfo(
       data: { bankName, bankAccountNumber: sealSecret(account.number), bankAccountName },
     });
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal update rekening") };
+    return { error: userErrorMessage(err, "Gagal menyimpan rekening. Coba lagi.") };
   }
 
   revalidatePath("/coach/saldo");
@@ -58,7 +58,7 @@ export async function requestWithdrawal(_prev: ActionState, formData: FormData):
     const request = await requestCoachWithdrawal(profile.id, Number(formData.get("amount")));
     await notifyAdminsWithdrawalRequested(session.user.name ?? "Coach", request.amount);
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal ajukan pencairan") };
+    return { error: userErrorMessage(err, "Gagal mengajukan pencairan. Coba lagi.") };
   }
 
   revalidatePath("/coach/saldo");

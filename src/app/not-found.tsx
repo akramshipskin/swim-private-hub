@@ -24,8 +24,8 @@ export default function NotFound() {
           <span className="mb-2 text-5xl font-bold tracking-tight text-brand-700">404</span>
           <h1 className="mb-1 text-xl font-semibold text-text">Halaman Tidak Ditemukan</h1>
           <p className="mb-6 text-sm text-text-muted">
-            Halaman yang kamu cari tidak ada atau sudah dipindah. Cek lagi alamatnya,
-            atau balik ke beranda.
+            Halaman yang kamu cari tidak ada atau sudah dipindahkan. Periksa lagi alamatnya,
+            atau kembali ke beranda.
           </p>
           <Link href="/" className={buttonClass({ className: "w-full" })}>
             Kembali ke Beranda

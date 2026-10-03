@@ -27,7 +27,7 @@ export async function addAvailability(
   const poolId = formData.get("poolId") as string;
 
   if (!date || !startTime || !endTime || !poolId) {
-    return { error: "Tanggal, jam mulai, jam selesai, dan kolam wajib diisi" };
+    return { error: "Tanggal, jam mulai, jam selesai, dan kolam wajib diisi." };
   }
   // Tanpa ini, tanggal/jam ngaco jadi Invalid Date -> semua pengecekan
   // di bawah (dibandingin sama NaN) diem-diem false, 0 slot kebuat tapi
@@ -58,18 +58,18 @@ export async function addAvailability(
         await notifyUser(o.ownerId, "Isi jam buka kolam", `Coach belum bisa membuka jadwal di ${affiliated.pool.name} karena jam buka kolam belum diisi.`, "/pool/info");
       }
     }
-    return { error: `Jam buka ${affiliated.pool.name} belum diisi, jadi slot baru belum bisa dibuka. Pemilik kolam sudah diberi tahu; coba lagi setelah jam bukanya diisi.` };
+    return { error: `Jam buka ${affiliated.pool.name} belum diisi, jadi jadwal baru belum bisa dibuka. Pemilik kolam sudah diberi tahu; coba lagi setelah jam bukanya diisi.` };
   }
 
   const startDateTime = wibDateTime(date, startTime);
   const endDateTime = wibDateTime(date, endTime);
 
   if (endDateTime <= startDateTime) {
-    return { error: "Jam selesai harus setelah jam mulai" };
+    return { error: "Jam selesai harus setelah jam mulai." };
   }
 
   if (startDateTime < new Date()) {
-    return { error: "Tidak bisa buat slot di tanggal/jam yang sudah lewat." };
+    return { error: "Jadwal tidak bisa dibuka di tanggal atau jam yang sudah lewat." };
   }
 
   // Slot selalu dipecah per jam bulat -- TimeSelect (hourOnly) udah
@@ -152,7 +152,7 @@ export async function addAvailability(
 
   if (blocked.length > 0 && openedChunks.length === 0) {
     return {
-      error: `${blockedNote}${visibleBlocked.length > 0 ? " Pilih jam lain atau hapus slot lamanya dulu." : ""}`,
+      error: `${blockedNote}${visibleBlocked.length > 0 ? " Pilih jam lain atau hapus jam lamanya dulu." : ""}`,
     };
   }
 
@@ -186,7 +186,7 @@ export async function addAvailability(
       await sendPushToUsers(
         members.map((m) => m.id),
         {
-          title: "Slot jadwal baru",
+          title: "Jam kosong baru",
           body: `${session.user.name}, ${affiliated.pool.name}, ${formatDateLabel(first.date)} ${rangeLabel}`,
           url: "/member/booking",
         }

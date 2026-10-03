@@ -111,7 +111,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <Link href="/admin/users" className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-        ← Kembali ke Kelola Pengguna
+        ← Kembali ke Pengguna
       </Link>
 
       <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
@@ -154,7 +154,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
         <Card>
           <CardBody>
             <h2 className="mb-2 text-lg font-semibold text-text">Data akun</h2>
-            <Row label="No HP" value={user.phone ?? "-"} />
+            <Row label="Nomor HP" value={user.phone ?? "-"} />
             <Row label="Email" value={user.email ?? "-"} />
             <Row label="Terdaftar" value={shortDate(user.createdAt)} />
             <Row label="Wajib ganti password" value={user.mustChangePassword ? "Ya" : "Tidak"} />
@@ -239,7 +239,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
               )}
               <Row
                 label="Sesi bulan ini"
-                value={`${coachSessions.filter((b) => b.attended === true).length} hadir · ${coachSessions.filter((b) => b.status === "BOOKED" && b.attended === null).length} terjadwal`}
+                value={`${coachSessions.filter((b) => b.attended === true).length} Hadir · ${coachSessions.filter((b) => b.status === "BOOKED" && b.attended === null).length} terjadwal`}
               />
               <Row
                 label="Rekening"
@@ -381,7 +381,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                         {b.package.dependent.isSelf ? user.name : b.package.dependent.name}
                       </span>{" "}
                       <Badge tone={b.status === "CANCELLED" ? "neutral" : b.attended ? "success" : "brand"}>
-                        {b.status === "CANCELLED" ? "Dibatalkan" : b.attended === true ? "Hadir" : b.attended === false ? "Tidak hadir" : "Terjadwal"}
+                        {b.status === "CANCELLED" ? "Dibatalkan" : b.attended === true ? "Hadir" : b.attended === false ? "Tidak Hadir" : "Terjadwal"}
                       </Badge>
                     </li>
                   ))}

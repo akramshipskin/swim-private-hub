@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/require-role";
 import { notifyAdmins, notifyUser } from "@/lib/notify";
-import { coachTeachesDependent, visibleItemsWhere } from "@/lib/milestone-data";
+import { coachHasTaughtDependent, visibleItemsWhere } from "@/lib/milestone-data";
 import {
   MILESTONE_GROUPS,
   groupForBirthDate,
@@ -22,8 +22,8 @@ async function requireTeachingCoach(dependentId: string) {
   const session = await auth();
   if (!session || session.user.role !== "COACH") throw new MilestoneError("Hanya coach yang bisa mengisi milestone.");
   if (session.user.needsPartnerAgreement) throw new MilestoneError("Setujui perjanjian kemitraan dulu.");
-  if (!(await coachTeachesDependent(session.user.id, dependentId))) {
-    throw new MilestoneError("Kamu belum pernah mengajar peserta ini.");
+  if (!(await coachHasTaughtDependent(session.user.id, dependentId))) {
+    throw new MilestoneError("Milestone bisa diisi setelah minimal 1 sesi peserta ini ditandai Hadir.");
   }
   return session.user.id;
 }
@@ -130,7 +130,7 @@ export async function addMilestoneItem(
     const propose = formData.get("propose") === "on";
 
     const dep = await prisma.dependent.findUniqueOrThrow({ where: { id: dependentId }, select: { milestoneGroup: true } });
-    if (!dep.milestoneGroup) return { error: "Isi catatan milestone pertama dulu (menentukan kelompok peserta)." };
+    if (!dep.milestoneGroup) return { error: "Isi Update milestone pertama dulu (menentukan kelompok peserta)." };
     const levels = await prisma.milestoneItem.findMany({
       where: { ...visibleItemsWhere(dependentId), group: dep.milestoneGroup },
       select: { level: true },

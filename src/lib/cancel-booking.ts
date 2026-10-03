@@ -52,7 +52,7 @@ export async function cancelBooking({
   }
 
   if (actor.role === "COACH" && booking.availability.coachId !== actor.coachId) {
-    throw new CancelError("Bukan sesi kamu", 403);
+    throw new CancelError("Sesi ini bukan sesimu.", 403);
   }
 
   if (booking.status !== "BOOKED") {
@@ -85,6 +85,20 @@ export async function cancelBooking({
           { jatahCancel: number }[]
         >`SELECT "jatahCancel" FROM "Package" WHERE id = ${booking.packageId} FOR UPDATE`;
 
+        // Sesi yang mulai sebelum ganti coach terakhir selesai milik periode
+        // harga lama (Hadi 3 Okt malam, #5A): bila dibatalkan, sesinya kembali
+        // ke paket dan nanti dibagi dengan harga coach baru padahal selisihnya
+        // tidak pernah ditagih/dikreditkan. Jalurnya: tandai kehadiran.
+        const olderThanChange = await tx.coachChangeRequest.count({
+          where: { packageId: booking.packageId, status: "COMPLETED", completedAt: { gte: booking.availability.startTime } },
+        });
+        if (olderThanChange > 0) {
+          throw new CancelError(
+            "Sesi ini terjadi sebelum ganti coach, jadi tidak bisa dibatalkan. Tandai kehadirannya (Hadir / Tidak Hadir) di Laporan Kehadiran.",
+            409
+          );
+        }
+
         if (actor.role === "MEMBER") {
           const hoursUntilStart =
             (booking.availability.startTime.getTime() - Date.now()) / (1000 * 60 * 60);
@@ -109,7 +123,7 @@ export async function cancelBooking({
           if (selfCancelCount >= quota) {
             throw new CancelError(
               quota === 0
-                ? "Sesi coba tidak bisa dibatalkan sendiri; tidak hadir = sesi hangus. Hubungi admin kalau ada keadaan khusus."
+                ? "Sesi coba tidak bisa dibatalkan sendiri. Bila tidak hadir, sesi hangus. Hubungi admin bila ada keadaan khusus."
                 : "Jatah pembatalan mandiri sudah habis. Hubungi admin untuk kasus khusus.",
               409
             );

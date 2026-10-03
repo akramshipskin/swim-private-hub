@@ -53,7 +53,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/member/dashboard", label: "Dashboard", icon: "bar-chart" },
     { href: "/member/booking", label: "Booking", icon: "calendar" },
     { href: "/member/cari-coach", label: "Cari Coach", icon: "search" },
-    { href: "/member/riwayat", label: "Riwayat", icon: "clock" },
+    { href: "/member/riwayat", label: "Riwayat Booking", icon: "clock" },
     { href: "/member/paket", label: "Paket", icon: "package" },
     { href: "/member/pembayaran", label: "Riwayat Bayar", icon: "credit-card" },
     { href: "/member/peserta", label: "Peserta", icon: "users" },
@@ -66,7 +66,7 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
     { href: "/pool/saldo", label: "Saldo", icon: "credit-card" },
     { href: "/pool/info", label: "Info Kolam", icon: "package" },
     { href: "/pool/paket", label: "Paket & Harga", icon: "credit-card" },
-    { href: "/pool/coach", label: "Coach", icon: "users" },
+    { href: "/pool/coach", label: "Coach di Kolam", icon: "users" },
     { href: "/profil", label: "Profil Saya", icon: "settings", group: "Pengaturan" },
   ],
 };
@@ -75,10 +75,10 @@ export const roleNavLinks: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", B
 // malam, #25/#32). activeGroup = menu itu mewakili seluruh kelompok.
 export const roleBottomNav: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", { primary: (BottomNavLink & { activeGroup?: string })[]; moreLabel: string }> = {
   ADMIN: {
-    moreLabel: "Menu",
+    moreLabel: "Lainnya",
     primary: [
       { href: "/admin", label: "Dashboard", icon: "bar-chart" },
-      { href: "/admin/booking-overview", label: "Booking", icon: "calendar" },
+      { href: "/admin/booking-overview", label: "Jadwal", icon: "calendar" },
       { href: "/admin/komisi", label: "Keuangan", icon: "credit-card", activeGroup: "Keuangan" },
       { href: "/admin/pesan", label: "Pesan", icon: "chat" },
     ],
@@ -88,7 +88,7 @@ export const roleBottomNav: Record<"ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER", 
     primary: [
       { href: "/coach/dashboard", label: "Dashboard", icon: "bar-chart" },
       { href: "/coach/jadwal", label: "Jadwal", icon: "calendar" },
-      { href: "/coach/riwayat-sesi", label: "Sesi", icon: "clipboard-check" },
+      { href: "/coach/riwayat-sesi", label: "Riwayat", icon: "clipboard-check" },
       { href: "/coach/saldo", label: "Saldo", icon: "credit-card" },
     ],
   },

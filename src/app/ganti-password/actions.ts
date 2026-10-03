@@ -59,7 +59,7 @@ export async function changePassword(
     session.user.role === "MEMBER" &&
     (await prisma.dependent.count({ where: { memberId: session.user.id, isActive: true } })) === 0;
   if (needsParticipants && children.length === 0 && !wantsSelf) {
-    return { error: "Isi minimal 1 peserta (diri sendiri atau anak)" };
+    return { error: "Isi minimal 1 peserta (diri sendiri atau anak)." };
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 12);

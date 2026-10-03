@@ -11,7 +11,7 @@ export default function ReportButton({ bookingId, deadlineLabel }: { bookingId: 
   const [state, action, pending] = useActionState(reportAttendance, null);
 
   if (state?.ok) {
-    return <p className="text-xs text-text-muted">Laporan terkirim. Admin akan memeriksa.</p>;
+    return <p className="text-xs text-text-muted">Laporan terkirim. Admin akan memeriksanya.</p>;
   }
 
   if (!open) {
@@ -36,7 +36,7 @@ export default function ReportButton({ bookingId, deadlineLabel }: { bookingId: 
         name="note"
         maxLength={500}
         rows={3}
-        placeholder="Misal: anak saya datang dan les sampai selesai"
+        placeholder="Contoh: anak saya datang dan les sampai selesai"
         className="rounded-lg border border-border bg-surface px-2 py-1.5 text-sm text-text focus:outline-none focus:ring-2 focus:ring-brand-500/20"
       />
       <div className="flex justify-end gap-2">

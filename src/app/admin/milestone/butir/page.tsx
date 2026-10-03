@@ -24,7 +24,7 @@ export default async function StandardItemsPage() {
       <p className="mt-1 text-sm text-text-muted">
         Berlaku untuk semua peserta di kelompok & level itu. Butir yang dinonaktifkan tidak dihitung lagi; level yang
         sudah selesai dan sertifikatnya tidak berubah. Butir tidak bisa dipindah kelompok/level supaya progres peserta
-        tidak teracak — nonaktifkan lalu tambah butir baru.
+        tidak teracak. Untuk memindahkan, nonaktifkan lalu tambah butir baru.
       </p>
 
       <Card className="mt-6">

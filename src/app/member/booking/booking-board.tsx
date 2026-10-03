@@ -348,7 +348,7 @@ export default function BookingBoard({
             <div className="sm:hidden">
               <div className="mb-1.5 flex items-center justify-between text-xs text-text-subtle">
                 <span className="flex items-center gap-1">
-                  <span className="h-1 w-1 rounded-full bg-brand-500" /> ada slot kosong
+                  <span className="h-1 w-1 rounded-full bg-brand-500" /> ada jam kosong
                 </span>
                 <button
                   type="button"
@@ -510,7 +510,7 @@ export default function BookingBoard({
                         </p>
                         {s.bookedByMe && s.canCancel && s.bookedForChildName && (
                           <p className="text-center text-sm font-medium text-text">
-                            buat {s.bookedForChildName}
+                            untuk {s.bookedForChildName}
                           </p>
                         )}
                       </div>
@@ -525,7 +525,7 @@ export default function BookingBoard({
                         ) : (
                           <div className="flex max-w-[220px] flex-col items-end gap-1.5 text-right">
                             <p className="text-xs font-medium text-text">
-                              Booking kamu{s.bookedForChildName && ` — buat ${s.bookedForChildName}`}
+                              Booking kamu{s.bookedForChildName && ` — untuk ${s.bookedForChildName}`}
                             </p>
                             <p className="text-xs text-text-subtle">{s.cancelReason}</p>
                             <a

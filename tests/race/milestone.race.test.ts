@@ -74,10 +74,19 @@ describe("MILESTONE", () => {
     expect(again).toEqual({ error: "Penilaian awal hanya untuk catatan pertama peserta." });
   });
 
+  it("M3b: coach yang baru punya booking (belum ada sesi Hadir) bisa melihat tapi belum bisa menulis milestone", async () => {
+    const { pool, m, dep, pkg } = await setup();
+    const fresh = await mkUser("COACH");
+    const s = await mkSlot(fresh.id, pool.id, 48);
+    await book(m.id, s.id, pkg.id);
+    expect(await milestoneAccess({ id: fresh.id, role: "COACH" }, dep.id)).toEqual({ canView: true, canEdit: false });
+    expect(await asCoach(fresh, () => saveMilestoneUpdate(dep.id, null, fd({ note: "x" })))).toEqual({ error: "Milestone bisa diisi setelah minimal 1 sesi peserta ini ditandai Hadir." });
+  });
+
   it("M3: coach yang tidak pernah mengajar peserta ditolak; butir dari kelompok lain ditolak", async () => {
     const { coach, dep } = await setup();
     const stranger = await mkUser("COACH");
-    expect(await asCoach(stranger, () => saveMilestoneUpdate(dep.id, null, fd({ note: "x" })))).toEqual({ error: "Kamu belum pernah mengajar peserta ini." });
+    expect(await asCoach(stranger, () => saveMilestoneUpdate(dep.id, null, fd({ note: "x" })))).toEqual({ error: "Milestone bisa diisi setelah minimal 1 sesi peserta ini ditandai Hadir." });
     expect(await asCoach(coach, () => saveMilestoneUpdate(dep.id, null, fd({ note: "x", achieved: "i_d1_1" })))).toEqual({
       error: "Butir tidak valid, muat ulang halaman.",
     });
@@ -92,7 +101,9 @@ describe("MILESTONE", () => {
       const { pool, coach, m, dep, pkg } = await setup();
       const coach2 = await mkUser("COACH");
       const s2 = await mkSlot(coach2.id, pool.id, -30);
-      await book(m.id, s2.id, pkg.id);
+      const b2 = await book(m.id, s2.id, pkg.id);
+      // Menulis milestone butuh minimal 1 sesi Hadir (Hadi 3 Okt malam, #8A).
+      await prisma.booking.update({ where: { id: b2.id }, data: { attended: true } });
       await prisma.milestoneAchievement.create({ data: { dependentId: dep.id, itemId: "i_c1_1", coachId: coach.id } });
       await prisma.dependent.update({ where: { id: dep.id }, data: { milestoneGroup: "C" } });
       const rs = await settle(

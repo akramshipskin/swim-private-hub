@@ -42,11 +42,11 @@ export default function RegisterPoolForm() {
     setError(null);
 
     if (!isValidIndonesianPhone(phone)) {
-      setError("Format No HP tidak valid (contoh: 0812xxxxxxx)");
+      setError("Format Nomor HP tidak valid (contoh: 0812xxxxxxx)");
       return;
     }
     if (closeTime <= openTime) {
-      setError("Jam tutup harus setelah jam buka");
+      setError("Jam tutup harus setelah jam buka.");
       return;
     }
 
@@ -79,7 +79,7 @@ export default function RegisterPoolForm() {
 
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error ?? "Registrasi gagal");
+      setError(data.error ?? "Pendaftaran gagal. Coba lagi.");
       setLoading(false);
       return;
     }
@@ -134,7 +134,7 @@ export default function RegisterPoolForm() {
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium text-text">Harga tiket paket</p>
               <p className="text-xs text-text-subtle">
-                Tiket masuk untuk 1 coach + 1 peserta + 1 pendamping per sesi. Isi minimal satu, kelipatan Rp1.000. Bisa diubah nanti.
+                Tiket masuk untuk 1 coach + 1 peserta + 1 pendamping per sesi. Isi minimal satu, kelipatan Rp 1.000. Bisa diubah nanti.
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Paket 4 sesi (Rp)">
@@ -146,7 +146,7 @@ export default function RegisterPoolForm() {
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Field label="Kapasitas harian untuk pelanggan SPH (sesi per hari)">
+              <Field label="Kapasitas harian untuk member SPH (sesi per hari)">
                 <Input
                   type="number"
                   inputMode="numeric"
@@ -155,7 +155,7 @@ export default function RegisterPoolForm() {
                   value={dailyCapacity}
                   onChange={(e) => setDailyCapacity(e.target.value)}
                   required
-                  placeholder="Misal: 10"
+                  placeholder="Contoh: 10"
                 />
               </Field>
               <p className="text-xs text-text-subtle">
@@ -194,13 +194,13 @@ export default function RegisterPoolForm() {
 
             <hr className="border-border" />
             <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">
-              Akun pemilik (buat masuk)
+              Akun pemilik kolam (untuk masuk)
             </p>
 
             <Field label="Nama Pemilik">
               <Input value={ownerName} onChange={(e) => setOwnerName(e.target.value)} required autoComplete="name" />
             </Field>
-            <Field label="No HP">
+            <Field label="Nomor HP">
               <Input
                 type="tel"
                 placeholder="0812xxxxxxx"

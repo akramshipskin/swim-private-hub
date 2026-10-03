@@ -54,7 +54,7 @@ beforeEach(() => {
 describe("addChildForMember", () => {
   it("requires a memberId", async () => {
     const result = await addChildForMember(null, formData({ type: "child", name: "Budi" }));
-    expect(result).toEqual({ error: "Pilih member dulu" });
+    expect(result).toEqual({ error: "Pilih member dulu." });
   });
 
   it("creates a self dependent when type is self", async () => {
@@ -98,7 +98,7 @@ describe("assignPackageToMember (model harga-dari-coach, tanpa bagi hasil)", () 
 
   it("requires memberId", async () => {
     const result = await assignPackageToMember(null, formData({ ...base, memberId: "" }));
-    expect(result).toEqual({ error: "Pilih member dulu" });
+    expect(result).toEqual({ error: "Pilih member dulu." });
   });
 
   it("requires dependentId with a specific hint to add a participant first", async () => {
@@ -107,8 +107,8 @@ describe("assignPackageToMember (model harga-dari-coach, tanpa bagi hasil)", () 
   });
 
   it("requires pool, coach, and a 4 or 8 session pack", async () => {
-    expect(await assignPackageToMember(null, formData({ ...base, coachId: "" }))).toEqual({ error: "Pilih kolam dan coach dulu" });
-    expect(await assignPackageToMember(null, formData({ ...base, sesi: "5" }))).toEqual({ error: "Pilih paket 4 atau 8 sesi" });
+    expect(await assignPackageToMember(null, formData({ ...base, coachId: "" }))).toEqual({ error: "Pilih kolam dan coach dulu." });
+    expect(await assignPackageToMember(null, formData({ ...base, sesi: "5" }))).toEqual({ error: "Pilih paket 4 atau 8 sesi." });
     expect(packageCreate).not.toHaveBeenCalled();
   });
 
@@ -117,7 +117,7 @@ describe("assignPackageToMember (model harga-dari-coach, tanpa bagi hasil)", () 
   it("rejects when the dependent belongs to a different member (IDOR)", async () => {
     dependentFindUnique.mockResolvedValueOnce({ memberId: "someone-else", isActive: true });
     const result = await assignPackageToMember(null, formData(base));
-    expect(result).toEqual({ error: "Peserta tidak ditemukan atau bukan milik member ini" });
+    expect(result).toEqual({ error: "Peserta tidak ditemukan atau bukan milik member ini." });
     expect(packageCreate).not.toHaveBeenCalled();
   });
 
@@ -182,12 +182,12 @@ describe("updatePackage", () => {
       null,
       formData({ packageId: "pkg-1", sisaSesi: "", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
     );
-    expect(blankSisa?.error).toBe("Sisa sesi wajib diisi (0 atau lebih)");
+    expect(blankSisa?.error).toBe("Sisa sesi wajib diisi (0 atau lebih).");
     const blankJatah = await updatePackage(
       null,
       formData({ packageId: "pkg-1", sisaSesi: "3", jatahCancel: "", status: "ACTIVE", expiredDate: "" })
     );
-    expect(blankJatah?.error).toBe("Jatah batal wajib diisi (0 atau lebih)");
+    expect(blankJatah?.error).toBe("Jatah batal wajib diisi (0 atau lebih).");
     expect(packageUpdate).not.toHaveBeenCalled();
   });
 

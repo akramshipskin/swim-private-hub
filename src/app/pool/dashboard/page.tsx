@@ -84,7 +84,7 @@ export default async function PoolDashboardPage() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
               <BentoCard title="Ringkasan bulan ini" href="/pool/laporan" className="md:col-span-4">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
-                  <Stat label="Sesi dihadiri" value={pick(attended, p.id)?._count ?? 0} />
+                  <Stat label="Sesi Hadir" value={pick(attended, p.id)?._count ?? 0} />
                   <Stat label="Bagian kolam" value={formatRupiah(pick(revenue, p.id)?._sum.amount ?? 0)} hint="Sebelum PPh 0,5%" />
                   <Stat label="Paket terjual" value={pick(sold, p.id)?._count ?? 0} />
                   <Stat label="Coach terdaftar" value={p._count.affiliations} />
@@ -101,7 +101,7 @@ export default async function PoolDashboardPage() {
 
               <BentoCard title={`Jam ramai hari ini · ${bookedToday} sesi les`} href="/pool/jadwal" linkLabel="Lihat jadwal" className="md:col-span-4">
                 {rows.every((r) => r.booked.length === 0 && r.open.length === 0) ? (
-                  <p className="text-sm text-text-muted">Belum ada les atau slot coach hari ini.</p>
+                  <p className="text-sm text-text-muted">Belum ada sesi les atau jam kosong coach hari ini.</p>
                 ) : (
                 <ul className="flex flex-col gap-1">
                   {rows.map((r) => (
@@ -111,7 +111,7 @@ export default async function PoolDashboardPage() {
                         <div className="h-full rounded-full bg-brand-500" style={{ width: `${(r.booked.length / busiest) * 100}%` }} />
                       </div>
                       <span className="w-40 shrink-0 text-right text-text">
-                        {r.booked.length > 0 ? `${r.booked.length} sesi les` : r.open.length > 0 ? `${r.open.length} slot kosong` : "Tidak ada les"}
+                        {r.booked.length > 0 ? `${r.booked.length} sesi les` : r.open.length > 0 ? `${r.open.length} jam kosong` : "Tidak ada les"}
                       </span>
                     </li>
                   ))}

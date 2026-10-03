@@ -74,7 +74,7 @@ export default async function CoachDashboardPage() {
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         {overdue.length > 0 && (
-          <BentoCard title="Pencairan ditahan" href="/coach/peserta" linkLabel="Isi catatan milestone" className="md:col-span-6">
+          <BentoCard title="Pencairan ditahan" href="/coach/peserta" linkLabel="Update milestone" className="md:col-span-6">
             <p className="text-sm text-warning-text">
               {overdue.map((o) => o.name).join(", ")} sudah {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir atau lebih tanpa catatan
               milestone darimu. Isi catatannya supaya saldo bisa dicairkan lagi.
@@ -114,12 +114,12 @@ export default async function CoachDashboardPage() {
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Saldo bisa dicairkan" value={formatRupiah(profile?.walletBalance ?? 0)} />
             <Stat label="Sesi belum ditandai" value={unmarked.length} tone={unmarked.length > 0 ? "warning" : undefined} hint="Saldo masuk setelah ditandai" />
-            <Stat label="Slot kosong 7 hari ke depan" value={openThisWeek} />
+            <Stat label="Jam kosong 7 hari ke depan" value={openThisWeek} />
             <Stat label="Kolam tempat mengajar" value={pools.length} hint={pools.map((p) => p.pool.name).join(", ") || "Belum ada"} />
           </div>
         </BentoCard>
 
-        <BentoCard title="Sesi belum ditandai hadir" href="/coach/riwayat-sesi" linkLabel="Tandai sekarang" className="md:col-span-2">
+        <BentoCard title="Sesi belum ditandai Hadir" href="/coach/riwayat-sesi" linkLabel="Tandai sekarang" className="md:col-span-2">
           <SessionList
             items={unmarked.map((b) => ({
               id: b.id,

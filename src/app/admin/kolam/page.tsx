@@ -11,7 +11,7 @@ import PoolInfoForm from "@/components/pool-info-form";
 import { PoolPhotosForm } from "@/components/pool-photos-form";
 import { isStorageConfigured } from "@/lib/storage";
 
-export const metadata = { title: "Kelola Kolam | Swim Private Hub" };
+export const metadata = { title: "Kolam | Swim Private Hub" };
 
 export default async function AdminKolamPage() {
   await requireRole("ADMIN");
@@ -106,7 +106,7 @@ export default async function AdminKolamPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-text">Kelola Kolam</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-text">Kolam</h1>
       <p className="mt-1 text-sm text-text-muted">
         Harga tiket paket, biaya layanan SPH, dan tanda bebas PPh per kolam.
       </p>
@@ -114,7 +114,7 @@ export default async function AdminKolamPage() {
       {pools.length === 0 ? (
         <Card className="mt-6">
           <CardBody className="py-10 text-center text-sm text-text-muted">
-            Belum ada kolam. Jalankan <code>npm run onboard:pools</code>.
+            Belum ada kolam. Kolam muncul di sini setelah pemilik kolam mendaftar atau ditambahkan lewat menu Pengguna.
           </CardBody>
         </Card>
       ) : (
@@ -139,8 +139,8 @@ export default async function AdminKolamPage() {
                 {(stuckByPool.get(p.id) ?? 0) > 0 && (
                   <div className="rounded-xl border border-warning-text/15 bg-warning-bg p-3 text-sm text-warning-text">
                     <strong>{stuckByPool.get(p.id)} booking mendatang</strong> masih terjadwal di kolam nonaktif ini.
-                    Sesi tetap berlaku — hubungi member, lalu batalkan lewat{" "}
-                    <a href="/admin/booking-overview" className="underline">Booking Overview</a> kalau kolam tidak bisa melayani.
+                    Sesi tetap berlaku. Hubungi member, lalu batalkan lewat{" "}
+                    <a href="/admin/booking-overview" className="underline">Jadwal Booking</a> bila kolam tidak bisa melayani.
                   </div>
                 )}
 

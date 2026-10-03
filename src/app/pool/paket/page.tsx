@@ -35,7 +35,7 @@ export default async function PoolPaketPage() {
                 <PackPriceForm action={updatePoolPrices} hidden={{ poolId: p.id }} pricePack4={p.pricePack4} pricePack8={p.pricePack8} />
                 <p className="text-xs text-text-subtle">
                   Kosongkan salah satu kalau tidak menjual paket itu. Bagian kolam per sesi = harga paket ÷ jumlah sesi,
-                  dipotong PPh 0,5% kecuali sudah menyerahkan surat pernyataan omzet di bawah Rp500 juta ke admin. Biaya
+                  dipotong PPh 0,5% kecuali sudah menyerahkan surat pernyataan omzet di bawah Rp 500 juta ke admin. Biaya
                   layanan SPH di kolam ini {formatBps(p.serviceFeeBps)}, dibayar member di atas harga. {p._count.affiliations} coach mengajar di sini.
                 </p>
               </CardBody>

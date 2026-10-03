@@ -25,7 +25,7 @@ export function CoachChangeForm({ packageId, coaches }: { packageId: string; coa
       <input type="hidden" name="packageId" value={packageId} />
       <p className="text-xs text-text-muted">
         Ganti coach hanya untuk alasan yang jelas (kecocokan atau masalah pribadi), di kolam yang sama, dan diputuskan admin.
-        Sisa sesi dihitung ulang dengan harga coach baru: lebih murah = selisih masuk saldomu, lebih mahal = tambah bayar dalam 24 jam.
+        Sisa sesi dihitung ulang dengan harga coach baru. Bila lebih murah, selisihnya masuk saldomu. Bila lebih mahal, kamu tambah bayar dalam 24 jam.
       </p>
       <Field label="Coach pengganti">
         <Select name="toCoachId" required defaultValue="">

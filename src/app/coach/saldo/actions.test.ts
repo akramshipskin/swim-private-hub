@@ -44,7 +44,7 @@ describe("coach updateBankInfo", () => {
   });
 
   it("menolak field kosong", async () => {
-    await expect(updateBankInfo(null, form({ bankAccountNumber: "" }))).resolves.toEqual({ error: "Semua field rekening wajib diisi." });
+    await expect(updateBankInfo(null, form({ bankAccountNumber: "" }))).resolves.toEqual({ error: "Semua data rekening wajib diisi." });
     expect(profileUpdate).not.toHaveBeenCalled();
   });
 });

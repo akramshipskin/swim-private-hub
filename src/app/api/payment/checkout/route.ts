@@ -17,7 +17,7 @@ import { coachMeetsOpenSlotRule, MIN_OPEN_SLOTS, OPEN_SLOT_WINDOW_DAYS } from "@
 export async function POST(request: Request) {
   const session = await auth();
   if (!session || session.user.role !== "MEMBER") {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
   }
   if (session.user.mustChangePassword) {
     return Response.json({ error: "Ganti password sementara dulu sebelum membeli paket." }, { status: 403 });
@@ -41,6 +41,18 @@ export async function POST(request: Request) {
       { error: userErrorMessage(err, "Anak tidak valid") },
       { status: 403 }
     );
+  }
+  // Hadi 3 Okt malam (#8A): tidak bisa membeli paket untuk peserta yang sudah
+  // dinonaktifkan, atau saat akun sedang diajukan untuk dihapus.
+  const [buyer, dep] = await Promise.all([
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { deletionRequestedAt: true } }),
+    prisma.dependent.findUnique({ where: { id: dependentId }, select: { isActive: true } }),
+  ]);
+  if (buyer?.deletionRequestedAt) {
+    return Response.json({ error: "Kamu sedang mengajukan penghapusan akun. Batalkan pengajuannya di Profil dulu untuk membeli paket." }, { status: 409 });
+  }
+  if (!dep?.isActive) {
+    return Response.json({ error: "Peserta ini sudah dinonaktifkan. Aktifkan lagi di menu Peserta atau pilih peserta lain." }, { status: 409 });
   }
 
   // Model harga-dari-coach (Hadi 2 Okt): yang dibeli = kolam + coach + ukuran

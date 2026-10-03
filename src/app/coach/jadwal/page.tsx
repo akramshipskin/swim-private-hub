@@ -10,7 +10,7 @@ import { formatDateLabel, formatTimeWib, dateLabel, todayWibDateString } from "@
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata = { title: "Jadwal Saya | Swim Private Hub" };
+export const metadata = { title: "Jadwal | Swim Private Hub" };
 
 export default async function CoachJadwalPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const q = (await searchParams).q ?? "";
@@ -85,9 +85,9 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
     <main className="w-full px-4 py-6 sm:py-8">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-text">Jadwal Saya</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-text">Jadwal</h1>
           <p className="mt-1 text-sm text-text-muted">
-            Tambah slot per tanggal. Member langsung bisa melihat dan membooking slot ini.
+            Buka jam kosong per tanggal. Member langsung bisa melihat dan membooking jam ini.
           </p>
         </div>
       </div>
@@ -98,19 +98,19 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
 
       {hiddenExpired > 0 && (
         <p className="mb-3 text-sm text-text-subtle">
-          {hiddenExpired} slot kosong yang jamnya sudah lewat disembunyikan (sudah tidak berlaku).
+          {hiddenExpired} jam kosong yang sudah lewat disembunyikan (sudah tidak berlaku).
         </p>
       )}
       {byDate.size === 0 ? (
         <Card>
           <CardBody className="py-10 text-center">
-            <p className="text-sm font-medium text-text">{q ? "Tidak ada slot yang cocok" : "Belum ada slot terjadwal"}</p>
+            <p className="text-sm font-medium text-text">{q ? "Tidak ada jadwal yang cocok" : "Belum ada jadwal"}</p>
             <p className="mt-1 text-sm text-text-muted">
               {q
-                ? "Coba kata lain, atau tekan Reset untuk melihat semua slot."
+                ? "Coba kata lain, atau tekan Reset untuk melihat semua jadwal."
                 : myPools.length === 0
-                  ? "Slot bisa ditambahkan setelah kamu memilih kolam di menu Kolam Saya."
-                  : "Tambah slot pertamamu di atas."}
+                  ? "Jadwal bisa dibuka setelah kamu memilih kolam di menu Kolam Saya."
+                  : "Buka jam kosong pertamamu lewat formulir di atas."}
             </p>
           </CardBody>
         </Card>
@@ -124,7 +124,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                   <h3 className="mb-2 flex items-center gap-2 text-base font-semibold text-brand-700">
                     {poolName}
                     <span className="text-sm font-normal text-text-muted">
-                      · {dayAvailabilities.filter((a) => a.pool.name === poolName).length} slot
+                      · {dayAvailabilities.filter((a) => a.pool.name === poolName).length} jam
                     </span>
                   </h3>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -181,7 +181,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
         <div className="mt-10">
           <h2 className="text-lg font-semibold text-text">Jadwal Coach Lain</h2>
           <p className="mt-1 text-sm text-text-muted">
-            Slot yang sudah dibuka coach lain, agar kamu tahu siapa saja yang bertugas di hari yang sama.
+            Jam yang sudah dibuka coach lain, supaya kamu tahu siapa saja yang bertugas di hari yang sama.
           </p>
 
           <div className="mt-4 flex flex-col gap-8">

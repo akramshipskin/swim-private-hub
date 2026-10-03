@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   if (!body) return Response.json({ error: INVALID_BODY_ERROR }, { status: 400 });
   const shapeError = checkTextFields(body, {
     name: { max: MAX_NAME, label: "Nama" },
-    phone: { max: 20, label: "No HP" },
+    phone: { max: 20, label: "Nomor HP" },
     email: { max: MAX_EMAIL, label: "Email" },
     birthDate: { max: 10, label: "Tanggal lahir" },
     password: { max: MAX_PASSWORD, label: "Password" },
@@ -64,20 +64,20 @@ export async function POST(request: Request) {
 
   // Anti-spam sama persis pola /api/register (honeypot + minimum waktu isi).
   if (website) {
-    return Response.json({ error: "Registrasi gagal" }, { status: 400 });
+    return Response.json({ error: "Pendaftaran gagal. Coba lagi." }, { status: 400 });
   }
   if (typeof formRenderedAt === "number" && Date.now() - formRenderedAt < 1500) {
-    return Response.json({ error: "Registrasi gagal, coba lagi" }, { status: 400 });
+    return Response.json({ error: "Pendaftaran gagal. Tunggu sebentar, lalu kirim lagi." }, { status: 400 });
   }
 
   if (!name || !rawPhone || !password) {
-    return Response.json({ error: "Nama, No HP, dan password wajib diisi" }, { status: 400 });
+    return Response.json({ error: "Nama, Nomor HP, dan password wajib diisi." }, { status: 400 });
   }
   if (!isValidIndonesianPhone(rawPhone)) {
-    return Response.json({ error: "Format No HP tidak valid (contoh: 0812xxxxxxx)" }, { status: 400 });
+    return Response.json({ error: "Format Nomor HP tidak valid (contoh: 0812xxxxxxx)" }, { status: 400 });
   }
   if (password.length < 8) {
-    return Response.json({ error: "Password minimal 8 karakter" }, { status: 400 });
+    return Response.json({ error: "Password minimal 8 karakter." }, { status: 400 });
   }
 
   // Tanggal lahir wajib (keputusan Hadi 30 Sep: semua form daftar).
@@ -86,19 +86,19 @@ export async function POST(request: Request) {
     birthDate = parseCoachBirthDate((rawBirthDate ?? "").trim());
   } catch (err) {
     const message = userErrorMessage(err, "Tanggal lahir tidak valid.");
-    return Response.json({ error: rawBirthDate ? message : "Tanggal lahir wajib diisi" }, { status: 400 });
+    return Response.json({ error: rawBirthDate ? message : "Tanggal lahir wajib diisi." }, { status: 400 });
   }
 
   const cleanSpecialties = (specialties ?? []).filter((s) =>
     (COACH_SPECIALTIES as readonly string[]).includes(s)
   );
   if (cleanSpecialties.length === 0) {
-    return Response.json({ error: "Pilih minimal 1 keahlian" }, { status: 400 });
+    return Response.json({ error: "Pilih minimal 1 keahlian." }, { status: 400 });
   }
 
   // Kota domisili & harga jasa diisi saat daftar (Hadi 3 Okt).
   if (!isCity(city)) {
-    return Response.json({ error: "Pilih kota domisili dari daftar" }, { status: 400 });
+    return Response.json({ error: "Pilih kota domisili dari daftar." }, { status: 400 });
   }
   const prices = parseRegisterPrices(pricePack4, pricePack8);
   if ("error" in prices) return Response.json({ error: prices.error }, { status: 400 });
@@ -115,12 +115,12 @@ export async function POST(request: Request) {
   const phone = normalizePhone(rawPhone);
   const email = normalizeEmail(rawEmail);
   if (email && !isPlausibleEmail(email)) {
-    return Response.json({ error: "Format email tidak valid" }, { status: 400 });
+    return Response.json({ error: "Format email tidak valid." }, { status: 400 });
   }
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
-    return Response.json({ error: "No HP atau email sudah terdaftar" }, { status: 409 });
+    return Response.json({ error: "Nomor HP atau email sudah terdaftar." }, { status: 409 });
   }
 
   const registerHit = await takeAttempt(`register-staff:${clientIp(request.headers)}`, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS);
@@ -164,7 +164,7 @@ export async function POST(request: Request) {
     return Response.json({ user }, { status: 201 });
   } catch (err) {
     if (err instanceof Error && "code" in err && (err as { code?: string }).code === "P2002") {
-      return Response.json({ error: "No HP atau email sudah terdaftar" }, { status: 409 });
+      return Response.json({ error: "Nomor HP atau email sudah terdaftar." }, { status: 409 });
     }
     throw err;
   }

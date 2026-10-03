@@ -56,7 +56,7 @@ export function PoolPhotosForm({
         </Button>
       </form>
 
-      {!storageReady && <p className="text-sm text-warning-text">Unggah file belum diaktifkan (penyimpanan belum dikonfigurasi).</p>}
+      {!storageReady && <p className="text-sm text-warning-text">Unggah foto belum bisa dipakai karena penyimpanan file belum aktif.</p>}
       {error && (
         <p role="alert" className="text-sm text-danger-text">
           {error}

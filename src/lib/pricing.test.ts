@@ -125,7 +125,7 @@ describe("parsePackPrices", () => {
     expect(parsePackPrices(fd({ pricePack4: "abc", pricePack8: "" }), null)).toHaveProperty("error");
   });
   it("harga baru wajib kelipatan Rp1.000; harga lama yang tidak diubah tetap diterima", () => {
-    expect(parsePackPrices(fd({ pricePack4: "260500", pricePack8: "" }), null)).toEqual({ error: "Harga harus kelipatan Rp1.000, misal Rp260.000." });
+    expect(parsePackPrices(fd({ pricePack4: "260500", pricePack8: "" }), null)).toEqual({ error: "Harga harus kelipatan Rp 1.000, contoh Rp 260.000." });
     expect(parsePackPrices(fd({ pricePack4: "260500", pricePack8: "481000" }), { pricePack4: 260_500, pricePack8: 480_000 })).toEqual({ pricePack4: 260_500, pricePack8: 481_000 });
     expect(parsePackPrices(fd({ pricePack4: "260500", pricePack8: "" }), { pricePack4: 260_000, pricePack8: null })).toHaveProperty("error");
     // Isian tersembunyi "harga lama" dari browser tidak dipercaya.

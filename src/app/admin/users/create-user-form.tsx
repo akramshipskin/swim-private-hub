@@ -47,7 +47,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
               onChange={(e) => setNewUserName(e.target.value)}
             />
           </Field>
-          <Field label="No HP">
+          <Field label="Nomor HP">
             <Input type="tel" name="phone" placeholder="0812xxxxxxx" required className="w-full" />
           </Field>
           <Field label="Email (opsional)">
@@ -97,13 +97,13 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
                   <Input name="newPoolAddress" placeholder="Alamat kolam (opsional)" />
                 </div>
               )}
-              <p className="text-xs text-text-subtle">Kolam baru langsung aktif. Harga paket diatur di tab Paket, info &amp; fasilitas di tab Kolam.</p>
+              <p className="text-xs text-text-subtle">Kolam baru langsung aktif. Harga paket, info, dan fasilitas diatur di menu Kolam.</p>
             </div>
           )}
 
           {role === "MEMBER" && (
             <div className="col-span-1 flex flex-col gap-2 sm:col-span-2">
-              <p className="text-sm font-medium text-text">Siapa yang mau les?</p>
+              <p className="text-sm font-medium text-text">Siapa yang akan ikut les?</p>
               <p className="text-xs text-text-subtle">
                 Bisa diri sendiri, bisa anak, bisa keduanya. Tanggal lahir wajib. Bisa ditambah lagi nanti.
               </p>

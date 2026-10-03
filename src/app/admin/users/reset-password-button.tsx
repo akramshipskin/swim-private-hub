@@ -32,7 +32,7 @@ export default function ResetPasswordButton({
   }
 
   const waMessage = tempPassword
-    ? `Halo ${userName}, password akun Swim Private Hub kamu sudah direset admin.\n\nNo HP/email untuk masuk: ${loginId}\nPassword sementara: ${tempPassword}\n\nSaat masuk, kamu akan diminta membuat password baru.`
+    ? `Halo ${userName}, password akun Swim Private Hub kamu sudah direset admin.\n\nNomor HP/email untuk masuk: ${loginId}\nPassword sementara: ${tempPassword}\n\nSaat masuk, kamu akan diminta membuat password baru.`
     : "";
 
   return (
@@ -80,7 +80,7 @@ export default function ResetPasswordButton({
                   rel="noopener noreferrer"
                   className="inline-flex items-center rounded-md bg-whatsapp px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 max-lg:min-h-[44px]"
                 >
-                  Kirim via WA
+                  Kirim lewat WhatsApp
                 </a>
               )}
               <Button

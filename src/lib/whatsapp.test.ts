@@ -25,16 +25,16 @@ describe("buildAdminCancelWaLink", () => {
     timeRange: "14.00–15.00",
   };
 
-  it("includes a Buat: line when childName is given", () => {
+  it("includes a Peserta: line when childName is given", () => {
     const link = buildAdminCancelWaLink({ ...base, childName: "bayu" });
     const message = decodeURIComponent(link.split("?text=")[1]);
-    expect(message).toContain("Buat: bayu");
+    expect(message).toContain("Peserta: bayu");
   });
 
-  it("omits the Buat: line for a self-type booking (no childName)", () => {
+  it("omits the Peserta: line for a self-type booking (no childName)", () => {
     const link = buildAdminCancelWaLink(base);
     const message = decodeURIComponent(link.split("?text=")[1]);
-    expect(message).not.toContain("Buat:");
+    expect(message).not.toContain("Peserta:");
   });
 });
 

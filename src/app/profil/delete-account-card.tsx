@@ -44,7 +44,7 @@ export default function DeleteAccountCard({ requestedAt, memberBalance }: { requ
             </p>
             {memberBalance > 0 && (
               <p className="mt-2 text-sm text-text">
-                Kamu masih punya saldo <b>{formatRupiah(memberBalance)}</b>. Pakai dulu untuk membeli paket, atau minta
+                Kamu masih punya saldo <b>{formatRupiah(memberBalance)}</b>. Pakai lebih dulu untuk membeli paket, atau minta
                 bantuan admin memakainya sebelum akun ditutup. Sisa saldo hangus saat akun dihapus.
               </p>
             )}

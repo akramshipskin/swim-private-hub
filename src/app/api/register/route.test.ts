@@ -55,12 +55,12 @@ describe("POST /api/register (member): batas input", () => {
       const res = await post(registerMember, json({ ...memberOk, city }));
       expect(res.status).toBe(400);
     }
-    expect((await (await post(registerMember, json({ ...memberOk, city: "Paris" }))).json()).error).toBe("Pilih kota domisili dari daftar");
+    expect((await (await post(registerMember, json({ ...memberOk, city: "Paris" }))).json()).error).toBe("Pilih kota domisili dari daftar.");
   });
   it("menolak email yang bentuknya jelas salah (sebelum cek DB)", async () => {
     const res = await post(registerMember, json({ ...memberOk, city: "Jakarta", email: "bukan-email" }));
     expect(res.status).toBe(400);
-    expect((await res.json()).error).toBe("Format email tidak valid");
+    expect((await res.json()).error).toBe("Format email tidak valid.");
   });
 });
 

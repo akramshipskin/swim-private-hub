@@ -5,6 +5,7 @@ vi.mock("@/lib/push", () => ({ sendPushToUser: vi.fn().mockResolvedValue(undefin
 const findUnique = vi.fn();
 const bookingUpdateMany = vi.fn();
 let jatah = 2;
+const changeCount = vi.fn().mockResolvedValue(0);
 const availabilityUpdate = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -15,6 +16,7 @@ vi.mock("@/lib/prisma", () => ({
         booking: { count: vi.fn().mockResolvedValue(0), updateMany: (...args: unknown[]) => bookingUpdateMany(...args) },
         availability: { update: (...args: unknown[]) => availabilityUpdate(...args) },
         package: { update: vi.fn().mockResolvedValue({}) },
+        coachChangeRequest: { count: (...args: unknown[]) => changeCount(...args) },
       }),
   },
 }));
@@ -150,5 +152,14 @@ describe("cancelBooking", () => {
     jatah = 0;
     findUnique.mockResolvedValue(booking());
     await expect(cancelBooking({ bookingId: "b-1", actor: { role: "MEMBER", memberId: "m-1" } })).rejects.toThrow("Sesi coba tidak bisa dibatalkan sendiri");
+  });
+});
+
+describe("sesi sebelum ganti coach", () => {
+  it("admin tidak bisa membatalkan sesi yang mulai sebelum ganti coach terakhir selesai (Hadi 3 Okt #5A)", async () => {
+    findUnique.mockResolvedValue(booking({ availability: { coachId: "c-1", date: new Date("2026-09-23T00:00:00Z"), startTime: new Date(Date.now() - 3600e3) } }));
+    changeCount.mockResolvedValueOnce(1);
+    await expect(cancelBooking({ bookingId: "b-1", actor: { role: "ADMIN" } })).rejects.toThrow("sebelum ganti coach");
+    expect(bookingUpdateMany).not.toHaveBeenCalled();
   });
 });

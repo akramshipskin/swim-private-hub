@@ -7,7 +7,7 @@ import { getOverdueParticipants } from "@/lib/milestone-hold";
 import { formatMilestoneDate } from "@/lib/milestone";
 import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
 
-export const metadata = { title: "Peserta Saya | Swim Private Hub" };
+export const metadata = { title: "Peserta | Swim Private Hub" };
 
 // Semua peserta yang pernah/sedang diajar coach ini, dengan status catatan
 // milestone. Peserta yang menahan pencairan ditaruh paling atas.
@@ -46,15 +46,15 @@ export default async function CoachPesertaPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-text">Peserta Saya</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-text">Peserta</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Isi update milestone tiap peserta minimal sekali per {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir. Kalau ada peserta
-        yang lewat, pengajuan pencairan saldo ditahan sampai catatannya diisi.
+        Isi Update milestone tiap peserta minimal sekali per {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir. Bila ada peserta
+        yang melewati batas itu, pengajuan pencairan saldo ditahan sampai catatannya diisi.
       </p>
 
       {overdue.length > 0 && (
         <p className="mt-4 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
-          Pencairan ditahan: {overdue.length} peserta belum dicatat.
+          Pencairan ditahan: {overdue.length} peserta belum diberi catatan.
         </p>
       )}
 

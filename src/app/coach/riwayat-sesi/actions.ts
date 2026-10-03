@@ -22,7 +22,7 @@ export async function markAttendance(
   const session = await auth();
   if (!session) redirect("/login");
   if (session.user.role !== "COACH" && session.user.role !== "ADMIN") {
-    return { error: "Tidak punya akses." };
+    return { error: "Kamu tidak punya akses untuk tindakan ini." };
   }
   // Aksi ini mengkredit saldo; server action bisa dipanggil lewat alamat yang
   // tidak melewati pagar halaman, jadi gerbang perjanjian dicek di sini juga.
@@ -47,10 +47,10 @@ export async function markAttendance(
     return { error: "Booking tidak ditemukan atau sudah dibatalkan." };
   }
   if (session.user.role === "COACH" && booking.availability.coachId !== session.user.id) {
-    return { error: "Bukan sesi kamu." };
+    return { error: "Sesi ini bukan sesimu." };
   }
   if (booking.availability.endTime > new Date()) {
-    return { error: "Belum waktunya, sesi ini belum selesai." };
+    return { error: "Sesi ini belum selesai, jadi belum bisa ditandai." };
   }
   // Keputusan Hadi 29 Sep: coach wajib menandai paling lambat 24 jam setelah
   // sesi selesai (termasuk mengubah tanda). Lewat itu hanya admin.

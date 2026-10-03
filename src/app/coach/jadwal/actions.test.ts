@@ -76,9 +76,9 @@ describe("cancelBookingAsCoach", () => {
   });
 
   it("surfaces a CancelError message instead of throwing (e.g. not this coach's session)", async () => {
-    cancelBooking.mockRejectedValue(new MockCancelError("Bukan sesi kamu", 403));
+    cancelBooking.mockRejectedValue(new MockCancelError("Sesi ini bukan sesimu.", 403));
     const result = await cancelBookingAsCoach(null, formData("booking-1"));
-    expect(result).toEqual({ error: "Bukan sesi kamu" });
+    expect(result).toEqual({ error: "Sesi ini bukan sesimu." });
   });
 
   it("rethrows a non-CancelError instead of swallowing it", async () => {
@@ -159,7 +159,7 @@ describe("addAvailability new-slot notification", () => {
   });
 
   // Slot yang dulu "dihapus" tapi ditutup (punya riwayat booking) tidak kelihatan
-  // di daftar coach -- pesannya tidak boleh menyuruh "hapus slot lamanya".
+  // di daftar coach -- pesannya tidak boleh menyuruh "hapus jam lamanya".
   const closed = (h: number, poolId: string, poolName: string, id = `s${h}`) => ({
     id, status: "CLOSED", poolId, pool: { name: poolName },
     startTime: new Date(`2099-01-05T0${h}:00:00Z`), endTime: new Date(`2099-01-05T0${h + 1}:00:00Z`),
@@ -170,7 +170,7 @@ describe("addAvailability new-slot notification", () => {
     const res = await addAvailability(null, slotForm({}));
     expect(res?.error).toContain("Kolam Mawar");
     expect(res?.error).toContain("tidak bisa dipindah");
-    expect(res?.error).not.toContain("hapus slot lamanya");
+    expect(res?.error).not.toContain("hapus jam lamanya");
     expect(availabilityCreateMany).not.toHaveBeenCalled();
     expect(availabilityUpdateMany).not.toHaveBeenCalled();
   });

@@ -16,6 +16,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     pool: { update: (...args: unknown[]) => poolUpdate(...args), findUnique: vi.fn().mockResolvedValue({ city: "Jakarta" }) },
     user: { findFirst: (...args: unknown[]) => userFindFirst(...args) },
+    package: { updateMany: (...args: unknown[]) => packageUpdateMany(...args) },
     poolAffiliation: {
       upsert: (...args: unknown[]) => affiliationUpsert(...args),
       deleteMany: (...args: unknown[]) => affiliationDelete(...args),
@@ -26,10 +27,12 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 const userUpdateMany = vi.fn().mockResolvedValue({ count: 1 });
+const packageUpdateMany = vi.fn().mockResolvedValue({ count: 0 });
 const txMock = {
   poolAffiliation: { deleteMany: (...args: unknown[]) => affiliationDelete(...args) },
   pool: { update: (...args: unknown[]) => poolUpdate(...args) },
   user: { updateMany: (...args: unknown[]) => userUpdateMany(...args) },
+  package: { updateMany: (...args: unknown[]) => packageUpdateMany(...args) },
 };
 
 const { affiliateCoach, removeAffiliation, togglePoolActive } = await import("./actions");

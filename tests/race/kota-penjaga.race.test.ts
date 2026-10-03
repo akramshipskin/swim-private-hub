@@ -8,8 +8,9 @@ import { POST as bookingPost } from "@/app/api/booking/route";
 import { POST as checkout } from "@/app/api/payment/checkout/route";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 import { freeChangeCoach } from "@/app/member/paket/free-change-actions";
-import { runCoachSlotWatch } from "@/lib/coach-slot-watch";
+import { runCoachSlotWatch, countEpisodes, coachViolationEpisodes } from "@/lib/coach-slot-watch";
 import { completeCoachChange } from "@/lib/coach-change";
+import { togglePoolActive } from "@/app/admin/kolam/actions";
 import * as push from "@/lib/push";
 
 beforeEach(async () => {
@@ -146,6 +147,73 @@ describe("PENJAGA JADWAL COACH", () => {
     expect(cleared.freeCoachChangeAt).not.toBeNull();
     spyUser.mockRestore();
     spyRole.mockRestore();
+  });
+
+  it("PJ6: coach diam ke 3 member = 3 catatan paket tapi 1 kejadian; admin diberi tahu sekali", async () => {
+    const spyRole = vi.spyOn(push, "sendPushToRole");
+    const { pool, coach } = await mkPricedOffer();
+    await prisma.availability.deleteMany({ where: { coachId: coach.id } });
+    for (let i = 0; i < 3; i++) await paidPackage(pool.id, coach.id);
+    const t0 = new Date();
+    await runCoachSlotWatch(t0);
+    await runCoachSlotWatch(new Date(t0.getTime() + 10 * DAY));
+    expect(await prisma.coachViolation.count({ where: { coachId: coach.id } })).toBe(3);
+    expect((await coachViolationEpisodes(new Date(t0.getTime() + 10 * DAY), [coach.id])).get(coach.id)).toBe(1);
+    expect(spyRole.mock.calls.filter(([r]) => r === "ADMIN")).toHaveLength(1);
+    expect((spyRole.mock.calls[0][1] as { title: string }).title).toContain("Coach tidak membuka jadwal");
+    spyRole.mockRestore();
+    // Pengelompokan: awal kejadian berjarak > 10 hari = kejadian terpisah.
+    const d = (n: number) => new Date(t0.getTime() + n * DAY);
+    expect(countEpisodes([d(0), d(1), d(9)])).toBe(1);
+    expect(countEpisodes([d(0), d(11), d(30), d(31)])).toBe(3);
+  });
+
+  it("PJ7: kolam dinonaktifkan admin: hari ke-10 member boleh ganti tanpa biaya (sekali), coach TIDAK dicatat melanggar dan tidak diingatkan", async () => {
+    const spyUser = vi.spyOn(push, "sendPushToUser");
+    const { pool, coach } = await mkPricedOffer();
+    const { m, pkg } = await paidPackage(pool.id, coach.id);
+    await prisma.pool.update({ where: { id: pool.id }, data: { isActive: false } });
+    const t0 = new Date();
+    await runCoachSlotWatch(t0);
+    await runCoachSlotWatch(new Date(t0.getTime() + 3 * DAY));
+    expect(spyUser.mock.calls.filter(([u]) => u === coach.id)).toHaveLength(0);
+    const t10 = new Date(t0.getTime() + 10 * DAY);
+    await runCoachSlotWatch(t10);
+    await runCoachSlotWatch(t10);
+    expect(await prisma.coachViolation.count({ where: { coachId: coach.id } })).toBe(0);
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).freeCoachChangeAt).not.toBeNull();
+    expect(spyUser.mock.calls.filter(([u]) => u === m.id)).toHaveLength(1);
+    spyUser.mockRestore();
+  });
+
+  it("PJ8: satu masa diam coach tetap 1 kejadian walau paket kedua baru ikut diam 12 hari kemudian (member membatalkan sesinya)", async () => {
+    const { pool, coach } = await mkPricedOffer();
+    await prisma.availability.deleteMany({ where: { coachId: coach.id } });
+    await paidPackage(pool.id, coach.id);
+    const b = await paidPackage(pool.id, coach.id);
+    await prisma.package.update({ where: { id: b.pkg.id }, data: { sisaSesi: 0 } });
+    const t0 = new Date();
+    const at = (d: number) => new Date(t0.getTime() + d * DAY);
+    await runCoachSlotWatch(t0);
+    await runCoachSlotWatch(at(10));
+    await prisma.package.update({ where: { id: b.pkg.id }, data: { sisaSesi: 1 } });
+    await runCoachSlotWatch(at(12));
+    await runCoachSlotWatch(at(22));
+    expect(await prisma.coachViolation.count({ where: { coachId: coach.id } })).toBe(2);
+    expect((await coachViolationEpisodes(at(22), [coach.id])).get(coach.id)).toBe(1);
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: b.pkg.id } })).freeCoachChangeAt).not.toBeNull();
+  });
+
+  it("PJ9: kolam diaktifkan lagi: hitungan hari dimulai ulang (hari saat kolam nonaktif tidak dihitung)", async () => {
+    const { pool, coach } = await mkPricedOffer();
+    await prisma.availability.deleteMany({ where: { coachId: coach.id } });
+    const { pkg } = await paidPackage(pool.id, coach.id);
+    await prisma.pool.update({ where: { id: pool.id }, data: { isActive: false } });
+    await runCoachSlotWatch(new Date(Date.now() - 8 * DAY));
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).noSlotSince).not.toBeNull();
+    const admin = await mkUser("ADMIN");
+    await as({ id: admin.id, role: "ADMIN" }, () => togglePoolActive(pool.id, true));
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).noSlotSince).toBeNull();
   });
 
   it("PJ2: jam kosong setelah paket berakhir tidak dihitung; paket tanpa sisa sesi / sesi coba tidak diawasi", async () => {

@@ -115,7 +115,7 @@ export default async function MemberDashboardPage() {
           </div>
           <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-border pt-4 xl:grid-cols-4">
             <Stat label="Belanja paket bulan ini" value={formatRupiah(spentThisMonth._sum.amount ?? 0)} />
-            <Stat label="Paling sering diajar" value={topCoach ?? "-"} />
+            <Stat label="Coach tersering" value={topCoach ?? "-"} />
           </div>
           {expiringSoon.length > 0 && (
             <p className="mt-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">

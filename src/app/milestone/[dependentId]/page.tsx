@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 const BACK: Record<string, { href: string; label: string }> = {
-  COACH: { href: "/coach/peserta", label: "← Peserta Saya" },
+  COACH: { href: "/coach/peserta", label: "← Peserta" },
   MEMBER: { href: "/member/peserta", label: "← Peserta" },
   ADMIN: { href: "/admin/milestone", label: "← Milestone" },
 };
@@ -110,6 +110,12 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
         {overdue && (
           <p className="mt-4 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
             Sudah {overdue.sessionsWithoutNote} sesi Hadir tanpa catatan. Pencairan saldomu ditahan sampai catatan diisi.
+          </p>
+        )}
+
+        {!access.canEdit && session.user.role === "COACH" && (
+          <p className="mt-4 rounded-lg bg-surface-muted px-3 py-2 text-sm text-text-muted">
+            Milestone bisa diisi setelah sesi pertama peserta ini ditandai Hadir di Riwayat Sesi.
           </p>
         )}
 

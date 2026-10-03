@@ -12,7 +12,7 @@ async function currentUser() {
 
 export async function GET() {
   const user = await currentUser();
-  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
   // Pengguna hanya melihat 90 hari terakhir (keputusan Hadi 25 Sep); arsip
   // lengkap tetap tersimpan untuk penyelesaian masalah dan terlihat admin.
   // 100 pesan TERBARU (dulu urut naik + take = 100 pesan paling lama, jadi
@@ -33,7 +33,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const user = await currentUser();
-  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
 
   const { content } = (await request.json().catch(() => ({}))) as { content?: string };
   const text = content?.trim() ?? "";

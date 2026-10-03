@@ -38,14 +38,14 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
       </h2>
       <Input
         type="search"
-        placeholder="Cari nama, email, No HP, atau nama anak..."
+        placeholder="Cari nama, email, Nomor HP, atau nama peserta..."
         aria-label="Cari member"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="mb-3 max-w-sm"
       />
       {filtered.length === 0 ? (
-        <p className="text-sm text-text-subtle">Tidak ada yang cocok sama pencarian &ldquo;{search}&rdquo;.</p>
+        <p className="text-sm text-text-subtle">Tidak ada yang cocok dengan pencarian &ldquo;{search}&rdquo;.</p>
       ) : (
         <>
           {/* Desktop: tabel -- Nama & Email digabung 1 kolom (email di
@@ -57,7 +57,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                 <thead>
                   <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
                     <th className="px-5 py-3.5 font-medium">Nama</th>
-                    <th className="px-5 py-3.5 font-medium">No HP</th>
+                    <th className="px-5 py-3.5 font-medium">Nomor HP</th>
                     <th className="w-56 px-5 py-3.5 font-medium">Paket</th>
                     <th className="px-5 py-3.5 font-medium">Status</th>
                     <th className="px-5 py-3.5"></th>
@@ -114,7 +114,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                     </Badge>
                   </div>
                   {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
-                  <p className="text-xs text-text-muted">No HP: {u.phone ?? "-"}</p>
+                  <p className="text-xs text-text-muted">Nomor HP: {u.phone ?? "-"}</p>
                   <div className="text-xs text-text-muted">
                     <PesertaList items={u.peserta} />
                   </div>

@@ -52,8 +52,8 @@ export default async function KinerjaCoachPage({
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Kinerja Coach</h1>
       <p className="mb-6 text-sm text-text-muted">
-        Jumlah sesi valid (member benar-benar hadir) per coach di rentang tanggal — dasar hitung
-        komisi coach.
+        Jumlah sesi valid (peserta benar-benar hadir) per coach di rentang tanggal. Angka ini dasar hitung
+        bagi hasil coach.
       </p>
 
       <Card className="mb-6">
@@ -92,7 +92,7 @@ export default async function KinerjaCoachPage({
                   <p className="text-sm text-text-muted">
                     <b className="text-2xl text-text">{r.total.valid}</b> sesi valid
                     {r.total.unmarked > 0 && <span className="text-warning-text"> · {r.total.unmarked} belum ditandai</span>}
-                    {r.total.notHadir > 0 && <> · {r.total.notHadir} tidak hadir</>}
+                    {r.total.notHadir > 0 && <> · {r.total.notHadir} Tidak Hadir</>}
                   </p>
                 </div>
                 <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -100,7 +100,7 @@ export default async function KinerjaCoachPage({
                     <li key={poolName} className="rounded-lg border border-border px-3 py-2">
                       <p className="text-sm font-semibold text-brand-700">{poolName}</p>
                       <p className="text-sm text-text">
-                        {c.valid} valid · {c.unmarked} belum ditandai · {c.notHadir} tidak hadir
+                        {c.valid} valid · {c.unmarked} belum ditandai · {c.notHadir} Tidak Hadir
                       </p>
                     </li>
                   ))}
@@ -112,7 +112,7 @@ export default async function KinerjaCoachPage({
       )}
 
       <p className="mt-4 text-xs text-text-subtle">
-        Booking yang belum ditandai atau ditandai tidak hadir tidak ikut dihitung sesi valid — cek
+        Booking yang belum ditandai atau ditandai Tidak Hadir tidak dihitung sebagai sesi valid. Cek
         di Booking &amp; Riwayat Sesi coach.
       </p>
     </main>

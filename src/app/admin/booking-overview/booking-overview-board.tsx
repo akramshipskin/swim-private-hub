@@ -28,7 +28,7 @@ function dateKey(d: Date) {
 }
 
 function buildKabarinWaLink(coachName: string, dateLabel: string) {
-  const message = `Halo semua! Coach ${coachName} baru saja buka jadwal baru tanggal ${dateLabel}. Buruan booking sebelum kehabisan slot ya! 🏊`;
+  const message = `Halo semua! Coach ${coachName} baru saja membuka jadwal baru tanggal ${dateLabel}. Segera booking sebelum jam kosongnya habis. 🏊`;
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }
 
@@ -84,7 +84,7 @@ export default function BookingOverviewBoard({
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight text-text">Jadwal Booking</h1>
-      <p className="mt-1 mb-4 text-sm text-text-muted">Semua slot coach: siapa, tanggal berapa, di kolam mana, dan dibooking siapa.</p>
+      <p className="mt-1 mb-4 text-sm text-text-muted">Semua jadwal coach: siapa, tanggal berapa, di kolam mana, dan dibooking siapa.</p>
 
       <Card className="mb-6">
         <CardBody className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -100,7 +100,7 @@ export default function BookingOverviewBoard({
             Periode
             <Select value={period} onChange={(e) => setPeriod(e.target.value as Period)} className="w-full">
               <option value="upcoming">Hari ini &amp; mendatang</option>
-              <option value="unmarked">Lewat, belum ditandai hadir</option>
+              <option value="unmarked">Lewat, belum ditandai Hadir</option>
               <option value="past">Sudah lewat</option>
               <option value="all">Semua</option>
             </Select>
@@ -128,7 +128,7 @@ export default function BookingOverviewBoard({
 
       {byCoach.size === 0 ? (
         <Card>
-          <CardBody className="py-10 text-center text-sm text-text-muted">Tidak ada slot yang cocok dengan filter.</CardBody>
+          <CardBody className="py-10 text-center text-sm text-text-muted">Tidak ada jadwal yang cocok dengan filter.</CardBody>
         </Card>
       ) : (
         [...byCoach.entries()].map(([coachId, group]) => {

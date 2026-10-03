@@ -17,7 +17,7 @@ function memberSince(d: Date) {
   });
 }
 
-export const metadata = { title: "Kelola Paket | Swim Private Hub" };
+export const metadata = { title: "Paket | Swim Private Hub" };
 
 export default async function AdminPaketPage() {
   await requireRole("ADMIN");
@@ -76,12 +76,12 @@ export default async function AdminPaketPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola Paket</h1>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Paket</h1>
 
       {/* --- List member + paket, advanced --- */}
       <p className="mb-3 text-xs text-text-subtle">
-        Mau tambah peserta atau memberi paket gratis ke member? Ada di
-        tab <span className="font-medium text-text-muted">Kelola Pengguna</span>.
+        Untuk menambah peserta atau memberi paket gratis ke member, buka
+        menu <span className="font-medium text-text-muted">Pengguna</span>.
       </p>
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>
       <PaketPerMemberList

@@ -102,7 +102,7 @@ describe("updatePoolInfo", () => {
   it("rejects an address over 300 chars and a phone over 20 chars (before touching the DB)", async () => {
     auth.mockResolvedValue({ user: { id: "a1", role: "ADMIN" } });
     expect((await updatePoolInfo(null, fd([["poolId", "p1"], ["address", "a".repeat(301)]])))?.error).toBe("Alamat maksimal 300 karakter.");
-    expect((await updatePoolInfo(null, fd([["poolId", "p1"], ["contactPhone", "1".repeat(21)]])))?.error).toBe("No. telepon maksimal 20 karakter.");
+    expect((await updatePoolInfo(null, fd([["poolId", "p1"], ["contactPhone", "1".repeat(21)]])))?.error).toBe("Nomor telepon maksimal 20 karakter.");
     expect(poolUpdateMany).not.toHaveBeenCalled();
   });
 

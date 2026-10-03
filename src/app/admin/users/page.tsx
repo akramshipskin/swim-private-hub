@@ -22,7 +22,7 @@ const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] 
   { role: "POOL_OWNER", label: "Pemilik Kolam" },
 ];
 
-export const metadata = { title: "Kelola Pengguna | Swim Private Hub" };
+export const metadata = { title: "Pengguna | Swim Private Hub" };
 
 export default async function AdminUsersPage() {
   const session = await requireRole("ADMIN");
@@ -68,7 +68,7 @@ export default async function AdminUsersPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Kelola Pengguna</h1>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Pengguna</h1>
 
       <PendingCertificates />
 
@@ -82,7 +82,7 @@ export default async function AdminUsersPage() {
             <h2 className="text-sm font-semibold text-text">Tambah Peserta</h2>
             <p className="mt-1 mb-3 text-sm text-text-muted">
               1 paket = 1 peserta (bisa anak, bisa diri sendiri). Member baru yang belum pernah masuk belum punya
-              peserta terdaftar — tambahkan di sini dulu kalau mau langsung assign paket.
+              peserta. Tambahkan di sini bila ingin langsung memberi paket.
             </p>
             <AddChildForm members={memberOptions} />
           </div>
@@ -102,7 +102,7 @@ export default async function AdminUsersPage() {
         coaches={coachOptions}
       />
 
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua User</h2>
+      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua Pengguna</h2>
 
       {roleSections.map(({ role, label }) => {
         // Pendaftar baru yang menunggu persetujuan tampil paling atas.
@@ -143,7 +143,7 @@ export default async function AdminUsersPage() {
                             <p className="text-xs text-text-subtle">{coachBioLine(u.coachProfile)}</p>
                           )}
                           <p className="text-sm text-text-muted">
-                            {u.phone ?? "No HP belum diisi"}
+                            {u.phone ?? "Nomor HP belum diisi"}
                             {u.email ? ` · ${u.email}` : ""}
                           </p>
                           {role === "COACH" && (

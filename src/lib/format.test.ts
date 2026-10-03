@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formNumber, identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants, toProperCase } from "./format";
+import { formatRupiah, formNumber, identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, phoneVariants, toProperCase } from "./format";
 
 describe("toProperCase", () => {
   it("capitalizes the first letter of an all-lowercase name", () => {
@@ -116,5 +116,14 @@ describe("formNumber", () => {
     expect(formNumber(fd({ n: "" }), "n")).toBeNaN();
     expect(formNumber(fd({ n: "   " }), "n")).toBeNaN();
     expect(formNumber(fd({}), "n")).toBeNaN();
+  });
+});
+
+describe("formatRupiah", () => {
+  // Satu bentuk di seluruh aplikasi sesuai brand-kit/MESSAGING.md: "Rp 172.250"
+  // (spasi tak terputus supaya "Rp" tidak terpisah dari angkanya).
+  it("Rp + spasi tak terputus + angka bertitik", () => {
+    expect(formatRupiah(172250)).toBe("Rp\u00a0172.250");
+    expect(formatRupiah(0)).toBe("Rp\u00a00");
   });
 });

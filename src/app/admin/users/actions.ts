@@ -28,13 +28,13 @@ export async function createUser(
   const role = formData.get("role") as "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
 
   if (!rawName?.trim() || !phone || !password || !role) {
-    return { error: "Nama, No HP, password, dan role wajib diisi" };
+    return { error: "Nama, Nomor HP, password, dan peran wajib diisi." };
   }
   if (rawName.trim().length > MAX_NAME) return { error: `Nama maksimal ${MAX_NAME} karakter.` };
   if (email && email.length > MAX_EMAIL) return { error: `Email maksimal ${MAX_EMAIL} karakter.` };
   const name = toProperCase(rawName.trim());
   if (password.length < 8) {
-    return { error: "Password minimal 8 karakter" };
+    return { error: "Password minimal 8 karakter." };
   }
 
   // Samain kayak halaman daftar member sendiri -- kalau bikin akun Member,
@@ -49,7 +49,7 @@ export async function createUser(
       return { error: userErrorMessage(err, "Tanggal lahir peserta tidak valid.") };
     }
     if (children.length === 0 && !wantsSelf) {
-      return { error: "Pilih minimal 1 peserta (diri sendiri atau anak)" };
+      return { error: "Pilih minimal 1 peserta (diri sendiri atau anak)." };
     }
   }
 
@@ -62,16 +62,16 @@ export async function createUser(
       return { error: `Nama kolam maksimal ${MAX_POOL_NAME} karakter, alamat maksimal ${MAX_ADDRESS} karakter.` };
     }
     if (poolMode === "new" ? !newPoolName : !poolId) {
-      return { error: "Pilih kolam yang ada atau isi nama kolam baru" };
+      return { error: "Pilih kolam yang ada atau isi nama kolam baru." };
     }
     if (poolMode !== "new" && (await prisma.pool.count({ where: { id: poolId } })) === 0) {
-      return { error: "Kolam tidak ditemukan" };
+      return { error: "Kolam tidak ditemukan." };
     }
   }
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
-    return { error: "No HP atau email sudah terdaftar" };
+    return { error: "Nomor HP atau email sudah terdaftar." };
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -113,7 +113,7 @@ export async function createUser(
     // Double-submit barengan: 2 request lolos cek `existing` di atas, yang
     // kalah kena unique constraint -- dulu jadi halaman error.
     if ((err as { code?: string })?.code === "P2002") {
-      return { error: "No HP atau email sudah terdaftar" };
+      return { error: "Nomor HP atau email sudah terdaftar." };
     }
     throw err;
   }
@@ -204,7 +204,7 @@ export async function resetUserPassword(
     data: { passwordHash, mustChangePassword: true, sessionVersion: { increment: 1 } },
   });
   if (updated.count === 0) {
-    return { error: "User tidak ditemukan." };
+    return { error: "Pengguna tidak ditemukan." };
   }
   return { tempPassword };
 }
@@ -219,7 +219,7 @@ export async function resetUserTotp(userId: string): Promise<{ error?: string }>
     where: { id: userId, role: { not: "ADMIN" } },
     data: { totpSecret: null, totpEnabledAt: null, totpLastStep: null, sessionVersion: { increment: 1 } },
   });
-  if (res.count === 0) return { error: "User tidak ditemukan, atau akun admin (reset admin lewat skrip server)." };
+  if (res.count === 0) return { error: "Pengguna tidak ditemukan, atau akun ini milik admin (2FA admin hanya bisa direset lewat server)." };
   revalidatePath(`/admin/users/${userId}`);
   return {};
 }

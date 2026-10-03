@@ -52,7 +52,7 @@ export default function PaketPerMemberList({ rows }: { rows: Row[] }) {
         className="mb-3 max-w-sm"
       />
       {filtered.length === 0 ? (
-        <p className="text-sm text-text-subtle">Tidak ada yang cocok sama pencarian &ldquo;{search}&rdquo;.</p>
+        <p className="text-sm text-text-subtle">Tidak ada yang cocok dengan pencarian &ldquo;{search}&rdquo;.</p>
       ) : (
         <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {filtered.map((r) => (

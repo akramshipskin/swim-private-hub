@@ -39,7 +39,7 @@ export async function updateStandardItem(itemId: string, _prev: ItemActionState,
   const t = readText(formData);
   if ("error" in t) return t;
   const sortOrder = readInt(formData, "sortOrder", 0, 999);
-  if (sortOrder === null) return { error: "Urutan harus angka 0-999." };
+  if (sortOrder === null) return { error: "Urutan harus angka 0–999." };
   const r = await prisma.milestoneItem.updateMany({ where: { id: itemId, dependentId: null }, data: { text: t.text, sortOrder } });
   if (r.count === 0) return { error: "Butir standar tidak ditemukan." };
   return done();
@@ -56,7 +56,7 @@ export async function addStandardItem(_prev: ItemActionState, formData: FormData
   const group = formData.get("group")?.toString() as MilestoneGroup;
   if (!MILESTONE_GROUPS.includes(group)) return { error: "Pilih kelompok." };
   const level = readInt(formData, "level", 1, MAX_LEVEL);
-  if (level === null) return { error: `Level harus angka 1-${MAX_LEVEL}.` };
+  if (level === null) return { error: `Level harus angka 1–${MAX_LEVEL}.` };
   const t = readText(formData);
   if ("error" in t) return t;
   const last = await prisma.milestoneItem.aggregate({ where: { group, level, dependentId: null }, _max: { sortOrder: true } });

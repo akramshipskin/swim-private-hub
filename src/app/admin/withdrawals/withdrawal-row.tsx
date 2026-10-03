@@ -93,7 +93,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
               <form action={processAction}>
                 <input type="hidden" name="withdrawalId" value={w.id} />
                 <Button type="submit" size="sm" loading={processPending}>
-                  Proses via Iris
+                  Proses lewat Iris
                 </Button>
               </form>
             )}

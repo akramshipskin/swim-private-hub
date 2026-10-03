@@ -88,7 +88,7 @@ describe("markAttendance", () => {
   it("refuses a MEMBER (only COACH/ADMIN can mark attendance)", async () => {
     auth.mockResolvedValue({ user: { id: "member-1", role: "MEMBER" } });
     const result = await markAttendance(null, formData("booking-1", "true"));
-    expect(result).toEqual({ error: "Tidak punya akses." });
+    expect(result).toEqual({ error: "Kamu tidak punya akses untuk tindakan ini." });
     expect(bookingFindUnique).not.toHaveBeenCalled();
   });
 
@@ -122,7 +122,7 @@ describe("markAttendance", () => {
   it("refuses a coach marking a session that isn't theirs", async () => {
     bookingFindUnique.mockResolvedValue(baseBooking({ availability: { ...baseBooking().availability, coachId: "someone-else" } }));
     const result = await markAttendance(null, formData("booking-1", "true"));
-    expect(result).toEqual({ error: "Bukan sesi kamu." });
+    expect(result).toEqual({ error: "Sesi ini bukan sesimu." });
     expect(bookingUpdateMany).not.toHaveBeenCalled();
   });
 
@@ -137,7 +137,7 @@ describe("markAttendance", () => {
   it("refuses to mark attendance before the session has actually ended", async () => {
     bookingFindUnique.mockResolvedValue(baseBooking({ availability: { ...baseBooking().availability, endTime: FUTURE } }));
     const result = await markAttendance(null, formData("booking-1", "true"));
-    expect(result?.error).toContain("Belum waktunya");
+    expect(result?.error).toContain("belum selesai");
     expect(bookingUpdateMany).not.toHaveBeenCalled();
   });
 

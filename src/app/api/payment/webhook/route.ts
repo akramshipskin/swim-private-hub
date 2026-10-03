@@ -6,6 +6,7 @@ import { sendPushToUser } from "@/lib/push";
 import { completeCoachChange, notifyCoachChangeResult } from "@/lib/coach-change";
 import { creditMember, reclaimRefundedBalance, refundMemberBalanceOnce } from "@/lib/member-wallet";
 import { notifyAdmins } from "@/lib/notify";
+import { formatRupiah } from "@/lib/format";
 import { metaCapiEnabled, sendMetaEvent, type MetaTracking } from "@/lib/meta-capi";
 
 // Signature Midtrans dihitung pake Server Key platform -- service
@@ -232,7 +233,7 @@ export async function POST(request: Request) {
   if (activated) {
     await sendPushToUser(payment.package.memberId, {
       title: "Pembayaran berhasil",
-      body: `${payment.package.name} sudah aktif. Yuk booking jadwal.`,
+      body: `${payment.package.name} sudah aktif. Sekarang kamu bisa booking jadwal.`,
       url: "/member/booking",
     }).catch(() => {});
     // Pelacak iklan Meta (Hadi 2 Okt, 5A): sekali, di transisi pertama ke
@@ -252,7 +253,7 @@ export async function POST(request: Request) {
 
   if (saldoShortage > 0) {
     console.error(`[webhook] ${orderId} lunas setelah saldo dikembalikan; saldo member kurang ${saldoShortage}`);
-    await notifyAdmins("Cek saldo member", `Pembayaran ${orderId} lunas belakangan; saldo member kurang ${saldoShortage} untuk ditarik kembali`, "/admin/pembayaran").catch(() => {});
+    await notifyAdmins("Cek saldo member", `Pembayaran ${orderId} lunas belakangan. Saldo member kurang ${formatRupiah(saldoShortage)} untuk ditarik kembali.`, "/admin/pembayaran").catch(() => {});
   }
   if (coachChangeId && coachChangeResult) {
     await notifyCoachChangeResult(coachChangeId, coachChangeResult).catch(() => {});

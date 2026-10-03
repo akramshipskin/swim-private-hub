@@ -329,7 +329,7 @@ export async function notifyCoachChangeResult(requestId: string, result: "comple
     await notifyUser(
       req.memberId,
       "Ganti coach selesai",
-      `Paket ${who} sekarang dengan ${req.toCoach.name}.${credited > 0 ? ` ${formatRupiah(credited)} masuk ke saldomu.` : ""} Booking ulang jadwalnya ya.`,
+      `Paket ${who} sekarang dengan ${req.toCoach.name}.${credited > 0 ? ` ${formatRupiah(credited)} masuk ke saldomu.` : ""} Silakan booking ulang jadwalnya.`,
       "/member/booking"
     );
     // Coach lama diberi tahu (keputusan Hadi 2 Okt).

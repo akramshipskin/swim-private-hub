@@ -14,8 +14,8 @@ export async function recordPphRemittance(_prev: RemitState, formData: FormData)
   const amount = formNumber(formData, "amount");
   const reference = formData.get("reference")?.toString().trim() ?? "";
   const note = formData.get("note")?.toString().trim() || null;
-  if (!Number.isInteger(amount) || amount < 1) return { error: "Nominal setoran harus angka bulat minimal Rp1." };
-  if (reference.length < 3 || reference.length > 100) return { error: "Isi nomor bukti setor (NTPN/kode billing), 3-100 huruf." };
+  if (!Number.isInteger(amount) || amount < 1) return { error: "Nominal setoran harus angka bulat minimal Rp 1." };
+  if (reference.length < 3 || reference.length > 100) return { error: "Isi nomor bukti setor (NTPN/kode billing), 3–100 karakter." };
   const res = await withDedupeLock("pph-remittance", async (tx) => {
     const held = -((await tx.walletTransaction.aggregate({ where: { type: "PPH_WITHHELD" }, _sum: { amount: true } }))._sum.amount ?? 0);
     const paid = (await tx.pphRemittance.aggregate({ _sum: { amount: true } }))._sum.amount ?? 0;

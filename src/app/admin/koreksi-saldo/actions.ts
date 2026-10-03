@@ -20,7 +20,7 @@ export async function adjustWallet(_state: WalletAdjustState, formData: FormData
   const source = formData.get("source");
   const nominal = formNumber(formData, "amount");
 
-  if ((targetType !== "pool" && targetType !== "coach") || !targetId) return { error: "Formulir tidak lengkap, muat ulang halaman." };
+  if ((targetType !== "pool" && targetType !== "coach") || !targetId) return { error: "Formulir tidak lengkap. Muat ulang halaman, lalu coba lagi." };
   if (direction !== "credit" && direction !== "debit") return { error: "Pilih tambah atau kurangi saldo." };
   if (source !== "platform" && source !== "none") return { error: "Pilih sumber dana koreksi." };
   if (!Number.isInteger(nominal) || nominal <= 0) return { error: "Isi nominal koreksi." };

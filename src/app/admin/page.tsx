@@ -150,7 +150,7 @@ export default async function AdminDashboardPage() {
             <ActionRow label="Usulan butir milestone" count={pendingMilestoneProposals} href="/admin/milestone" />
             <ActionRow label="Coach/pemilik kolam baru menunggu persetujuan" count={pendingAccounts} href="/admin/users" />
             <ActionRow label="Kolam belum disetujui" count={pools.length - activePools.length} href="/admin/kolam" />
-            <ActionRow label="Sesi lewat belum ditandai hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach baru masuk setelah ditandai hadir" />
+            <ActionRow label="Sesi lewat belum ditandai Hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach baru masuk setelah ditandai Hadir" />
           </div>
         </BentoCard>
 
@@ -161,11 +161,11 @@ export default async function AdminDashboardPage() {
           <SessionList items={tomorrowItems} empty="Belum ada sesi besok." />
         </BentoCard>
 
-        <BentoCard title="Pendapatan platform" href="/admin/withdrawals" linkLabel="Tarik saldo" className="md:col-span-6">
+        <BentoCard title="Pendapatan platform" href="/admin/withdrawals" linkLabel="Cairkan saldo" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Pendapatan bersih bulan ini" value={formatRupiah(monthSum("PLATFORM_REVENUE"))} tone="success" />
             <Stat label="PPN bulan ini" value={formatRupiah(monthSum("PLATFORM_TAX"))} />
-            <Stat label="Pendapatan bersih bisa ditarik" value={formatRupiah(Math.max(0, platformBalance.availableRevenue))} />
+            <Stat label="Pendapatan bersih bisa dicairkan" value={formatRupiah(Math.max(0, platformBalance.availableRevenue))} />
             <Stat label="Saldo pajak belum disetor" value={formatRupiah(platformBalance.tax)} />
           </div>
           <p className="mt-3 text-xs text-text-subtle">Dihitung dari komisi setiap sesi yang ditandai Hadir (komisi sudah termasuk PPN). Tarif 11% sejak 30 Sep 2026; sesi sebelumnya 12%.</p>

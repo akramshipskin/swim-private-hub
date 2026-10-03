@@ -25,7 +25,7 @@ export async function requestDeletionAction(): Promise<DeletionState> {
 
 export async function cancelDeletionAction(): Promise<DeletionState> {
   const session = await auth();
-  if (!session || session.user.role !== "MEMBER") return { error: "Tidak punya akses." };
+  if (!session || session.user.role !== "MEMBER") return { error: "Kamu tidak punya akses untuk tindakan ini." };
   await cancelAccountDeletion(session.user.id);
   revalidatePath("/profil");
   return { ok: true };

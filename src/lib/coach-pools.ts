@@ -1,7 +1,7 @@
 // Coach memilih sendiri kolam tempat ia mengajar (Hadi 3 Okt): kolam tidak
 // menyetujui coach. Tautan coach-kolam (PoolAffiliation) = izin buka slot dan
 // pasangan paket yang bisa dibeli member. Admin tetap bisa menautkan/mencabut
-// lewat Kelola Kolam (jalur cadangan, tanpa penjaga di bawah).
+// lewat menu Kolam admin (jalur cadangan, tanpa penjaga di bawah).
 import { prisma } from "@/lib/prisma";
 import { removeOpenSlots } from "@/lib/availability";
 import { STALE_PAYMENT_MS } from "@/lib/stale-payments";
@@ -28,7 +28,12 @@ export async function pickCoachPool(coachId: string, poolId: string): Promise<Pi
       if (err?.code !== "P2002") throw err;
       return false;
     });
-  if (created) await notifyWaitlistForPool(poolId);
+  if (created) {
+    // Tautan baru (mis. setelah dilepas admin): hari tanpa tautan bukan salah
+    // coach, hitungan penjaga jadwal dimulai ulang (Hadi 3 Okt malam #2A).
+    await prisma.package.updateMany({ where: { poolId, coachId, noSlotSince: { not: null } }, data: { noSlotSince: null } });
+    await notifyWaitlistForPool(poolId);
+  }
   return "OK";
 }
 

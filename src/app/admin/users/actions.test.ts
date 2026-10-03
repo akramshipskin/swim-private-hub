@@ -78,7 +78,7 @@ describe("createUser", () => {
   it("rejects when phone or email is already registered", async () => {
     userFindFirst.mockResolvedValue({ id: "existing" });
     const result = await createUser(null, formData(base));
-    expect(result).toEqual({ error: "No HP atau email sudah terdaftar" });
+    expect(result).toEqual({ error: "Nomor HP atau email sudah terdaftar." });
     expect(userCreate).not.toHaveBeenCalled();
   });
 
@@ -91,7 +91,7 @@ describe("createUser", () => {
 
   it("requires at least one participant (self or child) when creating a MEMBER", async () => {
     const result = await createUser(null, formData({ ...base, role: "MEMBER" }));
-    expect(result).toEqual({ error: "Pilih minimal 1 peserta (diri sendiri atau anak)" });
+    expect(result).toEqual({ error: "Pilih minimal 1 peserta (diri sendiri atau anak)." });
     expect(userCreate).not.toHaveBeenCalled();
   });
 
@@ -237,7 +237,7 @@ describe("resetUserPassword", () => {
   it("reports a missing user", async () => {
     userUpdateMany.mockResolvedValueOnce({ count: 0 });
     const res = await resetUserPassword("gone");
-    expect(res).toEqual({ error: "User tidak ditemukan." });
+    expect(res).toEqual({ error: "Pengguna tidak ditemukan." });
   });
 });
 

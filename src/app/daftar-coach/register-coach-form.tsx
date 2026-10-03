@@ -43,11 +43,11 @@ export default function RegisterCoachForm() {
     setError(null);
 
     if (!isValidIndonesianPhone(phone)) {
-      setError("Format No HP tidak valid (contoh: 0812xxxxxxx)");
+      setError("Format Nomor HP tidak valid (contoh: 0812xxxxxxx)");
       return;
     }
     if (specialties.length === 0) {
-      setError("Pilih minimal 1 keahlian");
+      setError("Pilih minimal 1 keahlian.");
       return;
     }
 
@@ -78,7 +78,7 @@ export default function RegisterCoachForm() {
 
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error ?? "Registrasi gagal");
+      setError(data.error ?? "Pendaftaran gagal. Coba lagi.");
       setLoading(false);
       return;
     }
@@ -114,7 +114,7 @@ export default function RegisterCoachForm() {
             <Field label="Nama Lengkap">
               <Input value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />
             </Field>
-            <Field label="No HP">
+            <Field label="Nomor HP">
               <Input
                 type="tel"
                 placeholder="0812xxxxxxx"
@@ -154,7 +154,7 @@ export default function RegisterCoachForm() {
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium text-text">Harga jasa kamu</p>
               <p className="text-xs text-text-subtle">
-                Satu harga untuk semua kolam. Isi minimal satu, kelipatan Rp1.000. Member membayar harga ini + harga kolam + biaya layanan SPH. Bisa diubah nanti.
+                Satu harga untuk semua kolam. Isi minimal satu, kelipatan Rp 1.000. Member membayar harga ini ditambah harga kolam dan biaya layanan SPH. Bisa diubah nanti.
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Paket 4 sesi (Rp)">
@@ -218,7 +218,7 @@ export default function RegisterCoachForm() {
                 <Input
                   value={certificationNote}
                   onChange={(e) => setCertificationNote(e.target.value)}
-                  placeholder="Misal: Sertifikasi Pelatih Renang FASI"
+                  placeholder="Contoh: Sertifikasi Pelatih Renang FASI"
                 />
               </Field>
             )}

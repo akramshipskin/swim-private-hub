@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 //
 // Nilai sesi, bagian kolam & coach diambil
 // dari ledger (yang benar-benar dikredit), sama seperti halaman Bagi Hasil admin.
-export const metadata = { title: "Laporan Kolam | Swim Private Hub" };
+export const metadata = { title: "Laporan | Swim Private Hub" };
 
 export default async function PoolLaporanPage({
   searchParams,
@@ -92,7 +92,7 @@ export default async function PoolLaporanPage({
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Laporan Kolam</h1>
+      <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Laporan</h1>
       <p className="mb-6 text-sm text-text-muted">
         Rincian bagian kolam kamu per sesi yang benar-benar ditandai Hadir.
       </p>

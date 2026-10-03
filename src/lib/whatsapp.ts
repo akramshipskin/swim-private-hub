@@ -33,20 +33,20 @@ export function buildAdminCancelWaLink({
   dateLabel: string;
   timeRange: string;
 }) {
-  const forLine = childName ? `\nBuat: ${childName}` : "";
-  const message = `Halo Admin Swim Private Hub, saya mau minta bantuan batalkan booking:
+  const forLine = childName ? `\nPeserta: ${childName}` : "";
+  const message = `Halo Admin Swim Private Hub, saya ingin minta bantuan membatalkan booking:
 
 Nama: ${memberName}${forLine}
 Coach: ${coachName}
 Jadwal: ${dateLabel}, ${timeRange}
 
-Jatah pembatalan mandiri saya sudah habis / di luar waktu yang diizinkan. Mohon dibantu ya, terima kasih.`;
+Jatah pembatalan mandiri saya sudah habis / di luar waktu yang diizinkan. Mohon bantuannya, terima kasih.`;
 
   return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
 export function buildOwnerInquiryWaLink() {
   const message =
-    "Halo, saya punya kolam renang dan tertarik gabung jadi mitra Swim Private Hub. Boleh minta info lebih lanjut?";
+    "Halo, saya punya kolam renang dan tertarik bergabung menjadi kolam mitra Swim Private Hub. Boleh minta info lebih lanjut?";
   return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }

@@ -78,7 +78,7 @@ export default async function KeamananPage() {
               )}
               <ol className="mb-4 list-decimal space-y-1.5 pl-5 text-sm text-text-muted">
                 <li>Pasang aplikasi <b className="text-text">Google Authenticator</b> di HP (gratis di Play Store / App Store).</li>
-                <li>Tekan &ldquo;Buat kunci&rdquo;, lalu tambahkan akun di aplikasi: tap link dari HP, atau pilih &ldquo;Masukkan kunci penyiapan&rdquo; dan ketik kuncinya.</li>
+                <li>Tekan &ldquo;Buat kunci&rdquo;, lalu tambahkan akun di aplikasi: ketuk link dari HP, atau pilih &ldquo;Masukkan kunci penyiapan&rdquo; dan ketik kuncinya.</li>
                 <li>Ketik password akunmu dan 6 digit yang muncul di aplikasi.</li>
               </ol>
               {!isAdmin && (

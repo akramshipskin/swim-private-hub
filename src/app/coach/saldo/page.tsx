@@ -9,7 +9,7 @@ import { getOverdueParticipants } from "@/lib/milestone-hold";
 import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
 import { releaseDueCommissions } from "@/lib/affiliate";
 
-export const metadata = { title: "Saldo Coach | Swim Private Hub" };
+export const metadata = { title: "Saldo | Swim Private Hub" };
 
 export default async function CoachSaldoPage() {
   const session = await requireRole("COACH");
@@ -59,7 +59,7 @@ export default async function CoachSaldoPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Saldo Saya</h1>
+      <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Saldo</h1>
       <p className="mb-6 text-sm text-text-muted">
         Bagian kamu dari tiap sesi yang ditandai Hadir (penuh) atau Tidak Hadir karena peserta tidak datang (50%).
         {pph > 0 && <> Potongan PPh 0,5% sejauh ini: {formatRupiah(pph)} (sudah dikurangkan dari saldo, disetor SPH atas namamu).</>}

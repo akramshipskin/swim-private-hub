@@ -36,7 +36,7 @@ export async function AffiliateCard({
       <p className="text-sm text-text-muted">
         Member baru yang mendaftar dengan kode <b className="text-text">{code}</b> memberimu komisi{" "}
         {AFFILIATE_SERVICE_FEE_SHARE_PERCENT}% dari biaya layanan SPH (setelah PPN) pada paket berbayar pertamanya, sekali per member;
-        sesi coba tidak dihitung. Contoh: paket dengan biaya layanan Rp83.200 memberi komisi Rp37.477. Komisi masuk saldo{" "}
+        sesi coba tidak dihitung. Contoh: paket dengan biaya layanan Rp 83.200 memberi komisi Rp 37.477. Komisi masuk saldo{" "}
         {AFFILIATE_HOLD_DAYS} hari setelah sesi pertamanya ditandai Hadir.
       </p>
       <CopyLinkButton link={link} id={`affiliate-link-${code}`} />

@@ -20,7 +20,7 @@ export async function adminCancelBooking(
     await cancelBooking({ bookingId, actor: { role: "ADMIN" } });
   } catch (err) {
     if (err instanceof CancelError) return { error: err.message };
-    return { error: "Gagal membatalkan booking, coba lagi." };
+    return { error: "Gagal membatalkan booking. Coba lagi." };
   }
 
   revalidatePath("/admin/booking-overview");

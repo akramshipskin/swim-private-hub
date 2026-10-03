@@ -34,7 +34,7 @@ describe("POST /api/register-coach: tanggal lahir", () => {
   it("wajib diisi", async () => {
     const res = await POST(req({ birthDate: undefined }));
     expect(res.status).toBe(400);
-    expect((await res.json()).error).toBe("Tanggal lahir wajib diisi");
+    expect((await res.json()).error).toBe("Tanggal lahir wajib diisi.");
     expect(userCreate).not.toHaveBeenCalled();
   });
 

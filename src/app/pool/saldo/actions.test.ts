@@ -42,7 +42,7 @@ describe("pool updateBankInfo", () => {
 
   it("tetap menolak kolam yang bukan milik akun ini", async () => {
     poolFind.mockResolvedValue(null);
-    await expect(updateBankInfo("pool-x", null, form({}))).resolves.toEqual({ error: "Kolam ini bukan milik akun kamu." });
+    await expect(updateBankInfo("pool-x", null, form({}))).resolves.toEqual({ error: "Kolam ini bukan milik akunmu." });
     expect(poolUpdate).not.toHaveBeenCalled();
   });
 });

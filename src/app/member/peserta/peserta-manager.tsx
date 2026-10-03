@@ -108,7 +108,7 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                   <h3 className="text-base font-semibold text-text">Tambah peserta</h3>
                   {active.length === 0 && (
                     <p className="mt-0.5 text-sm text-text-muted">
-                      Belum ada peserta — bisa kamu sendiri, bisa anak.
+                      Belum ada peserta. Peserta bisa kamu sendiri atau anak.
                     </p>
                   )}
                 </div>
@@ -162,7 +162,7 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
         <section>
           <h2 className="mb-2 text-lg font-semibold text-text">Peserta nonaktif</h2>
           <p className="mb-2 text-sm text-text-muted">
-            Paket dan riwayatnya disimpan. Aktifkan lagi kalau peserta ini mau les lagi.
+            Paket dan riwayatnya disimpan. Aktifkan lagi bila peserta ini ingin les lagi.
           </p>
           <ul className="flex flex-col gap-2">
             {inactive.map((c) => (

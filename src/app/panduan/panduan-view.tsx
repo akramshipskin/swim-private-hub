@@ -22,8 +22,8 @@ const HIGHLIGHTS = [
     body: "Satu orang tua bisa mendaftarkan dirinya sendiri dan beberapa anak. Paket dan sisa sesi dihitung per peserta, jadi tidak pernah tertukar.",
   },
   {
-    title: "Slot terkunci begitu diambil",
-    body: "Begitu satu member mengambil jam tertentu dengan coach tertentu, slot itu langsung hilang dari daftar member lain. Coach juga tidak bisa membuka jam bentrok di dua kolam.",
+    title: "Jam terkunci begitu diambil",
+    body: "Begitu satu member mengambil jam tertentu dengan coach tertentu, jam itu langsung hilang dari daftar member lain. Coach juga tidak bisa membuka jam bentrok di dua kolam.",
   },
   {
     title: "Pembatalan yang adil",
@@ -31,15 +31,15 @@ const HIGHLIGHTS = [
   },
   {
     title: "Bagi hasil otomatis",
-    body: "Setiap sesi yang ditandai Hadir langsung dibagi: kolam dan coach menerima harga paket mereka dibagi jumlah sesi (dipotong PPh 0,5% kecuali bebas potongan), sisanya biaya layanan SPH (termasuk PPN 11%). Kalau peserta sudah booking tapi tidak datang, coach dapat 50% dari bagiannya dan kolam tidak dapat bagian. Kolam dan coach mencairkan saldonya sendiri.",
+    body: "Setiap sesi yang ditandai Hadir langsung dibagi: kolam dan coach menerima harga paket mereka dibagi jumlah sesi (dipotong PPh 0,5% kecuali bebas potongan), sisanya biaya layanan SPH (termasuk PPN 11%). Kalau peserta sudah booking tapi tidak datang, coach mendapat 50% dari bagiannya dan kolam tidak mendapat bagian. Kolam dan coach mencairkan saldonya sendiri.",
   },
   {
     title: "Harga dari kolam dan coach",
-    body: "Kolam memasang harga tiket dan coach memasang harga jasanya, masing-masing untuk paket 4 sesi (berlaku 2 bulan) dan 8 sesi (berlaku 3 bulan). Member membayar keduanya + biaya layanan SPH di bawah 7%. Harga baru langsung berlaku; paket yang sudah dibeli tidak berubah.",
+    body: "Kolam memasang harga tiket dan coach memasang harga jasanya, masing-masing untuk paket 4 sesi (berlaku 2 bulan) dan 8 sesi (berlaku 3 bulan). Member membayar keduanya ditambah biaya layanan SPH di bawah 7%. Harga baru langsung berlaku; paket yang sudah dibeli tidak berubah.",
   },
   {
     title: "Notifikasi dua arah",
-    body: "Member booking, coach dapat notifikasi. Coach membuka slot baru, member aktif dapat notifikasi. Cukup diaktifkan sekali di browser.",
+    body: "Saat member booking, coach mendapat notifikasi. Saat coach membuka jadwal baru, member aktif mendapat notifikasi. Cukup diaktifkan sekali di browser.",
   },
 ];
 
@@ -53,11 +53,11 @@ const GUIDES: Guide[] = [
       {
         heading: "1. Daftar & tambah peserta",
         steps: [
-          { title: "Klik Daftar di halaman utama", body: "Isi nama kamu sendiri (yang punya akun), No HP, dan password. Email opsional." },
-          { title: "Tentukan siapa yang les", body: "Bisa kamu sendiri, bisa anak, bisa keduanya. Peserta juga bisa ditambah kapan saja lewat menu Peserta." },
+          { title: "Klik Daftar di halaman utama", body: "Isi nama kamu sendiri (yang punya akun), Nomor HP, dan password. Email opsional." },
+          { title: "Tentukan siapa yang les", body: "Bisa kamu sendiri, anak, atau keduanya. Peserta juga bisa ditambah kapan saja lewat menu Peserta." },
           { title: "Akun langsung aktif", body: "Kamu otomatis masuk dan diarahkan ke halaman Paket, karena akun baru belum punya paket." },
         ],
-        note: "Kalau akunmu dibuatkan admin, kamu masuk pakai No HP + password sementara, lalu diminta membuat password baru.",
+        note: "Kalau akunmu dibuatkan admin, kamu masuk memakai Nomor HP dan password sementara, lalu diminta membuat password baru.",
       },
       {
         heading: "2. Beli paket",
@@ -71,7 +71,7 @@ const GUIDES: Guide[] = [
         heading: "3. Booking sesi",
         steps: [
           { title: "Pilih peserta, kolam, dan tanggal", body: "Sisa sesi, sisa jatah batal, dan nama paket peserta tampil di bagian atas halaman." },
-          { title: "Pilih coach & jam", body: "Slot kosong ada tombol Booking. Slot yang sudah diambil member lain otomatis terkunci." },
+          { title: "Pilih coach & jam", body: "Jam kosong punya tombol Booking. Jam yang sudah diambil member lain otomatis terkunci." },
           { title: "Selesai", body: "Sisa sesi berkurang 1, dan coach mendapat notifikasi kalau notifikasinya sudah aktif." },
         ],
         note: "Jadwal semua coach di kolam itu bisa dilihat, tapi yang bisa dibooking hanya jadwal coach paketmu.",
@@ -105,16 +105,16 @@ const GUIDES: Guide[] = [
         heading: "1. Buka jadwal",
         steps: [
           { title: "Pilih kolam dan tanggal", body: "Kolam yang muncul hanya kolam yang kamu pilih di menu Kolam Saya." },
-          { title: "Pilih jam mulai dan selesai", body: "Rentang jam otomatis dipecah jadi slot per jam. Misalnya 08.00–10.00 jadi dua slot: 08–09 dan 09–10." },
-          { title: "Klik Tambah Slot", body: "Slot langsung bisa dibooking member. Member aktif yang sudah menyalakan notifikasi otomatis diberi tahu." },
+          { title: "Pilih jam mulai dan selesai", body: "Rentang jam otomatis dipecah per jam. Contoh: 08.00–10.00 menjadi dua jam kosong, 08.00–09.00 dan 09.00–10.00." },
+          { title: "Klik Tambah Slot", body: "Jam kosong langsung bisa dibooking member. Member aktif yang sudah menyalakan notifikasi otomatis diberi tahu." },
         ],
-        note: "Slot kosong yang jamnya sudah lewat otomatis disembunyikan karena sudah tidak bisa dibooking.",
+        note: "Jam kosong yang sudah lewat otomatis disembunyikan karena sudah tidak bisa dibooking.",
       },
       {
-        heading: "2. Kelola slot",
+        heading: "2. Kelola jam kosong",
         steps: [
-          { title: "Slot belum dibooking", body: "Bisa dihapus kalau salah jam. Ada konfirmasi sebelum slot benar-benar hilang." },
-          { title: "Slot sudah dibooking", body: "Menampilkan nama peserta. Kalau kamu benar-benar berhalangan, batalkan dari sini: sisa sesi member otomatis kembali dan member dapat notifikasi." },
+          { title: "Jam belum dibooking", body: "Bisa dihapus bila salah jam. Ada konfirmasi sebelum jam itu benar-benar hilang." },
+          { title: "Jam sudah dibooking", body: "Menampilkan nama peserta. Kalau kamu benar-benar berhalangan, batalkan dari sini: sisa sesi member otomatis kembali dan member mendapat notifikasi." },
           { title: "Jadwal coach lain", body: "Di bagian bawah halaman, supaya kamu tahu siapa saja yang bertugas di hari yang sama." },
         ],
       },
@@ -123,14 +123,14 @@ const GUIDES: Guide[] = [
         steps: [
           { title: "Buka menu Riwayat Sesi", body: "Semua sesi yang sudah lewat waktunya menunggu ditandai. Batasnya 24 jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai." },
           { title: "Pilih Hadir atau Tidak Hadir", body: "Langsung tersimpan begitu dipilih, tidak perlu tombol Simpan." },
-          { title: "Saldo masuk", body: "Hadir: bagianmu (harga paketmu ÷ jumlah sesi, dipotong PPh 0,5% kecuali bebas potongan) masuk penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu dapat 50% dari bagianmu." },
+          { title: "Saldo masuk", body: "Hadir: bagianmu (harga paketmu ÷ jumlah sesi, dipotong PPh 0,5% kecuali bebas potongan) masuk penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu mendapat 50% dari bagianmu." },
         ],
-        note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum ditandai — pastikan pilihannya benar.",
+        note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum ditandai. Pastikan pilihannya benar.",
       },
       {
         heading: "4. Saldo & profil",
         steps: [
-          { title: "Isi rekening sekali", body: "Setelah tersimpan, rekening terkunci. Klik Edit kalau mau mengubah." },
+          { title: "Isi rekening sekali", body: "Setelah tersimpan, rekening terkunci. Klik Edit bila ingin mengubahnya." },
           { title: "Ajukan pencairan", body: `Minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja. Riwayat pencairan menampilkan status, tanggal, dan rekening tujuan.` },
           { title: "Lengkapi profil", body: "Tanggal lahir, jenis kelamin, bio, keahlian, foto, dan sertifikat. Orang tua sering memilih coach dari informasi ini." },
         ],
@@ -178,7 +178,7 @@ const INSTALL_STEPS: { platform: string; steps: string[] }[] = [
     steps: [
       "Buka link Swim Private Hub di Chrome.",
       'Kalau muncul tawaran "Tambahkan ke layar utama", langsung pilih itu.',
-      "Kalau tidak muncul, tap titik tiga di pojok kanan atas.",
+      "Kalau tidak muncul, ketuk titik tiga di pojok kanan atas.",
       'Pilih "Instal aplikasi" atau "Tambahkan ke Layar utama", lalu konfirmasi.',
       "Selesai. Ikonnya muncul di layar utama dan terbuka tanpa address bar.",
     ],
@@ -187,9 +187,9 @@ const INSTALL_STEPS: { platform: string; steps: string[] }[] = [
     platform: "iPhone — Safari",
     steps: [
       "Buka link Swim Private Hub di Safari.",
-      "Tap ikon Share (kotak dengan panah ke atas) di bar bawah.",
+      "Ketuk ikon Share (kotak dengan panah ke atas) di bar bawah.",
       'Pilih "Tambah ke Layar Utama" / "Add to Home Screen".',
-      'Tap "Tambah" untuk konfirmasi.',
+      'Ketuk "Tambah" untuk konfirmasi.',
       "Ikonnya muncul di layar utama seperti aplikasi biasa.",
     ],
   },
@@ -197,9 +197,9 @@ const INSTALL_STEPS: { platform: string; steps: string[] }[] = [
     platform: "iPhone — Chrome",
     steps: [
       "Buka link Swim Private Hub di Chrome.",
-      "Tap ikon Share di bar bawah layar.",
+      "Ketuk ikon Share di bar bawah layar.",
       'Kalau pilihannya belum kelihatan, pilih "View More".',
-      'Pilih "Tambah ke Layar Utama", lalu tap "Tambah".',
+      'Pilih "Tambah ke Layar Utama", lalu ketuk "Tambah".',
     ],
   },
 ];
@@ -392,14 +392,14 @@ export default function PanduanView() {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-10 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Logotype className="text-lg text-white" />
-            <p className="mt-1 text-sm text-white/70">Sistem booking & manajemen les renang privat.</p>
+            <p className="mt-1 text-sm text-white/70">Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya.</p>
           </div>
           <div className="flex flex-wrap gap-4 text-sm text-white/70">
             <Link href="/" className="hover:text-white hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               Beranda
             </Link>
             <Link href="/daftar-coach" className="hover:text-white hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-              Daftar jadi coach
+              Daftar sebagai coach
             </Link>
             <Link href="/daftar-kolam" className="hover:text-white hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               Daftarkan kolam

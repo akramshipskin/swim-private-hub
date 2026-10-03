@@ -31,7 +31,7 @@ async function createWithdrawalRequest({
 }) {
   if (amount < MIN_WITHDRAWAL) {
     throw new WithdrawalError(
-      `Minimal pencairan Rp${MIN_WITHDRAWAL.toLocaleString("id-ID")}.`
+      `Minimal pencairan Rp ${MIN_WITHDRAWAL.toLocaleString("id-ID")}.`
     );
   }
 
@@ -105,7 +105,7 @@ export async function requestPoolWithdrawal(poolId: string, amount?: number) {
     },
   });
   if (!pool.bankName || !pool.bankAccountNumber || !pool.bankAccountName) {
-    throw new WithdrawalError("Isi rekening tujuan dulu sebelum cairkan saldo.");
+    throw new WithdrawalError("Isi rekening tujuan dulu sebelum mencairkan saldo.");
   }
   return createWithdrawalRequest({
     poolId,
@@ -129,7 +129,7 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
     },
   });
   if (!coach.bankName || !coach.bankAccountNumber || !coach.bankAccountName) {
-    throw new WithdrawalError("Isi rekening tujuan dulu sebelum cairkan saldo.");
+    throw new WithdrawalError("Isi rekening tujuan dulu sebelum mencairkan saldo.");
   }
   // Penahanan milestone: dicek sebelum saldo dipotong. Sengaja tidak dikunci
   // bareng tandai hadir -- kalau keduanya pas bersamaan, urutan mana pun

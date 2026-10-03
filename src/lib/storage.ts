@@ -57,7 +57,7 @@ export async function uploadObject(bucket: string, path: string, file: File) {
     headers: headers({ "content-type": file.type, "x-upsert": "true" }),
     body: Buffer.from(await file.arrayBuffer()),
   });
-  if (!res.ok) throw new Error(`Upload gagal (${res.status})`);
+  if (!res.ok) throw new Error(`Unggah file gagal (${res.status}). Coba lagi.`);
 }
 
 // Hapus file; gagal dibiarkan diam (file yatim di bucket tidak berbahaya,

@@ -124,9 +124,9 @@ export default async function KomisiPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Bagi Hasil</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Pembagian uang dari setiap sesi yang sudah ditandai: komisi platform, komisi kolam, dan komisi coach. Sesi
-        Tidak Hadir (peserta sudah booking tapi tidak datang): coach dapat 50% dari bagiannya, kolam tidak dapat bagian.
-        Sesi yang belum ditandai belum dihitung. Kolam dan coach dapat harga mereka ÷ jumlah sesi (sebelum potongan PPh
+        Pembagian uang dari setiap sesi yang sudah ditandai: komisi platform, bagian kolam, dan bagian coach. Sesi
+        Tidak Hadir (peserta sudah booking tetapi tidak datang): coach mendapat 50% dari bagiannya, kolam tidak mendapat bagian.
+        Sesi yang belum ditandai belum dihitung. Kolam dan coach mendapat harga mereka ÷ jumlah sesi (sebelum potongan PPh
         0,5%), sisanya biaya layanan SPH.
       </p>
       <Card className="mt-4">
@@ -181,7 +181,7 @@ export default async function KomisiPage() {
           )}
           {(manualPlatformNet !== 0 || manualPlatformTax !== 0 || manualCoach !== 0) && (
             <div className="order-4 w-full space-y-0.5 border-t border-border pt-2 text-xs text-text-subtle sm:order-none">
-              <p className="font-medium text-text-muted">Koreksi manual (dicatat langsung di database, bukan dari sesi) — ikut di saldo, tidak masuk hitungan di halaman ini:</p>
+              <p className="font-medium text-text-muted">Koreksi manual (dicatat langsung di database, bukan dari sesi). Ikut di saldo, tetapi tidak masuk hitungan di halaman ini:</p>
               {(manualPlatformNet !== 0 || manualPlatformTax !== 0) && (
                 <p>Platform: bersih {signed(manualPlatformNet)} · PPN {signed(manualPlatformTax)}</p>
               )}
@@ -197,7 +197,7 @@ export default async function KomisiPage() {
           const parts = [
             { label: "Paket", p: e.paket },
             ...(e.legacy.sessions > 0 ? [{ label: "Riwayat paket model lama", p: e.legacy }] : []),
-            ...(e.noShow.sessions > 0 ? [{ label: "Peserta tidak datang", p: e.noShow }] : []),
+            ...(e.noShow.sessions > 0 ? [{ label: "Tidak Hadir", p: e.noShow }] : []),
           ];
           const all = [e.paket, e.legacy, e.noShow];
           // Tampilan HP: tabel 7 kolom tidak muat, jadi tiap baris jadi kartu.
@@ -285,7 +285,7 @@ export default async function KomisiPage() {
                   const manual = manualPool.find((x) => x.poolId === pool.id)?._sum.amount ?? 0;
                   return manual !== 0 ? (
                     <p className="text-xs text-text-subtle">
-                      Koreksi manual saldo kolam (tanpa sesi): {manual < 0 ? "−" : ""}{formatRupiah(Math.abs(manual))} — tidak termasuk tabel di atas, tapi ikut di saldo kolam.
+                      Koreksi manual saldo kolam (tanpa sesi): {manual < 0 ? "−" : ""}{formatRupiah(Math.abs(manual))}. Tidak termasuk tabel di atas, tetapi ikut di saldo kolam.
                     </p>
                   ) : null;
                 })()}

@@ -93,16 +93,16 @@ export default async function PembayaranSuksesPage({
           </h1>
           <p className="mb-6 text-sm text-text-muted">
             {isFailed
-              ? "Pembayaran dibatalkan atau belum diselesaikan. Saldo SPH yang sempat terpakai kembali otomatis bila pembayaran tidak selesai. Lanjutkan dari menu Paket dalam 24 jam, atau beli lagi kapan saja."
+              ? "Pembayaran dibatalkan atau belum diselesaikan. Saldo yang sempat terpakai kembali otomatis bila pembayaran tidak selesai. Lanjutkan dari menu Paket dalam 24 jam, atau beli lagi kapan saja."
               : isUnknown
-                ? "Status pembayaranmu bisa dilihat di halaman Paket Saya. Paket aktif otomatis begitu pembayaran masuk."
+                ? "Status pembayaranmu bisa dilihat di halaman Paket. Paket aktif otomatis begitu pembayaran masuk."
                 : isPending
-                ? "Selesaikan pembayaran sesuai instruksi (VA/QRIS/dll) sebelum batas waktunya. Paket aktif otomatis begitu pembayaran masuk."
+                ? "Selesaikan pembayaran sesuai instruksi (virtual account, QRIS, atau lainnya) sebelum batas waktunya. Paket aktif otomatis begitu pembayaran masuk."
                 : "Terima kasih! Paketmu sedang diproses otomatis dan akan aktif dalam beberapa saat."}
           </p>
           <div className="flex w-full flex-col gap-2">
             <Link href="/member/paket" className={buttonClass({ className: "w-full" })}>
-              {isFailed ? "Coba Lagi" : "Lihat Paket Saya"}
+              {isFailed ? "Coba Lagi" : "Lihat Paket"}
             </Link>
             <Link href="/member/booking" className={buttonClass({ variant: "secondary", className: "w-full" })}>
               {isFailed ? "Kembali ke Booking" : "Booking Sekarang"}

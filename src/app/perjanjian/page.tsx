@@ -71,7 +71,7 @@ export default async function PerjanjianPage({ searchParams }: { searchParams: P
             </label>
             {error && (
               <p role="alert" className="rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger-text">
-                Centang persetujuan dulu.
+                Centang kotak persetujuan untuk melanjutkan.
               </p>
             )}
             <Button type="submit">Setuju dan lanjut</Button>

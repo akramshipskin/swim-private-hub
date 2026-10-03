@@ -50,9 +50,9 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
   const closeTime = str("closeTime");
   if (description.length > 1000) return { error: "Deskripsi maksimal 1000 karakter." };
   if (address.length > 300) return { error: "Alamat maksimal 300 karakter." };
-  if (contactPhone.length > 20) return { error: "No. telepon maksimal 20 karakter." };
+  if (contactPhone.length > 20) return { error: "Nomor telepon maksimal 20 karakter." };
   if ((openTime && !TIME.test(openTime)) || (closeTime && !TIME.test(closeTime))) {
-    return { error: "Format jam harus JJ:MM, misal 06:00." };
+    return { error: "Format jam harus JJ:MM, contoh 06:00." };
   }
   if (!!openTime !== !!closeTime || (openTime && closeTime && openTime >= closeTime)) {
     return { error: "Isi jam buka dan jam tutup; jam tutup harus setelah jam buka." };

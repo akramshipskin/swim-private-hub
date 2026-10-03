@@ -20,7 +20,7 @@ async function getOwnedPool(userId: string, poolId: string) {
   const pool = await prisma.pool.findFirst({
     where: { id: poolId, ownerships: { some: { ownerId: userId } } },
   });
-  if (!pool) throw new WithdrawalError("Kolam ini bukan milik akun kamu.");
+  if (!pool) throw new WithdrawalError("Kolam ini bukan milik akunmu.");
   return pool;
 }
 
@@ -36,7 +36,7 @@ export async function updateBankInfo(
   const bankAccountName = (formData.get("bankAccountName") as string)?.trim();
 
   if (!bankName || !bankAccountNumber || !bankAccountName) {
-    return { error: "Semua field rekening wajib diisi." };
+    return { error: "Semua data rekening wajib diisi." };
   }
   const bankError = validateBankName(bankName);
   if (bankError) return { error: bankError };
@@ -51,7 +51,7 @@ export async function updateBankInfo(
       data: { bankName, bankAccountNumber: sealSecret(account.number), bankAccountName },
     });
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal update rekening") };
+    return { error: userErrorMessage(err, "Gagal menyimpan rekening. Coba lagi.") };
   }
 
   revalidatePath("/pool/saldo");
@@ -70,7 +70,7 @@ export async function requestWithdrawal(
     const request = await requestPoolWithdrawal(pool.id, Number(formData.get("amount")));
     await notifyAdminsWithdrawalRequested(pool.name, request.amount);
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal ajukan pencairan") };
+    return { error: userErrorMessage(err, "Gagal mengajukan pencairan. Coba lagi.") };
   }
 
   revalidatePath("/pool/saldo");

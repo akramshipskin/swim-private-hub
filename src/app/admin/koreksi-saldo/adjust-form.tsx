@@ -84,7 +84,7 @@ export default function AdjustForm({
           Simpan koreksi
         </Button>
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
-        {state?.ok && <p role="status" className="text-sm text-success-text">Koreksi tersimpan. Notifikasi dikirim ke {targetType === "pool" ? "pemilik kolam" : "coach"} (sampai kalau notifikasi aktif di HP-nya).</p>}
+        {state?.ok && <p role="status" className="text-sm text-success-text">Koreksi tersimpan. Notifikasi dikirim ke {targetType === "pool" ? "pemilik kolam" : "coach"} (diterima bila notifikasi di HP-nya aktif).</p>}
       </form>
 
       <ConfirmDialog

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   if (!body) return Response.json({ error: INVALID_BODY_ERROR }, { status: 400 });
   const shapeError = checkTextFields(body, {
     name: { max: MAX_NAME, label: "Nama" },
-    phone: { max: 20, label: "No HP" },
+    phone: { max: 20, label: "Nomor HP" },
     email: { max: MAX_EMAIL, label: "Email" },
     password: { max: MAX_PASSWORD, label: "Password" },
     referralCode: { max: 30, label: "Kode afiliasi" },
@@ -61,10 +61,10 @@ export async function POST(request: Request) {
   // otomatis bakal ke-isi ini juga). formRenderedAt dipake buat nolak
   // submit yang lebih cepet dari waktu wajar buat isi form manual.
   if (website) {
-    return Response.json({ error: "Registrasi gagal" }, { status: 400 });
+    return Response.json({ error: "Pendaftaran gagal. Coba lagi." }, { status: 400 });
   }
   if (typeof formRenderedAt === "number" && Date.now() - formRenderedAt < 1500) {
-    return Response.json({ error: "Registrasi gagal, coba lagi" }, { status: 400 });
+    return Response.json({ error: "Pendaftaran gagal. Tunggu sebentar, lalu kirim lagi." }, { status: 400 });
   }
   // entryReferrer dikirim client (document.referrer pas landing pertama,
   // disimpen di sessionStorage) -- itu sumber ASLI (WA/IG/Google/dll).
@@ -76,14 +76,14 @@ export async function POST(request: Request) {
 
   if (!name || !rawPhone || !password) {
     return Response.json(
-      { error: "Nama, No HP, dan password wajib diisi" },
+      { error: "Nama, Nomor HP, dan password wajib diisi." },
       { status: 400 }
     );
   }
 
   if (!isValidIndonesianPhone(rawPhone)) {
     return Response.json(
-      { error: "Format No HP tidak valid (contoh: 0812xxxxxxx)" },
+      { error: "Format Nomor HP tidak valid (contoh: 0812xxxxxxx)" },
       { status: 400 }
     );
   }
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     .filter((c) => c.name);
   if (cleanChildren.length === 0 && !wantsSelf) {
     return Response.json(
-      { error: "Isi minimal 1 peserta (diri sendiri atau anak)" },
+      { error: "Isi minimal 1 peserta (diri sendiri atau anak)." },
       { status: 400 }
     );
   }
@@ -112,14 +112,14 @@ export async function POST(request: Request) {
 
   if (password.length < 8) {
     return Response.json(
-      { error: "Password minimal 8 karakter" },
+      { error: "Password minimal 8 karakter." },
       { status: 400 }
     );
   }
 
   // Kota domisili wajib (Hadi 3 Okt): member disuguhi kolam & coach kotanya.
   if (!isCity(city)) {
-    return Response.json({ error: "Pilih kota domisili dari daftar" }, { status: 400 });
+    return Response.json({ error: "Pilih kota domisili dari daftar." }, { status: 400 });
   }
 
   const consent = consentData(acceptedTerms);
@@ -146,13 +146,13 @@ export async function POST(request: Request) {
   const phone = normalizePhone(rawPhone);
   const email = normalizeEmail(rawEmail);
   if (email && !isPlausibleEmail(email)) {
-    return Response.json({ error: "Format email tidak valid" }, { status: 400 });
+    return Response.json({ error: "Format email tidak valid." }, { status: 400 });
   }
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
     return Response.json(
-      { error: "No HP atau email sudah terdaftar" },
+      { error: "Nomor HP atau email sudah terdaftar." },
       { status: 409 }
     );
   }
@@ -210,7 +210,7 @@ export async function POST(request: Request) {
       "code" in err &&
       (err as { code?: string }).code === "P2002"
     ) {
-      return Response.json({ error: "No HP atau email sudah terdaftar" }, { status: 409 });
+      return Response.json({ error: "Nomor HP atau email sudah terdaftar." }, { status: 409 });
     }
     throw err;
   }

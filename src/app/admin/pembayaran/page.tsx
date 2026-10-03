@@ -78,7 +78,7 @@ export default async function AdminPembayaranPage({
       <h1 className="text-2xl font-semibold tracking-tight text-text">Uang Masuk</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
         Pembayaran paket dari member lewat Midtrans (berhasil, menunggu, gagal). Uang ini dibagi ke kolam &amp; coach
-        per sesi Hadir — rinciannya di Bagi Hasil.
+        per sesi Hadir. Rinciannya ada di menu Bagi Hasil.
       </p>
 
       <Card className="mb-6">

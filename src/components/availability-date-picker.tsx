@@ -30,7 +30,7 @@ export function AvailabilityDatePicker({
   maxDate,
   onChange,
   fetchUrl = "/api/availability/available-dates",
-  legendLabel = "ada slot kosong",
+  legendLabel = "ada jam kosong",
   defaultOpen = false,
 }: {
   value: string;
@@ -166,7 +166,7 @@ export function AvailabilityDatePicker({
                 <button
                   key={key}
                   type="button"
-                  aria-label={`${day} ${MONTH_LABELS[viewM]} ${viewY}${hasSlot ? ", sudah ada slot" : ""}`}
+                  aria-label={`${day} ${MONTH_LABELS[viewM]} ${viewY}${hasSlot ? ", ada jadwal" : ""}`}
                   aria-pressed={isSelected}
                   disabled={isPast}
                   aria-disabled={isPast}

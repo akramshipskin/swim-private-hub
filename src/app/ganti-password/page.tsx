@@ -55,8 +55,8 @@ export default async function GantiPasswordPage() {
         <p className="text-lg text-text"><Logotype /></p>
         <p className="text-sm text-text-muted">
           {needsParticipants
-            ? "Ini kali pertama kamu masuk — ganti password bawaan dulu ya."
-            : "Ganti password sementara kamu dulu ya sebelum lanjut."}
+            ? "Ini pertama kali kamu masuk. Ganti password bawaan lebih dulu."
+            : "Ganti password sementaramu sebelum lanjut."}
         </p>
       </div>
 

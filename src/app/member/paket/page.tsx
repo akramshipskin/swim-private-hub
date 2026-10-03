@@ -42,7 +42,7 @@ function toDateLabelFromDate(d: Date) {
 }
 
 
-export const metadata = { title: "Paket Saya | Swim Private Hub" };
+export const metadata = { title: "Paket | Swim Private Hub" };
 
 export default async function MemberPaketPage({ searchParams }: { searchParams: Promise<{ kota?: string; ganti?: string }> }) {
   const session = await requireRole("MEMBER");
@@ -247,7 +247,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
         <div className="flex flex-col gap-2 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
           <span>
             Ganti ke {req.toCoach.name} disetujui. Tambah bayar {formatRupiah(req.amount)} untuk {req.sessions} sesi sisa, paling lambat{" "}
-            {formatDateWib(deadline)} pukul {formatTimeWib(deadline)} WIB. Saldo dipakai dulu kalau ada.
+            {formatDateWib(deadline)} pukul {formatTimeWib(deadline)} WIB. Saldo dipakai lebih dulu bila ada.
           </span>
           <div className="flex flex-wrap items-center gap-3">
             <PayDifferenceButton requestId={req.id} label={req.payments.length ? "Lanjut bayar" : `Bayar ${formatRupiah(req.amount)}`} />
@@ -275,7 +275,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-text">Paket Saya</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-text">Paket</h1>
         {membershipBadge}
       </div>
 
@@ -376,8 +376,8 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
       <h2 id="beli" className="mb-1 scroll-mt-20 text-xl font-semibold text-text">Beli Paket Baru</h2>
       <p className="mb-4 text-sm text-text-muted">
         Pilih kolam, lalu coach. Paket berlaku untuk coach dan kolam yang kamu pilih. Harga sudah termasuk tiket masuk
-        untuk 1 peserta, 1 pendamping, dan coach-nya, plus biaya layanan SPH di bawah 7%.
-        {wallet && wallet.memberBalance > 0 && <> Saldomu {formatRupiah(wallet.memberBalance)} otomatis dipakai dulu, sisanya dibayar lewat Midtrans.</>}
+        untuk 1 peserta, 1 pendamping, dan coach-nya, ditambah biaya layanan SPH di bawah 7%.
+        {wallet && wallet.memberBalance > 0 && <> Saldomu {formatRupiah(wallet.memberBalance)} otomatis dipakai lebih dulu, sisanya dibayar lewat Midtrans.</>}
       </p>
       <form method="get" action="#beli" className="mb-3 flex flex-wrap items-end gap-2">
         <label className="flex min-w-48 flex-1 flex-col gap-1.5 text-sm font-medium text-text sm:flex-none">
@@ -413,7 +413,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
           <CardBody className="flex flex-col gap-3">
             <p className="text-base font-semibold text-text">Belum tersedia di {city}</p>
             <p className="text-sm text-text-muted">
-              Kami sedang mencari kolam dan coach di {city}. Tekan Kabari saya: begitu paket pertama di {city} bisa dibeli, kami kabari lewat notifikasi HP (bila notifikasi aktif) dan paketnya langsung muncul di halaman ini.
+              Kami sedang mencari kolam dan coach di {city}. Tekan Kabari saya. Begitu paket pertama di {city} bisa dibeli, kami kabari lewat notifikasi HP (bila notifikasi aktif). Paketnya juga langsung muncul di halaman ini.
             </p>
             {city && isCity(city) && (waitlisted ? (
               <p role="status" className="rounded-lg bg-success-bg px-3 py-2 text-sm text-success-text">Kamu sudah masuk daftar tunggu {city}.</p>
@@ -492,7 +492,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                         {[
                           ...(eight ? [{ q: eight, label: "Paket 8 sesi", note: saving > 0 ? `Hemat ${saving}% per sesi dibanding paket 4` : null }] : []),
                           ...(four ? [{ q: four, label: "Paket 4 sesi", note: null }] : []),
-                          ...(trial && trialChildren.length > 0 ? [{ q: trial, label: "Sesi coba", note: "Sekali per peserta yang belum pernah punya paket. Tidak bisa dibatalkan sendiri; tidak hadir = hangus." }] : []),
+                          ...(trial && trialChildren.length > 0 ? [{ q: trial, label: "Sesi coba", note: "Sekali per peserta yang belum pernah punya paket. Tidak bisa dibatalkan sendiri. Bila tidak hadir, sesi hangus." }] : []),
                         ].map(({ q, label, note }) => (
                           <li key={label} className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
                             <div className="flex items-start justify-between gap-2">

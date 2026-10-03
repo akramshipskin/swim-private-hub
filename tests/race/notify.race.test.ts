@@ -190,7 +190,7 @@ describe("NOTIFIKASI ke coach / pemilik kolam / member", () => {
     const day = new Date(Date.now() + 3 * 86400e3).toISOString().slice(0, 10);
     const res = await as({ id: coach.id, role: "COACH", name: "Coach Uji" }, () => addAvailability(null, fd({ date: day, startTime: "08:00", endTime: "09:00", poolId: pool.id })));
     expect(res).toBeNull();
-    expect(await inbox()).toEqual({ [m.id]: ["Slot jadwal baru"] });
+    expect(await inbox()).toEqual({ [m.id]: ["Jam kosong baru"] });
   });
 
   it("N11: admin membalas chat -> hanya pemilik percakapan; isi panjang dipotong", async () => {

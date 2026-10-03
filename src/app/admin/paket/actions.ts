@@ -29,7 +29,7 @@ export async function addChildForMember(
   const name = formData.get("name")?.toString() ?? "";
 
   if (!memberId) {
-    return { error: "Pilih member dulu" };
+    return { error: "Pilih member dulu." };
   }
 
   try {
@@ -44,7 +44,7 @@ export async function addChildForMember(
       await createDependent(memberId, name, prisma, birthDate);
     }
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal menambah peserta") };
+    return { error: userErrorMessage(err, "Gagal menambah peserta. Coba lagi.") };
   }
 
   revalidatePath("/admin/paket");
@@ -70,20 +70,20 @@ export async function assignPackageToMember(
   const coachId = formData.get("coachId")?.toString() ?? "";
   const sesi = Number(formData.get("sesi"));
 
-  if (!memberId) return { error: "Pilih member dulu" };
+  if (!memberId) return { error: "Pilih member dulu." };
   if (!dependentId) {
     return {
-      error: "Member ini belum punya peserta terdaftar — tambahkan dulu di bagian \"Tambah Peserta\" sebelum memberi paket.",
+      error: "Member ini belum punya peserta. Tambahkan dulu di bagian \"Tambah Peserta\", lalu berikan paket.",
     };
   }
-  if (!poolId || !coachId) return { error: "Pilih kolam dan coach dulu" };
-  if (sesi !== 4 && sesi !== 8) return { error: "Pilih paket 4 atau 8 sesi" };
+  if (!poolId || !coachId) return { error: "Pilih kolam dan coach dulu." };
+  if (sesi !== 4 && sesi !== 8) return { error: "Pilih paket 4 atau 8 sesi." };
 
   // Peserta harus milik member ini (dropdown sudah dibatasi, tetap dicek ulang
   // di server: jangan percaya yang dikirim browser).
   const dependent = await prisma.dependent.findUnique({ where: { id: dependentId }, select: { memberId: true, isActive: true } });
   if (!dependent || dependent.memberId !== memberId || !dependent.isActive) {
-    return { error: "Peserta tidak ditemukan atau bukan milik member ini" };
+    return { error: "Peserta tidak ditemukan atau bukan milik member ini." };
   }
   const [pool, coach] = await Promise.all([
     prisma.pool.findFirst({
@@ -151,10 +151,10 @@ export async function updatePackage(
   const expiredDateRaw = formData.get("expiredDate") as string;
 
   if (!packageId || !Number.isInteger(sisaSesiRaw) || sisaSesiRaw < 0) {
-    return { error: "Sisa sesi wajib diisi (0 atau lebih)" };
+    return { error: "Sisa sesi wajib diisi (0 atau lebih)." };
   }
   if (!Number.isInteger(jatahCancelRaw) || jatahCancelRaw < 0) {
-    return { error: "Jatah batal wajib diisi (0 atau lebih)" };
+    return { error: "Jatah batal wajib diisi (0 atau lebih)." };
   }
 
   const pkg = await prisma.package.findUnique({ where: { id: packageId } });

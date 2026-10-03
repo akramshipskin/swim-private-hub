@@ -57,7 +57,7 @@ export default async function PoolCoachPage() {
         <section key={p.id} className="mb-8">
           <h2 className="mb-3 text-lg font-semibold text-brand-700">{p.name}</h2>
           {p.affiliations.length === 0 ? (
-            <p className="text-sm text-text-muted">Belum ada coach. Hubungi admin untuk menambahkan coach ke kolam ini.</p>
+            <p className="text-sm text-text-muted">Belum ada coach yang memilih kolam ini. Coach memilih sendiri kolam tempat mereka mengajar lewat menu Kolam Saya.</p>
           ) : (
             <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {p.affiliations.map(({ coach }) => {
@@ -80,10 +80,10 @@ export default async function PoolCoachPage() {
                         <p className="text-sm text-text-muted">
                           {coach.coachProfile?.specialties.join(", ") || "Keahlian belum diisi"}
                         </p>
-                        {coach.phone && <p className="text-sm text-text-muted">No HP: {coach.phone}</p>}
+                        {coach.phone && <p className="text-sm text-text-muted">Nomor HP: {coach.phone}</p>}
                         <p className="mt-2 text-sm text-text">
-                          Bulan ini di kolammu: <b>{attended}</b> sesi sudah mengajar · {upcomingBooked} sesi akan datang ·{" "}
-                          {upcomingOpen} slot masih kosong
+                          Bulan ini di kolammu: <b>{attended}</b> sesi Hadir · {upcomingBooked} sesi akan datang ·{" "}
+                          {upcomingOpen} jam masih kosong
                         </p>
                       </div>
                     </CardBody>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { activePackageWhere } from "@/lib/active-package";
 import { CANCEL_WINDOW_HOURS } from "@/lib/policy";
 
-export const metadata = { title: "Booking Coach | Swim Private Hub" };
+export const metadata = { title: "Booking | Swim Private Hub" };
 
 export default async function MemberBookingPage() {
   const session = await requireRole("MEMBER");
@@ -78,18 +78,18 @@ export default async function MemberBookingPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-text">Booking Coach</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-text">Booking</h1>
           <p className="mt-1 text-sm text-text-muted">
-            Pilih peserta, kolam, coach, dan jam. Slot yang sudah diambil otomatis terkunci.
+            Pilih peserta, kolam, coach, dan jam. Jam yang sudah diambil otomatis terkunci.
           </p>
         </div>
       </div>
 
       {children.length === 0 && (
         <div className="mb-6 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
-          Belum ada anak terdaftar.{" "}
+          Belum ada peserta terdaftar.{" "}
           <Link href="/member/peserta" className="font-medium underline">
-            Tambah anak dulu
+            Tambah peserta dulu
           </Link>
           .
         </div>
@@ -126,8 +126,8 @@ export default async function MemberBookingPage() {
         </summary>
         <p className="mt-2">
           Pembatalan booking paling lambat {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
-          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan = sesi tetap terpakai dan
-          tidak dikembalikan. Jatah habis? Hubungi admin via WhatsApp.
+          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan: sesi tetap terpakai dan
+          tidak dikembalikan. Jatah habis? Hubungi admin lewat WhatsApp.
         </p>
       </details>
 
@@ -135,8 +135,8 @@ export default async function MemberBookingPage() {
         <p className="mb-1 font-medium text-text">KEBIJAKAN PEMBATALAN</p>
         <p>
           Pembatalan booking paling lambat {CANCEL_WINDOW_HOURS} jam sebelum jadwal, sesuai sisa jatah
-          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan = sesi tetap terpakai dan
-          tidak dikembalikan. Jatah habis? Hubungi admin via WhatsApp.
+          batal paket (lihat di bawah). Tidak hadir tanpa pembatalan: sesi tetap terpakai dan
+          tidak dikembalikan. Jatah habis? Hubungi admin lewat WhatsApp.
         </p>
       </div>
 

@@ -81,10 +81,33 @@ nandain, dibikinin → bentuk baku: dilewati, dikelompokkan, menandai, dibuatkan
 | Saldo | dompet, wallet |
 | Cairkan saldo | withdraw, tarik dana |
 | Ditandai Hadir | absen, check-in |
+| Tidak Hadir | gak hadir, absen, bolos |
+| Peserta yang dilatih coach / sesi bersama coach | diajar, diajarin, murid coach |
+| Membuka jadwal (coach) / jam kosong | buka slot (di teks; "slot" boleh di tombol teknis Tambah Slot) |
+| Booking (kata benda & kerja: "booking sesi", "sudah dibooking") | pesan jadwal, reservasi (pilih satu: booking) |
+| Batalkan / dibatalkan | cancel, dicancel |
+| Pemilik kolam | owner, pengelola (kecuali di teks hukum) |
+| Biaya layanan SPH | fee, komisi (untuk member) |
+| Bagi hasil (admin) / bagianmu (coach & kolam) | revenue share, payout |
+| Pencairan / cairkan saldo | withdraw, tarik dana |
+| Kota domisili | kota asal, lokasi |
+| Daftar tunggu ("Kabari saya") | waiting list |
+| Ganti coach tanpa biaya | ganti gratis (boleh di judul pendek admin) |
+
+Kata santai/daerah yang TIDAK dipakai di teks pengguna (komentar kode boleh):
+gak, nggak, udah, aja, banget, bikin, pake, dapet, liat, kalo, gimana, doang,
+nih, sih, dong, yuk, ngajar, diajar, nandain, dibikinin. Pakai: tidak, sudah,
+saja, sangat, membuat, pakai, dapat, lihat, kalau/bila, bagaimana, hanya,
+mengajar, dilatih/sesi bersama.
+
+### Nama menu = judul halaman (3 Okt malam)
+Label menu samping (desktop) sama persis dengan judul halaman. Bilah bawah HP
+boleh memendekkan ke kata pertama yang sama ("Riwayat Booking" -> "Riwayat").
+Tombol menu tambahan di bilah bawah HP: "Lainnya" untuk semua peran.
 
 ## 5. Angka, tanggal, dan waktu
 
-- Rupiah: `Rp 1.650.000` (pemisah titik, tanpa desimal).
+- Rupiah: `Rp 1.650.000` (pemisah titik, tanpa desimal, spasi setelah Rp) di angka DAN di dalam kalimat. Teks hukum tidak diubah tanpa Hadi.
 - Persen: `15%` tanpa spasi.
 - Tanggal panjang: `18 September 2026`. Tanggal pendek: `18 Sep 2026`.
 - Jam: 24 jam, `06:00–21:00` (pakai en dash).
