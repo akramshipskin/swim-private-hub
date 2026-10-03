@@ -27,7 +27,7 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Jawaban 5 pertanyaan masuk 3 Okt (1B rev.3 perjanjian/MOU, 2A, 3A, 4B skrip uji pulih di laptop, 5A). Belum dikerjakan: rev.3 (butuh teks final dari orang hukum) dan skrip laptop. Hadi sedang brainstorm penautan coach-kolam per kota.
+1. Rancangan kota + coach memilih kolam + kapasitas + tanggungan sesi coach: docs/designs/kota-coach-kolam.md, menunggu persetujuan Hadi + 4 pertanyaan di bagian 8. Lalu draf rev.3 perjanjian/MOU (Claude susun, Hadi kirim ke orang hukum). Uji pulih backup tetap tombol GitHub saja.
 2. P8 (reset password via email) setelah email production terbukti.
 3. Pantau rilis stabil next-auth v5 (sekarang dikunci 5.0.0-beta.32).
 4. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi).
