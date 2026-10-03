@@ -12,14 +12,15 @@ export const metadata: Metadata = {
 
 // Teks = docs/legal/draft-perjanjian-coach-v1.md (perubahan harga-dari-coach
 // v3 disetujui orang hukum 2 Okt) dengan isian [ISI HADI] yang disetujui Hadi
-// 2 Okt. Mengubah isi halaman ini = ganti PARTNER_AGREEMENTS.COACH.version
+// 2 Okt. Rev.3 (3 Okt: coach memilih kolam sendiri, kewajiban menyediakan jadwal,
+// tanpa 5% & pasal peralihan) = docs/legal/draft-rev3-kota-coach-kolam.md, disetujui orang hukum 3 Okt. Mengubah isi halaman ini = ganti PARTNER_AGREEMENTS.COACH.version
 // (src/lib/partner-agreement.ts) supaya semua coach diminta setuju ulang.
 const doc = PARTNER_AGREEMENTS.COACH;
 const link = "-my-3 inline-block py-3 text-brand-700 hover:underline";
 
 export default function PerjanjianCoachPage() {
   return (
-    <LegalPageLayout title={doc.title} updatedAt="2 Oktober 2026">
+    <LegalPageLayout title={doc.title} updatedAt="3 Oktober 2026">
       {doc.version && <p className="text-xs text-text-subtle">Versi: {doc.version}</p>}
       <p>Perjanjian Kemitraan Coach ini (&ldquo;Perjanjian&rdquo;) berlaku antara:</p>
       <ol>
@@ -54,7 +55,12 @@ export default function PerjanjianCoachPage() {
           perjanjian kerja.
         </li>
         <li>
-          Coach menentukan sendiri jadwal yang dibuka di Aplikasi, per Kolam Mitra tempat Coach dikaitkan oleh SPH.
+          Coach mencantumkan kota domisilinya dan memilih sendiri Kolam Mitra tempat ia mengajar melalui Aplikasi,
+          termasuk Kolam Mitra di luar kota domisilinya. Coach menentukan sendiri jadwal yang dibuka di setiap Kolam
+          Mitra yang dipilihnya, di dalam jam buka Kolam Mitra tersebut. Coach tidak dapat melepas pilihan Kolam Mitra
+          selama masih ada Member dengan paket aktif bersama Coach di Kolam Mitra itu. SPH dapat menambahkan atau
+          mencabut pilihan Kolam Mitra seorang Coach bila diperlukan untuk keselamatan, ketertiban, atau pelaksanaan
+          Perjanjian ini.
         </li>
         <li>
           Bergabung sebagai Coach tidak dikenakan biaya pendaftaran maupun langganan. Biaya Layanan SPH dibayar Member
@@ -119,6 +125,24 @@ export default function PerjanjianCoachPage() {
           untuk sertifikat tersebut. Sertifikat level adalah catatan perkembangan belajar di SPH, bukan sertifikasi
           resmi lembaga renang.
         </li>
+        <li>
+          <strong>Kewajiban menyediakan jadwal.</strong> Selama ada Member dengan paket aktif bersama Coach yang masih
+          memiliki Sesi belum terjadwal, Coach wajib membuka jadwal di Kolam Mitra paket tersebut sehingga Member dapat
+          memesan Sesi sebelum masa berlaku paketnya berakhir. Aplikasi menampilkan jumlah Sesi yang harus disediakan
+          Coach di halaman dasbor Coach.
+          <br />
+          a. Bila selama 2 (dua) hari berturut-turut tidak ada jadwal yang dapat dipesan oleh Member tersebut, Aplikasi mengirim peringatan
+          kepada Coach setiap hari sampai jadwal tersedia.
+          <br />
+          b. Bila keadaan itu berlangsung 10 (sepuluh) hari berturut-turut, SPH dan Member diberi tahu, Member berhak mengganti Coach
+          tanpa biaya tambahan sesuai Syarat &amp; Ketentuan, dan Coach mendapat 1 (satu) catatan pelanggaran untuk
+          paket tersebut.
+          <br />
+          c. Coach yang mendapat 3 (tiga) catatan pelanggaran dalam 6 (enam) bulan dapat dinonaktifkan oleh SPH. SPH
+          menilai setiap kasus; keadaan sakit atau darurat yang diberitahukan kepada SPH dapat tidak dihitung.
+          <br />
+          d. Masa berlaku paket Member tidak diperpanjang karena Coach tidak membuka jadwal.
+        </li>
       </ol>
 
       <h2>4. Bagi Hasil</h2>
@@ -163,14 +187,11 @@ export default function PerjanjianCoachPage() {
           Sesi coba: harga Coach adalah harga Coach paket 4 Sesi dibagi 4. Bagian Coach dihitung seperti Sesi biasa.
         </li>
         <li>
-          Member dapat dipindahkan ke Coach lain di Kolam Mitra yang sama atas pengajuan Member yang disetujui SPH.
-          Coach sebelumnya diberi tahu, jadwal yang belum berlangsung dibatalkan, dan Sesi yang sudah diajar tetap
-          dibayar dengan harga Coach sebelumnya. Coach tidak berhak atas sisa Sesi yang dipindahkan.
-        </li>
-        <li>
-          Untuk Sesi dari paket yang dibeli sebelum 2 Oktober 2026, bagi hasil mengikuti ketentuan lama, yaitu
-          persentase bagi hasil yang tercatat untuk Kolam Mitra tempat Sesi diajar pada saat Sesi ditandai, tanpa
-          potongan PPh 0,5%.
+          Member dapat dipindahkan ke Coach lain di Kolam Mitra yang sama atas pengajuan Member yang disetujui SPH,
+          atau, dalam keadaan Pasal 3 butir 9 huruf b, tanpa persetujuan SPH ke Coach di Kolam Mitra yang sama atau
+          Kolam Mitra lain di kota yang sama. Coach sebelumnya diberi tahu, jadwal yang belum berlangsung dibatalkan,
+          dan Sesi yang sudah diajar tetap dibayar dengan harga Coach sebelumnya. Coach tidak berhak
+          atas sisa Sesi yang dipindahkan.
         </li>
       </ol>
 
@@ -292,8 +313,7 @@ export default function PerjanjianCoachPage() {
           Contoh: paket dengan Biaya Layanan Rp83.200 (Rp74.955 setelah PPN 11%) memberi komisi Rp37.477; besarnya
           sama untuk Coach dan Kolam Mitra. Komisi dikreditkan setelah Member menghadiri Sesi pertamanya dari paket
           berbayar (ditandai Hadir) dan lewat masa laporan 3 (tiga) hari, supaya pendaftaran palsu tidak menghasilkan
-          uang. Untuk paket yang dibayar sebelum 3 Oktober 2026, komisi tetap 5% dari jumlah yang dibayar Member untuk
-          paket pertamanya.
+          uang.
         </li>
         <li>
           Program tidak dibatasi waktu selama Perjanjian berlaku; Coach dapat membawa Member kapan saja. SPH dapat

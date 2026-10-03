@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function KebijakanPengembalianPage() {
   return (
-    <LegalPageLayout title="Kebijakan Pengembalian" updatedAt="2 Oktober 2026">
+    <LegalPageLayout title="Kebijakan Pengembalian" updatedAt="3 Oktober 2026">
       <p>
         Halaman ini menjelaskan ketentuan pengembalian dana (refund) atas
         pembayaran paket les, serta perbedaannya dengan jatah pembatalan
@@ -40,6 +40,7 @@ export default function KebijakanPengembalianPage() {
         <li>Pembatalan keikutsertaan setelah paket aktif tanpa sesi yang terpakai, yang diajukan lebih dari 7 (tujuh) hari sejak tanggal pembayaran (dapat dipertimbangkan secara kasus per kasus melalui kontak di bawah).</li>
         <li>Kesalahan input data peserta yang dilakukan oleh pembeli sendiri (dapat dikoreksi melalui administrator, dan bukan merupakan dasar pengajuan pengembalian dana).</li>
         <li>Sesi coba yang tidak dihadiri peserta, kecuali dikabulkan administrator.</li>
+        <li>Sesi yang hangus karena Member tidak mengganti Coach padahal hak penggantian tanpa biaya sudah diberikan.</li>
         <li>Saldo Member (tidak dapat dicairkan).</li>
       </ul>
 

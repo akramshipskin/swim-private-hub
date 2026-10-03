@@ -19,7 +19,7 @@ const link = "-my-3 inline-block py-3 text-brand-700 hover:underline";
 
 export default function MouKolamPage() {
   return (
-    <LegalPageLayout title={doc.title} updatedAt="2 Oktober 2026">
+    <LegalPageLayout title={doc.title} updatedAt="3 Oktober 2026">
       {doc.version && <p className="text-xs text-text-subtle">Versi: {doc.version}</p>}
       <p>
         Perjanjian Kerja Sama Kolam Mitra Swim Private Hub ini (&ldquo;MOU&rdquo;) berlaku antara:
@@ -68,9 +68,12 @@ export default function MouKolamPage() {
           SPH dibayar Member di atas harga Kolam Mitra (Pasal 5).
         </li>
         <li>
-          SPH tidak menetapkan batas jumlah les yang berjalan bersamaan di Kolam Mitra. Bila kapasitas kolam
-          terganggu, Kolam Mitra memberi tahu SPH, dan SPH menyesuaikan jadwal yang tampil di Aplikasi paling lambat
-          1x24 (satu kali dua puluh empat) jam sejak pemberitahuan diterima.
+          Kolam Mitra menetapkan sendiri kapasitas harian untuk Sesi melalui Aplikasi, yaitu jumlah Sesi dari SPH yang
+          masih dapat diterima kolam dalam satu hari, dengan memperhitungkan pengunjung kolam dari sumber lain. Satu
+          Sesi terdiri atas 1 (satu) Coach, 1 (satu) Peserta, dan 1 (satu) pendamping. Kolam Mitra dapat mengubah
+          kapasitas ini kapan saja. Bila kapasitas suatu hari sudah terpenuhi, Aplikasi tidak menerima pemesanan baru
+          di Kolam Mitra itu untuk hari tersebut. Penurunan kapasitas tidak membatalkan Sesi yang sudah dipesan.
+          Selama kapasitas belum diisi atau dikosongkan, Aplikasi tidak membatasi jumlah Sesi per hari.
         </li>
       </ol>
 
@@ -85,16 +88,21 @@ export default function MouKolamPage() {
           pendamping yang tidak berenang (boleh bergantian). Coach, Peserta, dan pendamping tidak dikenakan tiket lain
           untuk Sesi Aplikasi.
         </li>
+        <li>
+          Kolam Mitra mencantumkan kota dan alamat lengkap kolam di Aplikasi dan menjaga data tersebut, termasuk jam
+          buka, harga, dan kapasitas harian, tetap sesuai keadaan sebenarnya.
+        </li>
       </ol>
 
       <h2>3. Coach</h2>
       <ol>
         <li>
-          Coach yang mengajar di Kolam Mitra adalah Coach yang telah disetujui SPH dan dikaitkan oleh SPH ke Kolam
-          Mitra.
+          Coach yang mengajar di Kolam Mitra adalah Coach yang telah disetujui SPH dan memilih Kolam Mitra tersebut
+          melalui Aplikasi. SPH dapat menambahkan atau mencabut Coach dari Kolam Mitra bila diperlukan.
         </li>
         <li>
-          Kolam Mitra tidak dapat menolak Coach yang telah disetujui SPH dan dikaitkan ke Kolam Mitra. Kolam Mitra
+          Kolam Mitra menyediakan tempat dan tidak dapat menolak Coach yang telah disetujui SPH dan memilih Kolam
+          Mitra, selama jumlah Sesi masih dalam kapasitas harian (Pasal 1 butir 6). Kolam Mitra
           dapat melaporkan pelanggaran tata tertib atau keselamatan oleh Coach kepada SPH, dan SPH menindaklanjuti
           laporan tersebut paling lambat 3 (tiga) hari kerja sejak laporan diterima.
         </li>
@@ -186,9 +194,9 @@ export default function MouKolamPage() {
           berikutnya.
         </li>
         <li>
-          Untuk Sesi dari paket yang dibeli sebelum 2 Oktober 2026, bagi hasil mengikuti ketentuan lama, yaitu
-          persentase bagi hasil yang tercatat untuk Kolam Mitra tempat Sesi diajar pada saat Sesi ditandai, tanpa
-          potongan PPh 0,5%.
+          Bila Member berpindah Coach ke Kolam Mitra lain sesuai Syarat &amp; Ketentuan, Sesi yang sudah berlangsung di
+          Kolam Mitra tetap dibayar sesuai harga Kolam Mitra dalam paket; Kolam Mitra tidak berhak atas sisa Sesi yang
+          dipindahkan.
         </li>
       </ol>
 
@@ -303,8 +311,7 @@ export default function MouKolamPage() {
           Contoh: paket dengan Biaya Layanan Rp83.200 (Rp74.955 setelah PPN 11%) memberi komisi Rp37.477; besarnya
           sama untuk Coach dan Kolam Mitra. Komisi dikreditkan setelah Member menghadiri Sesi pertamanya dari paket
           berbayar (ditandai Hadir) dan lewat masa laporan 3 (tiga) hari, supaya pendaftaran palsu tidak menghasilkan
-          uang. Untuk paket yang dibayar sebelum 3 Oktober 2026, komisi tetap 5% dari jumlah yang dibayar Member untuk
-          paket pertamanya.
+          uang.
         </li>
         <li>
           Program tidak dibatasi waktu selama MOU berlaku. SPH dapat mengubah ketentuan afiliasi melalui pembaruan MOU

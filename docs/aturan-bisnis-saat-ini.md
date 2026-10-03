@@ -31,7 +31,7 @@ Dibuat Claude (Sonnet) dari keputusan Hadi di docs/KEPUTUSAN.md, rancangan docs/
 
 ## Login dan perjanjian mitra
 - Salah password ditahan 15 menit: 3x dari jaringan yang sama untuk satu akun, 10x dari semua jaringan untuk satu akun, 20x per jaringan untuk semua akun. Konfirmasi password di menu Keamanan tetap 3x.
-- Coach dan pemilik kolam wajib mencentang Perjanjian Kemitraan Coach / MOU Kolam (versi "2 Oktober 2026 rev.2") sebelum memakai fitur utama. Batal oleh coach: pedoman longgar (peringatan, admin menilai, sakit/darurat tidak dihitung); berlaku 12 bulan sejak pertama disetujui, tidak dimulai ulang saat versi baru.
+- Coach dan pemilik kolam wajib mencentang Perjanjian Kemitraan Coach / MOU Kolam (versi "3 Oktober 2026 rev.3") sebelum memakai fitur utama. Batal oleh coach: pedoman longgar (peringatan, admin menilai, sakit/darurat tidak dihitung); berlaku 12 bulan sejak pertama disetujui, tidak dimulai ulang saat versi baru.
 - Pencairan yang lewat 7 hari kerja ditandai di halaman Pencairan dan dasbor admin (libur nasional belum dihitung). Rekap PPh per mitra per bulan bisa diunduh dari halaman Bagi Hasil.
 
 ## Paket pemberian admin

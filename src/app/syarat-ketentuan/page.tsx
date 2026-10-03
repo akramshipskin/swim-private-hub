@@ -57,7 +57,11 @@ export default function SyaratKetentuanPage() {
         <li>
           Paket terdiri atas 4 (empat) Sesi dengan masa berlaku 60 (enam puluh) hari atau 8 (delapan) Sesi dengan
           masa berlaku 90 (sembilan puluh) hari, dihitung sejak pembayaran berhasil. Paket berlaku untuk satu Coach dan
-          satu Kolam Mitra yang dipilih saat pembelian.
+          satu Kolam Mitra yang dipilih saat pembelian, kecuali bila dipindahkan sesuai ketentuan penggantian Coach.
+          Aplikasi menampilkan Coach yang memiliki jadwal tersedia dan jadwal terdekatnya sebelum pembelian; Coach
+          tampil untuk dibeli bila memiliki minimal 4 (empat) jam kosong yang dapat dipesan dalam 14 (empat belas)
+          hari ke depan di Kolam Mitra tersebut. Ketersediaan jadwal sesudah pembelian bergantung pada jadwal yang
+          dibuka Coach.
         </li>
         <li>
           Harga paket terdiri atas harga Kolam Mitra, harga Coach, dan Biaya Layanan, yang ditampilkan terpisah sebelum
@@ -134,6 +138,18 @@ export default function SyaratKetentuanPage() {
           Sesi yang sudah berlangsung tidak dihitung ulang. Bila penggantian tidak dapat diselesaikan setelah selisih
           dibayar (misalnya Coach baru tidak lagi aktif atau paket berakhir), pembayaran selisih dikembalikan ke Saldo
           Member.
+        </li>
+        <li>
+          <strong>Penggantian Coach tanpa biaya.</strong> Bila selama 10 (sepuluh) hari berturut-turut Coach tidak
+          membuka jadwal yang dapat dipesan Member padahal paket masih memiliki Sesi belum terjadwal, Aplikasi memberi
+          tahu Member dan Member dapat langsung mengganti Coach tanpa persetujuan administrator ke Coach di kota yang
+          sama yang memiliki jadwal tersedia, selama harga sisa Sesi dengan Coach dan Kolam Mitra baru sama atau lebih
+          murah. Selisih yang lebih murah masuk ke Saldo Member. Penggantian ke Coach yang lebih mahal mengikuti
+          pengajuan biasa. Masa berlaku paket tidak diperpanjang.
+        </li>
+        <li>
+          Member mencantumkan kota domisili. Aplikasi menampilkan Kolam Mitra dan Coach di kota tersebut lebih dulu;
+          Member tetap dapat memilih kota lain.
         </li>
       </ol>
 
