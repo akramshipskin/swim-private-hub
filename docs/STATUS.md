@@ -1,6 +1,6 @@
 # STATUS SPH (diperbarui 4 Okt 2026 siang, setelah rombak UI desain Claude Design)
 
-Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
+Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5, mulai dari docs/HANDOFF-AGEN.md. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
 ## Terakhir live: 7017f6e (4 Okt siang; GitHub Test hijau, Vercel sukses; rute lonceng di situs menjawab 401 tanpa login = ada). Migrasi lonceng (20261004120000) SUDAH dijalankan Hadi di production 4 Okt.
 
