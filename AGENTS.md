@@ -75,3 +75,18 @@ Rules:
 Not lazy about: understanding the problem (read it fully and trace the real flow before picking a rung, a small diff you don't understand is just laziness dressed up as efficiency), input validation at trust boundaries, error handling that prevents data loss, security, accessibility, the calibration real hardware needs. Lazy code without its check is unfinished: non-trivial logic leaves ONE runnable check behind, the smallest thing that fails if the logic breaks (an assert-based demo/self-check or one small test file; no frameworks, no fixtures). Trivial one-liners need no test.
 
 Source: https://github.com/DietrichGebert/ponytail
+
+## Aturan main Hadi (SPH; ringkas, lengkap di docs/HANDOFF-AGEN.md)
+
+Hadi (pemilik) = orang marketing dan branding, BUKAN programmer. Hadi memutuskan APA; kamu memutuskan BAGAIMANA. Berlaku untuk asisten mana pun yang bekerja di repo ini.
+
+1. **Awal sesi:** baca `docs/HANDOFF-AGEN.md` (sekali, seluruhnya), `docs/STATUS.md`, `docs/aturan-bisnis-saat-ini.md`. Buka balasan pertama dengan 3 baris: Terakhir / Lanjut / Tugas Hadi (dari STATUS).
+2. **Jujur:** tidak tahu = tulis "belum dicek". "Baru baca kode" beda dengan "sudah dijalankan". Selesai/aman hanya setelah diverifikasi, sebut caranya. Temuan false alarm tetap dilaporkan.
+3. **Pertanyaan = jawab, bukan langsung mengubah.** Perintah eksplisit ("kerjain X") = jalan. Permintaan ambigu atau besar = tampilkan breakdown, tunggu "lanjut". Kerjakan hanya yang diminta.
+4. **Jangan menebak aturan bisnis** (harga, pembatalan, refund, bagi hasil, saldo, pencairan, hak akses, data historis). Repo jelas = ikuti; ambigu = tanya Hadi. Urutan acuan: kode > docs/aturan-bisnis-saat-ini.md > docs/KEPUTUSAN.md > brand-kit/MESSAGING.md > dokumen lama.
+5. **Batas keras:** tidak transaksi uang sungguhan, tidak mengetik password ke situs production, tidak menghapus data production permanen, tidak membaca atau menyalin isi `.env*`. Password/kunci asli tidak ditulis ke file atau chat.
+6. **Deploy:** ada berkas baru di `prisma/migrations/` sejak `origin/main` = BERHENTI; Hadi menjalankan migrasi ke production lebih dulu, baru kirim. Sebelum kirim: cek penulisan kode (`npx tsc --noEmit`), tes (`npx vitest run`), dan build lulus. Cek hasil GitHub dan Vercel setelah push. Sebelum commit: cek cabang dan merge/rebase yang berjalan.
+7. **Uang, booking/slot, login/hak akses, skema database:** wajib pemeriksa kedua berkonteks segar (bukan penulisnya) + tes sebelum dikirim; tulis hasilnya di laporan. Server menjaga aturan, bukan tampilan; pikirkan dua permintaan bersamaan.
+8. **Laporan ke Hadi:** bahasa Indonesia awam, "gue/lu", tanpa nama file/cabang/perintah (pakai padanan awam). Kalimat pertama = jawaban. Urutan: Sudah / Proses / Belum / Rekomendasi / Pertanyaan. SEMUA yang butuh keputusan diulang di "Pertanyaan" (bernomor, pilihan A/B + rekomendasi). "Next" memuat seluruh langkah sisa. Laporan yang menyentuh kode memuat baris "Status kode" (di-commit? di-push? tayang?). Maks ±35 baris; rincian ke `docs/`. Tutup dengan "Dicatat: …" bila menulis ke file catatan.
+9. **Catatan:** perbarui `docs/STATUS.md` (maks 60 baris) saat satu bagian selesai dan `docs/KEPUTUSAN.md` saat Hadi memutuskan sesuatu.
+10. **Alur aplikasi tidak diubah tanpa izin Hadi** (tampilan boleh dirombak; alur dan aturan tidak).

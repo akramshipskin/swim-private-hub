@@ -1,12 +1,12 @@
-# Serah terima SPH untuk Codex (OpenAI) — 4 Okt 2026
+# Serah terima SPH untuk asisten pengkode berikutnya (OpenCode / Codex / lainnya) — 4 Okt 2026
 
-Dokumen ini untuk asisten pengkode baru yang melanjutkan Swim Private Hub (SPH) setelah dikerjakan Claude. Baca SELURUHNYA sebelum mengubah apa pun. Ditulis dari kode dan dokumen repo per commit 7017f6e (4 Okt 2026 siang). Bila dokumen ini bertentangan dengan kode, kode yang benar: laporkan ke Hadi, jangan diam-diam mengikuti salah satunya.
+Dokumen ini untuk asisten pengkode baru (Hadi memakai OpenCode dengan model Fable 5; isinya netral dan berlaku juga untuk Codex atau asisten lain) yang melanjutkan Swim Private Hub (SPH) setelah dikerjakan Claude. Baca SELURUHNYA sebelum mengubah apa pun. Ditulis dari kode dan dokumen repo per commit 7017f6e (4 Okt 2026 siang). Bila dokumen ini bertentangan dengan kode, kode yang benar: laporkan ke Hadi, jangan diam-diam mengikuti salah satunya.
 
-## 0. Prompt awal yang disarankan untuk Codex
+## 0. Prompt awal yang disarankan
 
-> Kamu melanjutkan project SPH di folder ini. Baca dulu, berurutan: docs/HANDOFF-CODEX.md (seluruhnya), AGENTS.md, docs/STATUS.md, docs/aturan-bisnis-saat-ini.md, lalu docs/KEPUTUSAN.md bagian bawah. Aturan di CLAUDE.md juga berlaku untukmu (isinya diringkas di dokumen serah terima, bagian 2 dan 3). Jangan menebak aturan bisnis: ragu = tanya Hadi. Jangan menyentuh uang, login, skema database, atau booking tanpa membaca bagian 6 dan 7. Lapor ke Hadi dengan bahasa Indonesia awam (bagian 3).
+> Kamu melanjutkan project SPH di folder ini. Baca dulu, berurutan: docs/HANDOFF-AGEN.md (seluruhnya), AGENTS.md, docs/STATUS.md, docs/aturan-bisnis-saat-ini.md, lalu docs/KEPUTUSAN.md bagian bawah. Aturan di CLAUDE.md juga berlaku untukmu (isinya diringkas di dokumen serah terima, bagian 2 dan 3). Jangan menebak aturan bisnis: ragu = tanya Hadi. Jangan menyentuh uang, login, skema database, atau booking tanpa membaca bagian 6 dan 7. Lapor ke Hadi dengan bahasa Indonesia awam (bagian 3).
 
-Catatan: CLAUDE.md dan folder `.claude/` adalah milik Claude Code. Codex membaca `AGENTS.md`, jadi semua yang penting dari CLAUDE.md diringkas di sini. `AGENTS.md` sendiri ada blok yang ditulis ulang otomatis oleh `next dev`: jangan dihapus.
+Catatan: CLAUDE.md dan folder `.claude/` adalah milik Claude Code (pagar otomatis format laporan, pembuka sesi otomatis, dan paket cara kerja Claude TIDAK ikut ke asisten lain; aturannya sudah ditulis di dokumen ini dan di bagian "Aturan main Hadi" di AGENTS.md). Asisten lain umumnya membaca `AGENTS.md` otomatis (belum dicek untuk OpenCode versi Hadi), karena itu prompt di atas tetap perlu dikirim sebagai pesan pertama setiap sesi baru. `AGENTS.md` sendiri ada blok yang ditulis ulang otomatis oleh `next dev`: jangan dihapus.
 
 ## 1. Produk dan peran
 
@@ -135,7 +135,7 @@ Nilai risiko dari AKIBATNYA, bukan besar kodenya: 10 baris di dompet bisa lebih 
 - **Uji alur penuh (e2e)** `scripts/e2e.mts`: berjalan di GitHub Actions (`.github/workflows/test.yml`): daftar member → beli paket dari saldo → booking dua langkah → batal → coach menandai Hadir → saldo coach. Untuk menjalankannya lokal: DB `e2e` di 54329 (pengguna dan password uji ada di berkas workflow), `prisma migrate deploy`, `npm run build`, `npx next start -p 3120`, lalu `E2E_BASE=http://localhost:3120 npx tsx scripts/e2e.mts`. Bila alur booking / tombol berubah, perbarui skrip ini.
 - **Alat sweeping lokal** (hanya ke localhost; akun uji dummy): `scripts/sweep-halaman.mjs` (kunjungi daftar halaman × lebar layar × tema, tangkapan layar + temuan otomatis; butuh Google Chrome), `uji-hak-akses.mjs` (peran × halaman × API), `uji-formulir.mjs` (kirim formulir), `audit-uang.mjs` (cocokkan ledger; production hanya baca-saja dengan `AUDIT_PROD=1`), `ukur-halaman.mjs` (kecepatan).
 - **Aturan sweeping** (dipakai Hadi): "Sweeping UI" = SEMUA halaman × SEMUA peran, tampilan dan tulisan. "Sweeping sistem" = itu + fitur, tombol, hitungan uang, logika, keamanan. Laporan wajib berupa tabel cakupan halaman × peran × (dicek / tidak bisa dicek + alasan). Perbaiki yang mekanis (teks, spasi, warna ke token yang ada) langsung; yang menyentuh uang, login, booking, skema, brand baru, teks hukum: lapor dan tunggu Hadi. Contoh laporan: `docs/reviews/2026-10-03-sweeping-sistem-malam.md`.
-- Pekerjaan berisiko (uang, booking, login, skema) sebaiknya diperiksa pihak kedua berkonteks segar (bukan penulisnya) ditambah tes.
+- **WAJIB (keputusan Hadi 4 Okt):** pekerjaan yang mengubah uang, booking/slot, login/hak akses, atau skema database harus diperiksa PIHAK KEDUA berkonteks segar (sesi atau model lain yang tidak ikut menulis kodenya; tugasnya mencari cacat, bukan membenarkan) ditambah tes, SEBELUM dikirim ke GitHub. Tulis hasil pemeriksaan kedua di laporan ke Hadi. Pemeriksa tidak boleh model yang lebih lemah dari penulisnya. Mengaku "sudah aman" tanpa pemeriksa kedua untuk area ini tidak dihitung selesai.
 
 **Lingkungan lokal** (nyalakan lagi bila laptop tidur):
 - `npm run db:dev` (DB dev 54330), `node scripts/qa-storage.mjs` (storage 54331), `npm run db:race` (54329). `npm run db:dev:sync` menyalin data production ke dev lewat penyanitasi `scripts/dev-db-sanitize.mjs` (tabel `InAppNotification` sengaja tidak disalin karena memuat nama dan nominal).
