@@ -1,8 +1,8 @@
-# STATUS SPH (diperbarui 4 Okt 2026 pagi, setelah mode tidur Opus)
+# STATUS SPH (diperbarui 4 Okt 2026 siang, setelah rombak UI desain Claude Design)
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: 0953d4c (4 Okt; GitHub hijau untuk 4c350eb, 49bb1b0, b26498f, 0953d4c; Vercel sukses; teks baru terlihat di situs). Tidak ada migrasi baru sejak kota.
+## Terakhir live: 5624d62 (4 Okt siang; Vercel sukses; GitHub Test: lihat catatan di bawah). Tidak ada migrasi baru di main sejak kota. Cabang `lonceng-notifikasi` (fd5d239) BELUM digabung: berisi migrasi baru.
 
 ## Sudah selesai dan live (ringkas; rinci di docs/reviews/ dan docs/KEPUTUSAN.md)
 - Per 30 Sep-1 Okt: tanggal lahir di semua form daftar, testimoni, CSP, PPN komisi 11%, landing dirombak, backup DB+storage hijau, Vercel Singapura, brand v2, animasi landing + dalam aplikasi.
@@ -15,16 +15,21 @@ Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di doc
 - 3 Okt malam: sweeping sistem total ulang (Opus): 474 kunjungan, hak akses 445 sel 0 bocor, formulir 174 kiriman 0 error, audit uang cocok, 4 pemeriksa Opus 0 berat, 14 kelompok perbaikan (docs/reviews/2026-10-03-sweeping-sistem-malam.md). 3 catatan orang hukum: dibiarkan (S&K tidak diubah).
 - 4 Okt dini hari (mode tidur, Opus, live): 9 keputusan Hadi dikerjakan (pelanggaran per kejadian coach, kolam nonaktif bukan salah coach + hitungan dimulai ulang, tolak batal sesi sebelum ganti coach, Cari Coach berkolam+kota, tolak beli/booking saat hapus akun & peserta nonaktif, milestone setelah sesi Hadir, rupiah "Rp 1.000", nama menu = judul halaman, sweeping kata ±300 potongan). Rombak UI tahap A (docs/designs/rombak-ui-aplikasi.md): kartu "Langkah berikutnya" di dasbor member/coach/kolam, kebijakan batal di bawah papan booking, tautan beli paket. Kecepatan: server cepat (8-65 md lokal); lambat = server Vercel "bangun tidur" (0,8-2,3 dtk kunjungan pertama). Sweeping tampilan akhir 474 kunjungan 0 masalah; 766 tes + 195 tes balapan lulus.
 
+- 4 Okt siang (live fcef4e8 + 5624d62): ROMBAK UI desain Claude Design (docs/designs/analisis-alur-desain-baru.md; alur TIDAK diubah kecuali booking). Kartu utama gelap (lime di mode gelap), kartu saldo (coach, kolam), segmen sisa sesi (dasbor member + Paket), chip peserta, batang "Terisi 7 hari ke depan" (kolam), beranda member otomatis (jadwal dulu / angka sisa sesi), tombol Hadir/Tidak hadir di dasbor coach (aksi & kunci 24 jam lama, + konfirmasi), BOOKING DUA LANGKAH (pilih jam, tombol menempel, layar sukses + kode; server tidak berubah). 2 pemeriksa Opus: 0 cacat berat; diperbaiki: kalender tertutup tombol menempel, dialog di luar form. Tes: 785 lulus (main), uji alur penuh lokal lulus. Belum ada tes untuk logika pilih-jam di papan booking.
+- LONCENG notifikasi (cabang lonceng-notifikasi, fd5d239, 822 tes lulus, build lulus): tabel InAppNotification, 1 pintu di push.ts, lencana dari klien (tanpa query tambahan di render), halaman /notifikasi, hapus >90 hari di cron, dihapus saat akun dianonimkan. Migrasi: prisma/migrations/20261004120000_notifikasi_lonceng (murni tambahan). 1 pemeriksa Opus: 0 cacat berat.
+
 ## Sedang jalan / menunggu Hadi
-- 3 pertanyaan terbuka (4 Okt): (1) tolak ganti coach saat member minta hapus akun? (rekomendasi A tolak); (2) lanjut rombak UI tahap berikut (navigasi HP satu sumber + tombol utama menempel) setelah Hadi melihat dasbor baru? (A); (3) tombol "Edit" -> "Ubah" di semua peran? (A).
+- LONCENG: Hadi jalankan migrasi di production dulu (`set -a; source .env.prod; set +a; DATABASE_URL=$PROD_DIRECT_URL DIRECT_URL=$PROD_DIRECT_URL npx prisma migrate deploy`), baru Claude gabungkan cabang lonceng-notifikasi ke main + push.
+- Pertanyaan terbuka: (1) tolak ganti coach saat member minta hapus akun? (rek. A tolak); (2) tombol "Edit" -> "Ubah" di semua peran? (rek. A); (3) lonceng admin/coach menyimpan nama member yang akunnya dihapus sampai 90 hari: terima atau ikut dibersihkan? (rek. terima, hilang otomatis); (4) beli paket: tombol menempel di halaman Paket belum dibuat (kartu beli per paket); lanjut bentuk lain?
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Kerjakan jawaban 3 pertanyaan 4 Okt (no. 1 Opus). Rombak UI lanjutan sesuai docs/designs/rombak-ui-aplikasi.md; opsi C (rombak alur total) tunggu data pemakaian.
+1. Gabung lonceng setelah migrasi production; kerjakan jawaban 4 pertanyaan terbuka; sapu halaman lain yang ikut kerangka + ukur kecepatan. Opsi C (rombak alur total) tunggu data pemakaian.
 2. P8 (reset password via email) setelah email production terbukti. Pantau next-auth v5 stabil (dikunci 5.0.0-beta.32).
 3. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi), (aturan kota/ganti gratis/pelanggaran sudah ditulis di docs/aturan-bisnis-saat-ini.md 3 Okt malam).
 
 ## Tugas Hadi
+0. Jalankan migrasi lonceng di production (perintah di atas), lalu kabari Claude.
 1. CRON_SECRET sudah dipasang + Redeploy (3 Okt malam). 4 Okt setelah 06.00 WIB cek Vercel > Logs /api/cron/harian: 200 = jalan, 401 = kunci tidak cocok. Sekalian cek Settings > Functions: Fluid Compute aktif? (mengurangi server "bangun tidur").
 2. **14 Okt 2026 (INGATKAN Hadi di awal sesi pada/sesudah tanggal ini):** jalankan ulang isi-jadwal-dummy --apply di production (jam kosong contoh habis sekitar 13 Okt; tanpa itu coach contoh hilang dari halaman beli paket). Pengingat cukup catatan ini (Hadi pilih A, bukan kalender).
 3. Production: akhiri-paket-lama (lihat dulu, lalu --apply); belum tercatat sudah dijalankan.
