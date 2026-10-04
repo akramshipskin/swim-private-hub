@@ -23,9 +23,11 @@ const BANK = { bankName: () => "BCA", bankAccountNumber: (r, i) => `9${pad(i, 9)
 // null = tabel tidak disalin sama sekali (isinya tidak berguna di lokal dan
 // berisiko): langganan push = alamat notifikasi HP asli (kalau disalin, uji
 // lokal bisa mengirim notifikasi ke HP orang sungguhan); RateLimitHit = key
-// berisi IP/HP, cuma data sementara.
+// berisi IP/HP, cuma data sementara; InAppNotification = isi notifikasi
+// berisi nama & nominal asli, tidak dibutuhkan di lokal.
 export const POLICY = {
   PushSubscription: null,
+  InAppNotification: null,
   RateLimitHit: null,
 
   User: {

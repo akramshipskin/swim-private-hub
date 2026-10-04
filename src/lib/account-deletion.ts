@@ -91,6 +91,8 @@ export async function anonymizeMember(userId: string) {
     await tx.dependent.updateMany({ where: { memberId: userId }, data: { name: ANONYMIZED_DEPENDENT_NAME, isActive: false, birthDate: null } });
     await tx.milestoneNote.updateMany({ where: { dependent: { memberId: userId } }, data: { note: ANONYMIZED_NOTE } });
     await tx.pushSubscription.deleteMany({ where: { userId } });
+    // Riwayat lonceng memuat nama/nominal sesi: hilang bersama akunnya.
+    await tx.inAppNotification.deleteMany({ where: { userId } });
     // Cookie pelacak iklan Meta yang tersimpan saat checkout.
     await tx.payment.updateMany({ where: { package: { memberId: userId }, NOT: { metaTracking: { equals: Prisma.DbNull } } }, data: { metaTracking: Prisma.DbNull } });
   });
@@ -110,5 +112,8 @@ export async function anonymizeMember(userId: string) {
       if (!(err instanceof CancelError)) throw err;
     }
   }
+  // Pembatalan di atas mengirim kabar ke akun ini dan ikut tercatat di lonceng;
+  // hapus lagi supaya akun yang sudah dianonimkan tidak menyisakan riwayat.
+  if (cancelled > 0) await prisma.inAppNotification.deleteMany({ where: { userId } });
   return { cancelledBookings: cancelled };
 }

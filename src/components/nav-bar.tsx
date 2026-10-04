@@ -5,6 +5,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { UserMenu } from "@/components/user-menu";
 import { Logotype } from "@/components/ui/logotype";
 import { ChatWidget } from "@/components/chat-widget";
+import { NotificationBell } from "@/components/notification-bell";
 import { roleBottomNav, roleLabel } from "@/lib/nav-links";
 
 // Shell dashboard: header full-width (logo+user menu) di atas, sidebar kiri
@@ -53,7 +54,10 @@ export function NavBar({
             <Logotype className="text-base sm:text-lg" />
           </Link>
 
-          <UserMenu userName={userName} userRole={userRole} avatarUrl={avatarUrl} />
+          <div className="flex min-w-0 items-center gap-2">
+            <NotificationBell />
+            <UserMenu userName={userName} userRole={userRole} avatarUrl={avatarUrl} />
+          </div>
         </div>
       </header>
 

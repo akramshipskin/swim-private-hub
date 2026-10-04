@@ -199,6 +199,7 @@ model User {
   coachChangesTo           CoachChangeRequest[] @relation("CoachChangeTo")
   coachViolations          CoachViolation[]
   pushSubscriptions   PushSubscription[]
+  inAppNotifications  InAppNotification[]
   poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
   poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
   chatThread          ChatThread?
@@ -734,6 +735,24 @@ model PushSubscription {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// Riwayat notifikasi di lonceng (Hadi 4 Okt). Diisi dari satu pintu:
+// schedule() di src/lib/push.ts, jadi setiap kejadian yang mengirim push
+// otomatis tercatat di sini, walau push mati (env VAPID kosong). Dihapus
+// setelah 90 hari oleh cron harian.
+model InAppNotification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  url       String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model Booking {
