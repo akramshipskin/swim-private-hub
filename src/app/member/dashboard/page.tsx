@@ -2,7 +2,8 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { activePackageWhere } from "@/lib/active-package";
 import { todayWibDateString, dateLabel, formatDateLabel, formatTimeLeft, formatTimeWib, wibDateTime } from "@/lib/datetime";
-import { BentoCard, NextStepCard, Stat, SessionList } from "@/components/dashboard";
+import { BentoCard, NextStepCard, SegmentBar, Stat } from "@/components/dashboard";
+import { PackageSchedule } from "./package-schedule";
 import { formatRupiah } from "@/lib/format";
 
 export const metadata = { title: "Dashboard | Swim Private Hub" };
@@ -74,6 +75,7 @@ export default async function MemberDashboardPage() {
   const topCoach = Object.entries(coachCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
   const totalSisa = packages.reduce((s, p) => s + p.sisaSesi, 0);
+  const totalAll = packages.reduce((s, p) => s + p.totalSesi, 0);
   // orderBy expiredDate asc di atas -> elemen pertama = yang paling dekat habis.
   const expiringSoon = packages.filter((p) => p.expiredDate && p.expiredDate.getTime() - now.getTime() < 7 * 86_400_000);
   const nearest = expiringSoon[0];
@@ -116,19 +118,27 @@ export default async function MemberDashboardPage() {
           {next ? (
             <NextStepCard
               eyebrow="Jadwal berikutnya"
-              title={`${dayLabel(next.availability.date)}, ${formatTimeWib(next.availability.startTime)}–${formatTimeWib(next.availability.endTime)}`}
+              badge={`dalam ${formatTimeLeft(Math.max(0, next.availability.startTime.getTime() - now.getTime()))}`}
+              kicker={dayLabel(next.availability.date)}
+              title={`${formatTimeWib(next.availability.startTime)}–${formatTimeWib(next.availability.endTime)}`}
               body={`${next.package.dependent.name} · ${next.availability.pool.name} · dengan ${next.availability.coach.name}`}
               href={unscheduled > 0 ? "/member/booking" : undefined}
               cta={unscheduled > 0 ? `Booking sesi lain (${unscheduled} tersisa)` : undefined}
               secondary={{ href: "/member/riwayat", label: "Semua jadwal" }}
             />
           ) : unscheduled > 0 ? (
+            // Belum ada jadwal tapi masih ada sisa sesi: tampilkan sisa sesinya
+            // sebagai angka besar ("paket dulu"), karena itu yang paling penting.
             <NextStepCard
-              title={`${unscheduled} sesi belum dijadwalkan`}
+              eyebrow="Sesi belum dijadwalkan"
+              kicker="Sisa sesi paketmu"
+              title={`${unscheduled} sesi`}
               body="Pilih tanggal dan jam dengan coach-mu sebelum paket berakhir."
               href="/member/booking"
               cta="Booking sekarang"
-            />
+            >
+              <SegmentBar sisa={totalSisa} total={totalAll} tone="hero" className="mt-4" />
+            </NextStepCard>
           ) : (
             <NextStepCard
               title={packages.length === 0 ? "Belum ada paket aktif" : "Semua sesi paketmu sudah dipakai"}
@@ -162,43 +172,30 @@ export default async function MemberDashboardPage() {
           )}
         </BentoCard>
 
-        <BentoCard title="Paket aktif" href="/member/paket" className="md:col-span-3">
-          {packages.length === 0 ? (
-            <p className="text-sm text-text-muted">Belum ada paket aktif. Beli paket di menu Paket.</p>
-          ) : (
-            <ul className="flex flex-col divide-y divide-border">
-              {packages.map((p) => (
-                <li key={p.id} className="py-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-brand-700">{p.pool.name}</p>
-                  </div>
-                  <p className="text-sm text-text">
-                    {p.dependent.name} · {p.name}
-                  </p>
-                  <p className="text-sm text-text-muted">
-                    Sisa {p.sisaSesi}/{p.totalSesi} sesi · jatah batal {Math.max(0, p.jatahCancel - p._count.bookings)}
-                    {p.expiredDate && ` · s.d. ${p.expiredDate.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" })}${p.expiredDate.getTime() - now.getTime() < 2 * 86_400_000 ? `, ${formatTimeWib(p.expiredDate)} WIB` : ""}`}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </BentoCard>
-
-        <BentoCard title="Jadwal berikutnya" href="/member/riwayat" className="md:col-span-3">
-          <SessionList
-            items={upcoming.map((b) => ({
-              id: b.id,
-              startTime: b.availability.startTime,
-              endTime: b.availability.endTime,
-              poolName: b.availability.pool.name,
-              coachName: b.availability.coach.name,
-              who: b.package.dependent.name,
-              status: b.availability.date.toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }),
-            }))}
-            empty="Belum ada jadwal. Booking sesi di menu Booking."
-          />
-        </BentoCard>
+        <PackageSchedule
+          peserta={[...new Set(packages.map((p) => p.dependent.name))]}
+          packages={packages.map((p) => ({
+            id: p.id,
+            pool: p.pool.name,
+            dependent: p.dependent.name,
+            name: p.name,
+            sisa: p.sisaSesi,
+            total: p.totalSesi,
+            jatahBatal: Math.max(0, p.jatahCancel - p._count.bookings),
+            expiredLabel: p.expiredDate
+              ? `s.d. ${p.expiredDate.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" })}${p.expiredDate.getTime() - now.getTime() < 2 * 86_400_000 ? `, ${formatTimeWib(p.expiredDate)} WIB` : ""}`
+              : "",
+          }))}
+          sessions={upcoming.map((b) => ({
+            id: b.id,
+            startTime: b.availability.startTime,
+            endTime: b.availability.endTime,
+            poolName: b.availability.pool.name,
+            coachName: b.availability.coach.name,
+            who: b.package.dependent.name,
+            status: b.availability.date.toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }),
+          }))}
+        />
       </div>
     </main>
   );

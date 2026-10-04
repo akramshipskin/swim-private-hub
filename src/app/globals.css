@@ -46,6 +46,14 @@
   /* Hijau WA versi gelap: teks putih di atasnya 5.4:1 (#25d366 asli cuma 2:1). */
   --color-whatsapp: #0f7a3c;
   --color-whatsapp-text: #0f7a3c;
+
+  /* Kartu utama gelap ("hero", desain Claude Design 4 Okt): terang = charcoal
+     dengan aksen lime; gelap = lime penuh dengan teks charcoal. Dipakai
+     HeroCard di dasbor; tombol biasa tetap charcoal. */
+  --color-hero: #14140f;
+  --color-hero-ink: #f6f6ee;
+  --color-hero-muted: #b6b3a5;
+  --color-hero-accent: #c6ff3d;
 }
 
 /* Dark mode: ikut OS by default (media query), atau override manual lewat
@@ -102,6 +110,11 @@
        teks putih di atasnya masih kontras jelas. */
     --color-whatsapp: #0f7a3c;
     --color-whatsapp-text: #3fcf7c; /* teks hijau di kartu gelap >= 6:1 */
+
+    --color-hero: #c6ff3d;
+    --color-hero-ink: #14140f;
+    --color-hero-muted: #3d3b2e;
+    --color-hero-accent: #14140f;
   }
 }
 
@@ -145,6 +158,11 @@
 
   --color-whatsapp: #0f7a3c;
   --color-whatsapp-text: #3fcf7c;
+
+  --color-hero: #c6ff3d;
+  --color-hero-ink: #14140f;
+  --color-hero-muted: #3d3b2e;
+  --color-hero-accent: #14140f;
 }
 
 @theme inline {
@@ -185,6 +203,11 @@
 
   --color-whatsapp: var(--color-whatsapp);
   --color-whatsapp-text: var(--color-whatsapp-text);
+
+  --color-hero: var(--color-hero);
+  --color-hero-ink: var(--color-hero-ink);
+  --color-hero-muted: var(--color-hero-muted);
+  --color-hero-accent: var(--color-hero-accent);
 }
 
 /* Warna TETAP (tidak ikut tema terang/gelap), dipakai halaman yang memang

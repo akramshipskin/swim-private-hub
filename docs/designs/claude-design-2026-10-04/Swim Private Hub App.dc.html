@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap">
+<style>body{margin:0}a{color:#6F8F1E}a:hover{color:#14140F}button{font-family:inherit}::-webkit-scrollbar{width:0}</style>
+</helmet>
+<div style="{{ themeStyle }}">
+<div style="min-height:100vh;background:var(--pg);font-family:'Sora',system-ui,sans-serif;color:var(--ink);padding:28px 20px 48px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:22px">
+
+<div style="display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;justify-content:center;flex:none">
+<div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--sm)">
+<sc-for list="{{ roles }}" as="r" hint-placeholder-count="4"><button onClick="{{ r.onClick }}" style="{{ r.style }}">{{ r.label }}</button></sc-for>
+</div>
+<div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--sm)">
+<sc-for list="{{ themes }}" as="t" hint-placeholder-count="2"><button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+</div>
+<sc-if value="{{ isMember }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mu)">Beranda
+<div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:var(--sm)">
+<sc-for list="{{ variants }}" as="v" hint-placeholder-count="2"><button onClick="{{ v.onClick }}" style="{{ v.style }}">{{ v.label }}</button></sc-for>
+</div></div>
+</sc-if>
+</div>
+
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ dark }}" hint-size="402px,874px">
+<div style="position:absolute;inset:0;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;font-family:'Sora',system-ui,sans-serif">
+<div style="flex:1;overflow-y:auto;padding:60px 20px 20px;display:flex;flex-direction:column;gap:16px">
+
+<!-- ============ MEMBER: HOME ============ -->
+<sc-if value="{{ showHome }}">
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;align-items:center;gap:9px">
+<svg width="30" height="30" viewBox="8 8 84 84"><defs><clipPath id="mk"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><g clip-path="url(#mk)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F"/></g></svg>
+<span style="font-weight:700;font-size:17px;letter-spacing:-0.5px">swim<span style="color:var(--b5)">.</span>privatehub</span>
+</div>
+<div style="width:44px;height:44px;border-radius:50%;background:var(--sf);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;position:relative">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0112 0c0 6 2 7 2 7H4s2-1 2-7"/><path d="M10 20a2 2 0 004 0"/></svg>
+<span style="position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--b5)"></span>
+</div>
+</div>
+
+<div>
+<div style="font-size:12px;color:var(--mu);margin-bottom:4px">Minggu, 4 Oktober 2026</div>
+<h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.8px">Halo, {{ parentName }}</h1>
+</div>
+
+<div style="display:flex;gap:8px">
+<sc-for list="{{ profiles }}" as="p" hint-placeholder-count="3">
+<button onClick="{{ p.onClick }}" style="{{ p.style }}"><span style="{{ p.dot }}">{{ p.initial }}</span>{{ p.name }}</button>
+</sc-for>
+</div>
+
+<!-- variant A: next session first -->
+<sc-if value="{{ isHomeA }}">
+<div style="background:var(--hero);color:var(--heroInk);border-radius:26px;padding:20px 20px 18px;display:flex;flex-direction:column;gap:14px">
+<sc-if value="{{ hasNext }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<span style="font-size:11px;font-weight:600;letter-spacing:.6px;white-space:nowrap;text-transform:uppercase;color:var(--heroAcc)">Jadwal berikutnya</span>
+<span style="font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--heroAcc);color:var(--hero)">{{ nextIn }}</span>
+</div>
+<div>
+<div style="font-size:15px;opacity:.8">{{ nextDay }}</div>
+<div style="font-size:38px;font-weight:700;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;line-height:1.1">{{ nextTime }}</div>
+</div>
+<div style="font-size:14px;line-height:1.5;opacity:.85">{{ pName }} · {{ nextPool }}<br>dengan {{ nextCoach }}</div>
+<button onClick="{{ goBook }}" style="height:48px;border:0;border-radius:14px;background:var(--heroAcc);color:var(--hero);font-weight:700;font-size:15px;cursor:pointer">Booking sesi lain ({{ sisa }} tersisa)</button>
+</sc-if>
+<sc-if value="{{ noNext }}">
+<span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--heroAcc)">Langkah berikutnya</span>
+<div style="font-size:26px;font-weight:700;letter-spacing:-0.8px;line-height:1.15">{{ sisa }} sesi belum dijadwalkan</div>
+<div style="font-size:14px;line-height:1.5;opacity:.85">Pilih tanggal dan jam dengan coach-mu sebelum paket berakhir.</div>
+<button onClick="{{ goBook }}" style="height:48px;border:0;border-radius:14px;background:var(--heroAcc);color:var(--hero);font-weight:700;font-size:15px;cursor:pointer">Booking sekarang</button>
+</sc-if>
+</div>
+
+<div style="background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-weight:600;font-size:15px">{{ pkgName }}</span><span style="font-size:13px;color:var(--mu);font-variant-numeric:tabular-nums">Sisa {{ sisa }}/{{ total }} sesi</span></div>
+<div style="display:flex;gap:4px"><sc-for list="{{ segs }}" as="s" hint-placeholder-count="8"><div style="{{ s.style }}"></div></sc-for></div>
+<div style="font-size:12px;color:var(--mu)">{{ pkgPool }} · jatah batal {{ batal }} · s.d. {{ pkgExp }}</div>
+</div>
+</sc-if>
+
+<!-- variant B: package progress first -->
+<sc-if value="{{ isHomeB }}">
+<div style="background:var(--hero);color:var(--heroInk);border-radius:26px;padding:20px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--heroAcc)">{{ pkgName }}</span><span style="font-size:12px;opacity:.8">s.d. {{ pkgExp }}</span></div>
+<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:72px;font-weight:700;letter-spacing:-4px;line-height:.95;font-variant-numeric:tabular-nums">{{ sisa }}</span><span style="font-size:16px;opacity:.8">dari {{ total }} sesi tersisa</span></div>
+<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:5px"><sc-for list="{{ segsB }}" as="s" hint-placeholder-count="8"><div style="{{ s.style }}"></div></sc-for></div>
+<div style="font-size:13px;opacity:.85">{{ pkgPool }} · jatah batal {{ batal }}</div>
+<button onClick="{{ goBook }}" style="height:48px;border:0;border-radius:14px;background:var(--heroAcc);color:var(--hero);font-weight:700;font-size:15px;cursor:pointer">Booking sesi</button>
+</div>
+<div style="background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:6px">
+<sc-if value="{{ hasNext }}"><span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--br)">Jadwal berikutnya · {{ nextIn }}</span>
+<span style="font-size:20px;font-weight:700;letter-spacing:-.5px">{{ nextDay }}, {{ nextTime }}</span>
+<span style="font-size:13px;color:var(--mu)">{{ pName }} · {{ nextPool }} · dengan {{ nextCoach }}</span></sc-if>
+<sc-if value="{{ noNext }}"><span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--br)">Belum ada jadwal</span>
+<span style="font-size:14px;color:var(--mu);line-height:1.5">Pilih tanggal dan jam dengan coach-mu sebelum paket berakhir.</span></sc-if>
+</div>
+</sc-if>
+
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-.3px">Jadwal</h2><span style="font-size:12px;color:var(--br);font-weight:600">Semua jadwal</span></div>
+<sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="2">
+<div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--bd)">
+<div style="width:50px;text-align:center;flex:none"><div style="font-size:11px;color:var(--mu);text-transform:uppercase">{{ u.dow }}</div><div style="font-size:22px;font-weight:700;font-variant-numeric:tabular-nums">{{ u.dd }}</div></div>
+<div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">{{ u.time }}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">{{ u.pool }} · {{ u.coach }}</div></div>
+<span style="{{ u.badge }}">{{ u.tag }}</span>
+</div>
+</sc-for>
+<sc-if value="{{ noUpcoming }}"><div style="font-size:13px;color:var(--mu);padding:10px 0;border-top:1px solid var(--bd)">Belum ada jadwal. Booking sesi di menu Booking.</div></sc-if>
+</div>
+</sc-if>
+
+<!-- ============ MEMBER: CARI ============ -->
+<sc-if value="{{ showCari }}">
+<h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.8px">Cari coach</h1>
+<div style="height:48px;border-radius:14px;background:var(--sf);border:1px solid var(--bd);display:flex;align-items:center;gap:10px;padding:0 14px;color:var(--mu);font-size:14px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Cari nama coach atau kolam</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ filters }}" as="f" hint-placeholder-count="4"><button onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button></sc-for></div>
+<div>
+<h2 style="margin:0 0 10px;font-size:17px;font-weight:700;letter-spacing:-.3px">Kolam mitra</h2>
+<div style="display:flex;gap:12px;overflow-x:auto;margin:0 -20px;padding:0 20px">
+<sc-for list="{{ pools }}" as="p" hint-placeholder-count="2">
+<div style="flex:none;width:210px;background:var(--sf);border:1px solid var(--bd);border-radius:20px;overflow:hidden">
+<div style="height:96px;background:repeating-linear-gradient(135deg,var(--sm) 0 10px,var(--bg) 10px 20px);display:flex;align-items:flex-end;padding:8px 10px;font:500 10px ui-monospace,Menlo,monospace;color:var(--mu)">foto kolam</div>
+<div style="padding:12px 14px 14px"><div style="font-weight:600;font-size:15px">{{ p.name }}</div><div style="font-size:12px;color:var(--mu);margin-top:3px">{{ p.info }}</div></div>
+</div>
+</sc-for>
+</div>
+</div>
+<div>
+<h2 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-.3px">Kenalan dengan coach</h2>
+<sc-for list="{{ coachList }}" as="c" hint-placeholder-count="3">
+<div onClick="{{ c.onClick }}" style="display:flex;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--bd);cursor:pointer">
+<div style="width:52px;height:52px;border-radius:50%;background:var(--sm);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex:none">{{ c.initials }}</div>
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:15px">{{ c.name }}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">{{ c.pools }}</div><div style="font-size:12px;color:var(--br);font-weight:600;margin-top:4px">{{ c.slots }} slot kosong minggu ini</div></div>
+<svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="var(--mu)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<!-- ============ MEMBER: COACH PROFILE ============ -->
+<sc-if value="{{ showCoach }}">
+<button onClick="{{ goCari }}" style="align-self:flex-start;height:44px;padding:0 14px 0 8px;border:0;background:transparent;color:var(--ink);font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;cursor:pointer"><svg width="10" height="16" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2L2 10l8 8"/></svg>Cari coach</button>
+<div style="display:flex;gap:16px;align-items:center">
+<div style="width:76px;height:76px;border-radius:50%;background:var(--hero);color:var(--heroAcc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:24px;flex:none">{{ coach.initials }}</div>
+<div><h1 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-.7px">{{ coach.name }}</h1><div style="font-size:13px;color:var(--mu);margin-top:4px">{{ coach.pools }}</div>
+<sc-if value="{{ coach.cert }}"><span style="display:inline-block;margin-top:8px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:999px;background:var(--sm);color:var(--ok)">Bersertifikat</span></sc-if></div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ coach.specs }}" as="s" hint-placeholder-count="3"><span style="font-size:12px;padding:7px 12px;border-radius:999px;border:1px solid var(--bd);background:var(--sf)">{{ s }}</span></sc-for></div>
+<p style="margin:0;font-size:14px;line-height:1.6;color:var(--mu)">{{ coach.about }}</p>
+<div style="display:flex;flex-direction:column;gap:10px">
+<h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-.3px">Paket</h2>
+<sc-for list="{{ coach.pkgs }}" as="k" hint-placeholder-count="2">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--sf);border:1px solid var(--bd);border-radius:16px"><div><div style="font-weight:600;font-size:15px">{{ k.name }}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">{{ k.note }}</div></div><div style="font-weight:700;font-size:15px;font-variant-numeric:tabular-nums">{{ k.price }}</div></div>
+</sc-for>
+</div>
+<div style="font-size:12px;color:var(--mu);line-height:1.5">Harga sudah termasuk tiket kolam dan biaya layanan.</div>
+</sc-if>
+
+<!-- ============ MEMBER: BOOKING ============ -->
+<sc-if value="{{ showBook }}">
+<h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.8px">Booking Coach</h1>
+<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:16px">
+<div style="width:40px;height:40px;border-radius:50%;background:var(--sm);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none">{{ bkCoach.initials }}</div>
+<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">{{ pName }} · {{ bkCoach.name }}</div><div style="font-size:12px;color:var(--mu)">{{ pkgName }} · sisa {{ sisa }} sesi</div></div>
+<span onClick="{{ goCari }}" style="font-size:12px;font-weight:600;color:var(--br);cursor:pointer;padding:12px 0 12px 8px">Ganti</span>
+</div>
+<div style="background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:14px">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 8px"><span style="font-weight:700;font-size:16px">Oktober 2026</span><span style="font-size:11px;color:var(--mu)">Titik = ada slot kosong</span></div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:11px;color:var(--mu);padding-bottom:4px"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span></div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">
+<sc-for list="{{ cells }}" as="c" hint-placeholder-count="35"><div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.d }}<span style="{{ c.dot }}"></span></div></sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:column">
+<div style="font-size:15px;font-weight:700;margin-bottom:6px">{{ selLabel }}</div>
+<sc-if value="{{ noSel }}"><div style="font-size:13px;color:var(--mu);padding:10px 0">Pilih tanggal untuk melihat jam yang masih kosong.</div></sc-if>
+<sc-for list="{{ slots }}" as="s" hint-placeholder-count="3">
+<div onClick="{{ s.onClick }}" style="{{ s.style }}">
+<div style="flex:1"><div style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums">{{ s.time }}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">{{ s.where }}</div></div>
+<span style="{{ s.badge }}">{{ s.tag }}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<!-- ============ MEMBER: DONE ============ -->
+<sc-if value="{{ showDone }}">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px">
+<div style="width:64px;height:64px;border-radius:50%;background:#C6FF3D;display:flex;align-items:center;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#14140F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+<h1 style="margin:0;font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1.15">Slot terkunci untukmu</h1>
+<div style="background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:6px">
+<div style="font-size:12px;color:var(--mu)">{{ doneDay }}</div>
+<div style="font-size:32px;font-weight:700;letter-spacing:-1px;font-variant-numeric:tabular-nums">{{ doneTime }}</div>
+<div style="font-size:14px;line-height:1.5">{{ pName }} · {{ doneWhere }}</div>
+<div style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--mu);margin-top:6px">Kode booking {{ doneCode }}</div>
+</div>
+<div style="font-size:13px;color:var(--mu);line-height:1.5">Sisa sesi paket: {{ sisa }}. Kamu bisa membatalkan sesi sesuai jatah batal ({{ batal }} tersisa).</div>
+<button onClick="{{ goHome }}" style="height:52px;border:0;border-radius:16px;background:#C6FF3D;color:#14140F;font-weight:700;font-size:15px;cursor:pointer">Ke beranda</button>
+</div>
+</sc-if>
+
+<!-- ============ COACH ============ -->
+<sc-if value="{{ isCoach }}">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:17px;letter-spacing:-.5px">swim<span style="color:var(--b5)">.</span>privatehub</span><span style="font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--sm)">Coach</span></div>
+<div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">Minggu, 4 Oktober 2026</div><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.8px">Halo, Dimas</h1></div>
+<div style="background:var(--hero);color:var(--heroInk);border-radius:26px;padding:20px;display:flex;flex-direction:column;gap:6px">
+<span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--heroAcc)">Saldo</span>
+<span style="font-size:38px;font-weight:700;letter-spacing:-1.5px;font-variant-numeric:tabular-nums">{{ coachSaldo }}</span>
+<span style="font-size:13px;opacity:.85">Bertambah setiap sesi ditandai Hadir.</span>
+<button style="margin-top:8px;height:46px;border:0;border-radius:14px;background:var(--heroAcc);color:var(--hero);font-weight:700;font-size:14px;cursor:pointer">Cairkan saldo</button>
+</div>
+<div>
+<h2 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-.3px">Tandai kehadiran</h2>
+<div style="font-size:12px;color:var(--mu);margin-bottom:6px">{{ pendingCount }} sesi menunggu ditandai</div>
+<sc-for list="{{ attList }}" as="a" hint-placeholder-count="3">
+<div style="padding:14px 0;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><div><div style="font-size:15px;font-weight:600">{{ a.who }}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">{{ a.when }} · {{ a.pool }}</div></div></div>
+<sc-if value="{{ a.pending }}"><div style="display:flex;gap:8px"><button onClick="{{ a.hadir }}" style="flex:1;height:44px;border:0;border-radius:12px;background:#C6FF3D;color:#14140F;font-weight:700;font-size:14px;cursor:pointer">Hadir</button><button onClick="{{ a.absen }}" style="flex:1;height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);color:var(--ink);font-weight:600;font-size:14px;cursor:pointer">Tidak hadir</button></div></sc-if>
+<sc-if value="{{ a.done }}"><span style="{{ a.badge }}">{{ a.result }}</span></sc-if>
+</div>
+</sc-for>
+</div>
+<div>
+<h2 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-.3px">Jadwal terbuka</h2>
+<sc-for list="{{ coachSlots }}" as="u" hint-placeholder-count="3">
+<div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--bd)"><div style="width:50px;text-align:center;flex:none"><div style="font-size:11px;color:var(--mu);text-transform:uppercase">{{ u.dow }}</div><div style="font-size:22px;font-weight:700">{{ u.dd }}</div></div><div style="flex:1"><div style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">{{ u.time }}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">{{ u.pool }}</div></div><span style="{{ u.badge }}">{{ u.tag }}</span></div>
+</sc-for>
+</div>
+</sc-if>
+
+<!-- ============ POOL OWNER ============ -->
+<sc-if value="{{ isPool }}">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:17px;letter-spacing:-.5px">swim<span style="color:var(--b5)">.</span>privatehub</span><span style="font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--sm)">Pemilik kolam</span></div>
+<div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">Minggu, 4 Oktober 2026</div><h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.8px">Kolam Tirta Cianjur</h1></div>
+<div style="background:var(--hero);color:var(--heroInk);border-radius:26px;padding:20px;display:flex;flex-direction:column;gap:6px">
+<span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--heroAcc)">Saldo kolam</span>
+<span style="font-size:38px;font-weight:700;letter-spacing:-1.5px;font-variant-numeric:tabular-nums">Rp 2.340.000</span>
+<span style="font-size:13px;opacity:.85">Dari sesi Hadir di kolammu.</span>
+<button style="margin-top:8px;height:46px;border:0;border-radius:14px;background:var(--heroAcc);color:var(--hero);font-weight:700;font-size:14px;cursor:pointer">Ajukan pencairan</button>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:14px"><div style="font-size:12px;color:var(--mu)">Sesi hari ini</div><div style="font-size:28px;font-weight:700;letter-spacing:-1px;margin-top:4px">0</div><div style="font-size:11px;color:var(--mu);margin-top:2px">Besok: 7 sesi</div></div>
+<div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:14px"><div style="font-size:12px;color:var(--mu)">Coach terafiliasi</div><div style="font-size:28px;font-weight:700;letter-spacing:-1px;margin-top:4px">3</div><div style="font-size:11px;color:var(--mu);margin-top:2px">Jam buka 07.00–18.00</div></div>
+</div>
+<div>
+<h2 style="margin:0 0 8px;font-size:17px;font-weight:700;letter-spacing:-.3px">Terisi minggu ini</h2>
+<sc-for list="{{ poolDays }}" as="d" hint-placeholder-count="6">
+<div style="display:flex;align-items:center;gap:12px;padding:8px 0"><span style="width:34px;font-size:12px;color:var(--mu)">{{ d.day }}</span><div style="flex:1;height:10px;border-radius:999px;background:var(--sm);overflow:hidden"><div style="{{ d.bar }}"></div></div><span style="width:44px;text-align:right;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums">{{ d.n }}</span></div>
+</sc-for>
+</div>
+</sc-if>
+
+<!-- ============ ADMIN ============ -->
+<sc-if value="{{ isAdmin }}">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:17px;letter-spacing:-.5px">swim<span style="color:var(--b5)">.</span>privatehub</span><span style="font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--sm)">Admin</span></div>
+<h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.8px">Pencairan</h1>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:14px"><div style="font-size:12px;color:var(--mu)">Menunggu</div><div style="font-size:28px;font-weight:700;letter-spacing:-1px;margin-top:4px">{{ adminPending }}</div></div>
+<div style="background:var(--sf);border:1px solid var(--bd);border-radius:18px;padding:14px"><div style="font-size:12px;color:var(--mu)">Total diajukan</div><div style="font-size:20px;font-weight:700;letter-spacing:-.5px;margin-top:8px;font-variant-numeric:tabular-nums">{{ adminTotal }}</div></div>
+</div>
+<div>
+<sc-for list="{{ wds }}" as="w" hint-placeholder-count="3">
+<div style="padding:14px 0;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><div><div style="font-size:15px;font-weight:600">{{ w.name }}</div><div style="font-size:12px;color:var(--mu);margin-top:2px">{{ w.kind }} · {{ w.when }}</div></div><div style="font-size:16px;font-weight:700;font-variant-numeric:tabular-nums">{{ w.amount }}</div></div>
+<sc-if value="{{ w.pending }}"><div style="display:flex;gap:8px"><button onClick="{{ w.approve }}" style="flex:1;height:44px;border:0;border-radius:12px;background:#C6FF3D;color:#14140F;font-weight:700;font-size:14px;cursor:pointer">Setujui</button><button onClick="{{ w.reject }}" style="flex:1;height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);color:var(--ink);font-weight:600;font-size:14px;cursor:pointer">Tolak</button></div></sc-if>
+<sc-if value="{{ w.done }}"><span style="{{ w.badge }}">{{ w.result }}</span></sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+</div>
+
+<!-- member bottom nav / sticky CTA -->
+<sc-if value="{{ showBookCta }}">
+<div style="padding:12px 20px 34px;background:var(--bg);border-top:1px solid var(--bd)"><button onClick="{{ confirmBook }}" style="{{ ctaStyle }}">{{ ctaLabel }}</button></div>
+</sc-if>
+<sc-if value="{{ showTabs }}">
+<div style="display:flex;padding:8px 12px 30px;background:var(--bg);border-top:1px solid var(--bd)">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+<div onClick="{{ t.onClick }}" style="{{ t.style }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"/></svg>{{ t.label }}</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</x-import>
+
+<div style="max-width:420px;text-align:center;font-size:12px;line-height:1.6;color:var(--mu)">Prototipe interaktif. Data contoh. Warna, font, dan tulisan mengikuti brand kit Lime Pulse dan MESSAGING.md.</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+class Component extends DCLogic {
+  state = { role: 'member', theme: 'light', variant: 'A', profile: 0, view: 'home', coachId: 0, filter: 0, selDate: null, selSlot: null, booked: [], att: {}, wd: {} };
+
+  COACHES = [
+    { id: 0, name: 'Dimas Pratama', initials: 'DP', pools: 'Kolam Tirta Cianjur', pool: 'Kolam Tirta Cianjur', cert: true, specs: ['Anak dan pemula', 'Pengenalan air', 'Gaya bebas'], about: 'Mengajar anak usia 5 tahun ke atas. Mulai dari adaptasi air, lalu napas dan gaya bebas, dengan kemajuan dicatat tiap sesi.', slots: 9 },
+    { id: 1, name: 'Sari Wulandari', initials: 'SW', pools: 'Kolam Lembah Biru', pool: 'Kolam Lembah Biru', cert: true, specs: ['Dewasa pemula', 'Takut air', 'Gaya dada'], about: 'Fokus pada pemula dewasa dan peserta yang masih takut air. Tempo pelan, satu keterampilan per sesi.', slots: 6 },
+    { id: 2, name: 'Bagas Nugroho', initials: 'BN', pools: 'Tirta Cianjur · Lembah Biru', pool: 'Kolam Tirta Cianjur', cert: false, specs: ['Teknik gaya', 'Stamina', 'Gaya punggung'], about: 'Memperbaiki teknik untuk peserta yang sudah bisa berenang dan ingin lebih efisien.', slots: 4 },
+  ];
+  PROFILES = [
+    { name: 'Alya', age: 'anak', pkg: 'Paket 8 Sesi', pool: 'Kolam Tirta Cianjur', coach: 0, sisa: 5, total: 8, batal: 1, exp: '28 Nov 2026', upcoming: [{ dow: 'Sen', dd: '5', time: '16.00–17.00', pool: 'Tirta Cianjur', coach: 'Dimas' }, { dow: 'Sen', dd: '12', time: '16.00–17.00', pool: 'Tirta Cianjur', coach: 'Dimas' }], next: { day: 'Senin, 5 Oktober', time: '16.00–17.00', in: 'dalam 1 hari' } },
+    { name: 'Raka', age: 'anak', pkg: 'Paket 4 Sesi', pool: 'Kolam Lembah Biru', coach: 1, sisa: 3, total: 4, batal: 1, exp: '2 Nov 2026', upcoming: [{ dow: 'Rab', dd: '7', time: '15.00–16.00', pool: 'Lembah Biru', coach: 'Sari' }], next: { day: 'Rabu, 7 Oktober', time: '15.00–16.00', in: 'dalam 3 hari' } },
+    { name: 'Saya', age: 'dewasa', pkg: 'Paket 4 Sesi', pool: 'Kolam Tirta Cianjur', coach: 2, sisa: 4, total: 4, batal: 1, exp: '4 Des 2026', upcoming: [], next: null },
+  ];
+  DOW = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+  MON = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+  rp(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+  dowOf(d) { return (d + 2) % 7; }
+  daySlots(d) {
+    const w = this.dowOf(d); if (d < 5 || w === 6) return [];
+    const times = w === 5 ? ['07.00', '08.00', '09.00'] : ['07.00', '15.00', '16.00', '17.00'];
+    return times.map((t, i) => ({ t, taken: (d * 7 + i * 3) % 5 === 0 }));
+  }
+  hasFree(d) { return this.daySlots(d).some(s => !s.taken); }
+  seg(on, size) { return { flex: size ? 'none' : 1, height: size || 8, borderRadius: 999, background: on ? 'var(--heroAcc, #C6FF3D)' : 'rgba(128,128,110,.35)' }; }
+  chip(active) { return { height: 36, padding: '0 14px', border: 0, borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: active ? '#14140F' : 'transparent', color: active ? '#F6F6EE' : 'var(--ink)' }; }
+
+  renderVals() {
+    const s = this.state, set = (o) => this.setState(o);
+    const dark = s.theme === 'dark';
+    const light = { '--pg': '#E6E4D8', '--bg': '#F6F6EE', '--sf': '#FCFCF7', '--bd': '#DEDACA', '--ink': '#14140F', '--mu': '#5C5945', '--sm': '#ECE9DC', '--br': '#4F6B0F', '--b5': '#9FCC1F', '--hero': '#14140F', '--heroInk': '#F6F6EE', '--heroAcc': '#C6FF3D', '--ok': '#047857', '--wa': '#A8480A' };
+    const dk = { '--pg': '#0B0B08', '--bg': '#14140F', '--sf': '#1E1F18', '--bd': '#4A4C44', '--ink': '#F6F6EE', '--mu': '#B6B3A5', '--sm': '#32342E', '--br': '#BDE85A', '--b5': '#BDE85A', '--hero': '#C6FF3D', '--heroInk': '#14140F', '--heroAcc': '#14140F', '--ok': '#6FD6A8', '--wa': '#F2C14E' };
+    const P = this.PROFILES[s.profile];
+    const bookedN = s.booked.filter(b => b.profile === s.profile).length;
+    const sisa = P.sisa - bookedN;
+    const coach = this.COACHES[s.coachId];
+    const bkCoach = this.COACHES[s.coachId];
+    const pill = (active) => ({ whiteSpace: 'nowrap', flex: 'none', height: 36, padding: '0 14px', border: 0, borderRadius: 999, fontFamily: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer', background: active ? '#14140F' : 'transparent', color: active ? '#F6F6EE' : 'var(--ink)' });
+    const dkPill = (active) => dark && active ? { ...pill(true), background: '#C6FF3D', color: '#14140F' } : pill(active);
+
+    const roles = [['member', 'Member'], ['coach', 'Coach'], ['pool', 'Pemilik kolam'], ['admin', 'Admin']].map(([k, l]) => ({ label: l, style: dkPill(s.role === k), onClick: () => set({ role: k }) }));
+    const themes = [['light', 'Terang'], ['dark', 'Gelap']].map(([k, l]) => ({ label: l, style: dkPill(s.theme === k), onClick: () => set({ theme: k }) }));
+    const variants = [['A', 'Jadwal dulu'], ['B', 'Paket dulu']].map(([k, l]) => ({ label: l, style: dkPill(s.variant === k), onClick: () => set({ variant: k, view: 'home', role: 'member' }) }));
+
+    const profiles = this.PROFILES.map((p, i) => ({
+      name: p.name, initial: p.name[0],
+      style: { display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 14px 0 6px', borderRadius: 999, fontFamily: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer', border: '1px solid ' + (s.profile === i ? 'var(--ink)' : 'var(--bd)'), background: s.profile === i ? 'var(--ink)' : 'var(--sf)', color: s.profile === i ? 'var(--bg)' : 'var(--ink)' },
+      dot: { width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, background: '#C6FF3D', color: '#14140F' },
+      onClick: () => set({ profile: i, coachId: p.coach }),
+    }));
+
+    const segs = Array.from({ length: P.total }, (_, i) => this.seg(i < sisa));
+    const segsB = Array.from({ length: P.total }, (_, i) => this.seg(i < sisa, 10));
+    const upcomingAll = [...s.booked.filter(b => b.profile === s.profile).map(b => ({ dow: b.dow, dd: b.dd, time: b.time, pool: b.pool, coach: b.coach, tag: 'Baru', fresh: true })), ...P.upcoming.map(u => ({ ...u, tag: 'Terjadwal' }))];
+    const upcoming = upcomingAll.map(u => ({ ...u, badge: { fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 999, background: u.fresh ? '#C6FF3D' : 'var(--sm)', color: u.fresh ? '#14140F' : 'var(--ink)' } }));
+    const next = upcomingAll[0] && !upcomingAll[0].fresh ? P.next : (upcomingAll[0] ? { day: this.DOW[this.dowOf(+upcomingAll[0].dd)] + ', ' + upcomingAll[0].dd + ' Oktober', time: upcomingAll[0].time, in: 'baru dibooking' } : null);
+    const nxtItem = upcomingAll[0];
+
+    const goTab = (v) => () => set({ view: v });
+    const inMember = s.role === 'member';
+    const tabsOn = inMember && ['home', 'cari', 'book'].includes(s.view);
+    const tabDef = [['home', 'Beranda', 'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10'], ['cari', 'Cari coach', 'M11 18a7 7 0 100-14 7 7 0 000 14zM20 20l-4-4'], ['book', 'Booking', 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4']];
+    const tabs = tabDef.map(([k, l, ic]) => ({ label: l, icon: ic, onClick: goTab(k), style: { flex: 1, minHeight: 48, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, fontSize: 11, fontWeight: 600, cursor: 'pointer', color: s.view === k ? 'var(--ink)' : 'var(--mu)', opacity: s.view === k ? 1 : .8 } }));
+
+    const filters = ['Semua', 'Anak', 'Dewasa', 'Tirta Cianjur'].map((l, i) => ({ label: l, onClick: () => set({ filter: i }), style: { height: 36, padding: '0 14px', borderRadius: 999, fontFamily: 'inherit', fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1px solid ' + (s.filter === i ? 'var(--ink)' : 'var(--bd)'), background: s.filter === i ? 'var(--ink)' : 'var(--sf)', color: s.filter === i ? 'var(--bg)' : 'var(--ink)' } }));
+    const fOk = (c) => s.filter === 0 || (s.filter === 1 && c.specs.some(x => /Anak/.test(x))) || (s.filter === 2 && c.specs.some(x => /Dewasa/.test(x) || /Teknik/.test(x))) || (s.filter === 3 && /Tirta/.test(c.pools));
+    const coachList = this.COACHES.filter(fOk).map(c => ({ ...c, onClick: () => set({ view: 'coach', coachId: c.id }) }));
+    const pools = [{ name: 'Kolam Tirta Cianjur', info: 'Buka 07.00–18.00 · 2 coach' }, { name: 'Kolam Lembah Biru', info: 'Buka 06.00–17.00 · 2 coach' }];
+    const coachV = { ...coach, pkgs: [{ name: 'Paket 4 Sesi', note: 'Berlaku 30 hari', price: this.rp(520000) }, { name: 'Paket 8 Sesi', note: 'Berlaku 60 hari', price: this.rp(980000) }] };
+
+    // calendar
+    const cells = [];
+    for (let i = 0; i < 3; i++) cells.push({ d: '', style: { height: 44 }, dot: { display: 'none' }, onClick: () => {} });
+    for (let d = 1; d <= 31; d++) {
+      const past = d < 5, free = this.hasFree(d), sel = s.selDate === d, today = d === 4;
+      cells.push({ d: String(d), onClick: () => (!past && free) ? set({ selDate: d, selSlot: null }) : null,
+        style: { height: 44, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, borderRadius: 12, fontSize: 14, fontWeight: sel || today ? 700 : 500, fontVariantNumeric: 'tabular-nums', cursor: (!past && free) ? 'pointer' : 'default', background: sel ? '#14140F' : 'transparent', color: sel ? '#F6F6EE' : (past || !free) ? 'var(--mu)' : 'var(--ink)', opacity: (past || !free) && !sel ? .45 : 1, outline: today && !sel ? '1px solid var(--bd)' : 'none' },
+        dot: { width: 5, height: 5, borderRadius: '50%', background: (!past && free) ? (sel ? '#C6FF3D' : 'var(--b5)') : 'transparent' } });
+    }
+    const d = s.selDate;
+    const where = bkCoach.name.split(' ')[0] + ' · ' + bkCoach.pool;
+    const slots = d ? this.daySlots(d).map((x, i) => {
+      const sel = s.selSlot === i;
+      const h = parseInt(x.t); const end = String(h + 1).padStart(2, '0') + '.00';
+      return { time: x.t + '–' + end, where, tag: x.taken ? 'Terisi' : (sel ? 'Dipilih' : 'Kosong'),
+        onClick: () => x.taken ? null : set({ selSlot: i }),
+        style: { display: 'flex', alignItems: 'center', gap: 12, minHeight: 60, padding: '8px 14px', margin: '4px 0', borderRadius: 16, cursor: x.taken ? 'default' : 'pointer', border: '1px solid ' + (sel ? 'var(--ink)' : 'var(--bd)'), background: sel ? 'var(--sm)' : 'var(--sf)', opacity: x.taken ? .5 : 1 },
+        badge: { fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 999, background: sel ? '#C6FF3D' : 'var(--sm)', color: sel ? '#14140F' : (x.taken ? 'var(--mu)' : 'var(--ok)') } };
+    }) : [];
+    const selSlotObj = d && s.selSlot != null ? slots[s.selSlot] : null;
+    const selLabel = d ? this.DOW[this.dowOf(d)] + ', ' + d + ' Oktober' : 'Jam kosong';
+    const canBook = !!selSlotObj && sisa > 0;
+    const last = s.booked[s.booked.length - 1];
+
+    // coach role
+    const ATT = [{ id: 'a1', who: 'Alya', when: 'Jum, 2 Okt · 16.00', pool: 'Tirta Cianjur' }, { id: 'a2', who: 'Naufal', when: 'Jum, 2 Okt · 17.00', pool: 'Tirta Cianjur' }, { id: 'a3', who: 'Kinan', when: 'Sab, 3 Okt · 08.00', pool: 'Tirta Cianjur' }];
+    const PAY = 135000;
+    const hadirN = ATT.filter(a => s.att[a.id] === 'hadir').length;
+    const attList = ATT.map(a => { const v = s.att[a.id]; return { ...a, pending: !v, done: !!v, result: v === 'hadir' ? 'Hadir · saldo bertambah' : 'Tidak hadir', badge: { display: 'inline-block', alignSelf: 'flex-start', fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 999, background: 'var(--sm)', color: v === 'hadir' ? 'var(--ok)' : 'var(--mu)' }, hadir: () => set({ att: { ...s.att, [a.id]: 'hadir' } }), absen: () => set({ att: { ...s.att, [a.id]: 'absen' } }) }; });
+    const coachSlots = [{ dow: 'Sen', dd: '5', time: '16.00–17.00', pool: 'Tirta Cianjur · Alya', tag: 'Terisi' }, { dow: 'Sen', dd: '5', time: '17.00–18.00', pool: 'Tirta Cianjur', tag: 'Kosong' }, { dow: 'Sel', dd: '6', time: '15.00–16.00', pool: 'Tirta Cianjur', tag: 'Kosong' }].map(u => ({ ...u, badge: { fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 999, background: u.tag === 'Terisi' ? '#C6FF3D' : 'var(--sm)', color: u.tag === 'Terisi' ? '#14140F' : 'var(--ok)' } }));
+
+    // pool
+    const poolDays = [['Sen', 6, 8], ['Sel', 5, 8], ['Rab', 7, 8], ['Kam', 4, 8], ['Jum', 6, 8], ['Sab', 8, 8]].map(([day, n, m]) => ({ day, n: n + '/' + m, bar: { width: (n / m * 100) + '%', height: '100%', background: 'var(--b5)', borderRadius: 999 } }));
+
+    // admin
+    const WD = [{ id: 'w1', name: 'Kolam Lembah Biru', kind: 'Kolam', when: '3 Okt', amt: 1850000 }, { id: 'w2', name: 'Sari Wulandari', kind: 'Coach', when: '3 Okt', amt: 640000 }, { id: 'w3', name: 'Bagas Nugroho', kind: 'Coach', when: '4 Okt', amt: 405000 }];
+    const wds = WD.map(w => { const v = s.wd[w.id]; return { ...w, amount: this.rp(w.amt), pending: !v, done: !!v, result: v === 'ok' ? 'Disetujui' : 'Ditolak', badge: { display: 'inline-block', alignSelf: 'flex-start', fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 999, background: 'var(--sm)', color: v === 'ok' ? 'var(--ok)' : 'var(--wa)' }, approve: () => set({ wd: { ...s.wd, [w.id]: 'ok' } }), reject: () => set({ wd: { ...s.wd, [w.id]: 'no' } }) }; });
+    const pend = WD.filter(w => !s.wd[w.id]);
+
+    return {
+      themeStyle: dark ? dk : light, dark, roles, themes, variants,
+      isMember: inMember, isCoach: s.role === 'coach', isPool: s.role === 'pool', isAdmin: s.role === 'admin',
+      showHome: inMember && s.view === 'home', showCari: inMember && s.view === 'cari', showCoach: inMember && s.view === 'coach', showBook: inMember && s.view === 'book', showDone: inMember && s.view === 'done',
+      isHomeA: s.variant === 'A', isHomeB: s.variant === 'B',
+      parentName: 'Ibu Rina', profiles, pName: P.name, pkgName: P.pkg, pkgPool: P.pool, pkgExp: P.exp, sisa, total: P.total, batal: P.batal, segs, segsB,
+      hasNext: !!nxtItem, noNext: !nxtItem, nextDay: next ? next.day : '', nextTime: next ? next.time : '', nextIn: next ? next.in : '', nextPool: nxtItem ? nxtItem.pool : '', nextCoach: nxtItem ? nxtItem.coach : '',
+      upcoming, noUpcoming: upcoming.length === 0,
+      goBook: goTab('book'), goCari: goTab('cari'), goHome: goTab('home'),
+      filters, coachList, pools, coach: coachV, bkCoach,
+      cells, selLabel, noSel: !d, slots,
+      showBookCta: inMember && s.view === 'book', ctaLabel: canBook ? 'Booking ' + selLabel.split(',')[0] + ', ' + d + ' Okt · ' + selSlotObj.time.split('–')[0] : (sisa > 0 ? 'Pilih tanggal dan jam' : 'Sesi paket habis'),
+      ctaStyle: { width: '100%', height: 52, border: 0, borderRadius: 16, fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: canBook ? 'pointer' : 'default', background: canBook ? '#C6FF3D' : 'var(--sm)', color: canBook ? '#14140F' : 'var(--mu)' },
+      confirmBook: () => { if (!canBook) return; const h = selSlotObj.time; set({ booked: [...s.booked, { profile: s.profile, dow: this.MON[this.dowOf(d)], dd: String(d), time: h.replace('–', '–'), day: selLabel, pool: bkCoach.pool.replace('Kolam ', ''), coach: bkCoach.name.split(' ')[0], full: where, code: (Math.abs(d * 7919 + s.selSlot * 104729) % 1679616).toString(36).toUpperCase().padStart(6, 'K') }], view: 'done', selSlot: null }); },
+      doneDay: last ? last.day : '', doneTime: last ? last.time : '', doneWhere: last ? last.full : '', doneCode: last ? last.code : '',
+      showTabs: tabsOn, tabs,
+      coachSaldo: this.rp(1250000 + hadirN * PAY), attList, pendingCount: ATT.filter(a => !s.att[a.id]).length, coachSlots,
+      poolDays, wds, adminPending: pend.length, adminTotal: this.rp(pend.reduce((a, w) => a + w.amt, 0)),
+    };
+  }
+}
+</script>
+</body>
+</html>

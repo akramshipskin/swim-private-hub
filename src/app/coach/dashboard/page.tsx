@@ -2,11 +2,12 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import { todayWibDateString, dateLabel, addDaysToDateString, formatDateLabel, formatTimeWib } from "@/lib/datetime";
-import { BentoCard, NextStepCard, Stat, SessionList } from "@/components/dashboard";
+import { BalanceCard, BentoCard, NextStepCard, Stat, SessionList } from "@/components/dashboard";
+import AttendanceButtons from "@/components/attendance-buttons";
 import { getOverdueParticipants } from "@/lib/milestone-hold";
 import { releaseDueCommissions } from "@/lib/affiliate";
 import { AffiliateCard } from "@/components/affiliate-card";
-import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
+import { ATTENDANCE_MARK_WINDOW_HOURS, MILESTONE_NOTE_EVERY_SESSIONS, coachCanMarkAttendance } from "@/lib/policy";
 import { packagesWithBookableSlot, watchedPackageWhere, daysWithoutSlot, FREE_CHANGE_AFTER_DAYS } from "@/lib/coach-slot-watch";
 
 export const metadata = { title: "Dashboard Coach | Swim Private Hub" };
@@ -87,8 +88,16 @@ export default async function CoachDashboardPage() {
       <h1 className="text-2xl font-semibold tracking-tight text-text">Dashboard</h1>
       <p className="mt-1 text-sm text-text-muted">{formatDateLabel(today)}</p>
 
-      <div className="mt-6">
-        <NextStepCard {...step} />
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
+        <NextStepCard {...step} tone="soft" className="md:col-span-4" />
+        <BalanceCard
+          label="Saldo bisa dicairkan"
+          amount={formatRupiah(profile?.walletBalance ?? 0)}
+          hint="Bertambah setelah sesi ditandai Hadir."
+          href="/coach/saldo"
+          cta="Cairkan saldo"
+          className="md:col-span-2"
+        />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
@@ -131,30 +140,48 @@ export default async function CoachDashboardPage() {
         )}
         <BentoCard title="Ringkasan" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
-            <Stat label="Saldo bisa dicairkan" value={formatRupiah(profile?.walletBalance ?? 0)} />
             <Stat label="Sesi belum ditandai" value={unmarked.length} tone={unmarked.length > 0 ? "warning" : undefined} hint="Saldo masuk setelah ditandai" />
             <Stat label="Jam kosong 7 hari ke depan" value={openThisWeek} />
             <Stat label="Kolam tempat mengajar" value={pools.length} hint={pools.map((p) => p.pool.name).join(", ") || "Belum ada"} />
           </div>
         </BentoCard>
 
-        <BentoCard title="Sesi belum ditandai Hadir" href="/coach/riwayat-sesi" linkLabel="Tandai sekarang" className="md:col-span-2">
-          <SessionList
-            items={unmarked.map((b) => ({
-              id: b.id,
-              startTime: b.availability.startTime,
-              endTime: b.availability.endTime,
-              poolName: b.availability.pool.name,
-              who: b.package.dependent.name,
-              status: b.availability.date.toLocaleDateString("id-ID", { day: "numeric", month: "short", timeZone: "UTC" }),
-            }))}
-            empty="Semua sesi sudah ditandai."
-          />
+        <BentoCard
+          title="Sesi belum ditandai Hadir"
+          href="/coach/riwayat-sesi"
+          linkLabel="Semua sesi"
+          className={unmarked.length > 0 ? "md:col-span-6" : "md:col-span-2"}
+        >
+          {unmarked.length === 0 ? (
+            <p className="text-sm text-text-muted">Semua sesi sudah ditandai.</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-border">
+              {unmarked.slice(0, 6).map((b) => (
+                <li key={b.id} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold tabular-nums text-text">
+                      {b.package.dependent.name} · {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}
+                    </p>
+                    <p className="text-sm text-text-muted">
+                      {b.availability.date.toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })} · {b.availability.pool.name}
+                    </p>
+                  </div>
+                  <div className="sm:w-72 sm:shrink-0">
+                    <AttendanceButtons
+                      bookingId={b.id}
+                      lockedReason={coachCanMarkAttendance(b.availability.endTime) ? undefined : `Lewat ${ATTENDANCE_MARK_WINDOW_HOURS} jam, hubungi admin`}
+                    />
+                  </div>
+                </li>
+              ))}
+              {unmarked.length > 6 && <li className="pt-3 text-xs text-text-subtle">+{unmarked.length - 6} sesi lainnya di Riwayat Sesi</li>}
+            </ul>
+          )}
         </BentoCard>
-        <BentoCard title="Jadwal hari ini" href="/coach/jadwal" className="md:col-span-2">
+        <BentoCard title="Jadwal hari ini" href="/coach/jadwal" className={unmarked.length > 0 ? "md:col-span-3" : "md:col-span-2"}>
           <SessionList items={slots.filter((s) => s.date.getTime() === today.getTime()).map(toItem)} empty="Tidak ada sesi yang dibooking hari ini." />
         </BentoCard>
-        <BentoCard title="Jadwal besok" href="/coach/jadwal" className="md:col-span-2">
+        <BentoCard title="Jadwal besok" href="/coach/jadwal" className={unmarked.length > 0 ? "md:col-span-3" : "md:col-span-2"}>
           <SessionList items={slots.filter((s) => s.date.getTime() === tomorrow.getTime()).map(toItem)} empty="Belum ada sesi yang dibooking besok." />
         </BentoCard>
 

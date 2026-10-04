@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -14,6 +14,8 @@ import { AvailabilityDatePicker } from "@/components/availability-date-picker";
 import { DateQuickPicker } from "@/components/date-quick-picker";
 import { Avatar } from "@/components/ui/avatar";
 import { Loader } from "@/components/ui/loader";
+import { BookingSuccess, type BookingDone } from "./booking-success";
+import { bookButtonState } from "./booking-labels";
 
 type PackageOption = {
   packageId: string;
@@ -135,7 +137,16 @@ export default function BookingBoard({
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(
     null
   );
-  const [pendingId, setPendingId] = useState<string | null>(null);
+  // Booking dua langkah (rombak UI T3): ketuk jam = memilih; tombol menempel =
+  // booking. Pilihan terikat ke (tanggal|kolam|peserta): ganti salah satunya =
+  // pilihan hilang.
+  const selKey = `${slotsKey}|${dependentId}`;
+  const [selection, setSelection] = useState<{ id: string; key: string } | null>(null);
+  const [booking, setBooking] = useState(false);
+  // Penjaga ketuk ganda: state belum ter-render di ketukan kedua yang sangat cepat.
+  const bookingRef = useRef(false);
+  const [done, setDone] = useState<BookingDone | null>(null);
+  const [refreshing, startRefresh] = useTransition();
   const [cancelTarget, setCancelTarget] = useState<Slot | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
 
@@ -206,33 +217,76 @@ export default function BookingBoard({
       }));
   }, [slots]);
 
-  async function handleBook(availabilityId: string, coachId: string) {
-    const packageId = pkgForCoach(coachId)?.packageId;
-    if (!packageId) {
+  const isSelectable = (s: Slot) => s.status === "AVAILABLE" && !s.bookedByMe && !!pkgForCoach(s.coach.id);
+  const selectedSlot =
+    selection && selection.key === selKey && slots ? (slots.find((s) => s.id === selection.id) ?? null) : null;
+  // Pola "adjust state during render": pilihan dikosongkan bila konteksnya
+  // berganti, atau bila data jadwal terbaru (polling 5 detik) menunjukkan jam
+  // itu tidak bisa dipilih lagi. Tidak dicek selama permintaan booking berjalan.
+  if (selection && !booking) {
+    if (selection.key !== selKey) {
+      setSelection(null);
+    } else if (slots && !(selectedSlot && isSelectable(selectedSlot))) {
+      setSelection(null);
+      if (!selectedSlot) {
+        setMessage({ text: "Jam yang kamu pilih sudah tidak tersedia. Pilih jam lain.", ok: false });
+      } else if (selectedSlot.status === "BOOKED" && !selectedSlot.bookedByMe) {
+        setMessage({ text: "Jam yang kamu pilih baru saja diambil member lain. Pilih jam lain.", ok: false });
+      }
+    }
+  }
+
+  async function handleBook() {
+    if (bookingRef.current || !selectedSlot) return;
+    const target = selectedSlot;
+    const pkg = pkgForCoach(target.coach.id);
+    if (!pkg) {
       setMessage({ text: "Peserta ini belum punya paket untuk coach ini di kolam ini", ok: false });
       return;
     }
-    setPendingId(availabilityId);
+    bookingRef.current = true;
+    setBooking(true);
     setMessage(null);
 
-    const res = await fetch("/api/booking", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ availabilityId, packageId }),
-    });
+    try {
+      const res = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ availabilityId: target.id, packageId: pkg.packageId }),
+      });
 
-    const data = await res.json();
-    setPendingId(null);
+      const data = await res.json();
 
-    if (!res.ok) {
-      setMessage({ text: data.error, ok: false });
+      if (!res.ok) {
+        setSelection(null);
+        setMessage({ text: data.error, ok: false });
+        loadSlots();
+        return;
+      }
+
+      setSelection(null);
+      setDone({
+        bookingId: data.booking.id,
+        dateLabel: formatFullDate(target.startTime),
+        timeRange: `${formatTime(target.startTime)}–${formatTime(target.endTime)}`,
+        participantName: dependents.find((d) => d.id === dependentId)?.name ?? "",
+        poolName: selectedPool?.name ?? "",
+        coachName: target.coach.name,
+        packageId: pkg.packageId,
+        cancelRemainingAtBooking: pkg.cancelRemaining,
+      });
       loadSlots();
-      return;
+      // Sisa sesi di layar sukses menunggu data paket terbaru dari server.
+      startRefresh(() => router.refresh());
+    } catch {
+      // Jaringan putus: booking bisa saja sudah tersimpan. Polling berikutnya
+      // menampilkan jam itu sebagai "Booking kamu" bila memang berhasil.
+      setMessage({ text: "Koneksi terputus saat booking. Cek Riwayat Booking dulu sebelum mencoba lagi.", ok: false });
+      loadSlots();
+    } finally {
+      bookingRef.current = false;
+      setBooking(false);
     }
-
-    setMessage({ text: "Booking berhasil! Cek di halaman Riwayat.", ok: true });
-    loadSlots();
-    router.refresh();
   }
 
   async function handleConfirmCancel() {
@@ -274,6 +328,30 @@ export default function BookingBoard({
     loadSlots();
     router.refresh();
   }
+
+  if (done) {
+    const livePkg = packageOptions.find((p) => p.packageId === done.packageId) ?? null;
+    return (
+      <BookingSuccess
+        done={done}
+        pkg={livePkg}
+        refreshing={refreshing}
+        onBookAnother={() => {
+          setDone(null);
+          setMessage(null);
+          window.scrollTo({ top: 0, behavior: "instant" });
+        }}
+      />
+    );
+  }
+
+  // Sisa sesi paket yang akan dipakai: paket coach jam terpilih, atau (belum
+  // memilih) paket peserta di kolam ini. null = tidak ada paket aktif di sini.
+  const barPkg = selectedSlot ? pkgForCoach(selectedSlot.coach.id) : null;
+  const bar = bookButtonState({
+    sisaSesi: barPkg ? barPkg.sisaSesi : poolPkgs.length > 0 ? Math.max(...poolPkgs.map((p) => p.sisaSesi)) : null,
+    selectedStart: selectedSlot?.startTime ?? null,
+  });
 
   return (
     <div>
@@ -501,8 +579,49 @@ export default function BookingBoard({
               </div>
 
               <ul className="flex flex-col gap-2">
-                {group.slots.map((s) => (
-                  <Card key={s.id}>
+                {group.slots.map((s) => {
+                  if (!s.bookedByMe) {
+                    const selected = selectedSlot?.id === s.id;
+                    const canSelect = isSelectable(s);
+                    return (
+                      <li key={s.id}>
+                        <button
+                          type="button"
+                          aria-pressed={selected}
+                          disabled={!canSelect || booking}
+                          onClick={() => {
+                            setSelection(selected ? null : { id: s.id, key: selKey });
+                            setMessage(null);
+                          }}
+                          className={`flex min-h-[60px] w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed ${
+                            selected
+                              ? "border-text bg-surface-muted ring-1 ring-text"
+                              : canSelect
+                                ? "border-border bg-surface hover:bg-surface-muted"
+                                : "border-border bg-surface opacity-60"
+                          }`}
+                        >
+                          <span className="text-base font-semibold tabular-nums text-text">
+                            {formatTime(s.startTime)}–{formatTime(s.endTime)}
+                          </span>
+                          <span
+                            className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                              selected
+                                ? "bg-brand-500 text-fixed-ink"
+                                : s.status === "BOOKED"
+                                  ? "bg-surface-muted text-text-subtle"
+                                  : "bg-surface-muted text-success-text"
+                            }`}
+                          >
+                            {selected ? "Dipilih" : s.status === "BOOKED" ? "Sudah dibooking" : "Kosong"}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  }
+                  return (
+                  <li key={s.id}>
+                  <Card>
                     <CardBody className="flex items-center justify-between gap-3 py-3">
                       <div>
                         <p className="text-sm font-medium text-text">
@@ -515,52 +634,42 @@ export default function BookingBoard({
                         )}
                       </div>
 
-                      {s.bookedByMe ? (
-                        s.canCancel ? (
-                          <Button size="sm" variant="danger" onClick={() => setCancelTarget(s)}>
-                            Batalkan
-                          </Button>
-                        ) : new Date(s.startTime) <= new Date() ? (
-                          <p className="text-xs font-medium text-text-subtle">Sesi sudah lewat</p>
-                        ) : (
-                          <div className="flex max-w-[220px] flex-col items-end gap-1.5 text-right">
-                            <p className="text-xs font-medium text-text">
-                              Booking kamu{s.bookedForChildName && ` — untuk ${s.bookedForChildName}`}
-                            </p>
-                            <p className="text-xs text-text-subtle">{s.cancelReason}</p>
-                            <a
-                              href={buildAdminCancelWaLink({
-                                memberName: session?.user?.name ?? "Member",
-                                childName:
-                                  s.bookedForChildName === "kamu sendiri"
-                                    ? undefined
-                                    : (s.bookedForChildName ?? undefined),
-                                coachName: s.coach.name,
-                                dateLabel: formatFullDate(s.startTime),
-                                timeRange: `${formatTime(s.startTime)}-${formatTime(s.endTime)}`,
-                              })}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 max-lg:min-h-[44px]"
-                            >
-                              Hubungi Admin (WA)
-                            </a>
-                          </div>
-                        )
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant={s.status === "BOOKED" ? "secondary" : "primary"}
-                          disabled={s.status === "BOOKED" || pendingId === s.id || !pkgForCoach(s.coach.id)}
-                          loading={pendingId === s.id}
-                          onClick={() => handleBook(s.id, s.coach.id)}
-                        >
-                          {s.status === "BOOKED" ? "Sudah dibooking" : "Booking"}
+                      {s.canCancel ? (
+                        <Button size="sm" variant="danger" onClick={() => setCancelTarget(s)}>
+                          Batalkan
                         </Button>
+                      ) : new Date(s.startTime) <= new Date() ? (
+                        <p className="text-xs font-medium text-text-subtle">Sesi sudah lewat</p>
+                      ) : (
+                        <div className="flex max-w-[220px] flex-col items-end gap-1.5 text-right">
+                          <p className="text-xs font-medium text-text">
+                            Booking kamu{s.bookedForChildName && ` — untuk ${s.bookedForChildName}`}
+                          </p>
+                          <p className="text-xs text-text-subtle">{s.cancelReason}</p>
+                          <a
+                            href={buildAdminCancelWaLink({
+                              memberName: session?.user?.name ?? "Member",
+                              childName:
+                                s.bookedForChildName === "kamu sendiri"
+                                  ? undefined
+                                  : (s.bookedForChildName ?? undefined),
+                              coachName: s.coach.name,
+                              dateLabel: formatFullDate(s.startTime),
+                              timeRange: `${formatTime(s.startTime)}-${formatTime(s.endTime)}`,
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 max-lg:min-h-[44px]"
+                          >
+                            Hubungi Admin (WA)
+                          </a>
+                        </div>
                       )}
                     </CardBody>
                   </Card>
-                ))}
+                  </li>
+                  );
+                })}
               </ul>
             </div>
             );
@@ -583,6 +692,24 @@ export default function BookingBoard({
               </>
             );
           })()}
+        </div>
+      )}
+
+      {/* Tombol booking menempel (rombak UI T3). HP: di atas bilah menu bawah
+          (tinggi 67px + safe area; 66px supaya menyelip di bawah garis atasnya), sisi kanan dikosongkan untuk tombol chat
+          bantuan. Desktop: kartu menempel di dasar area konten. Elemen sticky ikut
+          alur halaman, jadi baris jadwal terakhir tidak tertutup. */}
+      {dependentId && poolId && (
+        <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+4.125rem)] z-10 -mx-4 mt-6 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:bottom-4 sm:mx-0 sm:rounded-2xl sm:border sm:px-4 sm:shadow-lg">
+          <Button
+            type="button"
+            className="min-h-12 w-[calc(100%-3.25rem)] py-2 text-sm leading-tight font-semibold sm:w-auto sm:min-w-[20rem] sm:text-base"
+            disabled={bar.disabled}
+            loading={booking}
+            onClick={handleBook}
+          >
+            {bar.label}
+          </Button>
         </div>
       )}
 

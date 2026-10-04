@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>body{margin:0}a{color:#6F8F1E}a:hover{color:#14140F}</style>
+</helmet>
+<div style="{{ themeStyle }}">
+<div style="background:var(--pg);font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--ink);padding:40px 44px 60px;display:flex;flex-direction:column;gap:56px;width:1760px;box-sizing:border-box">
+<div>
+<h1 style="margin:0;font-size:34px;font-weight:700;letter-spacing:-1px">Swim Private Hub: semua halaman</h1>
+<p style="margin:8px 0 0;font-size:14px;color:var(--mu);max-width:760px;line-height:1.6">{{ total }} halaman, tiap halaman dalam desktop dan mobile. Dikelompokkan per peran. Id (mis. M2) dan rute sama dengan <code>src/app</code>. Isi blok adalah data contoh. Token dan pola ada di HANDOFF.md.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><sc-for list="{{ groups }}" as="g" hint-placeholder-count="6"><a href="{{ g.href }}" style="font-size:12px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap;background:var(--sm);color:var(--ink);text-decoration:none">{{ g.label }} · {{ g.n }}</a></sc-for></div>
+</div>
+
+<sc-for list="{{ sections }}" as="sec" hint-placeholder-count="6">
+<section id="{{ sec.id }}" style="display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--bd);padding-bottom:12px"><h2 style="margin:0;font-size:24px;font-weight:700;letter-spacing:-.6px">{{ sec.label }}</h2><span style="font-size:12px;color:var(--mu);white-space:nowrap">{{ sec.n }} halaman</span></div>
+<sc-for list="{{ sec.pages }}" as="pg" hint-placeholder-count="3">
+<div id="{{ pg.id }}" style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:baseline;gap:10px"><span style="font:600 11px ui-monospace,Menlo,monospace;padding:3px 8px;border-radius:5px;background:var(--ink);color:var(--bg)">{{ pg.id }}</span><span style="font-size:15px;font-weight:600">{{ pg.title }}</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:var(--mu)">{{ pg.route }}</span></div>
+<div style="display:flex;gap:28px;align-items:flex-start">
+<sc-for list="{{ pg.vps }}" as="vp" hint-placeholder-count="2">
+<div style="{{ vp.frame }}">
+<!-- desktop top bar -->
+<sc-if value="{{ vp.desk }}"><div style="height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid var(--bd);background:var(--sf)"><span style="display:flex;align-items:center;gap:8px;font-family:Sora;font-weight:700;font-size:17px;letter-spacing:-.5px"><svg width="34" height="34" viewBox="8 8 84 84"><rect x="8" y="8" width="84" height="84" rx="26" fill="#C6FF3D"/><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="#14140F" clip-path="inset(0 round 26px)"/></svg>swim<span style="color:var(--b5)">.</span>privatehub</span><span style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mu)">{{ vp.user }}<span style="width:32px;height:32px;border-radius:50%;background:var(--sm)"></span></span></div></sc-if>
+<sc-if value="{{ vp.mob }}"><div style="height:{{ vp.topH }}px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 16px 8px;background:var(--bg)"><span style="font-weight:700;font-size:14px;letter-spacing:-.4px">swim<span style="color:var(--b5)">.</span>privatehub</span><span style="width:26px;height:26px;border-radius:50%;background:var(--sm)"></span></div></sc-if>
+<div style="flex:1;min-height:0;display:flex">
+<sc-if value="{{ vp.side }}"><div style="width:208px;flex:none;align-self:flex-start;margin:20px 0 0 24px;border:1px solid var(--bd);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px;background:var(--sf)"><sc-for list="{{ vp.nav }}" as="n" hint-placeholder-count="6"><div style="{{ n.style }}">{{ n.label }}</div></sc-for></div></sc-if>
+<div style="{{ vp.content }}">
+<sc-for list="{{ vp.blocks }}" as="b" hint-placeholder-count="3">
+<div>
+<sc-if value="{{ b.isTitle }}"><div style="{{ b.s }}">{{ b.title }}</div></sc-if>
+<sc-if value="{{ b.isStats }}"><div style="{{ b.s }}"><sc-for list="{{ b.items }}" as="i" hint-placeholder-count="4"><div style="{{ i.s }}"><div style="font-size:12px;color:var(--mu)">{{ i.a }}</div><div style="{{ i.vs }}">{{ i.b }}</div><div style="font-size:10px;color:var(--mu)">{{ i.c }}</div></div></sc-for></div></sc-if>
+<sc-if value="{{ b.isHero }}"><div style="{{ b.s }}"><span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--br)">{{ b.eyebrow }}</span><div style="{{ b.ts }}">{{ b.title }}</div><div style="font-size:12px;line-height:1.5;opacity:.85">{{ b.body }}</div><div style="align-self:flex-start;min-height:44px;padding:0 16px;margin-top:8px;border-radius:12px;background:var(--b6);color:#fff;font-weight:500;font-size:13px;display:flex;align-items:center">{{ b.cta }}</div></div></sc-if>
+<sc-if value="{{ b.isCard }}"><div style="{{ b.s }}">
+<sc-if value="{{ b.hasHead }}"><div style="font-size:13px;font-weight:700">{{ b.head }}</div></sc-if>
+<sc-if value="{{ b.hasCols }}"><div style="{{ b.colS }}"><sc-for list="{{ b.cols }}" as="c" hint-placeholder-count="4"><span>{{ c }}</span></sc-for></div></sc-if>
+<sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="3"><div style="{{ r.s }}"><sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="3"><span style="{{ c.s }}">{{ c.v }}</span></sc-for></div></sc-for>
+</div></sc-if>
+<sc-if value="{{ b.isForm }}"><div style="{{ b.s }}">
+<sc-if value="{{ b.hasHead }}"><div style="font-size:13px;font-weight:700">{{ b.head }}</div></sc-if>
+<sc-for list="{{ b.fields }}" as="f" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:11px;font-weight:600">{{ f.a }}</span><span style="height:38px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);display:flex;align-items:center;padding:0 12px;font-size:12px;color:var(--mu)">{{ f.b }}</span></div></sc-for>
+<div style="align-self:flex-start;min-height:44px;padding:0 20px;border-radius:12px;background:var(--b6);color:#fff;font-weight:500;font-size:13px;display:flex;align-items:center">{{ b.cta }}</div>
+</div></sc-if>
+<sc-if value="{{ b.isText }}"><div style="{{ b.s }}"><div style="font-size:13px;font-weight:700">{{ b.head }}</div><div style="font-size:12px;line-height:1.65;color:var(--mu)">{{ b.body }}</div></div></sc-if>
+<sc-if value="{{ b.isNotice }}"><div style="{{ b.s }}">{{ b.body }}</div></sc-if>
+<sc-if value="{{ b.isCards }}"><div style="{{ b.s }}"><sc-for list="{{ b.items }}" as="i" hint-placeholder-count="3"><div style="{{ i.s }}"><div style="font-size:13px;font-weight:600">{{ i.a }}</div><div style="font-size:11px;color:var(--mu);line-height:1.5">{{ i.b }}</div><div style="font-size:12px;font-weight:700;color:var(--br)">{{ i.c }}</div></div></sc-for></div></sc-if>
+<sc-if value="{{ b.isCal }}"><div style="{{ b.s }}"><div style="font-size:13px;font-weight:700;margin-bottom:8px">Oktober 2026</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center"><sc-for list="{{ b.days }}" as="d" hint-placeholder-count="35"><div style="{{ d.s }}">{{ d.v }}</div></sc-for></div></div></sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+<!-- mobile bottom nav -->
+<sc-if value="{{ vp.bottom }}"><div style="flex:none;display:flex;padding:6px 6px 22px;gap:2px;border-top:1px solid var(--bd);background:var(--sf)"><sc-for list="{{ vp.nav4 }}" as="n" hint-placeholder-count="4"><div style="{{ n.bs }}"><span style="{{ n.dot }}"></span>{{ n.label }}</div></sc-for></div></sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</section>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  NAV = {
+    member: [['Dashboard',''],['Booking',''],['Cari Coach',''],['Riwayat Booking',''],['Paket',''],['Riwayat Bayar',''],['Peserta',''],['Profil Saya','Pengaturan']],
+    coach: [['Dashboard',''],['Jadwal',''],['Kolam Saya',''],['Riwayat Sesi',''],['Peserta',''],['Harga',''],['Saldo',''],['Profil Saya','Pengaturan']],
+    pool: [['Dashboard',''],['Jadwal Kolam',''],['Laporan',''],['Saldo',''],['Info Kolam',''],['Paket & Harga',''],['Coach di Kolam',''],['Profil Saya','Pengaturan']],
+    admin: [['Dashboard','Operasional'],['Jadwal Booking','Operasional'],['Laporan Kehadiran','Operasional'],['Ganti Coach','Operasional'],['Coach Tanpa Jadwal','Operasional'],['Pengguna','Mitra & Member'],['Kolam','Mitra & Member'],['Peminat per Kota','Mitra & Member'],['Paket','Mitra & Member'],['Kinerja Coach','Mitra & Member'],['Milestone','Mitra & Member'],['Uang Masuk','Keuangan'],['Bagi Hasil','Keuangan'],['Pencairan Saldo','Keuangan'],['Koreksi Saldo','Keuangan'],['Afiliasi','Keuangan'],['Pesan','Lainnya'],['Email','Lainnya'],['Testimoni','Lainnya'],['Profil Saya','Lainnya']],
+  };
+  PRIM = { member: ['Dashboard','Booking','Paket','Riwayat'], coach: ['Dashboard','Jadwal','Riwayat','Saldo'], pool: ['Dashboard','Jadwal','Laporan','Saldo'], admin: ['Dashboard','Jadwal','Keuangan','Pesan'] };
+  USER = { member: 'Ibu Rina', coach: 'Dimas Pratama', pool: 'Tirta Cianjur', admin: 'Founder', pub: 'Masuk', auth: '' };
+  RN = { member: 'Member', coach: 'Coach', pool: 'Pemilik kolam', admin: 'Admin', pub: 'Publik dan lintas peran', auth: 'Masuk dan daftar' };
+  RP = { member: 'M', coach: 'C', pool: 'P', admin: 'A', pub: 'U', auth: 'L' };
+
+  // block builders
+  S = (items) => ({ t: 'stats', items });
+  H = (eyebrow, title, body, cta) => ({ t: 'hero', eyebrow, title, body, cta });
+  T = (head, cols, rows) => ({ t: 'table', head, cols, rows });
+  L = (head, rows) => ({ t: 'list', head, rows });
+  F = (head, fields, cta) => ({ t: 'form', head, fields: fields.map(f => ({ a: f[0], b: f[1] })), cta });
+  X = (head, body) => ({ t: 'text', head, body });
+  N = (body, tone) => ({ t: 'notice', body, tone: tone || 'warn' });
+  C = (items) => ({ t: 'cards', items: items.map(i => ({ a: i[0], b: i[1], c: i[2] || '' })) });
+  CAL = () => ({ t: 'cal' });
+
+  pages() {
+    const S = this.S, H = this.H, T = this.T, L = this.L, F = this.F, X = this.X, N = this.N, C = this.C, CAL = this.CAL;
+    const st = (a, b, c) => [a, b, c || ''];
+    const SALDO = (bal) => [
+      S([st('Saldo bisa dicairkan', bal), st('Dalam proses pencairan', 'Rp 0')]),
+      F('Cairkan saldo', [['Nominal (minimal Rp 50.000)', bal]], 'Cairkan'),
+      N('Pencairan ditransfer secepatnya, paling lambat 7 hari kerja sejak diajukan.', 'info'),
+      F('Rekening Tujuan Pencairan  ·  Tersimpan', [['Nama Bank', 'BCA'], ['Nomor Rekening', '1234567890'], ['Nama Pemilik Rekening', 'Dimas Pratama']], 'Edit Rekening'),
+      L('Komisi Afiliasi', [['+Rp 25.000', 'Masuk saldo setelah 12 Okt 2026', 'Menunggu']]),
+      L('Riwayat Pencairan', [['Rp 600.000', 'Diajukan 20 September 2026 · BCA •••• 7890 a.n. Dimas Pratama', 'Berhasil']]),
+    ].flat();
+    const LEGAL = (n, b) => [X('1. Ruang lingkup', b), X('2. Hak dan kewajiban', 'Pengguna wajib memberikan data yang benar dan menjaga kerahasiaan akun.'), X('3. Perubahan', 'Dokumen ini dapat diperbarui. Tanggal pembaruan tertera di atas.')];
+    return {
+      member: [
+        ['/member', 'Beranda Member', 'app', [N('Halaman ini tidak punya tampilan: langsung mengarahkan ke /member/booking.', 'info')]],
+        ['/member/dashboard', 'Dashboard', 'app', [N('Minggu, 4 Oktober 2026', 'info'), H('Jadwal berikutnya', 'Senin, 5 Oktober, 16.00–17.00', 'Alya · Kolam Tirta Cianjur · dengan Dimas Pratama', 'Booking sesi lain (5 tersisa)  →  Semua jadwal'), L('Ringkasan', [['Paket aktif', '2 · 3 peserta terdaftar', ''], ['Total sisa sesi', '8', ''], ['Sesi terjadwal', '3', ''], ['Sesi dihadiri', '12 · 4 sesi bulan ini', ''], ['Belanja paket bulan ini', 'Rp 980.000', ''], ['Coach tersering', 'Dimas Pratama', ''], ['Paket Paket 4 Sesi (Raka) kedaluwarsa dalam 5 hari. Pakai sisa sesinya sebelum hangus.', '', 'Menunggu']]), L('Paket aktif', [['Kolam Tirta Cianjur', 'Alya · Paket 8 Sesi', ''], ['Sisa 5/8 sesi · jatah batal 1 · s.d. 28 Nov 2026', '', ''], ['Kolam Lembah Biru', 'Raka · Paket 4 Sesi', ''], ['Sisa 3/4 sesi · jatah batal 1 · s.d. 9 Okt 2026', '', '']]), L('Jadwal berikutnya', [['16.00–17.00 · Tirta Cianjur', 'Dimas · Alya', 'Sen, 5 Okt'], ['15.00–16.00 · Lembah Biru', 'Sari · Raka', 'Rab, 7 Okt']])]],
+        ['/member/booking', 'Booking', 'app', [N('Pilih peserta, kolam, coach, dan jam. Jam yang sudah diambil otomatis terkunci.', 'info'), F('Pilih', [['Peserta', 'Alya'], ['Kolam', 'Kolam Tirta Cianjur'], ['Coach', 'Dimas Pratama · sisa 5 sesi · jatah batal 1']], 'Lihat jam kosong'), CAL(), L('Senin, 5 Oktober', [['07.00–08.00', 'Dimas · Tirta Cianjur', 'Kosong'], ['15.00–16.00', 'Dimas · Tirta Cianjur', 'Terisi'], ['16.00–17.00', 'Dimas · Tirta Cianjur', 'Kosong']]), X('Kebijakan pembatalan', 'Pembatalan booking paling lambat 24 jam sebelum jadwal, sesuai sisa jatah batal paket. Tidak hadir tanpa pembatalan: sesi tetap terpakai dan tidak dikembalikan. Jatah habis? Hubungi admin lewat WhatsApp.')]],
+        ['/member/cari-coach', 'Cari Coach', 'app', [N('Semua coach aktif beserta kolam tempat mereka mengajar. Paket dibeli per coach dan kolam lewat menu Paket, dan hanya berlaku untuk coach itu di kolam itu.', 'info'), C([['Dimas Pratama  ·  Bersertifikat', 'Domisili Cianjur · 29 tahun, laki-laki\nMengajar anak usia 5 tahun ke atas, dari adaptasi air sampai gaya bebas.\nAnak dan pemula · Pengenalan air · Gaya bebas\nMengajar di: Kolam Tirta Cianjur · Jl. Contoh No. 1, Cianjur', 'Lihat profil lengkap →'], ['Sari Wulandari  ·  Bersertifikat', 'Domisili Cianjur · 32 tahun, perempuan\nFokus pemula dewasa dan peserta yang takut air.\nDewasa pemula · Takut air · Gaya dada\nMengajar di: Kolam Lembah Biru · Jl. Contoh No. 2, Cianjur', 'Lihat profil lengkap →']])]],
+        ['/member/paket', 'Paket', 'app', [N('Member sejak 12 September 2026   ·   Beli paket baru ↓', 'info'), L('Saldo kamu  Rp 40.000', [['Otomatis dipakai saat membeli paket berikutnya atau tambah bayar ganti coach. Tidak bisa dicairkan.', '', ''], ['3 Okt · Selisih ganti coach', '+Rp 40.000', '']]), L('Kolam Tirta Cianjur', [['Paket 8 Sesi · Alya', 'Sisa 5/8 · s.d. 28 Nov 2026', 'Aktif'], ['Ganti coach: pilih coach pengganti di kolam ini', '', '']]), L('Kolam Lembah Biru', [['Paket 4 Sesi · Raka', 'Sisa 3/4 · s.d. 9 Okt 2026', 'Aktif']]), L('Beli paket baru · kota Cianjur', [['Tirta Cianjur · Dimas Pratama', 'Paket 4 Sesi Rp 520.000 · Paket 8 Sesi Rp 980.000', 'Beli'], ['Lembah Biru · Sari Wulandari', 'Paket 4 Sesi Rp 480.000 · Paket 8 Sesi Rp 900.000', 'Beli']]), N('Bagian bawah halaman ini (form beli, trial, daftar tunggu kota) belum saya baca dari kode.', 'warn')]],
+        ['/member/riwayat', 'Riwayat Booking', 'app', [F(null, [['Cari', 'Cari coach, kolam, atau peserta']], 'Cari'), L('Jumat, 2 Oktober 2026  ·  TIRTA CIANJUR', [['16.00–17.00', 'Coach Dimas Pratama', 'Hadir'], ['Peserta: Alya · Paket 8 Sesi', '', '']]), L('Senin, 5 Oktober 2026  ·  TIRTA CIANJUR', [['16.00–17.00', 'Coach Dimas Pratama', 'Terjadwal'], ['Peserta: Alya · Paket 8 Sesi', 'Sisa jatah batal: 1', 'Batalkan']]), L('Rabu, 30 September 2026  ·  LEMBAH BIRU', [['15.00–16.00', 'Coach Sari Wulandari', 'Dibatalkan'], ['Peserta: Raka · Paket 4 Sesi · oleh kamu', '', '']])]],
+        ['/member/pembayaran', 'Riwayat Bayar', 'app', [N('Semua pembayaran paket kamu, termasuk yang belum selesai dibayar. Paket aktif ada di menu Paket.', 'info'), L('Total yang sudah dibayar  Rp 1.500.000', []), L(null, [['Paket 8 Sesi', 'Rp 980.000', 'Berhasil'], ['Kolam Tirta Cianjur · peserta Alya · 1 Oktober 2026, 10.12', 'No. transaksi: SPH-4F2A91', ''], ['Paket 4 Sesi', 'Rp 520.000', 'Menunggu'], ['Kolam Lembah Biru · peserta Raka · 3 Oktober 2026, 09.40', 'Lanjut bayar →', ''], ['Paket 4 Sesi', 'Rp 520.000', 'Gagal']])]],
+        ['/member/peserta', 'Peserta', 'app', [N('Siapa saja yang ikut les: kamu sendiri dan/atau anak. Setiap peserta punya paket dan sisa sesi sendiri, jadi sesinya tidak tercampur.', 'info'), L('Peserta', [['Ibu Rina (kamu)', 'Dewasa · belum ada paket aktif', 'Aktif'], ['Alya', '9 tahun · Tirta Cianjur · Paket 8 Sesi sisa 5/8', 'Aktif'], ['Raka', '6 tahun · Lembah Biru · Paket 4 Sesi sisa 3/4', 'Aktif']]), F('Tambah peserta', [['Nama', 'Nama panjang'], ['Tanggal lahir', 'dd/mm/yyyy']], 'Simpan'), N('Detail PesertaManager (ubah, nonaktifkan) belum saya baca dari kode.', 'warn')]],
+      ],
+      coach: [
+        ['/coach', 'Beranda Coach', 'app', [N('Halaman ini tidak punya tampilan: mengarahkan ke /coach/dashboard.', 'info')]],
+        ['/coach/dashboard', 'Dashboard Coach', 'app', [N('Minggu, 4 Oktober 2026', 'info'), H('Langkah berikutnya', '2 sesi belum ditandai Hadir', 'Bagianmu masuk saldo setelah sesi ditandai. Lewat 24 jam setelah sesi selesai, hanya admin yang bisa menandai.', 'Tandai sekarang'), L('Pencairan ditahan  ·  Update milestone →', [['Naufal sudah 4 sesi Hadir atau lebih tanpa catatan milestone darimu. Isi catatannya supaya saldo bisa dicairkan lagi.', '', 'Menunggu']]), L('Sesi yang harus kamu sediakan  ·  Buka jadwal →', [['4 sesi dari 2 paket member belum terjadwal. 1 member belum bisa booking karena kamu belum membuka jam kosong di kolamnya.', '', ''], ['Raka · Lembah Biru · 3 sesi belum terjadwal · paket berakhir 5 hari lagi', 'Belum ada jam kosong (hari ke-6)', ''], ['Alya · Tirta Cianjur · 1 sesi belum terjadwal', '', '']]), S([st('Saldo bisa dicairkan', 'Rp 1.250.000'), st('Sesi belum ditandai', '2', 'Saldo masuk setelah ditandai'), st('Jam kosong 7 hari ke depan', '9'), st('Kolam tempat mengajar', '2', 'Tirta Cianjur, Lembah Biru')]), L('Sesi belum ditandai Hadir', [['16.00–17.00 · Tirta Cianjur', 'Alya', '2 Okt'], ['17.00–18.00 · Tirta Cianjur', 'Naufal', '2 Okt']]), L('Jadwal hari ini', [['Tidak ada sesi yang dibooking hari ini.', '', '']]), L('Jadwal besok', [['16.00–17.00 · Tirta Cianjur', 'Alya', '']]), L('Lengkapi profil  ·  Buka profil →', [['Unggah foto dan sertifikat supaya profilmu tampil lebih meyakinkan di mata orang tua. Badge "Bersertifikat" muncul setelah sertifikat disetujui admin.', '', '']]), L('Afiliasi', [['Kode afiliasi dan komisi (komponen AffiliateCard, belum saya baca)', '', '']])]],
+        ['/coach/jadwal', 'Jadwal', 'app', [N('Buka jam kosong per tanggal. Member langsung bisa melihat dan membooking jam ini.', 'info'), F('Buka jam kosong', [['Kolam', 'Kolam Tirta Cianjur · buka 07.00–18.00'], ['Tanggal', 'Pilih tanggal'], ['Jam', 'Pilih jam']], 'Buka slot'), F(null, [['Cari', 'Cari kolam atau peserta di jadwalmu']], 'Cari'), L('Senin, 5 Oktober 2026  ·  Kolam Tirta Cianjur · 3 jam', [['16.00–17.00', 'Peserta: Alya', 'Batalkan'], ['17.00–18.00', 'Belum dibooking', 'Hapus'], ['18.00–19.00', 'Belum dibooking', 'Hapus']]), L('Selasa, 6 Oktober 2026  ·  Kolam Tirta Cianjur · 1 jam', [['15.00–16.00', 'Belum dibooking', 'Hapus']]), L('Jadwal Coach Lain  ·  Senin, 5 Oktober', [['Kolam Tirta Cianjur · Bagas Nugroho', '', ''], ['15.00–16.00', 'Terisi', ''], ['16.00–17.00', 'Kosong', '']])]],
+        ['/coach/kolam', 'Kolam Saya', 'app', [N('Pilih kolam tempat kamu mengajar. Member bisa membeli paket denganmu di kolam yang kamu pilih, dan kamu membuka jadwal di sana lewat menu Jadwal. Kota domisili: Cianjur (ganti di Profil).', 'info'), L('Kolam di Cianjur', [['Kolam Tirta Cianjur  ·  Kolam kamu', 'Jl. Contoh No. 1 · Buka 07.00–18.00\nTiket kolam: 4 sesi Rp 260.000 · 8 sesi Rp 500.000', 'Lepas'], ['Kolam Lembah Biru', 'Jl. Contoh No. 2 · Buka 06.00–17.00\nTiket kolam: belum dipasang', 'Pilih']]), L('Kolam di kota lain (lipat)', [['Peringatan: member di kota lain mungkin sulit menjangkau jadwalmu.', '', '']])]],
+        ['/coach/harga', 'Harga', 'app', [N('Pasang harga jasamu untuk paket 4 sesi (berlaku 1 bulan) dan 8 sesi (berlaku 2 bulan). Satu harga untuk semua kolam. Harga baru langsung berlaku untuk pembelian berikutnya; paket yang sudah dibeli tidak berubah.', 'info'), F(null, [['Paket 4 sesi', 'Rp 260.000'], ['Paket 8 sesi', 'Rp 480.000']], 'Simpan'), N('Kosongkan salah satu kalau kamu tidak menjual paket itu. Bagianmu per sesi = harga paket ÷ jumlah sesi, dipotong PPh 0,5%.', 'info'), L('Harga yang dilihat member  ·  Kolam Tirta Cianjur', [['Paket 4 sesi: Rp 535.000', '(kolam Rp 260.000 + kamu Rp 260.000 + layanan 5% Rp 15.000)', ''], ['Paket 8 sesi: Rp 1.015.000', '(kolam Rp 500.000 + kamu Rp 480.000 + layanan 5% Rp 35.000)', ''], ['Paket 8 sesi 5% lebih hemat per sesi.', '', '']])]],
+        ['/coach/peserta', 'Peserta', 'app', [N('Isi Update milestone tiap peserta minimal sekali per 4 sesi Hadir. Bila ada peserta yang melewati batas itu, pengajuan pencairan saldo ditahan sampai catatannya diisi.', 'info'), N('Pencairan ditahan: 1 peserta belum diberi catatan.', 'warn'), C([['Naufal  ·  4 sesi tanpa catatan', 'Akun Pak Andi · Sesi terakhir 2 Okt · Catatan terakhirmu belum ada', 'Update milestone →'], ['Alya', 'Akun Ibu Rina · Sesi terakhir 2 Okt · Catatan terakhirmu 25 Sep', 'Update milestone →']])]],
+        ['/coach/riwayat-sesi', 'Riwayat Sesi', 'app', [F(null, [['Cari', 'Cari peserta, nama akun, atau kolam']], 'Cari'), N('Tandai kehadiran paling lambat 24 jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai. Hadir: kamu dan kolam mendapat bagian penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu mendapat 50% dari bagianmu.', 'info'), S([st('Belum ditandai', '2'), st('Hadir', '14'), st('Tidak Hadir', '1')]), L('Jumat, 2 Oktober 2026  ·  Tirta Cianjur', [['16.00–17.00', 'Peserta: Alya  ·  Update milestone', 'Tandai'], ['Akun Ibu Rina · Paket 8 Sesi', '', ''], ['17.00–18.00', 'Peserta: Naufal  ·  Update milestone', 'Tandai'], ['Akun Pak Andi · Paket 4 Sesi', '', '']]), L('Rabu, 30 September 2026  ·  Tirta Cianjur', [['16.00–17.00', 'Peserta: Alya', 'Hadir'], ['ditandai coach', '', '']])]],
+        ['/coach/saldo', 'Saldo', 'app', [N('Bagian kamu dari tiap sesi yang ditandai Hadir (penuh) atau Tidak Hadir karena peserta tidak datang (50%). Potongan PPh 0,5% sejauh ini: Rp 6.000 (sudah dikurangkan dari saldo, disetor SPH atas namamu).', 'info'), N('Pencairan ditahan sampai catatan milestone diisi. Naufal · 4 sesi tanpa catatan', 'warn'), ...SALDO('Rp 1.250.000')]],
+      ],
+      pool: [
+        ['/pool', 'Beranda Kolam', 'app', [H('Kolam Tirta Cianjur', 'Ringkasan kolam', 'Harga, jadwal, coach, dan saldo kolammu.', 'Ke dashboard')]],
+        ['/pool/dashboard', 'Dashboard Kolam', 'app', [S([st('Sesi bulan ini', '64'), st('Pendapatan', 'Rp 4.2 jt'), st('Coach', '3'), st('Hadir', '92%')]), H('Saldo', 'Rp 2.340.000', 'Dari sesi Hadir di kolammu.', 'Ajukan pencairan'), L('Info kolam', [['Jam buka', '07.00–18.00', ''], ['Alamat', 'Jl. Contoh No. 1', '']])]],
+        ['/pool/jadwal', 'Jadwal Kolam', 'app', [CAL(), T('Senin, 5 Oktober', ['Jam', 'Coach', 'Peserta'], [['15.00', 'Dimas', 'Naufal'], ['16.00', 'Dimas', 'Alya'], ['16.00', 'Bagas', '-']])]],
+        ['/pool/coach', 'Coach di Kolam', 'app', [L('Coach terafiliasi', [['Dimas Pratama', 'Anak dan pemula', 'Aktif'], ['Bagas Nugroho', 'Teknik gaya', 'Aktif'], ['Rani Sari', 'Menunggu persetujuan', 'Setujui']])]],
+        ['/pool/paket', 'Paket & Harga', 'app', [F('Harga tiket kolam', [['Paket 4 Sesi', 'Rp 260.000'], ['Paket 8 Sesi', 'Rp 500.000']], 'Simpan')]],
+        ['/pool/laporan', 'Laporan', 'app', [S([st('Sesi Hadir', '58'), st('Tidak hadir', '6'), st('Pendapatan', 'Rp 4.2 jt'), st('PPh 0,5%', 'Rp 21.000')]), T(null, ['Minggu', 'Sesi', 'Pendapatan'], [['28 Sep', '15', 'Rp 980.000'], ['21 Sep', '17', 'Rp 1.100.000']])]],
+        ['/pool/saldo', 'Saldo', 'app', [H('Saldo kolam', 'Rp 2.340.000', 'Pencairan diproses admin.', 'Ajukan pencairan'), T('Mutasi', ['Tanggal', 'Keterangan', 'Jumlah'], [['3 Okt', 'Sesi Hadir', '+Rp 65.000'], ['25 Sep', 'Pencairan', '-Rp 1.500.000']])]],
+        ['/pool/info', 'Info Kolam', 'app', [F(null, [['Nama kolam', 'Kolam Tirta Cianjur'], ['Alamat', 'Jl. Contoh No. 1'], ['Jam buka', '07.00–18.00'], ['Fasilitas', 'Ruang bilas, loker']], 'Simpan'), N('Foto kolam: unggah maksimal 6 foto.', 'info')]],
+      ],
+      admin: [
+        ['/admin', 'Dashboard Admin', 'app', [S([st('Booking hari ini', '14'), st('Pengguna baru', '5'), st('Uang masuk', 'Rp 3.1 jt'), st('Pencairan menunggu', '3')]), L('Perlu tindakan', [['3 pencairan menunggu', '', 'Buka'], ['2 usulan milestone', '', 'Buka'], ['1 kolam menunggu', '', 'Buka']]), L('Jadwal hari ini', [['16.00 Alya', 'Dimas · Tirta Cianjur', '']]), H('Pendapatan platform', 'Rp 820.000', 'Cairkan saldo platform.', 'Cairkan saldo'), T('Ringkasan tiap kolam', ['Kolam', 'Sesi', 'Saldo'], [['Tirta Cianjur', '64', 'Rp 2.3 jt'], ['Lembah Biru', '41', 'Rp 1.4 jt']])]],
+        ['/admin/users', 'Pengguna', 'app', [F(null, [['Cari', 'Nama atau email']], 'Cari'), T(null, ['Nama', 'Peran', 'Terdaftar'], [['Ibu Rina', 'Member', '12 Sep'], ['Dimas Pratama', 'Coach', '1 Sep'], ['Tirta Cianjur', 'Pemilik kolam', '28 Agu']])]],
+        ['/admin/users/[userId]', 'Detail Pengguna', 'app', [S([st('Peran', 'Member'), st('Paket aktif', '2'), st('Saldo', 'Rp 0'), st('Status', 'Aktif')]), L('Peserta', [['Alya', 'Anak', ''], ['Raka', 'Anak', '']]), F('Beri paket gratis', [['Paket', 'Pilih paket'], ['Peserta', 'Pilih peserta']], 'Berikan')]],
+        ['/admin/kolam', 'Kolam', 'app', [T(null, ['Kolam', 'Tiket 4/8', 'Biaya layanan', 'Coach'], [['Tirta Cianjur', '260rb / 500rb', 'Rp 15.000', '3'], ['Lembah Biru', '240rb / 460rb', 'Rp 15.000', '2']])]],
+        ['/admin/paket', 'Paket', 'app', [T(null, ['Paket', 'Peserta', 'Sisa', 'Kedaluwarsa'], [['8 Sesi · Alya', 'Alya', '5', '28 Nov'], ['4 Sesi · Raka', 'Raka', '3', '2 Nov']])]],
+        ['/admin/afiliasi', 'Afiliasi', 'app', [T(null, ['Coach', 'Kolam', 'Status'], [['Rani Sari', 'Tirta Cianjur', 'Setujui'], ['Dimas', 'Lembah Biru', 'Aktif']])]],
+        ['/admin/booking-overview', 'Jadwal Booking', 'app', [CAL(), T('Senin, 5 Oktober', ['Jam', 'Coach', 'Peserta', 'Kolam'], [['15.00', 'Dimas', 'Naufal', 'Tirta'], ['16.00', 'Dimas', 'Alya', 'Tirta'], ['15.00', 'Sari', 'Raka', 'Lembah']])]],
+        ['/admin/coach-tanpa-jadwal', 'Coach Tanpa Jadwal', 'app', [N('Coach di bawah belum membuka slot minggu ini.', 'warn'), L(null, [['Rani Sari', 'Tirta Cianjur', 'Ingatkan'], ['Eko Putra', 'Lembah Biru', 'Ingatkan']])]],
+        ['/admin/email', 'Email', 'app', [F('Kirim email', [['Penerima', 'Semua member'], ['Subjek', 'Pengumuman'], ['Isi', 'Tulis pesan']], 'Kirim'), L('Terkirim', [['Pengingat jadwal', '3 Okt', '']])]],
+        ['/admin/ganti-coach', 'Ganti Coach', 'app', [T(null, ['Peserta', 'Dari', 'Ke', 'Aksi'], [['Raka', 'Sari', 'Bagas', 'Setujui']])]],
+        ['/admin/kinerja-coach', 'Kinerja Coach', 'app', [T(null, ['Coach', 'Sesi', 'Hadir', 'Rating'], [['Dimas', '18', '94%', '4,9'], ['Sari', '12', '91%', '4,8']])]],
+        ['/admin/komisi', 'Bagi Hasil', 'app', [S([st('Pendapatan platform', 'Rp 820.000'), st('PPh', 'Rp 41.000'), st('Kolam', 'Rp 3.7 jt'), st('Coach', 'Rp 4.1 jt')]), T(null, ['Tanggal', 'Sesi', 'Kolam', 'Coach', 'SPH'], [['3 Okt', 'Alya', '65rb', '135rb', '20rb']])]],
+        ['/admin/koreksi-saldo', 'Koreksi Saldo', 'app', [F('Koreksi', [['Pemilik saldo', 'Pilih coach atau kolam'], ['Jumlah', 'Rp 0'], ['Alasan', 'Wajib diisi']], 'Terapkan'), N('Semua koreksi tercatat di ledger.', 'info')]],
+        ['/admin/laporan-kehadiran', 'Laporan Kehadiran', 'app', [S([st('Hadir', '92%'), st('Tidak hadir', '6%'), st('Belum ditandai', '2%')]), T(null, ['Coach', 'Hadir', 'Tidak', 'Belum'], [['Dimas', '17', '1', '0'], ['Sari', '10', '1', '1']])]],
+        ['/admin/milestone', 'Milestone', 'app', [L('Usulan coach', [['Meluncur tanpa papan', 'Diusulkan Dimas', 'Tinjau'], ['Lompat masuk air', 'Diusulkan Sari', 'Tinjau']])]],
+        ['/admin/milestone/butir', 'Butir standar milestone', 'app', [T(null, ['Butir', 'Level', 'Status'], [['Masuk air', '1', 'Aktif'], ['Mengapung', '1', 'Aktif'], ['Gaya bebas', '3', 'Aktif']])]],
+        ['/admin/pembayaran', 'Uang Masuk', 'app', [T(null, ['Tanggal', 'Member', 'Paket', 'Jumlah', 'Status'], [['3 Okt', 'Ibu Rina', '8 Sesi', 'Rp 980.000', 'Berhasil'], ['2 Okt', 'Pak Andi', '4 Sesi', 'Rp 520.000', 'Berhasil']])]],
+        ['/admin/peminat-kota', 'Peminat per Kota', 'app', [T(null, ['Kota', 'Peminat'], [['Bandung', '48'], ['Jakarta', '41'], ['Bogor', '17']])]],
+        ['/admin/pesan', 'Pesan', 'app', [L('Pesan masuk', [['Pak Andi', 'Cara batalkan sesi?', 'Baru'], ['Ibu Sinta', 'Paket belum aktif', 'Dibalas']])]],
+        ['/admin/testimoni', 'Testimoni', 'app', [L(null, [['Ibu Rina', '"Anak jadi berani di air."', 'Tampil'], ['Pak Dedi', '"Jadwal jelas."', 'Tampil']])]],
+        ['/admin/withdrawals', 'Pencairan Saldo', 'app', [S([st('Menunggu', '3'), st('Total diajukan', 'Rp 2.9 jt')]), T(null, ['Pemohon', 'Jenis', 'Jumlah', 'Aksi'], [['Lembah Biru', 'Kolam', 'Rp 1.850.000', 'Setujui'], ['Sari', 'Coach', 'Rp 640.000', 'Setujui']])]],
+      ],
+      pub: [
+        ['/', 'Landing', 'plain', [H('swim.privatehub', 'Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya.', 'Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub. Perkembangan tercatat, pembayaran jelas.', 'Daftar'), C([['Pilih coach', 'Lihat profil dan jadwal kosong', ''], ['Pilih kolam', 'Kolam mitra di kotamu', ''], ['Pilih jam', 'Slot terkunci otomatis', '']])]],
+        ['/panduan', 'Panduan', 'plain', [X('Cara kerja', 'Pilih kolam dan coach, beli paket, lalu booking jam yang masih kosong.'), C([['1. Daftar', 'Buat akun dan tambah peserta', ''], ['2. Beli paket', 'Bayar lewat Midtrans', ''], ['3. Booking', 'Pilih tanggal dan jam', '']])]],
+        ['/brandguideline', 'Panduan Brand', 'plain', [X('Lime Pulse', 'Charcoal #14140F, Cream #F6F6EE, Lime #C6FF3D. Font Sora.'), S([st('Charcoal', '#14140F'), st('Cream', '#F6F6EE'), st('Lime', '#C6FF3D'), st('Lime Dark', '#6F8F1E')])]],
+        ['/pelatih/[coachId]', 'Profil Coach', 'plain', [H('Bersertifikat', 'Dimas Pratama', 'Kolam Tirta Cianjur · Anak dan pemula', 'Pilih jam'), C([['Paket 4 Sesi', '30 hari', 'Rp 520.000'], ['Paket 8 Sesi', '60 hari', 'Rp 980.000']])]],
+        ['/kota', 'Pilih Kota', 'auth', [F('Kamu tinggal di kota mana?', [['Kota', 'Pilih kota']], 'Lanjut')]],
+        ['/daftar-coach', 'Daftar Coach', 'auth', [F('Daftar sebagai coach', [['Nama', 'Nama panjang'], ['Nomor HP', '08xx'], ['Keahlian', 'Anak dan pemula, ...'], ['Sertifikasi', 'Opsional']], 'Daftar')]],
+        ['/daftar-kolam', 'Daftar Kolam', 'auth', [F('Daftar sebagai kolam', [['Nama kolam', 'Nama kolam'], ['Kota', 'Cianjur'], ['Nomor HP', '08xx']], 'Daftar')]],
+        ['/perjanjian', 'Perjanjian', 'auth', [X('Perjanjian kemitraan', 'Baca dan setujui sebelum melanjutkan.'), F(null, [['Persetujuan', 'Saya menyetujui']], 'Setuju')]],
+        ['/ganti-password', 'Ganti Password', 'auth', [F('Ganti Password', [['Password lama', '••••••'], ['Password baru', '••••••']], 'Simpan')]],
+        ['/keamanan', 'Keamanan (2FA)', 'auth', [F('Pasang 2FA', [['Kode dari aplikasi', '000000']], 'Aktifkan'), N('Simpan kode cadangan di tempat aman.', 'info')]],
+        ['/profil', 'Profil Saya', 'app', [F('Profil Saya', [['Nama', 'Ibu Rina'], ['Nomor HP', '0812…'], ['Kota', 'Cianjur']], 'Simpan'), N('Notifikasi push: aktif.', 'info')]],
+        ['/milestone/[dependentId]', 'Perkembangan Peserta', 'plain', [H('Perkembangan', 'Perkembangan Alya', '5 dari 12 butir selesai', 'Lihat sertifikat'), L('Butir', [['Masuk air', 'Selesai', ''], ['Mengapung', 'Selesai', ''], ['Gaya bebas', 'Berjalan', '']])]],
+        ['/milestone/[dependentId]/sertifikat/[completionId]', 'Sertifikat', 'plain', [H('Sertifikat', 'Alya', 'Menyelesaikan Level 1: Pengenalan air', 'Unduh')]],
+        ['/pembayaran/sukses', 'Pembayaran Berhasil', 'auth', [X('Pembayaran berhasil', 'Paket 8 Sesi untuk Alya sudah aktif. Booking sesi pertamamu.'), F(null, [], 'Booking sekarang')]],
+        ['/pembayaran/gagal', 'Pembayaran Gagal', 'auth', [X('Pembayaran gagal', 'Tidak ada uang yang terpotong. Coba lagi atau pilih metode lain.'), F(null, [], 'Coba lagi')]],
+        ['/syarat-ketentuan', 'Syarat & Ketentuan', 'plain', LEGAL(0, 'Syarat dan ketentuan penggunaan Swim Private Hub.')],
+        ['/kebijakan-privasi', 'Kebijakan Privasi', 'plain', LEGAL(0, 'Data apa yang dikumpulkan dan cara penggunaannya.')],
+        ['/kebijakan-pengembalian', 'Kebijakan Pengembalian', 'plain', LEGAL(0, 'Ketentuan pembatalan dan pengembalian sesi.')],
+        ['/kebijakan-cookie', 'Kebijakan Cookie', 'plain', LEGAL(0, 'Cookie yang dipakai dan cara mengaturnya.')],
+      ],
+      auth: [
+        ['/(auth)/login', 'Masuk', 'auth', [F('Masuk', [['Email atau nomor HP', 'nama@email.com'], ['Password', '••••••']], 'Masuk'), N('Belum punya akun? Daftar.', 'info')]],
+        ['/(auth)/register', 'Daftar', 'auth', [F('Buat akun', [['Nama', 'Nama panjang'], ['Nomor HP', '08xx'], ['Password', '••••••']], 'Daftar')]],
+      ],
+    };
+  }
+
+  renderVals() {
+    const dark = this.props.theme === 'dark';
+    const light = { '--pg': '#E6E4D8', '--bg': '#F6F6EE', '--sf': '#FFFFFF', '--bd': '#DEDACA', '--ink': '#14140F', '--mu': '#5C5945', '--sm': '#ECE9DC', '--br': '#14140F', '--b5': '#9FCC1F', '--b50': '#F1FBDD', '--b6': '#14140F', '--ok': '#047857', '--okbg': '#ECFDF5', '--wa': '#A8480A', '--wabg': '#FFFBEB', '--dg': '#B91C1C', '--dgbg': '#FEF2F2' };
+    const dk = { '--pg': '#0B0B08', '--bg': '#191A17', '--sf': '#282A25', '--bd': '#4A4C44', '--ink': '#E8E6DC', '--mu': '#B6B3A5', '--sm': '#32342E', '--br': '#B9E063', '--b5': '#BDE85A', '--b50': '#2A3119', '--b6': '#5A7A12', '--ok': '#6FD6A8', '--okbg': '#1B3A2D', '--wa': '#F2C14E', '--wabg': '#3D2F12', '--dg': '#F29191', '--dgbg': '#3F2023' };
+    const P = this.pages();
+    let total = 0;
+    const tag = (v) => {
+      const ok = /^(Hadir|Aktif|Berhasil|Tampil|Selesai|Dibalas)$/.test(v), wa = /^(Tandai|Tinjau|Buka|Setujui|Ingatkan|Baru|Menunggu)$/.test(v), dg = /^(Gagal|Dibatalkan|Batalkan)$/.test(v), br = /^(Kosong|Terjadwal|Berjalan)$/.test(v);
+      const c = ok ? ['var(--okbg)', 'var(--ok)'] : wa ? ['var(--wabg)', 'var(--wa)'] : dg ? ['var(--dgbg)', 'var(--dg)'] : br ? ['var(--b50)', 'var(--br)'] : ['var(--sm)', 'var(--mu)'];
+      return { fontSize: 11, fontWeight: 500, padding: '2px 10px', borderRadius: 999, whiteSpace: 'nowrap', background: c[0], color: c[1], border: '1px solid ' + (br || !(ok || wa || dg) ? 'var(--bd)' : 'transparent') };
+    };
+    const isTag = (v) => /^(Hadir|Aktif|Berhasil|Kosong|Tampil|Selesai|Dibalas|Tandai|Tinjau|Buka|Setujui|Ingatkan|Batalkan|Terisi|Baru|Terjadwal|Menunggu|Gagal|Dibatalkan|Berjalan)$/.test(v);
+    const card = { background: 'var(--sf)', border: '1px solid var(--bd)', borderRadius: 16, padding: 16, display: 'flex', flexDirection: 'column', gap: 10, boxShadow: '0 2px 10px -2px rgba(20,20,15,.08)' };
+
+    const mkBlocks = (blocks, m, title) => {
+      const out = [{ isTitle: true, title, s: { fontSize: m ? 20 : 22, fontWeight: 700, letterSpacing: -.6, marginBottom: 2 } }];
+      blocks.forEach(b => {
+        const base = { isTitle: false, isStats: false, isHero: false, isCard: false, isForm: false, isText: false, isNotice: false, isCards: false, isCal: false };
+        if (b.t === 'stats') out.push({ ...base, isStats: true, s: { display: 'grid', gridTemplateColumns: m ? '1fr 1fr' : 'repeat(' + Math.min(b.items.length, 4) + ',1fr)', gap: 10 }, items: b.items.map(i => ({ a: i[0], b: i[1], c: i[2], s: { ...card, gap: 3, padding: 12 }, vs: { fontSize: m ? 16 : 20, fontWeight: 700, letterSpacing: -.5 } })) });
+        else if (b.t === 'hero') out.push({ ...base, isHero: true, eyebrow: b.eyebrow, title: b.title, body: b.body, cta: b.cta, s: { background: 'var(--b50)', border: '1px solid rgba(90,122,18,.4)', color: 'var(--ink)', borderRadius: 16, padding: m ? 16 : 20, display: 'flex', flexDirection: 'column', gap: 6 }, ts: { fontSize: m ? 17 : 20, fontWeight: 600, lineHeight: 1.25, fontFamily: 'Sora' } });
+        else if (b.t === 'table' || b.t === 'list') {
+          const isT = b.t === 'table', cols = isT ? b.cols : null;
+          const rows = b.rows.map(r => {
+            const cells = r.map((v, i) => ({ v, s: isTag(v) ? tag(v) : (i === 0 ? { fontWeight: 600 } : { color: 'var(--mu)' }) }));
+            if (isT && !m) return { cells, s: { display: 'grid', gridTemplateColumns: 'repeat(' + cols.length + ',1fr)', gap: 8, alignItems: 'center', fontSize: 12, padding: '10px 0', borderTop: '1px solid var(--bd)' } };
+            const vis = cells.filter(c => c.v !== '');
+            return { cells: vis, s: { display: 'flex', flexWrap: m ? 'wrap' : 'nowrap', justifyContent: 'space-between', alignItems: 'center', gap: m ? 4 : 12, fontSize: 12, padding: '10px 0', borderTop: '1px solid var(--bd)' } };
+          });
+          out.push({ ...base, isCard: true, s: card, head: b.head, hasHead: !!b.head, hasCols: isT && !m, cols, colS: { display: 'grid', gridTemplateColumns: 'repeat(' + (cols ? cols.length : 1) + ',1fr)', gap: 8, fontSize: 10, fontWeight: 600, color: 'var(--mu)', textTransform: 'uppercase', letterSpacing: .5 }, rows });
+        } else if (b.t === 'form') out.push({ ...base, isForm: true, s: { ...card, gap: 12 }, head: b.head, hasHead: !!b.head, fields: b.fields, cta: b.cta });
+        else if (b.t === 'text') out.push({ ...base, isText: true, s: card, head: b.head, body: b.body });
+        else if (b.t === 'notice') out.push({ ...base, isNotice: true, body: b.body, s: { fontSize: 12, lineHeight: 1.5, padding: '10px 14px', borderRadius: 12, background: 'var(--sm)', color: b.tone === 'warn' ? 'var(--wa)' : 'var(--ink)' } });
+        else if (b.t === 'cards') out.push({ ...base, isCards: true, s: { display: 'grid', gridTemplateColumns: m ? '1fr' : 'repeat(' + Math.min(b.items.length, 3) + ',1fr)', gap: 10 }, items: b.items.map(i => ({ ...i, s: { ...card, gap: 4 } })) });
+        else if (b.t === 'cal') {
+          const days = ['S', 'S', 'R', 'K', 'J', 'S', 'M'].map(v => ({ v, s: { fontSize: 10, color: 'var(--mu)', padding: 2 } }));
+          for (let i = 0; i < 3; i++) days.push({ v: '', s: { height: m ? 26 : 28 } });
+          for (let d = 1; d <= 31; d++) days.push({ v: String(d), s: { height: m ? 26 : 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, borderRadius: 8, fontWeight: d === 5 ? 700 : 400, background: d === 5 ? '#14140F' : 'transparent', color: d === 5 ? '#F6F6EE' : (d < 5 ? 'var(--mu)' : 'var(--ink)'), opacity: d < 5 ? .5 : 1 } });
+          out.push({ ...base, isCal: true, s: card, days });
+        }
+      });
+      return out;
+    };
+
+    const groups = [], sections = [];
+    ['member', 'coach', 'pool', 'admin', 'pub', 'auth'].forEach(role => {
+      const list = P[role]; const nav = this.NAV[role];
+      const pages = list.map((p, i) => {
+        total++;
+        const [route, title, shell, blocks] = p, id = this.RP[role] + (i + 1);
+        const hasNav = shell === 'app' && nav, appM = shell === 'app-m';
+        const nv = this.NAV[role] || (title === 'Profil Saya' ? this.NAV.member : null), rk = this.NAV[role] ? role : 'member';
+        const hasNav2 = shell === 'app' && !!nv;
+        const act = hasNav2 ? nv.findIndex(n => n[0] === title || (title.indexOf('Dashboard') === 0 && n[0] === 'Dashboard')) : -1;
+        const mkNav = () => { const o = []; let g = null; nv.forEach((n, k) => { if (n[1] !== g) { g = n[1]; if (g) o.push({ label: g, style: { fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: .5, color: 'var(--mu)', padding: '8px 12px 2px' } }); } o.push({ label: n[0], style: { fontSize: 12, padding: '8px 12px', borderRadius: 8, fontWeight: k === act ? 600 : 400, background: k === act ? 'var(--b6)' : 'transparent', color: k === act ? '#fff' : 'var(--mu)' } }); }); return o; };
+        const prim = hasNav2 ? this.PRIM[rk] : [], pact = act >= 0 ? prim.findIndex(l => nv[act][0].indexOf(l) === 0) : -1;
+        const nav4 = hasNav2 ? [...prim, 'Lainnya'].map((l, k) => { const on = k === (pact >= 0 ? pact : prim.length); return { label: l, bs: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, fontSize: 9, fontWeight: 600, padding: '6px 0', borderRadius: 10, background: on ? 'var(--b6)' : 'transparent', color: on ? '#fff' : 'var(--mu)' }, dot: { width: 16, height: 16, borderRadius: 5, border: '2px solid currentColor' } }; }) : [];
+        const centered = shell === 'auth', plain = shell === 'plain';
+        const dc = { flex: 1, minWidth: 0, overflow: 'hidden', padding: 22, display: 'flex', flexDirection: 'column', gap: 12, background: 'var(--bg)', alignItems: 'stretch' };
+        const desk = {
+          desk: true, mob: false, topH: 0, user: this.USER[role], side: hasNav2, nav: hasNav2 ? mkNav() : [], bottom: false, nav4: [],
+          frame: { width: 1180, minHeight: 720, flex: 'none', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--bd)', background: 'var(--bg)', display: 'flex', flexDirection: 'column', boxShadow: '0 1px 3px rgba(0,0,0,.08)' },
+          content: { ...dc, padding: centered ? '40px 330px' : (plain ? '30px 120px' : 24), justifyContent: centered ? 'center' : 'flex-start' },
+          blocks: mkBlocks(blocks, false, title),
+        };
+        const mob = {
+          desk: false, mob: true, topH: 54, user: '', side: false, nav: [], bottom: hasNav2, nav4,
+          frame: { width: 360, minHeight: 720, flex: 'none', borderRadius: 38, overflow: 'hidden', border: '8px solid #14140F', background: 'var(--bg)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' },
+          content: { ...dc, padding: '8px 16px 16px', justifyContent: centered ? 'center' : 'flex-start' },
+          blocks: mkBlocks(blocks, true, title),
+        };
+        return { id, route, title, vps: [desk, mob] };
+      });
+      groups.push({ label: this.RN[role], n: pages.length, href: '#' + this.RP[role] + '1' });
+      sections.push({ id: 'sec-' + role, label: this.RN[role], n: pages.length, pages });
+    });
+    return { themeStyle: dark ? dk : light, total, groups, sections };
+  }
+}
+</script>
+</body>
+</html>

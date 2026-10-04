@@ -5,6 +5,7 @@ import CheckoutButton from "./checkout-button";
 import { trialBlockingPackageWhere } from "@/lib/trial";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SegmentBar } from "@/components/dashboard";
 import { formatTimeWib, formatDateWib } from "@/lib/datetime";
 import { expireStaleCoachChanges } from "@/lib/coach-change-actions-core";
 import { releaseStalePayments } from "@/lib/stale-payments";
@@ -346,6 +347,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                               Sisa <b className="text-text">{p.sisaSesi}</b> dari {p.totalSesi} sesi
                               {p.expiredDate && <> · berlaku s.d. {formatDateWib(p.expiredDate)}</>}
                             </p>
+                            {p.status === "ACTIVE" && <SegmentBar sisa={p.sisaSesi} total={p.totalSesi} className="mt-2 w-48 max-w-full" />}
                           </div>
                           {used ? (
                             <Badge tone="neutral">{p._count.bookings > 0 ? "Semua sesi sudah dijadwalkan" : "Sesi habis"}</Badge>

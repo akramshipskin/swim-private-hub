@@ -19,7 +19,7 @@ export function BentoCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card className={cn("flex flex-col", className)}>
+    <Card className={cn("flex flex-col rounded-3xl", className)}>
       <CardBody className="flex flex-1 flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           <h2 className="min-w-0 text-base font-semibold text-text">{title}</h2>
@@ -106,42 +106,136 @@ export function SessionList({ items, empty, limit = 6 }: { items: SessionItem[];
   );
 }
 
-// Kartu "Langkah berikutnya" di puncak dasbor (rombak UI 4 Okt, opsi A): satu
-// tindakan utama per peran, supaya pengguna langsung tahu harus apa.
+// Kartu utama di puncak dasbor (desain Claude Design 4 Okt, rombak UI opsi A):
+// satu tindakan utama per peran. tone "dark" = kartu gelap besar (lime di mode
+// gelap); "soft" = kartu lembut, dipakai bila ada kartu gelap lain di sebelahnya.
+// kicker = baris kecil di atas judul (mis. nama hari); bila ada, judul tampil besar
+// (mis. jam sesi). badge = pil kecil di kanan atas (mis. "dalam 1 hari").
 export function NextStepCard({
   eyebrow = "Langkah berikutnya",
+  badge,
+  kicker,
   title,
   body,
   href,
   cta,
   secondary,
+  tone = "dark",
+  className,
+  children,
 }: {
   eyebrow?: string;
+  badge?: string;
+  kicker?: string;
   title: string;
   body?: React.ReactNode;
   href?: string;
   cta?: string;
   secondary?: { href: string; label: string };
+  tone?: "dark" | "soft";
+  className?: string;
+  children?: React.ReactNode;
 }) {
+  const dark = tone === "dark";
   return (
-    <section aria-label={eyebrow} className="rounded-2xl border border-brand-600/40 bg-brand-50 p-4 sm:p-5">
-      <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">{eyebrow}</p>
-      <p className="mt-1 text-lg font-semibold text-text sm:text-xl">{title}</p>
-      {body && <div className="mt-1 text-sm text-text-muted">{body}</div>}
+    <section
+      aria-label={eyebrow}
+      className={cn(
+        "rounded-3xl p-5 sm:p-6",
+        dark ? "bg-hero text-hero-ink" : "border border-brand-600/40 bg-brand-50 text-text",
+        className
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className={cn("text-xs font-semibold uppercase tracking-wide", dark ? "text-hero-accent" : "text-brand-700")}>{eyebrow}</p>
+        {badge && (
+          <span className={cn("shrink-0 rounded-full px-3 py-1 text-xs font-semibold", dark ? "bg-hero-ink/15 text-hero-ink" : "bg-surface text-text")}>{badge}</span>
+        )}
+      </div>
+      {kicker && <p className={cn("mt-3 text-base font-medium", dark ? "text-hero-muted" : "text-text-muted")}>{kicker}</p>}
+      <p className={cn("font-bold tabular-nums leading-tight", kicker ? "mt-1 text-3xl sm:text-4xl" : "mt-2 text-xl sm:text-2xl")}>{title}</p>
+      {body && <div className={cn("mt-2 text-sm", dark ? "text-hero-muted" : "text-text-muted")}>{body}</div>}
+      {children}
       {(href || secondary) && (
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-3">
           {href && cta && (
-            <Link href={href} className={buttonClass({ className: "max-sm:w-full" })}>
+            <Link
+              href={href}
+              className={cn(
+                "inline-flex min-h-[48px] items-center justify-center rounded-2xl px-5 text-sm font-bold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full",
+                dark ? "bg-hero-accent text-hero hover:opacity-90" : "bg-brand-600 text-white hover:bg-fixed-ink-deep"
+              )}
+            >
               {cta}
             </Link>
           )}
           {secondary && (
-            <Link href={secondary.href} className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+            <Link
+              href={secondary.href}
+              className={cn("text-sm font-medium underline-offset-2 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center", dark ? "text-hero-ink" : "text-brand-700")}
+            >
               {secondary.label} &rarr;
             </Link>
           )}
         </div>
       )}
+    </section>
+  );
+}
+
+// Progres sisa sesi paket: satu segmen per sesi (maks 16; lebih dari itu satu
+// batang proporsional). tone "hero" dipakai di dalam kartu gelap.
+export function SegmentBar({ sisa, total, tone = "default", className }: { sisa: number; total: number; tone?: "default" | "hero"; className?: string }) {
+  const hero = tone === "hero";
+  const on = hero ? "bg-hero-accent" : "bg-brand-500";
+  const off = hero ? "bg-hero-ink/20" : "bg-surface-muted";
+  const left = Math.max(0, Math.min(sisa, total));
+  const label = `Sisa ${left} dari ${total} sesi`;
+  if (total <= 0) return null;
+  if (total > 16) {
+    return (
+      <div role="img" aria-label={label} className={cn("h-2 overflow-hidden rounded-full", off, className)}>
+        <div className={cn("h-full rounded-full", on)} style={{ width: `${(left / total) * 100}%` }} />
+      </div>
+    );
+  }
+  return (
+    <div role="img" aria-label={label} className={cn("flex gap-1", className)}>
+      {Array.from({ length: total }, (_, i) => (
+        <span key={i} className={cn("h-2 flex-1 rounded-full", i < left ? on : off)} />
+      ))}
+    </div>
+  );
+}
+
+// Kartu saldo gelap untuk coach dan pemilik kolam. Tombol hanya tautan ke halaman
+// Saldo yang sudah ada (aturan pencairan tetap di sana).
+export function BalanceCard({
+  label,
+  amount,
+  hint,
+  href,
+  cta,
+  className,
+}: {
+  label: string;
+  amount: string;
+  hint?: React.ReactNode;
+  href: string;
+  cta: string;
+  className?: string;
+}) {
+  return (
+    <section aria-label={label} className={cn("flex flex-col rounded-3xl bg-hero p-5 text-hero-ink sm:p-6", className)}>
+      <p className="text-xs font-semibold uppercase tracking-wide text-hero-accent">{label}</p>
+      <p className="mt-2 text-3xl font-bold leading-tight tabular-nums sm:text-4xl">{amount}</p>
+      {hint && <div className="mt-2 text-sm text-hero-muted">{hint}</div>}
+      <Link
+        href={href}
+        className="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-hero-accent px-5 text-sm font-bold text-hero transition-all duration-150 hover:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full md:mt-auto md:self-start"
+      >
+        {cta}
+      </Link>
     </section>
   );
 }

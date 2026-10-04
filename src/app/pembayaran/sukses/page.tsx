@@ -61,7 +61,7 @@ export default async function PembayaranSuksesPage({
                 ? "bg-danger-bg text-danger-text"
                 : isPending || isUnknown
                   ? "bg-warning-bg text-warning-text"
-                  : "bg-success-bg text-success-text"
+                  : "bg-brand-500 text-fixed-ink"
             }`}
           >
             {isUnknown ? (
