@@ -2,7 +2,7 @@
 
 Dimuat otomatis di awal sesi. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: 5624d62 (4 Okt siang; Vercel sukses; GitHub Test: lihat catatan di bawah). Tidak ada migrasi baru di main sejak kota. Cabang `lonceng-notifikasi` (fd5d239) BELUM digabung: berisi migrasi baru.
+## Terakhir live: 5624d62 (4 Okt siang; Vercel sukses; GitHub Test hijau untuk 5624d62; fcef4e8 merah hanya karena uji alur penuh belum mengikuti booking dua langkah, sudah diperbaiki). Tidak ada migrasi baru di main sejak kota. Cabang `lonceng-notifikasi` (fd5d239) BELUM digabung: berisi migrasi baru.
 
 ## Sudah selesai dan live (ringkas; rinci di docs/reviews/ dan docs/KEPUTUSAN.md)
 - Per 30 Sep-1 Okt: tanggal lahir di semua form daftar, testimoni, CSP, PPN komisi 11%, landing dirombak, backup DB+storage hijau, Vercel Singapura, brand v2, animasi landing + dalam aplikasi.
