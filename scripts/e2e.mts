@@ -199,7 +199,15 @@ try {
   await goto("/member/booking");
   await waitFor("pilihan tanggal", `[...document.querySelectorAll("button")].some((b) => b.querySelector("span.text-base")?.innerText.trim() === "${s.tomorrowDay}")`);
   await js(`[...document.querySelectorAll("button")].find((b) => b.querySelector("span.text-base")?.innerText.trim() === "${s.tomorrowDay}").click()`);
-  await clickText("Booking");
+  // Booking dua langkah: ketuk jam (memilih), lalu tombol menempel "Booking <hari> · <jam>".
+  const slotBtn = `[...document.querySelectorAll("button[aria-pressed]")].find((b) => b.innerText.includes("Kosong") && !b.disabled)`;
+  await waitFor("jam kosong", slotBtn);
+  await js(`${slotBtn}.click()`);
+  const bookBtn = `[...document.querySelectorAll("button")].find((b) => b.innerText.trim().startsWith("Booking ") && !b.disabled)`;
+  await waitFor("tombol booking menempel", bookBtn);
+  await js(`${bookBtn}.click()`);
+  await waitFor("layar sukses booking", `document.body.innerText.includes("Slot terkunci untukmu")`);
+  await clickText("Booking sesi lain");
   await waitFor("booking tersimpan", `[...document.querySelectorAll("button")].some((b) => b.innerText.trim() === "Batalkan")`);
   expectEq("sisa sesi setelah booking", (await prisma.package.findUniqueOrThrow({ where: { id: bought.id } })).sisaSesi, 3);
   await clickText("Batalkan");
