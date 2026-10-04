@@ -75,8 +75,30 @@ async function deliver(userIds: string[], payload: Payload) {
 // Dijadwalkan lewat after(): di serverless (Vercel) promise yang dilempar
 // begitu saja bisa terputus saat fungsi selesai membalas, jadi push gak
 // sampai. Di luar request (tes/skrip) after() melempar error -> jalan langsung.
+//
+// Riwayat lonceng (Hadi 4 Okt) diisi di sini juga: 1 baris per penerima,
+// 1 query createMany untuk semua penerima, TERLEPAS dari VAPID/langganan
+// (push mati tetap tercatat). Gagal simpan cukup dicatat di log -- tidak
+// boleh menggagalkan aksi utama atau menghentikan push.
+async function record(userIds: string[], payload: Payload) {
+  const ids = [...new Set(userIds)];
+  if (ids.length === 0) return;
+  await prisma.inAppNotification.createMany({
+    data: ids.map((userId) => ({ userId, title: payload.title, body: payload.body, url: payload.url ?? null })),
+  });
+}
+
 async function schedule(userIds: string[], payload: Payload) {
-  const job = () => deliver(userIds, payload).catch(() => {});
+  // Simpan riwayat & kirim push berjalan bersamaan; masing-masing menelan
+  // kegagalannya sendiri.
+  const job = async () => {
+    await Promise.all([
+      record(userIds, payload).catch((err: unknown) => {
+        console.error(`[notifikasi] gagal menyimpan "${payload.title}": ${(err as Error)?.message ?? "error"}`);
+      }),
+      deliver(userIds, payload).catch(() => {}),
+    ]);
+  };
   try {
     after(job);
   } catch {

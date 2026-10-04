@@ -15,8 +15,10 @@ vi.mock("next/server", () => ({ after: (...a: unknown[]) => after(...a) }));
 const subFindMany = vi.fn();
 const subDelete = vi.fn();
 const userFindMany = vi.fn();
+const notifCreateMany = vi.fn();
 vi.mock("@/lib/prisma", () => ({
   prisma: {
+    inAppNotification: { createMany: (...a: unknown[]) => notifCreateMany(...a) },
     pushSubscription: { findMany: (...a: unknown[]) => subFindMany(...a), delete: (...a: unknown[]) => subDelete(...a) },
     user: { findMany: (...a: unknown[]) => userFindMany(...a) },
   },
@@ -33,6 +35,7 @@ beforeEach(() => {
   process.env.VAPID_PRIVATE_KEY = "priv";
   subFindMany.mockResolvedValue([sub]);
   sendNotification.mockResolvedValue({});
+  notifCreateMany.mockResolvedValue({ count: 1 });
   after.mockImplementation((job: () => Promise<void>) => job());
 });
 
@@ -138,5 +141,75 @@ describe("sendPushToUsers", () => {
     sendNotification.mockRejectedValueOnce({ statusCode: 500 }).mockResolvedValueOnce({});
     await sendPushToUsers(["u1", "u2"], { title: "t", body: "b" });
     await vi.waitFor(() => expect(sendNotification).toHaveBeenCalledTimes(2));
+  });
+});
+
+describe("riwayat lonceng (InAppNotification)", () => {
+  it("menyimpan 1 baris untuk 1 penerima, dengan url", async () => {
+    await sendPushToUser("u1", { title: "Judul", body: "Isi", url: "/member/dashboard" });
+    expect(notifCreateMany).toHaveBeenCalledTimes(1);
+    expect(notifCreateMany).toHaveBeenCalledWith({ data: [{ userId: "u1", title: "Judul", body: "Isi", url: "/member/dashboard" }] });
+  });
+
+  it("menyimpan semua penerima dalam SATU createMany (duplikat dibuang), url kosong = null", async () => {
+    await sendPushToUsers(["u1", "u2", "u1", "u3"], { title: "t", body: "b" });
+    expect(notifCreateMany).toHaveBeenCalledTimes(1);
+    expect(notifCreateMany.mock.calls[0][0].data).toEqual([
+      { userId: "u1", title: "t", body: "b", url: null },
+      { userId: "u2", title: "t", body: "b", url: null },
+      { userId: "u3", title: "t", body: "b", url: null },
+    ]);
+  });
+
+  it("siaran ke role: 1 query pengguna + 1 createMany untuk semuanya", async () => {
+    userFindMany.mockResolvedValue([{ id: "a1" }, { id: "a2" }, { id: "a3" }]);
+    await sendPushToRole("ADMIN", { title: "t", body: "b", url: "/admin" });
+    expect(userFindMany).toHaveBeenCalledTimes(1);
+    expect(notifCreateMany).toHaveBeenCalledTimes(1);
+    expect(notifCreateMany.mock.calls[0][0].data.map((r: { userId: string }) => r.userId)).toEqual(["a1", "a2", "a3"]);
+  });
+
+  it("tetap menyimpan riwayat saat VAPID kosong (push dilewati)", async () => {
+    vi.resetModules();
+    delete process.env.VAPID_PRIVATE_KEY;
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fresh = await import("./push");
+    await fresh.sendPushToUser("u1", { title: "t", body: "b" });
+    expect(sendNotification).not.toHaveBeenCalled();
+    expect(notifCreateMany).toHaveBeenCalledWith({ data: [{ userId: "u1", title: "t", body: "b", url: null }] });
+    warn.mockRestore();
+  });
+
+  it("tetap menyimpan riwayat saat penerima tidak punya langganan push", async () => {
+    subFindMany.mockResolvedValue([]);
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    await sendPushToUser("u1", { title: "t", body: "b" });
+    expect(notifCreateMany).toHaveBeenCalledTimes(1);
+    info.mockRestore();
+  });
+
+  it("gagal menyimpan: tidak melempar, dicatat di log, push tetap dikirim", async () => {
+    notifCreateMany.mockRejectedValue(new Error("db putus"));
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(sendPushToUser("u1", { title: "Judul", body: "b" })).resolves.toBeUndefined();
+    await vi.waitFor(() => expect(sendNotification).toHaveBeenCalledTimes(1));
+    expect(error).toHaveBeenCalledWith('[notifikasi] gagal menyimpan "Judul": db putus');
+    error.mockRestore();
+  });
+
+  it("gagal menyimpan saat after() tidak tersedia (di luar request) juga tidak melempar", async () => {
+    after.mockImplementation(() => {
+      throw new Error("outside");
+    });
+    notifCreateMany.mockRejectedValue(new Error("db putus"));
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(sendPushToUser("u1", { title: "t", body: "b" })).resolves.toBeUndefined();
+    expect(sendNotification).toHaveBeenCalledTimes(1);
+    error.mockRestore();
+  });
+
+  it("daftar penerima kosong: tidak menyimpan apa pun", async () => {
+    await sendPushToUsers([], { title: "t", body: "b" });
+    expect(notifCreateMany).not.toHaveBeenCalled();
   });
 });
