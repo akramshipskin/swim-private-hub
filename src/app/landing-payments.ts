@@ -19,7 +19,4 @@ export const PAYMENT_METHODS: { label: string; logo?: string }[] = [
   { label: "BNI", logo: "/images/payments/bni.svg" },
   { label: "BRI", logo: "/images/payments/bri.svg" },
   { label: "Permata", logo: "/images/payments/permata.svg" },
-  { label: "Visa", logo: "/images/payments/visa.svg" },
-  { label: "Mastercard", logo: "/images/payments/mastercard.svg" },
-  { label: "JCB", logo: "/images/payments/jcb.svg" },
 ];

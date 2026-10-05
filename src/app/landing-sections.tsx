@@ -138,8 +138,8 @@ const PARENT_POINTS: Point[] = [
     body: "Peserta tidak membayar tiket lagi di loket. Tiket per sesi sudah mencakup 1 peserta, 1 pendamping, dan coach-nya.",
   },
   {
-    title: "Benar-benar privat: 1 coach, 1 anak",
-    body: "Setiap sesi berlangsung 60 menit dan dijadwalkan khusus untuk anakmu. Bukan kelas gabungan.",
+    title: "Benar-benar privat: 1 coach, 1 peserta",
+    body: "Setiap sesi berlangsung 60 menit dan dijadwalkan khusus untuk pesertanya. Bukan kelas gabungan.",
   },
   {
     title: "Kamu yang memilih coach",
@@ -147,7 +147,7 @@ const PARENT_POINTS: Point[] = [
   },
   {
     title: "Perkembangan anak tercatat",
-    body: "Coach mencatat kemampuan yang sudah dikuasai, dari mengapung sampai gaya bebas. Kamu bisa melihatnya kapan saja, dan anak mendapat sertifikat setiap naik level.",
+    body: "Coach mencatat kemampuan yang sudah dikuasai, dari mengapung sampai gaya bebas. Kamu bisa melihatnya kapan saja, dan anak mendapat sertifikat saat naik level bersama coach.",
   },
   {
     title: "Keselamatan kolam jelas penanggung jawabnya",
@@ -225,7 +225,7 @@ const COACH_CELLS: { title: string; body: string }[] = [
   },
   {
     title: "Tarifmu, kamu yang tentukan",
-    body: "Pasang harga paket 4 dan 8 sesi sendiri, satu harga untuk semua kolam tempat kamu mengajar. Biaya layanan SPH dibayar member di atas harga itu, bukan dipotong dari bagianmu. Buka jam kosong, tandai kehadiran, dan saldomu langsung bertambah.",
+    body: "Pasang harga paket 4 dan 8 sesi sendiri, satu harga untuk semua kolam tempat kamu mengajar. Biaya layanan Swim Private Hub (SPH) dibayar member di atas harga itu, bukan dipotong dari bagianmu. Buka jam kosong, tandai kehadiran, dan saldomu langsung bertambah.",
   },
   {
     title: "Tanpa biaya masuk kolam",
@@ -237,11 +237,11 @@ const COACH_CELLS: { title: string; body: string }[] = [
   },
   {
     title: "Kredensialmu tampil profesional",
-    body: "Unggah beberapa sertifikat dan tampil dengan badge Bersertifikat setelah diperiksa admin. Peserta yang naik level mendapat sertifikat bertanda tanganmu.",
+    body: "Unggah beberapa sertifikat dan tampil dengan badge Bersertifikat setelah diperiksa admin. Peserta yang naik level mendapat sertifikat atas namamu (dengan tanda tanganmu bila sudah diunggah).",
   },
   {
     title: "Semua pihak melihat angka yang sama",
-    body: "Bagianmu dari setiap sesi tercatat jelas, dipotong PPh final 0,5% yang disetor SPH atas namamu. Pencairan diproses manual oleh admin, secepatnya, dan statusnya terlihat.",
+    body: "Bagianmu dari setiap sesi tercatat jelas, dipotong PPh final 0,5% yang disetor SPH atas namamu. Pencairan diproses manual oleh admin secepatnya, paling lambat 7 hari kerja, dan statusnya terlihat.",
   },
 ];
 

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { Logotype } from "@/components/ui/logotype";
-import { buildOwnerInquiryWaLink } from "@/lib/whatsapp";
+import { buildAdminWaLink, buildOwnerInquiryWaLink } from "@/lib/whatsapp";
 import { BUSINESS_ADDRESS } from "@/lib/business";
 import { formatRupiah } from "@/lib/format";
 import { CANCEL_WINDOW_HOURS, MIN_WITHDRAWAL } from "@/lib/policy";
@@ -49,6 +49,8 @@ export type LandingCoach = {
 };
 
 const OWNER_WA_LINK = buildOwnerInquiryWaLink();
+// Tautan "Hubungi kami" di footer untuk semua pengunjung (bukan hanya pemilik kolam).
+const ADMIN_WA_LINK = buildAdminWaLink("Halo Admin Swim Private Hub, saya ingin bertanya.");
 
 // Video latar hero (desktop saja). Pexels #6012384 (Tima Miroshnichenko, lisensi
 // Pexels: bebas dipakai komersial), dipotong detik 2,2-19 supaya wajah perenang
@@ -66,7 +68,7 @@ const AUDIENCES: AudienceSteps[] = [
     label: "Orang tua / peserta",
     steps: [
       { title: "Daftar & tambah peserta", body: "Satu akun untuk kamu sendiri dan/atau beberapa anak. Setiap peserta punya paket dan sisa sesi sendiri." },
-      { title: "Pilih coach & kolam, lalu beli paket", body: "Harga tampil rinci sebelum bayar: tiket kolam, jasa coach, dan biaya layanan SPH. Belum yakin? Mulai dari 1 sesi coba. Bayar online lewat Midtrans (saldo di akunmu dipakai dulu), paket langsung aktif." },
+      { title: "Pilih coach & kolam, lalu beli paket", body: "Harga tampil rinci sebelum bayar: tiket kolam, jasa coach, dan biaya layanan Swim Private Hub (SPH). Belum yakin? Mulai dari 1 sesi coba. Bayar online lewat Midtrans (saldo di akunmu dipakai dulu), paket langsung aktif." },
       { title: "Booking jam yang masih kosong", body: "Pilih jam dari jadwal coach pilihanmu. Jam yang sudah diambil orang lain otomatis terkunci." },
       { title: "Datang & les", body: `Tidak bisa datang? Batalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelumnya, sesi kembali ke paket. Perkembangan peserta dicatat coach setelah sesi.` },
     ],
@@ -130,7 +132,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Bagaimana kalau batal mendadak?",
-        a: `Paket 4 sesi punya jatah batal 2 kali dan paket 8 sesi 4 kali, paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal; sesinya kembali ke paket. Di luar itu bisa menghubungi admin lewat tombol bantuan di aplikasi. Tidak hadir tanpa membatalkan berarti sesi tetap terpakai. Kalau ditandai Tidak Hadir padahal hadir, laporkan dari menu Riwayat paling lambat 3 hari setelah sesi.`,
+        a: `Paket 4 sesi punya jatah batal 2 kali dan paket 8 sesi 4 kali, paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal; sesinya kembali ke paket. Di luar itu bisa menghubungi admin lewat tombol Hubungi Admin di menu Riwayat Booking. Tidak hadir tanpa membatalkan berarti sesi tetap terpakai. Kalau ditandai Tidak Hadir padahal hadir, laporkan dari menu Riwayat Booking paling lambat 3 hari setelah sesi.`,
       },
       {
         q: "Kalau coach berhalangan, sesinya hangus?",
@@ -142,7 +144,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kalau tidak cocok dengan coach-nya?",
-        a: "Ajukan ganti coach dari menu Paket; sisa sesi ikut pindah ke coach baru setelah disetujui admin. Kalau coach baru lebih murah, selisihnya masuk ke saldomu. Kalau lebih mahal, kamu menambah selisihnya.",
+        a: "Ajukan ganti coach dari menu Paket; sisa sesi ikut pindah ke coach lain di kolam yang sama setelah disetujui admin. Kalau coach baru lebih murah, selisihnya masuk ke saldomu (dipakai untuk paket berikutnya, tidak bisa dicairkan). Kalau lebih mahal, kamu menambah selisihnya.",
       },
       {
         q: "Apakah coach-nya bersertifikat?",
@@ -210,7 +212,7 @@ const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: "Apa untungnya untuk kolam saya?",
-        a: "Kamu bisa membuka jam kosong untuk les privat satuan (1 coach, 1 peserta, bukan sewa club), dan setiap sesi yang terlaksana memberi bagian ke kolam secara otomatis. Kamu juga bisa melihat jam ramai kolam setiap hari. Kolammu tetap kolam umum: pengunjung dari mana pun tetap bisa masuk.",
+        a: "Jam kosong kolammu terisi les privat satuan (1 coach, 1 peserta, bukan sewa club) yang jadwalnya dibuka coach di dalam jam buka kolam, dan setiap sesi yang terlaksana memberi bagian ke kolam secara otomatis. Kamu juga bisa melihat jam ramai kolam setiap hari. Kolammu tetap kolam umum: pengunjung dari mana pun tetap bisa masuk.",
       },
       {
         q: "Siapa yang menentukan harga paket?",
@@ -226,11 +228,11 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Saya juga harus menyediakan coach?",
-        a: "Tidak harus. Coach yang sudah terdaftar di platform bisa diafiliasikan ke kolam kamu; kamu tetap bisa memakai coach sendiri kalau punya.",
+        a: "Tidak harus. Coach yang sudah disetujui SPH memilih sendiri kolam tempat mengajar, termasuk kolammu. Punya coach sendiri? Minta ia mendaftar lewat halaman Daftar Coach, lalu memilih kolammu.",
       },
       {
         q: "Bagaimana cara bergabung sebagai mitra?",
-        a: "Daftar lewat halaman Daftarkan Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin (diperiksa paling lambat 1×24 jam), kolam kamu langsung bisa menerima booking. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
+        a: "Daftar lewat halaman Daftar Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin (diperiksa paling lambat 1×24 jam), kolam kamu langsung bisa menerima booking. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
       },
     ],
   },
@@ -354,7 +356,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       <section aria-label="Ringkasan layanan" className="border-b border-fixed-ink/10">
         <ul className="mx-auto grid w-full max-w-6xl grid-cols-2 lg:grid-cols-4">
           {[
-            { t: "60 menit, 1 coach", d: "Untuk 1 anak, bukan kelas gabungan." },
+            { t: "60 menit, 1 coach", d: "Untuk 1 peserta, bukan kelas gabungan." },
             { t: "Tiket masuk termasuk", d: "Peserta tidak membayar lagi di loket." },
             { t: "Sertifikat diperiksa", d: "Badge Bersertifikat tampil setelah admin menyetujui." },
             { t: "Harga jelas di depan", d: "Tiket, jasa coach, dan biaya layanan tampil sebelum bayar." },
@@ -619,7 +621,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
 
           <div className="flex flex-col gap-1.5">
             <p className="font-semibold text-white">Hubungi kami</p>
-            <a href={OWNER_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+            <a href={ADMIN_WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               WhatsApp +62 821-1717-3124
             </a>
             <a href="mailto:hello@swimprivatehub.biz.id" className="hover:text-white hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">

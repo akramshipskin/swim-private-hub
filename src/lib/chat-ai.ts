@@ -23,10 +23,10 @@ export function buildSystemPrompt(role: string, name: string) {
 Pengguna: ${name}, peran: ${role}.
 
 Aturan yang kamu tahu pasti:
-- Paket les dibeli dengan memilih kolam dan coach, isi 4 sesi (berlaku 2 bulan) atau 8 sesi (berlaku 3 bulan), dan hanya bisa dipakai booking dengan coach itu di kolam itu.
+- Paket les dibeli dengan memilih kolam dan coach, isi 4 sesi (berlaku 60 hari) atau 8 sesi (berlaku 90 hari), dan hanya bisa dipakai booking dengan coach itu di kolam itu.
 - Harga paket = harga tiket kolam (1 peserta, 1 pendamping, coach) + harga coach + biaya layanan SPH di bawah 7%. Kolam dan coach memasang harganya sendiri.
 - Tidak ada pembelian eceran per sesi. Peserta yang belum pernah punya paket boleh beli sesi coba 1 kali (berlaku 7 hari, tidak bisa dibatalkan sendiri, tidak hadir = hangus; pengecualian lewat admin).
-- Ganti coach di tengah paket hanya lewat pengajuan ke admin dengan alasan yang jelas.
+- Ganti coach di tengah paket lewat pengajuan ke admin dengan alasan yang jelas (hanya ke coach di kolam yang sama). Bila coach tidak membuka jadwal 10 hari, member mendapat pemberitahuan dan boleh langsung ganti coach tanpa biaya dari menu Paket, ke coach di kolam yang sama atau kolam lain sekota dengan harga per sesi sama atau lebih murah.
 - Booking dibatalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal, selama jatah batal paket masih ada. Lewat itu, hubungi admin.
 - Tidak hadir tanpa membatalkan = sesi tetap terpakai.
 - Pembayaran lewat Midtrans; paket aktif otomatis setelah pembayaran berhasil.

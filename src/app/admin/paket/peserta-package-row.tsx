@@ -6,18 +6,7 @@ import { Field, Input, Select } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-const statusTone = {
-  PENDING_PAYMENT: "warning",
-  ACTIVE: "success",
-  EXPIRED: "neutral",
-} as const;
-
-const statusLabel: Record<string, string> = {
-  PENDING_PAYMENT: "Menunggu Pembayaran",
-  ACTIVE: "Aktif",
-  EXPIRED: "Kedaluwarsa",
-};
+import { packageStatusLabel } from "./package-status";
 
 function shortDate(d: Date) {
   return d.toLocaleDateString("id-ID", {
@@ -60,6 +49,8 @@ export default function PesertaPackageRow({
       </div>
     );
   }
+
+  const status = packageStatusLabel(pkg);
 
   return (
     <div className="py-3 first:pt-0 last:pb-0">
@@ -131,7 +122,7 @@ export default function PesertaPackageRow({
         </div>
 
         <div className="w-full rounded-lg bg-surface-muted px-4 py-3 sm:w-auto sm:shrink-0 sm:text-right">
-          <Badge tone={statusTone[pkg.status]}>{statusLabel[pkg.status]}</Badge>
+          <Badge tone={status.tone}>{status.label}</Badge>
           <p className="mt-2 text-sm font-semibold text-text">
             {pkg.sisaSesi}/{pkg.totalSesi} sesi
           </p>

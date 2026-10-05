@@ -237,6 +237,12 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* Radio dan kotak centang bawaan browser berwarna biru (di luar palet): ikut warna merek. */
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--color-brand-600);
+}
+
 body {
   /* Gradient asalnya cuma di landing page (bg-[radial-gradient(...)] di
      page.tsx) -- dipindah ke sini biar 1 sumber kepake di semua halaman/role,

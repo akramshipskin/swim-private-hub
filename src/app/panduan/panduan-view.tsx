@@ -35,7 +35,7 @@ const HIGHLIGHTS = [
   },
   {
     title: "Harga dari kolam dan coach",
-    body: "Kolam memasang harga tiket dan coach memasang harga jasanya, masing-masing untuk paket 4 sesi (berlaku 2 bulan) dan 8 sesi (berlaku 3 bulan). Member membayar keduanya ditambah biaya layanan SPH di bawah 7%. Harga baru langsung berlaku; paket yang sudah dibeli tidak berubah.",
+    body: "Kolam memasang harga tiket dan coach memasang harga jasanya, masing-masing untuk paket 4 sesi (berlaku 60 hari) dan 8 sesi (berlaku 90 hari). Member membayar keduanya ditambah biaya layanan SPH di bawah 7%. Harga baru langsung berlaku; paket yang sudah dibeli tidak berubah.",
   },
   {
     title: "Notifikasi dua arah",
@@ -71,8 +71,8 @@ const GUIDES: Guide[] = [
         heading: "3. Booking sesi",
         steps: [
           { title: "Pilih peserta, kolam, dan tanggal", body: "Sisa sesi, sisa jatah batal, dan nama paket peserta tampil di bagian atas halaman." },
-          { title: "Pilih coach & jam", body: "Jam kosong punya tombol Booking. Jam yang sudah diambil member lain otomatis terkunci." },
-          { title: "Selesai", body: "Sisa sesi berkurang 1, dan coach mendapat notifikasi kalau notifikasinya sudah aktif." },
+          { title: "Pilih jam", body: "Ketuk jam kosong coach paketmu, lalu tekan tombol Booking di bawah layar. Jam yang sudah diambil member lain otomatis terkunci." },
+          { title: "Selesai", body: "Muncul layar berhasil dengan kode booking. Sisa sesi berkurang 1, dan coach mendapat notifikasi kalau notifikasinya sudah aktif." },
         ],
         note: "Jadwal semua coach di kolam itu bisa dilihat, tapi yang bisa dibooking hanya jadwal coach paketmu.",
       },
@@ -89,7 +89,7 @@ const GUIDES: Guide[] = [
         heading: "5. Peserta, profil, dan bantuan",
         steps: [
           { title: "Menu Peserta", body: "Tambah peserta baru (dengan tanggal lahirnya), lihat paket aktif tiap peserta, atau nonaktifkan peserta yang sudah tidak les." },
-          { title: "Menu Profil Saya", body: "Ubah nama dan password. Klik Ubah dulu, baru bisa mengubah isinya." },
+          { title: "Menu Profil Saya", body: "Ubah nama dan password (klik Ubah dulu, baru bisa mengubah isinya), dan pilih kota domisili lewat Simpan kota." },
           { title: "Tombol bantuan", body: "Ada di pojok kanan bawah setelah masuk. Pertanyaan umum dijawab asisten; yang perlu dicek admin diteruskan, balasannya muncul di jendela chat yang sama." },
         ],
       },
@@ -104,6 +104,7 @@ const GUIDES: Guide[] = [
       {
         heading: "1. Buka jadwal",
         steps: [
+          { title: "Siapkan kolam dan harga", body: "Pilih kolam tempat mengajar di menu Kolam Saya, lalu isi harga paket 4 dan 8 sesi di menu Harga." },
           { title: "Pilih kolam dan tanggal", body: "Kolam yang muncul hanya kolam yang kamu pilih di menu Kolam Saya." },
           { title: "Pilih jam mulai dan selesai", body: "Rentang jam otomatis dipecah per jam. Contoh: 08.00–10.00 menjadi dua jam kosong, 08.00–09.00 dan 09.00–10.00." },
           { title: "Klik Tambah Slot", body: "Jam kosong langsung bisa dibooking member. Member aktif yang sudah menyalakan notifikasi otomatis diberi tahu." },
@@ -123,6 +124,7 @@ const GUIDES: Guide[] = [
         steps: [
           { title: "Buka menu Riwayat Sesi", body: "Semua sesi yang sudah lewat waktunya menunggu ditandai. Batasnya 24 jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai." },
           { title: "Pilih Hadir atau Tidak Hadir", body: "Langsung tersimpan begitu dipilih, tidak perlu tombol Simpan." },
+          { title: "Isi catatan perkembangan", body: "Isi Update milestone tiap peserta minimal sekali setiap 2 sesi Hadir. Selama ada yang belum diisi, pengajuan pencairan baru ditahan." },
           { title: "Saldo masuk", body: "Hadir: bagianmu (harga paketmu ÷ jumlah sesi, dipotong PPh 0,5% kecuali bebas potongan) masuk penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu mendapat 50% dari bagianmu." },
         ],
         note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum ditandai. Pastikan pilihannya benar.",
@@ -147,7 +149,7 @@ const GUIDES: Guide[] = [
       {
         heading: "1. Dashboard & jadwal",
         steps: [
-          { title: "Ringkasan bulan ini", body: "Sesi yang dihadiri, pendapatan kolam, paket terjual, jumlah coach, dan saldo yang bisa dicairkan." },
+          { title: "Ringkasan bulan ini", body: "Sesi Hadir, bagian kolam (sebelum PPh), paket terjual, coach terdaftar, dan saldo yang bisa dicairkan." },
           { title: "Jam ramai hari ini", body: "Grafik per jam: berapa sesi les privat di tiap jam, dan jam mana yang masih kosong." },
           { title: "Menu Jadwal Kolam", body: "Per tanggal, lengkap dengan coach yang mengajar dan peserta yang les di jam itu." },
         ],
@@ -313,7 +315,7 @@ export default function PanduanView() {
           </section>
 
           <section className="mt-14">
-            <h2 className="text-3xl font-semibold tracking-tight">Empat peran, empat tampilan</h2>
+            <h2 className="text-3xl font-semibold tracking-tight">Tiga peran, tiga tampilan</h2>
             <p className="mt-2 max-w-2xl text-base text-fixed-muted">
               Setiap orang hanya melihat yang relevan untuknya. Klik salah satu untuk membuka panduan lengkapnya.
             </p>

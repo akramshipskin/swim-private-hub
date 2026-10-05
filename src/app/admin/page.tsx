@@ -166,7 +166,7 @@ export default async function AdminDashboardPage() {
             <Stat label="Pendapatan bersih bulan ini" value={formatRupiah(monthSum("PLATFORM_REVENUE"))} tone="success" />
             <Stat label="PPN bulan ini" value={formatRupiah(monthSum("PLATFORM_TAX"))} />
             <Stat label="Pendapatan bersih bisa dicairkan" value={formatRupiah(Math.max(0, platformBalance.availableRevenue))} />
-            <Stat label="Saldo pajak belum disetor" value={formatRupiah(platformBalance.tax)} />
+            <Stat label="Saldo PPN belum disetor" value={formatRupiah(platformBalance.tax)} />
           </div>
           <p className="mt-3 text-xs text-text-subtle">Dihitung dari komisi setiap sesi yang ditandai Hadir (komisi sudah termasuk PPN). Tarif 11% sejak 30 Sep 2026; sesi sebelumnya 12%.</p>
         </BentoCard>

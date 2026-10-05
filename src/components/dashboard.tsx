@@ -228,7 +228,9 @@ export function BalanceCard({
   return (
     <section aria-label={label} className={cn("flex flex-col rounded-3xl bg-hero p-5 text-hero-ink sm:p-6", className)}>
       <p className="text-xs font-semibold uppercase tracking-wide text-hero-accent">{label}</p>
-      <p className="mt-2 text-3xl font-bold leading-tight tabular-nums sm:text-4xl">{amount}</p>
+      {/* Angka rupiah tidak boleh pecah di tengah: tidak dibungkus, dan mengecil di
+          lebar tablet-kecil/laptop (768-1279) saat kartu berbagi baris dengan kartu lain. */}
+      <p className="mt-2 whitespace-nowrap text-3xl font-bold leading-tight tabular-nums sm:max-md:text-4xl md:max-xl:text-2xl xl:text-4xl">{amount}</p>
       {hint && <div className="mt-2 text-sm text-hero-muted">{hint}</div>}
       <Link
         href={href}

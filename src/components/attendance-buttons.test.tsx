@@ -24,17 +24,17 @@ describe("AttendanceButtons", () => {
     expect(fd.get("attended")).toBe("true");
   });
 
-  it("Tidak hadir -> konfirmasi -> attended=false", async () => {
+  it("Tidak Hadir -> konfirmasi -> attended=false", async () => {
     render(<AttendanceButtons bookingId="b2" />);
-    fireEvent.click(screen.getByRole("button", { name: "Tidak hadir" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tidak Hadir" }));
     fireEvent.click(screen.getByRole("button", { name: "Ya, tandai Tidak Hadir" }));
     await waitFor(() => expect(markAttendance).toHaveBeenCalledTimes(1));
     expect((markAttendance.mock.calls[0][1] as FormData).get("attended")).toBe("false");
   });
 
-  it("Batal di dialog tidak mengirim apa pun (jangan tercatat Tidak hadir)", async () => {
+  it("Batal di dialog tidak mengirim apa pun (jangan tercatat Tidak Hadir)", async () => {
     render(<AttendanceButtons bookingId="b3" />);
-    fireEvent.click(screen.getByRole("button", { name: "Tidak hadir" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tidak Hadir" }));
     fireEvent.click(screen.getByRole("button", { name: "Batal" }));
     await new Promise((r) => setTimeout(r, 50));
     expect(markAttendance).not.toHaveBeenCalled();

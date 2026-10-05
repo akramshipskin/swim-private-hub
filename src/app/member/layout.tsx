@@ -28,7 +28,7 @@ export default async function MemberLayout({
       links={roleNavLinks.MEMBER}
     >
       <PullToRefresh>
-        <div className="pb-16 sm:pb-0">{children}</div>
+        <div className="pb-16 lg:pb-0">{children}</div>
       </PullToRefresh>
     </NavBar>
   );

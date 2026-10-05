@@ -15,7 +15,7 @@ import { DateQuickPicker } from "@/components/date-quick-picker";
 import { Avatar } from "@/components/ui/avatar";
 import { Loader } from "@/components/ui/loader";
 import { BookingSuccess, type BookingDone } from "./booking-success";
-import { bookButtonState } from "./booking-labels";
+import { bookButtonState, resolveSelection } from "./booking-labels";
 
 type PackageOption = {
   packageId: string;
@@ -218,22 +218,13 @@ export default function BookingBoard({
   }, [slots]);
 
   const isSelectable = (s: Slot) => s.status === "AVAILABLE" && !s.bookedByMe && !!pkgForCoach(s.coach.id);
-  const selectedSlot =
-    selection && selection.key === selKey && slots ? (slots.find((s) => s.id === selection.id) ?? null) : null;
-  // Pola "adjust state during render": pilihan dikosongkan bila konteksnya
-  // berganti, atau bila data jadwal terbaru (polling 5 detik) menunjukkan jam
-  // itu tidak bisa dipilih lagi. Tidak dicek selama permintaan booking berjalan.
-  if (selection && !booking) {
-    if (selection.key !== selKey) {
-      setSelection(null);
-    } else if (slots && !(selectedSlot && isSelectable(selectedSlot))) {
-      setSelection(null);
-      if (!selectedSlot) {
-        setMessage({ text: "Jam yang kamu pilih sudah tidak tersedia. Pilih jam lain.", ok: false });
-      } else if (selectedSlot.status === "BOOKED" && !selectedSlot.bookedByMe) {
-        setMessage({ text: "Jam yang kamu pilih baru saja diambil member lain. Pilih jam lain.", ok: false });
-      }
-    }
+  // Pola "adjust state during render": nasib pilihan dihitung di resolveSelection
+  // (booking-labels.ts, dites); di sini hanya menerapkan hasilnya.
+  const sel = resolveSelection({ selection, selKey, slots, booking, isSelectable });
+  const selectedSlot = sel.selected;
+  if (sel.clear) {
+    setSelection(null);
+    if (sel.message) setMessage({ text: sel.message, ok: false });
   }
 
   async function handleBook() {
@@ -700,7 +691,7 @@ export default function BookingBoard({
           bantuan. Desktop: kartu menempel di dasar area konten. Elemen sticky ikut
           alur halaman, jadi baris jadwal terakhir tidak tertutup. */}
       {dependentId && poolId && (
-        <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+4.125rem)] z-10 -mx-4 mt-6 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:bottom-4 sm:mx-0 sm:rounded-2xl sm:border sm:px-4 sm:shadow-lg">
+        <div className="sticky bottom-[calc(env(safe-area-inset-bottom)+4.125rem)] z-10 -mx-4 mt-6 border-t border-border bg-background/95 px-4 py-3 backdrop-blur lg:bottom-4 sm:mx-0 sm:rounded-2xl sm:border sm:px-4 sm:shadow-lg">
           <Button
             type="button"
             className="min-h-12 w-[calc(100%-3.25rem)] py-2 text-sm leading-tight font-semibold sm:w-auto sm:min-w-[20rem] sm:text-base"

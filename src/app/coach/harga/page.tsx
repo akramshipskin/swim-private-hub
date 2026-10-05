@@ -44,7 +44,7 @@ export default async function CoachHargaPage() {
       <h2 className="mb-1 text-lg font-semibold text-text">Harga yang dilihat member</h2>
       <p className="mb-3 text-sm text-text-muted">Harga kolam + hargamu + biaya layanan SPH, di tiap kolam tempat kamu mengajar.</p>
       {pools.length === 0 ? (
-        <p className="text-sm text-text-muted">Kamu belum terdaftar mengajar di kolam mana pun. Hubungi admin.</p>
+        <p className="text-sm text-text-muted">Kamu belum memilih kolam tempat mengajar. Pilih kolam di menu Kolam Saya.</p>
       ) : (
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {pools.map((pool) => {

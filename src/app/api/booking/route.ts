@@ -131,7 +131,7 @@ export async function POST(request: Request) {
           );
         }
         throw new BookingError(
-          "Paket ini tidak bisa dipakai untuk slot ini: paketnya untuk kolam atau coach lain, kuota sesi habis, belum aktif, atau sudah kedaluwarsa.",
+          "Paket ini tidak bisa dipakai untuk jam ini: paketnya untuk kolam atau coach lain, sisa sesi habis, belum aktif, atau sudah kedaluwarsa.",
           409
         );
       }
@@ -182,7 +182,7 @@ export async function POST(request: Request) {
     }).catch(() => {});
 
     sendPushToUser(booking.availability.coachId, {
-      title: "Slot kamu dibooking",
+      title: "Jadwalmu dibooking",
       body: `${booking.package.dependent.name}, ${formatDateLabel(booking.availability.date)} ${formatTimeWib(booking.availability.startTime)}`,
       url: "/coach/jadwal",
     }).catch(() => {});

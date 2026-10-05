@@ -63,9 +63,9 @@ export function NavBar({
 
       <div className="flex w-full gap-6 px-4 lg:gap-8 lg:px-8">
         {links.length > 0 && <SidebarNav links={links} activePath={activePath} />}
-        {/* pb-28 (HP) / sm:pb-24 (desktop): ruang di bawah konten supaya bottom
+        {/* pb-28 (HP dan tablet) / lg:pb-24 (desktop): ruang di bawah konten supaya bottom
             nav + tombol chat mengambang tidak menutupi baris terakhir halaman. */}
-        <div className="min-w-0 flex-1 pb-28 sm:pb-24">{children}</div>
+        <div className="min-w-0 flex-1 pb-28 lg:pb-24">{children}</div>
       </div>
 
       {links.length > 0 && <MobileBottomNav links={links} primary={bottom.primary} moreLabel={bottom.moreLabel} activePath={activePath} />}

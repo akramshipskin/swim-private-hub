@@ -5,6 +5,7 @@ import { snap } from "@/lib/midtrans";
 import { COACH_CHANGE_PAY_WINDOW_MS, completeCoachChange, notifyCoachChangeResult } from "@/lib/coach-change";
 import { refundMemberBalanceOnce, spendMemberBalance } from "@/lib/member-wallet";
 import { NON_CARD_PAYMENTS } from "@/lib/midtrans-methods";
+import { DELETION_PENDING_COACH_CHANGE_ERROR } from "@/lib/coach-change-rules";
 
 // Tambah bayar ganti coach ke coach lebih mahal (Hadi 2 Okt): saldo member
 // dipakai dulu, sisanya lewat Midtrans; ganti coach berlaku setelah lunas.
@@ -36,7 +37,14 @@ export async function POST(request: Request) {
       return { error: "Pengajuan ini tidak menunggu pembayaran." } as const;
     }
     // Sudah ada pembayaran yang berjalan: arahkan ke situ, jangan bikin dobel.
+    // Dicek SEBELUM pintu hapus akun: uang yang sudah di jalan tidak boleh
+    // terkunci dari layar bayarnya (webhook tetap menyelesaikannya bila lunas).
     if (req.payments[0]) return { redirectUrl: req.payments[0].snapRedirectUrl } as const;
+    // Pintu hapus akun untuk pembayaran BARU (memakai saldo / membuat transaksi).
+    // Baris akun dikunci FOR UPDATE (sama dengan kunci spendMemberBalance di bawah, tanpa
+    // kenaikan kunci; urutan sama dengan completeCoachChange: pengajuan, akun, paket) supaya pengajuan hapus akun yang bersamaan menunggu dan bacaan ini segar.
+    const [owner] = await tx.$queryRaw<{ deletionRequestedAt: Date | null }[]>`SELECT "deletionRequestedAt" FROM "User" WHERE id = ${memberId} FOR UPDATE`;
+    if (owner?.deletionRequestedAt) return { error: DELETION_PENDING_COACH_CHANGE_ERROR } as const;
     if (Date.now() - req.decidedAt.getTime() > COACH_CHANGE_PAY_WINDOW_MS) {
       await tx.coachChangeRequest.update({ where: { id: req.id }, data: { status: "EXPIRED" } });
       return { error: "Batas 24 jam untuk tambah bayar sudah lewat, jadi pengajuan dibatalkan. Ajukan ulang bila masih ingin ganti coach." } as const;

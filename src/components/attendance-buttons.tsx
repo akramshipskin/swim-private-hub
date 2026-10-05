@@ -54,7 +54,7 @@ export default function AttendanceButtons({
             onClick={() => setToConfirm(false)}
             className="inline-flex min-h-[44px] flex-1 items-center justify-center rounded-xl border border-border bg-surface px-4 text-sm font-semibold text-text transition-colors hover:bg-surface-muted disabled:opacity-60"
           >
-            Tidak hadir
+            Tidak Hadir
           </button>
         </div>
         {state?.error && !pending && (

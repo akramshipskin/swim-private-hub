@@ -63,7 +63,7 @@ export default function MemberCard({
             </Button>
           ) : (
             <Button type="button" variant="secondary" size="sm" onClick={() => setIsEditing(true)}>
-              Edit
+              Ubah
             </Button>
           )}
         </div>

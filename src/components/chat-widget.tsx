@@ -55,7 +55,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed right-3 bottom-20 z-40 sm:right-4 sm:bottom-6">
+    <div className="fixed right-3 bottom-20 z-40 sm:right-4 lg:bottom-6">
       {open && (
         <div
           role="dialog"

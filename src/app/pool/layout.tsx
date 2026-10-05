@@ -23,7 +23,7 @@ export default async function PoolLayout({
       links={roleNavLinks.POOL_OWNER}
     >
       <PullToRefresh>
-        <div className="pb-16 sm:pb-0">{children}</div>
+        <div className="pb-16 lg:pb-0">{children}</div>
       </PullToRefresh>
     </NavBar>
   );

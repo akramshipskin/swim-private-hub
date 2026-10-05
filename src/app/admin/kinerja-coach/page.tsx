@@ -113,7 +113,7 @@ export default async function KinerjaCoachPage({
 
       <p className="mt-4 text-xs text-text-subtle">
         Booking yang belum ditandai atau ditandai Tidak Hadir tidak dihitung sebagai sesi valid. Cek
-        di Booking &amp; Riwayat Sesi coach.
+        di menu Jadwal Booking atau Laporan Kehadiran.
       </p>
     </main>
   );

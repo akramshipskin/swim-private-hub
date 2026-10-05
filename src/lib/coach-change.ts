@@ -8,6 +8,7 @@ import { creditMember } from "@/lib/member-wallet";
 import { prisma } from "@/lib/prisma";
 import { notifyUser } from "@/lib/notify";
 import { formatRupiah } from "@/lib/format";
+import { DELETION_PENDING_COACH_CHANGE_ERROR } from "@/lib/coach-change-rules";
 
 export { COACH_CHANGE_PAY_WINDOW_MS, MIN_REASON_LENGTH, MAX_REASON_LENGTH } from "@/lib/coach-change-rules";
 
@@ -211,6 +212,10 @@ export async function freeCoachChange(
   // booking dan ganti coach bersamaan tidak saling mengunci (deadlock):
   // kredit saldo di bawah mengubah baris akun member.
   await tx.$executeRaw`SELECT 1 FROM "User" WHERE id = ${input.memberId} FOR NO KEY UPDATE`;
+  // Akun yang sedang diajukan hapus tidak boleh ganti coach (kunci akun di atas
+  // membuat pengajuan hapus yang bersamaan menunggu, jadi bacaan ini pasti segar).
+  const owner = await tx.user.findUnique({ where: { id: input.memberId }, select: { deletionRequestedAt: true } });
+  if (owner?.deletionRequestedAt) return { ok: false, error: DELETION_PENDING_COACH_CHANGE_ERROR };
   // Kunci paket: tanda hadir, booking, pembatalan, dan klik ganda antre di sini.
   await tx.$executeRaw`SELECT 1 FROM "Package" WHERE id = ${input.packageId} FOR UPDATE`;
   const pkg = await tx.package.findFirst({

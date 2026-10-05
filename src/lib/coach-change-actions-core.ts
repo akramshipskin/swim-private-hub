@@ -10,6 +10,7 @@ import {
   completeCoachChange,
   remainingSessions,
 } from "@/lib/coach-change";
+import { DELETION_PENDING_APPROVE_ERROR, DELETION_PENDING_COACH_CHANGE_ERROR } from "@/lib/coach-change-rules";
 
 type Result = { error: string } | { ok: true; status?: string };
 
@@ -34,6 +35,8 @@ export async function submitCoachChange(memberId: string, input: { packageId: st
   const reason = input.reason.trim();
   if (reason.length < MIN_REASON_LENGTH) return { error: `Tulis alasannya minimal ${MIN_REASON_LENGTH} huruf.` };
   if (reason.length > MAX_REASON_LENGTH) return { error: `Alasan maksimal ${MAX_REASON_LENGTH} huruf.` };
+  const me = await prisma.user.findUnique({ where: { id: memberId }, select: { deletionRequestedAt: true } });
+  if (me?.deletionRequestedAt) return { error: DELETION_PENDING_COACH_CHANGE_ERROR };
   // Paket pemberian manual admin (tanpa pembayaran) tidak bisa ganti coach lewat
   // pengajuan: ganti ke coach lebih murah akan mengkredit selisih sebagai saldo
   // uang padahal paketnya tidak dibayar. Admin memberi paket baru saja.
@@ -90,6 +93,10 @@ export async function approveCoachChange(requestId: string, now = new Date()): P
     await tx.$executeRaw`SELECT 1 FROM "CoachChangeRequest" WHERE id = ${requestId} FOR UPDATE`;
     const req = await tx.coachChangeRequest.findUnique({ where: { id: requestId }, include: { package: true } });
     if (!req || req.status !== "PENDING") return { error: "Pengajuan ini sudah diproses." } as Result;
+    // Baris akun dikunci (pengajuan, akun, paket: urutan sama dengan completeCoachChange)
+    // supaya pengajuan hapus akun yang bersamaan menunggu dan bacaan ini segar.
+    const [owner] = await tx.$queryRaw<{ deletionRequestedAt: Date | null }[]>`SELECT "deletionRequestedAt" FROM "User" WHERE id = ${req.memberId} FOR NO KEY UPDATE`;
+    if (owner?.deletionRequestedAt) return { error: DELETION_PENDING_APPROVE_ERROR } as Result;
     const pkg = req.package;
     if (pkg.coachId !== req.fromCoachId || pkg.poolPrice == null || pkg.coachPrice == null || pkg.serviceFee == null) {
       return { error: "Paket ini sudah tidak bisa diganti coach-nya." } as Result;

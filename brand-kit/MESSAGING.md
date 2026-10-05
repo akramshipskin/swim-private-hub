@@ -20,7 +20,7 @@ Terakhir diperbarui: 25 September 2026 (headline & tagline baru).
 - Slot terkunci otomatis begitu diambil member lain.
 - Sisa sesi dan jatah pembatalan dihitung per peserta.
 - Bagi hasil ke kolam dan coach otomatis setiap sesi ditandai Hadir.
-- Paket dan harga diatur per kolam.
+- Harga tiket dipasang kolam, harga jasa dipasang coach; rincian tampil sebelum bayar.
 
 **Klaim yang dilarang:**
 

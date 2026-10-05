@@ -31,3 +31,36 @@ export function bookButtonState({
   if (!selectedStart) return { label: "Pilih tanggal dan jam", disabled: true };
   return { label: `Booking ${slotShortLabel(selectedStart)}`, disabled: false };
 }
+
+export const SLOT_GONE_MESSAGE = "Jam yang kamu pilih sudah tidak tersedia. Pilih jam lain.";
+export const SLOT_TAKEN_MESSAGE = "Jam yang kamu pilih baru saja diambil member lain. Pilih jam lain.";
+
+// Nasib jam yang dipilih member (langkah 1 booking dua langkah) setiap papan
+// dirender. Hanya tampilan: server (POST /api/booking) tetap yang menjaga aturan.
+// - selection terikat ke selKey (tanggal|kolam|peserta): kunci berubah = dikosongkan tanpa pesan.
+// - data jadwal terbaru (polling 5 detik) menunjukkan jam hilang / tidak bisa dipilih lagi =
+//   dikosongkan, dengan pesan bila jamnya hilang atau diambil member lain.
+// - selama permintaan booking berjalan (booking = true) pilihan tidak diusik.
+export function resolveSelection<T extends { id: string; status: string; bookedByMe: boolean }>({
+  selection,
+  selKey,
+  slots,
+  booking,
+  isSelectable,
+}: {
+  selection: { id: string; key: string } | null;
+  selKey: string;
+  slots: T[] | null;
+  booking: boolean;
+  isSelectable: (s: T) => boolean;
+}): { selected: T | null; clear: boolean; message: string | null } {
+  const selected = selection && selection.key === selKey && slots ? (slots.find((s) => s.id === selection.id) ?? null) : null;
+  if (!selection || booking) return { selected, clear: false, message: null };
+  if (selection.key !== selKey) return { selected, clear: true, message: null };
+  if (slots && !(selected && isSelectable(selected))) {
+    if (!selected) return { selected, clear: true, message: SLOT_GONE_MESSAGE };
+    if (selected.status === "BOOKED" && !selected.bookedByMe) return { selected, clear: true, message: SLOT_TAKEN_MESSAGE };
+    return { selected, clear: true, message: null };
+  }
+  return { selected, clear: false, message: null };
+}

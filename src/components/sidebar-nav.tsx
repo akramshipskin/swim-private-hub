@@ -41,7 +41,7 @@ export function SidebarNav({
     // "menyatu" dengan isi halaman (Hadi 18 Sep). Nama kategori tebal,
     // nama tab tidak -- kebalikan dari versi sebelumnya.
     <nav
-      className="hidden w-52 shrink-0 flex-col gap-4 self-start rounded-2xl border border-border bg-surface p-3 sm:sticky sm:top-20 sm:my-6 sm:flex"
+      className="hidden w-52 shrink-0 flex-col gap-4 self-start rounded-2xl border border-border bg-surface p-3 lg:sticky lg:top-20 lg:my-6 lg:flex"
       aria-label="Navigasi"
     >
       {groups.map(([group, items]) => (

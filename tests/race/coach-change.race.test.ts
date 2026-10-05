@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { as, reset, mkUser, mkSlot, book, fd, settle, mkPricedOffer } from "./fx";
+import { as, reset, mkUser, mkSlot, book, fd, settle, mkPricedOffer, openSlots } from "./fx";
 import { checkInvariants } from "./invariants";
 import { POST as checkout } from "@/app/api/payment/checkout/route";
 import { POST as payChange } from "@/app/api/payment/coach-change/route";
@@ -10,6 +10,8 @@ import { POST as webhook } from "@/app/api/payment/webhook/route";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 import { requestCoachChange } from "@/app/member/paket/coach-change-actions";
 import { approveAction } from "@/app/admin/ganti-coach/actions";
+import { freeChangeCoach } from "@/app/member/paket/free-change-actions";
+import { DELETION_PENDING_APPROVE_ERROR, DELETION_PENDING_COACH_CHANGE_ERROR } from "@/lib/coach-change-rules";
 import { recordPphRemittance } from "@/app/admin/komisi/actions";
 import { creditMember } from "@/lib/member-wallet";
 import { releaseStalePayments } from "@/lib/stale-payments";
@@ -339,5 +341,92 @@ describe("SETORAN PPh", () => {
     expect((await send("900"))?.error).toBeTruthy();
     await settle([1, 2, 3, 4, 5].map(() => send("800")));
     expect((await prisma.pphRemittance.aggregate({ _sum: { amount: true } }))._sum.amount).toBe(800);
+  });
+});
+
+// Hadi 6 Okt (jawaban A pertanyaan terbuka 1): akun yang sedang diajukan untuk
+// dihapus tidak boleh ganti coach di pintu mana pun.
+describe("HAPUS AKUN vs GANTI COACH", () => {
+  const asMember = <T,>(id: string, fn: () => Promise<T>) => as({ id, role: "MEMBER", name: "M" }, fn);
+  const askDeletion = (id: string) => prisma.user.update({ where: { id }, data: { deletionRequestedAt: new Date() } });
+
+  it("HG1: akun diajukan hapus -> pengajuan ganti coach ditolak, tidak ada baris pengajuan; batal hapus -> pengajuan lolos lagi", async () => {
+    const { pool, m, pkg } = await activePackage();
+    const b = await otherCoach(pool.id, 380000, 640000);
+    await askDeletion(m.id);
+    const reason = "Anak kurang cocok dengan gaya mengajarnya";
+    const r = await asMember(m.id, () => requestCoachChange(null, fd({ packageId: pkg.id, toCoachId: b.id, reason })));
+    expect(r).toEqual({ error: DELETION_PENDING_COACH_CHANGE_ERROR });
+    expect(await prisma.coachChangeRequest.count()).toBe(0);
+    await prisma.user.update({ where: { id: m.id }, data: { deletionRequestedAt: null } });
+    expect(await asMember(m.id, () => requestCoachChange(null, fd({ packageId: pkg.id, toCoachId: b.id, reason })))).toEqual({ ok: true });
+    expect(await prisma.coachChangeRequest.count()).toBe(1);
+  });
+
+  it("HG2: pengajuan sudah masuk lalu member ajukan hapus akun -> admin tidak bisa menyetujui (2x barengan pun), paket dan saldo tidak berubah", async () => {
+    const { pool, coach, m, pkg } = await activePackage();
+    const b = await otherCoach(pool.id, 380000, 640000);
+    const admin = await mkUser("ADMIN");
+    await asMember(m.id, () => requestCoachChange(null, fd({ packageId: pkg.id, toCoachId: b.id, reason: "Anak kurang cocok dengan gaya mengajarnya" })));
+    const req = await prisma.coachChangeRequest.findFirstOrThrow();
+    await askDeletion(m.id);
+    const rs = await settle([1, 2].map(() => as({ id: admin.id, role: "ADMIN" }, () => approveAction(null, fd({ requestId: req.id })))));
+    for (const r of rs) expect(r).toMatchObject({ status: "fulfilled", value: { error: DELETION_PENDING_APPROVE_ERROR } });
+    expect((await prisma.coachChangeRequest.findUniqueOrThrow({ where: { id: req.id } })).status).toBe("PENDING");
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).coachId).toBe(coach.id);
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance).toBe(0);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("HG3: sudah disetujui menunggu tambah bayar lalu member ajukan hapus akun -> bayar ditolak (409), saldo tidak terpakai, tidak ada transaksi Midtrans", async () => {
+    const { pool, m, pkg } = await activePackage();
+    const b = await otherCoach(pool.id, 600000, 1120000);
+    const admin = await mkUser("ADMIN");
+    await giveSaldo(m.id, 50000);
+    await asMember(m.id, () => requestCoachChange(null, fd({ packageId: pkg.id, toCoachId: b.id, reason: "Ingin coach yang lebih senior" })));
+    const req = await prisma.coachChangeRequest.findFirstOrThrow();
+    await as({ id: admin.id, role: "ADMIN" }, () => approveAction(null, fd({ requestId: req.id })));
+    expect((await prisma.coachChangeRequest.findUniqueOrThrow({ where: { id: req.id } })).status).toBe("AWAITING_PAYMENT");
+    await askDeletion(m.id);
+    const res = await asMember(m.id, () => payChange(new Request("http://x", { method: "POST", body: JSON.stringify({ requestId: req.id }) })));
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual({ error: DELETION_PENDING_COACH_CHANGE_ERROR });
+    expect(await prisma.payment.count({ where: { coachChangeRequestId: req.id } })).toBe(0);
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance).toBe(50000);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("HG4: ganti coach gratis hari ke-10 ditolak saat akun diajukan hapus; setelah batal hapus berhasil (paket pindah, selisih jadi saldo)", async () => {
+    const { pool, m, pkg } = await activePackage();
+    const b = await otherCoach(pool.id, 380000, 640000);
+    await openSlots(b.id, pool.id);
+    await prisma.package.update({ where: { id: pkg.id }, data: { freeCoachChangeAt: new Date() } });
+    await askDeletion(m.id);
+    expect(await asMember(m.id, () => freeChangeCoach(pkg.id, b.id, pool.id, null))).toEqual({ error: DELETION_PENDING_COACH_CHANGE_ERROR });
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).coachId).not.toBe(b.id);
+    expect(await prisma.coachChangeRequest.count()).toBe(0);
+    await prisma.user.update({ where: { id: m.id }, data: { deletionRequestedAt: null } });
+    // Sukses berakhir dengan redirect() Next, yang melempar galat khusus.
+    await expect(asMember(m.id, () => freeChangeCoach(pkg.id, b.id, pool.id, null))).rejects.toThrow("REDIRECT:/member/paket?ganti=ok");
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).coachId).toBe(b.id);
+    // Coach B lebih murah (640rb vs 800rb): selisih sesi jadi saldo member.
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance).toBeGreaterThan(0);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
+  it("HG5: tambah bayar yang SUDAH berjalan tetap bisa dibuka lagi walau akun lalu diajukan hapus (uang di jalan tidak terkunci); pembayaran baru tidak dibuat", async () => {
+    const { pool, m, pkg } = await activePackage();
+    const b = await otherCoach(pool.id, 600000, 1120000);
+    const admin = await mkUser("ADMIN");
+    await asMember(m.id, () => requestCoachChange(null, fd({ packageId: pkg.id, toCoachId: b.id, reason: "Ingin coach yang lebih senior" })));
+    const req = await prisma.coachChangeRequest.findFirstOrThrow();
+    await as({ id: admin.id, role: "ADMIN" }, () => approveAction(null, fd({ requestId: req.id })));
+    const call = () => asMember(m.id, () => payChange(new Request("http://x", { method: "POST", body: JSON.stringify({ requestId: req.id }) })));
+    expect((await call()).status).toBe(200);
+    expect(await prisma.payment.count({ where: { coachChangeRequestId: req.id } })).toBe(1);
+    await askDeletion(m.id);
+    const again = await call();
+    expect(again.status).toBe(200);
+    expect(await prisma.payment.count({ where: { coachChangeRequestId: req.id } })).toBe(1);
   });
 });

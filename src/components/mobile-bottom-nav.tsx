@@ -59,7 +59,7 @@ export function MobileBottomNav({
   return (
     <>
       {open && (
-        <div className="fixed inset-0 z-30 sm:hidden" role="dialog" aria-modal="true" aria-label={`Semua menu`}>
+        <div className="fixed inset-0 z-30 lg:hidden" role="dialog" aria-modal="true" aria-label={`Semua menu`}>
           <button type="button" aria-label="Tutup menu" className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
           <div className="absolute inset-x-0 bottom-0 max-h-[80vh] overflow-y-auto rounded-t-3xl bg-surface px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] shadow-2xl">
             {groups.map((g) => (
@@ -92,7 +92,7 @@ export function MobileBottomNav({
         </div>
       )}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-4px_rgb(0_0_0_/_0.12)] sm:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-4px_rgb(0_0_0_/_0.12)] lg:hidden"
         aria-label="Navigasi utama"
       >
         <div className="mx-auto flex max-w-3xl gap-0.5 px-1 py-1.5">

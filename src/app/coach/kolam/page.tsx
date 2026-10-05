@@ -63,7 +63,7 @@ export default async function CoachKolamPage({ searchParams }: { searchParams: P
             {other && <Badge tone="neutral">{p.city ?? "Kota belum diisi"}</Badge>}
           </p>
           <p className="text-sm text-text-muted">
-            {[p.address, `Buka ${poolHoursLabel(p)}`].filter(Boolean).join(" · ")}
+            {[p.address, `Jam buka ${poolHoursLabel(p)}`].filter(Boolean).join(" · ")}
           </p>
           <p className="text-sm text-text-muted">
             Tiket kolam: {[p.pricePack4 != null && `4 sesi ${formatRupiah(p.pricePack4)}`, p.pricePack8 != null && `8 sesi ${formatRupiah(p.pricePack8)}`].filter(Boolean).join(" · ") || "belum dipasang"}

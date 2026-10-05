@@ -44,7 +44,7 @@ export default function PackPriceForm({
       {children?.(edit.locked)}
       {edit.locked ? (
         <Button type="button" size="sm" variant="secondary" onClick={edit.startEdit}>
-          Edit
+          Ubah
         </Button>
       ) : (
         <>

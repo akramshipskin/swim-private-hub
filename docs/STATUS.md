@@ -20,8 +20,10 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 
 - 4 Okt malam (sesi lain): dokumen serah terima docs/HANDOFF-AGEN.md + ringkasan aturan main Hadi di AGENTS.md; Hadi memutuskan pengembangan berikutnya lewat OpenCode + Fable 5, uang/booking/login/skema wajib pemeriksa kedua berkonteks segar (lihat KEPUTUSAN 4 Okt siang).
 
+- 6 Okt (Opus, mode tidur): sweeping total ulang + keselarasan landing. Perbaikan: tablet 768-1023 (sidebar jadi bilah bawah di bawah 1024, angka saldo tidak pecah), hapus akun vs ganti coach, ~45 potongan tulisan landing/panduan/chat AI, logo kartu dihapus dari footer, label status paket admin jujur. Lokal: 468 kunjungan, hak akses 440 sel 0 bocor, 176 kiriman formulir 0 error, audit uang cocok, 835 tes + 200 tes balapan lulus. Live: hanya admin (baca saja, 24/25 halaman); peran lain TIDAK di live (aturan: tidak mengetik password ke production). Laporan: docs/reviews/2026-10-06-sweeping-sistem-total.md.
+
 ## Sedang jalan / menunggu Hadi
-- Pertanyaan terbuka (6 Okt, Hadi "kerjain semuanya" = jalankan rekomendasi): (1) tolak ganti coach saat member minta hapus akun: BELUM dikerjakan (wajib Opus + pemeriksa kedua, ditunda di mode tidur); (2) "Edit" -> "Ubah": SELESAI 6 Okt, belum dicek di browser; (3) nama di lonceng 90 hari: diterima apa adanya; (4) tombol beli menempel di Paket: tidak dibuat.
+- Pertanyaan terbuka (6 Okt): hapus akun vs ganti coach SELESAI (ditolak di 4 pintu, 5 tes balapan); "Edit"->"Ubah" SELESAI; lonceng 90 hari diterima; tombol beli menempel tidak dibuat. Daftar menunggu Hadi dari sweeping 6 Okt: docs/reviews/2026-10-06-sweeping-sistem-total.md bagian "Menunggu keputusan Hadi" (A1-A6 uang/aturan, B1-B7 landing/merek, C hukum, D data uji, E kecil).
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya

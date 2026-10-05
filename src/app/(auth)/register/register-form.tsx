@@ -274,6 +274,16 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
               Masuk
             </a>
           </p>
+          <p className="mt-1 text-center text-sm text-text-muted">
+            Coach atau pemilik kolam?{" "}
+            <a href="/daftar-coach" className="font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+              Daftar sebagai coach
+            </a>{" "}
+            ·{" "}
+            <a href="/daftar-kolam" className="font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+              Daftarkan kolam
+            </a>
+          </p>
         </CardBody>
       </Card>
     </AuthShell>
