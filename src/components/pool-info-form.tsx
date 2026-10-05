@@ -77,7 +77,7 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
       </fieldset>
       <div className="flex flex-wrap items-center gap-2">
         {edit.locked ? (
-          <Button type="button" variant="secondary" onClick={edit.startEdit}>Edit Info Kolam</Button>
+          <Button type="button" variant="secondary" onClick={edit.startEdit}>Ubah Info Kolam</Button>
         ) : (
           <>
             <Button type="submit" loading={pending} disabled={edit.saveDisabled}>Simpan</Button>

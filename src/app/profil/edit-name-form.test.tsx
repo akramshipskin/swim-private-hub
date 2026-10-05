@@ -6,8 +6,8 @@ vi.mock("./actions", () => ({ updateName: vi.fn(async () => ({ success: true }))
 
 import EditNameForm from "./edit-name-form";
 
-describe("EditNameForm (pola Edit dulu baru Simpan)", () => {
-  it("terkunci sampai klik Edit, Batal mengembalikan nilai awal dan mengunci lagi", async () => {
+describe("EditNameForm (pola Ubah dulu baru Simpan)", () => {
+  it("terkunci sampai klik Ubah, Batal mengembalikan nilai awal dan mengunci lagi", async () => {
     const user = userEvent.setup();
     render(<EditNameForm currentName="Ayu" label="Nama" />);
 
@@ -15,7 +15,7 @@ describe("EditNameForm (pola Edit dulu baru Simpan)", () => {
     expect(input).toBeDisabled();
     expect(screen.queryByRole("button", { name: "Simpan" })).toBeNull();
 
-    await user.click(screen.getByRole("button", { name: "Edit Nama" }));
+    await user.click(screen.getByRole("button", { name: "Ubah Nama" }));
     const unlocked = screen.getByRole("textbox");
     expect(unlocked).toBeEnabled();
     await user.clear(unlocked);

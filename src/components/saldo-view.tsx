@@ -92,7 +92,7 @@ export default function SaldoView({
   // Nama bank lama yang diketik bebas dan tidak cocok persis dengan daftar
   // tetap ditampilkan, tapi pemiliknya wajib memilih ulang dari daftar.
   const matchedBank = matchBankLabel(bankName);
-  // Rekening yang sudah tersimpan terkunci; ubah lewat tombol Edit.
+  // Rekening yang sudah tersimpan terkunci; ubah lewat tombol Ubah.
   const edit = useEditLock(bankPending, bankState?.error);
   const bankLocked = hasBankInfo && edit.locked;
   const canWithdraw = hasBankInfo && walletBalance >= MIN_WITHDRAWAL;
@@ -178,7 +178,7 @@ export default function SaldoView({
             </Field>
             {bankLocked ? (
               <Button type="button" variant="secondary" onClick={edit.startEdit} className="w-full">
-                Edit Rekening
+                Ubah Rekening
               </Button>
             ) : (
               <div className="flex gap-2">

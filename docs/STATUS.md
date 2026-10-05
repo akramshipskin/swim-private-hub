@@ -21,7 +21,7 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 - 4 Okt malam (sesi lain): dokumen serah terima docs/HANDOFF-AGEN.md + ringkasan aturan main Hadi di AGENTS.md; Hadi memutuskan pengembangan berikutnya lewat OpenCode + Fable 5, uang/booking/login/skema wajib pemeriksa kedua berkonteks segar (lihat KEPUTUSAN 4 Okt siang).
 
 ## Sedang jalan / menunggu Hadi
-- Pertanyaan terbuka: (1) tolak ganti coach saat member minta hapus akun? (rek. A tolak); (2) tombol "Edit" -> "Ubah" di semua peran? (rek. A); (3) lonceng admin/coach menyimpan nama member yang akunnya dihapus sampai 90 hari: terima atau ikut dibersihkan? (rek. terima, hilang otomatis); (4) beli paket: tombol menempel di halaman Paket belum dibuat (kartu beli per paket); lanjut bentuk lain? (rek. tidak perlu). Belum dijawab Hadi per 5 Okt malam.
+- Pertanyaan terbuka (6 Okt, Hadi "kerjain semuanya" = jalankan rekomendasi): (1) tolak ganti coach saat member minta hapus akun: BELUM dikerjakan (wajib Opus + pemeriksa kedua, ditunda di mode tidur); (2) "Edit" -> "Ubah": SELESAI 6 Okt, belum dicek di browser; (3) nama di lonceng 90 hari: diterima apa adanya; (4) tombol beli menempel di Paket: tidak dibuat.
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya

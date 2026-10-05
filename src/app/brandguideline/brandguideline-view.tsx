@@ -442,7 +442,7 @@ export default function BrandGuidelineView() {
                   <Button variant="danger">Nonaktifkan</Button>
                   <Button variant="ghost">Lihat semua</Button>
                 </div>
-                <Button size="sm">Edit</Button>
+                <Button size="sm">Ubah</Button>
               </ThemeScope>
               <ThemeScope theme="dark">
                 <div className="flex flex-wrap gap-2">
@@ -455,7 +455,7 @@ export default function BrandGuidelineView() {
                   <Button variant="danger">Nonaktifkan</Button>
                   <Button variant="ghost">Lihat semua</Button>
                 </div>
-                <Button size="sm">Edit</Button>
+                <Button size="sm">Ubah</Button>
               </ThemeScope>
             </div>
             <Link href="/login" className={buttonClass({ variant: "ghost", size: "sm", className: "mt-2" })}>

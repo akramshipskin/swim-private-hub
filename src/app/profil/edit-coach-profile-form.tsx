@@ -84,7 +84,7 @@ export default function EditCoachProfileForm({
       <div className="flex flex-wrap items-center gap-3">
         {edit.locked ? (
           <Button type="button" variant="secondary" onClick={edit.startEdit} className="w-full sm:w-auto">
-            Edit Profil Coach
+            Ubah Profil Coach
           </Button>
         ) : (
           <>

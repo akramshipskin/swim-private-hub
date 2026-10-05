@@ -32,7 +32,7 @@ export default function EditNameForm({ currentName, label }: { currentName: stri
       </div>
       {edit.locked ? (
         <Button type="button" variant="secondary" onClick={edit.startEdit} className="w-full sm:w-auto">
-          Edit Nama
+          Ubah Nama
         </Button>
       ) : (
         <div className="flex gap-2">

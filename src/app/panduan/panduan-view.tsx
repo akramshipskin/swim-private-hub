@@ -89,7 +89,7 @@ const GUIDES: Guide[] = [
         heading: "5. Peserta, profil, dan bantuan",
         steps: [
           { title: "Menu Peserta", body: "Tambah peserta baru (dengan tanggal lahirnya), lihat paket aktif tiap peserta, atau nonaktifkan peserta yang sudah tidak les." },
-          { title: "Menu Profil Saya", body: "Ubah nama dan password. Klik Edit dulu, baru bisa mengubah isinya." },
+          { title: "Menu Profil Saya", body: "Ubah nama dan password. Klik Ubah dulu, baru bisa mengubah isinya." },
           { title: "Tombol bantuan", body: "Ada di pojok kanan bawah setelah masuk. Pertanyaan umum dijawab asisten; yang perlu dicek admin diteruskan, balasannya muncul di jendela chat yang sama." },
         ],
       },
@@ -130,7 +130,7 @@ const GUIDES: Guide[] = [
       {
         heading: "4. Saldo & profil",
         steps: [
-          { title: "Isi rekening sekali", body: "Setelah tersimpan, rekening terkunci. Klik Edit bila ingin mengubahnya." },
+          { title: "Isi rekening sekali", body: "Setelah tersimpan, rekening terkunci. Klik Ubah bila ingin mengubahnya." },
           { title: "Ajukan pencairan", body: `Minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja. Riwayat pencairan menampilkan status, tanggal, dan rekening tujuan.` },
           { title: "Lengkapi profil", body: "Tanggal lahir, jenis kelamin, bio, keahlian, foto, dan sertifikat. Orang tua sering memilih coach dari informasi ini." },
         ],
@@ -164,7 +164,7 @@ const GUIDES: Guide[] = [
         heading: "3. Saldo & laporan",
         steps: [
           { title: "Saldo kolam", body: "Bertambah setiap sesi yang ditandai Hadir oleh coach." },
-          { title: "Ajukan pencairan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat Edit), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja.` },
+          { title: "Ajukan pencairan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat tombol Ubah), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja.` },
           { title: "Laporan", body: "Rincian bagian kolam (setelah PPh final 0,5%) per sesi yang benar-benar Hadir, bisa disaring per rentang tanggal." },
         ],
       },
