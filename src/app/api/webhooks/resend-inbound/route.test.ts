@@ -82,6 +82,23 @@ describe("resend inbound webhook", () => {
     );
   });
 
+  it("email otomatis (noreply) disimpan tapi tidak ditandai perlu dibalas dan tidak mengirim notifikasi", async () => {
+    verify.mockReturnValue({
+      type: "email.received",
+      data: { email_id: "em-3", from: "noreply@midtrans.com", subject: "Pembayaran" },
+    });
+    fetchReceivedEmail.mockResolvedValue({ to: ["hello@swimprivatehub.biz.id"], text: "x", html: null });
+
+    const res = await POST(req());
+
+    expect(res.status).toBe(200);
+    const arg = upsert.mock.calls[0][0];
+    expect(arg.create.needsAdmin).toBe(false);
+    expect(arg.update).not.toHaveProperty("needsAdmin");
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(sendPushToRole).not.toHaveBeenCalled();
+  });
+
   it("swallows a duplicate webhook retry (unique constraint) instead of throwing", async () => {
     verify.mockReturnValue({
       type: "email.received",

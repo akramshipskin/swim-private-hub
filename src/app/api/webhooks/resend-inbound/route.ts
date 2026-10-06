@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import { fetchReceivedEmail } from "@/lib/email";
 import { sendPushToRole } from "@/lib/push";
+import { isAutomatedSender } from "@/lib/automated-sender";
 
 // Resend ngirim webhook `email.received` cuma metadata (from/to/subject/
 // email_id) -- body/html/headers HARUS ditarik lagi via
@@ -42,10 +43,14 @@ export async function POST(request: Request) {
   const { email_id: emailId, from, subject } = event.data;
   const full = await fetchReceivedEmail(emailId);
 
+  // Email otomatis (noreply Midtrans, dsb): disimpan, tapi tidak menandai
+  // "perlu dibalas" dan tidak mengirim notifikasi (Hadi 6 Okt, 10A). Thread
+  // yang sudah menunggu dibalas tidak ikut berubah.
+  const automated = isAutomatedSender(from);
   const thread = await prisma.emailThread.upsert({
     where: { externalEmail: from },
-    create: { externalEmail: from, subject: subject || "(tanpa subjek)", needsAdmin: true },
-    update: { needsAdmin: true, subject: subject || "(tanpa subjek)" },
+    create: { externalEmail: from, subject: subject || "(tanpa subjek)", needsAdmin: !automated },
+    update: { ...(automated ? {} : { needsAdmin: true }), subject: subject || "(tanpa subjek)" },
   });
 
   let created = false;
@@ -70,7 +75,7 @@ export async function POST(request: Request) {
     if (code !== "P2002") throw err;
   }
 
-  if (created) {
+  if (created && !automated) {
     await sendPushToRole("ADMIN", {
       title: "Email baru",
       body: `${from}: ${subject || "(tanpa subjek)"}`,
