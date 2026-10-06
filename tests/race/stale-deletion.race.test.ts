@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { reset, mkPool, mkUser, mkMemberWithPackage, settle, jitter, spread, tally } from "./fx";
+import { as, reset, mkPool, mkUser, mkMemberWithPackage, mkPricedOffer, settle, jitter, spread, tally } from "./fx";
+import { POST as checkout } from "@/app/api/payment/checkout/route";
 import { checkInvariants } from "./invariants";
 import { POST as webhook } from "@/app/api/payment/webhook/route";
 import { releaseStalePayments } from "@/lib/stale-payments";
@@ -117,5 +118,26 @@ describe("Hapus akun diblokir saat ada pembayaran berjalan (1A)", () => {
       if (u.anonymizedAt) expect(pay.status).not.toBe("PENDING");
     }
     spread("D-D hasil persetujuan", seen);
+  });
+
+  it("D-E (balapan): beli paket dan (ajukan + setujui hapus akun) barengan -> tidak pernah ada akun terhapus yang punya paket baru", async () => {
+    const seen: Record<string, number> = {};
+    for (let i = 0; i < 6; i++) {
+      await reset();
+      const { pool, coach } = await mkPricedOffer();
+      const m = await mkUser("MEMBER");
+      const dep = await prisma.dependent.create({ data: { memberId: m.id, name: "A" } });
+      const rs = await settle([
+        jitter(20).then(() => as({ id: m.id, role: "MEMBER", name: "M" }, () => checkout(new Request("http://x/api/payment/checkout", { method: "POST", body: JSON.stringify({ poolId: pool.id, coachId: coach.id, sesi: 8, dependentId: dep.id }) })))),
+        jitter(20).then(async () => { await requestAccountDeletion(m.id); return anonymizeMember(m.id); }),
+      ]);
+      const u = await prisma.user.findUniqueOrThrow({ where: { id: m.id } });
+      const pkgs = await prisma.package.count({ where: { memberId: m.id } });
+      const co = rs[0].status === "fulfilled" ? (rs[0].value as Response).status : "ERR";
+      tally(seen, `checkout ${co} / ${u.anonymizedAt ? "terhapus" : "tidak terhapus"}`);
+      if (u.anonymizedAt) expect(pkgs).toBe(0);
+      if (pkgs > 0) expect(u.anonymizedAt).toBeNull();
+    }
+    spread("D-E checkout vs hapus akun", seen);
   });
 });

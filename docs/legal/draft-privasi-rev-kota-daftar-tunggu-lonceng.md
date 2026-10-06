@@ -21,6 +21,7 @@ Semua fakta di bawah dicek dari kode pada 6 Okt 2026 (bukan dari ingatan). Sumbe
 
 > - Kota domisili yang dipilih Pengguna saat mendaftar atau saat diminta melengkapi, serta kota lokasi untuk kolam. Kota dipilih dari daftar kota layanan yang tersedia di Aplikasi.
 > - Daftar tunggu kota: bila member memilih kota yang belum memiliki pasangan kolam dan coach yang sesuai dan menekan "Kabari saya", kami menyimpan kaitan antara akun member, kota tersebut, waktu pendaftaran daftar tunggu, dan waktu member dikabari.
+> - Untuk coach: catatan pelanggaran kewajiban membuka jadwal (tanggal kejadian dan paket terkait), yang dilihat administrator untuk menilai kelanjutan kemitraan sesuai Perjanjian Coach.
 > - Riwayat notifikasi dalam Aplikasi (lonceng): judul, isi, tautan, dan status sudah/belum dibaca dari notifikasi terkait pemesanan, pembayaran, dan layanan. Isi notifikasi dapat memuat nama peserta, nama coach atau kolam, jadwal sesi, dan nominal rupiah.
 
 ### Tambahan butir pada bagian 3 (Tujuan Penggunaan Data)
@@ -30,12 +31,11 @@ Semua fakta di bawah dicek dari kode pada 6 Okt 2026 (bukan dari ingatan). Sumbe
 
 ### Tambahan pada bagian 5 (Masa Penyimpanan), setelah paragraf chat
 
-> Riwayat notifikasi dalam Aplikasi (lonceng) kami simpan paling lama 90 hari sejak notifikasi dibuat, kemudian dihapus otomatis; riwayat ini juga dihapus saat akun dihapus. Data daftar tunggu kota disimpan sampai member dikabari dan, selama akun masih aktif, sampai member tidak lagi memerlukannya.
+> Riwayat notifikasi dalam Aplikasi (lonceng) kami simpan paling lama 90 hari sejak notifikasi dibuat, kemudian dihapus otomatis; riwayat ini juga dihapus saat akun dihapus. Saat akun member dihapus, kota domisili dan catatan daftar tunggu kota tetap tersimpan tanpa nama, nomor telepon, maupun email, dan hanya dipakai untuk menghitung minat layanan per kota.
 
-(Kalimat terakhir mengandung janji "tidak lagi memerlukannya" yang BELUM ada fiturnya: member belum bisa keluar dari daftar tunggu sendiri. Lihat pertanyaan 2 di bawah; orang hukum boleh memotong kalimat itu.)
+## Keputusan Hadi (6 Okt sore)
+1. Kota dan daftar tunggu setelah akun dihapus: B, dibiarkan; ditulis di Privasi (kalimat terakhir bagian 5 di atas).
+2. Tombol keluar dari daftar tunggu: B, tidak dibuat; kalimat janjinya dibuang dari draf.
+3. Catatan pelanggaran coach: A, ditambah satu butir di bagian 1 (butir "Untuk coach" di atas).
 
-## Yang perlu diputuskan sebelum dipasang (diteruskan ke Hadi)
-
-1. **Kota dan daftar tunggu setelah akun dihapus.** Saat ini penghapusan akun member (`anonymizeMember`) TIDAK menghapus `User.city` maupun baris `CityWaitlist`. Kota hanya data kasar, tetapi kaitannya ke akun yang dianonimkan tetap ada. Pilihan: (A) hapus baris daftar tunggu dan kosongkan kota saat dianonimkan (perubahan kecil di logika hapus akun, perlu Opus + pemeriksa kedua); (B) biarkan dan tulis di Kebijakan Privasi bahwa data kota kasar tetap tersimpan tanpa identitas.
-2. **Keluar dari daftar tunggu.** Belum ada tombolnya. Pilihan: (A) tambah tombol "Batalkan daftar tunggu" (perubahan kecil, Sonnet); (B) tidak ada, dan kalimat terakhir di atas dibuang.
-3. **Catatan pelanggaran coach** sudah disebut di perjanjian coach rev.3 (dicek di `docs/legal/draft-rev3-kota-coach-kolam.md`, butir b dan c), tetapi belum di Kebijakan Privasi. Pilihan: (A) tambah satu butir di bagian 1 ("catatan pelanggaran coach, dilihat admin"); (B) cukup di perjanjian coach.
+Langkah berikutnya: draf ini dikirim ke orang hukum. Setelah disetujui, Claude memasang teks, menaikkan tanggal Privasi, dan semua pengguna diminta setuju ulang.

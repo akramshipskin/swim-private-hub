@@ -25,6 +25,8 @@ const paymentUpdate = vi.fn().mockResolvedValue({});
 const packageDelete = vi.fn().mockResolvedValue({});
 const packageUpdate = vi.fn().mockResolvedValue({});
 const affiliationLock = vi.fn().mockResolvedValue([{ id: "aff1" }]);
+// Kunci baris akun pembeli (pintu hapus akun dibaca ulang di dalam kunci, 7A).
+const ownerLock = vi.fn().mockResolvedValue([{ deletionRequestedAt: null, anonymizedAt: null }]);
 const meetsSlots = vi.fn().mockResolvedValue(true);
 vi.mock("@/lib/coach-open-slots", () => ({ coachMeetsOpenSlotRule: (...a: unknown[]) => meetsSlots(...a), MIN_OPEN_SLOTS: 4, OPEN_SLOT_WINDOW_DAYS: 14 }));
 vi.mock("@/lib/prisma", () => {
@@ -36,7 +38,8 @@ vi.mock("@/lib/prisma", () => {
     payment: { create: paymentCreate, deleteMany: (...a: unknown[]) => paymentDeleteMany(...a), update: (...a: unknown[]) => paymentUpdate(...a) },
   };
   // Kunci tautan coach-kolam di dalam transaksi checkout (src/lib/coach-pools.ts).
-  prisma.$queryRaw = (...a: unknown[]) => affiliationLock(...a);
+  prisma.$queryRaw = (strings: TemplateStringsArray, ...a: unknown[]) =>
+    strings.join("?").includes('FROM "User"') ? ownerLock(strings, ...a) : affiliationLock(strings, ...a);
   prisma.$transaction = (arg: unknown) => (typeof arg === "function" ? arg(prisma) : Promise.all(arg as Promise<unknown>[]));
   return { prisma };
 });
@@ -115,6 +118,20 @@ describe("checkout paket pilih coach", () => {
     expect((await res.json()).error).toMatch(/tidak mengajar di kolam ini/);
     expect(packageCreate).not.toHaveBeenCalled();
     expect(createTransaction).not.toHaveBeenCalled();
+  });
+
+  it("hapus akun diajukan/disetujui setelah pengecekan awal: dibaca ulang di dalam kunci akun = ditolak, tidak ada paket/tagihan (7A)", async () => {
+    ownerLock.mockResolvedValueOnce([{ deletionRequestedAt: new Date(), anonymizedAt: null }]);
+    const res = await POST(buy());
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toMatch(/penghapusan akun/);
+    expect(packageCreate).not.toHaveBeenCalled();
+    expect(paymentCreate).not.toHaveBeenCalled();
+    expect(spendMemberBalance).not.toHaveBeenCalled();
+    expect(createTransaction).not.toHaveBeenCalled();
+    ownerLock.mockResolvedValueOnce([{ deletionRequestedAt: null, anonymizedAt: new Date() }]);
+    expect((await POST(buy())).status).toBe(409);
+    expect(packageCreate).not.toHaveBeenCalled();
   });
 
   it("coach dengan jam kosong kurang dari 4 dalam 14 hari tidak bisa dibeli (Hadi 3 Okt)", async () => {

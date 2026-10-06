@@ -25,11 +25,11 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 ## Sedang jalan / menunggu Hadi
 - Dijawab 6 Okt (rekomendasi dijalankan): hapus akun vs ganti coach ditolak (SELESAI); "Edit"->"Ubah" (SELESAI); lonceng 90 hari diterima; tombol beli menempel tidak dibuat.
 - 6 Okt sore: 12 jawaban Hadi dikerjakan, dikirim 4d68aa3 (3 commit; tidak ada migrasi; tes 864 + 207 balapan + uji alur penuh + build lulus lokal; pemeriksa Opus kedua untuk uang: 0 berat). Isi: hapus akun diblokir saat ada pembayaran berjalan; pembayaran Menunggu kedaluwarsa otomatis lewat cron harian; "6,5% (maksimal 7%)"; FAQ kolam jujur; landing + section kota/ganti coach gratis/syarat coach; gambar produk landing baru; Panduan ikut tema gelap; email noreply tidak dihitung; Title Case tombol/label dalam aplikasi (193 potongan); draf Privasi di docs/legal. 
-- MENUNGGU HADI (6 Okt sore): (a) Kebijakan Privasi: hapus akun belum menghapus kota/daftar tunggu kota (pilihan A hapus / B tulis di Privasi) dan belum ada tombol keluar daftar tunggu; (b) 2 email noreply lama di kotak masuk admin tetap "menunggu" sampai ditandai selesai manual; (c) konfirmasi tafsir Title Case dan jawaban 4 di KEPUTUSAN 6 Okt.
+- 6 Okt malam: 8 jawaban lanjutan dikerjakan: checkout membaca ulang status hapus akun di dalam kunci akun (pemeriksa Opus kedua: 0 berat), draf Privasi diperbarui (kota/daftar tunggu tetap tersimpan tanpa identitas, catatan pelanggaran coach), contekan Arahan Hadi diperbarui. MENUNGGU HADI: member yang dinonaktifkan admin masih bisa membeli paket (booking sudah ditolak), boleh atau tidak?
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Tunggu jawaban (a)-(c) di atas. Sweeping ulang bagian yang berubah (Title Case, Panduan gelap, landing); peran selain admin di live hanya bila Hadi login sendiri di browser aplikasi. Opsi C (rombak alur total) tunggu data pemakaian.
+1. Tunggu jawaban soal member nonaktif membeli paket; kirim draf Privasi ke orang hukum (Hadi). Sweeping ulang bagian yang berubah (Title Case, Panduan gelap, landing); peran selain admin di live hanya bila Hadi login sendiri di browser aplikasi. Opsi C (rombak alur total) tunggu data pemakaian.
 2. P8 (reset password via email) setelah email production terbukti. Pantau next-auth v5 stabil (dikunci 5.0.0-beta.32).
 3. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi), (aturan kota/ganti gratis/pelanggaran sudah ditulis di docs/aturan-bisnis-saat-ini.md 3 Okt malam).
 
