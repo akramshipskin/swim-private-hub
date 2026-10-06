@@ -25,7 +25,7 @@ function Fields({ v }: { v?: Values }) {
           <Input name="role" defaultValue={v?.role} maxLength={TESTIMONIAL_LIMITS.role} required placeholder="Orang tua peserta" />
         </Field>
       </div>
-      <Field label="Kutipan (persis kata mereka)">
+      <Field label="Kutipan (Persis Kata Mereka)">
         <Textarea name="quote" defaultValue={v?.quote} maxLength={TESTIMONIAL_LIMITS.quote} rows={4} required />
       </Field>
       <Field label="Catatan izin (siapa mengizinkan, kapan, lewat apa)">
@@ -41,7 +41,7 @@ export function AddTestimonialForm() {
     <form action={action} className="flex flex-col gap-3">
       <Fields />
       <div className="flex items-center gap-3">
-        <Button type="submit" loading={pending}>Tambah testimoni</Button>
+        <Button type="submit" loading={pending}>Tambah Testimoni</Button>
         <Status state={state} />
       </div>
     </form>
@@ -57,7 +57,7 @@ export function EditTestimonialForm({ id, values }: { id: string; values: Requir
         <Field label="Urutan">
           <Input name="sortOrder" type="number" min={0} max={999} defaultValue={values.sortOrder} className="w-24" />
         </Field>
-        <Button type="submit" size="sm" variant="secondary" loading={pending}>Simpan perubahan</Button>
+        <Button type="submit" size="sm" variant="secondary" loading={pending}>Simpan Perubahan</Button>
         <Status state={state} />
       </div>
     </form>

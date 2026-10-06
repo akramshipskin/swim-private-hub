@@ -4,7 +4,7 @@ Dibuat Claude (Sonnet) dari keputusan Hadi di docs/KEPUTUSAN.md, rancangan docs/
 
 ## Harga dan paket
 - Kolam memasang harga tiket paket 4 dan 8 sesi (tiket masuk 1 coach + 1 peserta + 1 pendamping per sesi). Coach memasang harga jasa paket 4 dan 8 sesi, satu harga untuk semua kolam. Perubahan harga berlaku untuk pembelian berikutnya.
-- Member bayar = harga kolam + harga coach + biaya layanan SPH di atasnya (6,5%; sistem mengunci maksimal 6,9%; ke pengguna disebut "di bawah 7%").
+- Member bayar = harga kolam + harga coach + biaya layanan SPH di atasnya (6,5%; sistem mengunci maksimal 6,9%; ke pengguna disebut "6,5% (maksimal 7%)", Hadi 6 Okt).
 - Paket 4 sesi berlaku 60 hari, batal sendiri maksimal 2x; paket 8 sesi 90 hari, batal 4x. Batal sendiri paling lambat 2 jam sebelum jadwal.
 - Sesi coba: 1x per peserta (belum pernah punya paket), berlaku 7 hari, tidak bisa dibatalkan sendiri. Eceran dan "beli 1 sesi di kolam lain" sudah dihapus. Paket terikat ke 1 coach dan 1 kolam.
 - Ganti coach: member mengajukan, admin memutuskan; sisa sesi dihitung ulang dengan harga coach baru. Lebih murah = selisih jadi saldo member; lebih mahal = member tambah bayar. Saldo member hanya untuk membeli paket berikutnya, tidak bisa dicairkan.
@@ -49,3 +49,9 @@ Dibuat Claude (Sonnet) dari keputusan Hadi di docs/KEPUTUSAN.md, rancangan docs/
 ## Tidak berlaku lagi (jangan jadi acuan)
 - Model lama DIHAPUS dari kode (Hadi 2 Okt malam, #9): bagi hasil persen per kolam (commissionPercent/coachSharePercent), katalog/template paket, usulan paket dari pemilik kolam, beli 1 sesi eceran, impor Excel member, komisi afiliasi 5%. Kolom database lamanya belum dihapus (menyusul). Riwayat buku besar & saldo model lama tetap, tidak dihitung ulang; paket lama yang masih aktif ditandai Berakhir lewat skrip akhiri-paket-lama. Tandai hadir paket berbayar model lama ditolak sistem (koreksi lewat admin).
 - Dokumen lama marketplace-pivot dan simulasi-pendapatan-kolam.
+
+## Tambahan 6 Okt 2026 (Hadi, jawaban sweeping)
+- Hapus akun member: admin tidak bisa menyetujui selama ada pembayaran Menunggu yang belum lewat batas bayar (24 jam + 15 menit jeda), baik beli paket maupun tambah bayar ganti coach. Tunggu lunas atau kedaluwarsa.
+- Pembayaran Menunggu yang lewat 24 jam 15 menit dikedaluwarsakan otomatis oleh pemeriksa harian (06.00 WIB), semua jenis (juga yang tanpa saldo); saldo yang terpakai kembali. Bila ternyata lunas belakangan, webhook tetap mengaktifkan paket dan menarik lagi saldonya.
+- Email otomatis (pengirim noreply/no-reply/do-not-reply/mailer-daemon) disimpan di Email admin tetapi tidak dihitung "menunggu dibalas" dan tidak memicu notifikasi.
+- Tulisan antarmuka: tombol, label isian, dan judul kartu angka di dalam aplikasi memakai Title Case ("Simpan Perubahan", "Tanggal Lahir"); kata sambung (di, ke, dari, dan, atau, yang, untuk, dengan, pada, dalam, oleh, bagi, serta, sampai, hingga, tanpa, per, sebagai) tetap huruf kecil. Judul bagian landing tetap huruf besar hanya di awal (brand-kit/MESSAGING.md).

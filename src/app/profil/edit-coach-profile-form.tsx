@@ -34,10 +34,10 @@ export default function EditCoachProfileForm({
     <form key={edit.formKey} action={formAction} className="flex flex-col gap-4">
       <fieldset disabled={edit.locked} className="flex flex-col gap-4 disabled:opacity-90">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Tanggal lahir">
+        <Field label="Tanggal Lahir">
           <DatePicker name="birthDate" defaultValue={profile.birthDate ? toDateInput(profile.birthDate) : ""} clearable />
         </Field>
-        <Field label="Jenis kelamin">
+        <Field label="Jenis Kelamin">
           <Select name="gender" defaultValue={profile.gender ?? ""}>
             <option value="">Belum diisi</option>
             <option value="MALE">Laki-laki</option>
@@ -50,7 +50,7 @@ export default function EditCoachProfileForm({
         sering memilih coach berdasarkan dua hal ini.
       </p>
 
-      <Field label="Bio singkat (opsional)">
+      <Field label="Bio Singkat (Opsional)">
         <Textarea
           name="bio"
           defaultValue={profile.bio ?? ""}

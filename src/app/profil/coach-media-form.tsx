@@ -71,7 +71,7 @@ export default function CoachMediaForm({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={signatureUrl} alt="Tanda tangan tersimpan" className="h-16 w-auto self-start rounded border border-border bg-white p-1" />
         )}
-        <Field label="File tanda tangan">
+        <Field label="File Tanda Tangan">
           <Input type="file" name="signature" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />
         </Field>
         <div className="flex items-center gap-3">
@@ -108,7 +108,7 @@ export default function CoachMediaForm({
                       ? "Sertifikat ini sudah disetujui. Kalau ini satu-satunya yang disetujui, badge \"Bersertifikat\" di profilmu ikut hilang."
                       : "File sertifikat ini dihapus dan tidak bisa dikembalikan."
                   }
-                  confirmLabel="Ya, hapus"
+                  confirmLabel="Ya, Hapus"
                 />
               </li>
             ))}
@@ -119,7 +119,7 @@ export default function CoachMediaForm({
           <p className="text-sm text-text-muted">Sudah {MAX_CERTIFICATES_PER_COACH} sertifikat. Hapus salah satu untuk menambah yang baru.</p>
         ) : (
           <form ref={certForm} action={certAction} className="flex flex-col gap-3">
-            <Field label="Nama sertifikat/lembaga">
+            <Field label="Nama Sertifikat/Lembaga">
               <Input
                 name="certificateName"
                 defaultValue={certificates.length === 0 ? defaultCertificateName ?? "" : ""}

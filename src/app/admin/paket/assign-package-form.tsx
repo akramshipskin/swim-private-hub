@@ -94,7 +94,7 @@ export default function AssignPackageForm({
             </Select>
           </Field>
           <Button type="submit" loading={pending} className="w-full sm:w-auto">
-            Berikan paket (langsung Aktif)
+            Berikan Paket (Langsung Aktif)
           </Button>
         </form>
         <p className="mt-3 text-xs text-text-subtle">

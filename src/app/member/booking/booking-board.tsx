@@ -381,7 +381,7 @@ export default function BookingBoard({
       )}
       <Card className="mb-4">
         <CardBody className="flex flex-col gap-3 py-3 sm:flex-row sm:items-end sm:flex-wrap">
-          <Field label="Untuk peserta">
+          <Field label="Untuk Peserta">
             <Select
               value={dependentId}
               onChange={(e) => setDependentId(e.target.value)}
@@ -424,7 +424,7 @@ export default function BookingBoard({
                   onClick={() => setShowFullCalendar((v) => !v)}
                   className="font-medium text-brand-700 underline underline-offset-2 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
                 >
-                  {showFullCalendar ? "Tutup kalender" : "Pilih tanggal lain"}
+                  {showFullCalendar ? "Tutup Kalender" : "Pilih Tanggal Lain"}
                 </button>
               </div>
               {/* Fallback buat booking di luar window 8 hari pill --
@@ -541,13 +541,13 @@ export default function BookingBoard({
             <p className="text-sm font-medium text-text">Jadwal gagal dimuat</p>
             <p className="mt-1 text-sm text-text-muted">Cek koneksi internetmu. Halaman akan mencoba lagi otomatis.</p>
             <Button type="button" size="sm" variant="secondary" className="mt-3" onClick={() => loadSlots()}>
-              Coba lagi sekarang
+              Coba Lagi Sekarang
             </Button>
           </CardBody>
         </Card>
       ) : slots === null ? (
         <div className="flex justify-center py-10" aria-busy="true">
-          <Loader label="Memuat jadwal" />
+          <Loader label="Memuat Jadwal" />
         </div>
       ) : slots.length === 0 ? (
         <Card>
@@ -604,7 +604,7 @@ export default function BookingBoard({
                                   : "bg-surface-muted text-success-text"
                             }`}
                           >
-                            {selected ? "Dipilih" : s.status === "BOOKED" ? "Sudah dibooking" : "Kosong"}
+                            {selected ? "Dipilih" : s.status === "BOOKED" ? "Sudah Dibooking" : "Kosong"}
                           </span>
                         </button>
                       </li>
@@ -712,7 +712,7 @@ export default function BookingBoard({
             ? `${cancelTarget.coach.name}, ${formatTime(cancelTarget.startTime)}–${formatTime(cancelTarget.endTime)}. Sisa sesi kamu akan kembali, tapi jatah batal berkurang.`
             : ""
         }
-        confirmLabel="Ya, batalkan"
+        confirmLabel="Ya, Batalkan"
         loading={cancelLoading}
         onConfirm={handleConfirmCancel}
         onCancel={() => setCancelTarget(null)}

@@ -189,7 +189,7 @@ try {
     prisma.user.update({ where: { id: member.id }, data: { memberBalance: { increment: 800_000 } } }),
   ]);
   await goto("/member/paket");
-  await clickText("Beli", "Paket 4 sesi");
+  await clickText("Beli", "Paket 4 Sesi");
   await waitFor("pembayaran sukses", `location.pathname === "/pembayaran/sukses"`, 30_000);
   const bought = await prisma.package.findFirstOrThrow({ where: { memberId: member.id }, include: { payments: true } });
   expectEq("status paket setelah bayar", bought.status, "ACTIVE");
@@ -207,11 +207,11 @@ try {
   await waitFor("tombol booking menempel", bookBtn);
   await js(`${bookBtn}.click()`);
   await waitFor("layar sukses booking", `document.body.innerText.includes("Slot terkunci untukmu")`);
-  await clickText("Booking sesi lain");
+  await clickText("Booking Sesi Lain");
   await waitFor("booking tersimpan", `[...document.querySelectorAll("button")].some((b) => b.innerText.trim() === "Batalkan")`);
   expectEq("sisa sesi setelah booking", (await prisma.package.findUniqueOrThrow({ where: { id: bought.id } })).sisaSesi, 3);
   await clickText("Batalkan");
-  await clickText("Ya, batalkan");
+  await clickText("Ya, Batalkan");
   await waitFor("booking dibatalkan", `![...document.querySelectorAll("button")].some((b) => b.innerText.trim() === "Batalkan")`);
   await sleep(500);
   const booking = await prisma.booking.findFirstOrThrow({ where: { memberId: member.id } });

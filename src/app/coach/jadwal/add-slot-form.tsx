@@ -57,8 +57,8 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
             <input type="hidden" name="date" value={date} />
           </Field>
           <div className="flex items-end gap-3">
-            <TimeSelect name="startTime" label="Jam mulai" defaultValue="08:00" hourOnly />
-            <TimeSelect name="endTime" label="Jam selesai" defaultValue="16:00" hourOnly />
+            <TimeSelect name="startTime" label="Jam Mulai" defaultValue="08:00" hourOnly />
+            <TimeSelect name="endTime" label="Jam Selesai" defaultValue="16:00" hourOnly />
           </div>
           <Button type="submit" loading={pending}>
             Tambah Slot

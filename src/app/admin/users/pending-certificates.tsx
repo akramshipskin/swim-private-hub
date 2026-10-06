@@ -46,7 +46,7 @@ export default async function PendingCertificates() {
                   label="Setujui"
                   title={`Setujui sertifikat ${r.coachName}?`}
                   description={`"${r.name}" langsung tampil di profil coach ini untuk semua orang, dengan badge "Bersertifikat".`}
-                  confirmLabel="Ya, setujui"
+                  confirmLabel="Ya, Setujui"
                 />
                 <ConfirmSubmit
                   action={reviewCertificate.bind(null, r.id, false)}
@@ -54,7 +54,7 @@ export default async function PendingCertificates() {
                   variant="danger"
                   title={`Tolak sertifikat ${r.coachName}?`}
                   description={`"${r.name}" ditolak. Coach bisa menghapusnya dan mengunggah ulang.`}
-                  confirmLabel="Ya, tolak"
+                  confirmLabel="Ya, Tolak"
                 />
               </div>
             </li>

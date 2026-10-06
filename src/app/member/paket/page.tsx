@@ -237,7 +237,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
           <span>Pengajuan ganti ke {req.toCoach.name} menunggu keputusan admin.</span>
           <form action={withdrawCoachChange}>
             <input type="hidden" name="requestId" value={req.id} />
-            <button type="submit" className="font-medium underline max-lg:min-h-[44px]">Batalkan pengajuan</button>
+            <button type="submit" className="font-medium underline max-lg:min-h-[44px]">Batalkan Pengajuan</button>
           </form>
         </div>
       );
@@ -255,7 +255,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
             {req.payments.length === 0 && (
               <form action={withdrawCoachChange}>
                 <input type="hidden" name="requestId" value={req.id} />
-                <button type="submit" className="font-medium underline max-lg:min-h-[44px]">Batalkan pengajuan</button>
+                <button type="submit" className="font-medium underline max-lg:min-h-[44px]">Batalkan Pengajuan</button>
               </form>
             )}
           </div>
@@ -385,7 +385,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
       <h2 id="beli" className="mb-1 scroll-mt-20 text-xl font-semibold text-text">Beli Paket Baru</h2>
       <p className="mb-4 text-sm text-text-muted">
         Pilih kolam, lalu coach. Paket berlaku untuk coach dan kolam yang kamu pilih. Harga sudah termasuk tiket masuk
-        untuk 1 peserta, 1 pendamping, dan coach-nya, ditambah biaya layanan SPH di bawah 7%.
+        untuk 1 peserta, 1 pendamping, dan coach-nya, ditambah biaya layanan SPH 6,5% (maksimal 7%).
         {wallet && wallet.memberBalance > 0 && <> Saldomu {formatRupiah(wallet.memberBalance)} otomatis dipakai lebih dulu, sisanya dibayar lewat Midtrans.</>}
       </p>
       <form method="get" action="#beli" className="mb-3 flex flex-wrap items-end gap-2">
@@ -428,7 +428,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
               <p role="status" className="rounded-lg bg-success-bg px-3 py-2 text-sm text-success-text">Kamu sudah masuk daftar tunggu {city}.</p>
             ) : (
               <form action={joinCityWaitlist.bind(null, city)}>
-                <Button type="submit">Kabari saya</Button>
+                <Button type="submit">Kabari Saya</Button>
               </form>
             ))}
             {nearby.length > 0 && (
@@ -499,9 +499,9 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                       </div>
                       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         {[
-                          ...(eight ? [{ q: eight, label: "Paket 8 sesi", note: saving > 0 ? `Hemat ${saving}% per sesi dibanding paket 4` : null }] : []),
-                          ...(four ? [{ q: four, label: "Paket 4 sesi", note: null }] : []),
-                          ...(trial && trialChildren.length > 0 ? [{ q: trial, label: "Sesi coba", note: "Sekali per peserta yang belum pernah punya paket. Tidak bisa dibatalkan sendiri. Bila tidak hadir, sesi hangus." }] : []),
+                          ...(eight ? [{ q: eight, label: "Paket 8 Sesi", note: saving > 0 ? `Hemat ${saving}% per sesi dibanding paket 4` : null }] : []),
+                          ...(four ? [{ q: four, label: "Paket 4 Sesi", note: null }] : []),
+                          ...(trial && trialChildren.length > 0 ? [{ q: trial, label: "Sesi Coba", note: "Sekali per peserta yang belum pernah punya paket. Tidak bisa dibatalkan sendiri. Bila tidak hadir, sesi hangus." }] : []),
                         ].map(({ q, label, note }) => (
                           <li key={label} className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
                             <div className="flex items-start justify-between gap-2">

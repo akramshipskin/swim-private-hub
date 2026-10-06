@@ -118,7 +118,7 @@ export default function RegisterPoolForm() {
             <Field label="Kota">
               <CitySelect value={city} onChange={(e) => setCity(e.target.value)} />
             </Field>
-            <Field label="Alamat lengkap">
+            <Field label="Alamat Lengkap">
               <Input
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
@@ -137,10 +137,10 @@ export default function RegisterPoolForm() {
                 Tiket masuk untuk 1 coach + 1 peserta + 1 pendamping per sesi. Isi minimal satu, kelipatan Rp 1.000. Bisa diubah nanti.
               </p>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Paket 4 sesi (Rp)">
+                <Field label="Paket 4 Sesi (Rp)">
                   <PriceInput name="pricePack4" />
                 </Field>
-                <Field label="Paket 8 sesi (Rp)">
+                <Field label="Paket 8 Sesi (Rp)">
                   <PriceInput name="pricePack8" />
                 </Field>
               </div>
@@ -163,7 +163,7 @@ export default function RegisterPoolForm() {
               </p>
             </div>
 
-            <Field label="Deskripsi kolam (opsional)">
+            <Field label="Deskripsi Kolam (Opsional)">
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -210,7 +210,7 @@ export default function RegisterPoolForm() {
                 autoComplete="tel"
               />
             </Field>
-            <Field label="Email (opsional)">
+            <Field label="Email (Opsional)">
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
             </Field>
             <Field label="Password">

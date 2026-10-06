@@ -111,7 +111,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
                   <form action={saveMyCity} className="flex flex-wrap items-end gap-3">
                     <input type="hidden" name="from" value="profil" />
                     <CitySelect defaultValue={cityUser.city ?? ""} aria-label="Kota domisili" className="min-w-48 flex-1" />
-                    <Button type="submit" variant="secondary">Simpan kota</Button>
+                    <Button type="submit" variant="secondary">Simpan Kota</Button>
                   </form>
                   {error === "kota" && <p role="alert" className="mt-2 text-sm text-danger-text">Pilih kota dari daftar.</p>}
                 </CardBody>

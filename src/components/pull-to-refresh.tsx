@@ -73,7 +73,7 @@ export function PullToRefresh({ children }: { children: React.ReactNode }) {
       >
         {showIndicator &&
           (refreshing ? (
-            <Loader size={20} label="Memuat ulang" />
+            <Loader size={20} label="Memuat Ulang" />
           ) : (
             <div
               className="h-5 w-5 rounded-full border-2 border-brand-500 border-t-transparent"

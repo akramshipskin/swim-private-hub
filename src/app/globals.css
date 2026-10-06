@@ -211,7 +211,7 @@
 }
 
 /* Warna TETAP (tidak ikut tema terang/gelap), dipakai halaman yang memang
-   dipaku terang: landing, panduan, halaman legal, dan tombol yang harus sama
+   dipaku terang: landing dan tombol yang harus sama
    di dua tema. Nilainya mengikuti palet brand-kit / token tema terang di atas.
    Dulu ditulis sebagai hex di tiap file (text-[#14140F] dst); sekarang satu
    sumber: ganti di sini, semua ikut. */

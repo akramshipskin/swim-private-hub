@@ -13,7 +13,7 @@ export default function ComposeForm() {
   if (!open) {
     return (
       <Button variant="secondary" size="sm" onClick={() => setOpen(true)}>
-        Tulis email baru
+        Tulis Email Baru
       </Button>
     );
   }

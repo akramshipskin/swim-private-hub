@@ -124,7 +124,7 @@ export default async function MemberDashboardPage() {
               body={`${next.package.dependent.name} · ${next.availability.pool.name} · dengan ${next.availability.coach.name}`}
               href={unscheduled > 0 ? "/member/booking" : undefined}
               cta={unscheduled > 0 ? `Booking sesi lain (${unscheduled} tersisa)` : undefined}
-              secondary={{ href: "/member/riwayat", label: "Semua jadwal" }}
+              secondary={{ href: "/member/riwayat", label: "Semua Jadwal" }}
             />
           ) : unscheduled > 0 ? (
             // Belum ada jadwal tapi masih ada sisa sesi: tampilkan sisa sesinya
@@ -153,14 +153,14 @@ export default async function MemberDashboardPage() {
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <BentoCard title="Ringkasan" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
-            <Stat label="Paket aktif" value={packages.length} hint={`${pesertaCount} peserta terdaftar`} />
-            <Stat label="Total sisa sesi" value={totalSisa} />
-            <Stat label="Sesi terjadwal" value={upcomingCount} />
-            <Stat label="Sesi dihadiri" value={attendedCount} hint={`${attendedThisMonth} sesi bulan ini`} />
+            <Stat label="Paket Aktif" value={packages.length} hint={`${pesertaCount} peserta terdaftar`} />
+            <Stat label="Total Sisa Sesi" value={totalSisa} />
+            <Stat label="Sesi Terjadwal" value={upcomingCount} />
+            <Stat label="Sesi Dihadiri" value={attendedCount} hint={`${attendedThisMonth} sesi bulan ini`} />
           </div>
           <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-border pt-4 xl:grid-cols-4">
-            <Stat label="Belanja paket bulan ini" value={formatRupiah(spentThisMonth._sum.amount ?? 0)} />
-            <Stat label="Coach tersering" value={topCoach ?? "-"} />
+            <Stat label="Belanja Paket Bulan Ini" value={formatRupiah(spentThisMonth._sum.amount ?? 0)} />
+            <Stat label="Coach Tersering" value={topCoach ?? "-"} />
           </div>
           {expiringSoon.length > 0 && (
             <p className="mt-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">

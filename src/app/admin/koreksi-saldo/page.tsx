@@ -82,7 +82,7 @@ export default async function AdminKoreksiSaldoPage({ searchParams }: { searchPa
         <Card>
           <CardBody className="flex flex-col gap-4">
             <form method="get" className="flex flex-col gap-2 sm:flex-row sm:items-end">
-              <Field label="Coach atau kolam" className="flex-1">
+              <Field label="Coach atau Kolam" className="flex-1">
                 <Select name="target" defaultValue={selected ? `${selected.type}:${selected.id}` : ""} required>
                   <option value="" disabled>
                     Pilih coach atau kolam

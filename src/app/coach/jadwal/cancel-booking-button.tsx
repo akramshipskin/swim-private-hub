@@ -24,7 +24,7 @@ export default function CancelBookingButton({ bookingId, label }: { bookingId: s
         open={open}
         title={`Batalkan sesi ${label}?`}
         description="Gunakan jika kamu benar-benar tidak bisa mengajar (sakit/darurat). Sisa sesi member otomatis kembali dan member mendapat notifikasi. Jam ini ditutup; kalau ternyata bisa mengajar, buka lagi lewat Tambah Slot."
-        confirmLabel="Ya, batalkan"
+        confirmLabel="Ya, Batalkan"
         loading={pending}
         onConfirm={() => {
           setOpen(false);

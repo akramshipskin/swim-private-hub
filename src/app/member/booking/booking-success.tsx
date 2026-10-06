@@ -92,7 +92,7 @@ export function BookingSuccess({
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button type="button" className="h-12 sm:flex-1" onClick={onBookAnother}>
-          Booking sesi lain
+          Booking Sesi Lain
         </Button>
         <Link href="/member/riwayat" className={buttonClass({ variant: "secondary", className: "h-12 sm:flex-1" })}>
           Lihat riwayat

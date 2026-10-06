@@ -17,7 +17,7 @@ export function FreeChangeButton({ packageId, toCoachId, toPoolId, title, descri
         open={open}
         title={title}
         description={description}
-        confirmLabel="Pindah sekarang"
+        confirmLabel="Pindah Sekarang"
         confirmVariant="primary"
         onCancel={() => setOpen(false)}
         onConfirm={() => {

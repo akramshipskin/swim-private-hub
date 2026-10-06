@@ -41,7 +41,7 @@ export default function ToggleActiveButton({
         open={open}
         title={`Nonaktifkan ${userName}?`}
         description="Pengguna ini tidak bisa masuk lagi sampai diaktifkan ulang."
-        confirmLabel="Ya, nonaktifkan"
+        confirmLabel="Ya, Nonaktifkan"
         loading={loading}
         onConfirm={handleToggle}
         onCancel={() => setOpen(false)}

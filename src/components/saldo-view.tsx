@@ -41,10 +41,10 @@ export type Commission = {
 export type SaldoActionState = { error?: string; ok?: boolean } | null;
 
 const statusInfo = {
-  PENDING: { label: "Menunggu diproses", tone: "warning" },
-  PROCESSING: { label: "Sedang diproses", tone: "neutral" },
-  PAID: { label: "Sudah ditransfer", tone: "success" },
-  FAILED: { label: "Gagal / ditolak", tone: "danger" },
+  PENDING: { label: "Menunggu Diproses", tone: "warning" },
+  PROCESSING: { label: "Sedang Diproses", tone: "neutral" },
+  PAID: { label: "Sudah Ditransfer", tone: "success" },
+  FAILED: { label: "Gagal / Ditolak", tone: "danger" },
 } as const;
 
 function dateTime(iso: string) {

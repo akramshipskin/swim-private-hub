@@ -7,9 +7,9 @@ import { AFFILIATE_HOLD_DAYS, AFFILIATE_SERVICE_FEE_SHARE_PERCENT } from "@/lib/
 import CopyLinkButton from "@/app/profil/copy-link-button";
 
 const STATUS = {
-  WAITING: { label: "Menunggu sesi Hadir pertama", tone: "neutral" },
+  WAITING: { label: "Menunggu Sesi Hadir Pertama", tone: "neutral" },
   PENDING: { label: "Cair", tone: "warning" },
-  RELEASED: { label: "Sudah masuk saldo", tone: "success" },
+  RELEASED: { label: "Sudah Masuk Saldo", tone: "success" },
 } as const;
 
 // Kode afiliasi coach/kolam + riwayat komisinya (dashboard coach & kolam).

@@ -85,7 +85,7 @@ export default function AffiliateCoachForm({
         open={removing !== null}
         title={`Lepas ${removing?.coachName ?? "coach"} dari kolam ini?`}
         description="Semua jam kosong coach ini di kolam ini mulai sekarang akan dihapus. Sesi yang sudah dibooking tetap berjalan."
-        confirmLabel="Ya, lepas"
+        confirmLabel="Ya, Lepas"
         onCancel={() => setRemoving(null)}
         onConfirm={() => {
           const id = removing?.id;

@@ -78,10 +78,10 @@ export default async function CoachDashboardPage() {
       : pools.length === 0
         ? { title: "Pilih kolam tempat kamu mengajar", body: "Member baru bisa membeli paket denganmu setelah kamu memilih kolam dan membuka jam kosong.", href: "/coach/kolam", cta: "Pilih kolam" }
         : nextToday
-          ? { eyebrow: "Sesi berikutnya hari ini", title: `${formatTimeWib(nextToday.startTime)}–${formatTimeWib(nextToday.endTime)} · ${nextToday.pool.name}`, body: nextToday.bookings[0]?.package.dependent.name, secondary: { href: "/coach/jadwal", label: "Lihat jadwal" } }
+          ? { eyebrow: "Sesi berikutnya hari ini", title: `${formatTimeWib(nextToday.startTime)}–${formatTimeWib(nextToday.endTime)} · ${nextToday.pool.name}`, body: nextToday.bookings[0]?.package.dependent.name, secondary: { href: "/coach/jadwal", label: "Lihat Jadwal" } }
           : openThisWeek < 4
             ? { title: "Buka jam kosong minggu ini", body: "Coach dengan minimal 4 jam kosong dalam 14 hari ke depan tampil di halaman beli paket member.", href: "/coach/jadwal", cta: "Buka jadwal" }
-            : { title: "Semua beres", body: `${openThisWeek} jam kosong 7 hari ke depan siap dibooking member.`, secondary: { href: "/coach/jadwal", label: "Lihat jadwal" } };
+            : { title: "Semua beres", body: `${openThisWeek} jam kosong 7 hari ke depan siap dibooking member.`, secondary: { href: "/coach/jadwal", label: "Lihat Jadwal" } };
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -91,7 +91,7 @@ export default async function CoachDashboardPage() {
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <NextStepCard {...step} tone="soft" className="md:col-span-4" />
         <BalanceCard
-          label="Saldo bisa dicairkan"
+          label="Saldo Bisa Dicairkan"
           amount={formatRupiah(profile?.walletBalance ?? 0)}
           hint="Bertambah setelah sesi ditandai Hadir."
           href="/coach/saldo"
@@ -140,9 +140,9 @@ export default async function CoachDashboardPage() {
         )}
         <BentoCard title="Ringkasan" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
-            <Stat label="Sesi belum ditandai" value={unmarked.length} tone={unmarked.length > 0 ? "warning" : undefined} hint="Saldo masuk setelah ditandai" />
+            <Stat label="Sesi Belum Ditandai" value={unmarked.length} tone={unmarked.length > 0 ? "warning" : undefined} hint="Saldo masuk setelah ditandai" />
             <Stat label="Jam kosong 7 hari ke depan" value={openThisWeek} />
-            <Stat label="Kolam tempat mengajar" value={pools.length} hint={pools.map((p) => p.pool.name).join(", ") || "Belum ada"} />
+            <Stat label="Kolam Tempat Mengajar" value={pools.length} hint={pools.map((p) => p.pool.name).join(", ") || "Belum ada"} />
           </div>
         </BentoCard>
 

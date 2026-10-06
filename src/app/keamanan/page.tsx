@@ -90,7 +90,7 @@ export default async function KeamananPage() {
 
               {!setupSecret ? (
                 <form action={startTotpSetup}>
-                  <Button type="submit" className="w-full">Buat kunci</Button>
+                  <Button type="submit" className="w-full">Buat Kunci</Button>
                 </form>
               ) : (
                 <div className="flex flex-col gap-4">

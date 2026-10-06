@@ -26,7 +26,7 @@ export default function AdminCancelButton({ bookingId }: { bookingId: string }) 
         open={open}
         title="Batalkan booking ini?"
         description="Sisa sesi member akan kembali. Jatah pembatalan mandiri member tidak berkurang."
-        confirmLabel="Ya, batalkan"
+        confirmLabel="Ya, Batalkan"
         loading={pending}
         onConfirm={() => {
           setOpen(false);

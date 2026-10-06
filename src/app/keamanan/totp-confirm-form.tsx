@@ -10,7 +10,7 @@ export default function TotpConfirmForm() {
   const [state, formAction, pending] = useActionState(confirmTotpSetup, null);
   return (
     <form action={formAction} className="flex flex-col gap-3">
-      <Field label="Password akunmu">
+      <Field label="Password Akunmu">
         <PasswordInput name="password" autoComplete="current-password" required />
       </Field>
       <Field label="Kode 6 digit dari aplikasi">

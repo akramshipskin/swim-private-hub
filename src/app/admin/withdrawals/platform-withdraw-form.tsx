@@ -21,7 +21,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
         <Field label="Nomor referensi / bukti transfer">
           <Input name="transferReference" required minLength={3} maxLength={100} placeholder="Nomor referensi dari m-banking" />
         </Field>
-        <Field label="Catatan (opsional)">
+        <Field label="Catatan (Opsional)">
           <Input name="note" maxLength={200} placeholder="Contoh: transfer ke rekening perusahaan" />
         </Field>
       </div>

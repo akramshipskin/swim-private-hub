@@ -98,7 +98,7 @@ export async function togglePoolActive(poolId: string, nextActive: boolean) {
 }
 
 // Model harga-dari-coach: admin bisa mengisi harga paket kolam, biaya layanan
-// SPH (maks 6,9%, bahasa ke pengguna "di bawah 7%"), dan tanda bebas potongan
+// SPH (maks 6,9%, bahasa ke pengguna "6,5% (maksimal 7%)"), dan tanda bebas potongan
 // PPh 0,5% (setelah kolam menyerahkan surat pernyataan omzet < Rp500 juta).
 export async function updatePoolPricing(_prev: PackPriceState, formData: FormData): Promise<PackPriceState> {
   await requireRole("ADMIN");

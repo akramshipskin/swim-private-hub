@@ -82,7 +82,7 @@ export default async function AdminMilestonePage() {
                       label="Setujui"
                       title="Jadikan butir standar?"
                       description={`"${p.text}" akan muncul di ${levelLabel(p.group as MilestoneGroup, p.level)} untuk semua peserta.`}
-                      confirmLabel="Ya, setujui"
+                      confirmLabel="Ya, Setujui"
                     />
                     <ConfirmSubmit
                       action={reviewMilestoneProposal.bind(null, p.id, false)}
@@ -90,7 +90,7 @@ export default async function AdminMilestonePage() {
                       variant="danger"
                       title="Tolak usulan?"
                       description="Butir tetap berlaku hanya untuk peserta asalnya."
-                      confirmLabel="Ya, tolak"
+                      confirmLabel="Ya, Tolak"
                     />
                   </div>
                 </li>

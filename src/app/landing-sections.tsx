@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/reveal";
 import { Spotlight } from "./landing-fx";
+import { CITIES } from "@/lib/cities";
 
 // Section jualan landing (blind spot 26 Sep, diputuskan Hadi 29 Sep): satu
 // section per peran + pilih peran + dulu-vs-sekarang. Semua klaim bersumber
@@ -161,7 +162,7 @@ const PARENT_POINTS: Point[] = [
 
 const SHOTS = [
   { src: "/images/landing/produk-cari-coach.png", caption: "Cari coach: keahlian, badge, dan kolam mengajar" },
-  { src: "/images/landing/produk-booking.png", caption: "Booking: pilih jam yang masih kosong" },
+  { src: "/images/landing/produk-booking.png", caption: "Booking: pilih jam yang masih kosong, lalu konfirmasi" },
   { src: "/images/landing/produk-milestone.png", caption: "Perkembangan anak: butir yang sudah dikuasai" },
 ];
 
@@ -213,6 +214,58 @@ export function ParentSection() {
           </ul>
           <p className="mt-4 text-sm text-fixed-muted">Contoh tampilan dengan data contoh: cari coach, booking jam, dan perkembangan anak.</p>
         </Reveal>
+      </div>
+    </section>
+  );
+}
+
+// Jawaban atas kekhawatiran calon pembeli soal wilayah dan jadwal (Hadi 6 Okt,
+// 5A): kota yang dilayani, jaminan ganti coach tanpa biaya, dan syarat coach
+// tampil. Isinya mengikuti docs/aturan-bisnis-saat-ini.md (bagian Kota).
+export function CoverageSection() {
+  return (
+    <section aria-labelledby="kota-jaminan" className="mx-auto w-full max-w-6xl px-4 py-14 sm:py-20">
+      <Reveal>
+        <h2 id="kota-jaminan" className="max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-5xl">
+          Ada di kotamu. Dan jadwalnya tidak dibiarkan menggantung.
+        </h2>
+      </Reveal>
+      <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-16">
+        <Reveal className="min-w-0">
+          <h3 className="text-lg font-semibold leading-snug">Kota yang dilayani</h3>
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {CITIES.map((c) => (
+              <li key={c} className="rounded-full border border-fixed-ink/20 px-4 py-1.5 text-sm font-medium">
+                {c}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm leading-relaxed text-fixed-muted">
+            Kotamu belum punya pasangan kolam dan coach yang cocok? Tekan &quot;Kabari saya&quot; saat memilih paket. Kamu
+            diberi tahu lewat notifikasi HP begitu ada.
+          </p>
+        </Reveal>
+        <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+          <li className="border-t border-fixed-ink/20 pt-5">
+            <Reveal delay={80}>
+            <h3 className="text-lg font-semibold leading-snug">Coach tidak membuka jadwal? Ganti tanpa biaya.</h3>
+            <p className="mt-2 text-sm leading-relaxed text-fixed-ink-soft">
+              Kalau sampai hari ke-10 paketmu masih punya sesi yang belum bisa dijadwalkan karena coach tidak membuka jam
+              kosong, kamu boleh pindah ke coach lain di kolam yang sama atau kolam lain sekota, tanpa biaya, selama harga
+              per sesinya sama atau lebih murah. Selisihnya masuk saldo. Masa berlaku paket tidak diperpanjang.
+            </p>
+            </Reveal>
+          </li>
+          <li className="border-t border-fixed-ink/20 pt-5">
+            <Reveal delay={140}>
+            <h3 className="text-lg font-semibold leading-snug">Coach yang tampil punya jam kosong</h3>
+            <p className="mt-2 text-sm leading-relaxed text-fixed-ink-soft">
+              Coach baru muncul di pencarian kalau punya minimal 4 jam kosong yang bisa dibooking di kolam itu dalam 14
+              hari ke depan. Di kartunya tertulis jadwal terdekat, jadi kamu tahu kapan bisa mulai.
+            </p>
+            </Reveal>
+          </li>
+        </ul>
       </div>
     </section>
   );
@@ -300,9 +353,21 @@ export function CoachSection() {
           ))}
         </Spotlight>
 
-        {/* Kartu "Satu syarat pencairan" (Hadi 2 Okt malam, #19). */}
-        <Reveal>
-          <div className="mt-8 max-w-2xl rounded-3xl border border-fixed-lime/40 bg-white/[0.04] p-6">
+        {/* Syarat tampil di pencarian (Hadi 6 Okt, 5A) dan kartu "Satu syarat pencairan" (2 Okt malam, #19). */}
+        <div className="mt-8 grid gap-4 lg:grid-cols-2">
+        <Reveal className="min-w-0">
+          <div className="h-full rounded-3xl border border-fixed-lime/40 bg-white/[0.04] p-6">
+            <p className="text-xs font-semibold uppercase tracking-wide text-fixed-lime">Syarat tampil di pencarian</p>
+            <p className="mt-2 text-lg font-semibold leading-snug">Punya minimal 4 jam kosong yang bisa dibooking dalam 14 hari ke depan.</p>
+            <p className="mt-2 text-sm text-white/75">
+              Dicek per kolam. Kalau paket member punya sesi yang belum terjadwal dan kamu tidak membuka jam kosong sampai
+              hari ke-10, member boleh ganti coach tanpa biaya dan kamu mendapat catatan pelanggaran. Tiga catatan dalam 6
+              bulan dinilai admin untuk penonaktifan.
+            </p>
+          </div>
+        </Reveal>
+        <Reveal className="min-w-0">
+          <div className="h-full rounded-3xl border border-fixed-lime/40 bg-white/[0.04] p-6">
             <p className="text-xs font-semibold uppercase tracking-wide text-fixed-lime">Satu syarat pencairan</p>
             <p className="mt-2 text-lg font-semibold leading-snug">Isi catatan perkembangan peserta setiap 2 sesi Hadir.</p>
             <p className="mt-2 text-sm text-white/75">
@@ -311,6 +376,7 @@ export function CoachSection() {
             </p>
           </div>
         </Reveal>
+        </div>
         <Link href="/daftar-coach" className="mt-6 inline-flex items-center rounded-full bg-fixed-lime px-6 py-3 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
           Daftar sebagai coach
         </Link>

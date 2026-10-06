@@ -196,7 +196,7 @@ export default async function KomisiPage() {
           const e = byPool.get(pool.id) ?? emptyEntry();
           const parts = [
             { label: "Paket", p: e.paket },
-            ...(e.legacy.sessions > 0 ? [{ label: "Riwayat paket model lama", p: e.legacy }] : []),
+            ...(e.legacy.sessions > 0 ? [{ label: "Riwayat Paket Model Lama", p: e.legacy }] : []),
             ...(e.noShow.sessions > 0 ? [{ label: "Tidak Hadir", p: e.noShow }] : []),
           ];
           const all = [e.paket, e.legacy, e.noShow];

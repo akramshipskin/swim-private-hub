@@ -94,7 +94,7 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                     onClick={() => setConfirming(c)}
                     className="mt-auto self-start text-sm font-medium text-danger-text hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
                   >
-                    Nonaktifkan peserta
+                    Nonaktifkan Peserta
                   </button>
                 </CardBody>
               </Card>
@@ -117,7 +117,7 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                     <legend className="mb-1 text-sm font-medium text-text">Peserta ini siapa?</legend>
                     <label className="flex items-center gap-2 text-sm text-text max-lg:min-h-[44px]">
                       <input type="radio" name="type" value="child" checked={type === "child"} onChange={() => setType("child")} />
-                      Anak saya
+                      Anak Saya
                     </label>
                     <label className="flex items-center gap-2 text-sm text-text max-lg:min-h-[44px]">
                       <input
@@ -128,22 +128,22 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                         disabled={hasSelf}
                         onChange={() => setType("self")}
                       />
-                      Saya sendiri {hasSelf && <span className="text-xs text-text-subtle">(sudah terdaftar)</span>}
+                      Saya Sendiri {hasSelf && <span className="text-xs text-text-subtle">(sudah terdaftar)</span>}
                     </label>
                   </fieldset>
 
                   {type === "child" && (
-                    <Field label="Nama anak">
+                    <Field label="Nama Anak">
                       <Input name="name" placeholder="Nama lengkap anak" required />
                     </Field>
                   )}
 
-                  <Field label="Tanggal lahir">
+                  <Field label="Tanggal Lahir">
                     <Input name="birthDate" type="date" required max={new Date().toISOString().slice(0, 10)} />
                   </Field>
 
                   <Button type="submit" loading={pending} className="mt-auto w-full sm:w-auto sm:self-start">
-                    Tambah peserta
+                    Tambah Peserta
                   </Button>
 
                   {state?.error && (
@@ -187,7 +187,7 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
         open={confirming !== null}
         title={`Nonaktifkan ${confirming?.name}?`}
         description="Paket & booking peserta ini tidak bisa diakses lagi sampai diaktifkan ulang."
-        confirmLabel="Ya, nonaktifkan"
+        confirmLabel="Ya, Nonaktifkan"
         loading={deactivating}
         onConfirm={handleDeactivate}
         onCancel={() => setConfirming(null)}

@@ -16,7 +16,7 @@ export const PACK_CANCEL_QUOTA: Record<PackSize, number> = { 4: 2, 8: 4 };
 export const TRIAL_CANCEL_QUOTA = 0;
 
 // Biaya layanan SPH dalam basis poin (650 = 6,5%). Dikunci di bawah 7% supaya
-// kalimat "biaya layanan di bawah 7%" selalu benar.
+// kalimat "biaya layanan 6,5% (maksimal 7%)" selalu benar.
 export const DEFAULT_SERVICE_FEE_BPS = 650;
 export const MAX_SERVICE_FEE_BPS = 690;
 // PPh 0,5% (PMK 37/2025) dari bagian kolam/coach, kecuali yang sudah

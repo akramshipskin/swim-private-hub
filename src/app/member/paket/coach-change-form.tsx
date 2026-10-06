@@ -16,7 +16,7 @@ export function CoachChangeForm({ packageId, coaches }: { packageId: string; coa
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="text-sm font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-        Ajukan ganti coach
+        Ajukan Ganti Coach
       </button>
     );
   }
@@ -27,7 +27,7 @@ export function CoachChangeForm({ packageId, coaches }: { packageId: string; coa
         Ganti coach hanya untuk alasan yang jelas (kecocokan atau masalah pribadi), di kolam yang sama, dan diputuskan admin.
         Sisa sesi dihitung ulang dengan harga coach baru. Bila lebih murah, selisihnya masuk saldomu. Bila lebih mahal, kamu tambah bayar dalam 24 jam.
       </p>
-      <Field label="Coach pengganti">
+      <Field label="Coach Pengganti">
         <Select name="toCoachId" required defaultValue="">
           <option value="" disabled>
             Pilih coach
@@ -44,7 +44,7 @@ export function CoachChangeForm({ packageId, coaches }: { packageId: string; coa
       </Field>
       <div className="flex gap-2">
         <Button type="submit" size="sm" loading={pending}>
-          Kirim pengajuan
+          Kirim Pengajuan
         </Button>
         <Button type="button" size="sm" variant="ghost" onClick={() => setOpen(false)} disabled={pending}>
           Batal

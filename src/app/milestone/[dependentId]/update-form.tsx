@@ -66,7 +66,7 @@ export function MilestoneUpdateForm({
         <label className="flex items-start gap-2 rounded-lg bg-brand-50 px-3 py-2 text-sm text-text">
           <input type="checkbox" name="prior" checked={prior} onChange={(e) => setPrior(e.target.checked)} className={checkbox} />
           <span>
-            Ini penilaian awal
+            Ini Penilaian Awal
             <span className="block text-xs text-text-muted">
               Centang butir yang SUDAH bisa dilakukan peserta sebelum les di sini. Butir ini dicatat &quot;sudah bisa
               sebelumnya&quot; dan tidak masuk sertifikat.
@@ -121,7 +121,7 @@ export function MilestoneUpdateForm({
         </Field>
       )}
 
-      <Field label="Catatan perkembangan (wajib)">
+      <Field label="Catatan Perkembangan (Wajib)">
         <Textarea
           name="note"
           rows={3}
@@ -151,10 +151,10 @@ export function AddItemForm({ dependentId, levels }: { dependentId: string; leve
 
   return (
     <form ref={form} action={action} className="flex flex-col gap-3">
-      <Field label="Butir keterampilan tambahan">
+      <Field label="Butir Keterampilan Tambahan">
         <Input name="text" maxLength={200} required placeholder="Contoh: Meluncur telentang dari dinding sejauh 2 meter" />
       </Field>
-      <Field label="Masuk ke level">
+      <Field label="Masuk ke Level">
         <Select name="level" defaultValue={levels[0]?.value}>
           {levels.map((l) => (
             <option key={l.value} value={l.value}>
@@ -172,7 +172,7 @@ export function AddItemForm({ dependentId, levels }: { dependentId: string; leve
       </label>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="sm" variant="secondary" loading={pending}>
-          Tambah butir
+          Tambah Butir
         </Button>
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
         {state?.success && <p role="status" className="text-sm text-success-text">Butir ditambahkan.</p>}

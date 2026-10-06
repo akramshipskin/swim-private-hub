@@ -114,12 +114,12 @@ export default async function AdminDashboardPage() {
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <BentoCard title="Hari ini" className="md:col-span-4">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-            <Stat label="Sesi hari ini" value={todayItems.length} />
-            <Stat label="Sesi besok" value={tomorrowItems.length} />
-            <Stat label="Uang masuk hari ini" value={formatRupiah(paidToday._sum.amount ?? 0)} hint={`${paidToday._count} transaksi`} />
-            <Stat label="Uang masuk bulan ini" value={formatRupiah(paidMonth._sum.amount ?? 0)} hint={`${paidMonth._count} transaksi`} />
+            <Stat label="Sesi Hari Ini" value={todayItems.length} />
+            <Stat label="Sesi Besok" value={tomorrowItems.length} />
+            <Stat label="Uang Masuk Hari Ini" value={formatRupiah(paidToday._sum.amount ?? 0)} hint={`${paidToday._count} transaksi`} />
+            <Stat label="Uang Masuk Bulan Ini" value={formatRupiah(paidMonth._sum.amount ?? 0)} hint={`${paidMonth._count} transaksi`} />
             <Stat
-              label="Saldo mengendap"
+              label="Saldo Mengendap"
               value={formatRupiah(totalHeldBalance)}
               hint="Kolam + coach + platform (termasuk pendapatan yang masih ditahan 3 hari), belum dicairkan"
             />
@@ -128,14 +128,14 @@ export default async function AdminDashboardPage() {
 
         <BentoCard title="Perlu tindakan" className="md:col-span-2 md:row-span-2">
           <div className="flex flex-col">
-            <ActionRow label="Pesan perlu dibalas" count={waitingChats} href="/admin/pesan" />
+            <ActionRow label="Pesan Perlu Dibalas" count={waitingChats} href="/admin/pesan" />
             <ActionRow
-              label="Permintaan hapus akun"
+              label="Permintaan Hapus Akun"
               count={deletionRequests.length}
               href={deletionRequests[0] ? `/admin/users/${deletionRequests[0].id}` : "/admin/users"}
             />
             <ActionRow
-              label="Pencairan menunggu"
+              label="Pencairan Menunggu"
               count={pendingWithdrawals._count}
               href="/admin/withdrawals"
               detail={formatRupiah(pendingWithdrawals._sum.amount ?? 0)}
@@ -146,10 +146,10 @@ export default async function AdminDashboardPage() {
               href="/admin/withdrawals"
               detail="Janji transfer di perjanjian coach & MOU kolam"
             />
-            <ActionRow label="Sertifikat coach menunggu" count={pendingCerts} href="/admin/users" />
-            <ActionRow label="Usulan butir milestone" count={pendingMilestoneProposals} href="/admin/milestone" />
+            <ActionRow label="Sertifikat Coach Menunggu" count={pendingCerts} href="/admin/users" />
+            <ActionRow label="Usulan Butir Milestone" count={pendingMilestoneProposals} href="/admin/milestone" />
             <ActionRow label="Coach/pemilik kolam baru menunggu persetujuan" count={pendingAccounts} href="/admin/users" />
-            <ActionRow label="Kolam belum disetujui" count={pools.length - activePools.length} href="/admin/kolam" />
+            <ActionRow label="Kolam Belum Disetujui" count={pools.length - activePools.length} href="/admin/kolam" />
             <ActionRow label="Sesi lewat belum ditandai Hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach baru masuk setelah ditandai Hadir" />
           </div>
         </BentoCard>
@@ -163,27 +163,27 @@ export default async function AdminDashboardPage() {
 
         <BentoCard title="Pendapatan platform" href="/admin/withdrawals" linkLabel="Cairkan saldo" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
-            <Stat label="Pendapatan bersih bulan ini" value={formatRupiah(monthSum("PLATFORM_REVENUE"))} tone="success" />
-            <Stat label="PPN bulan ini" value={formatRupiah(monthSum("PLATFORM_TAX"))} />
-            <Stat label="Pendapatan bersih bisa dicairkan" value={formatRupiah(Math.max(0, platformBalance.availableRevenue))} />
-            <Stat label="Saldo PPN belum disetor" value={formatRupiah(platformBalance.tax)} />
+            <Stat label="Pendapatan Bersih Bulan Ini" value={formatRupiah(monthSum("PLATFORM_REVENUE"))} tone="success" />
+            <Stat label="PPN Bulan Ini" value={formatRupiah(monthSum("PLATFORM_TAX"))} />
+            <Stat label="Pendapatan Bersih Bisa Dicairkan" value={formatRupiah(Math.max(0, platformBalance.availableRevenue))} />
+            <Stat label="Saldo PPN Belum Disetor" value={formatRupiah(platformBalance.tax)} />
           </div>
           <p className="mt-3 text-xs text-text-subtle">Dihitung dari komisi setiap sesi yang ditandai Hadir (komisi sudah termasuk PPN). Tarif 11% sejak 30 Sep 2026; sesi sebelumnya 12%.</p>
         </BentoCard>
 
         <BentoCard title="Pengguna" href="/admin/users" className="md:col-span-3">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
-            <Stat label="Member punya paket aktif" value={activeMembers} hint={`dari ${totalMembers} member`} />
-            <Stat label="Peserta sedang les" value={activeDependents} hint={`${activePackages} paket aktif`} />
-            <Stat label="Coach aktif" value={activeCoaches} />
-            <Stat label="Kolam aktif" value={activePools.length} />
+            <Stat label="Member Punya Paket Aktif" value={activeMembers} hint={`dari ${totalMembers} member`} />
+            <Stat label="Peserta Sedang Les" value={activeDependents} hint={`${activePackages} paket aktif`} />
+            <Stat label="Coach Aktif" value={activeCoaches} />
+            <Stat label="Kolam Aktif" value={activePools.length} />
           </div>
         </BentoCard>
 
         <BentoCard title="Saldo belum dicairkan" href="/admin/komisi" className="md:col-span-3">
           <div className="grid grid-cols-2 gap-4">
-            <Stat label="Total saldo kolam" value={formatRupiah(poolWalletTotal)} />
-            <Stat label="Total saldo coach" value={formatRupiah(coachWallets._sum.walletBalance ?? 0)} />
+            <Stat label="Total Saldo Kolam" value={formatRupiah(poolWalletTotal)} />
+            <Stat label="Total Saldo Coach" value={formatRupiah(coachWallets._sum.walletBalance ?? 0)} />
           </div>
         </BentoCard>
 

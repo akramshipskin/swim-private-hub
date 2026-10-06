@@ -140,7 +140,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
                 autoComplete="tel"
               />
             </Field>
-            <Field label="Email (opsional)">
+            <Field label="Email (Opsional)">
               <Input
                 type="email"
                 placeholder="nama@email.com"
@@ -161,11 +161,11 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
               />
             </Field>
 
-            <Field label="Kota domisili">
+            <Field label="Kota Domisili">
               <CitySelect value={city} onChange={(e) => setCity(e.target.value)} />
             </Field>
 
-            <Field label="Kode afiliasi coach/kolam (opsional)">
+            <Field label="Kode Afiliasi Coach/Kolam (Opsional)">
               <Input
                 placeholder="Contoh: NADIA27"
                 value={referralCode}
@@ -232,7 +232,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
                 onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "", birthDate: "" }])}
                 className="self-start text-sm font-medium text-brand-700 hover:underline max-lg:min-h-[44px]"
               >
-                + Tambah peserta lain
+                + Tambah Peserta Lain
               </button>
             </div>
 

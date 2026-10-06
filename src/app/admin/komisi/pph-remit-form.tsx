@@ -12,17 +12,17 @@ export default function PphRemitForm() {
   const keep = useKeepFormOnError(state, action);
   return (
     <form key={keep.key} onSubmit={keep.onSubmit} className="flex flex-wrap items-end gap-3">
-      <Field label="Nominal disetor (Rp)">
+      <Field label="Nominal Disetor (Rp)">
         <PriceInput name="amount" className="w-full sm:w-36" />
       </Field>
-      <Field label="Nomor bukti setor (NTPN)">
+      <Field label="Nomor Bukti Setor (NTPN)">
         <Input name="reference" maxLength={100} className="w-full sm:w-48" />
       </Field>
-      <Field label="Catatan (opsional)">
+      <Field label="Catatan (Opsional)">
         <Input name="note" maxLength={300} className="w-full sm:w-56" />
       </Field>
       <Button type="submit" size="sm" loading={pending}>
-        Catat sudah disetor
+        Catat Sudah Disetor
       </Button>
       {state?.error && <p className="w-full text-xs text-danger-text">{state.error}</p>}
       {state?.ok && <p className="w-full text-xs text-success-text">Setoran tercatat.</p>}

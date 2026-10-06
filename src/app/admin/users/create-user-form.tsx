@@ -50,7 +50,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
           <Field label="Nomor HP">
             <Input type="tel" name="phone" placeholder="0812xxxxxxx" required className="w-full" />
           </Field>
-          <Field label="Email (opsional)">
+          <Field label="Email (Opsional)">
             <Input type="email" name="email" className="w-full" />
           </Field>
           <Field label="Password">
@@ -77,12 +77,12 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
                 {pools.length > 0 && (
                   <label className="flex items-center gap-2">
                     <input type="radio" name="poolMode" value="existing" checked={poolMode === "existing"} onChange={() => setPoolMode("existing")} />
-                    Kolam yang sudah ada
+                    Kolam yang Sudah Ada
                   </label>
                 )}
                 <label className="flex items-center gap-2">
                   <input type="radio" name="poolMode" value="new" checked={poolMode === "new"} onChange={() => setPoolMode("new")} />
-                  Kolam baru
+                  Kolam Baru
                 </label>
               </div>
               {poolMode === "existing" ? (
@@ -170,7 +170,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
                 onClick={() => setParticipants((prev) => [...prev, { type: "child", name: "", birthDate: "" }])}
                 className="self-start text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
               >
-                + Tambah peserta lain
+                + Tambah Peserta Lain
               </button>
             </div>
           )}

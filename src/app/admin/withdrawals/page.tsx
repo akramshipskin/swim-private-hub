@@ -12,9 +12,9 @@ import { openSecret } from "@/lib/secret-box";
 import { isWithdrawalOverdue } from "@/lib/withdrawal-deadline";
 
 const STATUS_FILTERS = {
-  waiting: { label: "Perlu diproses", statuses: ["PENDING", "PROCESSING"] },
-  paid: { label: "Sudah ditransfer", statuses: ["PAID"] },
-  failed: { label: "Gagal / ditolak", statuses: ["FAILED"] },
+  waiting: { label: "Perlu Diproses", statuses: ["PENDING", "PROCESSING"] },
+  paid: { label: "Sudah Ditransfer", statuses: ["PAID"] },
+  failed: { label: "Gagal / Ditolak", statuses: ["FAILED"] },
   all: { label: "Semua", statuses: ["PENDING", "PROCESSING", "PAID", "FAILED"] },
 } as const;
 type StatusKey = keyof typeof STATUS_FILTERS;

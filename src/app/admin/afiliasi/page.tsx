@@ -8,9 +8,9 @@ import { releaseDueCommissions } from "@/lib/affiliate";
 export const metadata = { title: "Afiliasi | Swim Private Hub" };
 
 const STATUS = {
-  WAITING: { label: "Menunggu sesi Hadir", tone: "neutral" },
-  PENDING: { label: "Masa tahan", tone: "warning" },
-  RELEASED: { label: "Sudah cair ke saldo", tone: "success" },
+  WAITING: { label: "Menunggu Sesi Hadir", tone: "neutral" },
+  PENDING: { label: "Masa Tahan", tone: "warning" },
+  RELEASED: { label: "Sudah Cair ke Saldo", tone: "success" },
 } as const;
 
 const date = (d: Date) => d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" });

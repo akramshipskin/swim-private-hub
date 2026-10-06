@@ -20,7 +20,7 @@ export default function ResolveForm({ reportId }: { reportId: string }) {
         placeholder="Hasil pemeriksaan, tampil ke member. Contoh: sudah dicek dengan coach, status diubah menjadi Hadir."
       />
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" size="sm" loading={pending}>Tutup laporan</Button>
+        <Button type="submit" size="sm" loading={pending}>Tutup Laporan</Button>
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
       </div>
     </form>

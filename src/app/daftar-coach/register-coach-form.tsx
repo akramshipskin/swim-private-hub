@@ -124,7 +124,7 @@ export default function RegisterCoachForm() {
                 autoComplete="tel"
               />
             </Field>
-            <Field label="Email (opsional)">
+            <Field label="Email (Opsional)">
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
             </Field>
             <Field label="Tanggal Lahir">
@@ -148,7 +148,7 @@ export default function RegisterCoachForm() {
                 autoComplete="new-password"
               />
             </Field>
-            <Field label="Kota domisili">
+            <Field label="Kota Domisili">
               <CitySelect value={city} onChange={(e) => setCity(e.target.value)} />
             </Field>
             <div className="flex flex-col gap-2">
@@ -157,15 +157,15 @@ export default function RegisterCoachForm() {
                 Satu harga untuk semua kolam. Isi minimal satu, kelipatan Rp 1.000. Member membayar harga ini ditambah harga kolam dan biaya layanan SPH. Bisa diubah nanti.
               </p>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Paket 4 sesi (Rp)">
+                <Field label="Paket 4 Sesi (Rp)">
                   <PriceInput name="pricePack4" />
                 </Field>
-                <Field label="Paket 8 sesi (Rp)">
+                <Field label="Paket 8 Sesi (Rp)">
                   <PriceInput name="pricePack8" />
                 </Field>
               </div>
             </div>
-            <Field label="Bio singkat (opsional)">
+            <Field label="Bio Singkat (Opsional)">
               <Textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
@@ -214,7 +214,7 @@ export default function RegisterCoachForm() {
               </span>
             </label>
             {hasCertification && (
-              <Field label="Nama sertifikat/lembaga">
+              <Field label="Nama Sertifikat/Lembaga">
                 <Input
                   value={certificationNote}
                   onChange={(e) => setCertificationNote(e.target.value)}

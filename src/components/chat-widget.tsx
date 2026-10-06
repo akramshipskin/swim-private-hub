@@ -94,7 +94,7 @@ export function ChatWidget() {
           </div>
           <form onSubmit={send} className="flex flex-col gap-1.5 border-t border-border p-3">
             <div className="flex gap-2">
-              <label htmlFor="chat-input" className="sr-only">Tulis pesan</label>
+              <label htmlFor="chat-input" className="sr-only">Tulis Pesan</label>
               <Input
                 id="chat-input"
                 value={text}

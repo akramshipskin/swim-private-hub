@@ -93,17 +93,17 @@ export default async function PoolDashboardPage() {
           : p._count.affiliations === 0
             ? { title: "Belum ada coach di kolammu", body: "Coach memilih sendiri kolam tempat mengajar. Lengkapi foto, fasilitas, dan deskripsi supaya kolammu menarik dipilih.", href: "/pool/info", cta: "Lengkapi info kolam" }
             : nextLes
-              ? { eyebrow: "Les berikutnya hari ini", title: `${formatTimeWib(nextLes.startTime)}–${formatTimeWib(nextLes.endTime)} · ${nextLes.who ?? "Peserta"}`, body: `Dengan ${nextLes.coachName}. Total ${bookedToday} sesi les hari ini.`, secondary: { href: "/pool/jadwal", label: "Lihat jadwal" } }
+              ? { eyebrow: "Les berikutnya hari ini", title: `${formatTimeWib(nextLes.startTime)}–${formatTimeWib(nextLes.endTime)} · ${nextLes.who ?? "Peserta"}`, body: `Dengan ${nextLes.coachName}. Total ${bookedToday} sesi les hari ini.`, secondary: { href: "/pool/jadwal", label: "Lihat Jadwal" } }
               : !p.description || p.facilities.length === 0
                 ? { title: "Lengkapi info kolam", body: "Deskripsi dan fasilitas membantu member memilih kolammu.", href: "/pool/info", cta: "Lengkapi info" }
-                : { title: "Tidak ada les lagi hari ini", body: `Saldo bisa dicairkan ${formatRupiah(p.walletBalance)}.`, secondary: { href: "/pool/saldo", label: "Lihat saldo" } };
+                : { title: "Tidak ada les lagi hari ini", body: `Saldo bisa dicairkan ${formatRupiah(p.walletBalance)}.`, secondary: { href: "/pool/saldo", label: "Lihat Saldo" } };
         return (
           <section key={p.id} className="mt-6">
             {pools.length > 1 && <h2 className="mb-3 text-xl font-semibold text-text">{p.name}</h2>}
             <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-6">
               <NextStepCard {...step} tone="soft" className="md:col-span-4" />
               <BalanceCard
-                label="Saldo bisa dicairkan"
+                label="Saldo Bisa Dicairkan"
                 amount={formatRupiah(p.walletBalance)}
                 hint={`Dalam proses pencairan: ${formatRupiah(pick(pendingWithdrawals, p.id)?._sum.amount ?? 0)}`}
                 href="/pool/saldo"
@@ -115,9 +115,9 @@ export default async function PoolDashboardPage() {
               <BentoCard title="Ringkasan bulan ini" href="/pool/laporan" className="md:col-span-4">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
                   <Stat label="Sesi Hadir" value={pick(attended, p.id)?._count ?? 0} />
-                  <Stat label="Bagian kolam" value={formatRupiah(pick(revenue, p.id)?._sum.amount ?? 0)} hint="Sebelum PPh 0,5%" />
-                  <Stat label="Paket terjual" value={pick(sold, p.id)?._count ?? 0} />
-                  <Stat label="Coach terdaftar" value={p._count.affiliations} />
+                  <Stat label="Bagian Kolam" value={formatRupiah(pick(revenue, p.id)?._sum.amount ?? 0)} hint="Sebelum PPh 0,5%" />
+                  <Stat label="Paket Terjual" value={pick(sold, p.id)?._count ?? 0} />
+                  <Stat label="Coach Terdaftar" value={p._count.affiliations} />
                 </div>
               </BentoCard>
               <BentoCard title="Info kolam" href="/pool/info" linkLabel="Ubah" className="md:col-span-2">

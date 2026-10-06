@@ -54,7 +54,7 @@ export default async function AdminTestimonialsPage() {
                 variant="danger"
                 title="Hapus testimoni?"
                 description={`Testimoni ${t.name} dihapus permanen, termasuk catatan izinnya.`}
-                confirmLabel="Ya, hapus"
+                confirmLabel="Ya, Hapus"
               />
             </div>
           </CardBody>

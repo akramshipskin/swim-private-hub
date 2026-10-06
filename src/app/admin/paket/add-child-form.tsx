@@ -18,7 +18,7 @@ export default function AddChildForm({ members }: { members: Member[] }) {
     <Card className="mb-8">
       <CardBody>
         <form key={keep.key} onSubmit={keep.onSubmit} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-          <Field label="Member (orang tua)">
+          <Field label="Member (Orang Tua)">
             <Select name="memberId" required className="w-full sm:w-56">
               {members.map((m) => (
                 <option key={m.id} value={m.id}>
@@ -43,7 +43,7 @@ export default function AddChildForm({ members }: { members: Member[] }) {
               <Input name="name" required className="w-full sm:w-48" />
             </Field>
           )}
-          <Field label="Tanggal Lahir (opsional)">
+          <Field label="Tanggal Lahir (Opsional)">
             <Input name="birthDate" type="date" max={new Date().toISOString().slice(0, 10)} className="w-full sm:w-44" />
           </Field>
           <Button type="submit" loading={pending} className="w-full sm:w-auto">

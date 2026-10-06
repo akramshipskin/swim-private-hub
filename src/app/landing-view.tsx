@@ -15,7 +15,7 @@ import { HeroVideo } from "./hero-video";
 import { HeroFx, Magnetic } from "./landing-fx";
 import { PAYMENT_METHODS } from "./landing-payments";
 import { TestimonialsSection, type Testimonial } from "./landing-testimonials";
-import { BeforeAfter, CoachSection, ParentSection, PoolSection, RolePicker } from "./landing-sections";
+import { BeforeAfter, CoachSection, CoverageSection, ParentSection, PoolSection, RolePicker } from "./landing-sections";
 
 // Struktur mengikuti referensi Stride (hero foto penuh, badan krem, kartu
 // kolam selang-seling, kartu coach, FAQ, CTA gelap). Semua angka & data
@@ -108,7 +108,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Berapa biayanya, dan apa saja yang dibayar?",
-        a: "Harga paket terdiri dari tiket masuk kolam, jasa coach, dan biaya layanan SPH (di bawah 7%). Rinciannya tampil sebelum kamu bayar. Paket 4 sesi berlaku 60 hari, paket 8 sesi berlaku 90 hari (lebih hemat per sesi).",
+        a: "Harga paket terdiri dari tiket masuk kolam, jasa coach, dan biaya layanan SPH (6,5%, maksimal 7%). Rinciannya tampil sebelum kamu bayar. Paket 4 sesi berlaku 60 hari, paket 8 sesi berlaku 90 hari (lebih hemat per sesi).",
       },
       {
         q: "Bisa coba 1 sesi dulu?",
@@ -190,7 +190,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Ada biaya untuk bergabung?",
-        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. SPH mengambil biaya layanan di bawah 7% yang dibayar member di atas harga kolam dan coach.",
+        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. SPH mengambil biaya layanan 6,5% (maksimal 7%) yang dibayar member di atas harga kolam dan coach.",
       },
       {
         q: "Bagian saya dipotong komisi?",
@@ -224,7 +224,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Ada biaya untuk bergabung?",
-        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. SPH mengambil biaya layanan di bawah 7% yang dibayar member di atas harga kolam dan coach.",
+        a: "Tidak ada biaya pendaftaran maupun biaya bulanan. SPH mengambil biaya layanan 6,5% (maksimal 7%) yang dibayar member di atas harga kolam dan coach.",
       },
       {
         q: "Saya juga harus menyediakan coach?",
@@ -232,7 +232,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Bagaimana cara bergabung sebagai mitra?",
-        a: "Daftar lewat halaman Daftar Kolam atau hubungi kami lewat WhatsApp. Setelah kolam disetujui admin (diperiksa paling lambat 1×24 jam), kolam kamu langsung bisa menerima booking. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
+        a: "Daftar lewat halaman Daftar Kolam atau hubungi kami lewat WhatsApp. Admin memeriksa pendaftaranmu, lalu kolam tampil di pilihan member. Booking baru terjadi setelah ada coach yang memilih kolammu dan membuka jadwal. Calon member membandingkan coach dan kolam sebelum membeli paket, jadi lengkapi foto, fasilitas, dan jam buka kolammu, dan minta coach di kolammu mengunggah sertifikatnya. Halaman ini menampilkan kolam-kolam paling aktif, jadi kemunculannya di sini mengikuti aktivitas kolammu.",
       },
     ],
   },
@@ -387,6 +387,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
       <RolePicker />
       <BeforeAfter />
       <ParentSection />
+      <CoverageSection />
 
       {/* Kolam: maksimal 5 kolam paling laris, lengkap dengan foto, fasilitas,
           dan jumlah member yang les di situ. */}

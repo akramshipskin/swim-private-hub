@@ -27,7 +27,7 @@ export default function DeleteSlotButton({
         open={open}
         title={`Hapus jam ${label}?`}
         description="Jam ini tidak bisa dibooking lagi kecuali dibuka ulang."
-        confirmLabel="Ya, hapus"
+        confirmLabel="Ya, Hapus"
         onConfirm={() => {
           setOpen(false);
           formRef.current?.requestSubmit();

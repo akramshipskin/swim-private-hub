@@ -22,7 +22,7 @@ export default function DecideForm({ requestId, approveLabel }: { requestId: str
           open={confirming}
           title="Setujui ganti coach?"
           description="Sisa sesi dipindahkan ke coach baru dan selisih harganya langsung dicatat ke saldo member. Keputusan ini tidak bisa dibatalkan."
-          confirmLabel="Ya, setujui"
+          confirmLabel="Ya, Setujui"
           confirmVariant="primary"
           onCancel={() => setConfirming(false)}
           onConfirm={() => {

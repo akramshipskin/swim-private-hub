@@ -56,7 +56,7 @@ export default async function StandardItemsPage() {
                             variant="danger"
                             title="Nonaktifkan butir?"
                             description={`"${it.text}" tidak dihitung lagi. Peserta yang tinggal kurang butir ini naik level di catatan coach berikutnya.`}
-                            confirmLabel="Ya, nonaktifkan"
+                            confirmLabel="Ya, Nonaktifkan"
                           />
                         ) : (
                           <ConfirmSubmit
@@ -64,7 +64,7 @@ export default async function StandardItemsPage() {
                             label="Aktifkan"
                             title="Aktifkan lagi?"
                             description={`"${it.text}" dihitung lagi untuk level yang belum selesai.`}
-                            confirmLabel="Ya, aktifkan"
+                            confirmLabel="Ya, Aktifkan"
                           />
                         )}
                       </li>

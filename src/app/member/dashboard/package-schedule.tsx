@@ -41,7 +41,7 @@ export function PackageSchedule({ peserta, packages, sessions }: { peserta: stri
       {peserta.length > 1 && (
         <div className="md:col-span-6 -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0" role="group" aria-label="Pilih peserta">
           <button type="button" aria-pressed={who === null} onClick={() => setWho(null)} className={chip(who === null)}>
-            Semua peserta
+            Semua Peserta
           </button>
           {peserta.map((n) => (
             <button key={n} type="button" aria-pressed={who === n} onClick={() => setWho(n)} className={chip(who === n)}>

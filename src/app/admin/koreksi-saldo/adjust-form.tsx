@@ -53,10 +53,10 @@ export default function AdjustForm({
         <fieldset className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text">
           <legend className="mb-1 text-sm font-medium text-text">Arah</legend>
           <label className="inline-flex min-h-[44px] items-center gap-2 sm:min-h-0">
-            <input type="radio" name="direction" value="credit" required /> Tambah saldo
+            <input type="radio" name="direction" value="credit" required /> Tambah Saldo
           </label>
           <label className="inline-flex min-h-[44px] items-center gap-2 sm:min-h-0">
-            <input type="radio" name="direction" value="debit" required /> Kurangi saldo
+            <input type="radio" name="direction" value="debit" required /> Kurangi Saldo
           </label>
         </fieldset>
 
@@ -64,7 +64,7 @@ export default function AdjustForm({
           <PriceInput name="amount" required className="w-full" />
         </Field>
 
-        <Field label="Alasan (tampil ke penerima)">
+        <Field label="Alasan (Tampil ke Penerima)">
           <Textarea name="reason" required minLength={5} maxLength={500} rows={2} placeholder="Contoh: Sesi 12 Sep ditandai Hadir padahal batal" />
         </Field>
 
@@ -72,16 +72,16 @@ export default function AdjustForm({
           <legend className="mb-1 text-sm font-medium text-text">Sumber dana</legend>
           <label className="flex min-h-[44px] items-start gap-2 sm:min-h-0">
             <input type="radio" name="source" value="none" required className="mt-1" />
-            <span>Membetulkan salah catat <span className="text-text-subtle">— tidak ada pihak lain yang ikut berubah</span></span>
+            <span>Membetulkan Salah Catat <span className="text-text-subtle">— tidak ada pihak lain yang ikut berubah</span></span>
           </label>
           <label className="flex min-h-[44px] items-start gap-2 sm:min-h-0">
             <input type="radio" name="source" value="platform" required className="mt-1" />
-            <span>Dari/ke pendapatan platform <span className="text-text-subtle">— saldo platform ikut berkurang/bertambah sebesar nominal ini</span></span>
+            <span>Dari/ke Pendapatan Platform <span className="text-text-subtle">— saldo platform ikut berkurang/bertambah sebesar nominal ini</span></span>
           </label>
         </fieldset>
 
         <Button type="button" onClick={review} loading={pending} className="self-start">
-          Simpan koreksi
+          Simpan Koreksi
         </Button>
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
         {state?.ok && <p role="status" className="text-sm text-success-text">Koreksi tersimpan. Notifikasi dikirim ke {targetType === "pool" ? "pemilik kolam" : "coach"} (diterima bila notifikasi di HP-nya aktif).</p>}
@@ -97,7 +97,7 @@ export default function AdjustForm({
               } Koreksi tidak bisa dihapus; kalau salah, buat koreksi kebalikannya.`
             : ""
         }
-        confirmLabel="Ya, simpan"
+        confirmLabel="Ya, Simpan"
         confirmVariant="primary"
         onCancel={() => setConfirm(null)}
         onConfirm={() => {

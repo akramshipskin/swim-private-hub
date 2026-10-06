@@ -64,7 +64,7 @@ export default function PesertaPackageRow({
               <input type="hidden" name="packageId" value={pkg.id} />
               <input type="hidden" name="expectedSisaSesi" value={pkg.sisaSesi} />
               <div className="grid grid-cols-2 gap-3 sm:contents">
-                <Field label="Sisa sesi">
+                <Field label="Sisa Sesi">
                   <Input
                     type="number"
                     name="sisaSesi"
@@ -89,7 +89,7 @@ export default function PesertaPackageRow({
                   selebar baris di atas, jadi ujung kanannya otomatis
                   sejajar tanpa perlu bagi rata. */}
               <div className="grid grid-cols-[5rem_1fr] gap-3 sm:contents">
-                <Field label="Jatah batal">
+                <Field label="Jatah Batal">
                   <Input
                     type="number"
                     name="jatahCancel"

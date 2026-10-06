@@ -38,13 +38,13 @@ export default function ResetPasswordButton({
   return (
     <>
       <Button variant="ghost" size="sm" onClick={() => setOpen(true)} className="whitespace-nowrap">
-        Reset password
+        Reset Password
       </Button>
       <ConfirmDialog
         open={open}
         title={`Reset password ${userName}?`}
         description="Password lamanya langsung tidak berlaku. Kamu mendapat password sementara untuk dikirim ke pengguna, dan pengguna wajib membuat password baru saat masuk."
-        confirmLabel="Ya, reset"
+        confirmLabel="Ya, Reset"
         loading={loading}
         onConfirm={handleReset}
         onCancel={() => setOpen(false)}

@@ -58,7 +58,7 @@ export default function CancelButton({
         open={open}
         title="Batalkan booking ini?"
         description={`${label}. Sisa sesi kamu akan kembali, tapi jatah batal berkurang.`}
-        confirmLabel="Ya, batalkan"
+        confirmLabel="Ya, Batalkan"
         loading={loading}
         onConfirm={handleCancel}
         onCancel={() => setOpen(false)}

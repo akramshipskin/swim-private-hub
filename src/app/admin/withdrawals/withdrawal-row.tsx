@@ -93,7 +93,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
               <form action={processAction}>
                 <input type="hidden" name="withdrawalId" value={w.id} />
                 <Button type="submit" size="sm" loading={processPending}>
-                  Proses lewat Iris
+                  Proses Lewat Iris
                 </Button>
               </form>
             )}
@@ -144,7 +144,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
         open={confirming === "paid"}
         title="Tandai sudah ditransfer?"
         description={`Pastikan ${formatRupiah(w.amount)} sudah benar-benar ditransfer ke ${w.bankName} ${w.bankAccountNumber} a.n. ${w.bankAccountName}. Status tidak bisa dikembalikan.`}
-        confirmLabel="Ya, sudah ditransfer"
+        confirmLabel="Ya, Sudah Ditransfer"
         loading={paidPending}
         onCancel={() => setConfirming(null)}
         onConfirm={() => {

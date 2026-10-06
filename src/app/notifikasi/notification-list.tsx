@@ -73,7 +73,7 @@ export function NotificationList({ items }: { items: NotificationItem[] }) {
         </div>
         {unreadCount > 0 && (
           <Button type="button" variant="secondary" onClick={markAll} disabled={pending}>
-            Tandai semua dibaca
+            Tandai Semua Dibaca
           </Button>
         )}
       </div>

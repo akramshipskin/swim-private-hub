@@ -41,7 +41,7 @@ export default function PoolActiveToggle({
         open={open}
         title={`Nonaktifkan ${poolName}?`}
         description="Kolam ini tidak bisa dipilih member saat booking sampai diaktifkan ulang."
-        confirmLabel="Ya, nonaktifkan"
+        confirmLabel="Ya, Nonaktifkan"
         loading={loading}
         onConfirm={handleToggle}
         onCancel={() => setOpen(false)}

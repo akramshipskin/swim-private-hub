@@ -33,7 +33,7 @@ export default function DeleteAccountCard({ requestedAt, memberBalance }: { requ
               . Admin akan memprosesnya; setelah itu kamu tidak bisa masuk lagi.
             </p>
             <Button variant="secondary" size="sm" className="mt-3" loading={pending} onClick={() => run(cancelDeletionAction)}>
-              Batalkan permintaan
+              Batalkan Permintaan
             </Button>
           </>
         ) : (
@@ -49,7 +49,7 @@ export default function DeleteAccountCard({ requestedAt, memberBalance }: { requ
               </p>
             )}
             <Button variant="danger" size="sm" className="mt-3" onClick={() => setOpen(true)}>
-              Minta hapus akun
+              Minta Hapus Akun
             </Button>
           </>
         )}
@@ -59,7 +59,7 @@ export default function DeleteAccountCard({ requestedAt, memberBalance }: { requ
         open={open}
         title="Minta hapus akun?"
         description="Permintaan dikirim ke admin. Selama belum diproses, kamu masih bisa membatalkannya dari halaman ini."
-        confirmLabel="Ya, minta hapus"
+        confirmLabel="Ya, Minta Hapus"
         loading={pending}
         onCancel={() => setOpen(false)}
         onConfirm={() => run(requestDeletionAction)}

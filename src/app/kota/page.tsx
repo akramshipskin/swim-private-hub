@@ -41,7 +41,7 @@ export default async function KotaPage({ searchParams }: { searchParams: Promise
               : "Kami tampilkan kolam dan coach di kota ini lebih dulu. Kota lain tetap bisa dipilih."}
           </p>
           <form action={saveMyCity} className="flex flex-col gap-4">
-            <Field label="Kota domisili">
+            <Field label="Kota Domisili">
               <CitySelect />
             </Field>
             {error && (
@@ -49,7 +49,7 @@ export default async function KotaPage({ searchParams }: { searchParams: Promise
                 Pilih kota dari daftar.
               </p>
             )}
-            <Button type="submit">Simpan dan lanjut</Button>
+            <Button type="submit">Simpan dan Lanjut</Button>
           </form>
         </CardBody>
       </Card>

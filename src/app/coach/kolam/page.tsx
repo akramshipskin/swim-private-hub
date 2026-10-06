@@ -76,7 +76,7 @@ export default async function CoachKolamPage({ searchParams }: { searchParams: P
             variant="danger"
             title={`Lepas ${p.name}?`}
             description="Jam kosongmu di kolam ini akan ditutup dan member tidak bisa membeli paket denganmu di sini. Tidak bisa dilepas selama masih ada member aktif bersamamu di kolam ini."
-            confirmLabel="Lepas kolam"
+            confirmLabel="Lepas Kolam"
           />
         ) : other ? (
           <ConfirmSubmit
@@ -84,7 +84,7 @@ export default async function CoachKolamPage({ searchParams }: { searchParams: P
             label="Pilih"
             title={`Pilih ${p.name}?`}
             description={OTHER_CITY_WARNING.COACH}
-            confirmLabel="Tetap pilih"
+            confirmLabel="Tetap Pilih"
           />
         ) : (
           <form action={pickPool.bind(null, p.id)}>

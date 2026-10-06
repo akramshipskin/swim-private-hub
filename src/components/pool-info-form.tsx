@@ -30,10 +30,10 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
     <form key={edit.formKey} action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="poolId" value={pool.id} />
       <fieldset disabled={edit.locked} className="grid gap-4 disabled:opacity-90 lg:grid-cols-2">
-        <Field label="Deskripsi kolam">
+        <Field label="Deskripsi Kolam">
           <Textarea name="description" rows={3} maxLength={1000} defaultValue={pool.description ?? ""} placeholder="Ukuran kolam, kedalaman, suasana, dll." />
         </Field>
-        <Field label="Alamat lengkap">
+        <Field label="Alamat Lengkap">
           <Input name="address" defaultValue={pool.address ?? ""} placeholder="Jalan, nomor, kelurahan, kecamatan" />
         </Field>
         <Field label="Kota">
@@ -55,8 +55,8 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
           <Field label="No. telepon kolam">
             <Input name="contactPhone" defaultValue={pool.contactPhone ?? ""} />
           </Field>
-          <TimeSelect name="openTime" label="Jam buka" defaultValue={pool.openTime ?? "06:00"} />
-          <TimeSelect name="closeTime" label="Jam tutup" defaultValue={pool.closeTime ?? "21:00"} />
+          <TimeSelect name="openTime" label="Jam Buka" defaultValue={pool.openTime ?? "06:00"} />
+          <TimeSelect name="closeTime" label="Jam Tutup" defaultValue={pool.closeTime ?? "21:00"} />
         </div>
         <div className="lg:col-span-2">
           <p className="mb-2 text-sm font-medium text-text">Fasilitas</p>

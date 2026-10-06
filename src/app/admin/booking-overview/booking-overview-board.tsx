@@ -100,15 +100,15 @@ export default function BookingOverviewBoard({
             Periode
             <Select value={period} onChange={(e) => setPeriod(e.target.value as Period)} className="w-full">
               <option value="upcoming">Hari ini &amp; mendatang</option>
-              <option value="unmarked">Lewat, belum ditandai Hadir</option>
-              <option value="past">Sudah lewat</option>
+              <option value="unmarked">Lewat, Belum Ditandai Hadir</option>
+              <option value="past">Sudah Lewat</option>
               <option value="all">Semua</option>
             </Select>
           </label>
           <label className="flex flex-col gap-1 text-sm text-text-muted">
             Coach
             <Select value={selectedCoach} onChange={(e) => setSelectedCoach(e.target.value)} className="w-full">
-              <option value="all">Semua coach</option>
+              <option value="all">Semua Coach</option>
               {coaches.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -117,7 +117,7 @@ export default function BookingOverviewBoard({
           <label className="flex flex-col gap-1 text-sm text-text-muted">
             Kolam
             <Select value={selectedPool} onChange={(e) => setSelectedPool(e.target.value)} className="w-full">
-              <option value="all">Semua kolam</option>
+              <option value="all">Semua Kolam</option>
               {poolNames.map((n) => (
                 <option key={n} value={n}>{n}</option>
               ))}

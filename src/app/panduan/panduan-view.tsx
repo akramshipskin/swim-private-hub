@@ -35,7 +35,7 @@ const HIGHLIGHTS = [
   },
   {
     title: "Harga dari kolam dan coach",
-    body: "Kolam memasang harga tiket dan coach memasang harga jasanya, masing-masing untuk paket 4 sesi (berlaku 60 hari) dan 8 sesi (berlaku 90 hari). Member membayar keduanya ditambah biaya layanan SPH di bawah 7%. Harga baru langsung berlaku; paket yang sudah dibeli tidak berubah.",
+    body: "Kolam memasang harga tiket dan coach memasang harga jasanya, masing-masing untuk paket 4 sesi (berlaku 60 hari) dan 8 sesi (berlaku 90 hari). Member membayar keduanya ditambah biaya layanan SPH 6,5% (maksimal 7%). Harga baru langsung berlaku; paket yang sudah dibeli tidak berubah.",
   },
   {
     title: "Notifikasi dua arah",
@@ -216,13 +216,13 @@ function StepList({ steps }: { steps: Step[] }) {
   return (
     <ol className="flex flex-col gap-3">
       {steps.map((s, i) => (
-        <li key={s.title} className="flex gap-3 rounded-2xl bg-white p-4">
+        <li key={s.title} className="flex gap-3 rounded-2xl bg-surface p-4">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-fixed-lime-500 text-sm font-bold text-fixed-ink">
             {i + 1}
           </span>
           <div className="min-w-0">
-            <p className="font-semibold text-fixed-ink">{s.title}</p>
-            <p className="mt-0.5 text-sm text-fixed-ink-soft">{s.body}</p>
+            <p className="font-semibold text-text">{s.title}</p>
+            <p className="mt-0.5 text-sm text-text-muted">{s.body}</p>
           </div>
         </li>
       ))}
@@ -236,25 +236,25 @@ export default function PanduanView() {
 
   return (
     // Panduan mengikuti landing: selalu tampilan terang, lebar maksimal sama.
-    <main className="flex min-h-screen flex-col bg-fixed-cream text-fixed-ink" style={{ colorScheme: "light" }}>
-      <header className="border-b border-fixed-ink/10">
+    <main className="flex min-h-screen flex-col bg-background text-text">
+      <header className="border-b border-border">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-4">
           <Link href="/" className="flex shrink-0 items-center gap-2 max-lg:min-h-[44px]">
             <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 rounded-lg object-contain" />
             <Logotype className="text-sm sm:text-xl" />
           </Link>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-fixed-sand sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-surface-muted sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               Masuk
             </Link>
-            <Link href="/register" className="rounded-full bg-fixed-ink px-2.5 py-2 text-sm font-semibold text-white hover:bg-fixed-ink-deep sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+            <Link href="/register" className="rounded-full bg-text px-2.5 py-2 text-sm font-semibold text-background hover:opacity-90 sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               Daftar
             </Link>
           </div>
         </div>
       </header>
 
-      <nav aria-label="Bagian panduan" className="sticky top-0 z-30 border-b border-fixed-ink/10 bg-fixed-cream/95 backdrop-blur">
+      <nav aria-label="Bagian panduan" className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl gap-2 overflow-x-auto px-4 py-3">
           {TABS.map((t) => (
             <button
@@ -266,7 +266,7 @@ export default function PanduanView() {
               }}
               aria-current={t.key === tab}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors max-lg:min-h-[44px] ${
-                t.key === tab ? "bg-fixed-ink text-white" : "border border-fixed-ink/15 bg-white hover:bg-fixed-sand"
+                t.key === tab ? "bg-text text-background" : "border border-border bg-surface hover:bg-surface-muted"
               }`}
             >
               {t.label}
@@ -283,16 +283,16 @@ export default function PanduanView() {
               <span className="block">Pilih coach, pilih kolam,</span>
               <span className="block">dan pilih jamnya.</span>
             </h1>
-            <p className="mt-5 max-w-2xl text-lg text-fixed-ink-soft">
+            <p className="mt-5 max-w-2xl text-lg text-text-muted">
               Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub. Perkembangan tercatat, pembayaran jelas.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold hover:bg-fixed-lime-100">
+              <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold text-fixed-ink hover:bg-fixed-lime-100">
                 Daftar gratis
               </Link>
               <Link
                 href="/daftar-kolam"
-                className="rounded-full border border-fixed-ink/20 px-6 py-3 text-base font-semibold hover:bg-fixed-sand"
+                className="rounded-full border border-border px-6 py-3 text-base font-semibold hover:bg-surface-muted"
               >
                 Punya kolam renang? Daftarkan kolam
               </Link>
@@ -301,14 +301,14 @@ export default function PanduanView() {
 
           <section className="mt-14">
             <h2 className="text-3xl font-semibold tracking-tight">Kenapa ini beda</h2>
-            <p className="mt-2 max-w-2xl text-base text-fixed-muted">
+            <p className="mt-2 max-w-2xl text-base text-text-muted">
               Bukan aplikasi booking umum: setiap bagian mengikuti cara kerja les renang privat.
             </p>
             <ul className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {HIGHLIGHTS.map((h) => (
-                <li key={h.title} className="rounded-2xl bg-white p-6">
+                <li key={h.title} className="rounded-2xl bg-surface p-6">
                   <h3 className="text-lg font-semibold">{h.title}</h3>
-                  <p className="mt-2 text-sm text-fixed-ink-soft">{h.body}</p>
+                  <p className="mt-2 text-sm text-text-muted">{h.body}</p>
                 </li>
               ))}
             </ul>
@@ -316,7 +316,7 @@ export default function PanduanView() {
 
           <section className="mt-14">
             <h2 className="text-3xl font-semibold tracking-tight">Tiga peran, tiga tampilan</h2>
-            <p className="mt-2 max-w-2xl text-base text-fixed-muted">
+            <p className="mt-2 max-w-2xl text-base text-text-muted">
               Setiap orang hanya melihat yang relevan untuknya. Klik salah satu untuk membuka panduan lengkapnya.
             </p>
             <ul className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -328,10 +328,10 @@ export default function PanduanView() {
                       setTab(g.key);
                       window.scrollTo({ top: 0 });
                     }}
-                    className="h-full w-full rounded-2xl bg-white p-6 text-left transition-colors hover:bg-fixed-sand"
+                    className="h-full w-full rounded-2xl bg-surface p-6 text-left transition-colors hover:bg-surface-muted"
                   >
                     <h3 className="text-xl font-semibold">{g.title}</h3>
-                    <p className="mt-2 text-sm text-fixed-ink-soft">{g.lead}</p>
+                    <p className="mt-2 text-sm text-text-muted">{g.lead}</p>
                     <span className="mt-3 inline-block text-sm font-semibold underline">Lihat panduan →</span>
                   </button>
                 </li>
@@ -344,18 +344,18 @@ export default function PanduanView() {
       {guide && (
         <div className="mx-auto w-full max-w-6xl px-4 py-12">
           <h1 className="text-4xl font-semibold tracking-tight">{guide.title}</h1>
-          <p className="mt-2 max-w-2xl text-base text-fixed-muted">{guide.lead}</p>
+          <p className="mt-2 max-w-2xl text-base text-text-muted">{guide.lead}</p>
 
           <div className="mt-8 flex flex-col gap-10">
             {guide.sections.map((s) => (
               <section key={s.heading}>
                 <h2 className="text-2xl font-semibold tracking-tight">{s.heading}</h2>
-                {s.intro && <p className="mt-2 max-w-2xl text-base text-fixed-muted">{s.intro}</p>}
+                {s.intro && <p className="mt-2 max-w-2xl text-base text-text-muted">{s.intro}</p>}
                 <div className="mt-4">
                   <StepList steps={s.steps} />
                 </div>
                 {s.note && (
-                  <p className="mt-3 rounded-2xl border border-fixed-lime-500 bg-fixed-lime-50 px-4 py-3 text-sm text-fixed-ink-soft">
+                  <p className="mt-3 rounded-2xl border border-fixed-lime-500 bg-fixed-lime-500/15 px-4 py-3 text-sm text-text">
                     {s.note}
                   </p>
                 )}
@@ -368,18 +368,18 @@ export default function PanduanView() {
       {tab === "install" && (
         <div className="mx-auto w-full max-w-6xl px-4 py-12">
           <h1 className="text-4xl font-semibold tracking-tight">Install ke HP</h1>
-          <p className="mt-2 max-w-2xl text-base text-fixed-muted">
+          <p className="mt-2 max-w-2xl text-base text-text-muted">
             Tidak perlu Play Store atau App Store. Swim Private Hub adalah website yang bisa &ldquo;dipasang&rdquo; ke
             layar utama HP, supaya terbuka seperti aplikasi biasa tanpa mengetik alamatnya lagi.
           </p>
           <ul className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
             {INSTALL_STEPS.map((p) => (
-              <li key={p.platform} className="rounded-2xl bg-white p-6">
+              <li key={p.platform} className="rounded-2xl bg-surface p-6">
                 <h2 className="text-lg font-semibold">{p.platform}</h2>
-                <ol className="mt-3 flex flex-col gap-2 text-sm text-fixed-ink-soft">
+                <ol className="mt-3 flex flex-col gap-2 text-sm text-text-muted">
                   {p.steps.map((s, i) => (
                     <li key={s} className="flex gap-2">
-                      <span className="font-semibold text-fixed-ink">{i + 1}.</span>
+                      <span className="font-semibold text-text">{i + 1}.</span>
                       <span>{s}</span>
                     </li>
                   ))}

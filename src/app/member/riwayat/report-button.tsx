@@ -29,7 +29,7 @@ export default function ReportButton({ bookingId, deadlineLabel }: { bookingId: 
     <form action={action} className="flex w-56 flex-col gap-2">
       <input type="hidden" name="bookingId" value={bookingId} />
       <label className="text-xs font-medium text-text" htmlFor={`note-${bookingId}`}>
-        Ceritakan singkat (opsional)
+        Ceritakan Singkat (Opsional)
       </label>
       <textarea
         id={`note-${bookingId}`}
@@ -44,7 +44,7 @@ export default function ReportButton({ bookingId, deadlineLabel }: { bookingId: 
           Batal
         </Button>
         <Button type="submit" size="sm" loading={pending}>
-          Kirim laporan
+          Kirim Laporan
         </Button>
       </div>
       {state?.error && <p role="alert" className="text-xs text-danger-text">{state.error}</p>}

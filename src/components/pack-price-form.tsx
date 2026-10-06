@@ -35,10 +35,10 @@ export default function PackPriceForm({
           diubah, supaya tidak menimpa harga baru dari coach/kolam dengan angka lama. */}
       <input type="hidden" name="origPack4" value={pricePack4 ?? ""} />
       <input type="hidden" name="origPack8" value={pricePack8 ?? ""} />
-      <Field label="Paket 4 sesi (Rp)">
+      <Field label="Paket 4 Sesi (Rp)">
         <PriceInput name="pricePack4" defaultValue={pricePack4 ?? ""} disabled={edit.locked} className="w-full sm:w-36" />
       </Field>
-      <Field label="Paket 8 sesi (Rp)">
+      <Field label="Paket 8 Sesi (Rp)">
         <PriceInput name="pricePack8" defaultValue={pricePack8 ?? ""} disabled={edit.locked} className="w-full sm:w-36" />
       </Field>
       {children?.(edit.locked)}
