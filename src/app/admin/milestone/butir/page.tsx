@@ -7,7 +7,7 @@ import { MILESTONE_GROUPS, MILESTONE_GROUP_LABEL, levelsOf } from "@/lib/milesto
 import { setStandardItemActive } from "../actions";
 import { AddItemForm, EditItemForm } from "./item-forms";
 
-export const metadata = { title: "Butir standar milestone | Swim Private Hub" };
+export const metadata = { title: "Butir Standar Milestone | Swim Private Hub" };
 
 export default async function StandardItemsPage() {
   await requireRole("ADMIN");
@@ -20,7 +20,7 @@ export default async function StandardItemsPage() {
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <Link href="/admin/milestone" className="text-sm text-brand-700 hover:underline">← Milestone</Link>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-text">Butir standar milestone</h1>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-text">Butir Standar Milestone</h1>
       <p className="mt-1 text-sm text-text-muted">
         Berlaku untuk semua peserta di kelompok & level itu. Butir yang dinonaktifkan tidak dihitung lagi; level yang
         sudah selesai dan sertifikatnya tidak berubah. Butir tidak bisa dipindah kelompok/level supaya progres peserta
