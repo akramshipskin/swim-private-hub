@@ -1,8 +1,8 @@
-# STATUS SPH (diperbarui 6 Okt 2026, sapu memori setelah sweeping total)
+# STATUS SPH (diperbarui 6 Okt 2026 sore, 12 jawaban sweeping dikerjakan)
 
 Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5, mulai dari docs/HANDOFF-AGEN.md. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
-## Terakhir live: ef84ffd (kode, 6 Okt pagi; GitHub tes + tes balapan + uji alur penuh hijau [uji alur penuh sempat gagal sekali karena Chrome di mesin GitHub tidak jalan, lulus saat diulang], Vercel sukses, terbukti di situs: tablet 768 tanpa sidebar, "Saldo PPN", logo kartu hilang). Tidak ada migrasi baru sejak lonceng (20261004120000, sudah dijalankan Hadi 4 Okt). Commit 5515cdc ("Edit"->"Ubah") sempat "dibatalkan" di GitHub karena antre 15 menit tanpa mesin, bukan tes gagal.
+## Terakhir live: 4d68aa3 (kode, 6 Okt sore; GitHub tes + tes balapan + uji alur penuh hijau, Vercel sukses, terbukti di situs: landing memuat "Kota yang dilayani", "Syarat tampil di pencarian", "6,5% (maksimal 7%)", janji "1x24 jam" hilang; Panduan memuat "6,5% (maksimal 7%)"). Belum dicek di live: tampilan Title Case di peran login, Panduan mode gelap di live, layar admin hapus akun, pemeriksa harian yang baru. Tidak ada migrasi baru sejak lonceng (20261004120000, sudah dijalankan Hadi 4 Okt).
 
 ## Sudah selesai dan live (ringkas; rinci di docs/reviews/ dan docs/KEPUTUSAN.md)
 - Per 30 Sep-1 Okt: tanggal lahir di semua form daftar, testimoni, CSP, PPN komisi 11%, landing dirombak, backup DB+storage hijau, Vercel Singapura, brand v2, animasi landing + dalam aplikasi.
@@ -24,11 +24,12 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 
 ## Sedang jalan / menunggu Hadi
 - Dijawab 6 Okt (rekomendasi dijalankan): hapus akun vs ganti coach ditolak (SELESAI); "Edit"->"Ubah" (SELESAI); lonceng 90 hari diterima; tombol beli menempel tidak dibuat.
-- MENUNGGU HADI (12 pertanyaan dari sweeping 6 Okt, rinci di docs/reviews/2026-10-06-sweeping-sistem-total.md): (1) blokir setuju-hapus-akun saat ada pembayaran berjalan; (2) kedaluwarsa otomatis pembayaran Menunggu; (3) "di bawah 7%" vs "6,5%"; (4) janji kolam 1x24 jam; (5) landing: kota, ganti coach gratis hari ke-10, syarat coach; (6) tangkapan layar produk landing diambil ulang; (7) tombol Daftar gratis lime vs charcoal; (8) Panduan terang vs halaman hukum gelap; (9) bersihkan data uji production (kota kolam, testimoni Ibu Clara, Kolam Uji Daftar); (10) email noreply di kotak masuk admin; (11) draf Kebijakan Privasi (kota, daftar tunggu, lonceng) untuk orang hukum; (12) kapitalisasi tombol seragam. Rekomendasi gue di laporan = A semua.
+- 6 Okt sore: 12 jawaban Hadi dikerjakan, dikirim 4d68aa3 (3 commit; tidak ada migrasi; tes 864 + 207 balapan + uji alur penuh + build lulus lokal; pemeriksa Opus kedua untuk uang: 0 berat). Isi: hapus akun diblokir saat ada pembayaran berjalan; pembayaran Menunggu kedaluwarsa otomatis lewat cron harian; "6,5% (maksimal 7%)"; FAQ kolam jujur; landing + section kota/ganti coach gratis/syarat coach; gambar produk landing baru; Panduan ikut tema gelap; email noreply tidak dihitung; Title Case tombol/label dalam aplikasi (193 potongan); draf Privasi di docs/legal. 
+- MENUNGGU HADI (6 Okt sore): (a) Kebijakan Privasi: hapus akun belum menghapus kota/daftar tunggu kota (pilihan A hapus / B tulis di Privasi) dan belum ada tombol keluar daftar tunggu; (b) 2 email noreply lama di kotak masuk admin tetap "menunggu" sampai ditandai selesai manual; (c) konfirmasi tafsir Title Case dan jawaban 4 di KEPUTUSAN 6 Okt.
 - Pixel Meta + token sudah diisi Hadi di Vercel; event masuk BELUM dicek. Pembayaran asli di production belum pernah ada.
 
 ## Tugas Claude berikutnya
-1. Tunggu jawaban 12 pertanyaan sweeping 6 Okt lalu kerjakan (no. 1-2 uang/akses: Opus + pemeriksa kedua; sisanya Sonnet). Sweeping ulang bagian yang berubah; peran selain admin di live hanya bila Hadi login sendiri di browser aplikasi. Opsi C (rombak alur total) tunggu data pemakaian.
+1. Tunggu jawaban (a)-(c) di atas. Sweeping ulang bagian yang berubah (Title Case, Panduan gelap, landing); peran selain admin di live hanya bila Hadi login sendiri di browser aplikasi. Opsi C (rombak alur total) tunggu data pemakaian.
 2. P8 (reset password via email) setelah email production terbukti. Pantau next-auth v5 stabil (dikunci 5.0.0-beta.32).
 3. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (sebulan setelah P1, butuh Hadi), (aturan kota/ganti gratis/pelanggaran sudah ditulis di docs/aturan-bisnis-saat-ini.md 3 Okt malam).
 
