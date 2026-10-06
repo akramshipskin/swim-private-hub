@@ -14,6 +14,7 @@ import { clientIp } from "@/lib/rate-limit";
 import { coachMeetsOpenSlotRule, MIN_OPEN_SLOTS, OPEN_SLOT_WINDOW_DAYS } from "@/lib/coach-open-slots";
 
 
+const INACTIVE_CHECKOUT_ERROR = "Akunmu sedang dinonaktifkan, jadi belum bisa membeli paket. Hubungi admin lewat chat bantuan.";
 const DELETION_PENDING_CHECKOUT_ERROR = "Kamu sedang mengajukan penghapusan akun. Batalkan pengajuannya di Profil dulu untuk membeli paket.";
 
 export async function POST(request: Request) {
@@ -47,11 +48,15 @@ export async function POST(request: Request) {
   // Hadi 3 Okt malam (#8A): tidak bisa membeli paket untuk peserta yang sudah
   // dinonaktifkan, atau saat akun sedang diajukan untuk dihapus.
   const [buyer, dep] = await Promise.all([
-    prisma.user.findUnique({ where: { id: session.user.id }, select: { deletionRequestedAt: true } }),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { deletionRequestedAt: true, isActive: true } }),
     prisma.dependent.findUnique({ where: { id: dependentId }, select: { isActive: true } }),
   ]);
   if (buyer?.deletionRequestedAt) {
     return Response.json({ error: DELETION_PENDING_CHECKOUT_ERROR }, { status: 409 });
+  }
+  // Akun yang dinonaktifkan admin tidak bisa membeli paket, sama seperti booking (Hadi 6 Okt).
+  if (!buyer?.isActive) {
+    return Response.json({ error: INACTIVE_CHECKOUT_ERROR }, { status: 403 });
   }
   if (!dep?.isActive) {
     return Response.json({ error: "Peserta ini sudah dinonaktifkan. Aktifkan lagi di menu Peserta atau pilih peserta lain." }, { status: 409 });
@@ -129,9 +134,10 @@ export async function POST(request: Request) {
     // Pintu hapus akun dibaca ulang DI DALAM kunci baris akun (sama dengan kunci
     // spendMemberBalance & anonymizeMember): pengajuan/persetujuan hapus akun yang
     // terjadi setelah pengecekan awal di atas tidak bisa disalip (Hadi 6 Okt, 7A).
-    const [owner] = await tx.$queryRaw<{ deletionRequestedAt: Date | null; anonymizedAt: Date | null }[]>`
-      SELECT "deletionRequestedAt", "anonymizedAt" FROM "User" WHERE id = ${session.user.id} FOR UPDATE`;
+    const [owner] = await tx.$queryRaw<{ deletionRequestedAt: Date | null; anonymizedAt: Date | null; isActive: boolean }[]>`
+      SELECT "deletionRequestedAt", "anonymizedAt", "isActive" FROM "User" WHERE id = ${session.user.id} FOR UPDATE`;
     if (!owner || owner.deletionRequestedAt || owner.anonymizedAt) return "DELETION_PENDING" as const;
+    if (!owner.isActive) return "INACTIVE" as const;
     // Tautan coach-kolam dikunci bersama (FOR SHARE) sampai paket tercatat:
     // coach yang melepas kolam bersamaan menunggu dan melihat paket ini, atau
     // tautannya sudah hilang dan pembelian ditolak (src/lib/coach-pools.ts).
@@ -186,6 +192,9 @@ export async function POST(request: Request) {
     });
     return { ...created, cash: 0, orderId: "" };
   });
+  if (pkg === "INACTIVE") {
+    return Response.json({ error: INACTIVE_CHECKOUT_ERROR }, { status: 403 });
+  }
   if (pkg === "DELETION_PENDING") {
     return Response.json({ error: DELETION_PENDING_CHECKOUT_ERROR }, { status: 409 });
   }

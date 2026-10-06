@@ -396,6 +396,23 @@ describe("HAPUS AKUN vs GANTI COACH", () => {
     expect(await checkInvariants()).toEqual([]);
   });
 
+  it("HG3b: sudah disetujui menunggu tambah bayar lalu akun dinonaktifkan admin -> bayar ditolak, saldo tidak terpakai, tidak ada tagihan (Hadi 6 Okt)", async () => {
+    const { pool, m, pkg } = await activePackage();
+    const b = await otherCoach(pool.id, 600000, 1120000);
+    const admin = await mkUser("ADMIN");
+    await giveSaldo(m.id, 50000);
+    await asMember(m.id, () => requestCoachChange(null, fd({ packageId: pkg.id, toCoachId: b.id, reason: "Ingin coach yang lebih senior" })));
+    const req = await prisma.coachChangeRequest.findFirstOrThrow();
+    await as({ id: admin.id, role: "ADMIN" }, () => approveAction(null, fd({ requestId: req.id })));
+    await prisma.user.update({ where: { id: m.id }, data: { isActive: false } });
+    const res = await asMember(m.id, () => payChange(new Request("http://x", { method: "POST", body: JSON.stringify({ requestId: req.id }) })));
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toMatch(/dinonaktifkan/);
+    expect(await prisma.payment.count({ where: { coachChangeRequestId: req.id } })).toBe(0);
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: m.id } })).memberBalance).toBe(50000);
+    expect(await checkInvariants()).toEqual([]);
+  });
+
   it("HG4: ganti coach gratis hari ke-10 ditolak saat akun diajukan hapus; setelah batal hapus berhasil (paket pindah, selisih jadi saldo)", async () => {
     const { pool, m, pkg } = await activePackage();
     const b = await otherCoach(pool.id, 380000, 640000);

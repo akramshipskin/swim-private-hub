@@ -43,8 +43,10 @@ export async function POST(request: Request) {
     // Pintu hapus akun untuk pembayaran BARU (memakai saldo / membuat transaksi).
     // Baris akun dikunci FOR UPDATE (sama dengan kunci spendMemberBalance di bawah, tanpa
     // kenaikan kunci; urutan sama dengan completeCoachChange: pengajuan, akun, paket) supaya pengajuan hapus akun yang bersamaan menunggu dan bacaan ini segar.
-    const [owner] = await tx.$queryRaw<{ deletionRequestedAt: Date | null }[]>`SELECT "deletionRequestedAt" FROM "User" WHERE id = ${memberId} FOR UPDATE`;
+    const [owner] = await tx.$queryRaw<{ deletionRequestedAt: Date | null; isActive: boolean }[]>`SELECT "deletionRequestedAt", "isActive" FROM "User" WHERE id = ${memberId} FOR UPDATE`;
     if (owner?.deletionRequestedAt) return { error: DELETION_PENDING_COACH_CHANGE_ERROR } as const;
+    // Akun dinonaktifkan admin tidak bisa membuat tagihan baru (Hadi 6 Okt).
+    if (!owner?.isActive) return { error: "Akunmu sedang dinonaktifkan, jadi belum bisa membayar. Hubungi admin lewat chat bantuan." } as const;
     if (Date.now() - req.decidedAt.getTime() > COACH_CHANGE_PAY_WINDOW_MS) {
       await tx.coachChangeRequest.update({ where: { id: req.id }, data: { status: "EXPIRED" } });
       return { error: "Batas 24 jam untuk tambah bayar sudah lewat, jadi pengajuan dibatalkan. Ajukan ulang bila masih ingin ganti coach." } as const;

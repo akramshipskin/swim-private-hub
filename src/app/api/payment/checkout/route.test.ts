@@ -10,7 +10,7 @@ const packageFindFirst = vi.fn().mockResolvedValue(null);
 const packageCreate = vi.fn().mockResolvedValue({ id: "pkg-new" });
 const poolFindFirst = vi.fn();
 const userFindFirst = vi.fn();
-const userFindUnique = vi.fn().mockResolvedValue({ phone: "081200000001", email: null });
+const userFindUnique = vi.fn().mockResolvedValue({ phone: "081200000001", email: null, isActive: true });
 const depFindUnique = vi.fn().mockResolvedValue({ isActive: true });
 const sendMetaEvent = vi.fn().mockResolvedValue(undefined);
 let metaEnabled = false;
@@ -26,7 +26,7 @@ const packageDelete = vi.fn().mockResolvedValue({});
 const packageUpdate = vi.fn().mockResolvedValue({});
 const affiliationLock = vi.fn().mockResolvedValue([{ id: "aff1" }]);
 // Kunci baris akun pembeli (pintu hapus akun dibaca ulang di dalam kunci, 7A).
-const ownerLock = vi.fn().mockResolvedValue([{ deletionRequestedAt: null, anonymizedAt: null }]);
+const ownerLock = vi.fn().mockResolvedValue([{ deletionRequestedAt: null, anonymizedAt: null, isActive: true }]);
 const meetsSlots = vi.fn().mockResolvedValue(true);
 vi.mock("@/lib/coach-open-slots", () => ({ coachMeetsOpenSlotRule: (...a: unknown[]) => meetsSlots(...a), MIN_OPEN_SLOTS: 4, OPEN_SLOT_WINDOW_DAYS: 14 }));
 vi.mock("@/lib/prisma", () => {
@@ -132,6 +132,20 @@ describe("checkout paket pilih coach", () => {
     ownerLock.mockResolvedValueOnce([{ deletionRequestedAt: null, anonymizedAt: new Date() }]);
     expect((await POST(buy())).status).toBe(409);
     expect(packageCreate).not.toHaveBeenCalled();
+  });
+
+  it("akun dinonaktifkan admin tidak bisa membeli paket: dicek di awal dan di dalam kunci akun (Hadi 6 Okt)", async () => {
+    userFindUnique.mockResolvedValueOnce({ deletionRequestedAt: null, isActive: false });
+    let res = await POST(buy());
+    expect(res.status).toBe(403);
+    expect((await res.json()).error).toMatch(/dinonaktifkan/);
+    expect(packageCreate).not.toHaveBeenCalled();
+    ownerLock.mockResolvedValueOnce([{ deletionRequestedAt: null, anonymizedAt: null, isActive: false }]);
+    res = await POST(buy());
+    expect(res.status).toBe(403);
+    expect(packageCreate).not.toHaveBeenCalled();
+    expect(paymentCreate).not.toHaveBeenCalled();
+    expect(spendMemberBalance).not.toHaveBeenCalled();
   });
 
   it("coach dengan jam kosong kurang dari 4 dalam 14 hari tidak bisa dibeli (Hadi 3 Okt)", async () => {
@@ -259,7 +273,7 @@ describe("checkout dengan saldo member", () => {
       expect(sendMetaEvent.mock.calls[0][0]).toMatchObject({ eventName: "Purchase", eventId: "SALDO-pkg-new", value: 1_363_200 });
 
       // Panggilan pertama = cek pengajuan hapus akun; kedua = data member untuk Meta.
-      userFindUnique.mockResolvedValueOnce({ deletionRequestedAt: null }).mockRejectedValueOnce(new Error("db down"));
+      userFindUnique.mockResolvedValueOnce({ deletionRequestedAt: null, isActive: true }).mockRejectedValueOnce(new Error("db down"));
       expect((await POST(buy())).status).toBe(200);
 
       // Tunai lewat Midtrans: Purchase menunggu notifikasi lunas, cookie disimpan di Payment.
