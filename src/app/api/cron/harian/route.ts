@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { runCoachSlotWatch } from "@/lib/coach-slot-watch";
 import { purgeOldNotifications } from "@/lib/notifications";
+import { releaseStalePayments } from "@/lib/stale-payments";
 
 // Pemeriksa harian (Vercel Cron, 06.00 WIB, lihat vercel.json). Vercel mengirim
 // "Authorization: Bearer <CRON_SECRET>". Tanpa CRON_SECRET di Vercel = semua
@@ -17,12 +18,18 @@ export async function GET(request: Request) {
   if (!authorized(request.headers.get("authorization"))) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+  // Penjaga jadwal paling dulu (paling penting; pekerjaan di bawahnya bisa lambat).
+  const watch = await runCoachSlotWatch();
   // Riwayat lonceng lebih dari 90 hari dihapus (Hadi 4 Okt). Gagal hapus
-  // tidak menggagalkan pemeriksa jadwal di bawah, dan sebaliknya.
+  // tidak menggagalkan pekerjaan lain.
   const notificationsPurged = await purgeOldNotifications().catch((err: unknown) => {
     console.error(`[cron] gagal membersihkan notifikasi lama: ${(err as Error)?.message ?? "error"}`);
     return null;
   });
-  const watch = await runCoachSlotWatch();
-  return Response.json({ ok: true, watch, notificationsPurged });
+  // Pembayaran "Menunggu" yang lewat batas 24 jam dikedaluwarsakan (Hadi 6 Okt).
+  const paymentsExpired = await releaseStalePayments().catch((err: unknown) => {
+    console.error(`[cron] gagal mengedaluwarsakan pembayaran: ${(err as Error)?.message ?? "error"}`);
+    return null;
+  });
+  return Response.json({ ok: true, watch, notificationsPurged, paymentsExpired });
 }

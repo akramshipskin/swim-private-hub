@@ -13,12 +13,14 @@ export default function AnonymizeCard({
   upcomingBookings,
   remainingSessions,
   memberBalance,
+  pendingPayments,
 }: {
   userId: string;
   requestedAt: string;
   upcomingBookings: number;
   remainingSessions: number;
   memberBalance: number;
+  pendingPayments: number;
 }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -51,7 +53,13 @@ export default function AnonymizeCard({
             sebelum akun ditutup: hubungi member dulu. Kalau member tetap minta dihapus, sisa saldo hangus.
           </p>
         )}
-        <Button variant="danger" size="sm" className="mt-3" onClick={() => setOpen(true)}>
+        {pendingPayments > 0 && (
+          <p className="mt-2 rounded-md bg-warning-bg px-3 py-2 text-sm text-warning-text">
+            Ada <b>{pendingPayments}</b> pembayaran yang masih menunggu dibayar. Persetujuan baru bisa dilakukan setelah
+            lunas atau kedaluwarsa (sekitar 24 jam).
+          </p>
+        )}
+        <Button variant="danger" size="sm" className="mt-3" disabled={pendingPayments > 0} onClick={() => setOpen(true)}>
           Setujui &amp; hapus data
         </Button>
         {message && <p role="status" className="mt-2 text-sm text-text">{message}</p>}
@@ -60,7 +68,7 @@ export default function AnonymizeCard({
         open={open}
         title="Hapus data akun ini?"
         description={`Tidak bisa dibatalkan. ${upcomingBookings} jadwal mendatang dibatalkan dan ${remainingSessions} sisa sesi hangus.`}
-        confirmLabel="Ya, hapus data"
+        confirmLabel="Ya, Hapus Data"
         loading={pending}
         onCancel={() => setOpen(false)}
         onConfirm={approve}

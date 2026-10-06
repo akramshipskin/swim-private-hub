@@ -14,20 +14,24 @@ export const STALE_PAYMENT_MS = PAYMENT_WINDOW_MS + 15 * 60 * 1000;
 
 export async function releaseStalePayments(now = new Date()) {
   const stale = await prisma.payment.findMany({
-    // Hanya pembayaran yang menahan saldo member atau pengajuan ganti coach;
-    // pembayaran lama lainnya tidak diubah (data historis).
-    where: {
-      status: "PENDING",
-      createdAt: { lt: new Date(now.getTime() - STALE_PAYMENT_MS) },
-      OR: [{ coachChangeRequestId: { not: null } }, { package: { saldoUsed: { gt: 0 } } }],
-    },
-    select: { id: true },
+    // Semua pembayaran "Menunggu" yang lewat batas (Hadi 6 Okt, 2A): yang tidak
+    // menahan saldo ikut kedaluwarsa, supaya paket "Menunggu Pembayaran" tidak
+    // menumpuk. Paling lama dulu; sisanya diselesaikan di putaran berikutnya.
+    where: { status: "PENDING", createdAt: { lt: new Date(now.getTime() - STALE_PAYMENT_MS) } },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, rawWebhookPayload: true },
     take: 50,
   });
-  for (const { id } of stale) {
-    await prisma.$transaction(async (tx) => {
+  let released = 0;
+  for (const { id, rawWebhookPayload } of stale) {
+    // Midtrans sudah mengabari lunas tetapi jumlahnya tidak cocok: webhook sengaja
+    // menahannya PENDING untuk dicek admin. Jangan dikedaluwarsakan diam-diam.
+    const status = (rawWebhookPayload as { transaction_status?: string } | null)?.transaction_status;
+    if (status === "settlement" || status === "capture") continue;
+    // Satu baris yang gagal tidak boleh menahan baris lain di putaran ini.
+    const done = await prisma.$transaction(async (tx) => {
       const claim = await tx.payment.updateMany({ where: { id, status: "PENDING" }, data: { status: "EXPIRED" } });
-      if (claim.count === 0) return;
+      if (claim.count === 0) return false;
       const pay = await tx.payment.findUniqueOrThrow({
         where: { id },
         select: { packageId: true, coachChangeRequestId: true, package: { select: { memberId: true, saldoUsed: true } }, coachChangeRequest: { select: { saldoUsed: true } } },
@@ -39,6 +43,12 @@ export async function releaseStalePayments(now = new Date()) {
         await tx.package.updateMany({ where: { id: pay.packageId, status: "PENDING_PAYMENT" }, data: { status: "EXPIRED" } });
         await refundMemberBalanceOnce(tx, pay.package.memberId, pay.package.saldoUsed, { packageId: pay.packageId });
       }
+      return true;
+    }).catch((err: unknown) => {
+      console.error(`[stale-payments] gagal mengedaluwarsakan pembayaran ${id}: ${(err as Error)?.message ?? "error"}`);
+      return false;
     });
+    if (done) released++;
   }
+  return released;
 }

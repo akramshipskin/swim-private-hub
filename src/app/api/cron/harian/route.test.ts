@@ -4,6 +4,8 @@ const runCoachSlotWatch = vi.fn().mockResolvedValue({ watched: 0 });
 vi.mock("@/lib/coach-slot-watch", () => ({ runCoachSlotWatch: () => runCoachSlotWatch() }));
 const purgeOldNotifications = vi.fn().mockResolvedValue(3);
 vi.mock("@/lib/notifications", () => ({ purgeOldNotifications: () => purgeOldNotifications() }));
+const releaseStalePayments = vi.fn().mockResolvedValue(2);
+vi.mock("@/lib/stale-payments", () => ({ releaseStalePayments: () => releaseStalePayments() }));
 const { GET } = await import("./route");
 const call = (auth?: string) => GET(new Request("http://x/api/cron/harian", { headers: auth ? { authorization: auth } : {} }));
 
@@ -12,6 +14,7 @@ describe("GET /api/cron/harian", () => {
   beforeEach(() => {
     runCoachSlotWatch.mockClear();
     purgeOldNotifications.mockClear();
+    releaseStalePayments.mockClear();
   });
   afterEach(() => {
     process.env.CRON_SECRET = original;
@@ -23,6 +26,7 @@ describe("GET /api/cron/harian", () => {
     expect((await call("Bearer undefined")).status).toBe(401);
     expect(runCoachSlotWatch).not.toHaveBeenCalled();
     expect(purgeOldNotifications).not.toHaveBeenCalled();
+    expect(releaseStalePayments).not.toHaveBeenCalled();
   });
 
   it("kunci salah / tanpa header ditolak; kunci benar menjalankan pemeriksa", async () => {
@@ -34,7 +38,10 @@ describe("GET /api/cron/harian", () => {
     expect(ok.status).toBe(200);
     expect(runCoachSlotWatch).toHaveBeenCalledTimes(1);
     expect(purgeOldNotifications).toHaveBeenCalledTimes(1);
-    expect((await ok.json()).notificationsPurged).toBe(3);
+    expect(releaseStalePayments).toHaveBeenCalledTimes(1);
+    const body = await ok.json();
+    expect(body.notificationsPurged).toBe(3);
+    expect(body.paymentsExpired).toBe(2);
   });
 
   it("gagal membersihkan notifikasi lama tidak menggagalkan pemeriksa harian", async () => {
@@ -44,6 +51,17 @@ describe("GET /api/cron/harian", () => {
     const res = await call("Bearer rahasia-uji");
     expect(res.status).toBe(200);
     expect((await res.json()).notificationsPurged).toBeNull();
+    error.mockRestore();
+  });
+
+  it("gagal mengedaluwarsakan pembayaran tidak menggagalkan pemeriksa jadwal", async () => {
+    process.env.CRON_SECRET = "rahasia-uji";
+    releaseStalePayments.mockRejectedValueOnce(new Error("db putus"));
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const res = await call("Bearer rahasia-uji");
+    expect(res.status).toBe(200);
+    expect((await res.json()).paymentsExpired).toBeNull();
+    expect(runCoachSlotWatch).toHaveBeenCalledTimes(1);
     error.mockRestore();
   });
 });

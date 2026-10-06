@@ -11,6 +11,9 @@ const sendMetaEvent = vi.fn().mockResolvedValue(undefined);
 let metaEnabled = false;
 vi.mock("@/lib/meta-capi", () => ({ metaCapiEnabled: () => metaEnabled, sendMetaEvent: (...a: unknown[]) => sendMetaEvent(...a) }));
 
+const notifyAdmins = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/notify", () => ({ notifyAdmins: (...a: unknown[]) => notifyAdmins(...a) }));
+
 const paymentFindUnique = vi.fn();
 const packageUpdate = vi.fn().mockResolvedValue({});
 const tx = {
@@ -267,5 +270,22 @@ describe("webhook: pelacak iklan Meta (Purchase)", () => {
     await POST(capture("challenge"));
     metaEnabled = false;
     expect(sendMetaEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe("webhook jumlah tidak cocok", () => {
+  it("lunas tetapi jumlah beda dengan tagihan: paket tidak diaktifkan dan admin diberi tahu", async () => {
+    paymentFindUnique.mockResolvedValue({ id: "pay-3", status: "PENDING", amount: 150000, packageId: "pkg-3", package: { durationDays: 60 } });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    await POST(settlement());
+    expect(packageUpdate).not.toHaveBeenCalled();
+    expect(notifyAdmins).toHaveBeenCalledTimes(1);
+    expect(notifyAdmins.mock.calls[0][0]).toBe("Cek pembayaran");
+  });
+
+  it("jumlah cocok: admin tidak diganggu", async () => {
+    paymentFindUnique.mockResolvedValue({ id: "pay-4", status: "PENDING", amount: 135000, packageId: "pkg-4", package: { durationDays: 60 } });
+    await POST(settlement());
+    expect(notifyAdmins).not.toHaveBeenCalled();
   });
 });

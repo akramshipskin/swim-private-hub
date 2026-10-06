@@ -103,6 +103,7 @@ export async function POST(request: Request) {
   }
 
   let paymentStatus: "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED" = "PENDING";
+  let amountMismatch = false;
   let packageStatus: "PENDING_PAYMENT" | "ACTIVE" | "EXPIRED" | null = null;
 
   // `capture` (kartu) belum tentu aman: Midtrans FDS bisa ngasih
@@ -137,6 +138,7 @@ export async function POST(request: Request) {
     console.error(`[webhook] jumlah tidak cocok order ${orderId}: dibayar ${grossAmount}, tagihan ${payment.amount}`);
     paymentStatus = "PENDING";
     packageStatus = null;
+    amountMismatch = true;
   }
 
   // Paket menyimpan masa berlakunya sendiri (model harga-dari-coach); 60 hari
@@ -251,6 +253,9 @@ export async function POST(request: Request) {
     }
   }
 
+  if (amountMismatch) {
+    await notifyAdmins("Cek pembayaran", `Pembayaran ${orderId} sudah dibayar ${formatRupiah(Math.round(Number(grossAmount)))} tetapi tagihannya ${formatRupiah(payment.amount)}. Paket belum diaktifkan; perlu dicek.`, "/admin/pembayaran").catch(() => {});
+  }
   if (saldoShortage > 0) {
     console.error(`[webhook] ${orderId} lunas setelah saldo dikembalikan; saldo member kurang ${saldoShortage}`);
     await notifyAdmins("Cek saldo member", `Pembayaran ${orderId} lunas belakangan. Saldo member kurang ${formatRupiah(saldoShortage)} untuk ditarik kembali.`, "/admin/pembayaran").catch(() => {});

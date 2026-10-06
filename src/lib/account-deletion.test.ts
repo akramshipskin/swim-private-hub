@@ -8,7 +8,7 @@ const { tx, prismaMock } = vi.hoisted(() => {
     milestoneNote: { updateMany: vi.fn() },
     pushSubscription: { deleteMany: vi.fn() },
     inAppNotification: { deleteMany: vi.fn() },
-    payment: { updateMany: vi.fn() },
+    payment: { updateMany: vi.fn(), count: vi.fn() },
   };
   const prismaMock = {
     $transaction: vi.fn(async (cb: (t: typeof tx) => unknown) => cb(tx)),
@@ -21,11 +21,13 @@ vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("bcryptjs", () => ({ default: { hash: vi.fn(async () => "dead-hash") } }));
 vi.mock("@/lib/cancel-booking", () => ({ cancelBooking: vi.fn(), CancelError: class extends Error {} }));
 
-import { anonymizeMember, AccountDeletionError } from "./account-deletion";
+import { STALE_PAYMENT_MS } from "./stale-payments";
+import { anonymizeMember, AccountDeletionError, PENDING_PAYMENT_DELETION_ERROR } from "./account-deletion";
 
 beforeEach(() => {
   vi.clearAllMocks();
   prismaMock.booking.findMany.mockResolvedValue([]);
+  tx.payment.count.mockResolvedValue(0);
 });
 
 describe("anonymizeMember", () => {
@@ -47,5 +49,24 @@ describe("anonymizeMember", () => {
     tx.$queryRaw.mockResolvedValue([{ role: "MEMBER", deletionRequestedAt: null, anonymizedAt: null }]);
     await expect(anonymizeMember("u1")).rejects.toBeInstanceOf(AccountDeletionError);
     expect(tx.inAppNotification.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it("menolak saat masih ada pembayaran yang menunggu dibayar dan tidak mengubah apa pun (1A)", async () => {
+    tx.$queryRaw.mockResolvedValue([{ role: "MEMBER", deletionRequestedAt: new Date(), anonymizedAt: null }]);
+    tx.payment.count.mockResolvedValue(1);
+    await expect(anonymizeMember("u1")).rejects.toThrow(PENDING_PAYMENT_DELETION_ERROR);
+    expect(tx.user.update).not.toHaveBeenCalled();
+    expect(tx.dependent.updateMany).not.toHaveBeenCalled();
+    expect(prismaMock.booking.findMany).not.toHaveBeenCalled();
+  });
+
+  it("hanya menghitung pembayaran PENDING milik member itu yang belum lewat batas bayar", async () => {
+    tx.$queryRaw.mockResolvedValue([{ role: "MEMBER", deletionRequestedAt: new Date(), anonymizedAt: null }]);
+    await anonymizeMember("u1");
+    const where = tx.payment.count.mock.calls[0][0].where;
+    expect(where.status).toBe("PENDING");
+    expect(where.package).toEqual({ memberId: "u1" });
+    const cutoff = (where.createdAt.gte as Date).getTime();
+    expect(Math.abs(Date.now() - STALE_PAYMENT_MS - cutoff)).toBeLessThan(5000);
   });
 });

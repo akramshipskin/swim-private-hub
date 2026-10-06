@@ -149,6 +149,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             upcomingBookings={deletion.upcomingBookings}
             remainingSessions={deletion.remainingSessions}
             memberBalance={deletion.memberBalance}
+            pendingPayments={deletion.pendingPayments}
           />
         )}
         <Card>
@@ -157,7 +158,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             <Row label="Nomor HP" value={user.phone ?? "-"} />
             <Row label="Email" value={user.email ?? "-"} />
             <Row label="Terdaftar" value={shortDate(user.createdAt)} />
-            <Row label="Wajib ganti password" value={user.mustChangePassword ? "Ya" : "Tidak"} />
+            <Row label="Wajib Ganti Password" value={user.mustChangePassword ? "Ya" : "Tidak"} />
             {/* Reset 2FA hanya untuk coach/member/pemilik kolam; 2FA admin
                 direset lewat scripts/reset-admin-2fa.mts. */}
             <Row
@@ -171,7 +172,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                 </span>
               }
             />
-            {user.registeredReferer && <Row label="Sumber pendaftaran" value={user.registeredReferer} />}
+            {user.registeredReferer && <Row label="Sumber Pendaftaran" value={user.registeredReferer} />}
           </CardBody>
         </Card>
 
@@ -179,7 +180,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           <Card>
             <CardBody>
               <h2 className="mb-2 text-lg font-semibold text-text">Profil coach</h2>
-              <Row label="Umur & jenis kelamin" value={coachBioLine(user.coachProfile) ?? "Belum diisi"} />
+              <Row label="Umur & Jenis Kelamin" value={coachBioLine(user.coachProfile) ?? "Belum diisi"} />
               <Row label="Keahlian" value={user.coachProfile.specialties.join(", ") || "Belum diisi"} />
               <Row
                 label="Sertifikat"
@@ -205,7 +206,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                                 label="Setujui"
                                 title={`Setujui sertifikat ${user.name}?`}
                                 description={`"${c.name}" langsung tampil di profil coach ini untuk semua orang, dengan badge "Bersertifikat".`}
-                                confirmLabel="Ya, setujui"
+                                confirmLabel="Ya, Setujui"
                               />
                               <ConfirmSubmit
                                 action={reviewCertificate.bind(null, c.id, false)}
@@ -213,7 +214,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                                 variant="danger"
                                 title={`Tolak sertifikat ${user.name}?`}
                                 description={`"${c.name}" ditolak. Coach bisa menghapusnya dan mengunggah ulang.`}
-                                confirmLabel="Ya, tolak"
+                                confirmLabel="Ya, Tolak"
                               />
                             </span>
                           )}
@@ -238,7 +239,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                 <Row label="Termasuk koreksi manual (tanpa sesi)" value={`${manualAmount < 0 ? "−" : ""}${formatRupiah(Math.abs(manualAmount))}`} />
               )}
               <Row
-                label="Sesi bulan ini"
+                label="Sesi Bulan Ini"
                 value={`${coachSessions.filter((b) => b.attended === true).length} Hadir · ${coachSessions.filter((b) => b.status === "BOOKED" && b.attended === null).length} terjadwal`}
               />
               <Row

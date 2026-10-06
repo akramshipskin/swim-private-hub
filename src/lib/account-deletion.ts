@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { cancelBooking, CancelError } from "@/lib/cancel-booking";
+import { STALE_PAYMENT_MS } from "@/lib/stale-payments";
 
 // Hapus akun member (keputusan Hadi 25 Sep): member mengajukan dari Profil,
 // admin menyetujui. "Hapus" = identitas dianonimkan -- nama, HP, email, nama
@@ -14,6 +15,21 @@ export const ANONYMIZED_DEPENDENT_NAME = "Peserta dihapus";
 export const ANONYMIZED_NOTE = "(catatan dihapus)";
 
 export class AccountDeletionError extends Error {}
+
+// Pembayaran yang masih berjalan = Midtrans "Menunggu" yang belum lewat batas
+// bayar (termasuk tambahan bayar ganti coach). Menyetujui hapus akun saat itu
+// membuat uang yang sedang di jalan jatuh ke akun yang sudah dianonimkan
+// (Hadi 6 Okt, 1A: diblokir).
+export const PENDING_PAYMENT_DELETION_ERROR =
+  "Masih ada pembayaran yang menunggu dibayar. Tunggu sampai lunas atau kedaluwarsa (sekitar 24 jam), lalu setujui lagi.";
+
+function inFlightPaymentsWhere(memberId: string, now: Date) {
+  return {
+    status: "PENDING" as const,
+    createdAt: { gte: new Date(now.getTime() - STALE_PAYMENT_MS) },
+    package: { memberId },
+  };
+}
 
 export async function requestAccountDeletion(userId: string) {
   const res = await prisma.user.updateMany({
@@ -34,16 +50,18 @@ export async function cancelAccountDeletion(userId: string) {
 // Ringkasan untuk layar persetujuan admin: apa yang ikut hilang.
 export async function deletionImpact(userId: string) {
   const now = new Date();
-  const [upcomingBookings, usablePackages, user] = await Promise.all([
+  const [upcomingBookings, usablePackages, user, pendingPayments] = await Promise.all([
     prisma.booking.count({ where: { memberId: userId, status: "BOOKED", attended: null, availability: { startTime: { gt: now } } } }),
     prisma.package.findMany({
       where: { memberId: userId, status: "ACTIVE", sisaSesi: { gt: 0 }, OR: [{ expiredDate: null }, { expiredDate: { gte: now } }] },
       select: { sisaSesi: true },
     }),
     prisma.user.findUnique({ where: { id: userId }, select: { memberBalance: true } }),
+    prisma.payment.count({ where: inFlightPaymentsWhere(userId, now) }),
   ]);
   return {
     upcomingBookings,
+    pendingPayments,
     remainingSessions: usablePackages.reduce((n, p) => n + p.sisaSesi, 0),
     // Hadi 2 Okt: saldo member bisa dipakai sampai habis lewat admin sebelum
     // akun ditutup; kalau member tetap minta dihapus, sisa saldo hangus (tetap
@@ -66,6 +84,12 @@ export async function anonymizeMember(userId: string) {
     if (u.role !== "MEMBER") throw new AccountDeletionError("Hanya akun member yang bisa dihapus lewat fitur ini.");
     if (u.anonymizedAt) throw new AccountDeletionError("Akun ini sudah dihapus.");
     if (!u.deletionRequestedAt) throw new AccountDeletionError("Member ini tidak mengajukan penghapusan akun.");
+    // Pembayaran BARU sudah ditolak sejak pengajuan hapus akun (checkout, ganti
+    // coach); yang tersisa hanya yang dimulai sebelum pengajuan. Dicek di dalam
+    // kunci akun, sebelum apa pun diubah.
+    if ((await tx.payment.count({ where: inFlightPaymentsWhere(userId, new Date()) })) > 0) {
+      throw new AccountDeletionError(PENDING_PAYMENT_DELETION_ERROR);
+    }
 
     await tx.user.update({
       where: { id: userId },
