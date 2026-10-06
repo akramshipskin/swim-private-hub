@@ -91,7 +91,7 @@ export default async function CoachDashboardPage() {
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         <NextStepCard {...step} tone="soft" className="md:col-span-4" />
         <BalanceCard
-          label="Saldo Bisa Dicairkan"
+          label="Saldo Bisa Ditarik"
           amount={formatRupiah(profile?.walletBalance ?? 0)}
           hint="Bertambah setelah sesi ditandai Hadir."
           href="/coach/saldo"
@@ -102,10 +102,10 @@ export default async function CoachDashboardPage() {
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-6">
         {overdue.length > 0 && (
-          <BentoCard title="Pencairan ditahan" href="/coach/peserta" linkLabel="Update milestone" className="md:col-span-6">
+          <BentoCard title="Penarikan ditahan" href="/coach/peserta" linkLabel="Update milestone" className="md:col-span-6">
             <p className="text-sm text-warning-text">
               {overdue.map((o) => o.name).join(", ")} sudah {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir atau lebih tanpa catatan
-              milestone darimu. Isi catatannya supaya saldo bisa dicairkan lagi.
+              milestone darimu. Isi catatannya supaya saldo bisa ditarik lagi.
             </p>
           </BentoCard>
         )}

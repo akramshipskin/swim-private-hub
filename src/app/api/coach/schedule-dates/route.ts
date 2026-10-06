@@ -4,7 +4,7 @@ import { NOT_CLOSED } from "@/lib/availability";
 
 // Tanggal mana yang UDAH ada slot dibuka -- coach manapun, bukan cuma
 // yang lagi login (biar keliatan juga kalau coach lain udah isi jadwal
-// di tanggal itu). Dipake date picker di halaman "Tambah Slot".
+// di tanggal itu). Dipake date picker di halaman "Buka Jam Kosong".
 export async function GET(request: Request) {
   const session = await auth();
   // Coach yang belum menyetujui perjanjian kemitraan ditolak juga (rute ini

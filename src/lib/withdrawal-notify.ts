@@ -2,10 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import { sendPushToRole, sendPushToUser, sendPushToUsers } from "@/lib/push";
 
-// Best-effort: gagal kirim notifikasi tidak boleh menggagalkan pencairan.
+// Best-effort: gagal kirim notifikasi tidak boleh menggagalkan penarikan.
 export async function notifyAdminsWithdrawalRequested(requesterName: string, amount: number) {
   await sendPushToRole("ADMIN", {
-    title: "Pengajuan pencairan baru",
+    title: "Pengajuan penarikan baru",
     body: `${requesterName} mengajukan ${formatRupiah(amount)}`,
     url: "/admin/withdrawals",
   }).catch(() => {});
@@ -30,8 +30,8 @@ export async function notifyWithdrawalOutcome(withdrawalId: string, outcome: "PA
     const url = isCoach ? "/coach/saldo" : "/pool/saldo";
     const message =
       outcome === "PAID"
-        ? { title: "Pencairan dibayar", body: `${formatRupiah(request.amount)} sudah ditransfer ke rekening kamu.` }
-        : { title: "Pencairan tidak diproses", body: `${formatRupiah(request.amount)} sudah dikembalikan ke saldo kamu.` };
+        ? { title: "Penarikan dibayar", body: `${formatRupiah(request.amount)} sudah ditransfer ke rekening kamu.` }
+        : { title: "Penarikan tidak diproses", body: `${formatRupiah(request.amount)} sudah dikembalikan ke saldo kamu.` };
 
     await Promise.all(recipients.map((userId) => sendPushToUser(userId, { ...message, url })));
   } catch {

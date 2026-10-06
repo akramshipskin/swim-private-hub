@@ -7,7 +7,7 @@ import { MILESTONE_GROUPS, MILESTONE_GROUP_LABEL, levelsOf } from "@/lib/milesto
 import { setStandardItemActive } from "../actions";
 import { AddItemForm, EditItemForm } from "./item-forms";
 
-export const metadata = { title: "Butir Standar Milestone | Swim Private Hub" };
+export const metadata = { title: "Keterampilan Standar Milestone | Swim Private Hub" };
 
 export default async function StandardItemsPage() {
   await requireRole("ADMIN");
@@ -20,16 +20,16 @@ export default async function StandardItemsPage() {
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <Link href="/admin/milestone" className="text-sm text-brand-700 hover:underline">← Milestone</Link>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-text">Butir Standar Milestone</h1>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-text">Keterampilan Standar Milestone</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Berlaku untuk semua peserta di kelompok & level itu. Butir yang dinonaktifkan tidak dihitung lagi; level yang
-        sudah selesai dan sertifikatnya tidak berubah. Butir tidak bisa dipindah kelompok/level supaya progres peserta
-        tidak teracak. Untuk memindahkan, nonaktifkan lalu tambah butir baru.
+        Berlaku untuk semua peserta di kelompok & level itu. Keterampilan yang dinonaktifkan tidak dihitung lagi; level yang
+        sudah selesai dan sertifikatnya tidak berubah. Keterampilan tidak bisa dipindah kelompok/level supaya progres peserta
+        tidak teracak. Untuk memindahkan, nonaktifkan lalu tambah keterampilan baru.
       </p>
 
       <Card className="mt-6">
         <CardBody>
-          <h2 className="mb-3 text-lg font-semibold text-text">Tambah butir</h2>
+          <h2 className="mb-3 text-lg font-semibold text-text">Tambah keterampilan</h2>
           <AddItemForm />
         </CardBody>
       </Card>
@@ -40,7 +40,7 @@ export default async function StandardItemsPage() {
             <h2 className="text-lg font-semibold text-text">Kelompok {g}</h2>
             <p className="mb-3 text-sm text-text-muted">{MILESTONE_GROUP_LABEL[g]}</p>
             {levelsOf(items, g).length === 0 ? (
-              <p className="text-sm text-text-muted">Belum ada butir.</p>
+              <p className="text-sm text-text-muted">Belum ada keterampilan.</p>
             ) : (
               levelsOf(items, g).map((l) => (
                 <div key={l.level} className="mb-4 last:mb-0">
@@ -54,8 +54,8 @@ export default async function StandardItemsPage() {
                             action={setStandardItemActive.bind(null, it.id, false)}
                             label="Nonaktifkan"
                             variant="danger"
-                            title="Nonaktifkan butir?"
-                            description={`"${it.text}" tidak dihitung lagi. Peserta yang tinggal kurang butir ini naik level di catatan coach berikutnya.`}
+                            title="Nonaktifkan keterampilan?"
+                            description={`"${it.text}" tidak dihitung lagi. Peserta yang tinggal kurang keterampilan ini naik level di catatan coach berikutnya.`}
                             confirmLabel="Ya, Nonaktifkan"
                           />
                         ) : (

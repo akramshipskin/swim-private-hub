@@ -7,9 +7,9 @@ import { prisma } from "@/lib/prisma";
 // -- konvensi "koreksi manual" yang sudah dibaca halaman laporan admin), jadi
 // riwayatnya utuh dan tampil ke coach/kolam di halaman Saldo.
 //
-// Saldo BOLEH minus (uang yang ternyata salah sudah telanjur dicairkan).
+// Saldo BOLEH minus (uang yang ternyata salah sudah telanjur ditarik).
 // Tidak perlu logika pelunasan khusus: kredit sesi berikutnya menambah
-// saldo yang minus itu sampai tertutup, dan pencairan otomatis tertahan
+// saldo yang minus itu sampai tertutup, dan penarikan otomatis tertahan
 // selama saldo < minimal (CAS walletBalance >= nominal di withdrawal.ts).
 
 export class AdjustmentError extends Error {}

@@ -30,7 +30,7 @@ describe("notifyAdminsWithdrawalRequested", () => {
     await notifyAdminsWithdrawalRequested("Dewi", 50000);
     expect(sendPushToRole).toHaveBeenCalledWith(
       "ADMIN",
-      expect.objectContaining({ title: "Pengajuan pencairan baru", url: "/admin/withdrawals" })
+      expect.objectContaining({ title: "Pengajuan penarikan baru", url: "/admin/withdrawals" })
     );
     expect(sendPushToRole.mock.calls[0][1].body).toContain("Dewi");
   });
@@ -48,7 +48,7 @@ describe("notifyWithdrawalOutcome", () => {
     expect(sendPushToUser).toHaveBeenCalledTimes(1);
     expect(sendPushToUser).toHaveBeenCalledWith(
       "coach-1",
-      expect.objectContaining({ title: "Pencairan dibayar", url: "/coach/saldo" })
+      expect.objectContaining({ title: "Penarikan dibayar", url: "/coach/saldo" })
     );
   });
 
@@ -62,7 +62,7 @@ describe("notifyWithdrawalOutcome", () => {
     expect(sendPushToUser).toHaveBeenCalledTimes(2);
     expect(sendPushToUser).toHaveBeenCalledWith(
       "o1",
-      expect.objectContaining({ title: "Pencairan tidak diproses", url: "/pool/saldo" })
+      expect.objectContaining({ title: "Penarikan tidak diproses", url: "/pool/saldo" })
     );
   });
 

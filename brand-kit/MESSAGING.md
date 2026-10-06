@@ -101,6 +101,25 @@ nih, sih, dong, yuk, ngajar, diajar, nandain, dibikinin. Pakai: tidak, sudah,
 saja, sangat, membuat, pakai, dapat, lihat, kalau/bila, bagaimana, hanya,
 mengajar, dilatih/sesi bersama.
 
+### Pilihan kata yang lebih ramah (Hadi 6 Okt; menimpa tabel di atas bila beda)
+Aplikasi terasa kaku, jadi kata berikut diganti di semua teks aplikasi, landing, dan panduan (teks hukum tidak diubah):
+
+| Dulu | Sekarang |
+|---|---|
+| Butir (milestone) | Keterampilan |
+| Pengguna (menu admin) | Akun |
+| Tipe (form tambah peserta) | Untuk Siapa |
+| Permintaan (hapus akun, dll.) | Pengajuan |
+| Kedaluwarsa (paket) | Berakhir; pembayaran: waktu bayar habis |
+| Konfirmasi Password Baru | Ulangi Password Baru |
+| Pencairan / mencairkan / dicairkan | Penarikan / menarik / ditarik; menu "Tarik Saldo" |
+| Rekening Tujuan Pencairan | Rekening Penerima |
+| Perlu tindakan (dasbor admin) | Perlu Kamu Cek |
+| Tambah Slot (coach) | Buka Jam Kosong (perjanjian coach tetap menyebut "Tambah Slot") |
+
+Tetap seperti semula (pilihan Hadi): Saldo Mengendap, Kota Domisili, (Opsional), Menunggu Persetujuan, Tandai Hadir / Tidak Hadir, Jatah Batal, Nonaktifkan / Aktifkan, Peserta. Tombol dan label tetap Title Case.
+Catatan: teks hukum (S&K, Perjanjian, MOU, Kebijakan) masih memakai kata "pencairan"; selisih ini perlu diketahui orang hukum.
+
 ### Nama menu = judul halaman (3 Okt malam)
 Label menu samping (desktop) sama persis dengan judul halaman. Bilah bawah HP
 boleh memendekkan ke kata pertama yang sama ("Riwayat Booking" -> "Riwayat").

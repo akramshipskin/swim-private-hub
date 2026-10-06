@@ -44,7 +44,7 @@ export default async function KomisiPage() {
     // tidak masuk tabel sesi di bawah, tapi ikut di "Saldo kolam". Ditampilkan
     // terpisah supaya angka kartu bisa dicocokkan. Hanya dibaca.
     prisma.walletTransaction.groupBy({ by: ["poolId"], where: { type: "SESSION_REVENUE", poolId: { not: null }, bookingId: null }, _sum: { amount: true } }),
-    // Pencairan belum selesai: saldo sudah terpotong sejak diajukan.
+    // Penarikan belum selesai: saldo sudah terpotong sejak diajukan.
     prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { not: null }, status: { in: ["PENDING", "PROCESSING"] } }, _sum: { amount: true } }),
     // Koreksi manual saldo coach & pendapatan platform (baris tanpa sesi).
     // Tidak masuk hitungan sesi di halaman ini, tapi ikut di saldo mereka.
@@ -87,7 +87,7 @@ export default async function KomisiPage() {
 
   // tax = PPN yang benar-benar dicatat ledger per sesi. Jangan hitung ulang
   // dari total gabungan: pembulatan sekali di total bisa beda Rp1 dengan
-  // jumlah pembulatan per sesi (angka Dashboard & Pencairan pakai ledger).
+  // jumlah pembulatan per sesi (angka Dashboard & Penarikan pakai ledger).
   type Part = { sessions: number; gross: number; platform: number; tax: number; pool: number; coach: number };
   const zero = (): Part => ({ sessions: 0, gross: 0, platform: 0, tax: 0, pool: 0, coach: 0 });
   type Entry = { paket: Part; legacy: Part; noShow: Part; free: number };
@@ -221,7 +221,7 @@ export default async function KomisiPage() {
                     </p>
                   </div>
                   <Link href={`/admin/withdrawals?pool=${pool.id}`} className="shrink-0 text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-                    Riwayat pencairan &rarr;
+                    Riwayat penarikan &rarr;
                   </Link>
                 </div>
                 <ul className="flex flex-col gap-2 sm:hidden">
@@ -291,18 +291,18 @@ export default async function KomisiPage() {
                 })()}
                 <div className="grid grid-cols-2 gap-3 rounded-xl bg-surface-muted p-3">
                   <div>
-                    <p className="text-sm text-text-muted">Saldo kolam belum dicairkan</p>
+                    <p className="text-sm text-text-muted">Saldo kolam belum ditarik</p>
                     <p className="text-lg font-bold text-text">{formatRupiah(pool.walletBalance)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-text-muted">Sudah dicairkan</p>
+                    <p className="text-sm text-text-muted">Sudah ditarik</p>
                     <p className="text-lg font-semibold text-text-muted">{formatRupiah(paid)}</p>
                   </div>
                   {(() => {
                     const inProgress = processing.find((x) => x.poolId === pool.id)?._sum.amount ?? 0;
                     return inProgress > 0 ? (
                       <div className="col-span-2">
-                        <p className="text-sm text-text-muted">Pencairan sedang diproses</p>
+                        <p className="text-sm text-text-muted">Penarikan sedang diproses</p>
                         <p className="text-lg font-semibold text-text-muted">{formatRupiah(inProgress)}</p>
                         <p className="text-xs text-text-subtle">Sudah dipotong dari saldo di atas; kembali kalau ditolak.</p>
                       </div>

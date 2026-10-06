@@ -22,7 +22,7 @@ const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] 
   { role: "POOL_OWNER", label: "Pemilik Kolam" },
 ];
 
-export const metadata = { title: "Pengguna | Swim Private Hub" };
+export const metadata = { title: "Akun | Swim Private Hub" };
 
 export default async function AdminUsersPage() {
   const session = await requireRole("ADMIN");
@@ -68,7 +68,7 @@ export default async function AdminUsersPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Pengguna</h1>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Akun</h1>
 
       <PendingCertificates />
 
@@ -102,7 +102,7 @@ export default async function AdminUsersPage() {
         coaches={coachOptions}
       />
 
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua Pengguna</h2>
+      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua Akun</h2>
 
       {roleSections.map(({ role, label }) => {
         // Pendaftar baru yang menunggu persetujuan tampil paling atas.

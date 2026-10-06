@@ -43,7 +43,7 @@ export async function submitCoachChange(memberId: string, input: { packageId: st
   const pkg = await prisma.package.findFirst({ where: { id: input.packageId, memberId, payments: { some: { status: "SUCCESS" } } } });
   if (!pkg || !pkg.coachId || pkg.poolPrice == null || pkg.isTrial) return { error: "Paket ini tidak bisa diganti coach-nya." };
   if (!isUsablePackage(pkg) && (await remainingSessions(prisma, pkg.id, 0)) === 0) {
-    return { error: "Paket ini sudah tidak punya sisa sesi atau sudah kedaluwarsa." };
+    return { error: "Paket ini sudah tidak punya sisa sesi atau masa berlakunya sudah berakhir." };
   }
   const coach = await prisma.user.findFirst({
     where: { ...eligibleCoachWhere(pkg.poolId, pkg.coachId), id: input.toCoachId },
@@ -102,7 +102,7 @@ export async function approveCoachChange(requestId: string, now = new Date()): P
       return { error: "Paket ini sudah tidak bisa diganti coach-nya." } as Result;
     }
     if (pkg.status !== "ACTIVE" || (pkg.expiredDate && pkg.expiredDate < now)) {
-      return { error: "Paket ini sudah tidak aktif atau sudah kedaluwarsa, tidak bisa diganti coach-nya." } as Result;
+      return { error: "Paket ini sudah tidak aktif atau masa berlakunya sudah berakhir, tidak bisa diganti coach-nya." } as Result;
     }
     const coach = await tx.user.findFirst({
       where: { ...eligibleCoachWhere(pkg.poolId, pkg.coachId), id: req.toCoachId },

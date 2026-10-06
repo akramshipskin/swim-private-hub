@@ -154,7 +154,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
       />
       <ConfirmDialog
         open={confirming === "reject"}
-        title={w.status === "PROCESSING" ? "Tandai pencairan gagal?" : "Tolak pencairan?"}
+        title={w.status === "PROCESSING" ? "Tandai penarikan gagal?" : "Tolak penarikan?"}
         description={`Saldo ${formatRupiah(w.amount)} akan dikembalikan ke ${w.holderName}.${w.status === "PROCESSING" ? " Pastikan di dashboard Iris transfernya benar-benar gagal." : ""}`}
         confirmLabel={w.status === "PROCESSING" ? "Ya, gagal" : "Ya, tolak"}
         loading={rejectPending}

@@ -37,7 +37,7 @@ export default function AnonymizeCard({
   return (
     <Card className="border-danger-text/30">
       <CardBody>
-        <h2 className="mb-1 text-lg font-semibold text-text">Permintaan hapus akun</h2>
+        <h2 className="mb-1 text-lg font-semibold text-text">Pengajuan hapus akun</h2>
         <p className="text-sm text-text-muted">
           Diajukan member pada{" "}
           {new Date(requestedAt).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" })}
@@ -56,7 +56,7 @@ export default function AnonymizeCard({
         {pendingPayments > 0 && (
           <p className="mt-2 rounded-md bg-warning-bg px-3 py-2 text-sm text-warning-text">
             Ada <b>{pendingPayments}</b> pembayaran yang masih menunggu dibayar. Persetujuan baru bisa dilakukan setelah
-            lunas atau kedaluwarsa (sekitar 24 jam).
+            lunas atau waktu bayarnya habis (sekitar 24 jam).
           </p>
         )}
         <Button variant="danger" size="sm" className="mt-3" disabled={pendingPayments > 0} onClick={() => setOpen(true)}>

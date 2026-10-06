@@ -64,7 +64,7 @@ export default async function PoolSaldoPage() {
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Saldo</h1>
-      <p className="mb-6 text-sm text-text-muted">Saldo & pencairan tiap kolam kamu.</p>
+      <p className="mb-6 text-sm text-text-muted">Saldo & penarikan tiap kolam kamu.</p>
       <div className="flex flex-col gap-10">
         {pools.map((pool) => (
           <div key={pool.id}>

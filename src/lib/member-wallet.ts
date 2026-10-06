@@ -1,6 +1,6 @@
 // Saldo member (Hadi 2 Okt): masuk dari selisih ganti ke coach lebih murah,
 // dipakai otomatis saat membeli paket / tambah bayar ganti coach, tidak bisa
-// dicairkan. User.memberBalance = jumlah MemberWalletTransaction (buku besar).
+// ditarik. User.memberBalance = jumlah MemberWalletTransaction (buku besar).
 // Semua fungsi WAJIB dipanggil di dalam transaksi yang sama dengan perubahan
 // yang memicunya.
 import type { Prisma, MemberWalletType } from "@/generated/prisma/client";
@@ -55,7 +55,7 @@ export async function refundMemberBalanceOnce(
   if (!(amount > 0)) return;
   const refund = Math.min(amount, await heldMemberBalance(tx, refs));
   if (refund <= 0) return;
-  await creditMember(tx, memberId, refund, "PURCHASE_REFUND", { ...refs, note: "Pembayaran gagal/kedaluwarsa, saldo dikembalikan" });
+  await creditMember(tx, memberId, refund, "PURCHASE_REFUND", { ...refs, note: "Pembayaran gagal/waktu bayar habis, saldo dikembalikan" });
 }
 
 // Pembayaran yang sempat dianggap gagal (saldonya sudah dikembalikan) ternyata

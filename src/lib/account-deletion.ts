@@ -21,7 +21,7 @@ export class AccountDeletionError extends Error {}
 // membuat uang yang sedang di jalan jatuh ke akun yang sudah dianonimkan
 // (Hadi 6 Okt, 1A: diblokir).
 export const PENDING_PAYMENT_DELETION_ERROR =
-  "Masih ada pembayaran yang menunggu dibayar. Tunggu sampai lunas atau kedaluwarsa (sekitar 24 jam), lalu setujui lagi.";
+  "Masih ada pembayaran yang menunggu dibayar. Tunggu sampai lunas atau waktu bayarnya habis (sekitar 24 jam), lalu setujui lagi.";
 
 function inFlightPaymentsWhere(memberId: string, now: Date) {
   return {
@@ -80,7 +80,7 @@ export async function anonymizeMember(userId: string) {
     // booking sesudahnya ditolak karena akun sudah nonaktif.
     const [u] = await tx.$queryRaw<{ role: string; deletionRequestedAt: Date | null; anonymizedAt: Date | null }[]>`
       SELECT role, "deletionRequestedAt", "anonymizedAt" FROM "User" WHERE id = ${userId} FOR UPDATE`;
-    if (!u) throw new AccountDeletionError("Pengguna tidak ditemukan.");
+    if (!u) throw new AccountDeletionError("Akun tidak ditemukan.");
     if (u.role !== "MEMBER") throw new AccountDeletionError("Hanya akun member yang bisa dihapus lewat fitur ini.");
     if (u.anonymizedAt) throw new AccountDeletionError("Akun ini sudah dihapus.");
     if (!u.deletionRequestedAt) throw new AccountDeletionError("Member ini tidak mengajukan penghapusan akun.");
@@ -110,7 +110,7 @@ export async function anonymizeMember(userId: string) {
       },
     });
     // Tanggal lahir peserta ikut dihapus (data pribadi anak), dan isi catatan
-    // milestone dikosongkan karena bisa memuat nama/detail anak. Butir yang
+    // milestone dikosongkan karena bisa memuat nama/detail anak. Keterampilan yang
     // tercapai & sertifikat level tidak memuat identitas, jadi dibiarkan.
     await tx.dependent.updateMany({ where: { memberId: userId }, data: { name: ANONYMIZED_DEPENDENT_NAME, isActive: false, birthDate: null } });
     await tx.milestoneNote.updateMany({ where: { dependent: { memberId: userId } }, data: { note: ANONYMIZED_NOTE } });

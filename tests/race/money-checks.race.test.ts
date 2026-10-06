@@ -73,7 +73,7 @@ describe("Migrasi VALIDATE 2 pagar saldo", () => {
     expect(res).toMatch(/WalletTransaction_owner_matches_type/);
   });
 
-  it("V4: ada 1 pencairan lama tanpa pemilik -> migrasi gagal menyebut WithdrawalRequest_exactly_one_owner", async () => {
+  it("V4: ada 1 penarikan lama tanpa pemilik -> migrasi gagal menyebut WithdrawalRequest_exactly_one_owner", async () => {
     const res = await inOldState(async (c) => {
       await c.query(`INSERT INTO "WithdrawalRequest" (id, amount, "bankName", "bankAccountNumber", "bankAccountName") VALUES ('wr-bad', 1000, 'BCA', '1', 'X')`);
     });

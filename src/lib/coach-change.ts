@@ -110,7 +110,7 @@ export async function completeCoachChange(
     return { ok: false, error: "Paket ini sudah tidak bisa diganti coach-nya." };
   }
   if (pkg.status !== "ACTIVE" || (pkg.expiredDate && pkg.expiredDate < now)) {
-    return { ok: false, error: "Paket ini sudah tidak aktif atau sudah kedaluwarsa." };
+    return { ok: false, error: "Paket ini sudah tidak aktif atau masa berlakunya sudah berakhir." };
   }
   // Lihat submitCoachChange: paket tanpa pembayaran (pemberian admin) tidak ikut.
   if ((await tx.payment.count({ where: { packageId: pkg.id, status: "SUCCESS" } })) === 0) {
@@ -224,7 +224,7 @@ export async function freeCoachChange(
   });
   if (!pkg) return { ok: false, error: "Paket tidak ditemukan." };
   if (!pkg.freeCoachChangeAt) return { ok: false, error: "Paket ini belum berhak ganti coach tanpa biaya." };
-  if (pkg.status !== "ACTIVE" || (pkg.expiredDate && pkg.expiredDate <= now)) return { ok: false, error: "Paket ini sudah tidak aktif atau sudah kedaluwarsa." };
+  if (pkg.status !== "ACTIVE" || (pkg.expiredDate && pkg.expiredDate <= now)) return { ok: false, error: "Paket ini sudah tidak aktif atau masa berlakunya sudah berakhir." };
   if (pkg.isTrial || pkg.coachId == null || pkg.poolPrice == null || pkg.coachPrice == null || pkg.serviceFee == null) {
     return { ok: false, error: "Paket ini tidak bisa diganti coach-nya. Hubungi admin." };
   }

@@ -58,7 +58,7 @@ export async function requestWithdrawal(_prev: ActionState, formData: FormData):
     const request = await requestCoachWithdrawal(profile.id, Number(formData.get("amount")));
     await notifyAdminsWithdrawalRequested(session.user.name ?? "Coach", request.amount);
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal mengajukan pencairan. Coba lagi.") };
+    return { error: userErrorMessage(err, "Gagal mengajukan penarikan. Coba lagi.") };
   }
 
   revalidatePath("/coach/saldo");

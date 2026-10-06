@@ -96,16 +96,16 @@ export default async function PoolDashboardPage() {
               ? { eyebrow: "Les berikutnya hari ini", title: `${formatTimeWib(nextLes.startTime)}–${formatTimeWib(nextLes.endTime)} · ${nextLes.who ?? "Peserta"}`, body: `Dengan ${nextLes.coachName}. Total ${bookedToday} sesi les hari ini.`, secondary: { href: "/pool/jadwal", label: "Lihat Jadwal" } }
               : !p.description || p.facilities.length === 0
                 ? { title: "Lengkapi info kolam", body: "Deskripsi dan fasilitas membantu member memilih kolammu.", href: "/pool/info", cta: "Lengkapi info" }
-                : { title: "Tidak ada les lagi hari ini", body: `Saldo bisa dicairkan ${formatRupiah(p.walletBalance)}.`, secondary: { href: "/pool/saldo", label: "Lihat Saldo" } };
+                : { title: "Tidak ada les lagi hari ini", body: `Saldo bisa ditarik ${formatRupiah(p.walletBalance)}.`, secondary: { href: "/pool/saldo", label: "Lihat Saldo" } };
         return (
           <section key={p.id} className="mt-6">
             {pools.length > 1 && <h2 className="mb-3 text-xl font-semibold text-text">{p.name}</h2>}
             <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-6">
               <NextStepCard {...step} tone="soft" className="md:col-span-4" />
               <BalanceCard
-                label="Saldo Bisa Dicairkan"
+                label="Saldo Bisa Ditarik"
                 amount={formatRupiah(p.walletBalance)}
-                hint={`Dalam proses pencairan: ${formatRupiah(pick(pendingWithdrawals, p.id)?._sum.amount ?? 0)}`}
+                hint={`Dalam proses penarikan: ${formatRupiah(pick(pendingWithdrawals, p.id)?._sum.amount ?? 0)}`}
                 href="/pool/saldo"
                 cta="Buka saldo"
                 className="md:col-span-2"

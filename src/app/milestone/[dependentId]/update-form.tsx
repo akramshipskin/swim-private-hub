@@ -24,7 +24,7 @@ export function MilestoneUpdateForm({
 }: {
   dependentId: string;
   // Terisi kalau kelompok peserta belum bisa ditentukan dari tanggal lahir:
-  // butir tiap kelompok ikut dikirim, tampil begitu kelompok dipilih (supaya
+  // keterampilan tiap kelompok ikut dikirim, tampil begitu kelompok dipilih (supaya
   // penilaian awal tetap bisa di catatan pertama).
   groupOptions: ({ value: string; label: string } & ItemSet)[] | null;
   isFirst: boolean;
@@ -68,7 +68,7 @@ export function MilestoneUpdateForm({
           <span>
             Ini Penilaian Awal
             <span className="block text-xs text-text-muted">
-              Centang butir yang SUDAH bisa dilakukan peserta sebelum les di sini. Butir ini dicatat &quot;sudah bisa
+              Centang keterampilan yang SUDAH bisa dilakukan peserta sebelum les di sini. Keterampilan ini dicatat &quot;sudah bisa
               sebelumnya&quot; dan tidak masuk sertifikat.
             </span>
           </span>
@@ -78,7 +78,7 @@ export function MilestoneUpdateForm({
       {currentItems.length + otherItems.length > 0 && (
         <div className="flex flex-col gap-2">
           <p className="text-xs font-medium text-text-muted">
-            {prior ? "Butir yang sudah bisa sebelumnya" : "Butir yang tercapai hari ini (opsional)"}
+            {prior ? "Keterampilan yang sudah bisa sebelumnya" : "Keterampilan yang tercapai hari ini (opsional)"}
             {set?.currentLevelLabel ? ` — ${set.currentLevelLabel}` : ""}
           </p>
           {currentItems.map((it) => (
@@ -89,7 +89,7 @@ export function MilestoneUpdateForm({
           ))}
           {otherItems.length > 0 && (
             <details open={prior} className="rounded-lg border border-border px-3 py-2">
-              <summary className="cursor-pointer text-sm font-medium text-text-muted max-sm:flex max-lg:min-h-[44px] max-lg:items-center">Butir di level lain</summary>
+              <summary className="cursor-pointer text-sm font-medium text-text-muted max-sm:flex max-lg:min-h-[44px] max-lg:items-center">Keterampilan di level lain</summary>
               <div className="mt-2 flex flex-col gap-3">
                 {otherItems.map((g) => (
                   <div key={g.label} className="flex flex-col gap-1.5">
@@ -109,7 +109,7 @@ export function MilestoneUpdateForm({
       )}
 
       {focusOptions.length > 0 && (
-        <Field label="Sedang dilatih (saran: butir berikutnya)">
+        <Field label="Sedang dilatih (saran: keterampilan berikutnya)">
           <Select key={`${chosen}-${set?.suggestedItemId}`} name="focusItemId" defaultValue={set?.suggestedItemId ?? ""}>
             <option value="">— Tidak dipilih —</option>
             {focusOptions.map((it) => (
@@ -151,7 +151,7 @@ export function AddItemForm({ dependentId, levels }: { dependentId: string; leve
 
   return (
     <form ref={form} action={action} className="flex flex-col gap-3">
-      <Field label="Butir Keterampilan Tambahan">
+      <Field label="Keterampilan Tambahan">
         <Input name="text" maxLength={200} required placeholder="Contoh: Meluncur telentang dari dinding sejauh 2 meter" />
       </Field>
       <Field label="Masuk ke Level">
@@ -166,16 +166,16 @@ export function AddItemForm({ dependentId, levels }: { dependentId: string; leve
       <label className="flex items-start gap-2 text-sm text-text max-lg:min-h-[44px]">
         <input type="checkbox" name="propose" className={checkbox} />
         <span>
-          Usulkan jadi butir standar SPH
-          <span className="block text-xs text-text-muted">Kalau disetujui admin, butir ini berlaku untuk semua peserta di kelompok ini.</span>
+          Usulkan jadi keterampilan standar SPH
+          <span className="block text-xs text-text-muted">Kalau disetujui admin, keterampilan ini berlaku untuk semua peserta di kelompok ini.</span>
         </span>
       </label>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" size="sm" variant="secondary" loading={pending}>
-          Tambah Butir
+          Tambah Keterampilan
         </Button>
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
-        {state?.success && <p role="status" className="text-sm text-success-text">Butir ditambahkan.</p>}
+        {state?.success && <p role="status" className="text-sm text-success-text">Keterampilan ditambahkan.</p>}
       </div>
     </form>
   );

@@ -14,7 +14,7 @@ export async function requestDeletionAction(): Promise<DeletionState> {
   if (!session || session.user.role !== "MEMBER") return { error: "Hanya akun member yang bisa mengajukan hapus akun di sini." };
   if (await requestAccountDeletion(session.user.id)) {
     await sendPushToRole("ADMIN", {
-      title: "Permintaan hapus akun",
+      title: "Pengajuan hapus akun",
       body: `${session.user.name ?? "Seorang member"} meminta akunnya dihapus.`,
       url: `/admin/users/${session.user.id}`,
     }).catch(() => {});

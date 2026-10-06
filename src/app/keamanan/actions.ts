@@ -100,7 +100,7 @@ export async function disableTotp(_prev: TotpState, formData: FormData): Promise
   if (!user.totpEnabledAt || !user.totpSecret) redirect("/profil");
   if (!(await bcrypt.compare(password, user.passwordHash))) return { error: "Password salah." };
   const step = verifyTotp(openSecret(user.totpSecret), code);
-  if (step === null) return { error: "Kode salah atau sudah kedaluwarsa. Ketik kode yang sedang tampil." };
+  if (step === null) return { error: "Kode salah atau sudah tidak berlaku. Ketik kode yang sedang tampil." };
 
   // Satu UPDATE atomik: kunci masih yang dicek tadi, dan kodenya belum pernah
   // dipakai (login dengan kode yang sama barengan -> hanya satu yang menang).

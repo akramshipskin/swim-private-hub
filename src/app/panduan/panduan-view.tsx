@@ -31,7 +31,7 @@ const HIGHLIGHTS = [
   },
   {
     title: "Bagi hasil otomatis",
-    body: "Setiap sesi yang ditandai Hadir langsung dibagi: kolam dan coach menerima harga paket mereka dibagi jumlah sesi (dipotong PPh 0,5% kecuali bebas potongan), sisanya biaya layanan SPH (termasuk PPN 11%). Kalau peserta sudah booking tapi tidak datang, coach mendapat 50% dari bagiannya dan kolam tidak mendapat bagian. Kolam dan coach mencairkan saldonya sendiri.",
+    body: "Setiap sesi yang ditandai Hadir langsung dibagi: kolam dan coach menerima harga paket mereka dibagi jumlah sesi (dipotong PPh 0,5% kecuali bebas potongan), sisanya biaya layanan SPH (termasuk PPN 11%). Kalau peserta sudah booking tapi tidak datang, coach mendapat 50% dari bagiannya dan kolam tidak mendapat bagian. Kolam dan coach menarik saldonya sendiri.",
   },
   {
     title: "Harga dari kolam dan coach",
@@ -99,7 +99,7 @@ const GUIDES: Guide[] = [
     key: "coach",
     label: "Coach",
     title: "Panduan Coach",
-    lead: "Buka jadwal sendiri, tandai kehadiran, dan cairkan saldo.",
+    lead: "Buka jadwal sendiri, tandai kehadiran, dan tarik saldo.",
     sections: [
       {
         heading: "1. Buka jadwal",
@@ -107,7 +107,7 @@ const GUIDES: Guide[] = [
           { title: "Siapkan kolam dan harga", body: "Pilih kolam tempat mengajar di menu Kolam Saya, lalu isi harga paket 4 dan 8 sesi di menu Harga." },
           { title: "Pilih kolam dan tanggal", body: "Kolam yang muncul hanya kolam yang kamu pilih di menu Kolam Saya." },
           { title: "Pilih jam mulai dan selesai", body: "Rentang jam otomatis dipecah per jam. Contoh: 08.00–10.00 menjadi dua jam kosong, 08.00–09.00 dan 09.00–10.00." },
-          { title: "Klik Tambah Slot", body: "Jam kosong langsung bisa dibooking member. Member aktif yang sudah menyalakan notifikasi otomatis diberi tahu." },
+          { title: "Klik Buka Jam Kosong", body: "Jam kosong langsung bisa dibooking member. Member aktif yang sudah menyalakan notifikasi otomatis diberi tahu." },
         ],
         note: "Jam kosong yang sudah lewat otomatis disembunyikan karena sudah tidak bisa dibooking.",
       },
@@ -124,7 +124,7 @@ const GUIDES: Guide[] = [
         steps: [
           { title: "Buka menu Riwayat Sesi", body: "Semua sesi yang sudah lewat waktunya menunggu ditandai. Batasnya 24 jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai." },
           { title: "Pilih Hadir atau Tidak Hadir", body: "Langsung tersimpan begitu dipilih, tidak perlu tombol Simpan." },
-          { title: "Isi catatan perkembangan", body: "Isi Update milestone tiap peserta minimal sekali setiap 2 sesi Hadir. Selama ada yang belum diisi, pengajuan pencairan baru ditahan." },
+          { title: "Isi catatan perkembangan", body: "Isi Update milestone tiap peserta minimal sekali setiap 2 sesi Hadir. Selama ada yang belum diisi, pengajuan penarikan baru ditahan." },
           { title: "Saldo masuk", body: "Hadir: bagianmu (harga paketmu ÷ jumlah sesi, dipotong PPh 0,5% kecuali bebas potongan) masuk penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu mendapat 50% dari bagianmu." },
         ],
         note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum ditandai. Pastikan pilihannya benar.",
@@ -133,7 +133,7 @@ const GUIDES: Guide[] = [
         heading: "4. Saldo & profil",
         steps: [
           { title: "Isi rekening sekali", body: "Setelah tersimpan, rekening terkunci. Klik Ubah bila ingin mengubahnya." },
-          { title: "Ajukan pencairan", body: `Minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja. Riwayat pencairan menampilkan status, tanggal, dan rekening tujuan.` },
+          { title: "Ajukan penarikan", body: `Minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja. Riwayat penarikan menampilkan status, tanggal, dan rekening tujuan.` },
           { title: "Lengkapi profil", body: "Tanggal lahir, jenis kelamin, bio, keahlian, foto, dan sertifikat. Orang tua sering memilih coach dari informasi ini." },
         ],
         note: 'Badge "Bersertifikat" baru tampil setelah sertifikat kamu diperiksa dan disetujui admin.',
@@ -144,12 +144,12 @@ const GUIDES: Guide[] = [
     key: "kolam",
     label: "Pemilik Kolam",
     title: "Panduan Pemilik Kolam",
-    lead: "Pantau pemakaian kolam, atur harga tiket & info kolam, dan cairkan bagian kolam.",
+    lead: "Pantau pemakaian kolam, atur harga tiket & info kolam, dan tarik bagian kolam.",
     sections: [
       {
         heading: "1. Dashboard & jadwal",
         steps: [
-          { title: "Ringkasan bulan ini", body: "Sesi Hadir, bagian kolam (sebelum PPh), paket terjual, coach terdaftar, dan saldo yang bisa dicairkan." },
+          { title: "Ringkasan bulan ini", body: "Sesi Hadir, bagian kolam (sebelum PPh), paket terjual, coach terdaftar, dan saldo yang bisa ditarik." },
           { title: "Jam ramai hari ini", body: "Grafik per jam: berapa sesi les privat di tiap jam, dan jam mana yang masih kosong." },
           { title: "Menu Jadwal Kolam", body: "Per tanggal, lengkap dengan coach yang mengajar dan peserta yang les di jam itu." },
         ],
@@ -166,7 +166,7 @@ const GUIDES: Guide[] = [
         heading: "3. Saldo & laporan",
         steps: [
           { title: "Saldo kolam", body: "Bertambah setiap sesi yang ditandai Hadir oleh coach." },
-          { title: "Ajukan pencairan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat tombol Ubah), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja.` },
+          { title: "Ajukan penarikan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat tombol Ubah), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja.` },
           { title: "Laporan", body: "Rincian bagian kolam (setelah PPh final 0,5%) per sesi yang benar-benar Hadir, bisa disaring per rentang tanggal." },
         ],
       },

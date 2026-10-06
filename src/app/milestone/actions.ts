@@ -28,9 +28,9 @@ async function requireTeachingCoach(dependentId: string) {
   return session.user.id;
 }
 
-// "Update milestone": 1 catatan (wajib) + butir yang tercapai (opsional).
-// Catatan inilah yang dihitung untuk penahanan pencairan coach, jadi tetap
-// sah walau belum ada butir baru yang tercapai (Hadi 29 Sep).
+// "Update milestone": 1 catatan (wajib) + keterampilan yang tercapai (opsional).
+// Catatan inilah yang dihitung untuk penahanan penarikan coach, jadi tetap
+// sah walau belum ada keterampilan baru yang tercapai (Hadi 29 Sep).
 export async function saveMilestoneUpdate(
   dependentId: string,
   _prev: MilestoneActionState,
@@ -69,9 +69,9 @@ export async function saveMilestoneUpdate(
         select: { id: true, group: true, level: true, sortOrder: true },
       });
       const inGroup = new Set(items.filter((i) => i.group === group).map((i) => i.id));
-      if (achieved.some((id) => !inGroup.has(id))) throw new MilestoneError("Butir tidak valid, muat ulang halaman.");
+      if (achieved.some((id) => !inGroup.has(id))) throw new MilestoneError("Keterampilan tidak valid, muat ulang halaman.");
       if (focusItemId && !items.some((i) => i.id === focusItemId)) {
-        throw new MilestoneError("Butir fokus tidak valid, muat ulang halaman.");
+        throw new MilestoneError("Keterampilan fokus tidak valid, muat ulang halaman.");
       }
 
       if (achieved.length > 0) {
@@ -114,8 +114,8 @@ export async function saveMilestoneUpdate(
   return { success: true };
 }
 
-// Butir tambahan coach untuk peserta ini (di kelompok yang sedang dijalani).
-// propose = diusulkan jadi butir standar, berlaku setelah disetujui admin.
+// Keterampilan tambahan coach untuk peserta ini (di kelompok yang sedang dijalani).
+// propose = diusulkan jadi keterampilan standar, berlaku setelah disetujui admin.
 export async function addMilestoneItem(
   dependentId: string,
   _prev: MilestoneActionState,
@@ -124,8 +124,8 @@ export async function addMilestoneItem(
   try {
     const coachId = await requireTeachingCoach(dependentId);
     const text = formData.get("text")?.toString().trim() ?? "";
-    if (!text) return { error: "Tulis butir keterampilannya." };
-    if (text.length > 200) return { error: "Butir maksimal 200 karakter." };
+    if (!text) return { error: "Tulis keterampilannya." };
+    if (text.length > 200) return { error: "Keterampilan maksimal 200 karakter." };
     const level = Number(formData.get("level"));
     const propose = formData.get("propose") === "on";
 
@@ -149,7 +149,7 @@ export async function addMilestoneItem(
         proposalStatus: propose ? "PENDING" : "NONE",
       },
     });
-    if (propose) await notifyAdmins("Usulan butir milestone", `Coach mengusulkan: "${text.slice(0, 80)}"`, "/admin/milestone");
+    if (propose) await notifyAdmins("Usulan keterampilan milestone", `Coach mengusulkan: "${text.slice(0, 80)}"`, "/admin/milestone");
   } catch (err) {
     if (err instanceof MilestoneError) return { error: err.message };
     throw err;
@@ -158,8 +158,8 @@ export async function addMilestoneItem(
   return { success: true };
 }
 
-// Admin: setujui usulan = butir jadi standar untuk semua peserta di kelompok
-// itu; tolak = tetap jadi butir khusus peserta asalnya. CAS di status PENDING
+// Admin: setujui usulan = keterampilan jadi standar untuk semua peserta di kelompok
+// itu; tolak = tetap jadi keterampilan khusus peserta asalnya. CAS di status PENDING
 // supaya klik ganda / 2 admin tidak saling timpa.
 export async function reviewMilestoneProposal(itemId: string, approve: boolean) {
   await requireRole("ADMIN");
@@ -172,7 +172,7 @@ export async function reviewMilestoneProposal(itemId: string, approve: boolean) 
     await notifyUser(
       item.createdById,
       approve ? "Usulan milestone disetujui" : "Usulan milestone ditolak",
-      approve ? `"${item.text.slice(0, 80)}" jadi butir standar.` : `"${item.text.slice(0, 80)}" tetap jadi butir khusus peserta itu.`,
+      approve ? `"${item.text.slice(0, 80)}" jadi keterampilan standar.` : `"${item.text.slice(0, 80)}" tetap jadi keterampilan khusus peserta itu.`,
       "/coach/peserta"
     );
   }

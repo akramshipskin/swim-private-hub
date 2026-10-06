@@ -47,7 +47,7 @@ export async function checkInvariants(opts: { packages?: boolean; ledger?: boole
 
   // 3. Saldo kolam & coach sama dengan jumlah pembukuan (WalletTransaction).
   //    Saldo BOLEH negatif sejak keputusan Hadi 29 Sep (Hadir dibatalkan
-  //    setelah dicairkan); yang dijaga pencairan tidak melebihi saldo.
+  //    setelah ditarik); yang dijaga penarikan tidak melebihi saldo.
   const sumFor = async (where: { poolId: string } | { coachProfileId: string }) =>
     (await prisma.walletTransaction.aggregate({ where, _sum: { amount: true } }))._sum.amount ?? 0;
   for (const pool of await prisma.pool.findMany({ select: { id: true, walletBalance: true } })) {

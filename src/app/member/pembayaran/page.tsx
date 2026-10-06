@@ -16,7 +16,7 @@ const statusLabel: Record<string, string> = {
   SUCCESS: "Berhasil",
   PENDING: "Menunggu pembayaran",
   FAILED: "Gagal / dibatalkan",
-  EXPIRED: "Kedaluwarsa",
+  EXPIRED: "Berakhir",
 };
 
 const statusTone = { SUCCESS: "success", PENDING: "warning", FAILED: "danger" } as const;
@@ -95,7 +95,7 @@ export default async function MemberPembayaranPage() {
                       <p className="text-base font-bold text-text">{formatRupiah(p.amount)}</p>
                       {expired ? (
                         <>
-                          <Badge tone="neutral">Kedaluwarsa</Badge>
+                          <Badge tone="neutral">Berakhir</Badge>
                           <Link href="/member/paket" className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                             Beli lagi &rarr;
                           </Link>

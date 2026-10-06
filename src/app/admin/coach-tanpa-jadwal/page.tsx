@@ -8,7 +8,7 @@ export const metadata = { title: "Coach Tanpa Jadwal | Swim Private Hub" };
 
 // Penjaga jadwal coach (Hadi 3 Okt): paket yang coach-nya belum membuka jam
 // kosong, dan jumlah pelanggaran per coach dalam 6 bulan. Admin yang menilai
-// penonaktifan (3 pelanggaran) lewat menu Pengguna.
+// penonaktifan (3 pelanggaran) lewat menu Akun.
 export default async function CoachTanpaJadwalPage() {
   await requireRole("ADMIN");
   const now = new Date();
@@ -45,7 +45,7 @@ export default async function CoachTanpaJadwalPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Coach Tanpa Jadwal</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">
-        Diperiksa otomatis tiap pagi. Hari ke-2: coach diingatkan. Hari ke-{FREE_CHANGE_AFTER_DAYS}: member boleh ganti coach tanpa biaya dan coach tercatat 1 pelanggaran (berapa pun jumlah member yang terdampak). Kolam nonaktif atau coach dilepas dari kolam tidak dihitung pelanggaran. {VIOLATION_LIMIT} pelanggaran dalam 6 bulan: pertimbangkan menonaktifkan coach lewat menu Pengguna.
+        Diperiksa otomatis tiap pagi. Hari ke-2: coach diingatkan. Hari ke-{FREE_CHANGE_AFTER_DAYS}: member boleh ganti coach tanpa biaya dan coach tercatat 1 pelanggaran (berapa pun jumlah member yang terdampak). Kolam nonaktif atau coach dilepas dari kolam tidak dihitung pelanggaran. {VIOLATION_LIMIT} pelanggaran dalam 6 bulan: pertimbangkan menonaktifkan coach lewat menu Akun.
       </p>
       <Card className="mb-4">
         <CardBody>

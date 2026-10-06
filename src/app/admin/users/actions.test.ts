@@ -237,7 +237,7 @@ describe("resetUserPassword", () => {
   it("reports a missing user", async () => {
     userUpdateMany.mockResolvedValueOnce({ count: 0 });
     const res = await resetUserPassword("gone");
-    expect(res).toEqual({ error: "Pengguna tidak ditemukan." });
+    expect(res).toEqual({ error: "Akun tidak ditemukan." });
   });
 });
 

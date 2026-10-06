@@ -19,7 +19,7 @@ const statusLabel: Record<string, string> = {
   PENDING: "Menunggu",
   SUCCESS: "Berhasil",
   FAILED: "Gagal",
-  EXPIRED: "Kedaluwarsa",
+  EXPIRED: "Berakhir",
 };
 
 function dateKeyWib(d: Date) {

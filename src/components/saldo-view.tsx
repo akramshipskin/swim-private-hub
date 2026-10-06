@@ -63,7 +63,7 @@ function maskAccount(n: string) {
 }
 
 // Dipakai pemilik kolam & coach -- bentuk fiturnya sama (saldo, rekening,
-// cairkan, riwayat). Server action dioper sebagai prop.
+// tarik, riwayat). Server action dioper sebagai prop.
 export default function SaldoView({
   walletBalance,
   bankName,
@@ -107,13 +107,13 @@ export default function SaldoView({
         <CardBody className="flex flex-col gap-4 py-6">
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
             <div>
-              <p className="text-sm text-text-muted">Saldo bisa dicairkan</p>
+              <p className="text-sm text-text-muted">Saldo bisa ditarik</p>
               <p className={`mt-1 whitespace-nowrap text-3xl font-semibold ${walletBalance < 0 ? "text-danger-text" : "text-text"}`}>
                 {walletBalance < 0 ? `−${formatRupiah(-walletBalance)}` : formatRupiah(walletBalance)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-text-muted">Dalam proses pencairan</p>
+              <p className="text-sm text-text-muted">Dalam proses penarikan</p>
               <p className="mt-1 text-xl font-semibold text-text-muted">{formatRupiah(inProcess)}</p>
             </div>
           </div>
@@ -135,27 +135,27 @@ export default function SaldoView({
           {walletBalance < 0 && (
             <p className="rounded-xl bg-danger-bg p-3 text-sm text-danger-text">
               Saldo kamu minus {formatRupiah(-walletBalance)} karena koreksi admin atau status kehadiran sesi yang diubah setelah
-              uangnya dicairkan. Kekurangan ini otomatis tertutup dari bagian sesi berikutnya; pencairan bisa lagi setelah saldo
+              uangnya ditarik. Kekurangan ini otomatis tertutup dari bagian sesi berikutnya; penarikan bisa lagi setelah saldo
               kembali mencapai minimal {formatRupiah(MIN_WITHDRAWAL)}.
             </p>
           )}
           {!hasBankInfo ? (
-            <p className="text-sm text-warning-text">Isi rekening tujuan pencairan dulu.</p>
+            <p className="text-sm text-warning-text">Isi rekening tujuan penarikan dulu.</p>
           ) : (
             walletBalance >= 0 && walletBalance < MIN_WITHDRAWAL && (
-              <p className="text-sm text-text-subtle">Saldo belum mencapai minimal pencairan {formatRupiah(MIN_WITHDRAWAL)}.</p>
+              <p className="text-sm text-text-subtle">Saldo belum mencapai minimal penarikan {formatRupiah(MIN_WITHDRAWAL)}.</p>
             )
           )}
-          <p className="text-xs text-text-subtle">Pencairan ditransfer secepatnya, paling lambat 7 hari kerja sejak diajukan.</p>
+          <p className="text-xs text-text-subtle">Penarikan ditransfer secepatnya, paling lambat 7 hari kerja sejak diajukan.</p>
           {cairState?.error && <p role="alert" className="text-sm text-danger-text">{cairState.error}</p>}
-          {cairState?.ok && <p role="status" className="text-sm text-success-text">Pengajuan pencairan berhasil dibuat.</p>}
+          {cairState?.ok && <p role="status" className="text-sm text-success-text">Pengajuan penarikan berhasil dibuat.</p>}
         </CardBody>
       </Card>
 
       <Card>
         <CardBody>
           <div className="mb-3 flex items-center justify-between gap-2">
-            <h2 className="text-base font-semibold text-text">Rekening Tujuan Pencairan</h2>
+            <h2 className="text-base font-semibold text-text">Rekening Penerima</h2>
             {hasBankInfo && <Badge tone={bankLocked ? "success" : "warning"}>{bankLocked ? "Tersimpan" : "Sedang diubah"}</Badge>}
           </div>
           <form key={edit.formKey} action={bankAction} className="flex flex-col gap-3">
@@ -253,10 +253,10 @@ export default function SaldoView({
         </div>
       )}
       <div>
-        <h2 className="mb-3 text-base font-semibold text-text">Riwayat Pencairan</h2>
+        <h2 className="mb-3 text-base font-semibold text-text">Riwayat Penarikan</h2>
         {withdrawals.length === 0 ? (
           <Card>
-            <CardBody className="py-8 text-center text-sm text-text-muted">Belum ada pengajuan pencairan.</CardBody>
+            <CardBody className="py-8 text-center text-sm text-text-muted">Belum ada pengajuan penarikan.</CardBody>
           </Card>
         ) : (
           <div className="flex flex-col gap-2">

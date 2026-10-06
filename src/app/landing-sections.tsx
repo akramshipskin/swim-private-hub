@@ -163,7 +163,7 @@ const PARENT_POINTS: Point[] = [
 const SHOTS = [
   { src: "/images/landing/produk-cari-coach.png", caption: "Cari coach: keahlian, badge, dan kolam mengajar" },
   { src: "/images/landing/produk-booking.png", caption: "Booking: pilih jam yang masih kosong, lalu konfirmasi" },
-  { src: "/images/landing/produk-milestone.png", caption: "Perkembangan anak: butir yang sudah dikuasai" },
+  { src: "/images/landing/produk-milestone.png", caption: "Perkembangan anak: keterampilan yang sudah dikuasai" },
 ];
 
 const PHONE_SHADOW = "shadow-[0_30px_60px_-24px_rgba(20,20,15,0.45)]";
@@ -294,7 +294,7 @@ const COACH_CELLS: { title: string; body: string }[] = [
   },
   {
     title: "Semua pihak melihat angka yang sama",
-    body: "Bagianmu dari setiap sesi tercatat jelas, dipotong PPh final 0,5% yang disetor SPH atas namamu. Pencairan diproses manual oleh admin secepatnya, paling lambat 7 hari kerja, dan statusnya terlihat.",
+    body: "Bagianmu dari setiap sesi tercatat jelas, dipotong PPh final 0,5% yang disetor SPH atas namamu. Penarikan diproses manual oleh admin secepatnya, paling lambat 7 hari kerja, dan statusnya terlihat.",
   },
 ];
 
@@ -353,7 +353,7 @@ export function CoachSection() {
           ))}
         </Spotlight>
 
-        {/* Syarat tampil di pencarian (Hadi 6 Okt, 5A) dan kartu "Satu syarat pencairan" (2 Okt malam, #19). */}
+        {/* Syarat tampil di pencarian (Hadi 6 Okt, 5A) dan kartu "Satu syarat penarikan" (2 Okt malam, #19). */}
         <div className="mt-8 grid gap-4 lg:grid-cols-2">
         <Reveal className="min-w-0">
           <div className="h-full rounded-3xl border border-fixed-lime/40 bg-white/[0.04] p-6">
@@ -368,11 +368,11 @@ export function CoachSection() {
         </Reveal>
         <Reveal className="min-w-0">
           <div className="h-full rounded-3xl border border-fixed-lime/40 bg-white/[0.04] p-6">
-            <p className="text-xs font-semibold uppercase tracking-wide text-fixed-lime">Satu syarat pencairan</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-fixed-lime">Satu syarat penarikan</p>
             <p className="mt-2 text-lg font-semibold leading-snug">Isi catatan perkembangan peserta setiap 2 sesi Hadir.</p>
             <p className="mt-2 text-sm text-white/75">
-              Berlaku untuk sesi sejak 1 Oktober 2026. Selama ada catatan yang belum diisi, pengajuan pencairan baru ditahan
-              dulu; saldomu tetap tersimpan dan bisa dicairkan setelah catatannya diisi.
+              Berlaku untuk sesi sejak 1 Oktober 2026. Selama ada catatan yang belum diisi, pengajuan penarikan baru ditahan
+              dulu; saldomu tetap tersimpan dan bisa ditarik setelah catatannya diisi.
             </p>
           </div>
         </Reveal>

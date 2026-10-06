@@ -87,9 +87,9 @@ async function creditFixedSplit(
 // beneran udah dicatat buat bookingId ini (bukan hitung ulang dari harga) --
 // termasuk baris model bagi hasil persen lama yang masih ada di riwayat.
 // Keputusan Hadi 29 Sep (menggantikan D3 24 Sep): pembalikan TIDAK ditolak
-// walau uang sesi itu sudah dicairkan. Saldo coach/kolam boleh minus; minus
+// walau uang sesi itu sudah ditarik. Saldo coach/kolam boleh minus; minus
 // itu otomatis tertutup oleh bagi hasil sesi berikutnya, dan selama saldo
-// kurang dari nominal pencairan, pencairan tertahan (CAS di withdrawal.ts).
+// kurang dari nominal penarikan, penarikan tertahan (CAS di withdrawal.ts).
 export async function reverseSessionRevenue(
   tx: Prisma.TransactionClient,
   { bookingId }: { bookingId: string }

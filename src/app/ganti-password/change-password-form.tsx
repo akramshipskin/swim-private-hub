@@ -29,7 +29,7 @@ export default function ChangePasswordForm({
       <Field label="Password Baru">
         <PasswordInput name="newPassword" placeholder="Minimal 8 karakter" required autoComplete="new-password" />
       </Field>
-      <Field label="Konfirmasi Password Baru">
+      <Field label="Ulangi Password Baru">
         <PasswordInput name="confirmPassword" placeholder="Ulangi password baru" required autoComplete="new-password" />
       </Field>
 

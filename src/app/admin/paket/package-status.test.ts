@@ -9,14 +9,14 @@ describe("packageStatusLabel", () => {
     expect(packageStatusLabel(base, NOW)).toEqual({ label: "Aktif", tone: "success" });
     expect(packageStatusLabel({ ...base, expiredDate: null }, NOW).label).toBe("Aktif");
   });
-  it("status ACTIVE tapi tanggal sudah lewat -> Kedaluwarsa", () => {
-    expect(packageStatusLabel({ ...base, expiredDate: new Date("2026-09-25T00:00:00Z") }, NOW).label).toBe("Kedaluwarsa");
+  it("status ACTIVE tapi tanggal sudah lewat -> Berakhir", () => {
+    expect(packageStatusLabel({ ...base, expiredDate: new Date("2026-09-25T00:00:00Z") }, NOW).label).toBe("Berakhir");
   });
   it("status ACTIVE tapi sesi habis -> Sesi habis", () => {
     expect(packageStatusLabel({ ...base, sisaSesi: 0 }, NOW).label).toBe("Sesi habis");
   });
   it("status lain mengikuti database", () => {
     expect(packageStatusLabel({ ...base, status: "PENDING_PAYMENT" }, NOW).label).toBe("Menunggu Pembayaran");
-    expect(packageStatusLabel({ ...base, status: "EXPIRED" }, NOW).label).toBe("Kedaluwarsa");
+    expect(packageStatusLabel({ ...base, status: "EXPIRED" }, NOW).label).toBe("Berakhir");
   });
 });

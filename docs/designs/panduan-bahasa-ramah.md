@@ -1,4 +1,4 @@
-# Panduan bahasa aplikasi yang ramah (DRAF, menunggu pilihan Hadi 6 Okt 2026)
+# Panduan bahasa aplikasi yang ramah (DIPUTUSKAN Hadi 6 Okt 2026; dipasang, pilihan kata ada di brand-kit/MESSAGING.md)
 
 Masalah (Hadi 6 Okt): teks aplikasi terlalu kaku ("Butir", "Pengguna", "Tipe"), tapi jangan terlalu santai (kata "diajar" ditolak). Tombol dan label tetap Title Case; yang diubah adalah pilihan katanya.
 

@@ -30,7 +30,7 @@ const statusTone = {
 const statusLabel: Record<string, string> = {
   PENDING_PAYMENT: "Menunggu pembayaran",
   ACTIVE: "Aktif",
-  EXPIRED: "Kedaluwarsa",
+  EXPIRED: "Berakhir",
 };
 
 function toDateLabelFromDate(d: Date) {
@@ -297,7 +297,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
               <p className="text-sm font-semibold text-text">Saldo kamu</p>
               <p className="text-xl font-bold text-text">{formatRupiah(wallet.memberBalance)}</p>
             </div>
-            <p className="text-xs text-text-muted">Otomatis dipakai saat membeli paket berikutnya atau tambah bayar ganti coach. Tidak bisa dicairkan.</p>
+            <p className="text-xs text-text-muted">Otomatis dipakai saat membeli paket berikutnya atau tambah bayar ganti coach. Tidak bisa ditarik.</p>
             {wallet.memberWalletTransactions.length > 0 && (
               <ul className="flex flex-col gap-0.5 border-t border-border pt-2 text-xs text-text-muted">
                 {wallet.memberWalletTransactions.map((t) => (
@@ -352,7 +352,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
                           {used ? (
                             <Badge tone="neutral">{p._count.bookings > 0 ? "Semua sesi sudah dijadwalkan" : "Sesi habis"}</Badge>
                           ) : expired ? (
-                            <Badge tone="neutral">Kedaluwarsa</Badge>
+                            <Badge tone="neutral">Berakhir</Badge>
                           ) : p.status === "PENDING_PAYMENT" && p.payments[0]?.snapRedirectUrl ? (
                             <div className="flex shrink-0 flex-col items-end gap-2">
                               <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>

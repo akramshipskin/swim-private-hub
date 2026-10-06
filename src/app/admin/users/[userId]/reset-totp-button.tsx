@@ -29,7 +29,7 @@ export default function ResetTotpButton({ userId, userName }: { userId: string; 
       <ConfirmDialog
         open={open}
         title={`Reset 2FA ${userName}?`}
-        description="Lakukan hanya kalau pengguna kehilangan HP/aplikasi authenticator dan kamu yakin ini memang dia (contoh: sudah dicek lewat WhatsApp ke nomor terdaftar). Setelah direset, siapa pun yang tahu password-nya bisa masuk tanpa kode. Semua sesi yang terbuka ikut keluar."
+        description="Lakukan hanya kalau pemilik akun kehilangan HP/aplikasi authenticator dan kamu yakin ini memang dia (contoh: sudah dicek lewat WhatsApp ke nomor terdaftar). Setelah direset, siapa pun yang tahu password-nya bisa masuk tanpa kode. Semua sesi yang terbuka ikut keluar."
         confirmLabel="Ya, Reset 2FA"
         loading={pending}
         onCancel={() => setOpen(false)}

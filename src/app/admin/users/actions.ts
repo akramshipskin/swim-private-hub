@@ -204,7 +204,7 @@ export async function resetUserPassword(
     data: { passwordHash, mustChangePassword: true, sessionVersion: { increment: 1 } },
   });
   if (updated.count === 0) {
-    return { error: "Pengguna tidak ditemukan." };
+    return { error: "Akun tidak ditemukan." };
   }
   return { tempPassword };
 }
@@ -219,7 +219,7 @@ export async function resetUserTotp(userId: string): Promise<{ error?: string }>
     where: { id: userId, role: { not: "ADMIN" } },
     data: { totpSecret: null, totpEnabledAt: null, totpLastStep: null, sessionVersion: { increment: 1 } },
   });
-  if (res.count === 0) return { error: "Pengguna tidak ditemukan, atau akun ini milik admin (2FA admin hanya bisa direset lewat server)." };
+  if (res.count === 0) return { error: "Akun tidak ditemukan, atau akun ini milik admin (2FA admin hanya bisa direset lewat server)." };
   revalidatePath(`/admin/users/${userId}`);
   return {};
 }

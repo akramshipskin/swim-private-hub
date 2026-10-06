@@ -1,4 +1,4 @@
-// Penahanan pencairan coach karena catatan milestone telat. Aturan: lihat
+// Penahanan penarikan coach karena catatan milestone telat. Aturan: lihat
 // MILESTONE_NOTE_EVERY_SESSIONS di src/lib/policy.ts.
 import { prisma } from "@/lib/prisma";
 import { MILESTONE_HOLD_START, MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
@@ -6,7 +6,7 @@ import { MILESTONE_HOLD_START, MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/polic
 export type OverdueParticipant = { dependentId: string; name: string; sessionsWithoutNote: number };
 
 // Sesi Hadir coach ini per peserta yang dimulai SETELAH catatan terakhir coach
-// ini untuk peserta itu. Peserta yang jumlahnya >= batas = menahan pencairan.
+// ini untuk peserta itu. Peserta yang jumlahnya >= batas = menahan penarikan.
 export function overdueFromSessions(
   sessions: { dependentId: string; startTime: Date }[],
   lastNoteAt: Map<string, Date>,

@@ -4,7 +4,7 @@
 // Minimal jam sebelum jadwal buat member masih bisa cancel sendiri.
 export const CANCEL_WINDOW_HOURS = 2;
 
-// Minimal nominal pencairan saldo (kolam & coach). Dipake server
+// Minimal nominal penarikan saldo (kolam & coach). Dipake server
 // (withdrawal.ts) DAN tombol "Cairkan" (saldo-view) biar sama persis.
 export const MIN_WITHDRAWAL = 50_000;
 
@@ -55,10 +55,10 @@ export function memberCanReportAttendance(endTime: Date, now: Date = new Date())
   return now.getTime() <= endTime.getTime() + ATTENDANCE_REPORT_WINDOW_DAYS * 24 * HOUR_MS;
 }
 
-// Penahanan pencairan coach (Hadi 29 Sep, opsi B): tiap peserta wajib dapat
+// Penahanan penarikan coach (Hadi 29 Sep, opsi B): tiap peserta wajib dapat
 // catatan milestone dari coach-nya minimal sekali per sekian sesi Hadir.
 // Kalau ada peserta yang sudah sekian sesi Hadir (dengan coach itu) tanpa
-// catatan, coach tidak bisa mengajukan pencairan baru. Pengajuan yang sudah
+// catatan, coach tidak bisa mengajukan penarikan baru. Pengajuan yang sudah
 // masuk tetap diproses. Hanya sesi mulai MILESTONE_HOLD_START yang dihitung.
 export const MILESTONE_NOTE_EVERY_SESSIONS = 2;
 export const MILESTONE_HOLD_START = new Date("2026-10-01T00:00:00+07:00");

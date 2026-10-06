@@ -59,7 +59,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
       ? (await getOverdueParticipants(session.user.id)).find((o) => o.dependentId === dependentId)
       : undefined;
 
-  // Butir yang belum tercapai di satu kelompok: level berjalan + level lain
+  // Keterampilan yang belum tercapai di satu kelompok: level berjalan + level lain
   // yang belum selesai.
   const itemSet = (g: MilestoneGroup): ItemSet => {
     const lv = levelsOf(items, g);
@@ -109,7 +109,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
 
         {overdue && (
           <p className="mt-4 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
-            Sudah {overdue.sessionsWithoutNote} sesi Hadir tanpa catatan. Pencairan saldomu ditahan sampai catatan diisi.
+            Sudah {overdue.sessionsWithoutNote} sesi Hadir tanpa catatan. Penarikan saldomu ditahan sampai catatan diisi.
           </p>
         )}
 
@@ -126,7 +126,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
                 <CardBody>
                   <h2 className="mb-1 text-lg font-semibold text-text">Update milestone</h2>
                   <p className="mb-4 text-sm text-text-muted">
-                    Isi minimal sekali tiap 2 sesi Hadir. Catatan tetap dihitung walau belum ada butir baru yang tercapai.
+                    Isi minimal sekali tiap 2 sesi Hadir. Catatan tetap dihitung walau belum ada keterampilan baru yang tercapai.
                   </p>
                   <MilestoneUpdateForm
                     dependentId={dependentId}
@@ -176,7 +176,7 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
                                     {it.text}
                                     {it.dependentId && (
                                       <span className="ml-1 text-xs text-text-subtle">
-                                        (butir tambahan coach{it.proposalStatus === "PENDING" ? ", diusulkan jadi standar" : ""})
+                                        (keterampilan tambahan coach{it.proposalStatus === "PENDING" ? ", diusulkan jadi standar" : ""})
                                       </span>
                                     )}
                                     {a && (
@@ -247,8 +247,8 @@ export default async function MilestonePage({ params }: { params: Promise<{ depe
             {access.canEdit && group && dependent.milestoneGroup && levels.some((l) => !doneLevel.has(l.level)) && (
               <Card>
                 <CardBody>
-                  <h2 className="mb-1 text-lg font-semibold text-text">Tambah butir sendiri</h2>
-                  <p className="mb-3 text-sm text-text-muted">Butir tambahan hanya berlaku untuk {dependent.name}, kecuali disetujui jadi standar.</p>
+                  <h2 className="mb-1 text-lg font-semibold text-text">Tambah keterampilan sendiri</h2>
+                  <p className="mb-3 text-sm text-text-muted">Keterampilan tambahan hanya berlaku untuk {dependent.name}, kecuali disetujui jadi standar.</p>
                   <AddItemForm
                     dependentId={dependentId}
                     levels={levels

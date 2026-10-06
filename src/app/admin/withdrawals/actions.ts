@@ -28,7 +28,7 @@ export async function processWithdrawal(
   if (!isIrisConfigured()) {
     return {
       error:
-        "Pencairan otomatis (Midtrans Iris) belum aktif. Lakukan transfer manual dulu, lalu klik \"Tandai Dibayar\".",
+        "Penarikan otomatis (Midtrans Iris) belum aktif. Lakukan transfer manual dulu, lalu klik \"Tandai Dibayar\".",
     };
   }
 
@@ -82,7 +82,7 @@ export async function markPaidManually(
 
   const withdrawalId = formData.get("withdrawalId") as string;
   // Bukti transfer wajib (keputusan Hadi 25 Sep): nomor referensi dari
-  // m-banking, supaya tiap pencairan manual bisa dicocokkan ke mutasi bank.
+  // m-banking, supaya tiap penarikan manual bisa dicocokkan ke mutasi bank.
   const transferReference = (formData.get("transferReference") as string | null)?.trim() ?? "";
   if (transferReference.length < 4 || transferReference.length > 100) {
     return { error: "Isi nomor referensi transfer dari m-banking (minimal 4 karakter)." };

@@ -31,7 +31,7 @@ async function createWithdrawalRequest({
 }) {
   if (amount < MIN_WITHDRAWAL) {
     throw new WithdrawalError(
-      `Minimal pencairan Rp ${MIN_WITHDRAWAL.toLocaleString("id-ID")}.`
+      `Minimal penarikan Rp ${MIN_WITHDRAWAL.toLocaleString("id-ID")}.`
     );
   }
 
@@ -84,7 +84,7 @@ async function createWithdrawalRequest({
 function parseAmount(amount: number | undefined, balance: number) {
   const value = amount ?? balance;
   if (!Number.isInteger(value) || value <= 0) {
-    throw new WithdrawalError("Nominal pencairan tidak valid.");
+    throw new WithdrawalError("Nominal penarikan tidak valid.");
   }
   // Dicek di sini juga (bukan cuma CAS di bawah): angka raksasa membuat
   // database error "out of range" alih-alih pesan yang jelas (sweep 2 Okt).
@@ -105,7 +105,7 @@ export async function requestPoolWithdrawal(poolId: string, amount?: number) {
     },
   });
   if (!pool.bankName || !pool.bankAccountNumber || !pool.bankAccountName) {
-    throw new WithdrawalError("Isi rekening tujuan dulu sebelum mencairkan saldo.");
+    throw new WithdrawalError("Isi rekening tujuan dulu sebelum menarik saldo.");
   }
   return createWithdrawalRequest({
     poolId,
@@ -129,7 +129,7 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
     },
   });
   if (!coach.bankName || !coach.bankAccountNumber || !coach.bankAccountName) {
-    throw new WithdrawalError("Isi rekening tujuan dulu sebelum mencairkan saldo.");
+    throw new WithdrawalError("Isi rekening tujuan dulu sebelum menarik saldo.");
   }
   // Penahanan milestone: dicek sebelum saldo dipotong. Sengaja tidak dikunci
   // bareng tandai hadir -- kalau keduanya pas bersamaan, urutan mana pun
@@ -137,7 +137,7 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
   const overdue = await getOverdueParticipants(coach.userId);
   if (overdue.length > 0) {
     throw new WithdrawalError(
-      `Pencairan ditahan: isi dulu catatan milestone untuk ${overdue.map((o) => o.name).join(", ")}.`
+      `Penarikan ditahan: isi dulu catatan milestone untuk ${overdue.map((o) => o.name).join(", ")}.`
     );
   }
   return createWithdrawalRequest({
@@ -149,7 +149,7 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
   });
 }
 
-// Dipanggil admin kalau pencairan GAGAL diproses (Iris nolak, atau admin
+// Dipanggil admin kalau penarikan GAGAL diproses (Iris nolak, atau admin
 // batalin manual) -- saldo yang udah kepotong pas request dibuat WAJIB
 // balik, jangan biarin ilang gitu aja.
 //

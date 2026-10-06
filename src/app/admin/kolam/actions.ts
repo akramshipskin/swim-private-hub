@@ -24,7 +24,7 @@ export async function affiliateCoach(
   }
   const coach = await prisma.user.findFirst({ where: { id: coachId, role: "COACH", isActive: true }, select: { id: true } });
   if (!coach) {
-    return { error: "Coach tidak ditemukan atau belum aktif. Aktifkan dulu di menu Pengguna." };
+    return { error: "Coach tidak ditemukan atau belum aktif. Aktifkan dulu di menu Akun." };
   }
 
   // upsert Prisma bukan atomic di DB -- 2 submit barengan bisa dua-duanya

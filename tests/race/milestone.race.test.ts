@@ -1,6 +1,6 @@
-// Milestone + penahanan pencairan coach (Batch 3, 29 Sep) terhadap Postgres
+// Milestone + penahanan penarikan coach (Batch 3, 29 Sep) terhadap Postgres
 // lokal. Catatan: TRUNCATE ... CASCADE di reset() ikut mengosongkan
-// MilestoneItem (butir standar hasil migrasi), jadi tiap tes membuat butirnya sendiri.
+// MilestoneItem (keterampilan standar hasil migrasi), jadi tiap tes membuat butirnya sendiri.
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // Batas mulai hitungan dimundurkan supaya sesi "kemarin" ikut dihitung.
@@ -49,7 +49,7 @@ beforeEach(async () => {
 });
 
 describe("MILESTONE", () => {
-  it("M1: catatan pertama menentukan kelompok dari umur; butir tercapai + level selesai bersertifikat", async () => {
+  it("M1: catatan pertama menentukan kelompok dari umur; keterampilan tercapai + level selesai bersertifikat", async () => {
     const { coach, dep } = await setup();
     const r = await asCoach(coach, () => saveMilestoneUpdate(dep.id, null, fd({ note: "Bagus", achieved: "i_c1_1" })));
     expect(r).toEqual({ success: true });
@@ -83,17 +83,17 @@ describe("MILESTONE", () => {
     expect(await asCoach(fresh, () => saveMilestoneUpdate(dep.id, null, fd({ note: "x" })))).toEqual({ error: "Milestone bisa diisi setelah minimal 1 sesi peserta ini ditandai Hadir." });
   });
 
-  it("M3: coach yang tidak pernah mengajar peserta ditolak; butir dari kelompok lain ditolak", async () => {
+  it("M3: coach yang tidak pernah mengajar peserta ditolak; keterampilan dari kelompok lain ditolak", async () => {
     const { coach, dep } = await setup();
     const stranger = await mkUser("COACH");
     expect(await asCoach(stranger, () => saveMilestoneUpdate(dep.id, null, fd({ note: "x" })))).toEqual({ error: "Milestone bisa diisi setelah minimal 1 sesi peserta ini ditandai Hadir." });
     expect(await asCoach(coach, () => saveMilestoneUpdate(dep.id, null, fd({ note: "x", achieved: "i_d1_1" })))).toEqual({
-      error: "Butir tidak valid, muat ulang halaman.",
+      error: "Keterampilan tidak valid, muat ulang halaman.",
     });
     expect(await prisma.milestoneNote.count()).toBe(0);
   });
 
-  it("M4: dua coach menyimpan butir terakhir level barengan (20 putaran) -> level selesai tepat 1x, 2 catatan, tidak ada 500", async () => {
+  it("M4: dua coach menyimpan keterampilan terakhir level barengan (20 putaran) -> level selesai tepat 1x, 2 catatan, tidak ada 500", async () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 20; i++) {
       await reset();
@@ -123,11 +123,11 @@ describe("MILESTONE", () => {
     spread("M4", sebaran);
   });
 
-  it("M5: usulan butir disetujui admin -> jadi standar untuk peserta lain; klik setujui+tolak barengan diputuskan 1x", async () => {
+  it("M5: usulan keterampilan disetujui admin -> jadi standar untuk peserta lain; klik setujui+tolak barengan diputuskan 1x", async () => {
     const { coach, dep } = await setup();
     await asCoach(coach, () => saveMilestoneUpdate(dep.id, null, fd({ note: "awal" })));
-    expect(await asCoach(coach, () => addMilestoneItem(dep.id, null, fd({ text: "Butir baru", level: "1", propose: "on" })))).toEqual({ success: true });
-    const item = await prisma.milestoneItem.findFirstOrThrow({ where: { text: "Butir baru" } });
+    expect(await asCoach(coach, () => addMilestoneItem(dep.id, null, fd({ text: "Keterampilan baru", level: "1", propose: "on" })))).toEqual({ success: true });
+    const item = await prisma.milestoneItem.findFirstOrThrow({ where: { text: "Keterampilan baru" } });
     expect(item).toMatchObject({ dependentId: dep.id, proposalStatus: "PENDING", group: "C" });
     const admin = await mkUser("ADMIN");
     const rs = await settle([true, false, true].map((ok) => as({ id: admin.id, role: "ADMIN" }, () => reviewMilestoneProposal(item.id, ok))));
@@ -164,7 +164,7 @@ describe("PENAHANAN PENCAIRAN", () => {
     await mkItems();
     const { coach, dep } = await setup(2);
     const denied = await asCoach(coach, () => requestWithdrawal(null, fd({ amount: "60000" })));
-    expect(denied).toEqual({ error: `Pencairan ditahan: isi dulu catatan milestone untuk ${dep.name}.` });
+    expect(denied).toEqual({ error: `Penarikan ditahan: isi dulu catatan milestone untuk ${dep.name}.` });
     expect((await prisma.coachProfile.findUniqueOrThrow({ where: { id: coach.coachProfile!.id } })).walletBalance).toBe(100000);
     expect(await prisma.withdrawalRequest.count()).toBe(0);
 
@@ -188,7 +188,7 @@ describe("PENAHANAN PENCAIRAN", () => {
     expect(dep.id).toBeTruthy();
   });
 
-  it("H3: coach mengajukan pencairan pas mengisi catatan (20 putaran) -> tidak ada 500, saldo & ledger konsisten", async () => {
+  it("H3: coach mengajukan penarikan pas mengisi catatan (20 putaran) -> tidak ada 500, saldo & ledger konsisten", async () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 20; i++) {
       await reset();
@@ -215,7 +215,7 @@ describe("BUTIR STANDAR (admin)", () => {
   beforeEach(async () => { adminId = (await mkUser("ADMIN")).id; });
   const asAdmin = <T,>(fn: () => Promise<T>) => as({ id: adminId, role: "ADMIN", name: "Admin" }, fn);
 
-  it("M-A1: butir dinonaktifkan tidak dihitung -> peserta yang tinggal kurang butir itu selesai level di catatan berikutnya; level selesai tidak dicabut saat butir diaktifkan lagi", async () => {
+  it("M-A1: keterampilan dinonaktifkan tidak dihitung -> peserta yang tinggal kurang keterampilan itu selesai level di catatan berikutnya; level selesai tidak dicabut saat keterampilan diaktifkan lagi", async () => {
     const { setStandardItemActive } = await import("@/app/admin/milestone/actions");
     const { coach, dep } = await setup();
     await asCoach(coach, () => saveMilestoneUpdate(dep.id, null, fd({ note: "Mulai", achieved: "i_c1_1" })));
@@ -226,13 +226,13 @@ describe("BUTIR STANDAR (admin)", () => {
     expect(await prisma.milestoneLevelCompletion.count()).toBe(1);
   });
 
-  it("M-A2: edit teks/urutan hanya untuk butir standar; butir khusus peserta & input tidak valid ditolak; tambah butir urutannya di belakang", async () => {
+  it("M-A2: edit teks/urutan hanya untuk keterampilan standar; keterampilan khusus peserta & input tidak valid ditolak; tambah keterampilan urutannya di belakang", async () => {
     const { updateStandardItem, addStandardItem } = await import("@/app/admin/milestone/actions");
     const { dep } = await setup();
     await prisma.milestoneItem.create({ data: { id: "khusus", group: "C", level: 1, text: "Khusus", dependentId: dep.id } });
     expect(await asAdmin(() => updateStandardItem("i_c1_1", null, fd({ text: "Mengapung 5 detik", sortOrder: "4" })))).toEqual({ success: true });
     expect(await prisma.milestoneItem.findUniqueOrThrow({ where: { id: "i_c1_1" } })).toMatchObject({ text: "Mengapung 5 detik", sortOrder: 4, group: "C", level: 1 });
-    expect(await asAdmin(() => updateStandardItem("khusus", null, fd({ text: "Diubah", sortOrder: "1" })))).toEqual({ error: "Butir standar tidak ditemukan." });
+    expect(await asAdmin(() => updateStandardItem("khusus", null, fd({ text: "Diubah", sortOrder: "1" })))).toEqual({ error: "Keterampilan standar tidak ditemukan." });
     expect(await asAdmin(() => updateStandardItem("i_c1_1", null, fd({ text: "ab", sortOrder: "1" })))).toMatchObject({ error: expect.any(String) });
     expect(await asAdmin(() => addStandardItem(null, fd({ group: "Z", level: "1", text: "Apa" })))).toEqual({ error: "Pilih kelompok." });
     expect(await asAdmin(() => addStandardItem(null, fd({ group: "C", level: "0", text: "Apa" })))).toMatchObject({ error: expect.any(String) });

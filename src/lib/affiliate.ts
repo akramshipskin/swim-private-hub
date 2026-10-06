@@ -8,9 +8,9 @@
 //   member itu). Lewat releaseAt -> RELEASED: saldo pemilik kode bertambah,
 //   pendapatan SPH berkurang senilai sama. Yang sudah RELEASED tidak ditarik.
 //
-// Tidak ada cron: komisi yang jatuh tempo dicairkan "malas" oleh
+// Tidak ada cron: komisi yang jatuh tempo ditarik "malas" oleh
 // releaseDueCommissions(), dipanggil dari halaman saldo/dashboard dan
-// sebelum pengajuan pencairan.
+// sebelum pengajuan penarikan.
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { AFFILIATE_HOLD_DAYS, AFFILIATE_SERVICE_FEE_SHARE_PERCENT, splitPlatformTax } from "@/lib/policy";

@@ -1,4 +1,4 @@
-// Pencairan otomatis (Midtrans Iris) -- BELUM AKTIF sampai platform
+// Penarikan otomatis (Midtrans Iris) -- BELUM AKTIF sampai platform
 // daftar & dapet API key Iris (produk terpisah dari Snap, butuh KYC
 // bisnis sendiri di Midtrans). Sebelum itu ada, WithdrawalRequest
 // tetep PENDING sampai admin proses manual dari /admin/withdrawals

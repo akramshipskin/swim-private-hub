@@ -165,8 +165,8 @@ export default async function MemberDashboardPage() {
           {expiringSoon.length > 0 && (
             <p className="mt-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
               {expiringSoon.length === 1
-                ? `Paket ${nearest.name} (${nearest.dependent.name}) kedaluwarsa dalam ${nearestLeft}.`
-                : `${expiringSoon.length} paket akan kedaluwarsa. Terdekat: ${nearest.name} (${nearest.dependent.name}) dalam ${nearestLeft}.`}{" "}
+                ? `Paket ${nearest.name} (${nearest.dependent.name}) berakhir dalam ${nearestLeft}.`
+                : `${expiringSoon.length} paket akan berakhir. Terdekat: ${nearest.name} (${nearest.dependent.name}) dalam ${nearestLeft}.`}{" "}
               Pakai sisa sesinya sebelum hangus.
             </p>
           )}

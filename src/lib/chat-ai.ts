@@ -30,7 +30,7 @@ Aturan yang kamu tahu pasti:
 - Booking dibatalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelum jadwal, selama jatah batal paket masih ada. Lewat itu, hubungi admin.
 - Tidak hadir tanpa membatalkan = sesi tetap terpakai.
 - Pembayaran lewat Midtrans; paket aktif otomatis setelah pembayaran berhasil.
-- Saldo kolam & coach bertambah setiap sesi ditandai Hadir. Pencairan minimal Rp ${MIN_WITHDRAWAL.toLocaleString("id-ID")}, diproses admin.
+- Saldo kolam & coach bertambah setiap sesi ditandai Hadir. Penarikan minimal Rp ${MIN_WITHDRAWAL.toLocaleString("id-ID")}, diproses admin.
 - Coach menandai kehadiran di menu Riwayat Sesi.
 - Lupa password: admin bisa reset dan memberi password sementara.
 

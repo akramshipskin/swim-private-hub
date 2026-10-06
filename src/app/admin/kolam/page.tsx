@@ -57,14 +57,14 @@ export default async function AdminKolamPage() {
   ]);
 
   // Rincian asal saldo per kolam: pendapatan sesi (termasuk riwayat paket model
-  // lama, yang tetap tercatat di buku besar), koreksi manual, lalu pencairan.
+  // lama, yang tetap tercatat di buku besar), koreksi manual, lalu penarikan.
   const [revenueTxns, paidOut, processing, pphByPool, affiliateByPool] = await Promise.all([
     prisma.walletTransaction.findMany({
       where: { type: "SESSION_REVENUE", poolId: { not: null } },
       select: { poolId: true, amount: true, bookingId: true },
     }),
     prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { not: null }, status: "PAID" }, _sum: { amount: true } }),
-    // Pencairan yang belum selesai: saldo SUDAH dipotong sejak diajukan (dan
+    // Penarikan yang belum selesai: saldo SUDAH dipotong sejak diajukan (dan
     // balik lagi kalau ditolak/gagal), jadi harus muncul di rincian supaya
     // jumlahnya cocok dengan saldo.
     prisma.withdrawalRequest.groupBy({ by: ["poolId"], where: { poolId: { not: null }, status: { in: ["PENDING", "PROCESSING"] } }, _sum: { amount: true } }),
@@ -114,7 +114,7 @@ export default async function AdminKolamPage() {
       {pools.length === 0 ? (
         <Card className="mt-6">
           <CardBody className="py-10 text-center text-sm text-text-muted">
-            Belum ada kolam. Kolam muncul di sini setelah pemilik kolam mendaftar atau ditambahkan lewat menu Pengguna.
+            Belum ada kolam. Kolam muncul di sini setelah pemilik kolam mendaftar atau ditambahkan lewat menu Akun.
           </CardBody>
         </Card>
       ) : (
@@ -154,17 +154,17 @@ export default async function AdminKolamPage() {
                     return (
                       <div className="rounded-xl bg-surface-muted p-3">
                         <div className="flex items-baseline justify-between gap-2">
-                          <p className="text-sm font-semibold text-text">Saldo kolam (bisa dicairkan)</p>
+                          <p className="text-sm font-semibold text-text">Saldo kolam (bisa ditarik)</p>
                           <p className="text-lg font-bold text-text">{formatRupiah(p.walletBalance)}</p>
                         </div>
-                        <p className="text-xs text-text-subtle">Bagian kolam dari tiap sesi yang ditandai Hadir, dikurangi PPh dan pencairan.</p>
+                        <p className="text-xs text-text-subtle">Bagian kolam dari tiap sesi yang ditandai Hadir, dikurangi PPh dan penarikan.</p>
                         <dl className="mt-2 grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5 text-sm">
                           <dt className="text-text-muted">Bagian kolam dari sesi</dt><dd className="text-right text-text">{formatRupiah(r.sessions)}</dd>
                           {r.manual !== 0 && (<><dt className="text-text-muted">Koreksi manual (tanpa sesi)</dt><dd className="text-right text-text">{r.manual < 0 ? "−" : ""}{formatRupiah(Math.abs(r.manual))}</dd></>)}
                           {affiliate !== 0 && (<><dt className="text-text-muted">Komisi afiliasi</dt><dd className="text-right text-text">{formatRupiah(affiliate)}</dd></>)}
                           {pph !== 0 && (<><dt className="text-text-muted">Potongan PPh 0,5% (disetor SPH)</dt><dd className="text-right text-text">−{formatRupiah(-pph)}</dd></>)}
-                          <dt className="text-text-muted">Sudah dicairkan</dt><dd className="text-right text-text">−{formatRupiah(paid)}</dd>
-                          {inProgress > 0 && (<><dt className="text-text-muted">Pencairan sedang diproses</dt><dd className="text-right text-text">−{formatRupiah(inProgress)}</dd></>)}
+                          <dt className="text-text-muted">Sudah ditarik</dt><dd className="text-right text-text">−{formatRupiah(paid)}</dd>
+                          {inProgress > 0 && (<><dt className="text-text-muted">Penarikan sedang diproses</dt><dd className="text-right text-text">−{formatRupiah(inProgress)}</dd></>)}
                         </dl>
                       </div>
                     );

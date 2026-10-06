@@ -41,18 +41,18 @@ export default async function AdminMilestonePage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Milestone</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Usulan butir dari coach dan catatan perkembangan terbaru. Detail tiap peserta bisa dibuka dari sini atau dari halaman pengguna member.
+        Usulan keterampilan dari coach dan catatan perkembangan terbaru. Detail tiap peserta bisa dibuka dari sini atau dari halaman akun member.
       </p>
       <Link href="/admin/milestone/butir" className="mt-3 inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-        Kelola butir standar →
+        Kelola keterampilan standar →
       </Link>
 
       <Card className="mt-6">
         <CardBody>
-          <h2 className="mb-1 text-lg font-semibold text-text">Usulan butir standar ({proposals.length})</h2>
+          <h2 className="mb-1 text-lg font-semibold text-text">Usulan keterampilan standar ({proposals.length})</h2>
           <p className="mb-3 text-sm text-text-muted">
             Disetujui = berlaku untuk semua peserta di kelompok & level itu (termasuk yang sedang berjalan). Ditolak = tetap
-            jadi butir khusus peserta asalnya.
+            jadi keterampilan khusus peserta asalnya.
           </p>
           {proposals.length === 0 ? (
             <p className="text-sm text-text-muted">Tidak ada usulan.</p>
@@ -80,7 +80,7 @@ export default async function AdminMilestonePage() {
                     <ConfirmSubmit
                       action={reviewMilestoneProposal.bind(null, p.id, true)}
                       label="Setujui"
-                      title="Jadikan butir standar?"
+                      title="Jadikan keterampilan standar?"
                       description={`"${p.text}" akan muncul di ${levelLabel(p.group as MilestoneGroup, p.level)} untuk semua peserta.`}
                       confirmLabel="Ya, Setujui"
                     />
@@ -89,7 +89,7 @@ export default async function AdminMilestonePage() {
                       label="Tolak"
                       variant="danger"
                       title="Tolak usulan?"
-                      description="Butir tetap berlaku hanya untuk peserta asalnya."
+                      description="Keterampilan tetap berlaku hanya untuk peserta asalnya."
                       confirmLabel="Ya, Tolak"
                     />
                   </div>

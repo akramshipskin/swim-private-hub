@@ -1,6 +1,6 @@
 // Milestone perkembangan peserta (keputusan Hadi 29 Sep). Semua aturan level
 // & kelompok umur ada di sini sebagai fungsi murni supaya bisa dites tanpa DB.
-// Daftar butir standar: tabel MilestoneItem (diisi migrasi milestone).
+// Daftar keterampilan standar: tabel MilestoneItem (diisi migrasi milestone).
 import { ageFromBirthDate } from "@/lib/coach-bio";
 
 export type MilestoneGroup = "A" | "B" | "C" | "D";
@@ -72,7 +72,7 @@ export function currentLevel(items: ItemLite[], completions: CompletionLite[], g
 }
 
 // Level yang BARU selesai setelah pencapaian terbaru: semua butirnya tercapai
-// tapi belum ada catatan selesai. withCertificate = ada minimal 1 butir yang
+// tapi belum ada catatan selesai. withCertificate = ada minimal 1 keterampilan yang
 // dicapai bersama coach (bukan hasil penilaian awal).
 export function newlyCompletedLevels(
   items: ItemLite[],
@@ -89,7 +89,7 @@ export function newlyCompletedLevels(
 
 // Kelompok berikutnya setelah catatan disimpan. Anak yang naik umur di tengah
 // level tetap di kelompok lama sampai level itu selesai (Hadi 29 Sep): pindah
-// hanya kalau sedang di batas level (level berjalan belum ada butir tercapai)
+// hanya kalau sedang di batas level (level berjalan belum ada keterampilan tercapai)
 // atau seluruh kelompok sudah selesai.
 export function nextGroup(
   stored: MilestoneGroup,

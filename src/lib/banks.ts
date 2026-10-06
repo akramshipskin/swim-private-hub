@@ -1,6 +1,6 @@
-// Daftar bank untuk dropdown rekening pencairan (coach & kolam). Yang disimpan
+// Daftar bank untuk dropdown rekening penarikan (coach & kolam). Yang disimpan
 // di kolom bankName = LABEL (dibaca admin saat transfer manual). `code` = kode
-// bank Midtrans Payouts (huruf kecil, peka huruf besar/kecil) untuk pencairan
+// bank Midtrans Payouts (huruf kecil, peka huruf besar/kecil) untuk penarikan
 // otomatis nanti -- dari docs.midtrans.com/reference/list-of-supported-banks
 // (dibaca 24 Sep 2026), BELUM diuji lewat API karena Payouts belum aktif.
 export const BANKS = [

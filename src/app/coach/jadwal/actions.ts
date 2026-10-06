@@ -165,7 +165,7 @@ export async function addAvailability(
     // buat sliver TOCTOU yang sangat jarang.
     if (freeChunks.length > 0) await prisma.availability.createMany({ data: freeChunks, skipDuplicates: true });
 
-    // Broadcast 1 notif per aksi "Tambah Slot" (bukan per slot per jam)
+    // Broadcast 1 notif per aksi "Buka Jam Kosong" (bukan per slot per jam)
     // biar member gak kebanjiran notif kalau coach buka rentang jam
     // panjang sekaligus. Cuma ke member yang punya paket aktif DI KOLAM
     // INI (paket cuma berlaku di kolam tempat dibeli) -- dulu ke semua
@@ -225,7 +225,7 @@ export type CancelBookingActionState = { error?: string } | null;
 // window & jatah kuota mandiri member (lihat komentar cancelBooking),
 // beda dari deleteAvailability yang cuma bisa hapus slot yang MASIH
 // kosong. Sisa sesi member otomatis balik, slotnya DITUTUP (tidak bisa
-// dibooking member lain; coach bisa membukanya lagi lewat Tambah Slot),
+// dibooking member lain; coach bisa membukanya lagi lewat Buka Jam Kosong),
 // member dapet notif.
 export async function cancelBookingAsCoach(
   _prevState: CancelBookingActionState,

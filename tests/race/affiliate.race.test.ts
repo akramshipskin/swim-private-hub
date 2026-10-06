@@ -89,7 +89,7 @@ describe("AFILIASI", () => {
     spread("F5", sebaran);
   });
 
-  it("F6: pencairan komisi dipanggil 5x barengan -> saldo bertambah tepat sekali", async () => {
+  it("F6: penarikan komisi dipanggil 5x barengan -> saldo bertambah tepat sekali", async () => {
     const { teacher, referrer, bookings } = await setup();
     await mark(teacher, bookings[0].id, true);
     const later = new Date(Date.now() + 4 * DAY);

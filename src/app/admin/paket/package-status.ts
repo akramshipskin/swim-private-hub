@@ -9,8 +9,8 @@ export function packageStatusLabel(
   now: Date = new Date(),
 ): { label: string; tone: "warning" | "success" | "neutral" } {
   if (p.status === "PENDING_PAYMENT") return { label: "Menunggu Pembayaran", tone: "warning" };
-  if (p.status === "EXPIRED") return { label: "Kedaluwarsa", tone: "neutral" };
-  if (p.expiredDate && p.expiredDate < now) return { label: "Kedaluwarsa", tone: "neutral" };
+  if (p.status === "EXPIRED") return { label: "Berakhir", tone: "neutral" };
+  if (p.expiredDate && p.expiredDate < now) return { label: "Berakhir", tone: "neutral" };
   if (p.sisaSesi <= 0) return { label: "Sesi habis", tone: "neutral" };
   return { label: "Aktif", tone: "success" };
 }

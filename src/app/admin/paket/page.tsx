@@ -81,7 +81,7 @@ export default async function AdminPaketPage() {
       {/* --- List member + paket, advanced --- */}
       <p className="mb-3 text-xs text-text-subtle">
         Untuk menambah peserta atau memberi paket gratis ke member, buka
-        menu <span className="font-medium text-text-muted">Pengguna</span>.
+        menu <span className="font-medium text-text-muted">Akun</span>.
       </p>
       <h2 className="mb-3 text-lg font-semibold text-text">Paket per Member</h2>
       <PaketPerMemberList

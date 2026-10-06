@@ -21,7 +21,7 @@ const uid = () => `${Date.now()}${++n}${Math.floor(Math.random() * 1e6)}`;
 
 // Bawaan tanpa jam buka (booking tidak dibatasi jam, supaya slot uji yang jatuh
 // di jam berapa pun -- termasuk melewati tengah malam -- tetap bisa dibooking).
-// Tes yang memakai Tambah Slot coach wajib memberi jam buka (kolam tanpa jam
+// Tes yang memakai Buka Jam Kosong coach wajib memberi jam buka (kolam tanpa jam
 // buka tidak bisa dibuka slot barunya).
 export const ALL_DAY: [string, string] = ["00:00", "23:59"];
 export async function mkPool(opts: { balance?: number; bank?: boolean; hours?: [string, string] | null } = {}) {

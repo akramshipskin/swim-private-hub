@@ -119,9 +119,9 @@ describe("S2 / D2: coach yang dinonaktifkan", () => {
   });
 });
 
-describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairkan, saldo boleh minus", () => {
+describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah ditarik, saldo boleh minus", () => {
   // Paket 1.600.000 / 8 sesi: kolam 100.000 - PPh 500 = 99.500, coach 80.000 -
-  // PPh 400 = 79.600 (di atas minimal pencairan 50.000). Tidak datang: coach 50%
+  // PPh 400 = 79.600 (di atas minimal penarikan 50.000). Tidak datang: coach 50%
   // = 40.000 - PPh 200 = 39.800, kolam 0.
   async function creditedThenWithdrawn() {
     const pool = await mkPool(); const coach = await mkUser("COACH", { bank: true }); const admin = await mkUser("ADMIN");
@@ -136,7 +136,7 @@ describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairka
     return { pool, coach, admin, b };
   }
 
-  it("K3a: Hadir sudah dicairkan, lalu diubah jadi Tidak Hadir -> BERHASIL, saldo coach -39.800, catatan uang cocok", async () => {
+  it("K3a: Hadir sudah ditarik, lalu diubah jadi Tidak Hadir -> BERHASIL, saldo coach -39.800, catatan uang cocok", async () => {
     const x = await creditedThenWithdrawn();
     const res = await as({ id: x.admin.id, role: "ADMIN" }, () => markAttendance(null, fd({ bookingId: x.b.id, attended: "false" })));
     expect(res).toBeNull();
@@ -146,7 +146,7 @@ describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairka
     expect(await checkInvariants()).toEqual([]);
   });
 
-  it("K3c: coach mencairkan saldo BERSAMAAN admin mengubah Hadir jadi Tidak Hadir (15 putaran) -> selalu salah satu dari 2 hasil sah, catatan uang cocok", async () => {
+  it("K3c: coach menarik saldo BERSAMAAN admin mengubah Hadir jadi Tidak Hadir (15 putaran) -> selalu salah satu dari 2 hasil sah, catatan uang cocok", async () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 15; i++) {
       await reset();
@@ -172,7 +172,7 @@ describe("S3 / D3 (direvisi 29 Sep): Hadir boleh dibatalkan walau sudah dicairka
     spread("K3c", sebaran);
   });
 
-  it("K3b: Hadir belum dicairkan, diubah jadi Tidak Hadir -> saldo coach 39.800 (50% - PPh), kolam 0", async () => {
+  it("K3b: Hadir belum ditarik, diubah jadi Tidak Hadir -> saldo coach 39.800 (50% - PPh), kolam 0", async () => {
     const pool = await mkPool(); const coach = await mkUser("COACH"); const admin = await mkUser("ADMIN");
     const slot = await mkSlot(coach.id, pool.id, -3);
     const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 1600000 });

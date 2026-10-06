@@ -16,7 +16,7 @@ const STATUS = {
 const date = (d: Date) => d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" });
 
 // Semua komisi afiliasi (dibayar dari bagian SPH). Membuka halaman ini juga
-// mencairkan komisi yang sudah lewat masa tahan.
+// menarik komisi yang sudah lewat masa tahan.
 export default async function AdminAfiliasiPage() {
   await requireRole("ADMIN");
   await releaseDueCommissions();

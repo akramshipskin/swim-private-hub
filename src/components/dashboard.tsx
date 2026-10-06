@@ -209,7 +209,7 @@ export function SegmentBar({ sisa, total, tone = "default", className }: { sisa:
 }
 
 // Kartu saldo gelap untuk coach dan pemilik kolam. Tombol hanya tautan ke halaman
-// Saldo yang sudah ada (aturan pencairan tetap di sana).
+// Saldo yang sudah ada (aturan penarikan tetap di sana).
 export function BalanceCard({
   label,
   amount,

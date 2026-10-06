@@ -80,7 +80,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, unggah foto dan sertifikat (boleh lebih dari satu) untuk badge Bersertifikat." },
       { title: "Pasang harga & buka jadwal", body: "Tentukan harga paket 4 dan 8 sesimu sendiri, lalu buka tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
       { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi, lalu isi catatan perkembangan (milestone) peserta." },
-      { title: "Cairkan saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa dicairkan ke rekening: secepatnya, paling lambat 7 hari kerja." },
+      { title: "Cairkan saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa ditarik ke rekening: secepatnya, paling lambat 7 hari kerja." },
     ],
   },
   {
@@ -90,7 +90,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Gabung sebagai mitra", body: "Daftarkan kolam, lengkapi alamat, jam buka, dan fasilitas." },
       { title: "Pasang harga tiket", body: "Kolam memasang harga tiket untuk paket 4 dan 8 sesi; perubahan langsung berlaku untuk pembelian berikutnya." },
       { title: "Pantau jam ramai", body: "Lihat jam berapa kolam dipakai les privat, oleh coach siapa, setiap hari." },
-      { title: "Terima bagi hasil", body: "Bagian kolam (setelah PPh final 0,5%) masuk ke saldo setiap sesi Hadir dan bisa dicairkan ke rekening: secepatnya, paling lambat 7 hari kerja." },
+      { title: "Terima bagi hasil", body: "Bagian kolam (setelah PPh final 0,5%) masuk ke saldo setiap sesi Hadir dan bisa ditarik ke rekening: secepatnya, paling lambat 7 hari kerja." },
     ],
   },
 ];
@@ -144,7 +144,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kalau tidak cocok dengan coach-nya?",
-        a: "Ajukan ganti coach dari menu Paket; sisa sesi ikut pindah ke coach lain di kolam yang sama setelah disetujui admin. Kalau coach baru lebih murah, selisihnya masuk ke saldomu (dipakai untuk paket berikutnya, tidak bisa dicairkan). Kalau lebih mahal, kamu menambah selisihnya.",
+        a: "Ajukan ganti coach dari menu Paket; sisa sesi ikut pindah ke coach lain di kolam yang sama setelah disetujui admin. Kalau coach baru lebih murah, selisihnya masuk ke saldomu (dipakai untuk paket berikutnya, tidak bisa ditarik). Kalau lebih mahal, kamu menambah selisihnya.",
       },
       {
         q: "Apakah coach-nya bersertifikat?",
@@ -177,8 +177,8 @@ const FAQ_GROUPS: FaqGroup[] = [
         a: "Tandai kehadiran paling lambat 24 jam setelah sesi selesai. Sesi Hadir langsung menambah saldo kamu sebesar harga paketmu dibagi jumlah sesinya. Kalau peserta sudah booking tapi tidak datang, tandai Tidak Hadir: kamu tetap mendapat 50% dari bagianmu. Bagianmu dipotong PPh final 0,5% yang disetor SPH atas namamu, kecuali kamu menyerahkan surat pernyataan omzet di bawah Rp 500 juta setahun.",
       },
       {
-        q: "Cara mencairkan saldo?",
-        a: `Isi rekening sekali di menu Saldo, lalu ajukan pencairan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Pencairan diproses admin secepatnya, paling lambat 7 hari kerja, dan statusnya terlihat di riwayat pencairan.`,
+        q: "Cara menarik saldo?",
+        a: `Isi rekening sekali di menu Saldo, lalu ajukan penarikan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Penarikan diproses admin secepatnya, paling lambat 7 hari kerja, dan statusnya terlihat di riwayat penarikan.`,
       },
       {
         q: "Kalau saya tidak bisa mengajar?",
@@ -202,7 +202,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Wajib isi catatan perkembangan peserta?",
-        a: "Ya. Mulai 1 Oktober 2026, isi catatan perkembangan (milestone) setiap 2 sesi Hadir per peserta. Selama ada catatan yang belum diisi, pengajuan pencairan saldo yang baru ditahan.",
+        a: "Ya. Mulai 1 Oktober 2026, isi catatan perkembangan (milestone) setiap 2 sesi Hadir per peserta. Selama ada catatan yang belum diisi, pengajuan penarikan saldo yang baru ditahan.",
       },
     ],
   },

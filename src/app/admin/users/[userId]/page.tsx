@@ -21,7 +21,7 @@ import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { reviewCertificate } from "../certificate-actions";
 import { openSecret } from "@/lib/secret-box";
 
-export const metadata = { title: "Detail Pengguna | Swim Private Hub" };
+export const metadata = { title: "Detail Akun | Swim Private Hub" };
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -111,7 +111,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <Link href="/admin/users" className="text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-        ← Kembali ke Pengguna
+        ← Kembali ke Akun
       </Link>
 
       <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
@@ -246,7 +246,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
                 label="Rekening"
                 value={
                   // Disamarkan (keputusan Hadi 25 Sep): nomor lengkap hanya di
-                  // halaman proses pencairan, tempat admin benar-benar transfer.
+                  // halaman proses penarikan, tempat admin benar-benar transfer.
                   user.coachProfile.bankAccountNumber
                     ? `${user.coachProfile.bankName ?? "-"} · •••• ${openSecret(user.coachProfile.bankAccountNumber).slice(-4)} a.n. ${user.coachProfile.bankAccountName ?? "-"}`
                     : "Belum diisi"
@@ -395,9 +395,9 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
         {(user.role === "COACH" || user.role === "POOL_OWNER") && (
           <Card>
             <CardBody>
-              <h2 className="mb-2 text-lg font-semibold text-text">Pencairan terakhir</h2>
+              <h2 className="mb-2 text-lg font-semibold text-text">Penarikan terakhir</h2>
               {withdrawals.length === 0 ? (
-                <p className="text-sm text-text-muted">Belum pernah mengajukan pencairan.</p>
+                <p className="text-sm text-text-muted">Belum pernah mengajukan penarikan.</p>
               ) : (
                 <ul className="flex flex-col gap-2">
                   {withdrawals.map((w) => (

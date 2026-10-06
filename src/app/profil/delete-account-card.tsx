@@ -28,12 +28,12 @@ export default function DeleteAccountCard({ requestedAt, memberBalance }: { requ
         {requestedAt ? (
           <>
             <p className="text-sm text-text-muted">
-              Permintaan hapus akun dikirim{" "}
+              Pengajuan hapus akun dikirim{" "}
               {new Date(requestedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" })}
               . Admin akan memprosesnya; setelah itu kamu tidak bisa masuk lagi.
             </p>
             <Button variant="secondary" size="sm" className="mt-3" loading={pending} onClick={() => run(cancelDeletionAction)}>
-              Batalkan Permintaan
+              Batalkan Pengajuan
             </Button>
           </>
         ) : (
@@ -58,7 +58,7 @@ export default function DeleteAccountCard({ requestedAt, memberBalance }: { requ
       <ConfirmDialog
         open={open}
         title="Minta hapus akun?"
-        description="Permintaan dikirim ke admin. Selama belum diproses, kamu masih bisa membatalkannya dari halaman ini."
+        description="Pengajuan dikirim ke admin. Selama belum diproses, kamu masih bisa membatalkannya dari halaman ini."
         confirmLabel="Ya, Minta Hapus"
         loading={pending}
         onCancel={() => setOpen(false)}

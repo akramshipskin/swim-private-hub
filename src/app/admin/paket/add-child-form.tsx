@@ -27,7 +27,7 @@ export default function AddChildForm({ members }: { members: Member[] }) {
               ))}
             </Select>
           </Field>
-          <Field label="Tipe">
+          <Field label="Untuk Siapa">
             <Select
               name="type"
               value={type}

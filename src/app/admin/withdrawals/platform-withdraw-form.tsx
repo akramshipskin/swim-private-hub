@@ -30,9 +30,9 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
         Cairkan juga saldo PPN untuk disetor ke negara ({formatRupiah(Math.max(0, tax))})
       </label>
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" loading={pending}>Catat Pencairan</Button>
+        <Button type="submit" loading={pending}>Catat Penarikan</Button>
         {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
-        {state?.ok && <p role="status" className="text-sm text-success-text">Pencairan tercatat.</p>}
+        {state?.ok && <p role="status" className="text-sm text-success-text">Penarikan tercatat.</p>}
       </div>
     </form>
   );

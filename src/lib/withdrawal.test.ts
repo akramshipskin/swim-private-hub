@@ -82,7 +82,7 @@ describe("requestPoolWithdrawal", () => {
 
   it("rejects a chosen amount below the minimum or not a whole number", async () => {
     poolFindUniqueOrThrow.mockResolvedValue(okPool);
-    await expect(requestPoolWithdrawal("pool-1", 40_000)).rejects.toThrow("Minimal pencairan");
+    await expect(requestPoolWithdrawal("pool-1", 40_000)).rejects.toThrow("Minimal penarikan");
     await expect(requestPoolWithdrawal("pool-1", 0)).rejects.toThrow("tidak valid");
     expect(poolUpdateMany).not.toHaveBeenCalled();
   });
@@ -106,7 +106,7 @@ describe("requestPoolWithdrawal", () => {
 
   // CAS: kalo saldo berubah (misal kekredit sesi baru) di antara baca dan
   // updateMany, klaim gagal (count 0) dan request GAK boleh kebuat --
-  // nyegah pencairan lebih dari saldo yang beneran ada saat itu.
+  // nyegah penarikan lebih dari saldo yang beneran ada saat itu.
   it("aborts the whole request when the balance-sufficiency claim fails (race with a concurrent credit/debit)", async () => {
     poolFindUniqueOrThrow.mockResolvedValue(okPool);
     poolUpdateMany.mockResolvedValueOnce({ count: 0 });
@@ -132,13 +132,13 @@ describe("requestCoachWithdrawal", () => {
       { dependentId: "d1", name: "Budi", sessionsWithoutNote: 3 },
       { dependentId: "d2", name: "Sari", sessionsWithoutNote: 2 },
     ]);
-    await expect(requestCoachWithdrawal("coach-1")).rejects.toThrow("Pencairan ditahan: isi dulu catatan milestone untuk Budi, Sari.");
+    await expect(requestCoachWithdrawal("coach-1")).rejects.toThrow("Penarikan ditahan: isi dulu catatan milestone untuk Budi, Sari.");
     expect(getOverdueParticipants).toHaveBeenCalledWith("u-coach");
     expect(coachUpdateMany).not.toHaveBeenCalled();
     expect(withdrawalCreate).not.toHaveBeenCalled();
   });
 
-  it("pencairan kolam tidak kena aturan milestone", async () => {
+  it("penarikan kolam tidak kena aturan milestone", async () => {
     poolFindUniqueOrThrow.mockResolvedValue({ walletBalance: 100_000, bankName: "BCA", bankAccountNumber: "123", bankAccountName: "Budi" });
     await requestPoolWithdrawal("pool-1");
     expect(getOverdueParticipants).not.toHaveBeenCalled();

@@ -66,10 +66,10 @@ export default async function CoachSaldoPage() {
       </p>
       {overdue.length > 0 && (
         <div role="alert" className="mb-6 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
-          <p className="font-semibold">Pencairan ditahan sampai catatan milestone diisi</p>
+          <p className="font-semibold">Penarikan ditahan sampai catatan milestone diisi</p>
           <p className="mt-1">
             Peserta berikut sudah {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir atau lebih tanpa catatan darimu. Saldo tetap
-            tersimpan, hanya belum bisa dicairkan. Pengajuan yang sudah masuk tetap diproses.
+            tersimpan, hanya belum bisa ditarik. Pengajuan yang sudah masuk tetap diproses.
           </p>
           <ul className="mt-2 flex flex-col gap-1">
             {overdue.map((o) => (

@@ -18,8 +18,8 @@ export function EditItemForm({ id, text, sortOrder }: { id: string; text: string
     <form action={action} className="flex flex-1 flex-col gap-1">
       <div className="flex flex-wrap gap-2 sm:flex-nowrap">
         <Input name="sortOrder" type="number" min={0} max={999} defaultValue={sortOrder} aria-label="Urutan" className="w-20 shrink-0" />
-        {/* HP: teks butir satu baris penuh supaya terbaca. */}
-        <Input name="text" defaultValue={text} maxLength={200} required aria-label="Teks butir" className="min-w-0 flex-1 max-sm:order-first max-sm:basis-full" />
+        {/* HP: teks keterampilan satu baris penuh supaya terbaca. */}
+        <Input name="text" defaultValue={text} maxLength={200} required aria-label="Teks keterampilan" className="min-w-0 flex-1 max-sm:order-first max-sm:basis-full" />
         <Button type="submit" size="sm" variant="secondary" loading={pending}>Simpan</Button>
       </div>
       <Status state={state} />
@@ -40,7 +40,7 @@ export function AddItemForm() {
         <Input name="level" type="number" min={1} max={10} defaultValue={1} aria-label="Level" className="w-20" />
       </div>
       <div className="flex gap-2">
-        <Input name="text" placeholder="Teks butir baru" maxLength={200} required aria-label="Teks butir baru" className="min-w-0 flex-1" />
+        <Input name="text" placeholder="Teks keterampilan baru" maxLength={200} required aria-label="Teks keterampilan baru" className="min-w-0 flex-1" />
         <Button type="submit" size="sm" loading={pending}>Tambah</Button>
       </div>
       <Status state={state} />

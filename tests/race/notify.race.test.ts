@@ -87,10 +87,10 @@ describe("NOTIFIKASI ke admin (butuh tindakan admin)", () => {
     expect(last()?.body).toBe("Kolam Bahari (Budi Pemilik) menunggu persetujuan");
   });
 
-  it("N4: coach mengajukan pencairan -> admin aktif dapat; pemilik kolam mengajukan -> juga", async () => {
+  it("N4: coach mengajukan penarikan -> admin aktif dapat; pemilik kolam mengajukan -> juga", async () => {
     await prisma.walletTransaction.create({ data: { type: "SESSION_PAYOUT", coachProfileId: coach.coachProfile!.id, amount: 100000 } });
     expect(await as({ id: coach.id, role: "COACH", name: "Coach Uji" }, () => coachWithdraw(null, fd({ amount: "100000" })))).toEqual({ ok: true });
-    expect(await inbox()).toEqual({ [admin1.id]: ["Pengajuan pencairan baru"], [admin2.id]: ["Pengajuan pencairan baru"] });
+    expect(await inbox()).toEqual({ [admin1.id]: ["Pengajuan penarikan baru"], [admin2.id]: ["Pengajuan penarikan baru"] });
     expect(last()?.url).toBe("/admin/withdrawals");
 
     sent.length = 0;
@@ -98,16 +98,16 @@ describe("NOTIFIKASI ke admin (butuh tindakan admin)", () => {
     await prisma.walletTransaction.create({ data: { type: "SESSION_REVENUE", poolId: pool.id, amount: 200000 } });
     await prisma.poolOwnership.create({ data: { poolId: pool.id, ownerId: owner.id } });
     await as({ id: owner.id, role: "POOL_OWNER" }, () => poolWithdraw(pool.id, null, fd({ amount: "200000" })));
-    expect(await inbox()).toEqual({ [admin1.id]: ["Pengajuan pencairan baru"], [admin2.id]: ["Pengajuan pencairan baru"] });
+    expect(await inbox()).toEqual({ [admin1.id]: ["Pengajuan penarikan baru"], [admin2.id]: ["Pengajuan penarikan baru"] });
   });
 
   it("N5: member minta hapus akun -> admin aktif dapat", async () => {
     await as({ id: member.id, role: "MEMBER", name: "Member Uji" }, () => requestDeletionAction());
-    expect(await inbox()).toEqual({ [admin1.id]: ["Permintaan hapus akun"], [admin2.id]: ["Permintaan hapus akun"] });
+    expect(await inbox()).toEqual({ [admin1.id]: ["Pengajuan hapus akun"], [admin2.id]: ["Pengajuan hapus akun"] });
     expect(last()?.url).toBe(`/admin/users/${member.id}`);
   });
 
-  it("N6: coach mengusulkan butir milestone -> admin dapat; catatan biasa (bukan usulan) -> tidak ada", async () => {
+  it("N6: coach mengusulkan keterampilan milestone -> admin dapat; catatan biasa (bukan usulan) -> tidak ada", async () => {
     const pool = await mkPool();
     const { m, dep, pkg } = await mkMemberWithPackage(pool.id, coach.id);
     await prisma.dependent.update({ where: { id: dep.id }, data: { birthDate: new Date(Date.UTC(new Date().getUTCFullYear() - 9, 0, 1)) } });
@@ -117,14 +117,14 @@ describe("NOTIFIKASI ke admin (butuh tindakan admin)", () => {
     const asCoach = <T,>(fn: () => Promise<T>) => as({ id: coach.id, role: "COACH", name: "Coach Uji" }, fn);
     await asCoach(() => saveMilestoneUpdate(dep.id, null, fd({ note: "awal" })));
     expect(sent).toEqual([]);
-    await asCoach(() => addMilestoneItem(dep.id, null, fd({ text: "Butir khusus", level: "1" })));
+    await asCoach(() => addMilestoneItem(dep.id, null, fd({ text: "Keterampilan khusus", level: "1" })));
     expect(sent).toEqual([]);
-    await asCoach(() => addMilestoneItem(dep.id, null, fd({ text: "Butir usulan", level: "1", propose: "on" })));
-    expect(await inbox()).toEqual({ [admin1.id]: ["Usulan butir milestone"], [admin2.id]: ["Usulan butir milestone"] });
+    await asCoach(() => addMilestoneItem(dep.id, null, fd({ text: "Keterampilan usulan", level: "1", propose: "on" })));
+    expect(await inbox()).toEqual({ [admin1.id]: ["Usulan keterampilan milestone"], [admin2.id]: ["Usulan keterampilan milestone"] });
 
     // Admin memutuskan -> yang mengusulkan (coach) dikabari SEKALI, klik ganda tidak.
     sent.length = 0;
-    const item = await prisma.milestoneItem.findFirstOrThrow({ where: { text: "Butir usulan" } });
+    const item = await prisma.milestoneItem.findFirstOrThrow({ where: { text: "Keterampilan usulan" } });
     await as({ id: admin1.id, role: "ADMIN" }, () => reviewMilestoneProposal(item.id, true));
     await as({ id: admin1.id, role: "ADMIN" }, () => reviewMilestoneProposal(item.id, true));
     expect(await inbox()).toEqual({ [coach.id]: ["Usulan milestone disetujui"] });
@@ -144,13 +144,13 @@ describe("NOTIFIKASI ke admin (butuh tindakan admin)", () => {
 });
 
 describe("NOTIFIKASI ke coach / pemilik kolam / member", () => {
-  it("N8: admin menolak pencairan -> hanya coach yang mengajukan; admin koreksi saldo -> coach itu saja", async () => {
+  it("N8: admin menolak penarikan -> hanya coach yang mengajukan; admin koreksi saldo -> coach itu saja", async () => {
     await prisma.walletTransaction.create({ data: { type: "SESSION_PAYOUT", coachProfileId: coach.coachProfile!.id, amount: 100000 } });
     await as({ id: coach.id, role: "COACH", name: "Coach Uji" }, () => coachWithdraw(null, fd({ amount: "100000" })));
     sent.length = 0;
     const w = await prisma.withdrawalRequest.findFirstOrThrow();
     await as({ id: admin1.id, role: "ADMIN" }, () => rejectWithdrawal(null, fd({ withdrawalId: w.id })));
-    expect(await inbox()).toEqual({ [coach.id]: ["Pencairan tidak diproses"] });
+    expect(await inbox()).toEqual({ [coach.id]: ["Penarikan tidak diproses"] });
     expect(last()?.url).toBe("/coach/saldo");
 
     sent.length = 0;

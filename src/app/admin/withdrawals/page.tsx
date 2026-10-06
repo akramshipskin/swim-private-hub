@@ -19,7 +19,7 @@ const STATUS_FILTERS = {
 } as const;
 type StatusKey = keyof typeof STATUS_FILTERS;
 
-export const metadata = { title: "Pencairan Saldo | Swim Private Hub" };
+export const metadata = { title: "Tarik Saldo | Swim Private Hub" };
 
 export default async function AdminWithdrawalsPage({
   searchParams,
@@ -64,9 +64,9 @@ export default async function AdminWithdrawalsPage({
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-text">Pencairan Saldo</h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-text">Tarik Saldo</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Permintaan pencairan saldo dari kolam &amp; coach ke rekening mereka. Transfer manual lewat m-banking, lalu tandai
+        Permintaan penarikan saldo dari kolam &amp; coach ke rekening mereka. Transfer manual lewat m-banking, lalu tandai
         dibayar. Pengajuan yang ditolak otomatis mengembalikan saldo.
       </p>
 
@@ -75,14 +75,14 @@ export default async function AdminWithdrawalsPage({
           <div>
             <h2 className="text-lg font-semibold text-text">Saldo Platform</h2>
             <p className="text-sm text-text-muted">
-              Komisi platform dari setiap sesi, sudah dipisah dari PPN (11% sejak 30 Sep 2026, sebelumnya 12%). Dana sesi baru bisa dicairkan setelah ditahan{" "}
-              {PLATFORM_HOLD_DAYS} hari (masa member melapor). Catat di sini setiap kali saldo dicairkan dari akun Midtrans, lengkap
+              Komisi platform dari setiap sesi, sudah dipisah dari PPN (11% sejak 30 Sep 2026, sebelumnya 12%). Dana sesi baru bisa ditarik setelah ditahan{" "}
+              {PLATFORM_HOLD_DAYS} hari (masa member melapor). Catat di sini setiap kali saldo ditarik dari akun Midtrans, lengkap
               dengan bukti transfer.
             </p>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="rounded-xl bg-surface-muted p-3">
-              <p className="text-sm text-text-muted">Pendapatan bersih bisa dicairkan</p>
+              <p className="text-sm text-text-muted">Pendapatan bersih bisa ditarik</p>
               <p className="text-2xl font-bold text-text">{formatRupiah(Math.max(0, platform.availableRevenue))}</p>
               <p className="text-xs text-text-subtle">Total termasuk yang masih ditahan: {formatRupiah(platform.revenue)}</p>
             </div>
@@ -97,7 +97,7 @@ export default async function AdminWithdrawalsPage({
           <PlatformWithdrawForm revenue={platform.availableRevenue} tax={platform.availableTax} />
           {platformHistory.length > 0 && (
             <div>
-              <p className="mb-1 text-sm font-semibold text-text">Pencairan terakhir</p>
+              <p className="mb-1 text-sm font-semibold text-text">Penarikan terakhir</p>
               <ul className="flex flex-col divide-y divide-border text-sm">
                 {platformHistory.map((h) => (
                   <li key={h.id} className="flex flex-wrap justify-between gap-2 py-1.5">
@@ -117,7 +117,7 @@ export default async function AdminWithdrawalsPage({
         </CardBody>
       </Card>
 
-      <h2 className="mt-8 text-lg font-semibold text-text">Pencairan kolam &amp; coach</h2>
+      <h2 className="mt-8 text-lg font-semibold text-text">Penarikan kolam &amp; coach</h2>
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {(["waiting", "paid", "failed"] as const).map((k) => {
           const rows = total(STATUS_FILTERS[k].statuses);

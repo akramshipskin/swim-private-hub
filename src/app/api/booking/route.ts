@@ -58,7 +58,7 @@ export async function POST(request: Request) {
         select: { poolId: true, coachId: true, date: true, startTime: true, endTime: true, pool: { select: { isActive: true, openTime: true, closeTime: true, dailyCapacity: true } } },
       });
       if (!slot) {
-        throw new BookingError("Slot tidak ditemukan.", 404);
+        throw new BookingError("Jadwal tidak ditemukan.", 404);
       }
       // Coach yang dinonaktifkan admin: slotnya tidak bisa dibooking (keputusan
       // Hadi D2). Baris coach dikunci FOR SHARE sampai transaksi selesai --
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
           );
         }
         throw new BookingError(
-          "Paket ini tidak bisa dipakai untuk jam ini: paketnya untuk kolam atau coach lain, sisa sesi habis, belum aktif, atau sudah kedaluwarsa.",
+          "Paket ini tidak bisa dipakai untuk jam ini: paketnya untuk kolam atau coach lain, sisa sesi habis, belum aktif, atau masa berlakunya sudah berakhir.",
           409
         );
       }
@@ -151,7 +151,7 @@ export async function POST(request: Request) {
 
       if (claim.count === 0) {
         throw new BookingError(
-          "Slot ini sudah tidak bisa dibooking (baru saja diambil member lain, atau jamnya sudah lewat). Pilih slot lain.",
+          "Jam ini sudah tidak bisa dibooking (baru saja diambil member lain, atau jamnya sudah lewat). Pilih jam lain.",
           409
         );
       }
@@ -196,7 +196,7 @@ export async function POST(request: Request) {
     // kalau ada race condition yang lolos dari conditional update di atas.
     if ((err as { code?: string })?.code === "P2002") {
       return Response.json(
-        { error: "Slot ini baru saja diambil member lain, coba pilih slot lain." },
+        { error: "Jam ini baru saja diambil member lain, coba pilih jam lain." },
         { status: 409 }
       );
     }

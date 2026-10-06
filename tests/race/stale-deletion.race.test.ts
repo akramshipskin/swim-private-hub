@@ -27,7 +27,7 @@ async function pendingPkg(createdHoursAgo: number) {
   return { pkg, pay, m };
 }
 
-describe("Kedaluwarsa otomatis pembayaran Menunggu (2A)", () => {
+describe("Berakhir otomatis pembayaran Menunggu (2A)", () => {
   it("S1: Menunggu tanpa saldo yang lewat batas -> pembayaran dan paket kedaluwarsa; yang masih berjalan tidak disentuh", async () => {
     const old = await pendingPkg(30); const fresh = await pendingPkg(1);
     expect(await releaseStalePayments()).toBe(1);

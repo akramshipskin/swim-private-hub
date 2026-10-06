@@ -5,11 +5,11 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/require-role";
 import { MILESTONE_GROUPS, type MilestoneGroup } from "@/lib/milestone";
 
-// Edit butir STANDAR milestone (dependentId null) oleh admin -- H6/P4.
-// Sengaja tidak bisa memindah kelompok/level butir yang sudah ada: pencapaian
-// peserta menempel ke id butir, jadi memindahnya diam-diam mengacak progres
-// level peserta yang sedang berjalan. Pindah = nonaktifkan + tambah butir baru.
-// Butir nonaktif tidak dihitung lagi; level yang sudah selesai (dan
+// Edit keterampilan STANDAR milestone (dependentId null) oleh admin -- H6/P4.
+// Sengaja tidak bisa memindah kelompok/level keterampilan yang sudah ada: pencapaian
+// peserta menempel ke id keterampilan, jadi memindahnya diam-diam mengacak progres
+// level peserta yang sedang berjalan. Pindah = nonaktifkan + tambah keterampilan baru.
+// Keterampilan nonaktif tidak dihitung lagi; level yang sudah selesai (dan
 // sertifikatnya) tidak berubah.
 
 export type ItemActionState = { error?: string; success?: boolean } | null;
@@ -19,8 +19,8 @@ const MAX_LEVEL = 10;
 
 function readText(formData: FormData) {
   const text = formData.get("text")?.toString().trim() ?? "";
-  if (text.length < 3) return { error: "Teks butir minimal 3 karakter." };
-  if (text.length > MAX_TEXT) return { error: `Teks butir maksimal ${MAX_TEXT} karakter.` };
+  if (text.length < 3) return { error: "Teks keterampilan minimal 3 karakter." };
+  if (text.length > MAX_TEXT) return { error: `Teks keterampilan maksimal ${MAX_TEXT} karakter.` };
   return { text };
 }
 
@@ -41,7 +41,7 @@ export async function updateStandardItem(itemId: string, _prev: ItemActionState,
   const sortOrder = readInt(formData, "sortOrder", 0, 999);
   if (sortOrder === null) return { error: "Urutan harus angka 0–999." };
   const r = await prisma.milestoneItem.updateMany({ where: { id: itemId, dependentId: null }, data: { text: t.text, sortOrder } });
-  if (r.count === 0) return { error: "Butir standar tidak ditemukan." };
+  if (r.count === 0) return { error: "Keterampilan standar tidak ditemukan." };
   return done();
 }
 

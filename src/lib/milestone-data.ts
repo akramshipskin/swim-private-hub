@@ -30,7 +30,7 @@ export async function coachTeachesDependent(coachUserId: string, dependentId: st
   return n > 0;
 }
 
-// Menulis milestone (catatan, butir, sertifikat) baru boleh setelah minimal 1
+// Menulis milestone (catatan, keterampilan, sertifikat) baru boleh setelah minimal 1
 // sesi peserta ini dengan coach tersebut ditandai Hadir (Hadi 3 Okt malam, #8A).
 export async function coachHasTaughtDependent(coachUserId: string, dependentId: string) {
   const n = await prisma.booking.count({
@@ -39,7 +39,7 @@ export async function coachHasTaughtDependent(coachUserId: string, dependentId: 
   return n > 0;
 }
 
-// Butir yang berlaku untuk peserta ini: standar aktif + butir tambahan coach
+// Keterampilan yang berlaku untuk peserta ini: standar aktif + keterampilan tambahan coach
 // khusus peserta ini.
 export function visibleItemsWhere(dependentId: string) {
   return { isActive: true, OR: [{ dependentId: null }, { dependentId }] };

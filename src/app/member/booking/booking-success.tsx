@@ -55,7 +55,7 @@ export function BookingSuccess({
         tabIndex={-1}
         className="text-3xl font-semibold tracking-tight text-text focus:outline-none"
       >
-        Slot terkunci untukmu
+        Jam terkunci untukmu
       </h2>
 
       <div className="flex flex-col gap-1.5 rounded-2xl border border-border bg-surface p-5">

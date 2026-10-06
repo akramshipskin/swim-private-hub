@@ -164,7 +164,7 @@ describe("SALDO PLATFORM & PENCAIRAN", () => {
     spread("E4", sebaran);
   });
 
-  it("E5: admin menolak pencairan lama (saldo balik) pas coach mengajukan pencairan baru (15 putaran) -> saldo + pengajuan yang berjalan selalu = Rp100.000, tidak minus", async () => {
+  it("E5: admin menolak penarikan lama (saldo balik) pas coach mengajukan penarikan baru (15 putaran) -> saldo + pengajuan yang berjalan selalu = Rp100.000, tidak minus", async () => {
     const sebaran: Record<string, number> = {};
     for (let i = 0; i < 15; i++) {
       await reset();
@@ -298,7 +298,7 @@ describe("AKUN & SESI LOGIN", () => {
 });
 
 describe("JADWAL, NOTIFIKASI, CHAT", () => {
-  it("E9: coach klik 'Tambah Slot' 4x barengan untuk jam yang sama -> tepat 3 slot (08-11), tidak ada error 500", async () => {
+  it("E9: coach klik 'Buka Jam Kosong' 4x barengan untuk jam yang sama -> tepat 3 slot (08-11), tidak ada error 500", async () => {
     const pool = await mkPool({ hours: ALL_DAY }); const coach = await mkUser("COACH");
     await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
     const date = new Date(Date.now() + 3 * 86400e3).toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });

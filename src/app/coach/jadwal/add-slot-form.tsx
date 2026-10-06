@@ -61,7 +61,7 @@ export default function AddSlotForm({ pools }: { pools: PoolOption[] }) {
             <TimeSelect name="endTime" label="Jam Selesai" defaultValue="16:00" hourOnly />
           </div>
           <Button type="submit" loading={pending}>
-            Tambah Slot
+            Buka Jam Kosong
           </Button>
         </form>
         {state?.error && (

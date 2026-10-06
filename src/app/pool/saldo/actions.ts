@@ -70,7 +70,7 @@ export async function requestWithdrawal(
     const request = await requestPoolWithdrawal(pool.id, Number(formData.get("amount")));
     await notifyAdminsWithdrawalRequested(pool.name, request.amount);
   } catch (err) {
-    return { error: userErrorMessage(err, "Gagal mengajukan pencairan. Coba lagi.") };
+    return { error: userErrorMessage(err, "Gagal mengajukan penarikan. Coba lagi.") };
   }
 
   revalidatePath("/pool/saldo");
