@@ -406,3 +406,6 @@ Tetap menunggu Hadi: GitHub Actions `race`, secret backup R2/Supabase, tes produ
 Dihapus dari daftar: setuju ulang Kebijakan Privasi (belum ada pengguna lama), paksa ganti password coach/pemilik kolam (tidak dilakukan), tes Meta Ads (urusan Hadi).
 
 Update: PPN diputuskan 11% (30 Sep malam), sudah di kode. Akuntan tetap perlu memastikan mekanisme setor dan pajak komisi afiliasi.
+
+## 14. Tambahan 7 Okt 2026
+- Pengingat sebelum sesi untuk member dan coach (notifikasi HP + lonceng lewat push.ts; pemicu lewat cron atau jadwal). Hadi: penting. Dikerjakan setelah dokumen perencanaan; waktu pengingat (contoh H-1 dan beberapa jam sebelum) diputuskan di alur aplikasi. Menyentuh jadwal dan notifikasi, bukan uang.

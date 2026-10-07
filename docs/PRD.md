@@ -1,6 +1,6 @@
 # PRD Swim Private Hub (SPH): apa yang dibuat dan kenapa
 
-Status: DRAF 2 untuk ditinjau Hadi (7 Okt 2026), setelah Hadi minta periksa ulang blindspot. Dokumen perencanaan pertama dari enam (PRD, alur aplikasi, brief desain, TRD, skema data, rencana kerja). Dikerjakan satu per satu.
+Status: DRAF 3 (7 Okt 2026): empat pertanyaan draf 2 sudah dijawab Hadi; menunggu konfirmasi bahwa PRD disetujui. Dokumen perencanaan pertama dari enam (PRD, alur aplikasi, brief desain, TRD, skema data, rencana kerja). Dikerjakan satu per satu.
 
 Cara baca: dokumen ini menjawab APA yang dibuat dan UNTUK SIAPA. Cara membuatnya ada di TRD (belum ditulis). Rumus dan angka uang TIDAK ditulis ulang di sini; rujukannya `docs/aturan-bisnis-saat-ini.md`, `src/lib/policy.ts`, `src/lib/pricing.ts`. Bahan: keputusan Hadi (`docs/KEPUTUSAN.md`), sesi office hours 29 Sep (`docs/designs/validasi-permintaan-dan-kejujuran-landing.md`), pesan merek (`brand-kit/MESSAGING.md`), landing, dan kode per 7 Okt 2026. Bagian yang BUKAN keputusan Hadi ditandai **[usulan]** atau **[belum diputuskan]**.
 
@@ -12,7 +12,7 @@ SPH adalah aplikasi les renang privat. Orang tua (atau orang dewasa yang belajar
 - **Tujuan utama (Hadi 7 Okt):** aplikasi dipakai oleh sebanyak mungkin orang. Angka target belum dihitung (lihat bagian 9).
 - Posisi: SPH adalah **perantara** (marketplace) yang mencari ketiga sisi sekaligus: kolam, coach, dan member (keputusan 29 Sep). SPH memegang hubungan pelanggan dan semua uang lewat SPH. Bukan pemilik kolam, bukan pemberi kerja coach.
 - Bentuk les: **1 coach : 1 peserta, 60 menit, di kolam umum** (bukan sewa lintasan atau klub). Tiket masuk kolam sudah termasuk dalam harga.
-- Wilayah awal (Hadi 7 Okt): **Cianjur, Jakarta, Bandung, Surabaya.** Aplikasi sudah mendukung 10 kota; kota di luar empat itu masuk daftar tunggu.
+- Wilayah awal (Hadi 7 Okt): **Cianjur, Jakarta, Bandung, Surabaya.** Aplikasi tetap menerima pendaftaran dari 10 kota (Hadi 7 Okt); kota di luar empat itu masuk daftar tunggu dan datanya jadi petunjuk kota berikutnya.
 - Posisi pasar: belum ditemukan aplikasi sejenis dengan tiga peran seperti ini, tetapi itu bukan bukti; "aplikasi les renang privat" dipakai sebagai nama kategori, bukan klaim "pertama" (MESSAGING.md bagian 2).
 - Tahap sekarang: pengembangan. Semua akun di production dummy, pembayaran sandbox Midtrans, belum ada member, coach, atau kolam asli yang terdaftar. Belum ada kabar iklan SPH jalan.
 
@@ -92,7 +92,7 @@ Status dicek dari kode dan STATUS.md per 7 Okt 2026. "Live" = tayang di producti
 | 14 | Notifikasi HP dan lonceng dalam aplikasi (riwayat 90 hari) | Live |
 | 15 | Hapus akun (anonimkan), diblokir saat ada pembayaran berjalan | Live |
 | 16 | Email admin, chat bantuan, testimoni, Meta Pixel + Conversions API | Live; event Meta belum dicek |
-| 17 | **Pengingat sebelum sesi untuk member dan coach** | **Tidak ditemukan di kode** (dicek lewat pencarian kata; belum diuji). Usulan: lihat Pertanyaan |
+| 17 | **Pengingat sebelum sesi untuk member dan coach** | **Belum ada** (tidak ditemukan di kode; dicek lewat pencarian kata). **Diputuskan dibuat (Hadi 7 Okt, "penting")**; masuk daftar kerja, dikerjakan setelah dokumen perencanaan. Waktu pengingat (contoh H-1) diputuskan di alur aplikasi |
 | 18 | Reset password mandiri lewat email | Belum; menunggu bukti email production terkirim |
 | 19 | Drop kolom database model lama | Belum; butuh Hadi |
 
@@ -142,8 +142,8 @@ Tujuan utama dari Hadi: dipakai sebanyak mungkin orang. Angka target **belum dip
 | Ukuran | Arti | Sumber data |
 |---|---|---|
 | Sesi Hadir per bulan (per kota) | Berapa les benar-benar terjadi; dasar pendapatan semua pihak | Database (tanda Hadir); layar Laporan Kehadiran |
-| Member aktif | **[belum diputuskan definisinya]**; usulan: punya paket aktif atau minimal 1 sesi Hadir dalam 30 hari | Database; belum dicek apakah ada layar khusus angka ini |
-| Coach dan kolam aktif per kota | Coach yang tampil (punya jam kosong) dan kolam aktif; syarat kota siap diiklankan | Admin: Peminat per Kota, Coach Tanpa Jadwal |
+| Member aktif | Punya paket aktif atau minimal 1 sesi Hadir dalam 30 hari (Hadi 7 Okt) | Database; belum dicek apakah ada layar khusus angka ini |
+| Coach dan kolam aktif per kota | Coach yang tampil (punya jam kosong) dan kolam aktif. **Kota siap diiklankan ke member bila minimal 2 kolam dan 5 coach tampil** (Hadi 7 Okt) | Admin: Peminat per Kota, Coach Tanpa Jadwal |
 | Pembelian paket kedua | Member yang membeli lagi; tanda sistem berguna dan tidak kabur ke WhatsApp | Database (paket per member); belum ada layarnya |
 
 Alat ukur iklan: Meta Pixel + Conversions API (event belum dicek), biaya per pendaftar dari Meta Ads.
@@ -163,18 +163,15 @@ Alat ukur iklan: Meta Pixel + Conversions API (event belum dicek), biaya per pen
 | Coach tidak membuka jadwal setelah member bayar | Penjaga harian, ganti coach gratis hari ke-10, catatan pelanggaran | Belum terbukti dengan member asli |
 | Dua pihak berebut jam yang sama | Klaim slot di server + 209 tes balapan | Tidak ada |
 | Saldo salah hitung | Buku besar (ledger) sebagai sumber kebenaran, audit buku besar | Audit production butuh Hadi |
-| Peserta booking lalu tidak hadir (pendapatan kolam dan coach hilang) | Aturan 50% coach, kolam Rp0 | Tidak ada pengingat sebelum sesi (butir 17) |
+| Peserta booking lalu tidak hadir (pendapatan kolam dan coach hilang) | Aturan 50% coach, kolam Rp0 | Belum ada pengingat sebelum sesi (butir 17, akan dibuat) |
 | Admin satu orang menjadi hambatan | Penarikan lewat 7 hari kerja ditandai | Admin kedua: dipicu 100 member aktif |
 | Janji landing tidak sama dengan sistem | Pemeriksaan keselarasan 6 Okt (38 temuan, diperbaiki) | Cek ulang saat iklan jalan |
-| Belum ada kolam, coach, member asli | Strip statistik landing hanya akun asli | Pasokan di 4 kota belum dicari |
+| Belum ada kolam, coach, member asli | Strip statistik landing hanya akun asli | Pasokan di 4 kota belum dicari; iklan member baru jalan di kota yang memenuhi syarat 2 kolam + 5 coach |
 
-## 12. Pertanyaan terbuka untuk Hadi (diulang di laporan chat)
-
-1. Definisi "member aktif" (bagian 9).
-2. Aplikasi tetap menerima pendaftaran dari 10 kota, atau dibatasi ke 4 kota awal?
-3. Kriteria sebuah kota siap diiklankan ke member.
-4. Pengingat sebelum sesi: dibuat atau tidak.
+## 12. Pertanyaan terbuka
+Tidak ada. Empat pertanyaan draf 2 dijawab Hadi 7 Okt (semua A): definisi member aktif, 10 kota tetap menerima pendaftaran, syarat kota siap diiklankan, pengingat sebelum sesi dibuat.
 
 ## Riwayat dokumen
 - 7 Okt 2026: draf 1 (Claude, Sonnet 5.5). Bahan: aturan-bisnis-saat-ini, KEPUTUSAN, HANDOFF-AGEN, MESSAGING, kode.
 - 7 Okt 2026: draf 2 setelah Hadi minta periksa blindspot. Ditambah: nilai jam sepi untuk kolam (sebelumnya kelewat), bagian milestone lengkap (sebelumnya hanya satu baris), strategi dan risiko terbesar (permintaan belum terbukti, pasokan dulu, pindah ke WhatsApp, ekonomi per paket, keselamatan anak), wilayah awal 4 kota, pemicu admin kedua 100 member aktif, ukuran keberhasilan awal, temuan "tidak ada pengingat sebelum sesi". Diperbaiki: baris "iklan belum jalan" (tidak ada dasarnya), masalah kolam yang tadinya gue tebak ("tiket tercampur").
+- 7 Okt 2026: draf 3. Jawaban 4 pertanyaan dimasukkan; pengingat sebelum sesi dicatat sebagai akan dibuat.
