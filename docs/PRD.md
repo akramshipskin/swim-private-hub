@@ -1,6 +1,6 @@
 # PRD Swim Private Hub (SPH): apa yang dibuat dan kenapa
 
-Status: DRAF 3 (7 Okt 2026): empat pertanyaan draf 2 sudah dijawab Hadi; menunggu konfirmasi bahwa PRD disetujui. Dokumen perencanaan pertama dari enam (PRD, alur aplikasi, brief desain, TRD, skema data, rencana kerja). Dikerjakan satu per satu.
+Status: DRAF 3 revisi (7 Okt 2026): empat pertanyaan draf 2 sudah dijawab Hadi, lalu seluruh klaim PRD dicocokkan ke kode (hasil di Riwayat dokumen). Menunggu persetujuan Hadi. Dokumen perencanaan pertama dari enam (PRD, alur aplikasi, brief desain, TRD, skema data, rencana kerja). Dikerjakan satu per satu.
 
 Cara baca: dokumen ini menjawab APA yang dibuat dan UNTUK SIAPA. Cara membuatnya ada di TRD (belum ditulis). Rumus dan angka uang TIDAK ditulis ulang di sini; rujukannya `docs/aturan-bisnis-saat-ini.md`, `src/lib/policy.ts`, `src/lib/pricing.ts`. Bahan: keputusan Hadi (`docs/KEPUTUSAN.md`), sesi office hours 29 Sep (`docs/designs/validasi-permintaan-dan-kejujuran-landing.md`), pesan merek (`brand-kit/MESSAGING.md`), landing, dan kode per 7 Okt 2026. Bagian yang BUKAN keputusan Hadi ditandai **[usulan]** atau **[belum diputuskan]**.
 
@@ -40,7 +40,7 @@ Kekhawatiran Hadi yang jadi dasar aturan: coach "coba-coba" lalu tidak buka jadw
 
 ## 4. Pengguna dan peran
 
-Daftar halaman lengkap per peran: `docs/cakupan-halaman.md` (59 halaman).
+Daftar halaman lengkap per peran: `docs/cakupan-halaman.md` (daftar itu dibuat 1 Okt dan menulis 59; hitungan kode 7 Okt: 69 halaman dan 20 rute API, daftarnya perlu diperbarui).
 
 ### 4.1 Member (orang tua / dewasa belajar sendiri)
 - Daftar dengan kota; satu akun punya beberapa peserta ("Saya" = dirinya sendiri), tanggal lahir peserta wajib (menentukan kelompok umur milestone).
@@ -89,12 +89,14 @@ Status dicek dari kode dan STATUS.md per 7 Okt 2026. "Live" = tayang di producti
 | 11 | Ganti coach lewat pengajuan, ganti coach gratis hari ke-10, catatan pelanggaran coach | Live |
 | 12 | Penjaga jadwal harian (cron 06.00 WIB) | Live; log cron belum dicek Hadi |
 | 13 | Afiliasi: kode coach/kolam, komisi 50% biaya layanan bersih | Live |
-| 14 | Notifikasi HP dan lonceng dalam aplikasi (riwayat 90 hari) | Live |
+| 14 | Notifikasi HP, lonceng dalam aplikasi (riwayat 90 hari), dan bisa dipasang di layar utama HP seperti aplikasi (PWA) | Live; pemasangan di HP asli belum dicek |
 | 15 | Hapus akun (anonimkan), diblokir saat ada pembayaran berjalan | Live |
 | 16 | Email admin, chat bantuan, testimoni, Meta Pixel + Conversions API | Live; event Meta belum dicek |
 | 17 | **Pengingat sebelum sesi untuk member dan coach** | **Belum ada** (tidak ditemukan di kode; dicek lewat pencarian kata). **Diputuskan dibuat (Hadi 7 Okt, "penting")**; masuk daftar kerja, dikerjakan setelah dokumen perencanaan. Waktu pengingat (contoh H-1) diputuskan di alur aplikasi |
-| 18 | Reset password mandiri lewat email | Belum; menunggu bukti email production terkirim |
+| 18 | Reset password mandiri lewat email | Belum; sekarang lewat admin (lewat WhatsApp). Menunggu bukti email production terkirim |
 | 19 | Drop kolom database model lama | Belum; butuh Hadi |
+
+**Arti "Live" di tabel:** kodenya sudah tayang dan lulus tes otomatis. Yang BELUM terbukti di dunia nyata (STATUS.md): HP asli dan Safari, notifikasi HP, unggah foto/sertifikat ke penyimpanan asli, email, pembayaran asli sampai paket aktif, buku besar production.
 
 ## 6. Milestone (perkembangan peserta)
 
@@ -116,10 +118,10 @@ Hanya prinsipnya. Rumus, angka, dan contoh: `docs/aturan-bisnis-saat-ini.md`.
 2. **Uang dibagi saat sesi benar-benar terjadi** (tanda Hadir), bukan saat bayar. Tidak hadir: coach 50% dari bagiannya, kolam Rp0.
 3. **Satu paket, satu coach, satu kolam.** Tidak ada eceran. Ganti coach lewat pengajuan; gratis bila coach tidak membuka jadwal sampai hari ke-10.
 4. **Server yang menjaga aturan**, bukan tampilan: booking, saldo, hak akses dicek di server dan tahan terhadap dua permintaan bersamaan.
-5. **Pajak:** PPh final 0,5% dipotong dari bagian coach/kolam sebagai titipan (disetor SPH); PPN 11% sudah di dalam biaya layanan. NPWP coach urusan coach.
+5. **Pajak:** PPh final 0,5% dipotong dari bagian coach/kolam sebagai titipan (disetor SPH), kecuali mitra yang menyerahkan surat pernyataan omzet di bawah Rp500 juta setahun (tidak dipotong sejak surat diterima); PPN 11% sudah di dalam biaya layanan. NPWP coach urusan coach.
 6. **Perlindungan member:** paket tidak diperpanjang bila coach lalai; jatah batal per paket; sesi coba 7 hari; kehadiran bisa dilaporkan salah dalam 3 hari.
 7. **Perlindungan mitra:** perjanjian coach dan MOU kolam disetujui lewat centang; catatan pelanggaran coach per kejadian; 3 pelanggaran dalam 6 bulan = admin menilai.
-8. **Janji ke publik hanya yang bisa dibuktikan** (MESSAGING.md bagian 1): tanpa "terbaik", tanpa angka yang bukan dari database, tanpa janji hasil renang atau jumlah member untuk kolam dan coach. Strip statistik dan testimoni landing hanya dari data asli.
+8. **Janji ke publik hanya yang bisa dibuktikan** (MESSAGING.md bagian 1): tanpa "terbaik", tanpa angka yang bukan dari database, tanpa janji hasil renang atau jumlah member untuk kolam dan coach. Testimoni landing hanya yang asli dan tersembunyi bila belum ada. Strip statistik baru tampil bila member minimal 20; hitungan coach dan kolamnya tidak memasukkan akun contoh. **Tetapi** kartu coach dan kolam di landing (maksimal 5 masing-masing) diisi akun contoh bila yang asli kurang; label "contoh" pada kartu itu tidak ditemukan (dicek lewat pencarian kata, belum dilihat di browser). Lihat Pertanyaan 1.
 
 ## 8. Di luar cakupan (sudah diputuskan TIDAK dibuat)
 
@@ -166,12 +168,13 @@ Alat ukur iklan: Meta Pixel + Conversions API (event belum dicek), biaya per pen
 | Peserta booking lalu tidak hadir (pendapatan kolam dan coach hilang) | Aturan 50% coach, kolam Rp0 | Belum ada pengingat sebelum sesi (butir 17, akan dibuat) |
 | Admin satu orang menjadi hambatan | Penarikan lewat 7 hari kerja ditandai | Admin kedua: dipicu 100 member aktif |
 | Janji landing tidak sama dengan sistem | Pemeriksaan keselarasan 6 Okt (38 temuan, diperbaiki) | Cek ulang saat iklan jalan |
-| Belum ada kolam, coach, member asli | Strip statistik landing hanya akun asli | Pasokan di 4 kota belum dicari; iklan member baru jalan di kota yang memenuhi syarat 2 kolam + 5 coach |
+| Belum ada kolam, coach, member asli | Strip statistik landing tersembunyi di bawah 20 member dan tidak menghitung akun contoh; kartu landing masih bisa menampilkan akun contoh (bagian 7, butir 8) | Pasokan di 4 kota belum dicari; iklan member baru jalan di kota yang memenuhi syarat 2 kolam + 5 coach |
 
 ## 12. Pertanyaan terbuka
-Tidak ada. Empat pertanyaan draf 2 dijawab Hadi 7 Okt (semua A): definisi member aktif, 10 kota tetap menerima pendaftaran, syarat kota siap diiklankan, pengingat sebelum sesi dibuat.
+1. Kartu coach dan kolam contoh di landing saat iklan jalan: diberi label "contoh", disembunyikan, atau dibiarkan? (butir 8 bagian 7)
 
 ## Riwayat dokumen
 - 7 Okt 2026: draf 1 (Claude, Sonnet 5.5). Bahan: aturan-bisnis-saat-ini, KEPUTUSAN, HANDOFF-AGEN, MESSAGING, kode.
 - 7 Okt 2026: draf 2 setelah Hadi minta periksa blindspot. Ditambah: nilai jam sepi untuk kolam (sebelumnya kelewat), bagian milestone lengkap (sebelumnya hanya satu baris), strategi dan risiko terbesar (permintaan belum terbukti, pasokan dulu, pindah ke WhatsApp, ekonomi per paket, keselamatan anak), wilayah awal 4 kota, pemicu admin kedua 100 member aktif, ukuran keberhasilan awal, temuan "tidak ada pengingat sebelum sesi". Diperbaiki: baris "iklan belum jalan" (tidak ada dasarnya), masalah kolam yang tadinya gue tebak ("tiket tercampur").
 - 7 Okt 2026: draf 3. Jawaban 4 pertanyaan dimasukkan; pengingat sebelum sesi dicatat sebagai akan dibuat.
+- 7 Okt 2026: pencocokan klaim ke kode setelah Hadi minta sweeping draf 3. Cocok: konstanta uang dan waktu, paket 4/8 (60/90 hari, batal 2/4), sesi coba 7 hari, syarat tampil 4 jam/14 hari, penjaga jadwal 2/10 hari dan 3 pelanggaran/6 bulan, 10 kota, persetujuan admin coach/kolam, 4 kelompok umur dan 13 level milestone, penahanan penarikan karena milestone, akses milestone, kota dan tanggal lahir wajib saat daftar, pengingat sesi memang belum ada (cron hanya satu: harian). Diperbaiki: jumlah halaman 59 menjadi 69, pengecualian PPh 0,5% (surat omzet), catatan arti "Live", PWA, reset password lewat admin, klaim landing "hanya akun asli" (kartu contoh masih tampil).
