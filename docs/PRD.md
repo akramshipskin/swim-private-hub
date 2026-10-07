@@ -1,6 +1,6 @@
 # PRD Swim Private Hub (SPH): apa yang dibuat dan kenapa
 
-Status: DRAF 3 revisi (7 Okt 2026): empat pertanyaan draf 2 sudah dijawab Hadi, lalu seluruh klaim PRD dicocokkan ke kode (hasil di Riwayat dokumen). Menunggu persetujuan Hadi. Dokumen perencanaan pertama dari enam (PRD, alur aplikasi, brief desain, TRD, skema data, rencana kerja). Dikerjakan satu per satu.
+Status: DISETUJUI Hadi 7 Okt 2026 (draf 3 revisi). Seluruh klaim sudah dicocokkan ke kode (hasil di Riwayat dokumen). Perubahan berikutnya dicatat di Riwayat dokumen dan di docs/KEPUTUSAN.md. Dokumen perencanaan pertama dari enam (PRD, alur aplikasi, brief desain, TRD, skema data, rencana kerja). Dikerjakan satu per satu.
 
 Cara baca: dokumen ini menjawab APA yang dibuat dan UNTUK SIAPA. Cara membuatnya ada di TRD (belum ditulis). Rumus dan angka uang TIDAK ditulis ulang di sini; rujukannya `docs/aturan-bisnis-saat-ini.md`, `src/lib/policy.ts`, `src/lib/pricing.ts`. Bahan: keputusan Hadi (`docs/KEPUTUSAN.md`), sesi office hours 29 Sep (`docs/designs/validasi-permintaan-dan-kejujuran-landing.md`), pesan merek (`brand-kit/MESSAGING.md`), landing, dan kode per 7 Okt 2026. Bagian yang BUKAN keputusan Hadi ditandai **[usulan]** atau **[belum diputuskan]**.
 
@@ -121,7 +121,7 @@ Hanya prinsipnya. Rumus, angka, dan contoh: `docs/aturan-bisnis-saat-ini.md`.
 5. **Pajak:** PPh final 0,5% dipotong dari bagian coach/kolam sebagai titipan (disetor SPH), kecuali mitra yang menyerahkan surat pernyataan omzet di bawah Rp500 juta setahun (tidak dipotong sejak surat diterima); PPN 11% sudah di dalam biaya layanan. NPWP coach urusan coach.
 6. **Perlindungan member:** paket tidak diperpanjang bila coach lalai; jatah batal per paket; sesi coba 7 hari; kehadiran bisa dilaporkan salah dalam 3 hari.
 7. **Perlindungan mitra:** perjanjian coach dan MOU kolam disetujui lewat centang; catatan pelanggaran coach per kejadian; 3 pelanggaran dalam 6 bulan = admin menilai.
-8. **Janji ke publik hanya yang bisa dibuktikan** (MESSAGING.md bagian 1): tanpa "terbaik", tanpa angka yang bukan dari database, tanpa janji hasil renang atau jumlah member untuk kolam dan coach. Testimoni landing hanya yang asli dan tersembunyi bila belum ada. Strip statistik baru tampil bila member minimal 20; hitungan coach dan kolamnya tidak memasukkan akun contoh. **Tetapi** kartu coach dan kolam di landing (maksimal 5 masing-masing) diisi akun contoh bila yang asli kurang; label "contoh" pada kartu itu tidak ditemukan (dicek lewat pencarian kata, belum dilihat di browser). Lihat Pertanyaan 1.
+8. **Janji ke publik hanya yang bisa dibuktikan** (MESSAGING.md bagian 1): tanpa "terbaik", tanpa angka yang bukan dari database, tanpa janji hasil renang atau jumlah member untuk kolam dan coach. Testimoni landing hanya yang asli dan tersembunyi bila belum ada. Strip statistik baru tampil bila member minimal 20; hitungan coach dan kolamnya tidak memasukkan akun contoh. **Tetapi** kartu coach dan kolam di landing (maksimal 5 masing-masing) diisi akun contoh bila yang asli kurang; label "contoh" pada kartu itu tidak ditemukan (dicek lewat pencarian kata, belum dilihat di browser). **Dibiarkan atas keputusan Hadi 7 Okt**; risiko dicatat dan dinilai ulang sebelum iklan jalan.
 
 ## 8. Di luar cakupan (sudah diputuskan TIDAK dibuat)
 
@@ -171,10 +171,11 @@ Alat ukur iklan: Meta Pixel + Conversions API (event belum dicek), biaya per pen
 | Belum ada kolam, coach, member asli | Strip statistik landing tersembunyi di bawah 20 member dan tidak menghitung akun contoh; kartu landing masih bisa menampilkan akun contoh (bagian 7, butir 8) | Pasokan di 4 kota belum dicari; iklan member baru jalan di kota yang memenuhi syarat 2 kolam + 5 coach |
 
 ## 12. Pertanyaan terbuka
-1. Kartu coach dan kolam contoh di landing saat iklan jalan: diberi label "contoh", disembunyikan, atau dibiarkan? (butir 8 bagian 7)
+Tidak ada. Kartu contoh di landing dibiarkan (Hadi 7 Okt, 1C); PRD disetujui (2A).
 
 ## Riwayat dokumen
 - 7 Okt 2026: draf 1 (Claude, Sonnet 5.5). Bahan: aturan-bisnis-saat-ini, KEPUTUSAN, HANDOFF-AGEN, MESSAGING, kode.
 - 7 Okt 2026: draf 2 setelah Hadi minta periksa blindspot. Ditambah: nilai jam sepi untuk kolam (sebelumnya kelewat), bagian milestone lengkap (sebelumnya hanya satu baris), strategi dan risiko terbesar (permintaan belum terbukti, pasokan dulu, pindah ke WhatsApp, ekonomi per paket, keselamatan anak), wilayah awal 4 kota, pemicu admin kedua 100 member aktif, ukuran keberhasilan awal, temuan "tidak ada pengingat sebelum sesi". Diperbaiki: baris "iklan belum jalan" (tidak ada dasarnya), masalah kolam yang tadinya gue tebak ("tiket tercampur").
 - 7 Okt 2026: draf 3. Jawaban 4 pertanyaan dimasukkan; pengingat sebelum sesi dicatat sebagai akan dibuat.
 - 7 Okt 2026: pencocokan klaim ke kode setelah Hadi minta sweeping draf 3. Cocok: konstanta uang dan waktu, paket 4/8 (60/90 hari, batal 2/4), sesi coba 7 hari, syarat tampil 4 jam/14 hari, penjaga jadwal 2/10 hari dan 3 pelanggaran/6 bulan, 10 kota, persetujuan admin coach/kolam, 4 kelompok umur dan 13 level milestone, penahanan penarikan karena milestone, akses milestone, kota dan tanggal lahir wajib saat daftar, pengingat sesi memang belum ada (cron hanya satu: harian). Diperbaiki: jumlah halaman 59 menjadi 69, pengecualian PPh 0,5% (surat omzet), catatan arti "Live", PWA, reset password lewat admin, klaim landing "hanya akun asli" (kartu contoh masih tampil).
+- 7 Okt 2026: PRD disetujui Hadi. Kartu coach dan kolam contoh di landing dibiarkan.
