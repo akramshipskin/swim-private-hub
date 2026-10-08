@@ -5,10 +5,11 @@ import { replyToEmailThread } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
 
-export default function ReplyForm({ threadId }: { threadId: string }) {
+export default function ReplyForm({ threadId, to }: { threadId: string; to: string }) {
   const [state, formAction, pending] = useActionState(replyToEmailThread, null);
   return (
-    <form action={formAction} key={pending ? "p" : "i"} className="flex flex-col gap-2">
+    <form action={formAction} key={pending ? "p" : "i"} id="balas" className="flex scroll-mt-24 flex-col gap-2 rounded-xl border border-border bg-surface p-3 shadow-sm">
+      <p className="text-xs text-text-subtle">Balas ke <span className="font-medium text-text-muted">{to}</span></p>
       <input type="hidden" name="threadId" value={threadId} />
       <label htmlFor="email-reply-content" className="sr-only">Balasan</label>
       <Textarea id="email-reply-content" name="content" rows={4} maxLength={4000} placeholder="Tulis balasan…" required />

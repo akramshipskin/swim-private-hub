@@ -5,15 +5,28 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ReplyForm from "./reply-form";
 import ComposeForm from "./compose-form";
+import EmailBody from "./email-body";
 import { INBOX_ADDRESSES } from "@/lib/email";
+import { emailSrcDoc, parseSender, senderInitial, shortTime } from "@/lib/email-view";
 
 function time(d: Date) {
-  return d.toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" });
+  return d.toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" });
 }
 
 const BOX_TABS = ["Semua", ...INBOX_ADDRESSES] as const;
 
 export const metadata = { title: "Email | Swim Private Hub" };
+
+function Avatar({ name, size = "md" }: { name: string; size?: "md" | "sm" }) {
+  return (
+    <span
+      aria-hidden
+      className={`flex shrink-0 items-center justify-center rounded-full bg-brand-50 font-semibold text-brand-700 ${size === "md" ? "h-10 w-10 text-base" : "h-8 w-8 text-sm"}`}
+    >
+      {senderInitial(name)}
+    </span>
+  );
+}
 
 export default async function AdminEmailPage({ searchParams }: { searchParams: Promise<{ t?: string; box?: string }> }) {
   await requireRole("ADMIN");
@@ -55,14 +68,17 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
           id: true,
           externalEmail: true,
           subject: true,
+          needsAdmin: true,
           messages: {
             orderBy: { createdAt: "asc" },
-            select: { id: true, direction: true, textBody: true, fromAddress: true, createdAt: true },
+            select: { id: true, direction: true, textBody: true, htmlBody: true, fromAddress: true, toAddress: true, createdAt: true },
           },
         },
       })
     : null;
   const waiting = threads.filter((th) => th.needsAdmin).length;
+  const boxQuery = activeBox !== "Semua" ? `&box=${activeBox}` : "";
+  const selectedOurAddress = selected ? withOurAddress.find((th) => th.id === selected.id)?.ourAddress : undefined;
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -95,25 +111,31 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
           <CardBody className="py-10 text-center text-sm text-text-muted">Belum ada email masuk.</CardBody>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
-          <ul className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[22rem_minmax(0,1fr)]">
+          {/* Di HP: daftar saja, atau isi email saja (seperti Gmail). Di layar lebar: berdampingan. */}
+          <ul className={`${t ? "max-lg:hidden" : ""} h-fit divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface`}>
             {filteredThreads.map((th) => {
               const last = th.messages[0];
+              const sender = parseSender(th.externalEmail);
+              const unread = th.needsAdmin;
               return (
                 <li key={th.id}>
                   <Link
-                    href={`/admin/email?t=${th.id}${activeBox !== "Semua" ? `&box=${activeBox}` : ""}`}
-                    className={`block rounded-xl border px-3 py-2.5 ${th.id === selectedId ? "border-brand-500 bg-brand-50" : "border-border bg-surface hover:bg-surface-muted"}`}
+                    href={`/admin/email?t=${th.id}${boxQuery}`}
+                    className={`flex gap-3 px-3 py-3 ${th.id === selectedId ? "bg-brand-50" : "hover:bg-surface-muted"}`}
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-sm font-medium text-text">{th.externalEmail}</p>
-                      {th.needsAdmin && <Badge tone="warning">Perlu dibalas</Badge>}
+                    <Avatar name={sender.name} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={`truncate text-sm ${unread ? "font-semibold text-text" : "font-medium text-text-muted"}`}>{sender.name}</p>
+                        <span className={`shrink-0 text-xs ${unread ? "font-semibold text-text" : "text-text-subtle"}`}>{shortTime(th.updatedAt)}</span>
+                      </div>
+                      <p className={`truncate text-sm ${unread ? "font-semibold text-text" : "text-text-muted"}`}>{th.subject}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="min-w-0 flex-1 truncate text-xs text-text-subtle">{last?.textBody}</p>
+                        {unread && <Badge tone="warning">Perlu dibalas</Badge>}
+                      </div>
                     </div>
-                    <p className="text-xs text-text-subtle">
-                      {th.subject} · {time(th.updatedAt)}
-                      {th.ourAddress && <> · <span className="text-text-muted">ke {th.ourAddress}</span></>}
-                    </p>
-                    <p className="mt-1 truncate text-xs text-text-muted">{last?.textBody}</p>
                   </Link>
                 </li>
               );
@@ -121,25 +143,61 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
           </ul>
 
           {selected && (
-            <Card>
-              <CardBody className="flex flex-col gap-4">
-                <div>
-                  <p className="text-base font-semibold text-text">{selected.externalEmail}</p>
-                  <p className="text-sm text-text-muted">{selected.subject}</p>
-                </div>
-                <div className="flex max-h-[28rem] flex-col gap-2 overflow-y-auto">
-                  {selected.messages.map((m) => (
-                    <div key={m.id} className={m.direction === "INBOUND" ? "self-start" : "self-end text-right"}>
-                      <p className="text-xs text-text-subtle">{m.direction === "INBOUND" ? m.fromAddress : `Admin (${m.fromAddress})`} · {time(m.createdAt)}</p>
-                      <p className={`inline-block max-w-[85%] rounded-xl px-3 py-2 text-left text-sm whitespace-pre-wrap ${m.direction === "INBOUND" ? "bg-surface-muted text-text" : "bg-brand-50 text-text"}`}>
-                        {m.textBody}
-                      </p>
+            <section className={`${t ? "" : "max-lg:hidden"} min-w-0`}>
+              <Link href={`/admin/email${activeBox !== "Semua" ? `?box=${activeBox}` : ""}`} className="mb-3 inline-flex min-h-[44px] items-center text-sm font-medium text-brand-700 lg:hidden">
+                ← Kotak Masuk
+              </Link>
+              <Card>
+                <CardBody className="flex flex-col gap-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h2 className="text-xl font-semibold leading-snug text-text">{selected.subject}</h2>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        {selectedOurAddress && <span className="rounded-md bg-surface-muted px-2 py-0.5 text-xs text-text-muted">ke {selectedOurAddress}</span>}
+                        {selected.needsAdmin && <Badge tone="warning">Perlu dibalas</Badge>}
+                      </div>
                     </div>
-                  ))}
-                </div>
-                <ReplyForm threadId={selected.id} />
-              </CardBody>
-            </Card>
+                    <a
+                      href="#balas"
+                      className="inline-flex min-h-[44px] items-center rounded-full border border-border bg-surface px-4 text-sm font-medium text-text hover:bg-surface-muted lg:min-h-0 lg:py-1.5"
+                    >
+                      ↩ Balas
+                    </a>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    {selected.messages.map((m) => {
+                      const inbound = m.direction === "INBOUND";
+                      const sender = inbound ? parseSender(m.fromAddress) : { name: "Admin", email: m.fromAddress };
+                      return (
+                        <article key={m.id} className={`rounded-xl border border-border ${inbound ? "bg-surface" : "bg-brand-50/40"}`}>
+                          <header className="flex items-start gap-3 px-4 pt-3">
+                            <Avatar name={sender.name} size="sm" />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm text-text">
+                                <span className="font-semibold">{sender.name}</span>{" "}
+                                <span className="text-xs text-text-subtle">&lt;{sender.email}&gt;</span>
+                              </p>
+                              <p className="truncate text-xs text-text-subtle">kepada {m.toAddress}</p>
+                            </div>
+                            <time dateTime={m.createdAt.toISOString()} className="shrink-0 text-xs text-text-subtle">{time(m.createdAt)}</time>
+                          </header>
+                          <div className="px-4 pb-4 pt-3">
+                            {inbound && m.htmlBody ? (
+                              <EmailBody srcDoc={emailSrcDoc(m.htmlBody)} />
+                            ) : (
+                              <p className="whitespace-pre-wrap text-sm text-text">{m.textBody}</p>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+
+                  <ReplyForm threadId={selected.id} to={selected.externalEmail} />
+                </CardBody>
+              </Card>
+            </section>
           )}
         </div>
       )}
