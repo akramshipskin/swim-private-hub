@@ -8,6 +8,13 @@ export function parseSender(raw: string): { name: string; email: string } {
   return { name, email };
 }
 
+// Potongan isi untuk daftar. Harus dipotong di server: kalau seluruh isi email
+// dikirim ke browser lalu dipotong gaya tampilan, 100 percakapan bisa jadi
+// beberapa MB halaman.
+export function snippet(text: string | undefined, max = 140): string {
+  return (text ?? "").replace(/\s+/g, " ").trim().slice(0, max);
+}
+
 export function senderInitial(name: string): string {
   return (name.trim().charAt(0) || "?").toUpperCase();
 }

@@ -7,7 +7,7 @@ import ReplyForm from "./reply-form";
 import ComposeForm from "./compose-form";
 import EmailBody from "./email-body";
 import { INBOX_ADDRESSES } from "@/lib/email";
-import { emailSrcDoc, parseSender, senderInitial, shortTime } from "@/lib/email-view";
+import { emailSrcDoc, parseSender, senderInitial, shortTime, snippet } from "@/lib/email-view";
 
 function time(d: Date) {
   return d.toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta" });
@@ -132,7 +132,7 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
                       </div>
                       <p className={`truncate text-sm ${unread ? "font-semibold text-text" : "text-text-muted"}`}>{th.subject}</p>
                       <div className="flex items-center gap-2">
-                        <p className="min-w-0 flex-1 truncate text-xs text-text-subtle">{last?.textBody}</p>
+                        <p className="min-w-0 flex-1 truncate text-xs text-text-subtle">{snippet(last?.textBody)}</p>
                         {unread && <Badge tone="warning">Perlu dibalas</Badge>}
                       </div>
                     </div>

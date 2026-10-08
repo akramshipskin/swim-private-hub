@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emailSrcDoc, parseSender, sanitizeEmailHtml, senderInitial, shortTime } from "./email-view";
+import { emailSrcDoc, parseSender, sanitizeEmailHtml, senderInitial, shortTime, snippet } from "./email-view";
 
 describe("parseSender", () => {
   it("memisah nama dan alamat", () => {
@@ -11,6 +11,18 @@ describe("parseSender", () => {
   });
   it("nama kosong jatuh ke bagian depan alamat", () => {
     expect(parseSender("<budi@x.id>")).toEqual({ name: "budi", email: "budi@x.id" });
+  });
+});
+
+describe("snippet", () => {
+  it("merapatkan spasi dan baris baru, lalu memotong", () => {
+    expect(snippet("  Halo\n\n  dunia   ini  ")).toBe("Halo dunia ini");
+    expect(snippet("a".repeat(500))).toHaveLength(140);
+    expect(snippet("abcdef", 3)).toBe("abc");
+  });
+  it("kosong atau tidak ada = teks kosong", () => {
+    expect(snippet(undefined)).toBe("");
+    expect(snippet("   ")).toBe("");
   });
 });
 
