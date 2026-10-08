@@ -44,6 +44,11 @@ describe("sanitizeEmailHtml", () => {
     expect(out).not.toMatch(/onclick|onerror|javascript:/i);
     expect(out).toContain('<a href="#"');
   });
+  it("mematikan aturan mode gelap bawaan email", () => {
+    const out = sanitizeEmailHtml("<style>@media (prefers-color-scheme: dark){.p{background:#262624}}</style><p class=\"p\">x</p>");
+    expect(out).not.toMatch(/prefers-color-scheme\s*:/);
+    expect(out).toContain("prefers-color-scheme-off");
+  });
   it("tombol dan gambar biasa tetap ada", () => {
     const html = '<a href="https://x.id/verify" style="background:#000;color:#fff">Verifikasi</a><img src="https://x.id/logo.png">';
     expect(sanitizeEmailHtml(html)).toBe(html);

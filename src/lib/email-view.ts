@@ -29,11 +29,14 @@ export function sanitizeEmailHtml(html: string): string {
     .replace(/<\s*(script|iframe|object|embed|form|noscript)\b[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
     .replace(/<\s*\/?\s*(script|iframe|object|embed|form|meta|base|link|noscript)\b[^>]*>/gi, "")
     .replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
-    .replace(/(href\s*=\s*["']?)\s*javascript:[^"'>\s]*/gi, "$1#");
+    .replace(/(href\s*=\s*["']?)\s*javascript:[^"'>\s]*/gi, "$1#")
+    // Email dengan gaya mode gelap sendiri jadi setengah gelap di atas latar putih
+    // kita. Nama fitur dibuat tidak dikenal supaya aturan gelapnya tidak pernah berlaku.
+    .replace(/prefers-color-scheme/gi, "prefers-color-scheme-off");
 }
 
 const EMAIL_CSP = "default-src 'none'; img-src https: data:; style-src 'unsafe-inline'; font-src https: data:";
 
 export function emailSrcDoc(html: string): string {
-  return `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${EMAIL_CSP}"><base target="_blank"><style>body{margin:0;padding:4px;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#202124;background:#fff;overflow-wrap:anywhere}img{max-width:100%;height:auto}a{color:#1a73e8}table{max-width:100%}</style></head><body>${sanitizeEmailHtml(html)}</body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="color-scheme" content="light only"><meta http-equiv="Content-Security-Policy" content="${EMAIL_CSP}"><base target="_blank"><style>body{margin:0;padding:4px;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:#202124;background:#fff;overflow-wrap:anywhere}img{max-width:100%;height:auto}a{color:#1a73e8}table{max-width:100%}</style></head><body>${sanitizeEmailHtml(html)}</body></html>`;
 }

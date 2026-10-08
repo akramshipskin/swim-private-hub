@@ -182,7 +182,7 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
                             </div>
                             <time dateTime={m.createdAt.toISOString()} className="shrink-0 text-xs text-text-subtle">{time(m.createdAt)}</time>
                           </header>
-                          <div className="px-4 pb-4 pt-3">
+                          <div className="px-2 pb-3 pt-2 sm:px-4 sm:pb-4 sm:pt-3">
                             {inbound && m.htmlBody ? (
                               <EmailBody srcDoc={emailSrcDoc(m.htmlBody)} />
                             ) : (
