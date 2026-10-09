@@ -55,7 +55,13 @@ jobs:
             | gpg --batch --yes --symmetric --cipher-algo AES256 --compress-algo none \
                   --passphrase-fd 3 --output "$FILE" 3<<< "$BACKUP_PASSPHRASE"
           # Uji baca: dekripsi + daftar isi. Gagal di sini = backup rusak.
-          gpg --batch --quiet --decrypt --passphrase-fd 3 "$FILE" 3<<< "$BACKUP_PASSPHRASE" | pg_restore --list > toc.txt
+          # Dekripsi ke berkas dulu, bukan lewat pipa: pg_restore --list berhenti
+          # membaca setelah daftar isi, jadi pipa menutup dini dan gpg gagal
+          # "Broken pipe" begitu backup lebih besar dari penyangga pipa (gagal
+          # 7 dan 8 Okt 2026 padahal backup-nya utuh).
+          gpg --batch --yes --quiet --decrypt --passphrase-fd 3 --output check.dump "$FILE" 3<<< "$BACKUP_PASSPHRASE"
+          pg_restore --list check.dump > toc.txt
+          rm -f check.dump
           grep -q 'TABLE DATA public User ' toc.txt || { echo "Tabel User tidak ada di backup"; exit 1; }
           echo "Ukuran: $(du -h "$FILE" | cut -f1), $(grep -c 'TABLE DATA' toc.txt) tabel berisi data"
           echo "FILE=$FILE" >> "$GITHUB_ENV"
