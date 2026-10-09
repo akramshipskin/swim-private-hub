@@ -409,3 +409,4 @@ Update: PPN diputuskan 11% (30 Sep malam), sudah di kode. Akuntan tetap perlu me
 
 ## 14. Tambahan 7 Okt 2026
 - Pengingat sebelum sesi untuk member dan coach (notifikasi HP + lonceng lewat push.ts; pemicu lewat cron atau jadwal). Hadi: penting. Dikerjakan setelah dokumen perencanaan; waktu pengingat (contoh H-1 dan beberapa jam sebelum) diputuskan di alur aplikasi. Menyentuh jadwal dan notifikasi, bukan uang.
+- 9 Okt (Hadi): waktu pengingat = 18.00 WIB malam sebelumnya + 06.00 WIB hari-H (butuh jadwal cron kedua; batas paket Vercel belum dicek). Tiga pemberitahuan ikut dikerjakan: (B) mitra disetujui, (C) Hadir/Tidak Hadir ditandai ke member, (D) paket mau berakhir (usulan 14 dan 3 hari). Nomor WhatsApp coach tidak boleh sampai ke member; kontak lewat WhatsApp admin.

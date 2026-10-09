@@ -1,6 +1,6 @@
 # Alur Aplikasi SPH: siapa melakukan apa, dalam urutan apa
 
-Status: DRAF 1 untuk ditinjau Hadi (7 Okt 2026). Dokumen 2 dari 6 (setelah PRD yang disetujui 7 Okt).
+Status: DRAF 1.1 untuk ditinjau Hadi (draf 1 7 Okt 2026; direvisi 9 Okt dengan jawaban Hadi). Dokumen 2 dari 6 (setelah PRD yang disetujui 7 Okt).
 
 Cara baca: dokumen ini menjelaskan langkah-langkah yang dilalui tiap peran dari awal sampai akhir. Isinya adalah **alur yang sudah ada di aplikasi** (dicek dari kode dan catatan keputusan, belum dijalankan ulang satu per satu), ditambah bagian bertanda **[baru]** untuk yang belum ada. Alur tidak diubah tanpa izin Hadi (AGENTS.md butir 10); tampilan boleh. Aturan angka dan uang ada di `docs/aturan-bisnis-saat-ini.md`; di sini hanya urutan dan kondisinya. Layar dan menu per peran: `src/lib/nav-links.ts`, daftar halaman `docs/cakupan-halaman.md`.
 
@@ -122,7 +122,7 @@ Belum ada di aplikasi (dicek dari kode; pemeriksa terjadwal hanya satu, harian j
 - **Kanal:** notifikasi HP dan lonceng (lewat satu pintu notifikasi yang sudah ada).
 - **Tidak dikirim** untuk sesi yang sudah dibatalkan.
 
-Pilihan waktu (Pertanyaan 1):
+**Diputuskan Hadi 9 Okt: pilihan A (18.00 WIB malam sebelumnya + 06.00 WIB pagi hari-H).** Pilihan waktu yang dibahas:
 
 | Pilihan | Waktu | Kebutuhan teknis |
 |---|---|---|
@@ -135,11 +135,12 @@ Rekomendasi: A. Pengingat malam sebelumnya memberi waktu batal sebelum batas 2 j
 
 | | Celah | Dampak | Usulan |
 |---|---|---|---|
-| A | Belum ada pengingat sebelum sesi | Peserta lupa; coach dan kolam kehilangan uang | Dibuat (bagian 7) |
-| B | Coach dan pemilik kolam tidak diberi tahu saat admin menyetujui akun | Mereka tidak tahu kapan boleh masuk; bergantung pada WhatsApp ke admin | Kirim pesan WhatsApp atau email saat disetujui (butuh kanal: belum ada push karena belum pernah masuk) |
-| C | Member tidak diberi tahu saat coach menandai Hadir atau Tidak Hadir | Member baru tahu saat membuka aplikasi; batas lapor "Tidak Hadir" salah hanya 3 hari | Notifikasi ke member saat ditandai |
-| D | Tidak ada peringatan paket mendekati berakhir (masa berlaku habis, sisa sesi hangus) | Member kehilangan sesi tanpa kabar | Notifikasi, misalnya 14 dan 3 hari sebelum berakhir bila masih ada sesi |
-| E | Tidak ditemukan cara member menghubungi coach di dalam aplikasi (hubungan lewat admin/WhatsApp) | Telat atau ganti jam diurus lewat luar aplikasi, mendorong transaksi pindah ke luar | Belum diputuskan; perlu pembahasan terpisah |
+| A | Belum ada pengingat sebelum sesi | Peserta lupa; coach dan kolam kehilangan uang | **Dibuat (bagian 7; diputuskan 9 Okt)** |
+| B | Coach dan pemilik kolam tidak diberi tahu saat admin menyetujui akun | Mereka tidak tahu kapan boleh masuk; bergantung pada WhatsApp ke admin | **Dikerjakan (Hadi 9 Okt).** Kirim pesan WhatsApp atau email saat disetujui (butuh kanal: belum ada push karena belum pernah masuk) |
+| C | Member tidak diberi tahu saat coach menandai Hadir atau Tidak Hadir | Member baru tahu saat membuka aplikasi; batas lapor "Tidak Hadir" salah hanya 3 hari | **Dikerjakan (Hadi 9 Okt).** Notifikasi ke member saat ditandai |
+| D | Tidak ada peringatan paket mendekati berakhir (masa berlaku habis, sisa sesi hangus) | Member kehilangan sesi tanpa kabar | **Dikerjakan (Hadi 9 Okt).** Notifikasi, misalnya 14 dan 3 hari sebelum berakhir bila masih ada sesi |
+| E | Tidak ditemukan cara member menghubungi coach di dalam aplikasi (hubungan lewat admin/WhatsApp) | Telat atau ganti jam diurus lewat luar aplikasi, mendorong transaksi pindah ke luar | **Diputuskan Hadi 9 Okt: tidak dibuat fitur chat atau kontak langsung; member menghubungi lewat WhatsApp admin; nomor WhatsApp coach TIDAK boleh sampai ke member.** Dicek 9 Okt dari kode: nomor coach tidak tampil di halaman member; bio coach dan catatan milestone adalah teks bebas tanpa penyaring nomor. Larangan coach membawa member keluar SPH sudah ada di Perjanjian Coach pasal 6 (12 bulan setelah berakhir, akun dinonaktifkan + daftar hitam; butir 2 hanya menyebut membagikan nomor lewat Aplikasi) dan MOU Kolam pasal 4; S&K member sengaja tidak mengikat member. |
 
 ## Riwayat dokumen
 - 7 Okt 2026: draf 1 (Claude, Sonnet 5.5). Bahan: kode (proxy, authorize, booking, cron, notifikasi), nav-links, catatan keputusan, PRD. Belum dicek: pesan login untuk akun belum disetujui; isi lengkap aturan di route booking; layar admin satu per satu.
+- 9 Okt 2026 (Hadi): jawaban 9 pertanyaan: pengingat A; pemberitahuan B/C/D dikerjakan; celah E = lewat WhatsApp admin, nomor coach tidak boleh sampai ke member. Menunggu: 2 pertanyaan turunan (penyaring nomor di bio dan catatan coach; perluasan bunyi pasal 6 di Perjanjian Coach, teks hukum, butuh orang hukum). Setelah itu persetujuan Hadi untuk dokumen ini.
