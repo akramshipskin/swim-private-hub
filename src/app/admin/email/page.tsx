@@ -5,7 +5,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ReplyForm from "./reply-form";
 import ComposeForm from "./compose-form";
-import EmailBody from "./email-body";
+import MessageCard from "./message-card";
 import { INBOX_ADDRESSES } from "@/lib/email";
 import { emailSrcDoc, parseSender, senderInitial, shortTime, snippet } from "@/lib/email-view";
 
@@ -34,7 +34,7 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
   const activeBox = box && (INBOX_ADDRESSES as readonly string[]).includes(box) ? box : "Semua";
 
   const threads = await prisma.emailThread.findMany({
-    orderBy: [{ needsAdmin: "desc" }, { updatedAt: "desc" }],
+    orderBy: { updatedAt: "desc" },
     take: 100,
     select: {
       id: true,
@@ -72,11 +72,18 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
           messages: {
             // Terbaru di atas supaya percakapan panjang tidak perlu digulir jauh.
             orderBy: { createdAt: "desc" },
-            select: { id: true, direction: true, textBody: true, htmlBody: true, fromAddress: true, toAddress: true, createdAt: true },
+            select: { id: true, direction: true, textBody: true, fromAddress: true, toAddress: true, createdAt: true },
           },
         },
       })
     : null;
+  // Hanya pesan terbaru yang dikirim lengkap (termasuk isi HTML); pesan lama
+  // dilipat dan diambil saat dibuka.
+  const newest = selected?.messages[0];
+  const newestHtml =
+    newest && newest.direction === "INBOUND"
+      ? (await prisma.emailMessage.findUnique({ where: { id: newest.id }, select: { htmlBody: true } }))?.htmlBody
+      : null;
   const waiting = threads.filter((th) => th.needsAdmin).length;
   const boxQuery = activeBox !== "Semua" ? `&box=${activeBox}` : "";
   const selectedOurAddress = selected ? withOurAddress.find((th) => th.id === selected.id)?.ourAddress : undefined;
@@ -167,30 +174,22 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
                   </div>
 
                   <div className="flex flex-col gap-3">
-                    {selected.messages.map((m) => {
+                    {selected.messages.map((m, i) => {
                       const inbound = m.direction === "INBOUND";
                       const sender = inbound ? parseSender(m.fromAddress) : { name: "Admin", email: m.fromAddress };
                       return (
-                        <article key={m.id} className={`rounded-xl border border-border ${inbound ? "bg-surface" : "bg-brand-50/40"}`}>
-                          <header className="flex items-start gap-3 px-4 pt-3">
-                            <Avatar name={sender.name} size="sm" />
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-sm text-text">
-                                <span className="font-semibold">{sender.name}</span>{" "}
-                                <span className="text-xs text-text-subtle">&lt;{sender.email}&gt;</span>
-                              </p>
-                              <p className="truncate text-xs text-text-subtle">kepada {m.toAddress}</p>
-                            </div>
-                            <time dateTime={m.createdAt.toISOString()} className="shrink-0 text-xs text-text-subtle">{time(m.createdAt)}</time>
-                          </header>
-                          <div className="px-2 pb-3 pt-2 sm:px-4 sm:pb-4 sm:pt-3">
-                            {inbound && m.htmlBody ? (
-                              <EmailBody srcDoc={emailSrcDoc(m.htmlBody)} />
-                            ) : (
-                              <p className="whitespace-pre-wrap text-sm text-text">{m.textBody}</p>
-                            )}
-                          </div>
-                        </article>
+                        <MessageCard
+                          key={m.id}
+                          id={m.id}
+                          inbound={inbound}
+                          name={sender.name}
+                          email={sender.email}
+                          to={m.toAddress}
+                          iso={m.createdAt.toISOString()}
+                          timeLabel={time(m.createdAt)}
+                          snippet={snippet(m.textBody)}
+                          initialBody={i === 0 ? { text: m.textBody, srcDoc: newestHtml ? emailSrcDoc(newestHtml) : null } : null}
+                        />
                       );
                     })}
                   </div>

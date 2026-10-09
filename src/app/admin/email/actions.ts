@@ -7,11 +7,21 @@ import { redirect } from "next/navigation";
 import { INBOX_ADDRESSES, INBOX_FROM_ADDRESS, sendReplyEmail } from "@/lib/email";
 import { takeAttempt } from "@/lib/rate-limit";
 import { userErrorMessage } from "@/lib/user-error";
+import { emailSrcDoc } from "@/lib/email-view";
 
 // Sweep keamanan 25 Sep: batas email keluar supaya akun admin yang dibobol
 // tidak bisa dipakai kirim spam dari domain kita.
 const MAX_OUTBOUND_EMAILS_PER_HOUR = 30;
 const EMAIL_LIMIT_ERROR = `Batas kirim email tercapai (${MAX_OUTBOUND_EMAILS_PER_HOUR} per jam). Coba lagi nanti.`;
+
+// Isi satu pesan lama yang dibuka dari daftar percakapan (pesan lama dilipat
+// dan tidak ikut dikirim bersama halaman).
+export async function loadEmailMessageBody(messageId: string): Promise<{ text: string; srcDoc: string | null } | { error: string }> {
+  await requireRole("ADMIN");
+  const m = await prisma.emailMessage.findUnique({ where: { id: messageId }, select: { direction: true, textBody: true, htmlBody: true } });
+  if (!m) return { error: "Pesan tidak ditemukan." };
+  return { text: m.textBody, srcDoc: m.direction === "INBOUND" && m.htmlBody ? emailSrcDoc(m.htmlBody) : null };
+}
 
 export type ReplyState = { error?: string } | null;
 const MAX_EMAIL_BODY_LENGTH = 4000;

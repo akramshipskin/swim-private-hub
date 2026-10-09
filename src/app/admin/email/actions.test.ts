@@ -23,6 +23,7 @@ vi.mock("@/lib/email", () => ({
 const findUnique = vi.fn();
 const upsert = vi.fn();
 const messageCreate = vi.fn().mockResolvedValue({});
+const messageFindUnique = vi.fn();
 const threadUpdate = vi.fn().mockResolvedValue({});
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -31,7 +32,7 @@ vi.mock("@/lib/prisma", () => ({
       update: (...a: unknown[]) => threadUpdate(...a),
       upsert: (...a: unknown[]) => upsert(...a),
     },
-    emailMessage: { create: (...a: unknown[]) => messageCreate(...a) },
+    emailMessage: { create: (...a: unknown[]) => messageCreate(...a), findUnique: (...a: unknown[]) => messageFindUnique(...a) },
     $transaction: (ops: Promise<unknown>[]) => Promise.all(ops),
   },
 }));
@@ -39,7 +40,7 @@ vi.mock("@/lib/prisma", () => ({
 const takeAttempt = vi.fn().mockResolvedValue("hit-1");
 vi.mock("@/lib/rate-limit", () => ({ takeAttempt: (...a: unknown[]) => takeAttempt(...a) }));
 
-const { replyToEmailThread, composeEmail } = await import("./actions");
+const { replyToEmailThread, composeEmail, loadEmailMessageBody } = await import("./actions");
 
 function formData(entries: Record<string, string>) {
   const fd = new FormData();
@@ -156,5 +157,26 @@ describe("composeEmail", () => {
     const res = await composeEmail(null, composeFormData(valid));
     expect(res?.error).toBe("Resend down");
     expect(upsert).not.toHaveBeenCalled();
+  });
+});
+
+describe("loadEmailMessageBody", () => {
+  it("pesan masuk ber-HTML: kembalikan teks dan isi HTML terbungkus", async () => {
+    messageFindUnique.mockResolvedValueOnce({ direction: "INBOUND", textBody: "halo", htmlBody: "<p>halo</p>" });
+    const res = await loadEmailMessageBody("m1");
+    expect(res).toMatchObject({ text: "halo" });
+    expect("srcDoc" in res && res.srcDoc).toContain("<p>halo</p>");
+  });
+
+  it("pesan keluar atau tanpa HTML: hanya teks", async () => {
+    messageFindUnique.mockResolvedValueOnce({ direction: "OUTBOUND", textBody: "balasan", htmlBody: "<p>x</p>" });
+    expect(await loadEmailMessageBody("m2")).toEqual({ text: "balasan", srcDoc: null });
+    messageFindUnique.mockResolvedValueOnce({ direction: "INBOUND", textBody: "polos", htmlBody: null });
+    expect(await loadEmailMessageBody("m3")).toEqual({ text: "polos", srcDoc: null });
+  });
+
+  it("pesan tidak ada: kembalikan error", async () => {
+    messageFindUnique.mockResolvedValueOnce(null);
+    expect(await loadEmailMessageBody("nope")).toEqual({ error: "Pesan tidak ditemukan." });
   });
 });
