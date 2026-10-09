@@ -44,6 +44,14 @@ describe("updateCoachProfile", () => {
     expect(res).toEqual({ error: "Pilih minimal 1 keahlian." });
   });
 
+  it("menolak bio yang memuat nomor HP, email, atau tautan chat (Hadi 9 Okt)", async () => {
+    for (const bio of ["WA 0812-3456-7890", "email saya budi@x.com", "chat wa.me/6281234567890"]) {
+      const res = await updateCoachProfile(null, fd([["bio", bio], ["specialties", "Gaya bebas"]]));
+      expect(res?.error).toMatch(/komunikasi dengan member lewat aplikasi/);
+    }
+    expect(coachProfileUpdateMany).not.toHaveBeenCalled();
+  });
+
   it("saves bio and known specialties of the coach's own profile only", async () => {
     const res = await updateCoachProfile(
       null,

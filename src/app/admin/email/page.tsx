@@ -34,7 +34,7 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
   const activeBox = box && (INBOX_ADDRESSES as readonly string[]).includes(box) ? box : "Semua";
 
   const threads = await prisma.emailThread.findMany({
-    orderBy: { updatedAt: "desc" },
+    orderBy: [{ needsAdmin: "desc" }, { updatedAt: "desc" }],
     take: 100,
     select: {
       id: true,

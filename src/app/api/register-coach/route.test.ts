@@ -95,3 +95,17 @@ describe("POST /api/register-coach: kota & harga (Hadi 3 Okt)", () => {
     expect(userCreate).not.toHaveBeenCalled();
   });
 });
+
+describe("POST /api/register-coach: kontak pribadi (Hadi 9 Okt)", () => {
+  it("menolak bio atau catatan sertifikasi yang memuat nomor HP", async () => {
+    const a = await POST(req({ bio: "Hubungi 0812 3456 7890" }));
+    expect(a.status).toBe(400);
+    expect((await a.json()).error).toMatch(/lewat aplikasi/);
+    expect((await POST(req({ hasCertification: true, certificationNote: "wa.me/6281234567890" }))).status).toBe(400);
+    expect(userCreate).not.toHaveBeenCalled();
+  });
+
+  it("bio biasa tetap diterima", async () => {
+    expect((await POST(req({ bio: "Mengajar 5 tahun, 25 meter gaya bebas" }))).status).toBe(201);
+  });
+});

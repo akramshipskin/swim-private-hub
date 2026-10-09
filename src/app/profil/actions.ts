@@ -11,6 +11,7 @@ import { COACH_SPECIALTIES, type CoachSpecialty } from "@/lib/coach-specialties"
 import { isStorageConfigured, validateUpload, extensionFor, uploadObject, publicObjectUrl, PHOTO_BUCKET, CERT_BUCKET, hasMatchingSignature, SIGNATURE_MISMATCH_ERROR, removeObject } from "@/lib/storage";
 import { MAX_CERTIFICATES_PER_COACH } from "@/lib/coach-certificates";
 import { parseCoachBirthDate } from "@/lib/coach-bio";
+import { hasPersonalContact, PERSONAL_CONTACT_ERROR } from "@/lib/contact-filter";
 import { notifyAdmins } from "@/lib/notify";
 import { userErrorMessage } from "@/lib/user-error";
 
@@ -182,6 +183,7 @@ export async function updateCoachProfile(
   if (bio.length > 500) {
     return { error: "Bio maksimal 500 karakter." };
   }
+  if (hasPersonalContact(bio)) return { error: PERSONAL_CONTACT_ERROR };
 
   const birthDateRaw = formData.get("birthDate")?.toString().trim() ?? "";
   let birthDate: Date | null = null;

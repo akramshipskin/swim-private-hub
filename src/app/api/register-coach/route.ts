@@ -7,6 +7,7 @@ import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP
 import { notifyAdmins } from "@/lib/notify";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 import { parseCoachBirthDate } from "@/lib/coach-bio";
+import { hasPersonalContact, PERSONAL_CONTACT_ERROR } from "@/lib/contact-filter";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, isStringArrayOrMissing, MAX_BIO, MAX_EMAIL, MAX_NAME, MAX_NOTE, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
 import { userErrorMessage } from "@/lib/user-error";
 import { isCity } from "@/lib/cities";
@@ -94,6 +95,10 @@ export async function POST(request: Request) {
   );
   if (cleanSpecialties.length === 0) {
     return Response.json({ error: "Pilih minimal 1 keahlian." }, { status: 400 });
+  }
+
+  if (hasPersonalContact(bio) || hasPersonalContact(certificationNote)) {
+    return Response.json({ error: PERSONAL_CONTACT_ERROR }, { status: 400 });
   }
 
   // Kota domisili & harga jasa diisi saat daftar (Hadi 3 Okt).

@@ -1,5 +1,6 @@
 "use server";
 
+import { hasPersonalContact, PERSONAL_CONTACT_ERROR } from "@/lib/contact-filter";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -41,6 +42,7 @@ export async function saveMilestoneUpdate(
     const note = formData.get("note")?.toString().trim() ?? "";
     if (!note) return { error: "Tulis catatan singkat perkembangan peserta." };
     if (note.length > 1000) return { error: "Catatan maksimal 1000 karakter." };
+    if (hasPersonalContact(note)) return { error: PERSONAL_CONTACT_ERROR };
     const focusItemId = formData.get("focusItemId")?.toString() || null;
     const achieved = [...new Set(formData.getAll("achieved").map(String))];
     const prior = formData.get("prior") === "on";
@@ -126,6 +128,7 @@ export async function addMilestoneItem(
     const text = formData.get("text")?.toString().trim() ?? "";
     if (!text) return { error: "Tulis keterampilannya." };
     if (text.length > 200) return { error: "Keterampilan maksimal 200 karakter." };
+    if (hasPersonalContact(text)) return { error: PERSONAL_CONTACT_ERROR };
     const level = Number(formData.get("level"));
     const propose = formData.get("propose") === "on";
 
