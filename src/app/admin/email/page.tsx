@@ -70,7 +70,8 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
           subject: true,
           needsAdmin: true,
           messages: {
-            orderBy: { createdAt: "asc" },
+            // Terbaru di atas supaya percakapan panjang tidak perlu digulir jauh.
+            orderBy: { createdAt: "desc" },
             select: { id: true, direction: true, textBody: true, htmlBody: true, fromAddress: true, toAddress: true, createdAt: true },
           },
         },
