@@ -28,5 +28,6 @@ declare module "next-auth/jwt" {
     sessionVersion?: number;
     needsTotpSetup?: boolean;
     needsPartnerAgreement?: boolean;
+    loginAt?: number;
   }
 }

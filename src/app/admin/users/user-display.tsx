@@ -82,7 +82,7 @@ export function UserActions({
   user,
   isSelf = false,
 }: {
-  user: { id: string; name: string; phone: string | null; email: string | null; isActive: boolean };
+  user: { id: string; name: string; phone: string | null; email: string | null; isActive: boolean; role?: string };
   isSelf?: boolean;
 }) {
   return (
@@ -107,7 +107,7 @@ export function UserActions({
           loginId={user.phone ?? user.email ?? ""}
         />
       )}
-      {!isSelf && <ToggleActiveButton userId={user.id} userName={user.name} isActive={user.isActive} />}
+      {!isSelf && <ToggleActiveButton userId={user.id} userName={user.name} isActive={user.isActive} phone={user.phone} role={user.role} />}
     </div>
   );
 }

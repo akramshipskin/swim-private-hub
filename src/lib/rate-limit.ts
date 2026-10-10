@@ -81,5 +81,8 @@ export const LOGIN_WINDOW_MS = 15 * 60_000;
 export const REGISTER_MEMBER_PER_IP = 10;
 export const REGISTER_STAFF_PER_IP = 3;
 export const REGISTER_WINDOW_MS = 60 * 60_000;
+// Cek "nomor/email sudah terdaftar" per jaringan (TRD T16): membatasi orang
+// yang mencoba-coba nomor HP untuk tahu siapa yang terdaftar.
+export const REGISTER_PROBE_PER_IP = 10;
 
 export const RATE_LIMIT_REGISTER_ERROR = "Terlalu banyak pendaftaran dari jaringan ini. Coba lagi dalam 1 jam.";

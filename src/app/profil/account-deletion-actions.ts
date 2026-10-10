@@ -1,5 +1,6 @@
 "use server";
 
+import { accountGateError } from "@/lib/require-role";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { cancelAccountDeletion, requestAccountDeletion } from "@/lib/account-deletion";
@@ -12,6 +13,7 @@ export type DeletionState = { error?: string; ok?: boolean } | null;
 export async function requestDeletionAction(): Promise<DeletionState> {
   const session = await auth();
   if (!session || session.user.role !== "MEMBER") return { error: "Hanya akun member yang bisa mengajukan hapus akun di sini." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
   if (await requestAccountDeletion(session.user.id)) {
     await sendPushToRole("ADMIN", {
       title: "Pengajuan hapus akun",
@@ -26,6 +28,7 @@ export async function requestDeletionAction(): Promise<DeletionState> {
 export async function cancelDeletionAction(): Promise<DeletionState> {
   const session = await auth();
   if (!session || session.user.role !== "MEMBER") return { error: "Kamu tidak punya akses untuk tindakan ini." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
   await cancelAccountDeletion(session.user.id);
   revalidatePath("/profil");
   return { ok: true };

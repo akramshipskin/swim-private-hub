@@ -160,10 +160,18 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
 // update), bukan cuma di caller.
 // Balikin true kalau request ini beneran diklaim (diubah ke FAILED) oleh
 // panggilan ini, false kalau udah keburu diproses duluan (PAID/FAILED).
-export async function markWithdrawalFailed(withdrawalRequestId: string, reason: string, processedById?: string) {
+// onlyFrom: status yang dilihat pemanggil. Admin yang menolak saat membaca
+// PENDING tidak boleh ikut menolak bila di antaranya Iris sudah mulai
+// memproses (TRD T12: transfer jalan + saldo kembali = uang keluar 2x).
+export async function markWithdrawalFailed(
+  withdrawalRequestId: string,
+  reason: string,
+  processedById?: string,
+  onlyFrom: ("PENDING" | "PROCESSING")[] = ["PENDING", "PROCESSING"]
+) {
   return prisma.$transaction(async (tx) => {
     const claim = await tx.withdrawalRequest.updateMany({
-      where: { id: withdrawalRequestId, status: { in: ["PENDING", "PROCESSING"] } },
+      where: { id: withdrawalRequestId, status: { in: onlyFrom } },
       data: { status: "FAILED", failureReason: reason, processedAt: new Date(), processedById },
     });
     if (claim.count === 0) return false;
@@ -205,10 +213,13 @@ export async function markWithdrawalFailed(withdrawalRequestId: string, reason: 
 export async function markWithdrawalPaid(
   withdrawalRequestId: string,
   midtransReferenceId?: string,
-  manual?: { transferReference: string; processedById: string }
+  manual?: { transferReference: string; processedById: string },
+  onlyFrom: ("PENDING" | "PROCESSING")[] = ["PENDING", "PROCESSING"]
 ) {
+  // onlyFrom = status yang dilihat admin (TRD T12): klik admin tidak boleh
+  // menyalip perubahan status di antaranya (contoh PENDING -> PROCESSING).
   const claim = await prisma.withdrawalRequest.updateMany({
-    where: { id: withdrawalRequestId, status: { in: ["PENDING", "PROCESSING"] } },
+    where: { id: withdrawalRequestId, status: { in: onlyFrom } },
     data: { status: "PAID", processedAt: new Date(), midtransReferenceId, ...manual },
   });
   return claim.count > 0;

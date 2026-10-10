@@ -6,6 +6,8 @@ const purgeOldNotifications = vi.fn().mockResolvedValue(3);
 vi.mock("@/lib/notifications", () => ({ purgeOldNotifications: () => purgeOldNotifications() }));
 const releaseStalePayments = vi.fn().mockResolvedValue(2);
 vi.mock("@/lib/stale-payments", () => ({ releaseStalePayments: () => releaseStalePayments() }));
+const releaseDueCommissions = vi.fn().mockResolvedValue(1);
+vi.mock("@/lib/affiliate", () => ({ releaseDueCommissions: () => releaseDueCommissions() }));
 const { GET } = await import("./route");
 const call = (auth?: string) => GET(new Request("http://x/api/cron/harian", { headers: auth ? { authorization: auth } : {} }));
 
@@ -63,5 +65,16 @@ describe("GET /api/cron/harian", () => {
     expect((await res.json()).paymentsExpired).toBeNull();
     expect(runCoachSlotWatch).toHaveBeenCalledTimes(1);
     error.mockRestore();
+  });
+
+  it("penjaga jadwal error: pekerjaan lain tetap jalan dan komisi dicairkan (TRD T2, T3)", async () => {
+    process.env.CRON_SECRET = "rahasia-uji";
+    runCoachSlotWatch.mockRejectedValueOnce(new Error("db putus"));
+    const res = await call("Bearer rahasia-uji");
+    expect(res.status).toBe(200);
+    expect(purgeOldNotifications).toHaveBeenCalled();
+    expect(releaseStalePayments).toHaveBeenCalled();
+    expect(releaseDueCommissions).toHaveBeenCalled();
+    expect(await res.json()).toMatchObject({ watch: null, commissionsReleased: 1 });
   });
 });

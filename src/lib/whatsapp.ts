@@ -50,3 +50,11 @@ export function buildOwnerInquiryWaLink() {
     "Halo, saya punya kolam renang dan tertarik bergabung menjadi kolam mitra Swim Private Hub. Boleh minta info lebih lanjut?";
   return `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
+
+// Kabar persetujuan pendaftaran mitra, dikirim admin dari WhatsApp-nya sendiri
+// (pendaftar belum bisa membuka lonceng sebelum masuk).
+export function buildApprovalWaLink(phone: string, name: string, role: "COACH" | "POOL_OWNER") {
+  const as = role === "COACH" ? "coach" : "kolam mitra";
+  const message = `Halo ${name}, pendaftaranmu sebagai ${as} Swim Private Hub sudah disetujui. Silakan masuk di https://www.swimprivatehub.biz.id/login dengan nomor HP dan password yang kamu buat saat daftar. Terima kasih!`;
+  return buildWaLinkTo(phone, message);
+}

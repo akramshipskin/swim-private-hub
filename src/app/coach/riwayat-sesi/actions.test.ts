@@ -36,6 +36,8 @@ vi.mock("@/lib/wallet", () => ({
   reverseSessionRevenue: (...args: unknown[]) => reverseSessionRevenue(...args),
 }));
 
+const notifyUser = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/notify", () => ({ notifyUser: (...a: unknown[]) => notifyUser(...a) }));
 const { markAttendance } = await import("./actions");
 
 function formData(bookingId: string, attended: "true" | "false") {
@@ -56,9 +58,11 @@ function baseBooking(overrides: Record<string, unknown> = {}) {
     availability: {
       coachId: "coach-1",
       poolId: "pool-1",
+      startTime: new Date(PAST.getTime() - 60 * 60 * 1000),
       endTime: PAST,
       coach: { coachProfile: { id: "coachprofile-1" } },
     },
+    memberId: "member-1",
     package: {
       id: "pkg-1",
       totalSesi: 8,
@@ -67,6 +71,7 @@ function baseBooking(overrides: Record<string, unknown> = {}) {
       coachPrice: 800_000,
       serviceFee: 83_200,
       payments: [{ amount: 1_363_200 }],
+      dependent: { name: "Alya", isSelf: false },
     },
     ...overrides,
   };
@@ -266,5 +271,21 @@ describe("markAttendance", () => {
     expect(bookingUpdateMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "booking-1", attended: null, status: "BOOKED" } })
     );
+  });
+});
+
+describe("pemberitahuan ke member (Hadi 9 Okt, celah C)", () => {
+  it("tanda berubah: member diberi tahu; Tidak Hadir menyebut batas lapor 3 hari", async () => {
+    bookingFindUnique.mockResolvedValue(baseBooking());
+    await markAttendance(null, formData("booking-1", "false"));
+    expect(notifyUser).toHaveBeenCalledTimes(1);
+    expect(notifyUser.mock.calls[0][0]).toBe("member-1");
+    expect(notifyUser.mock.calls[0][2]).toMatch(/Alya.*3 hari/);
+  });
+
+  it("tanda sama dikirim ulang: tidak ada pemberitahuan", async () => {
+    bookingFindUnique.mockResolvedValue(baseBooking({ attended: true }));
+    await markAttendance(null, formData("booking-1", "true"));
+    expect(notifyUser).not.toHaveBeenCalled();
   });
 });

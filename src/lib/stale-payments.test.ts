@@ -30,7 +30,8 @@ describe("releaseStalePayments", () => {
     expect(await releaseStalePayments(now)).toBe(0);
     const arg = prismaMock.payment.findMany.mock.calls[0][0];
     expect(arg.where).toEqual({ status: "PENDING", createdAt: { lt: new Date(now.getTime() - STALE_PAYMENT_MS) } });
-    expect(arg.orderBy).toEqual({ createdAt: "asc" });
+    expect(arg.select).toMatchObject({ id: true, createdAt: true });
+    expect(arg.orderBy).toEqual([{ createdAt: "asc" }, { id: "asc" }]);
   });
 
   it("pembelian paket tanpa saldo: pembayaran dan paket kedaluwarsa, tidak ada pengembalian saldo", async () => {
@@ -83,5 +84,15 @@ describe("releaseStalePayments", () => {
     expect(await releaseStalePayments()).toBe(1);
     expect(tx.payment.updateMany).toHaveBeenCalledTimes(1);
     expect(tx.payment.updateMany).toHaveBeenCalledWith({ where: { id: "p2", status: "PENDING" }, data: { status: "EXPIRED" } });
+  });
+
+  it("lebih dari 50: diambil berputar sampai habis, yang ditahan tidak menghentikan putaran (TRD T2)", async () => {
+    const at = new Date("2026-10-01T00:00:00Z");
+    const held = Array.from({ length: 50 }, (_, i) => ({ id: `h${i}`, createdAt: at, rawWebhookPayload: { transaction_status: "settlement" } }));
+    prismaMock.payment.findMany.mockResolvedValueOnce(held).mockResolvedValueOnce([{ id: "p9", rawWebhookPayload: null }]);
+    tx.payment.findUniqueOrThrow.mockResolvedValue({ packageId: "k9", coachChangeRequestId: null, package: { memberId: "m1", saldoUsed: 0 }, coachChangeRequest: null });
+    expect(await releaseStalePayments()).toBe(1);
+    expect(prismaMock.payment.findMany).toHaveBeenCalledTimes(2);
+    expect(prismaMock.payment.findMany.mock.calls[1][0].where.OR).toEqual([{ createdAt: { gt: at } }, { createdAt: at, id: { gt: "h49" } }]);
   });
 });

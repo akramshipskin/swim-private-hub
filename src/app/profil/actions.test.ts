@@ -44,6 +44,11 @@ describe("updateCoachProfile", () => {
     expect(res).toEqual({ error: "Pilih minimal 1 keahlian." });
   });
 
+  it("nama coach yang memuat nomor HP ditolak; nama member tidak disaring (TRD T15)", async () => {
+    auth.mockResolvedValueOnce({ user: { id: "coach-1", role: "COACH" } });
+    expect((await updateName(null, fd([["name", "Budi WA 081234567890"]])))?.error).toMatch(/lewat aplikasi/);
+  });
+
   it("menolak bio yang memuat nomor HP, email, atau tautan chat (Hadi 9 Okt)", async () => {
     for (const bio of ["WA 0812-3456-7890", "email saya budi@x.com", "chat wa.me/6281234567890"]) {
       const res = await updateCoachProfile(null, fd([["bio", bio], ["specialties", "Gaya bebas"]]));

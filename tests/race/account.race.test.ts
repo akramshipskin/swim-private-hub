@@ -44,7 +44,8 @@ describe("Hapus akun member", () => {
     expect((await prisma.milestoneNote.findMany({ where: { dependent: { memberId: m.id } } })).every((n) => n.note === "(catatan dihapus)")).toBe(true);
     const login = await authorizeCredentials({ identifier: phone, password: "rahasia123" }, new Request("http://x", { headers: { "x-forwarded-for": "5.5.5.5" } })).catch((e) => e);
     expect(login).toBeNull();
-    expect(await checkInvariants()).toEqual([]);
+    // packages: false = paket diakhiri saat hapus akun, sisa sesi sengaja hangus (Hadi 10 Okt, T8).
+    expect(await checkInvariants({ packages: false })).toEqual([]);
   });
 
   it("D2: nomor HP & email yang dihapus boleh dipakai daftar lagi", async () => {
@@ -87,7 +88,8 @@ describe("Hapus akun member", () => {
       ]);
       expect(rs.every((r) => r.status === "fulfilled")).toBe(true);
       expect(await prisma.booking.count({ where: { status: "BOOKED" } })).toBe(0);
-      expect(await checkInvariants()).toEqual([]);
+      // packages: false = sisa sesi sengaja hangus saat hapus akun (Hadi 10 Okt, T8).
+      expect(await checkInvariants({ packages: false })).toEqual([]);
       tally(sebaran, `${await prisma.booking.count()} sempat dibooking`);
     }
     spread("D4", sebaran);

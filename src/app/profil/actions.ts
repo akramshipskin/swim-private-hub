@@ -1,5 +1,6 @@
 "use server";
 
+import { accountGateError } from "@/lib/require-role";
 import { auth, unstable_update } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { createDependent, createSelfDependent, assertDependentOwnedByMember, parseParticipantBirthDate } from "@/lib/dependents";
@@ -23,6 +24,7 @@ export async function updateName(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, silakan masuk lagi." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
 
   const rawName = formData.get("name")?.toString().trim() ?? "";
   if (!rawName) {
@@ -31,6 +33,8 @@ export async function updateName(
   if (rawName.length > MAX_NAME) {
     return { error: `Nama maksimal ${MAX_NAME} karakter.` };
   }
+  // Nama coach tampil ke member (TRD T15).
+  if (session.user.role === "COACH" && hasPersonalContact(rawName)) return { error: PERSONAL_CONTACT_ERROR };
   const name = toProperCase(rawName);
 
   // Peserta "diri sendiri" (Dependent.isSelf) menyalin nama akun saat dibuat;
@@ -58,6 +62,7 @@ export async function updatePasswordProfil(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, silakan masuk lagi." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
 
   const currentPassword = formData.get("currentPassword") as string;
   const newPassword = formData.get("newPassword") as string;
@@ -105,6 +110,7 @@ export async function addChild(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, silakan masuk lagi." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
   if (session.user.role !== "MEMBER") return { error: "Hanya member yang bisa menambah peserta." };
 
   const type = formData.get("type")?.toString();
@@ -137,6 +143,7 @@ export async function setDependentBirthDate(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, silakan masuk lagi." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
   if (session.user.role !== "MEMBER") return { error: "Hanya member yang bisa mengubah data peserta." };
   const dependentId = formData.get("dependentId")?.toString() ?? "";
   try {
@@ -153,6 +160,7 @@ export async function setDependentBirthDate(
 export async function toggleChildActive(dependentId: string, isActive: boolean) {
   const session = await auth();
   if (!session) throw new Error("Sesi habis, silakan masuk lagi.");
+  { const gate = accountGateError(session.user); if (gate) throw new Error(gate); }
 
   await assertDependentOwnedByMember(dependentId, session.user.id);
   await prisma.dependent.update({ where: { id: dependentId }, data: { isActive } });
@@ -169,6 +177,7 @@ export async function updateCoachProfile(
 ): Promise<ActionState> {
   const session = await auth();
   if (!session) return { error: "Sesi habis, silakan masuk lagi." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
   if (session.user.role !== "COACH") return { error: "Hanya untuk akun coach." };
 
   const bio = formData.get("bio")?.toString().trim() ?? "";
@@ -218,6 +227,7 @@ export async function updateCoachProfile(
 export async function uploadCoachPhoto(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
   if (!session || session.user.role !== "COACH") return { error: "Hanya untuk akun coach." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
   if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("photo") as File | null;
   const invalid = validateUpload(file, "photo");
@@ -247,10 +257,12 @@ const LIMIT_ERROR = `Maksimal ${MAX_CERTIFICATES_PER_COACH} sertifikat. Hapus se
 export async function uploadCoachCertificate(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
   if (!session || session.user.role !== "COACH") return { error: "Hanya untuk akun coach." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
   if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("certificate") as File | null;
   const name = formData.get("certificateName")?.toString().trim().slice(0, 120) ?? "";
   if (!name) return { error: "Isi nama sertifikat/lembaga." };
+  if (hasPersonalContact(name)) return { error: PERSONAL_CONTACT_ERROR };
   const invalid = validateUpload(file, "certificate");
   if (invalid) return { error: invalid };
   if (!(await hasMatchingSignature(file!))) return { error: SIGNATURE_MISMATCH_ERROR };
@@ -293,7 +305,7 @@ export async function uploadCoachCertificate(_prev: ActionState, formData: FormD
 // perlu ditampilkan; daftar di Profil langsung diperbarui).
 export async function deleteCoachCertificate(certificateId: string): Promise<void> {
   const session = await auth();
-  if (!session || session.user.role !== "COACH") return;
+  if (!session || session.user.role !== "COACH" || accountGateError(session.user)) return;
   const cert = await prisma.coachCertificate.findFirst({
     where: { id: certificateId, coachProfile: { userId: session.user.id } },
     select: { id: true, filePath: true },
@@ -309,6 +321,7 @@ export async function deleteCoachCertificate(certificateId: string): Promise<voi
 export async function uploadCoachSignature(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const session = await auth();
   if (!session || session.user.role !== "COACH") return { error: "Hanya untuk akun coach." };
+  { const gate = accountGateError(session.user); if (gate) return { error: gate }; }
   if (!isStorageConfigured()) return { error: "Unggah file belum diaktifkan admin." };
   const file = formData.get("signature") as File | null;
   const invalid = validateUpload(file, "photo");

@@ -4,11 +4,15 @@ const groupBy = vi.fn();
 const queryRaw = vi.fn();
 const aggregate = vi.fn();
 const create = vi.fn().mockResolvedValue({ id: "pw-1" });
+const commissionAggregate = vi.fn();
+const releaseDueCommissions = vi.fn().mockResolvedValue(0);
+vi.mock("@/lib/affiliate", () => ({ releaseDueCommissions: () => releaseDueCommissions() }));
 const tx = {
   $executeRaw: vi.fn(),
   $queryRaw: queryRaw,
   walletTransaction: { groupBy },
   platformWithdrawal: { aggregate, create },
+  affiliateCommission: { aggregate: commissionAggregate },
 };
 vi.mock("@/lib/prisma", () => ({ prisma: { ...tx, $transaction: (fn: (t: typeof tx) => unknown) => fn(tx) } }));
 
@@ -35,6 +39,7 @@ beforeEach(() => {
   queryRaw.mockReset();
   ledger([100_000, 12_000], [100_000, 12_000]);
   aggregate.mockResolvedValue({ _sum: { revenueAmount: 30_000, taxAmount: 2_000 } });
+  commissionAggregate.mockResolvedValue({ _sum: { amount: null } });
 });
 
 describe("platform wallet", () => {
@@ -42,7 +47,7 @@ describe("platform wallet", () => {
     groupBy.mockReset();
     queryRaw.mockReset();
     ledger([100_000, 12_000], [60_000, 7_000]);
-    expect(await getPlatformBalance()).toEqual({ revenue: 70_000, tax: 10_000, availableRevenue: 30_000, availableTax: 5_000 });
+    expect(await getPlatformBalance()).toEqual({ revenue: 70_000, tax: 10_000, availableRevenue: 30_000, availableTax: 5_000, pendingCommissions: 0 });
   });
 
   it("batas 'matang' = sekarang dikurangi 3 hari, dikirim sebagai parameter SQL", async () => {
@@ -58,7 +63,7 @@ describe("platform wallet", () => {
     queryRaw.mockReset();
     groupBy.mockResolvedValueOnce([]);
     queryRaw.mockResolvedValueOnce([]);
-    expect(await getPlatformBalance()).toEqual({ revenue: -30_000, tax: -2_000, availableRevenue: -30_000, availableTax: -2_000 });
+    expect(await getPlatformBalance()).toEqual({ revenue: -30_000, tax: -2_000, availableRevenue: -30_000, availableTax: -2_000, pendingCommissions: 0 });
   });
 
   it("withdraws revenue only when tax is not included, with transfer reference", async () => {
@@ -85,6 +90,22 @@ describe("platform wallet", () => {
 
   it("wajib bukti transfer", async () => {
     await expect(withdrawPlatformBalance({ ...base, transferReference: "  ", revenueAmount: 1_000, includeTax: false })).rejects.toThrow("bukti transfer");
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("komisi afiliasi tertunda mengurangi yang boleh ditarik; komisi jatuh tempo dicairkan sebelum menarik (TRD T3)", async () => {
+    groupBy.mockReset();
+    queryRaw.mockReset();
+    ledger([100_000, 12_000], [60_000, 7_000]);
+    commissionAggregate.mockResolvedValueOnce({ _sum: { amount: 20_000 } });
+    expect(await getPlatformBalance()).toMatchObject({ availableRevenue: 10_000, pendingCommissions: 20_000 });
+
+    groupBy.mockReset();
+    queryRaw.mockReset();
+    ledger([100_000, 12_000], [60_000, 7_000]);
+    commissionAggregate.mockResolvedValueOnce({ _sum: { amount: 20_000 } });
+    await expect(withdrawPlatformBalance({ ...base, revenueAmount: 15_000, includeTax: false })).rejects.toThrow(/melebihi saldo/);
+    expect(releaseDueCommissions).toHaveBeenCalled();
     expect(create).not.toHaveBeenCalled();
   });
 });

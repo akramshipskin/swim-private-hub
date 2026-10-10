@@ -4,6 +4,9 @@ import { openSecret } from "@/lib/secret-box";
 vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ user: { id: "coach-1" } }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/withdrawal-notify", () => ({ notifyAdminsWithdrawalRequested: vi.fn() }));
+const confirmBankChangePassword = vi.fn().mockResolvedValue(null);
+const notifyBankChanged = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/bank-change", () => ({ confirmBankChangePassword: (...a: unknown[]) => confirmBankChangePassword(...a), notifyBankChanged: (...a: unknown[]) => notifyBankChanged(...a) }));
 
 const profileFind = vi.fn();
 const profileUpdate = vi.fn();
@@ -22,6 +25,7 @@ const form = (o: Record<string, string>) => {
 beforeEach(() => {
   vi.clearAllMocks();
   profileFind.mockResolvedValue({ id: "cp-1" });
+  confirmBankChangePassword.mockResolvedValue(null);
   profileUpdate.mockResolvedValue({});
 });
 
@@ -46,5 +50,17 @@ describe("coach updateBankInfo", () => {
   it("menolak field kosong", async () => {
     await expect(updateBankInfo(null, form({ bankAccountNumber: "" }))).resolves.toEqual({ error: "Semua data rekening wajib diisi." });
     expect(profileUpdate).not.toHaveBeenCalled();
+  });
+
+  it("password salah: rekening tidak disimpan dan tidak ada pemberitahuan (TRD T13)", async () => {
+    confirmBankChangePassword.mockResolvedValueOnce("Password salah.");
+    expect(await updateBankInfo(null, form({}))).toEqual({ error: "Password salah." });
+    expect(profileUpdate).not.toHaveBeenCalled();
+    expect(notifyBankChanged).not.toHaveBeenCalled();
+  });
+
+  it("berhasil: pemilik dan admin diberi tahu", async () => {
+    await updateBankInfo(null, form({}));
+    expect(notifyBankChanged).toHaveBeenCalledTimes(1);
   });
 });

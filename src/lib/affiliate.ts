@@ -164,6 +164,9 @@ export async function releaseDueCommissions(now: Date = new Date()) {
   let released = 0;
   for (const { id } of due) {
     const ok = await prisma.$transaction(async (tx) => {
+      // Kunci yang sama dengan penarikan uang SPH (platform-wallet.ts): komisi
+      // tidak cair di tengah hitungan saldo SPH yang boleh ditarik (TRD T3).
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('platform-withdrawal'))`;
       const claim = await tx.affiliateCommission.updateMany({
         where: { id, status: "PENDING", releaseAt: { lte: now } },
         data: { status: "RELEASED", releasedAt: now },

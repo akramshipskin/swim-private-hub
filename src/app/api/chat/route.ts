@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { notifyAdmins } from "@/lib/notify";
 import { withDedupeLock } from "@/lib/dedupe-lock";
 import { roleLabel } from "@/lib/nav-links";
 import { askAi, buildSystemPrompt, normalizeTurns, stripEscalateToken, chatVisibleSince, ESCALATE_TOKEN, MAX_CHAT_LENGTH } from "@/lib/chat-ai";
@@ -34,9 +35,12 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await currentUser();
   if (!user) return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
+  // Password sementara = ganti dulu (TRD T9); perjanjian mitra tidak menghalangi bertanya.
+  if (user.mustChangePassword) return Response.json({ error: "Ganti password sementara dulu." }, { status: 403 });
 
-  const { content } = (await request.json().catch(() => ({}))) as { content?: string };
-  const text = content?.trim() ?? "";
+  const { content } = (await request.json().catch(() => ({}))) as { content?: unknown };
+  // Isi bukan teks dulu membuat error 500 (TRD T20).
+  const text = typeof content === "string" ? content.trim() : "";
   if (!text) return Response.json({ error: "Pesan tidak boleh kosong." }, { status: 400 });
   if (text.length > MAX_CHAT_LENGTH) {
     return Response.json({ error: `Pesan maksimal ${MAX_CHAT_LENGTH} karakter.` }, { status: 400 });
@@ -100,6 +104,13 @@ export async function POST(request: Request) {
       }),
       prisma.chatThread.update({ where: { id: thread.id }, data: escalate ? { needsAdmin: true } : { updatedAt: new Date() } }),
     ]);
+  }
+
+  // Admin diberi tahu saat percakapan baru diteruskan kepadanya (Hadi 10 Okt);
+  // sekali per antrean, bukan tiap pesan selama masih menunggu dibalas.
+  const escalated = aiReply === null || aiReply.includes(ESCALATE_TOKEN);
+  if (escalated && !thread.needsAdmin) {
+    await notifyAdmins("Pesan bantuan baru", `${user.name ?? "Pengguna"}: ${text.slice(0, 80)}`, "/admin/pesan").catch(() => {});
   }
 
   return GET();

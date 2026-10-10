@@ -4,7 +4,7 @@ import { createSelfDependent, parseParticipantBirthDate } from "@/lib/dependents
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { consentData, CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { normalizeAffiliateCode } from "@/lib/affiliate";
-import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
+import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_MEMBER_PER_IP, REGISTER_WINDOW_MS, REGISTER_PROBE_PER_IP } from "@/lib/rate-limit";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, MAX_EMAIL, MAX_NAME, MAX_PASSWORD, readJsonObject } from "@/lib/register-input";
 import { userErrorMessage } from "@/lib/user-error";
 import { isCity } from "@/lib/cities";
@@ -63,7 +63,8 @@ export async function POST(request: Request) {
   if (website) {
     return Response.json({ error: "Pendaftaran gagal. Coba lagi." }, { status: 400 });
   }
-  if (typeof formRenderedAt === "number" && Date.now() - formRenderedAt < 1500) {
+  // Waktu isi wajib dikirim (TRD T16): tanpa isian ini pemeriksa bisa dilewati.
+  if (typeof formRenderedAt !== "number" || Date.now() - formRenderedAt < 1500) {
     return Response.json({ error: "Pendaftaran gagal. Tunggu sebentar, lalu kirim lagi." }, { status: 400 });
   }
   // entryReferrer dikirim client (document.referrer pas landing pertama,
@@ -151,6 +152,10 @@ export async function POST(request: Request) {
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
+    // Batas per jaringan untuk cek nomor terdaftar (TRD T16).
+    if (!(await takeAttempt(`register-probe:${clientIp(request.headers)}`, REGISTER_PROBE_PER_IP, REGISTER_WINDOW_MS))) {
+      return Response.json({ error: RATE_LIMIT_REGISTER_ERROR }, { status: 429 });
+    }
     return Response.json(
       { error: "Nomor HP atau email sudah terdaftar." },
       { status: 409 }

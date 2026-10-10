@@ -11,6 +11,12 @@ export async function GET(request: Request) {
   if (!session) {
     return Response.json({ error: "Kamu belum masuk atau tidak punya akses ke fitur ini. Silakan masuk lagi." }, { status: 401 });
   }
+  // Hanya member (yang booking) dan admin. Pemilik kolam dan coach tidak
+  // melihat jadwal dan kepadatan kolam lain lewat sini (Hadi 11 Okt, T14);
+  // jadwal kolam sendiri ada di halaman Jadwal Kolam.
+  if (session.user.role !== "MEMBER" && session.user.role !== "ADMIN") {
+    return Response.json({ error: "Kamu tidak punya akses ke fitur ini." }, { status: 403 });
+  }
 
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date") ?? todayWibDateString();

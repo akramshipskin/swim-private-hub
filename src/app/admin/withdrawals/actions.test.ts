@@ -118,11 +118,18 @@ describe("processWithdrawal", () => {
 });
 
 describe("markPaidManually", () => {
-  it("allows marking paid from either PENDING or PROCESSING", async () => {
+  it("tandai dibayar: PENDING langsung; PROCESSING hanya setelah admin menyatakan sudah cek Iris (TRD T12)", async () => {
+    findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
+    expect(await markPaidManually(null, formData("wd-1"))).toBeNull();
+    expect(markWithdrawalPaid).toHaveBeenCalledWith("wd-1", undefined, { transferReference: "TRF-20260925-01", processedById: "admin-1" }, ["PENDING"]);
+    markWithdrawalPaid.mockClear();
     findUnique.mockResolvedValue({ id: "wd-1", status: "PROCESSING" });
-    const result = await markPaidManually(null, formData("wd-1"));
-    expect(result).toBeNull();
-    expect(markWithdrawalPaid).toHaveBeenCalledWith("wd-1", undefined, { transferReference: "TRF-20260925-01", processedById: "admin-1" });
+    expect((await markPaidManually(null, formData("wd-1")))?.error).toMatch(/sedang diproses/);
+    expect(markWithdrawalPaid).not.toHaveBeenCalled();
+    const fd = formData("wd-1");
+    fd.set("confirmedPaid", "true");
+    expect(await markPaidManually(null, fd)).toBeNull();
+    expect(markWithdrawalPaid).toHaveBeenCalledWith("wd-1", undefined, { transferReference: "TRF-20260925-01", processedById: "admin-1" }, ["PROCESSING"]);
   });
 
   // Keputusan Hadi 25 Sep: bukti transfer wajib saat Tandai Dibayar.
@@ -146,7 +153,7 @@ describe("rejectWithdrawal", () => {
     findUnique.mockResolvedValue({ id: "wd-1", status: "PENDING" });
     const result = await rejectWithdrawal(null, formData("wd-1"));
     expect(result).toBeNull();
-    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Ditolak admin", "admin-1");
+    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Ditolak admin", "admin-1", ["PENDING"]);
   });
 
   it("refuses when the request is already FAILED", async () => {
@@ -170,7 +177,7 @@ describe("rejectWithdrawal", () => {
     const fd = formData("wd-1");
     fd.set("confirmedFailed", "true");
     await rejectWithdrawal(null, fd);
-    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Gagal di Iris (dicek admin)", "admin-1");
+    expect(markWithdrawalFailed).toHaveBeenCalledWith("wd-1", "Gagal di Iris (dicek admin)", "admin-1", ["PROCESSING"]);
   });
 });
 

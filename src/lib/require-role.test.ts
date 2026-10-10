@@ -46,3 +46,14 @@ describe("requireRole", () => {
     expect(res.user).toMatchObject({ id: "u1", role: "ADMIN", name: "Hadi" });
   });
 });
+
+describe("accountGateError (TRD T9)", async () => {
+  const { accountGateError } = await import("./require-role");
+  it("urutan: password sementara, 2FA, perjanjian; lolos = null", () => {
+    expect(accountGateError({ mustChangePassword: true, needsPartnerAgreement: true })).toBe("Ganti password sementara dulu.");
+    expect(accountGateError({ needsTotpSetup: true })).toMatch(/verifikasi 2 langkah/);
+    expect(accountGateError({ needsPartnerAgreement: true })).toMatch(/perjanjian/i);
+    expect(accountGateError({})).toBeNull();
+  });
+});
+

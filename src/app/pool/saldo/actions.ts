@@ -7,6 +7,7 @@ import { requestPoolWithdrawal, WithdrawalError } from "@/lib/withdrawal";
 import { notifyAdminsWithdrawalRequested } from "@/lib/withdrawal-notify";
 import { revalidatePath } from "next/cache";
 import { sealSecret } from "@/lib/secret-box";
+import { confirmBankChangePassword, notifyBankChanged } from "@/lib/bank-change";
 import { userErrorMessage } from "@/lib/user-error";
 
 export type ActionState = { error?: string; ok?: boolean } | null;
@@ -42,6 +43,8 @@ export async function updateBankInfo(
   if (bankError) return { error: bankError };
   const account = normalizeBankAccount(bankAccountNumber, bankAccountName);
   if ("error" in account) return { error: account.error };
+  const passwordError = await confirmBankChangePassword(session.user.id, (formData.get("password") as string | null) ?? "");
+  if (passwordError) return { error: passwordError };
 
   try {
     const pool = await getOwnedPool(session.user.id, poolId);
@@ -50,6 +53,8 @@ export async function updateBankInfo(
       // Nomor rekening disimpan terenkripsi (src/lib/secret-box.ts).
       data: { bankName, bankAccountNumber: sealSecret(account.number), bankAccountName },
     });
+    const owners = await prisma.poolOwnership.findMany({ where: { poolId: pool.id }, select: { ownerId: true } });
+    await notifyBankChanged({ ownerIds: owners.map((o) => o.ownerId), who: `Kolam ${pool.name}`, bankName, accountNumber: account.number, url: "/pool/saldo" });
   } catch (err) {
     return { error: userErrorMessage(err, "Gagal menyimpan rekening. Coba lagi.") };
   }

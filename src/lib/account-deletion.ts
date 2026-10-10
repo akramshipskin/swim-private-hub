@@ -136,6 +136,17 @@ export async function anonymizeMember(userId: string) {
       if (!(err instanceof CancelError)) throw err;
     }
   }
+  // Paket diakhiri, sisa sesi hangus (Hadi 10 Okt, T8): paket akun yang dihapus
+  // tidak lagi diawasi penjaga jadwal dan tidak menahan coach melepas kolam.
+  // Sesi yang sudah lewat tapi belum ditandai tetap bisa ditandai coach.
+  // Pengajuan ganti coach yang belum diputuskan ikut dibatalkan.
+  await prisma.$transaction([
+    prisma.package.updateMany({ where: { memberId: userId, status: "ACTIVE" }, data: { status: "EXPIRED", sisaSesi: 0 } }),
+    // Menunggu tambah bayar tanpa pembayaran berjalan juga ikut dibatalkan (yang
+    // masih berjalan sudah menolak hapus akun di atas); tanpa ini pengajuan tidak
+    // pernah kedaluwarsa dan coach tujuan tidak bisa melepas kolam.
+    prisma.coachChangeRequest.updateMany({ where: { memberId: userId, status: { in: ["PENDING", "AWAITING_PAYMENT"] } }, data: { status: "CANCELLED", adminNote: "Akun member dihapus" } }),
+  ]);
   // Pembatalan di atas mengirim kabar ke akun ini dan ikut tercatat di lonceng;
   // hapus lagi supaya akun yang sudah dianonimkan tidak menyisakan riwayat.
   if (cancelled > 0) await prisma.inAppNotification.deleteMany({ where: { userId } });

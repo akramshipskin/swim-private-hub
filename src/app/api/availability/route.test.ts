@@ -1,12 +1,21 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/auth", () => ({ auth: vi.fn().mockResolvedValue({ user: { id: "m1", role: "MEMBER" } }) }));
+const auth = vi.fn().mockResolvedValue({ user: { id: "m1", role: "MEMBER" } });
+vi.mock("@/auth", () => ({ auth: () => auth() }));
 const findMany = vi.fn().mockResolvedValue([]);
 vi.mock("@/lib/prisma", () => ({ prisma: { availability: { findMany: (...a: unknown[]) => findMany(...a) } } }));
 
 const { GET } = await import("./route");
 
 describe("GET /api/availability", () => {
+  it("pemilik kolam dan coach ditolak, tanpa membaca database (Hadi 11 Okt, T14)", async () => {
+    for (const role of ["POOL_OWNER", "COACH"]) {
+      auth.mockResolvedValueOnce({ user: { id: "x", role } });
+      expect((await GET(new Request("http://x/api/availability?date=2099-01-05"))).status).toBe(403);
+    }
+    expect(findMany).not.toHaveBeenCalled();
+  });
+
   // Regression: ?date=xyz dulu jadi Invalid Date di query -> 500.
   it("returns 400 for a malformed date without querying the DB", async () => {
     for (const d of ["xyz", "2026-13-45", "2026-9-1"]) {

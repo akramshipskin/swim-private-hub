@@ -4,7 +4,7 @@ import { hasPersonalContact, PERSONAL_CONTACT_ERROR } from "@/lib/contact-filter
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { requireRole } from "@/lib/require-role";
+import { accountGateError, requireRole } from "@/lib/require-role";
 import { notifyAdmins, notifyUser } from "@/lib/notify";
 import { coachHasTaughtDependent, visibleItemsWhere } from "@/lib/milestone-data";
 import {
@@ -22,7 +22,7 @@ class MilestoneError extends Error {}
 async function requireTeachingCoach(dependentId: string) {
   const session = await auth();
   if (!session || session.user.role !== "COACH") throw new MilestoneError("Hanya coach yang bisa mengisi milestone.");
-  if (session.user.needsPartnerAgreement) throw new MilestoneError("Setujui perjanjian kemitraan dulu.");
+  { const gate = accountGateError(session.user); if (gate) throw new MilestoneError(gate); }
   if (!(await coachHasTaughtDependent(session.user.id, dependentId))) {
     throw new MilestoneError("Milestone bisa diisi setelah minimal 1 sesi peserta ini ditandai Hadir.");
   }

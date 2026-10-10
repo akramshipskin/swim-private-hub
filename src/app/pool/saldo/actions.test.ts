@@ -4,11 +4,14 @@ import { openSecret } from "@/lib/secret-box";
 vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn().mockResolvedValue({ user: { id: "owner-1" } }) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/withdrawal-notify", () => ({ notifyAdminsWithdrawalRequested: vi.fn() }));
+const confirmBankChangePassword = vi.fn().mockResolvedValue(null);
+const notifyBankChanged = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/bank-change", () => ({ confirmBankChangePassword: (...a: unknown[]) => confirmBankChangePassword(...a), notifyBankChanged: (...a: unknown[]) => notifyBankChanged(...a) }));
 
 const poolFind = vi.fn();
 const poolUpdate = vi.fn();
 vi.mock("@/lib/prisma", () => ({
-  prisma: { pool: { findFirst: (...a: unknown[]) => poolFind(...a), update: (...a: unknown[]) => poolUpdate(...a) } },
+  prisma: { pool: { findFirst: (...a: unknown[]) => poolFind(...a), update: (...a: unknown[]) => poolUpdate(...a) }, poolOwnership: { findMany: async () => [{ ownerId: "owner-1" }] } },
 }));
 
 const { updateBankInfo } = await import("./actions");
@@ -21,7 +24,8 @@ const form = (o: Record<string, string>) => {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  poolFind.mockResolvedValue({ id: "pool-1" });
+  poolFind.mockResolvedValue({ id: "pool-1", name: "Tirta" });
+  confirmBankChangePassword.mockResolvedValue(null);
   poolUpdate.mockResolvedValue({});
 });
 
@@ -44,5 +48,17 @@ describe("pool updateBankInfo", () => {
     poolFind.mockResolvedValue(null);
     await expect(updateBankInfo("pool-x", null, form({}))).resolves.toEqual({ error: "Kolam ini bukan milik akunmu." });
     expect(poolUpdate).not.toHaveBeenCalled();
+  });
+
+  it("password salah: rekening tidak disimpan dan tidak ada pemberitahuan (TRD T13)", async () => {
+    confirmBankChangePassword.mockResolvedValueOnce("Password salah.");
+    expect(await updateBankInfo("pool-1", null, form({}))).toEqual({ error: "Password salah." });
+    expect(poolUpdate).not.toHaveBeenCalled();
+    expect(notifyBankChanged).not.toHaveBeenCalled();
+  });
+
+  it("berhasil: pemilik dan admin diberi tahu", async () => {
+    await updateBankInfo("pool-1", null, form({}));
+    expect(notifyBankChanged).toHaveBeenCalledTimes(1);
   });
 });

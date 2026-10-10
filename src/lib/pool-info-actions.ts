@@ -1,5 +1,6 @@
 "use server";
 
+import { hasPersonalContact, PERSONAL_CONTACT_ERROR } from "@/lib/contact-filter";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -49,6 +50,8 @@ export async function updatePoolInfo(_prev: PoolInfoState, formData: FormData): 
   const openTime = str("openTime");
   const closeTime = str("closeTime");
   if (description.length > 1000) return { error: "Deskripsi maksimal 1000 karakter." };
+  // Deskripsi kolam tampil ke member (TRD T15); nomor kontak kolam punya isian sendiri.
+  if (hasPersonalContact(description)) return { error: PERSONAL_CONTACT_ERROR };
   if (address.length > 300) return { error: "Alamat maksimal 300 karakter." };
   if (contactPhone.length > 20) return { error: "Nomor telepon maksimal 20 karakter." };
   if ((openTime && !TIME.test(openTime)) || (closeTime && !TIME.test(closeTime))) {

@@ -157,34 +157,49 @@ export async function updatePackage(
     return { error: "Jatah batal wajib diisi (0 atau lebih)." };
   }
 
-  const pkg = await prisma.package.findUnique({ where: { id: packageId } });
-  if (!pkg) {
-    return { error: "Paket tidak ditemukan, mungkin sudah dihapus." };
-  }
-  // Clamp biar sisa sesi gak bisa ngelewatin total sesi paketnya sendiri.
-  const sisaSesi = Math.min(sisaSesiRaw, pkg.totalSesi);
-
   // expectedSisaSesi = nilai sisa sesi pas form edit dibuka. Sisa sesi di
   // sini ditimpa nilai absolut, jadi kalau di antara buka form & klik
   // Simpan member sempet booking/batal, simpan tanpa cek ini nge-hapus
   // perubahan itu diem-diem (tes race lokal 2026-09-17: 3 booking masuk
-  // barengan, sisa sesi balik ke angka lama = 3 sesi gratis).
+  // barengan, sisa sesi balik ke angka lama = 3 sesi gratis). Wajib (TRD T11).
   const expectedRaw = formData.get("expectedSisaSesi");
-  const expected = expectedRaw === null || expectedRaw === "" ? null : Number(expectedRaw);
+  const expected = expectedRaw === null || expectedRaw === "" ? NaN : Number(expectedRaw);
+  if (!Number.isInteger(expected)) {
+    return { error: "Muat ulang halaman, lalu simpan lagi." };
+  }
 
-  const result = await prisma.package.updateMany({
-    where: { id: packageId, ...(expected !== null && Number.isInteger(expected) ? { sisaSesi: expected } : {}) },
-    data: {
-      sisaSesi,
-      jatahCancel: jatahCancelRaw,
-      status,
-      expiredDate: resolveExpiredDate(expiredDateRaw, pkg.expiredDate),
-    },
+  const outcome = await prisma.$transaction(async (tx) => {
+    // Kunci baris paket: booking/batal yang berjalan bersamaan antre di sini.
+    const [pkg] = await tx.$queryRaw<{ totalSesi: number; sisaSesi: number; status: string; expiredDate: Date | null }[]>`
+      SELECT "totalSesi", "sisaSesi", status::text AS status, "expiredDate" FROM "Package" WHERE id = ${packageId} FOR UPDATE`;
+    if (!pkg) return "NOT_FOUND" as const;
+    if (pkg.sisaSesi !== expected) return "CHANGED" as const;
+    // Paket Menunggu Pembayaran hanya berubah lewat pembayaran (TRD T1): admin
+    // tidak bisa mengaktifkannya tanpa bayar.
+    if (pkg.status === "PENDING_PAYMENT") return "PENDING" as const;
+    if (status !== "ACTIVE" && status !== "EXPIRED") return "BAD_STATUS" as const;
+    // Sisa sesi maksimal = total dikurangi sesi yang sudah dibooking (yang
+    // sudah berjalan atau terjadwal), supaya kolam dan coach tidak dibayar
+    // melebihi yang dibayar member (TRD T11, Hadi 10 Okt).
+    const used = await tx.booking.count({ where: { packageId, status: "BOOKED" } });
+    const max = Math.max(0, pkg.totalSesi - used);
+    if (sisaSesiRaw > max) return { tooMany: max };
+    await tx.package.update({
+      where: { id: packageId },
+      data: { sisaSesi: sisaSesiRaw, jatahCancel: jatahCancelRaw, status, expiredDate: resolveExpiredDate(expiredDateRaw, pkg.expiredDate) },
+    });
+    return "OK" as const;
   });
-  if (result.count === 0) {
+  if (outcome === "NOT_FOUND") return { error: "Paket tidak ditemukan, mungkin sudah dihapus." };
+  if (outcome === "CHANGED") {
     return {
       error: "Sisa sesi paket ini baru saja berubah (ada booking/pembatalan baru). Muat ulang halaman, cek angkanya, lalu simpan lagi.",
     };
+  }
+  if (outcome === "PENDING") return { error: "Paket ini masih menunggu pembayaran, jadi belum bisa diubah." };
+  if (outcome === "BAD_STATUS") return { error: "Status hanya bisa Aktif atau Berakhir." };
+  if (typeof outcome === "object") {
+    return { error: `Sisa sesi maksimal ${outcome.tooMany} (total sesi dikurangi sesi yang sudah dibooking).` };
   }
 
   revalidatePath("/admin/paket");

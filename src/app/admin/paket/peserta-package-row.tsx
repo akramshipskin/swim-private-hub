@@ -77,7 +77,7 @@ export default function PesertaPackageRow({
                 </Field>
                 <Field label="Status">
                   <Select name="status" defaultValue={pkg.status} className="w-full sm:w-44">
-                    <option value="PENDING_PAYMENT">Menunggu Pembayaran</option>
+                    {pkg.status === "PENDING_PAYMENT" && <option value="PENDING_PAYMENT" disabled>Menunggu Pembayaran</option>}
                     <option value="ACTIVE">Aktif</option>
                     <option value="EXPIRED">Berakhir</option>
                   </Select>

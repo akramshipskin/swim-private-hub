@@ -56,6 +56,17 @@ export default async function AdminKolamPage() {
     }),
   ]);
 
+  // Paket aktif per coach + kolam: peringatan sebelum admin mencopot coach
+  // (Hadi 11 Okt, T17: admin tetap boleh, member dapat ganti tanpa biaya lewat penjaga jadwal).
+  const nowTs = new Date();
+  const activeByPair = new Map(
+    (await prisma.package.groupBy({
+      by: ["poolId", "coachId"],
+      where: { status: "ACTIVE", sisaSesi: { gt: 0 }, coachId: { not: null }, OR: [{ expiredDate: null }, { expiredDate: { gt: nowTs } }] },
+      _count: { _all: true },
+    })).map((g) => [`${g.poolId}:${g.coachId}`, g._count._all]),
+  );
+
   // Rincian asal saldo per kolam: pendapatan sesi (termasuk riwayat paket model
   // lama, yang tetap tercatat di buku besar), koreksi manual, lalu penarikan.
   const [revenueTxns, paidOut, processing, pphByPool, affiliateByPool] = await Promise.all([
@@ -203,6 +214,7 @@ export default async function AdminKolamPage() {
                     coachId: a.coachId,
                     coachName: a.coach.name,
                     photoUrl: a.coach.coachProfile?.photoUrl ?? null,
+                    activePackages: activeByPair.get(`${p.id}:${a.coachId}`) ?? 0,
                   }))}
                 />
               </CardBody>

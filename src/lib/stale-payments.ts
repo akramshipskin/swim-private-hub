@@ -12,16 +12,40 @@ import { PAYMENT_WINDOW_MS } from "@/lib/policy";
 // Batas yang dilihat member tetap 24 jam (expiry Snap).
 export const STALE_PAYMENT_MS = PAYMENT_WINDOW_MS + 15 * 60 * 1000;
 
+const BATCH = 50;
+
 export async function releaseStalePayments(now = new Date()) {
-  const stale = await prisma.payment.findMany({
-    // Semua pembayaran "Menunggu" yang lewat batas (Hadi 6 Okt, 2A): yang tidak
-    // menahan saldo ikut kedaluwarsa, supaya paket "Menunggu Pembayaran" tidak
-    // menumpuk. Paling lama dulu; sisanya diselesaikan di putaran berikutnya.
-    where: { status: "PENDING", createdAt: { lt: new Date(now.getTime() - STALE_PAYMENT_MS) } },
-    orderBy: { createdAt: "asc" },
-    select: { id: true, rawWebhookPayload: true },
-    take: 50,
-  });
+  let released = 0;
+  // Diambil per 50 sampai habis (TRD T2): pemeriksa hanya jalan sekali sehari,
+  // dan pembayaran yang sengaja ditahan (lunas tapi jumlahnya beda) tidak boleh
+  // menghabiskan jatah putaran. Kursor = baris terakhir putaran sebelumnya.
+  // Lanjut setelah baris terakhir (createdAt, id) putaran sebelumnya. Bukan
+  // kursor Prisma: baris kursor biasanya sudah berubah EXPIRED dan tidak lagi
+  // cocok dengan filter, sehingga posisinya bisa melompati satu baris.
+  let after: { createdAt: Date; id: string } | undefined;
+  const cutoff = new Date(now.getTime() - STALE_PAYMENT_MS);
+  for (;;) {
+    const stale = await prisma.payment.findMany({
+      // Semua pembayaran "Menunggu" yang lewat batas (Hadi 6 Okt, 2A): yang tidak
+      // menahan saldo ikut kedaluwarsa, supaya paket "Menunggu Pembayaran" tidak
+      // menumpuk. Paling lama dulu.
+      where: {
+        status: "PENDING",
+        createdAt: { lt: cutoff },
+        ...(after ? { OR: [{ createdAt: { gt: after.createdAt } }, { createdAt: after.createdAt, id: { gt: after.id } }] } : {}),
+      },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      select: { id: true, createdAt: true, rawWebhookPayload: true },
+      take: BATCH,
+    });
+    released += await releaseBatch(stale);
+    if (stale.length < BATCH) return released;
+    const last = stale[stale.length - 1];
+    after = { createdAt: last.createdAt, id: last.id };
+  }
+}
+
+async function releaseBatch(stale: { id: string; rawWebhookPayload: unknown }[]) {
   let released = 0;
   for (const { id, rawWebhookPayload } of stale) {
     // Midtrans sudah mengabari lunas tetapi jumlahnya tidak cocok: webhook sengaja

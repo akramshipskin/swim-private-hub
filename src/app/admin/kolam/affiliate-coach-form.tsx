@@ -8,7 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type Coach = { id: string; name: string };
-type Affiliation = { id: string; coachId: string; coachName: string; photoUrl: string | null };
+type Affiliation = { id: string; coachId: string; coachName: string; photoUrl: string | null; activePackages: number };
 
 export default function AffiliateCoachForm({
   poolId,
@@ -84,7 +84,11 @@ export default function AffiliateCoachForm({
       <ConfirmDialog
         open={removing !== null}
         title={`Lepas ${removing?.coachName ?? "coach"} dari kolam ini?`}
-        description="Semua jam kosong coach ini di kolam ini mulai sekarang akan dihapus. Sesi yang sudah dibooking tetap berjalan."
+        description={
+          removing && removing.activePackages > 0
+            ? `Perhatian: masih ada ${removing.activePackages} paket aktif member dengan coach ini di kolam ini. Semua jam kosongnya di kolam ini dihapus, sesi yang sudah dibooking tetap berjalan, dan member akan diberi hak ganti coach tanpa biaya oleh pemeriksa harian (hari ke-10).`
+            : "Semua jam kosong coach ini di kolam ini mulai sekarang akan dihapus. Sesi yang sudah dibooking tetap berjalan."
+        }
         confirmLabel="Ya, Lepas"
         onCancel={() => setRemoving(null)}
         onConfirm={() => {

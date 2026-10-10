@@ -12,3 +12,16 @@ describe("splitPlatformTax", () => {
     expect(net + tax).toBe(14_062);
   });
 });
+
+describe("adminSessionExpired (TRD T6)", async () => {
+  const { adminSessionExpired, ADMIN_SESSION_MAX_DAYS } = await import("./policy");
+  const DAY = 86_400_000;
+  it("tanpa waktu masuk = kedaluwarsa; 14 hari pas masih berlaku; lewat = kedaluwarsa", () => {
+    const now = Date.parse("2026-10-20T00:00:00Z");
+    expect(ADMIN_SESSION_MAX_DAYS).toBe(14);
+    expect(adminSessionExpired(undefined, now)).toBe(true);
+    expect(adminSessionExpired(now - 14 * DAY, now)).toBe(false);
+    expect(adminSessionExpired(now - 14 * DAY - 1, now)).toBe(true);
+  });
+});
+

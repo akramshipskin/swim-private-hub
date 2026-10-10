@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { runCoachSlotWatch } from "@/lib/coach-slot-watch";
 import { purgeOldNotifications } from "@/lib/notifications";
 import { releaseStalePayments } from "@/lib/stale-payments";
+import { releaseDueCommissions } from "@/lib/affiliate";
 
 // Pemeriksa harian (Vercel Cron, 06.00 WIB, lihat vercel.json). Vercel mengirim
 // "Authorization: Bearer <CRON_SECRET>". Tanpa CRON_SECRET di Vercel = semua
@@ -19,7 +20,11 @@ export async function GET(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
   // Penjaga jadwal paling dulu (paling penting; pekerjaan di bawahnya bisa lambat).
-  const watch = await runCoachSlotWatch();
+  // Gagal di sini tidak boleh menghentikan pekerjaan lain (TRD T2).
+  const watch = await runCoachSlotWatch().catch((err: unknown) => {
+    console.error(`[cron] penjaga jadwal gagal: ${(err as Error)?.message ?? "error"}`);
+    return null;
+  });
   // Riwayat lonceng lebih dari 90 hari dihapus (Hadi 4 Okt). Gagal hapus
   // tidak menggagalkan pekerjaan lain.
   const notificationsPurged = await purgeOldNotifications().catch((err: unknown) => {
@@ -31,5 +36,11 @@ export async function GET(request: Request) {
     console.error(`[cron] gagal mengedaluwarsakan pembayaran: ${(err as Error)?.message ?? "error"}`);
     return null;
   });
-  return Response.json({ ok: true, watch, notificationsPurged, paymentsExpired });
+  // Komisi afiliasi yang lewat masa tunggu dicairkan tiap hari, tidak menunggu
+  // halaman dibuka (TRD T3).
+  const commissionsReleased = await releaseDueCommissions().catch((err: unknown) => {
+    console.error(`[cron] gagal mencairkan komisi afiliasi: ${(err as Error)?.message ?? "error"}`);
+    return null;
+  });
+  return Response.json({ ok: true, watch, notificationsPurged, paymentsExpired, commissionsReleased });
 }

@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import { adminSessionExpired } from "@/lib/policy";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { authorizeCredentials } from "@/lib/authorize";
@@ -26,6 +27,9 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         token.role = user.role;
         token.mustChangePassword = user.mustChangePassword;
         token.sessionVersion = user.sessionVersion ?? 0;
+        // Waktu masuk tersimpan sendiri: penanda bawaan token diisi ulang
+        // setiap sesi diperpanjang, jadi tidak bisa dipakai (TRD T6).
+        token.loginAt = Date.now();
         return token;
       }
 
@@ -47,6 +51,11 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       });
 
       if (!dbUser || !dbUser.isActive) {
+        return null;
+      }
+      // Admin wajib masuk ulang (password + 2FA) setiap 14 hari (Hadi 10 Okt,
+      // T6). Token admin lama tanpa waktu masuk = masuk ulang sekali.
+      if (dbUser.role === "ADMIN" && adminSessionExpired(token.loginAt as number | undefined)) {
         return null;
       }
       // Token lama (sebelum kolom ini ada) belum bawa versi -- diadopsi,

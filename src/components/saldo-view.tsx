@@ -176,6 +176,11 @@ export default function SaldoView({
             <Field label="Nama Pemilik Rekening">
               <Input name="bankAccountName" defaultValue={bankAccountName ?? ""} disabled={bankLocked} required />
             </Field>
+            {!bankLocked && (
+              <Field label="Password Akun">
+                <Input name="password" type="password" autoComplete="current-password" required />
+              </Field>
+            )}
             {bankLocked ? (
               <Button type="button" variant="secondary" onClick={edit.startEdit} className="w-full">
                 Ubah Rekening

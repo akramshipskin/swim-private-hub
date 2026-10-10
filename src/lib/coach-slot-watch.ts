@@ -62,6 +62,10 @@ export function watchedPackageWhere(now: Date, coachId?: string) {
     sisaSesi: { gt: 0 },
     coachId: coachId ?? { not: null },
     OR: [{ expiredDate: null }, { expiredDate: { gt: now } }],
+    // Member yang dinonaktifkan admin atau akunnya dihapus tidak diawasi
+    // (Hadi 10 Okt, T8): coach tidak diperingatkan / dicatat melanggar untuk
+    // member yang tidak bisa booking. Hitungan dimulai ulang bila diaktifkan lagi.
+    member: { isActive: true, anonymizedAt: null },
   };
 }
 
@@ -99,7 +103,7 @@ export async function runCoachSlotWatch(now = new Date()) {
     where: watchedPackageWhere(now),
     select: {
       id: true, coachId: true, poolId: true, expiredDate: true, noSlotSince: true, memberId: true,
-      dependent: { select: { name: true } }, coach: { select: { name: true } }, pool: { select: { name: true, isActive: true } },
+      dependent: { select: { name: true } }, coach: { select: { name: true, isActive: true } }, pool: { select: { name: true, isActive: true } },
       // Paket pemberian admin (tanpa pembayaran) tidak dapat hak ganti tanpa biaya.
       _count: { select: { payments: { where: { status: "SUCCESS" } } } },
     },
@@ -122,7 +126,8 @@ export async function runCoachSlotWatch(now = new Date()) {
       select: { coachId: true, poolId: true },
     })).map((a) => `${a.coachId}:${a.poolId}`),
   );
-  const noFault = (p: (typeof pkgs)[number]) => !p.pool.isActive || !links.has(`${p.coachId}:${p.poolId}`);
+  // Coach yang dinonaktifkan admin juga bukan kelalaian coach (Hadi 10 Okt, T10).
+  const noFault = (p: (typeof pkgs)[number]) => !p.pool.isActive || !p.coach?.isActive || !links.has(`${p.coachId}:${p.poolId}`);
 
   const warnByCoach = new Map<string, number>();
   const adminByCoach = new Map<string, { name: string; lines: string[] }>();
@@ -145,7 +150,11 @@ export async function runCoachSlotWatch(now = new Date()) {
         ? (await prisma.package.updateMany({ where: { id: p.id, coachId: p.coachId, noSlotSince: p.noSlotSince, freeCoachChangeAt: null }, data: { freeCoachChangeAt: now } })).count > 0
         : days === FREE_CHANGE_AFTER_DAYS;
       if (!first) continue;
-      const why = p.pool.isActive ? `coach ${p.coach?.name ?? ""} sudah tidak mengajar di ${p.pool.name}` : `${p.pool.name} sedang tidak aktif`;
+      const why = !p.pool.isActive
+        ? `${p.pool.name} sedang tidak aktif`
+        : !p.coach?.isActive
+          ? `coach ${p.coach?.name ?? ""} sedang tidak aktif`
+          : `coach ${p.coach?.name ?? ""} sudah tidak mengajar di ${p.pool.name}`;
       await notifyUser(
         p.memberId,
         "Jadwal belum bisa dibooking",

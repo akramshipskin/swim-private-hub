@@ -12,7 +12,7 @@ const post = (handler: (r: Request) => Promise<Response>, raw: string) =>
   handler(new Request("http://x.test/api", { method: "POST", body: raw }));
 const json = (v: unknown) => JSON.stringify(v);
 
-const memberOk = { name: "Uji", phone: "081234567890", password: "abcdefgh1", wantsSelf: true, selfBirthDate: "1990-01-01", acceptedTerms: true };
+const memberOk = { name: "Uji", phone: "081234567890", password: "abcdefgh1", wantsSelf: true, selfBirthDate: "1990-01-01", acceptedTerms: true, formRenderedAt: Date.now() - 10_000 };
 
 describe.each([
   ["member", registerMember],
@@ -61,6 +61,18 @@ describe("POST /api/register (member): batas input", () => {
     const res = await post(registerMember, json({ ...memberOk, city: "Jakarta", email: "bukan-email" }));
     expect(res.status).toBe(400);
     expect((await res.json()).error).toBe("Format email tidak valid.");
+  });
+});
+
+describe("POST /api/register: waktu isi wajib (TRD T16)", () => {
+  it.each([
+    ["member", registerMember],
+    ["coach", registerCoach],
+    ["pool", registerPool],
+  ] as const)("%s: tanpa waktu isi ditolak sebelum menyentuh database", async (_n, handler) => {
+    const res = await post(handler, json({ ...memberOk, formRenderedAt: undefined }));
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/Tunggu sebentar/);
   });
 });
 

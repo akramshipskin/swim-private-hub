@@ -90,6 +90,21 @@ describe("Hapus akun diblokir saat ada pembayaran berjalan (1A)", () => {
     expect((await prisma.user.findUniqueOrThrow({ where: { id: x.m.id } })).anonymizedAt).toBeInstanceOf(Date);
   });
 
+  it("D-D: hapus akun disetujui = paket diakhiri dan sisa sesi hangus, booking mendatang batal, coach bisa melepas kolam (Hadi 10 Okt, T8)", async () => {
+    const pool = await mkPool();
+    const coach = await mkUser("COACH");
+    await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: coach.id } });
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id);
+    await requestAccountDeletion(m.id);
+    await anonymizeMember(m.id);
+    const after = await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } });
+    expect(after.status).toBe("EXPIRED");
+    expect(after.sisaSesi).toBe(0);
+    expect(await prisma.booking.count({ where: { memberId: m.id, status: "BOOKED", availability: { startTime: { gt: new Date() } } } })).toBe(0);
+    // packages: false = sisa sesi sengaja dihanguskan (sisa + booking != total).
+    expect(await checkInvariants({ packages: false })).toEqual([]);
+  });
+
   it("D-C: pembayaran milik member lain tidak ikut memblokir", async () => {
     const other = await pendingPkg(1);
     const coach = await mkUser("COACH");

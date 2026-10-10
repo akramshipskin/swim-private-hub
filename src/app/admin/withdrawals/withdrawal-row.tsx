@@ -99,6 +99,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
             )}
             <form ref={paidForm} action={paidAction} className="flex flex-wrap items-center gap-2">
               <input type="hidden" name="withdrawalId" value={w.id} />
+              {w.status === "PROCESSING" && <input type="hidden" name="confirmedPaid" value="true" />}
               <Input
                 name="transferReference"
                 aria-label="No. referensi transfer"
@@ -118,7 +119,7 @@ export default function WithdrawalRow({ w, irisEnabled }: { w: WithdrawalRowData
                   if (paidForm.current?.reportValidity()) setConfirming("paid");
                 }}
               >
-                Tandai Dibayar (Manual)
+                {w.status === "PROCESSING" ? "Tandai Dibayar (sudah dicek di Iris)" : "Tandai Dibayar (Manual)"}
               </Button>
             </form>
             <form ref={rejectForm} action={rejectAction}>

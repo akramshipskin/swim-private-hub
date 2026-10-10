@@ -30,6 +30,10 @@ export async function createUser(
   if (!rawName?.trim() || !phone || !password || !role) {
     return { error: "Nama, Nomor HP, password, dan peran wajib diisi." };
   }
+  // Peran divalidasi di server (TRD T20): isian bisa dipalsukan.
+  if (!["ADMIN", "COACH", "MEMBER", "POOL_OWNER"].includes(role)) {
+    return { error: "Pilih peran akun." };
+  }
   if (rawName.trim().length > MAX_NAME) return { error: `Nama maksimal ${MAX_NAME} karakter.` };
   if (email && email.length > MAX_EMAIL) return { error: `Email maksimal ${MAX_EMAIL} karakter.` };
   const name = toProperCase(rawName.trim());
@@ -88,7 +92,9 @@ export async function createUser(
           // Dibuat admin = sudah disetujui (tidak masuk daftar "menunggu").
           approvedAt: new Date(),
           // MEMBER wajib ganti password pas login pertama.
-          ...(role === "MEMBER" ? { mustChangePassword: true } : {}),
+          // Semua peran wajib ganti password saat pertama masuk, supaya admin
+          // tidak tahu password mitra seterusnya (Hadi 11 Okt, T18).
+          mustChangePassword: true,
           ...(role === "COACH" ? { coachProfile: { create: {} } } : {}),
         },
       });
@@ -121,13 +127,17 @@ export async function createUser(
   revalidatePath("/admin/users");
   // Bukan null: null = keadaan awal form, jadi dulu sukses tidak terlihat
   // (form tetap terisi, admin mengira gagal lalu kirim ulang -> "sudah terdaftar").
-  return { success: `Akun ${name} dibuat.${role === "MEMBER" ? " Wajib ganti password saat masuk pertama." : ""}` };
+  return { success: `Akun ${name} dibuat. Wajib ganti password saat masuk pertama.` };
 }
 
-export async function toggleUserActive(userId: string, nextActive: boolean) {
+// Hasil: firstApproval = persetujuan pendaftaran PERTAMA coach/pemilik kolam,
+// supaya admin langsung ditawari kabar lewat WhatsApp (Hadi 9 Okt, celah B:
+// pendaftar belum bisa membuka lonceng sebelum masuk).
+export async function toggleUserActive(userId: string, nextActive: boolean): Promise<{ firstApproval: boolean }> {
   const session = await requireRole("ADMIN");
   // Guard server-side juga (tombolnya udah disembunyiin buat diri sendiri).
-  if (userId === session.user.id && !nextActive) return;
+  if (userId === session.user.id && !nextActive) return { firstApproval: false };
+  let approvedNow = false;
 
   const user = await prisma.user.update({
     where: { id: userId },
@@ -138,6 +148,7 @@ export async function toggleUserActive(userId: string, nextActive: boolean) {
   // persetujuan" di dashboard hilang). Tidak menimpa tanggal lama.
   if (nextActive) {
     const firstApproval = await prisma.user.updateMany({ where: { id: userId, approvedAt: null }, data: { approvedAt: new Date() } });
+    approvedNow = firstApproval.count > 0 && (user.role === "COACH" || user.role === "POOL_OWNER");
     // Pemilik kolam yang baru didaftarkan: kolamnya ikut dinyalakan (dulu admin
     // harus klik Setujui dua kali, di Pengguna lalu di Kolam). Hanya saat
     // persetujuan PERTAMA, jadi kolam yang sengaja dinonaktifkan nanti tidak
@@ -174,6 +185,7 @@ export async function toggleUserActive(userId: string, nextActive: boolean) {
   }
 
   revalidatePath("/admin/users");
+  return { firstApproval: approvedNow };
 }
 
 // Alfabet tanpa karakter yang gampang ketuker pas dibaca/diketik ulang

@@ -6,7 +6,7 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/notify", () => ({ notifyAdmins: vi.fn(), notifyUser: vi.fn() }));
 const transaction = vi.fn();
 vi.mock("@/lib/prisma", () => ({ prisma: { $transaction: (...a: unknown[]) => transaction(...a), dependent: { findUniqueOrThrow: vi.fn() } } }));
-vi.mock("@/lib/require-role", () => ({ requireRole: vi.fn() }));
+vi.mock("@/lib/require-role", async (orig) => ({ ...(await orig<typeof import("@/lib/require-role")>()), requireRole: vi.fn() }));
 vi.mock("@/lib/milestone-data", () => ({ coachHasTaughtDependent: vi.fn().mockResolvedValue(true), visibleItemsWhere: vi.fn() }));
 
 const { saveMilestoneUpdate, addMilestoneItem } = await import("./actions");
@@ -32,5 +32,12 @@ describe("kontak pribadi di teks coach (Hadi 9 Okt)", () => {
   it("keterampilan tambahan dengan tautan WhatsApp ditolak", async () => {
     const res = await addMilestoneItem("d1", null, fd({ text: "Latihan privat via wa.me/6281234567890", level: "1" }));
     expect(res?.error).toMatch(/lewat aplikasi/);
+  });
+
+  it("password sementara: ditolak sebelum menulis apa pun (TRD T9)", async () => {
+    auth.mockResolvedValue({ user: { id: "coach-1", role: "COACH", mustChangePassword: true } });
+    const res = await saveMilestoneUpdate("d1", null, fd({ note: "Bagus" }));
+    expect(res?.error).toBe("Ganti password sementara dulu.");
+    expect(transaction).not.toHaveBeenCalled();
   });
 });

@@ -27,13 +27,15 @@ export async function GET(request: Request) {
   const recap = buildPphRecap(monthRows, keys);
 
   const [pools, coaches] = await Promise.all([
-    prisma.pool.findMany({ where: { id: { in: recap.filter((r) => r.kind === "Kolam").map((r) => r.ownerId) } }, select: { id: true, name: true } }),
+    prisma.pool.findMany({ where: { id: { in: recap.filter((r) => r.kind === "Kolam").map((r) => r.ownerId) } }, select: { id: true, name: true, contactPhone: true, ownerships: { take: 1, orderBy: { createdAt: "asc" }, select: { owner: { select: { phone: true, email: true } } } } } }),
     prisma.coachProfile.findMany({
       where: { id: { in: recap.filter((r) => r.kind === "Coach").map((r) => r.ownerId) } },
       select: { id: true, user: { select: { name: true, phone: true, email: true } } },
     }),
   ]);
   const poolName = new Map(pools.map((p) => [p.id, p.name]));
+  // Kontak kolam untuk akuntan (TRD T21): nomor kolam, atau HP/email pemilik pertama.
+  const poolContact = new Map(pools.map((p) => [p.id, p.contactPhone ?? p.ownerships[0]?.owner.phone ?? p.ownerships[0]?.owner.email ?? ""]));
   const coachInfo = new Map(coaches.map((c) => [c.id, c.user]));
 
   const header = ["Jenis", "Nama", "Kontak", "Bruto bagian mitra (Rp)", "PPh final 0,5% dipotong (Rp)"];
@@ -41,7 +43,8 @@ export async function GET(request: Request) {
     .map((r) => {
       const coach = r.kind === "Coach" ? coachInfo.get(r.ownerId) : undefined;
       const name = r.kind === "Kolam" ? (poolName.get(r.ownerId) ?? r.ownerId) : (coach?.name ?? r.ownerId);
-      return [r.kind, name, coach?.phone ?? coach?.email ?? "", r.gross, r.pph];
+      const contact = r.kind === "Kolam" ? (poolContact.get(r.ownerId) ?? "") : (coach?.phone ?? coach?.email ?? "");
+      return [r.kind, name, contact, r.gross, r.pph];
     })
     .sort((a, b) => String(a[0]).localeCompare(String(b[0])) || String(a[1]).localeCompare(String(b[1])));
   const total = ["", "Total", "", recap.reduce((s, r) => s + r.gross, 0), recap.reduce((s, r) => s + r.pph, 0)];

@@ -3,11 +3,12 @@ import { isCity } from "@/lib/cities";
 import { parseDailyCapacity, parseRegisterPrices } from "@/lib/pricing";
 import bcrypt from "bcryptjs";
 import { notifyAdmins } from "@/lib/notify";
+import { hasPersonalContact, PERSONAL_CONTACT_ERROR } from "@/lib/contact-filter";
 import { prisma } from "@/lib/prisma";
 import { identityTakenWhere, isValidIndonesianPhone, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
 import { consentData, PARTNER_CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { partnerAgreementData } from "@/lib/partner-agreement";
-import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS } from "@/lib/rate-limit";
+import { clientIp, takeAttempt, RATE_LIMIT_REGISTER_ERROR, REGISTER_STAFF_PER_IP, REGISTER_WINDOW_MS, REGISTER_PROBE_PER_IP } from "@/lib/rate-limit";
 import { checkTextFields, INVALID_BODY_ERROR, isPlausibleEmail, isStringArrayOrMissing, MAX_ADDRESS, MAX_EMAIL, MAX_NAME, MAX_PASSWORD, MAX_POOL_NAME, readJsonObject } from "@/lib/register-input";
 
 export async function POST(request: Request) {
@@ -69,7 +70,8 @@ export async function POST(request: Request) {
   if (website) {
     return Response.json({ error: "Pendaftaran gagal. Coba lagi." }, { status: 400 });
   }
-  if (typeof formRenderedAt === "number" && Date.now() - formRenderedAt < 1500) {
+  // Waktu isi wajib dikirim (TRD T16): tanpa isian ini pemeriksa bisa dilewati.
+  if (typeof formRenderedAt !== "number" || Date.now() - formRenderedAt < 1500) {
     return Response.json({ error: "Pendaftaran gagal. Tunggu sebentar, lalu kirim lagi." }, { status: 400 });
   }
 
@@ -93,6 +95,10 @@ export async function POST(request: Request) {
   }
   if (closeTime <= openTime) {
     return Response.json({ error: "Jam tutup harus setelah jam buka." }, { status: 400 });
+  }
+  // Nama dan deskripsi kolam tampil ke member (TRD T15).
+  if (hasPersonalContact(poolName) || hasPersonalContact(description)) {
+    return Response.json({ error: PERSONAL_CONTACT_ERROR }, { status: 400 });
   }
   // Kota, harga paket, dan kapasitas harian diisi saat daftar (Hadi 3 Okt).
   if (!isCity(city)) {
@@ -120,6 +126,10 @@ export async function POST(request: Request) {
 
   const existing = await prisma.user.findFirst({ where: identityTakenWhere(phone, email) });
   if (existing) {
+    // Batas per jaringan untuk cek nomor terdaftar (TRD T16).
+    if (!(await takeAttempt(`register-probe:${clientIp(request.headers)}`, REGISTER_PROBE_PER_IP, REGISTER_WINDOW_MS))) {
+      return Response.json({ error: RATE_LIMIT_REGISTER_ERROR }, { status: 429 });
+    }
     return Response.json({ error: "Nomor HP atau email sudah terdaftar." }, { status: 409 });
   }
 

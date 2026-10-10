@@ -37,7 +37,7 @@ enum WalletTransactionType {
   // coachProfileId kosong = milik platform). Lihat splitPlatformTax.
   PLATFORM_REVENUE
   PLATFORM_TAX
-  // Komisi afiliasi 5% ke coach ATAU kolam pemilik kode (tepat 1 terisi).
+  // Komisi afiliasi (50% biaya layanan SPH bersih, Hadi 2 Okt) ke coach ATAU kolam pemilik kode (tepat 1 terisi).
   // Dicatat bareng baris PLATFORM_REVENUE negatif senilai sama: komisi
   // dibayar dari bagian SPH (pajaknya ditanggung SPH). Lihat src/lib/affiliate.ts.
   AFFILIATE_COMMISSION
@@ -938,7 +938,8 @@ model MilestoneLevelCompletion {
 
 // ---------------------------------------------------------------------------
 // Afiliasi (Hadi 29 Sep): kode singkat per coach dan per kolam, diisi member
-// di form daftar. Komisi 5% dari pembayaran paket pertama member, sekali per
+// di form daftar. Komisi 50% dari biaya layanan SPH bersih (setelah PPN) paket
+// berbayar pertama member (Hadi 2 Okt; aturan lama 5% dihapus), sekali per
 // member, cair ke saldo pemilik kode 3 hari setelah sesi pertama Hadir.
 
 model AffiliateCode {
@@ -973,7 +974,7 @@ model AffiliateCommission {
   coachProfile   CoachProfile?             @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
   poolId         String?
   pool           Pool?                     @relation(fields: [poolId], references: [id], onDelete: Cascade)
-  // Pembayaran paket pertama member (dasar 5%).
+  // Pembayaran paket berbayar pertama member (dasar hitungan komisi).
   paymentId      String
   amount         Int
   status         AffiliateCommissionStatus @default(WAITING)

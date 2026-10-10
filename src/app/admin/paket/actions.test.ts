@@ -10,6 +10,9 @@ const packageCreate = vi.fn().mockResolvedValue({});
 const packageFindUnique = vi.fn();
 const packageUpdate = vi.fn().mockResolvedValue({ count: 1 });
 const packageCount = vi.fn().mockResolvedValue(0);
+const queryRaw = vi.fn();
+const bookingCount = vi.fn().mockResolvedValue(0);
+const packageUpdateOne = vi.fn().mockResolvedValue({});
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -21,7 +24,11 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: (...args: unknown[]) => packageFindUnique(...args),
       updateMany: (...args: unknown[]) => packageUpdate(...args),
       count: (...args: unknown[]) => packageCount(...args),
+      update: (...args: unknown[]) => packageUpdateOne(...args),
     },
+    booking: { count: (...args: unknown[]) => bookingCount(...args) },
+    $queryRaw: (...args: unknown[]) => queryRaw(...args),
+    $transaction: async (fn: (tx: unknown) => unknown) => fn((await import("@/lib/prisma")).prisma),
   },
 }));
 // Lock dilewati di unit test; tx = mock prisma yang sama.
@@ -199,78 +206,64 @@ describe("updatePackage", () => {
     expect(result?.error).toBeTruthy();
   });
 
+  const row = (over: Record<string, unknown> = {}) => [{ totalSesi: 8, sisaSesi: 5, status: "ACTIVE", expiredDate: new Date("2026-09-25T07:32:00Z"), ...over }];
+  const edit = (over: Record<string, string> = {}) =>
+    updatePackage(null, formData({ packageId: "pkg-1", sisaSesi: "5", expectedSisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "", ...over }));
+
   it("returns a not-found error when the package no longer exists", async () => {
-    packageFindUnique.mockResolvedValueOnce(null);
-    const result = await updatePackage(
-      null,
-      formData({ packageId: "gone", sisaSesi: "1", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
-    );
-    expect(result).toEqual({ error: "Paket tidak ditemukan, mungkin sudah dihapus." });
+    queryRaw.mockResolvedValueOnce([]);
+    expect(await edit()).toEqual({ error: "Paket tidak ditemukan, mungkin sudah dihapus." });
   });
 
-  // Clamp: admin gak boleh nge-set sisa sesi ngelewatin total sesi paket
-  // itu sendiri (misal salah ketik "80" padahal totalSesi 8).
-  it("clamps sisaSesi so it can never exceed the package's own totalSesi", async () => {
-    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8 });
-    await updatePackage(
-      null,
-      formData({ packageId: "pkg-1", sisaSesi: "80", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
-    );
-    expect(packageUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ sisaSesi: 8 }) })
-    );
+  it("menolak status selain Aktif/Berakhir dan form tanpa angka awal (TRD T1, T11)", async () => {
+    queryRaw.mockResolvedValueOnce(row());
+    expect((await edit({ status: "PENDING_PAYMENT" }))?.error).toMatch(/Aktif atau Berakhir/);
+    expect(packageUpdateOne).not.toHaveBeenCalled();
+    expect((await edit({ expectedSisaSesi: "" }))?.error).toMatch(/Muat ulang/);
   });
 
-  it("leaves sisaSesi untouched when it's already within totalSesi", async () => {
-    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8 });
-    await updatePackage(
-      null,
-      formData({ packageId: "pkg-1", sisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
-    );
-    expect(packageUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ sisaSesi: 5 }) }));
+  it("paket Menunggu Pembayaran tidak bisa diaktifkan admin tanpa bayar (TRD T1)", async () => {
+    queryRaw.mockResolvedValueOnce(row({ status: "PENDING_PAYMENT" }));
+    expect((await edit())?.error).toMatch(/menunggu pembayaran/);
+    expect(packageUpdateOne).not.toHaveBeenCalled();
+  });
+
+  it("sisa sesi maksimal = total dikurangi sesi yang sudah dibooking (TRD T11)", async () => {
+    queryRaw.mockResolvedValueOnce(row({ sisaSesi: 2 }));
+    bookingCount.mockResolvedValueOnce(6);
+    expect((await edit({ sisaSesi: "4", expectedSisaSesi: "2" }))?.error).toBe("Sisa sesi maksimal 2 (total sesi dikurangi sesi yang sudah dibooking).");
+    expect(packageUpdateOne).not.toHaveBeenCalled();
+    queryRaw.mockResolvedValueOnce(row({ sisaSesi: 2 }));
+    bookingCount.mockResolvedValueOnce(6);
+    expect(await edit({ sisaSesi: "1", expectedSisaSesi: "2" })).toBeNull();
+    expect(packageUpdateOne.mock.calls[0][0].data.sisaSesi).toBe(1);
   });
 
   // Regression (tes race lokal 2026-09-17): form edit dibuka pas sisa 5,
-  // member booking 3x, admin simpan "5" -> 3 sesi gratis. Simpan harus
-  // gagal kalau sisa sesi udah beda dari pas form dibuka.
+  // member booking 3x, admin simpan "5" -> 3 sesi gratis.
   it("only updates when sisaSesi still equals the value the form was opened with", async () => {
-    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8 });
-    packageUpdate.mockResolvedValueOnce({ count: 0 });
-    const result = await updatePackage(
-      null,
-      formData({ packageId: "pkg-1", sisaSesi: "5", expectedSisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
-    );
-    expect(packageUpdate).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "pkg-1", sisaSesi: 5 } }));
-    expect(result?.error).toContain("baru saja berubah");
+    queryRaw.mockResolvedValueOnce(row({ sisaSesi: 2 }));
+    expect((await edit())?.error).toContain("baru saja berubah");
+    expect(packageUpdateOne).not.toHaveBeenCalled();
   });
 
-  // Bug sweep 24 Sep: koreksi sisa sesi tanpa ubah tanggal menggeser jam
-  // kedaluwarsa ke 23.59.
+  // Bug sweep 24 Sep: koreksi sisa sesi tanpa ubah tanggal menggeser jam kedaluwarsa ke 23.59.
   it("keeps the exact stored expiry instant when the date in the form is unchanged", async () => {
     const stored = new Date("2026-09-25T07:32:00Z");
-    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8, expiredDate: stored });
-    await updatePackage(
-      null,
-      formData({ packageId: "pkg-1", sisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "2026-09-25" })
-    );
-    expect(packageUpdate.mock.calls[0][0].data.expiredDate).toBe(stored);
+    queryRaw.mockResolvedValueOnce(row({ expiredDate: stored }));
+    await edit({ expiredDate: "2026-09-25" });
+    expect(packageUpdateOne.mock.calls[0][0].data.expiredDate).toBe(stored);
   });
 
   it("sets 23.59.59 WIB of the chosen date when the admin picks a different date", async () => {
-    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8, expiredDate: new Date("2026-09-25T07:32:00Z") });
-    await updatePackage(
-      null,
-      formData({ packageId: "pkg-1", sisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "2026-10-02" })
-    );
-    expect(packageUpdate.mock.calls[0][0].data.expiredDate.toISOString()).toBe("2026-10-02T16:59:59.000Z");
+    queryRaw.mockResolvedValueOnce(row());
+    await edit({ expiredDate: "2026-10-02" });
+    expect(packageUpdateOne.mock.calls[0][0].data.expiredDate.toISOString()).toBe("2026-10-02T16:59:59.000Z");
   });
 
   it("clears the expiry when the admin empties the date field", async () => {
-    packageFindUnique.mockResolvedValueOnce({ totalSesi: 8, expiredDate: new Date("2026-09-25T07:32:00Z") });
-    await updatePackage(
-      null,
-      formData({ packageId: "pkg-1", sisaSesi: "5", jatahCancel: "2", status: "ACTIVE", expiredDate: "" })
-    );
-    expect(packageUpdate.mock.calls[0][0].data.expiredDate).toBeNull();
+    queryRaw.mockResolvedValueOnce(row());
+    await edit();
+    expect(packageUpdateOne.mock.calls[0][0].data.expiredDate).toBeNull();
   });
 });

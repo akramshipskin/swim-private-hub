@@ -20,6 +20,8 @@ vi.mock("@/lib/dedupe-lock", () => ({
     return fn({ chatMessage: { count: (...a: unknown[]) => txCount(...a), create: (...a: unknown[]) => txCreate(...a) } });
   },
 }));
+const notifyAdmins = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/lib/notify", () => ({ notifyAdmins: (...a: unknown[]) => notifyAdmins(...a) }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     chatThread: { upsert: vi.fn().mockResolvedValue({ id: "t1" }), findUniqueOrThrow: vi.fn().mockResolvedValue({ id: "t1" }), findUnique: vi.fn().mockResolvedValue({ messages: [] }), update: vi.fn() },
@@ -40,6 +42,23 @@ beforeEach(() => {
 });
 
 describe("POST /api/chat rate limit", () => {
+  it("diteruskan ke admin: admin diberi tahu sekali, tidak lagi bila percakapan masih menunggu (Hadi 10 Okt)", async () => {
+    txCount.mockResolvedValue(0);
+    await send("tolong bantu");
+    expect(notifyAdmins).toHaveBeenCalledTimes(1);
+    expect(notifyAdmins.mock.calls[0][1]).toContain("Dedi");
+    notifyAdmins.mockClear();
+    const { prisma: p } = await import("@/lib/prisma");
+    (p.chatThread.upsert as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ id: "t1", needsAdmin: true });
+    await send("halo lagi");
+    expect(notifyAdmins).not.toHaveBeenCalled();
+  });
+
+  it("isi bukan teks: 400, bukan error 500 (TRD T20)", async () => {
+    const res = await POST(new Request("http://x/api/chat", { method: "POST", body: JSON.stringify({ content: { a: 1 } }) }));
+    expect(res.status).toBe(400);
+  });
+
   it("counts and stores the message inside a per-user lock", async () => {
     txCount.mockResolvedValue(3);
     const res = await send("halo");

@@ -71,3 +71,11 @@ export const MILESTONE_HOLD_START = new Date("2026-10-01T00:00:00+07:00");
 // Cair ke saldo setelah sesi pertama member Hadir + sekian hari.
 export const AFFILIATE_SERVICE_FEE_SHARE_PERCENT = 50;
 export const AFFILIATE_HOLD_DAYS = 3;
+
+// Admin wajib masuk ulang (password + 2FA) setiap sekian hari sejak masuk
+// terakhir, walau sesinya terus dipakai (Hadi 10 Okt, TRD T6).
+export const ADMIN_SESSION_MAX_DAYS = 14;
+
+export function adminSessionExpired(loginAt: number | undefined, now: number = Date.now()) {
+  return typeof loginAt !== "number" || now - loginAt > ADMIN_SESSION_MAX_DAYS * 24 * HOUR_MS;
+}

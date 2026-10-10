@@ -102,11 +102,16 @@ describe("createUser", () => {
     );
   });
 
-  it("does not force mustChangePassword for non-MEMBER roles", async () => {
+  it("semua peran wajib ganti password saat pertama masuk (Hadi 11 Okt, T18)", async () => {
     await createUser(null, formData(base));
     expect(userCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.not.objectContaining({ mustChangePassword: true }) })
+      expect.objectContaining({ data: expect.objectContaining({ mustChangePassword: true }) })
     );
+  });
+
+  it("peran di luar daftar ditolak (TRD T20)", async () => {
+    expect(await createUser(null, formData({ ...base, role: "SUPERADMIN" }))).toEqual({ error: "Pilih peran akun." });
+    expect(userCreate).not.toHaveBeenCalled();
   });
 
   it("attaches an empty coachProfile when creating a COACH", async () => {

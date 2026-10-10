@@ -108,7 +108,7 @@ describe("AFILIASI", () => {
       new Request("http://x/api/register", {
         method: "POST",
         headers: { "x-forwarded-for": `10.0.0.${phone.slice(-2)}` },
-        body: JSON.stringify({ name: "Ortu", phone, password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, wantsSelf: true, selfBirthDate: "1990-05-05", referralCode: ref }),
+        body: JSON.stringify({ name: "Ortu", phone, password: "12345678", acceptedTerms: true, city: "Jakarta", pricePack4: 260000, dailyCapacity: 10, wantsSelf: true, selfBirthDate: "1990-05-05", referralCode: ref, formRenderedAt: Date.now() - 10_000 }),
       });
     const bad = await register(body("SALAH99", "081277770001"));
     expect(bad.status).toBe(400);

@@ -186,6 +186,40 @@ describe("PENJAGA JADWAL COACH", () => {
     spyUser.mockRestore();
   });
 
+  it("PJ10: coach dinonaktifkan admin: bukan salah coach (Hadi 10 Okt, T10): tanpa pelanggaran, member tetap dapat ganti tanpa biaya", async () => {
+    const spyUser = vi.spyOn(push, "sendPushToUser");
+    const { pool, coach } = await mkPricedOffer();
+    const { m, pkg } = await paidPackage(pool.id, coach.id);
+    await prisma.user.update({ where: { id: coach.id }, data: { isActive: false } });
+    const t0 = new Date();
+    await runCoachSlotWatch(t0);
+    await runCoachSlotWatch(new Date(t0.getTime() + 3 * DAY));
+    expect(spyUser.mock.calls.filter(([u]) => u === coach.id)).toHaveLength(0);
+    await runCoachSlotWatch(new Date(t0.getTime() + 10 * DAY));
+    expect(await prisma.coachViolation.count({ where: { coachId: coach.id } })).toBe(0);
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: pkg.id } })).freeCoachChangeAt).not.toBeNull();
+    expect(spyUser.mock.calls.some(([u]) => u === m.id)).toBe(true);
+    spyUser.mockRestore();
+  });
+
+  it("PJ11: paket member nonaktif atau terhapus tidak diawasi (Hadi 10 Okt, T8): tanpa peringatan dan tanpa pelanggaran", async () => {
+    const spyUser = vi.spyOn(push, "sendPushToUser");
+    const { pool } = await mkPricedOffer();
+    const quiet = await prisma.user.create({ data: { name: "Coach Diam", phone: "08" + Math.random().toString().slice(2, 12), passwordHash: "x", role: "COACH", city: "Jakarta", coachProfile: { create: { pricePack4: 400000, pricePack8: 800000 } } } });
+    await prisma.poolAffiliation.create({ data: { poolId: pool.id, coachId: quiet.id } });
+    const a = await paidPackage(pool.id, quiet.id);
+    const b = await paidPackage(pool.id, quiet.id);
+    await prisma.user.update({ where: { id: a.m.id }, data: { isActive: false } });
+    await prisma.user.update({ where: { id: b.m.id }, data: { anonymizedAt: new Date() } });
+    const t0 = new Date();
+    await runCoachSlotWatch(t0);
+    await runCoachSlotWatch(new Date(t0.getTime() + 10 * DAY));
+    expect(await prisma.coachViolation.count({ where: { coachId: quiet.id } })).toBe(0);
+    expect(spyUser.mock.calls.filter(([u]) => u === quiet.id)).toHaveLength(0);
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: a.pkg.id } })).noSlotSince).toBeNull();
+    spyUser.mockRestore();
+  });
+
   it("PJ8: satu masa diam coach tetap 1 kejadian walau paket kedua baru ikut diam 12 hari kemudian (member membatalkan sesinya)", async () => {
     const { pool, coach } = await mkPricedOffer();
     await prisma.availability.deleteMany({ where: { coachId: coach.id } });

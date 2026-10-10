@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { PLATFORM_HOLD_DAYS } from "@/lib/policy";
+import { releaseDueCommissions } from "@/lib/affiliate";
 
 type Db = Prisma.TransactionClient | typeof prisma;
 
@@ -23,7 +24,7 @@ type Db = Prisma.TransactionClient | typeof prisma;
 export async function getPlatformBalance(db: Db = prisma, now: Date = new Date()) {
   const cutoff = new Date(now.getTime() - PLATFORM_HOLD_DAYS * 24 * 60 * 60 * 1000);
   const types = { in: ["PLATFORM_REVENUE", "PLATFORM_TAX"] as ("PLATFORM_REVENUE" | "PLATFORM_TAX")[] };
-  const [ledger, matured, withdrawn] = await Promise.all([
+  const [ledger, matured, withdrawn, owed] = await Promise.all([
     db.walletTransaction.groupBy({ by: ["type"], where: { type: types }, _sum: { amount: true } }),
     db.$queryRaw<{ type: string; total: number | null }[]>`
       SELECT type::text AS type, SUM(c)::int AS total FROM (
@@ -41,6 +42,10 @@ export async function getPlatformBalance(db: Db = prisma, now: Date = new Date()
         GROUP BY type
       ) t GROUP BY type`,
     db.platformWithdrawal.aggregate({ _sum: { revenueAmount: true, taxAmount: true } }),
+    // Komisi afiliasi yang sudah pasti (PENDING, menunggu masa tahan) masih
+    // tercatat sebagai pendapatan SPH sampai cair. Dikurangkan dari yang boleh
+    // ditarik supaya SPH tidak menarik uang yang sebenarnya utang komisi (TRD T3).
+    db.affiliateCommission.aggregate({ where: { status: "PENDING" }, _sum: { amount: true } }),
   ]);
   const sum = (rows: typeof ledger, t: string) => rows.find((l) => l.type === t)?._sum.amount ?? 0;
   const maturedSum = (t: string) => matured.find((m) => m.type === t)?.total ?? 0;
@@ -49,7 +54,8 @@ export async function getPlatformBalance(db: Db = prisma, now: Date = new Date()
   return {
     revenue: sum(ledger, "PLATFORM_REVENUE") - wRevenue,
     tax: sum(ledger, "PLATFORM_TAX") - wTax,
-    availableRevenue: maturedSum("PLATFORM_REVENUE") - wRevenue,
+    availableRevenue: maturedSum("PLATFORM_REVENUE") - wRevenue - (owed._sum.amount ?? 0),
+    pendingCommissions: owed._sum.amount ?? 0,
     availableTax: maturedSum("PLATFORM_TAX") - wTax,
   };
 }
@@ -83,6 +89,9 @@ export async function withdrawPlatformBalance({
   if (reference.length > 100) {
     throw new PlatformWithdrawalError("Nomor referensi maksimal 100 karakter.");
   }
+  // Komisi yang sudah jatuh tempo dicairkan dulu, supaya barisnya sudah
+  // mengurangi pendapatan SPH sebelum saldo dihitung (TRD T3).
+  await releaseDueCommissions();
   return prisma.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('platform-withdrawal'))`;
     const balance = await getPlatformBalance(tx);

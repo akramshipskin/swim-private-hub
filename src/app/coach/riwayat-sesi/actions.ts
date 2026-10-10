@@ -4,7 +4,9 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { creditSessionRevenue, reverseSessionRevenue } from "@/lib/wallet";
 import { pricesForSessionCoach } from "@/lib/coach-change";
-import { ATTENDANCE_MARK_WINDOW_HOURS, coachCanMarkAttendance } from "@/lib/policy";
+import { ATTENDANCE_MARK_WINDOW_HOURS, ATTENDANCE_REPORT_WINDOW_DAYS, coachCanMarkAttendance } from "@/lib/policy";
+import { notifyUser } from "@/lib/notify";
+import { formatDateWib, formatTimeWib } from "@/lib/datetime";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { PARTNER_AGREEMENT_REQUIRED_ERROR } from "@/lib/partner-agreement";
@@ -39,7 +41,7 @@ export async function markAttendance(
     where: { id: bookingId },
     include: {
       availability: { include: { coach: { include: { coachProfile: true } } } },
-      package: { include: { payments: { where: { status: "SUCCESS" }, take: 1 } } },
+      package: { include: { payments: { where: { status: "SUCCESS" }, take: 1 }, dependent: { select: { name: true, isSelf: true } } } },
     },
   });
 
@@ -123,6 +125,21 @@ export async function markAttendance(
       return { error: err.message };
     }
     throw err;
+  }
+
+  // Member diberi tahu tiap tanda berubah (Hadi 9 Okt, celah C): batas lapor
+  // "Tidak Hadir" yang salah hanya 3 hari, jadi member perlu tahu segera.
+  if (booking.attended !== attended) {
+    const who = booking.package.dependent.isSelf ? "kamu" : booking.package.dependent.name;
+    const when = `${formatDateWib(booking.availability.startTime)} ${formatTimeWib(booking.availability.startTime)}`;
+    await notifyUser(
+      booking.memberId,
+      attended ? "Sesi ditandai Hadir" : "Sesi ditandai Tidak Hadir",
+      attended
+        ? `Sesi ${who} pada ${when} ditandai Hadir oleh ${session.user.role === "ADMIN" ? "admin" : "coach"}.`
+        : `Sesi ${who} pada ${when} ditandai Tidak Hadir. Bila tidak sesuai, laporkan dalam ${ATTENDANCE_REPORT_WINDOW_DAYS} hari di Riwayat Booking.`,
+      "/member/riwayat",
+    ).catch(() => {});
   }
 
   revalidatePath("/coach/riwayat-sesi");

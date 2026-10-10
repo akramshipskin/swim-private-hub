@@ -165,7 +165,11 @@ export default async function AdminDashboardPage() {
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Pendapatan Bersih Bulan Ini" value={formatRupiah(monthSum("PLATFORM_REVENUE"))} tone="success" />
             <Stat label="PPN Bulan Ini" value={formatRupiah(monthSum("PLATFORM_TAX"))} />
-            <Stat label="Pendapatan Bersih Bisa Ditarik" value={formatRupiah(Math.max(0, platformBalance.availableRevenue))} />
+            <Stat
+              label="Pendapatan Bersih Bisa Ditarik"
+              value={formatRupiah(Math.max(0, platformBalance.availableRevenue))}
+              hint={platformBalance.pendingCommissions > 0 ? `Sudah dikurangi komisi afiliasi tertunda ${formatRupiah(platformBalance.pendingCommissions)}` : undefined}
+            />
             <Stat label="Saldo PPN Belum Disetor" value={formatRupiah(platformBalance.tax)} />
           </div>
           <p className="mt-3 text-xs text-text-subtle">Dihitung dari komisi setiap sesi yang ditandai Hadir (komisi sudah termasuk PPN). Tarif 11% sejak 30 Sep 2026; sesi sebelumnya 12%.</p>

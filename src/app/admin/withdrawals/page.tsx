@@ -84,6 +84,9 @@ export default async function AdminWithdrawalsPage({
             <div className="rounded-xl bg-surface-muted p-3">
               <p className="text-sm text-text-muted">Pendapatan bersih bisa ditarik</p>
               <p className="text-2xl font-bold text-text">{formatRupiah(Math.max(0, platform.availableRevenue))}</p>
+              {platform.pendingCommissions > 0 && (
+                <p className="text-xs text-text-subtle">Sudah dikurangi komisi afiliasi tertunda {formatRupiah(platform.pendingCommissions)}</p>
+              )}
               <p className="text-xs text-text-subtle">Total termasuk yang masih ditahan: {formatRupiah(platform.revenue)}</p>
             </div>
             <div className="rounded-xl bg-surface-muted p-3">

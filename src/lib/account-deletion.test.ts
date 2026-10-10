@@ -11,9 +11,12 @@ const { tx, prismaMock } = vi.hoisted(() => {
     payment: { updateMany: vi.fn(), count: vi.fn() },
   };
   const prismaMock = {
-    $transaction: vi.fn(async (cb: (t: typeof tx) => unknown) => cb(tx)),
+    // Callback = transaksi anonimisasi; array = akhiri paket + batalkan pengajuan (T8).
+    $transaction: vi.fn(async (arg: unknown) => (typeof arg === "function" ? (arg as (t: typeof tx) => unknown)(tx) : Promise.all(arg as unknown[]))),
     booking: { findMany: vi.fn() },
     inAppNotification: { deleteMany: vi.fn() },
+    package: { updateMany: vi.fn(async () => ({ count: 1 })) },
+    coachChangeRequest: { updateMany: vi.fn(async () => ({ count: 0 })) },
   };
   return { tx, prismaMock };
 });
@@ -28,9 +31,17 @@ beforeEach(() => {
   vi.clearAllMocks();
   prismaMock.booking.findMany.mockResolvedValue([]);
   tx.payment.count.mockResolvedValue(0);
+  prismaMock.$transaction.mockImplementation(async (arg: unknown) => (typeof arg === "function" ? (arg as (t: typeof tx) => unknown)(tx) : Promise.all(arg as unknown[])));
 });
 
 describe("anonymizeMember", () => {
+  it("paket aktif diakhiri dan sisa sesi hangus, pengajuan ganti coach dibatalkan (Hadi 10 Okt, T8)", async () => {
+    tx.$queryRaw.mockResolvedValue([{ role: "MEMBER", deletionRequestedAt: new Date(), anonymizedAt: null }]);
+    await anonymizeMember("u1");
+    expect(prismaMock.package.updateMany).toHaveBeenCalledWith({ where: { memberId: "u1", status: "ACTIVE" }, data: { status: "EXPIRED", sisaSesi: 0 } });
+    expect(prismaMock.coachChangeRequest.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: { memberId: "u1", status: { in: ["PENDING", "AWAITING_PAYMENT"] } } }));
+  });
+
   it("menghapus langganan push dan riwayat lonceng milik akun yang dianonimkan", async () => {
     tx.$queryRaw.mockResolvedValue([{ role: "MEMBER", deletionRequestedAt: new Date(), anonymizedAt: null }]);
     await anonymizeMember("u1");

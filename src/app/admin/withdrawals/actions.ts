@@ -66,7 +66,7 @@ export async function processWithdrawal(
     revalidatePath("/admin/withdrawals");
     return {
       error:
-        "Status transfer dari Iris belum pasti. Cek dashboard Iris dulu, lalu klik \"Tandai Dibayar\" atau \"Tandai Gagal\".",
+        "Status transfer dari Iris belum pasti. Cek dashboard Iris dulu, lalu klik \"Tandai Dibayar (sudah dicek di Iris)\" atau \"Tandai Gagal (sudah dicek di Iris)\".",
     };
   }
 
@@ -91,8 +91,13 @@ export async function markPaidManually(
   if (!request || (request.status !== "PENDING" && request.status !== "PROCESSING")) {
     return { error: "Pengajuan tidak ditemukan atau sudah diproses." };
   }
+  // PROCESSING = sudah dikirim ke Iris. Ditandai dibayar hanya bila admin
+  // menyatakan sudah mengecek transfernya berhasil di dashboard Iris (TRD T12).
+  if (request.status === "PROCESSING" && formData.get("confirmedPaid") !== "true") {
+    return { error: "Pengajuan ini sedang diproses Iris. Cek dashboard Iris dulu, jangan transfer manual." };
+  }
 
-  const claimed = await markWithdrawalPaid(withdrawalId, undefined, { transferReference, processedById: session.user.id });
+  const claimed = await markWithdrawalPaid(withdrawalId, undefined, { transferReference, processedById: session.user.id }, [request.status]);
   revalidatePath("/admin/withdrawals");
   if (!claimed) {
     return { error: "Pengajuan ini baru saja diproses (dibayar/ditolak). Muat ulang halaman dulu." };
@@ -123,7 +128,8 @@ export async function rejectWithdrawal(
   const claimed = await markWithdrawalFailed(
     withdrawalId,
     request.status === "PROCESSING" ? "Gagal di Iris (dicek admin)" : "Ditolak admin",
-    session.user.id
+    session.user.id,
+    [request.status]
   );
   revalidatePath("/admin/withdrawals");
   if (!claimed) {
