@@ -33,7 +33,7 @@ export default function RejectRegistrationButton({ userId, userName }: { userId:
         rel="noopener noreferrer"
         className="rounded-md px-2 py-1.5 text-sm font-medium text-whatsapp-text hover:bg-whatsapp/10 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
       >
-        Kabari Penolakan Lewat WhatsApp
+        Kabari Penolakan Lewat WhatsApp (tautan hanya muncul sekali)
       </a>
     ) : (
       <span className="text-sm text-text-muted">Ditolak</span>

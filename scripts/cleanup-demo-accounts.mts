@@ -28,7 +28,7 @@ const users = await prisma.user.findMany({
   select: {
     id: true, name: true, email: true, role: true, isActive: true,
     coachProfile: { select: { id: true, walletBalance: true, _count: { select: { walletTransactions: true, withdrawalRequests: true } } } },
-    _count: { select: { bookings: true, packages: true, availabilities: true, poolOwnerships: true } },
+    _count: { select: { bookings: true, packages: true, availabilities: true, poolOwnerships: true, coachReportsFiled: true, coachReportsAgainst: true, memberWalletTransactions: true } },
   },
   orderBy: { email: "asc" },
 });
@@ -43,6 +43,9 @@ for (const u of users) {
     paket: c.packages,
     jadwalCoach: c.availabilities,
     kolamDimiliki: c.poolOwnerships,
+    // Laporan coach tidak boleh hilang (bukti daftar hitam); riwayat saldo member juga riwayat.
+    laporanCoach: c.coachReportsFiled + c.coachReportsAgainst,
+    saldoMember: c.memberWalletTransactions,
     catatanSaldo: u.coachProfile?._count.walletTransactions ?? 0,
     pencairan: u.coachProfile?._count.withdrawalRequests ?? 0,
   };

@@ -177,7 +177,10 @@ describe("toggleUserActive", () => {
     userUpdate.mockResolvedValueOnce({ role: "POOL_OWNER" });
     userUpdateMany.mockResolvedValueOnce({ count: 1 });
     await toggleUserActive("owner-1", true);
-    expect(poolUpdateMany).toHaveBeenCalledWith({ where: { isActive: false, ownerships: { some: { ownerId: "owner-1" } } }, data: { isActive: true } });
+    expect(poolUpdateMany).toHaveBeenCalledWith({
+      where: { isActive: false, ownerships: { some: { ownerId: "owner-1" } }, OR: [{ deactivatedReason: null }, { deactivatedReason: { not: "ADMIN" } }] },
+      data: { isActive: true, deactivatedReason: null },
+    });
 
     poolUpdateMany.mockClear();
     userUpdate.mockResolvedValueOnce({ role: "POOL_OWNER" });

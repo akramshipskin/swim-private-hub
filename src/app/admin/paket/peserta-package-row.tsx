@@ -169,13 +169,14 @@ function RefundBox({ packageId, refund }: { packageId: string; refund: NonNullab
       <input type="hidden" name="packageId" value={packageId} />
       <p className="text-sm text-text">
         Transfer uang tunai dulu lewat dasbor Midtrans. Setelah disimpan, paket diakhiri, booking mendatang dibatalkan, dan sisa sesi hangus.
+        Sesi yang sudah Hadir sudah dibayarkan ke kolam dan coach, jadi perhitungkan saat mengisi nominal.
       </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label={`Uang Tunai Dikembalikan (maks ${formatRupiah(refund.cashPaid)})`}>
-          <Input name="refundCash" inputMode="numeric" defaultValue={String(refund.cashPaid)} />
+          <Input name="refundCash" inputMode="numeric" placeholder="0" />
         </Field>
         <Field label={`Kembali ke Saldo Member (maks ${formatRupiah(refund.saldoPaid)})`}>
-          <Input name="refundSaldo" inputMode="numeric" defaultValue={String(refund.saldoPaid)} />
+          <Input name="refundSaldo" inputMode="numeric" placeholder="0" />
         </Field>
         <Field label="No. Referensi Refund Midtrans">
           <Input name="refundReference" maxLength={100} />

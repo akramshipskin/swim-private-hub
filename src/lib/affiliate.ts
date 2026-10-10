@@ -20,6 +20,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 // Catatan baris PLATFORM_REVENUE negatif pasangan komisi afiliasi. Dipakai juga
 // halaman Bagi Hasil untuk memisahkannya dari koreksi manual.
 export const AFFILIATE_PAYOUT_NOTE = "Komisi afiliasi dibayar";
+// Pasangan penarikan balik komisi saat dana paket dikembalikan (Hadi 11 Okt).
+export const AFFILIATE_CLAWBACK_NOTE = "Komisi afiliasi ditarik balik (dana paket dikembalikan)";
 
 export function normalizeAffiliateCode(input: string) {
   return input.toUpperCase().replace(/[^A-Z0-9]/g, "");

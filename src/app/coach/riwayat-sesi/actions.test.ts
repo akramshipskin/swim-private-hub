@@ -269,7 +269,7 @@ describe("markAttendance", () => {
     bookingFindUnique.mockResolvedValue(baseBooking({ attended: null }));
     await markAttendance(null, formData("booking-1", "true"));
     expect(bookingUpdateMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: "booking-1", attended: null, status: "BOOKED", package: { refundedAt: null } } })
+      expect.objectContaining({ where: expect.objectContaining({ id: "booking-1", attended: null, status: "BOOKED" }) })
     );
   });
 });

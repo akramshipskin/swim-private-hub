@@ -185,9 +185,12 @@ export async function updatePackage(
     const used = await tx.booking.count({ where: { packageId, status: "BOOKED" } });
     const max = Math.max(0, pkg.totalSesi - used);
     if (sisaSesiRaw > max) return { tooMany: max };
+    const expiredDate = resolveExpiredDate(expiredDateRaw, pkg.expiredDate);
+    // Masa berlaku diubah: pemberitahuan paket mau berakhir boleh terkirim lagi.
+    const expiryChanged = (expiredDate?.getTime() ?? null) !== (pkg.expiredDate?.getTime() ?? null);
     await tx.package.update({
       where: { id: packageId },
-      data: { sisaSesi: sisaSesiRaw, jatahCancel: jatahCancelRaw, status, expiredDate: resolveExpiredDate(expiredDateRaw, pkg.expiredDate) },
+      data: { sisaSesi: sisaSesiRaw, jatahCancel: jatahCancelRaw, status, expiredDate, ...(expiryChanged ? { expiryNotice14At: null, expiryNotice3At: null } : {}) },
     });
     return "OK" as const;
   });

@@ -21,7 +21,8 @@ export async function sendSessionReminders(kind: "evening" | "morning", now: Dat
       attended: null,
       [field]: null,
       member: { isActive: true, anonymizedAt: null },
-      availability: { date: dateLabel(target), startTime: { gt: now } },
+      // Sesi di kolam/coach yang sedang nonaktif tidak bisa berjalan: tidak diingatkan.
+      availability: { date: dateLabel(target), startTime: { gt: now }, pool: { isActive: true }, coach: { isActive: true } },
     },
     select: {
       id: true,
@@ -86,7 +87,7 @@ export async function sendPackageExpiryNotices(now: Date = new Date()) {
     const peserta = p.dependent.isSelf ? "kamu" : p.dependent.name;
     await notifyUser(
       p.memberId,
-      soon ? "Paket berakhir dalam 3 hari" : "Paket berakhir dalam 2 minggu",
+      `Paket berakhir ${Math.max(1, Math.ceil((p.expiredDate!.getTime() - now.getTime()) / DAY))} hari lagi`,
       `Paket ${peserta} berakhir ${formatDateWib(p.expiredDate!)} dan masih ada ${p.sisaSesi} sesi yang belum dibooking. Booking sekarang supaya sesinya tidak hangus.`,
       "/member/booking",
     );

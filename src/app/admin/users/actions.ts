@@ -155,7 +155,11 @@ export async function toggleUserActive(userId: string, nextActive: boolean): Pro
     // persetujuan PERTAMA, jadi kolam yang sengaja dinonaktifkan nanti tidak
     // ikut menyala saat pemilik diaktifkan ulang.
     if (firstApproval?.count > 0 && user.role === "POOL_OWNER") {
-      await prisma.pool.updateMany({ where: { isActive: false, ownerships: { some: { ownerId: userId } } }, data: { isActive: true } });
+      // Kolam yang sengaja dimatikan admin tidak ikut menyala (T19).
+      await prisma.pool.updateMany({
+        where: { isActive: false, ownerships: { some: { ownerId: userId } }, OR: [{ deactivatedReason: null }, { deactivatedReason: { not: "ADMIN" } }] },
+        data: { isActive: true, deactivatedReason: null },
+      });
       revalidatePath("/admin/kolam");
     }
   }
@@ -281,6 +285,15 @@ export async function rejectRegistration(
     data: { rejectedAt: new Date(), rejectionReason: reason, phone: null, email: null, sessionVersion: { increment: 1 } },
   });
   if (claim.count === 0) return { error: "Pendaftar ini baru saja diproses. Muat ulang halaman." };
+  // Kolam yang didaftarkan pendaftar ini tetap nonaktif sebagai catatan; nomor
+  // kontaknya (nomor pendaftar) dikosongkan dan ditandai tidak ikut menyala.
+  if (user.role === "POOL_OWNER") {
+    await prisma.pool.updateMany({
+      where: { isActive: false, ownerships: { some: { ownerId: userId } } },
+      data: { contactPhone: null, deactivatedReason: "ADMIN" },
+    });
+    revalidatePath("/admin/kolam");
+  }
   revalidatePath("/admin/users");
   revalidatePath("/admin");
   return { phone: user.phone, name: user.name, role: user.role as "COACH" | "POOL_OWNER" };

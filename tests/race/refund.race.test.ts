@@ -26,7 +26,7 @@ async function setup() {
 }
 
 describe("KEMBALIKAN DANA", () => {
-  it("RF1: paket diakhiri + sisa 0, booking mendatang batal, sesi yang sudah Hadir tetap dibayar, sesi lampau belum ditandai tidak bisa ditandai lagi", async () => {
+  it("RF1: paket diakhiri + sisa 0, booking mendatang batal, sesi yang sudah Hadir tetap dibayar, sesi lampau sebelum refund masih bisa ditandai", async () => {
     const x = await setup();
     expect(await mark(x.coach.id, x.past.id, true)).toBeNull();
     const coachBefore = (await prisma.coachProfile.findUniqueOrThrow({ where: { userId: x.coach.id } })).walletBalance;
@@ -36,9 +36,20 @@ describe("KEMBALIKAN DANA", () => {
     expect(pkg.refundedAt).toBeInstanceOf(Date);
     expect((await prisma.booking.findUniqueOrThrow({ where: { id: x.future.id } })).status).toBe("CANCELLED");
     expect((await prisma.coachProfile.findUniqueOrThrow({ where: { userId: x.coach.id } })).walletBalance).toBe(coachBefore);
-    expect((await mark(x.coach.id, x.pastUnmarked.id, true))?.error).toMatch(/sudah dikembalikan/);
+    expect((await prisma.package.findUniqueOrThrow({ where: { id: x.pkg.id } })).sisaSesi).toBe(0);
+    // Sesi yang sudah berjalan sebelum refund tetap milik kolam/coach dan masih bisa ditandai.
+    expect(await mark(x.coach.id, x.pastUnmarked.id, true)).toBeNull();
     // packages: false = sisa sesi sengaja hangus.
     expect(await checkInvariants({ packages: false })).toEqual([]);
+  });
+
+  it("RF6: refund gagal (paket pemberian admin) tidak membatalkan jadwal member", async () => {
+    const pool = await mkPool();
+    const coach = await mkUser("COACH");
+    const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: null });
+    const f = await book(m.id, (await mkSlot(coach.id, pool.id, 48)).id, pkg.id);
+    await expect(refund(pkg.id, { cash: 1 })).rejects.toThrow(/maksimal|pemberian admin/);
+    expect((await prisma.booking.findUniqueOrThrow({ where: { id: f.id } })).status).toBe("BOOKED");
   });
 
   it("RF2: dua admin menekan Kembalikan Dana bersamaan -> tepat sekali; melebihi yang dibayar ditolak", async () => {

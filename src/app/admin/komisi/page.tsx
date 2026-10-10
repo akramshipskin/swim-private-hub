@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import Link from "next/link";
 import { Card, CardBody } from "@/components/ui/card";
-import { AFFILIATE_PAYOUT_NOTE } from "@/lib/affiliate";
+import { AFFILIATE_PAYOUT_NOTE, AFFILIATE_CLAWBACK_NOTE } from "@/lib/affiliate";
 import { formatBps } from "@/lib/pricing";
 import { todayWibDateString, formatDateWib } from "@/lib/datetime";
 import PphRemitForm from "./pph-remit-form";
@@ -54,12 +54,12 @@ export default async function KomisiPage() {
         type: { in: ["SESSION_PAYOUT", "PLATFORM_REVENUE", "PLATFORM_TAX"] },
         bookingId: null,
         // Komisi afiliasi yang dibayar dari SPH bukan koreksi manual: dihitung terpisah di bawah.
-        OR: [{ note: null }, { note: { not: AFFILIATE_PAYOUT_NOTE } }],
+        OR: [{ note: null }, { note: { notIn: [AFFILIATE_PAYOUT_NOTE, AFFILIATE_CLAWBACK_NOTE] } }],
       },
       _sum: { amount: true },
     }),
     prisma.walletTransaction.aggregate({
-      where: { type: "PLATFORM_REVENUE", bookingId: null, note: AFFILIATE_PAYOUT_NOTE },
+      where: { type: "PLATFORM_REVENUE", bookingId: null, note: { in: [AFFILIATE_PAYOUT_NOTE, AFFILIATE_CLAWBACK_NOTE] } },
       _sum: { amount: true },
     }),
   ]);
