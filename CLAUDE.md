@@ -38,7 +38,7 @@ Jangan menebak aturan tentang: harga, janji ke pelanggan, syarat kelayakan, pemb
 - Jelaskan risiko dengan bahasa bisnis, contoh: "ini menyentuh catatan uang asli; kalau salah, saldo coach atau kolam ikut salah".
 
 ## Desain dan animasi
-- Brand guideline: src/app/brandguideline/ (data.ts adalah sumber isinya). Ada versi lebih baru di cabang brand-guideline-v2; cek sebelum mengubah. Pakai skill prinsip-desain-hadi dan copy-indonesia.
+- Brand guideline: halaman /brandguideline (src/app/brandguideline/, versi 2.1 per 10 Okt 2026; semua cabang brand v2 sudah tergabung). Kode aplikasi menang bila berbeda. Pakai skill prinsip-desain-hadi dan copy-indonesia.
 - Landing dipakai jualan dan trafiknya dari iklan Meta, mayoritas lewat HP: kecepatan dan kejelasan diutamakan. Kekhawatiran calon pembeli dijawab lewat section jualan, bukan daftar FAQ panjang.
 - Animasi: HP ringan (kartu dan section muncul saat masuk layar, tanpa hover, tanpa video di header). Desktop lebih kaya (hover, muncul bertahap, video perenang di header). Hormati reduced-motion dan ukur kecepatan sebelum dan sesudah.
 - Video header: stok gratis berlisensi komersial (Pexels, Pixabay, Unsplash). Cek lisensinya dan minta izin Hadi sebelum mengunduh (sebut nama file, sumber, ukuran).

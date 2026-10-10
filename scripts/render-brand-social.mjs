@@ -29,9 +29,10 @@ const ASSETS = {
     mark: { size: 140, x: 90, y: 128 },
     wm: { size: 85.5, x: 270, y: 134, color: CREAM, dot: LIME },
     tg: { size: 28, color: LIME, y: 242, left: 272 } },
-  // Foto profil = tanda saja, latar transparan (tanpa kotak hitam), di tengah dan aman dipotong bulat.
+  // Foto profil = tanda selebar penuh tanpa sudut (Hadi 10 Okt: jangan kotak di dalam lingkaran);
+  // platform memotongnya bulat, jadi lingkaran terisi penuh lime dengan gelombang charcoal.
   profile: { file: "profile-picture-2000.png", w: 500, h: 500, bg: "transparent",
-    mark: { size: 340, x: 80, y: 80 } },
+    mark: { size: 500, x: 0, y: 0, square: true } },
 };
 
 const font = readFileSync(join(ROOT, "brand-kit/fonts/sora-latin-variable.woff2")).toString("base64");
@@ -46,8 +47,8 @@ html,body{margin:0;background:${a.bg};width:${a.w}px;height:${a.h}px;overflow:hi
 .t{position:absolute;white-space:nowrap;font-family:Sora;font-weight:700;line-height:1}
 </style>
 <svg style="position:absolute;left:${a.mark.x}px;top:${a.mark.y}px" width="${a.mark.size}" height="${a.mark.size}" viewBox="8 8 84 84" xmlns="http://www.w3.org/2000/svg">
-<defs><clipPath id="m"><rect x="8" y="8" width="84" height="84" rx="26"/></clipPath></defs>
-<rect x="8" y="8" width="84" height="84" rx="26" fill="${LIME}"/>
+<defs><clipPath id="m"><rect x="8" y="8" width="84" height="84" rx="${a.mark.square ? 0 : 26}"/></clipPath></defs>
+<rect x="8" y="8" width="84" height="84" rx="${a.mark.square ? 0 : 26}" fill="${LIME}"/>
 <g clip-path="url(#m)"><path d="M8,64 Q30,52 50,64 Q70,76 92,64 L92,92 L8,92 Z" fill="${CHAR}"/></g></svg>
 ${a.wm ? `<div class=t style="left:${a.wm.x}px;top:${a.wm.y}px;font-size:${a.wm.size}px;letter-spacing:-0.0217em;color:${a.wm.color}">swim<span style="color:${a.wm.dot}">.</span>privatehub</div>` : ""}
 ${a.tg ? `<div class=t style="${tg};top:${a.tg.y}px;font-size:${a.tg.size}px;color:${a.tg.color}">${TAGLINE}</div>` : ""}`;

@@ -109,8 +109,8 @@ function Note({ tone = "neutral", title, children }: { tone?: "neutral" | "warni
     <div
       className={
         tone === "warning"
-          ? "rounded-xl border border-warning-text/25 bg-warning-bg p-4 text-sm text-warning-text"
-          : "rounded-xl border border-border bg-surface-muted p-4 text-sm text-text-muted"
+          ? "rounded-xl border border-warning-text/25 bg-warning-bg p-3 text-sm text-warning-text sm:p-4"
+          : "rounded-xl border border-border bg-surface-muted p-3 text-sm text-text-muted sm:p-4"
       }
     >
       <b className="block text-text">{title}</b>
@@ -221,7 +221,7 @@ export default function BrandGuidelineView() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-4 py-10">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10">
         {/* Sampul */}
         <span className="text-xs font-bold uppercase tracking-wide text-brand-700">Swim Private Hub · Brand Guideline</span>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-text text-wrap-balance sm:text-4xl">Lime Pulse</h1>
@@ -314,7 +314,7 @@ export default function BrandGuidelineView() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <Note title="Lakukan">
-              <ul className="mt-1 list-disc pl-5">
+              <ul className="mt-1 list-disc pl-4 sm:pl-5">
                 <li>Langit lime di atas, air charcoal di bawah.</li>
                 <li>Di aplikasi: tanda + logotype berdampingan (header, masuk/daftar, footer).</li>
                 <li>Ruang kosong di sekeliling: ½ lebar tanda di materi luar, ¼ di header aplikasi.</li>
@@ -322,7 +322,7 @@ export default function BrandGuidelineView() {
               </ul>
             </Note>
             <Note tone="warning" title="Jangan">
-              <ul className="mt-1 list-disc pl-5">
+              <ul className="mt-1 list-disc pl-4 sm:pl-5">
                 <li>Membalik atau memutar tanda.</li>
                 <li>Mengganti warna, rasio, atau jarak huruf.</li>
                 <li>Menambah bayangan, efek 3D, atau gradien.</li>
@@ -367,7 +367,7 @@ export default function BrandGuidelineView() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <Note title="Lime boleh untuk">
-              <ul className="mt-1 list-disc pl-5">
+              <ul className="mt-1 list-disc pl-4 sm:pl-5">
                 <li>Aksen dan tombol di kartu utama gelap (dasbor) dan layar sukses</li>
                 <li>Cincin fokus, titik kalender, segmen sisa sesi</li>
                 <li>Tombol CTA di halaman marketing (landing, panduan)</li>
@@ -375,7 +375,7 @@ export default function BrandGuidelineView() {
               </ul>
             </Note>
             <Note tone="warning" title="Lime tidak boleh untuk">
-              <ul className="mt-1 list-disc pl-5">
+              <ul className="mt-1 list-disc pl-4 sm:pl-5">
                 <li>Tombol utama di dalam aplikasi (pakai charcoal)</li>
                 <li>Warna teks di latar terang (tidak terbaca)</li>
                 <li>Latar halaman atau kartu biasa</li>
@@ -659,7 +659,7 @@ export default function BrandGuidelineView() {
             <SubHeading>Media sosial</SubHeading>
             <div className="mt-3 grid gap-4 sm:grid-cols-3">
               <div>
-                <Image src="/brand-kit/social/profile-picture-2000.png" alt="Foto profil sosial Swim Private Hub" width={2000} height={2000} className="h-auto w-full rounded-full border border-border" />
+                <Image src="/brand-kit/social/profile-picture-2000.png" alt="Foto profil sosial Swim Private Hub" width={2000} height={2000} className="mx-auto h-auto w-full max-w-[200px] rounded-full" />
                 <p className="mt-2 text-xs text-text-subtle">Foto profil (2000 × 2000)</p>
               </div>
               <div className="flex flex-col gap-3 sm:col-span-2">
@@ -718,7 +718,7 @@ export default function BrandGuidelineView() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <Note title="Huruf kapital">
-              <ul className="mt-1 list-disc pl-5">
+              <ul className="mt-1 list-disc pl-4 sm:pl-5">
                 <li>Tombol dan label di aplikasi: Title Case, contoh &quot;Simpan Perubahan&quot;, &quot;Tanggal Lahir&quot;, &quot;Ya, Batalkan&quot;.</li>
                 <li>Kata sambung tetap kecil: di, ke, dari, dan, atau, yang, untuk, dengan, pada.</li>
                 <li>Kalimat penuh dan judul bagian: huruf besar hanya di awal.</li>
@@ -726,7 +726,7 @@ export default function BrandGuidelineView() {
               </ul>
             </Note>
             <Note title="Angka dan waktu">
-              <ul className="mt-1 list-disc pl-5">
+              <ul className="mt-1 list-disc pl-4 sm:pl-5">
                 <li>Rupiah: Rp 1.650.000 (titik, tanpa desimal).</li>
                 <li>Tanggal: 18 September 2026 atau 18 Sep 2026.</li>
                 <li>Jam sesi: 08.00–09.00. Waktu selalu WIB.</li>
