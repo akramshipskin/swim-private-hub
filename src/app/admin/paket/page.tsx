@@ -57,6 +57,10 @@ export default async function AdminPaketPage() {
             dependentId: true,
             poolId: true,
             pool: { select: { name: true } },
+            saldoUsed: true,
+            refundedAt: true,
+            refundCash: true,
+            refundSaldo: true,
           },
         },
       },
@@ -73,6 +77,16 @@ export default async function AdminPaketPage() {
       })
     ).map((r) => [r.packageId, r._count])
   );
+
+  // Dasar Kembalikan Dana per paket: uang tunai lunas + saldo yang dipakai
+  // (termasuk tambah bayar ganti coach).
+  const [cashByPackage, changeSaldoByPackage] = await Promise.all([
+    prisma.payment.groupBy({ by: ["packageId"], where: { packageId: { in: allPackageIds }, status: "SUCCESS" }, _sum: { amount: true } }),
+    prisma.coachChangeRequest.groupBy({ by: ["packageId"], where: { packageId: { in: allPackageIds }, status: "COMPLETED" }, _sum: { saldoUsed: true } }),
+  ]).then(([cash, change]) => [
+    new Map(cash.map((r) => [r.packageId, r._sum.amount ?? 0])),
+    new Map(change.map((r) => [r.packageId, r._sum.saldoUsed ?? 0])),
+  ]);
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -114,6 +128,13 @@ export default async function AdminPaketPage() {
                 expiredDate: pkg.expiredDate,
                 expiredDateInput: toInputDate(pkg.expiredDate),
                 cancelRemaining: Math.max(0, pkg.jatahCancel - (cancelUsedByPackage.get(pkg.id) ?? 0)),
+                refund: {
+                  cashPaid: cashByPackage.get(pkg.id) ?? 0,
+                  saldoPaid: pkg.saldoUsed + (changeSaldoByPackage.get(pkg.id) ?? 0),
+                  refundedAt: pkg.refundedAt,
+                  refundCash: pkg.refundCash,
+                  refundSaldo: pkg.refundSaldo,
+                },
               },
             }));
           }),

@@ -43,6 +43,7 @@ export default async function AdminDashboardPage() {
     activePackages,
     activeDependents,
     waitingChats,
+    openCoachReports,
     pendingWithdrawals,
     pendingCerts,
     pendingMilestoneProposals,
@@ -74,6 +75,7 @@ export default async function AdminDashboardPage() {
     prisma.package.count({ where: { ...usablePackageConditions(), member: { isActive: true } } }),
     prisma.dependent.count({ where: { isActive: true, member: { isActive: true }, packages: { some: usablePackageConditions() } } }),
     prisma.chatThread.count({ where: { needsAdmin: true } }),
+    prisma.coachReport.count({ where: { status: "OPEN" } }),
     prisma.withdrawalRequest.aggregate({ where: { status: { in: ["PENDING", "PROCESSING"] } }, _count: true, _sum: { amount: true } }),
     prisma.coachCertificate.count({ where: { status: "PENDING" } }),
     prisma.milestoneItem.count({ where: { proposalStatus: "PENDING" } }),
@@ -129,6 +131,7 @@ export default async function AdminDashboardPage() {
         <BentoCard title="Perlu Kamu Cek" className="md:col-span-2 md:row-span-2">
           <div className="flex flex-col">
             <ActionRow label="Pesan Perlu Dibalas" count={waitingChats} href="/admin/pesan" />
+            <ActionRow label="Laporan Coach dari Member" count={openCoachReports} href="/admin/laporan-coach" />
             <ActionRow
               label="Pengajuan Hapus Akun"
               count={deletionRequests.length}

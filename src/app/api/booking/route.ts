@@ -116,6 +116,8 @@ export async function POST(request: Request) {
             // coach (model lama yang sudah dihapus, atau coach-nya hilang karena
             // akun dihapus) tidak bisa dipakai booking.
             { coachId: slot.coachId },
+            // Paket yang dananya dikembalikan tidak bisa dibooking (TRD T1).
+            { refundedAt: null },
             { OR: [{ expiredDate: null }, { expiredDate: { gt: slot.startTime } }] },
           ],
         },

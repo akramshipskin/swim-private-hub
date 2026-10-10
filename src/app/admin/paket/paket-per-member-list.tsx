@@ -15,6 +15,7 @@ type PesertaPkg = {
   expiredDate: Date | null;
   expiredDateInput: string;
   cancelRemaining: number;
+  refund?: { cashPaid: number; saldoPaid: number; refundedAt: Date | null; refundCash: number | null; refundSaldo: number | null };
 };
 
 type Peserta = {

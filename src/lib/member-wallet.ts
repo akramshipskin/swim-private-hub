@@ -12,7 +12,7 @@ export async function creditMember(
   tx: Prisma.TransactionClient,
   memberId: string,
   amount: number,
-  type: Extract<MemberWalletType, "COACH_CHANGE_CREDIT" | "PURCHASE_REFUND">,
+  type: Extract<MemberWalletType, "COACH_CHANGE_CREDIT" | "PURCHASE_REFUND" | "ADMIN_REFUND">,
   refs: Refs = {}
 ) {
   if (!Number.isInteger(amount) || amount <= 0) return;

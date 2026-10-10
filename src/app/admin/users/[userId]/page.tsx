@@ -128,6 +128,8 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
         <div className="flex items-center gap-2">
           {user.anonymizedAt ? (
             <Badge tone="neutral">Akun dihapus</Badge>
+          ) : user.rejectedAt ? (
+            <Badge tone="danger">Ditolak</Badge>
           ) : (
             isPendingApproval(user) ? (
               <Badge tone="warning">Menunggu persetujuan</Badge>
@@ -137,7 +139,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           )}
           {/* Akun yang sudah dihapus tidak punya HP/email untuk masuk -- tombol
               aktifkan/reset password tidak ada gunanya dan membingungkan. */}
-          {!user.anonymizedAt && <UserActions user={user} isSelf={user.id === session.user.id} />}
+          {!user.anonymizedAt && !user.rejectedAt && <UserActions user={user} isSelf={user.id === session.user.id} pending={isPendingApproval(user)} />}
         </div>
       </div>
 

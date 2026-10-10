@@ -10,6 +10,7 @@ const STATUS = {
   WAITING: { label: "Menunggu Sesi Hadir Pertama", tone: "neutral" },
   PENDING: { label: "Cair", tone: "warning" },
   RELEASED: { label: "Sudah Masuk Saldo", tone: "success" },
+  VOID: { label: "Dibatalkan (Dana Dikembalikan)", tone: "danger" },
 } as const;
 
 // Kode afiliasi coach/kolam + riwayat komisinya (dashboard coach & kolam).

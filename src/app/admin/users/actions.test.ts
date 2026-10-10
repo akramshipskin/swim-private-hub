@@ -39,7 +39,7 @@ vi.mock("@/lib/prisma", () => ({
       update: (...args: unknown[]) => userUpdate(...args),
       updateMany: (...args: unknown[]) => userUpdateMany(...args),
     },
-    pool: { count: (...args: unknown[]) => poolCount(...args), updateMany: (...args: unknown[]) => poolUpdateMany(...args) },
+    pool: { count: (...args: unknown[]) => poolCount(...args), updateMany: (...args: unknown[]) => poolUpdateMany(...args), findMany: async () => [] },
   },
 }));
 

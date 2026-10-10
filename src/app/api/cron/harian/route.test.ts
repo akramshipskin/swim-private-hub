@@ -8,6 +8,9 @@ const releaseStalePayments = vi.fn().mockResolvedValue(2);
 vi.mock("@/lib/stale-payments", () => ({ releaseStalePayments: () => releaseStalePayments() }));
 const releaseDueCommissions = vi.fn().mockResolvedValue(1);
 vi.mock("@/lib/affiliate", () => ({ releaseDueCommissions: () => releaseDueCommissions() }));
+const sendSessionReminders = vi.fn().mockResolvedValue(4);
+const sendPackageExpiryNotices = vi.fn().mockResolvedValue(2);
+vi.mock("@/lib/scheduled-notices", () => ({ sendSessionReminders: (k: string) => sendSessionReminders(k), sendPackageExpiryNotices: () => sendPackageExpiryNotices() }));
 const { GET } = await import("./route");
 const call = (auth?: string) => GET(new Request("http://x/api/cron/harian", { headers: auth ? { authorization: auth } : {} }));
 
@@ -76,5 +79,12 @@ describe("GET /api/cron/harian", () => {
     expect(releaseStalePayments).toHaveBeenCalled();
     expect(releaseDueCommissions).toHaveBeenCalled();
     expect(await res.json()).toMatchObject({ watch: null, commissionsReleased: 1 });
+  });
+
+  it("pagi: pengingat sesi hari ini dan pemberitahuan paket berakhir ikut dijalankan (Hadi 9 Okt)", async () => {
+    process.env.CRON_SECRET = "rahasia-uji";
+    const res = await call("Bearer rahasia-uji");
+    expect(sendSessionReminders).toHaveBeenCalledWith("morning");
+    expect(await res.json()).toMatchObject({ remindersSent: 4, expiryNotices: 2 });
   });
 });

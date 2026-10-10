@@ -130,8 +130,10 @@ export default async function AdminUsersPage() {
                             <Link href={`/admin/users/${u.id}`} className="font-semibold text-text hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
                               {u.name}
                             </Link>
-                            {isPendingApproval(u) ? (
-                              <Badge tone="warning">Menunggu persetujuan</Badge>
+                            {u.rejectedAt ? (
+                              <Badge tone="danger">Ditolak</Badge>
+                            ) : isPendingApproval(u) ? (
+                              <Badge tone="warning">Menunggu Persetujuan</Badge>
                             ) : (
                               <Badge tone={u.isActive ? "success" : "neutral"}>{u.isActive ? "Aktif" : "Nonaktif"}</Badge>
                             )}
@@ -172,7 +174,11 @@ export default async function AdminUsersPage() {
                         >
                           Info detail
                         </Link>
-                        <UserActions user={u} isSelf={u.id === session.user.id} />
+                        {u.rejectedAt ? (
+                          <span className="text-sm text-text-muted">Ditolak: {u.rejectionReason}</span>
+                        ) : (
+                          <UserActions user={u} isSelf={u.id === session.user.id} pending={isPendingApproval(u)} />
+                        )}
                       </div>
                     </CardBody>
                   </Card>

@@ -1,7 +1,8 @@
 "use server";
 
+import { PENDING_APPROVAL_WHERE } from "@/lib/pending-approval";
 import { requireRole } from "@/lib/require-role";
-import { notifyWaitlistForCoach } from "@/lib/coach-pools";
+import { notifyWaitlistForCoach, notifyWaitlistForPool } from "@/lib/coach-pools";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { identityTakenWhere, normalizeEmail, normalizePhone, toProperCase } from "@/lib/format";
@@ -159,6 +160,30 @@ export async function toggleUserActive(userId: string, nextActive: boolean): Pro
     }
   }
 
+  // Pemilik kolam (Hadi 11 Okt, T19): kolam mati bila SEMUA pemiliknya
+  // nonaktif, dan menyala lagi saat pemilik diaktifkan -- kecuali kolam yang
+  // dimatikan admin sendiri (deactivatedReason ADMIN).
+  if (user.role === "POOL_OWNER") {
+    if (!nextActive) {
+      await prisma.pool.updateMany({
+        where: { isActive: true, ownerships: { some: { ownerId: userId }, none: { owner: { isActive: true } } } },
+        data: { isActive: false, deactivatedReason: "OWNER_INACTIVE" },
+      });
+    } else {
+      const revived = await prisma.pool.findMany({
+        where: { isActive: false, deactivatedReason: "OWNER_INACTIVE", ownerships: { some: { ownerId: userId } } },
+        select: { id: true },
+      });
+      for (const p of revived) {
+        await prisma.pool.updateMany({ where: { id: p.id, deactivatedReason: "OWNER_INACTIVE" }, data: { isActive: true, deactivatedReason: null } });
+        // Hari saat kolam mati bukan salah coach: hitungan penjaga jadwal dimulai ulang.
+        await prisma.package.updateMany({ where: { poolId: p.id, noSlotSince: { not: null } }, data: { noSlotSince: null } });
+        await notifyWaitlistForPool(p.id);
+      }
+    }
+    revalidatePath("/admin/kolam");
+  }
+
   // Coach diaktifkan bisa membuka paket pertama di kota kolamnya (daftar tunggu).
   if (nextActive && user.role === "COACH") await notifyWaitlistForCoach(userId);
 
@@ -234,4 +259,29 @@ export async function resetUserTotp(userId: string): Promise<{ error?: string }>
   if (res.count === 0) return { error: "Akun tidak ditemukan, atau akun ini milik admin (2FA admin hanya bisa direset lewat server)." };
   revalidatePath(`/admin/users/${userId}`);
   return {};
+}
+
+// Tolak pendaftar coach/pemilik kolam (Hadi 10 Okt). Nomor HP dan email
+// dikosongkan supaya pendaftar boleh daftar ulang dengan nomor yang sama
+// (Hadi 11 Okt); akun ini tetap tersimpan sebagai catatan dan tidak bisa
+// dipakai masuk. Kabar ke pendaftar lewat WhatsApp admin (belum bisa membuka
+// lonceng), jadi nomor dikembalikan ke layar sebelum dikosongkan.
+export async function rejectRegistration(
+  userId: string,
+  reasonRaw: string,
+): Promise<{ error: string } | { phone: string | null; name: string; role: "COACH" | "POOL_OWNER" }> {
+  await requireRole("ADMIN");
+  const reason = reasonRaw.trim();
+  if (reason.length < 5) return { error: "Tulis alasan penolakan (minimal 5 karakter)." };
+  if (reason.length > 300) return { error: "Alasan maksimal 300 karakter." };
+  const user = await prisma.user.findFirst({ where: { id: userId, ...PENDING_APPROVAL_WHERE }, select: { name: true, phone: true, role: true } });
+  if (!user) return { error: "Pendaftar ini sudah diproses atau tidak ditemukan. Muat ulang halaman." };
+  const claim = await prisma.user.updateMany({
+    where: { id: userId, ...PENDING_APPROVAL_WHERE },
+    data: { rejectedAt: new Date(), rejectionReason: reason, phone: null, email: null, sessionVersion: { increment: 1 } },
+  });
+  if (claim.count === 0) return { error: "Pendaftar ini baru saja diproses. Muat ulang halaman." };
+  revalidatePath("/admin/users");
+  revalidatePath("/admin");
+  return { phone: user.phone, name: user.name, role: user.role as "COACH" | "POOL_OWNER" };
 }

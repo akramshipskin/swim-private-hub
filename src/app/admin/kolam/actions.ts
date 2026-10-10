@@ -76,7 +76,8 @@ export async function togglePoolActive(poolId: string, nextActive: boolean) {
   await prisma.$transaction(async (tx) => {
     await tx.pool.update({
       where: { id: poolId },
-      data: { isActive: nextActive },
+      // Dimatikan admin = tidak ikut menyala saat pemiliknya diaktifkan lagi (T19).
+      data: { isActive: nextActive, deactivatedReason: nextActive ? null : "ADMIN" },
     });
     // Keputusan Hadi 25 Sep (opsi A): menyetujui kolam sekaligus menyetujui
     // pemiliknya -- HANYA pendaftar baru yang belum pernah disetujui. Pemilik

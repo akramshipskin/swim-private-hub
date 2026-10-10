@@ -8,10 +8,12 @@ export const PENDING_APPROVAL_WHERE = {
   isActive: false,
   approvedAt: null,
   anonymizedAt: null,
+  // Pendaftar yang ditolak admin tidak lagi menunggu (Hadi 10 Okt).
+  rejectedAt: null,
 } satisfies Prisma.UserWhereInput;
 
-type UserLike = { role: string; isActive: boolean; approvedAt: Date | null; anonymizedAt: Date | null };
+type UserLike = { role: string; isActive: boolean; approvedAt: Date | null; anonymizedAt: Date | null; rejectedAt?: Date | null };
 
 export function isPendingApproval(u: UserLike): boolean {
-  return (u.role === "COACH" || u.role === "POOL_OWNER") && !u.isActive && !u.approvedAt && !u.anonymizedAt;
+  return (u.role === "COACH" || u.role === "POOL_OWNER") && !u.isActive && !u.approvedAt && !u.anonymizedAt && !u.rejectedAt;
 }

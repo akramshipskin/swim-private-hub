@@ -1,5 +1,6 @@
 "use server";
 
+import { refundPackage, RefundError } from "@/lib/package-refund";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { withDedupeLock } from "@/lib/dedupe-lock";
@@ -204,4 +205,28 @@ export async function updatePackage(
 
   revalidatePath("/admin/paket");
   return null;
+}
+
+// Kembalikan Dana (Hadi 10 Okt, TRD T1): lihat src/lib/package-refund.ts.
+export async function refundPackageAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const session = await requireRole("ADMIN");
+  const num = (k: string) => {
+    const raw = formData.get(k)?.toString().replace(/[^0-9]/g, "") ?? "";
+    return raw === "" ? 0 : Number(raw);
+  };
+  try {
+    await refundPackage({
+      packageId: formData.get("packageId")?.toString() ?? "",
+      adminId: session.user.id,
+      cash: num("refundCash"),
+      saldo: num("refundSaldo"),
+      reference: formData.get("refundReference")?.toString() ?? "",
+      note: formData.get("refundNote")?.toString() ?? "",
+    });
+  } catch (err) {
+    if (err instanceof RefundError) return { error: err.message };
+    throw err;
+  }
+  revalidatePath("/admin/paket");
+  return { success: "Dana dikembalikan, paket diakhiri." };
 }

@@ -6,6 +6,7 @@ import { getCancelQuotaUsage, evaluateCancelEligibility } from "@/lib/cancel-eli
 import { buildAdminCancelWaLink } from "@/lib/whatsapp";
 import CancelButton from "./cancel-button";
 import ReportButton from "./report-button";
+import CoachReportForm from "./coach-report-form";
 import { ATTENDANCE_REPORT_WINDOW_DAYS, memberCanReportAttendance } from "@/lib/policy";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -231,6 +232,9 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
           );
         })
       )}
+      <CoachReportForm
+        coaches={[...new Map(bookings.map((b) => [b.availability.coachId, { id: b.availability.coachId, name: b.availability.coach.name }])).values()]}
+      />
     </main>
   );
 }

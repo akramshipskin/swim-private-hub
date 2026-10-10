@@ -11,6 +11,7 @@ const STATUS = {
   WAITING: { label: "Menunggu Sesi Hadir", tone: "neutral" },
   PENDING: { label: "Masa Tahan", tone: "warning" },
   RELEASED: { label: "Sudah Cair ke Saldo", tone: "success" },
+  VOID: { label: "Dibatalkan (Dana Dikembalikan)", tone: "danger" },
 } as const;
 
 const date = (d: Date) => d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" });

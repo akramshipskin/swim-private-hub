@@ -58,3 +58,10 @@ export function buildApprovalWaLink(phone: string, name: string, role: "COACH" |
   const message = `Halo ${name}, pendaftaranmu sebagai ${as} Swim Private Hub sudah disetujui. Silakan masuk di https://www.swimprivatehub.biz.id/login dengan nomor HP dan password yang kamu buat saat daftar. Terima kasih!`;
   return buildWaLinkTo(phone, message);
 }
+
+// Kabar penolakan pendaftaran (Hadi 10-11 Okt): boleh daftar ulang dengan nomor yang sama.
+export function buildRejectionWaLink(phone: string, name: string, role: "COACH" | "POOL_OWNER", reason: string) {
+  const as = role === "COACH" ? "coach" : "kolam mitra";
+  const message = `Halo ${name}, terima kasih sudah mendaftar sebagai ${as} Swim Private Hub. Mohon maaf, pendaftaranmu belum bisa kami setujui. Alasannya: ${reason} Kamu boleh mendaftar ulang dengan nomor HP yang sama setelah melengkapinya di https://www.swimprivatehub.biz.id.`;
+  return buildWaLinkTo(phone, message);
+}

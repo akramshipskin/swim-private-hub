@@ -83,7 +83,7 @@ describe("togglePoolActive", () => {
   // ini tombol satu-satunya yang bisa nge-flip itu.
   it("approves a pending pool by setting isActive true", async () => {
     await togglePoolActive("pool-1", true);
-    expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: true } });
+    expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: true, deactivatedReason: null } });
     // Kolam aktif bisa membuka paket pertama di kotanya: daftar tunggu dicek.
     expect(notifyWaitlistForPool).toHaveBeenCalledWith("pool-1");
   });
@@ -92,7 +92,7 @@ describe("togglePoolActive", () => {
     userUpdateMany.mockClear();
     notifyWaitlistForPool.mockClear();
     await togglePoolActive("pool-1", false);
-    expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: false } });
+    expect(poolUpdate).toHaveBeenCalledWith({ where: { id: "pool-1" }, data: { isActive: false, deactivatedReason: "ADMIN" } });
     expect(notifyWaitlistForPool).not.toHaveBeenCalled();
     expect(userUpdateMany).not.toHaveBeenCalled();
   });

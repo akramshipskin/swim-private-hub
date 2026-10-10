@@ -1,4 +1,5 @@
-import { timingSafeEqual } from "node:crypto";
+import { cronAuthorized as authorized } from "@/lib/cron-auth";
+import { sendPackageExpiryNotices, sendSessionReminders } from "@/lib/scheduled-notices";
 import { runCoachSlotWatch } from "@/lib/coach-slot-watch";
 import { purgeOldNotifications } from "@/lib/notifications";
 import { releaseStalePayments } from "@/lib/stale-payments";
@@ -7,13 +8,6 @@ import { releaseDueCommissions } from "@/lib/affiliate";
 // Pemeriksa harian (Vercel Cron, 06.00 WIB, lihat vercel.json). Vercel mengirim
 // "Authorization: Bearer <CRON_SECRET>". Tanpa CRON_SECRET di Vercel = semua
 // panggilan ditolak (gagal tertutup), jadi pemeriksa tidak jalan sampai diisi.
-function authorized(header: string | null) {
-  const secret = process.env.CRON_SECRET;
-  if (!secret || !header) return false;
-  const a = Buffer.from(header);
-  const b = Buffer.from(`Bearer ${secret}`);
-  return a.length === b.length && timingSafeEqual(a, b);
-}
 
 export async function GET(request: Request) {
   if (!authorized(request.headers.get("authorization"))) {
@@ -42,5 +36,14 @@ export async function GET(request: Request) {
     console.error(`[cron] gagal mencairkan komisi afiliasi: ${(err as Error)?.message ?? "error"}`);
     return null;
   });
-  return Response.json({ ok: true, watch, notificationsPurged, paymentsExpired, commissionsReleased });
+  // Pengingat sesi hari ini (06.00 WIB) dan paket mau berakhir (Hadi 9 Okt).
+  const remindersSent = await sendSessionReminders("morning").catch((err: unknown) => {
+    console.error(`[cron] gagal mengirim pengingat pagi: ${(err as Error)?.message ?? "error"}`);
+    return null;
+  });
+  const expiryNotices = await sendPackageExpiryNotices().catch((err: unknown) => {
+    console.error(`[cron] gagal mengirim pemberitahuan paket berakhir: ${(err as Error)?.message ?? "error"}`);
+    return null;
+  });
+  return Response.json({ ok: true, watch, notificationsPurged, paymentsExpired, commissionsReleased, remindersSent, expiryNotices });
 }

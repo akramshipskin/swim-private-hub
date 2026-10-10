@@ -33,7 +33,7 @@ export type Adjustment = { id: string; amount: number; note: string | null; crea
 export type Commission = {
   id: string;
   amount: number;
-  status: "WAITING" | "PENDING" | "RELEASED";
+  status: "WAITING" | "PENDING" | "RELEASED" | "VOID";
   releaseAt: string | null;
   releasedAt: string | null;
 };

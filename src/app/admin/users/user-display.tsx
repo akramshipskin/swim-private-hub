@@ -1,4 +1,5 @@
 import ToggleActiveButton from "./toggle-active-button";
+import RejectRegistrationButton from "./reject-registration-button";
 import ResetPasswordButton from "./reset-password-button";
 import { buildContactWaLink } from "@/lib/whatsapp";
 
@@ -81,9 +82,11 @@ export function PesertaList({ items }: { items: PesertaRow[] }) {
 export function UserActions({
   user,
   isSelf = false,
+  pending = false,
 }: {
   user: { id: string; name: string; phone: string | null; email: string | null; isActive: boolean; role?: string };
   isSelf?: boolean;
+  pending?: boolean;
 }) {
   return (
     <div className="flex flex-wrap items-center justify-end gap-1">
@@ -107,6 +110,7 @@ export function UserActions({
           loginId={user.phone ?? user.email ?? ""}
         />
       )}
+      {pending && <RejectRegistrationButton userId={user.id} userName={user.name} />}
       {!isSelf && <ToggleActiveButton userId={user.id} userName={user.name} isActive={user.isActive} phone={user.phone} role={user.role} />}
     </div>
   );

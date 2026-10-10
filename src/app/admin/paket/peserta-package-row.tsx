@@ -1,7 +1,10 @@
 "use client";
 
 import { useActionState } from "react";
-import { updatePackage } from "./actions";
+import { Textarea } from "@/components/ui/input";
+import { refundPackageAction, updatePackage } from "./actions";
+import { formatRupiah } from "@/lib/format";
+import { useState } from "react";
 import { Field, Input, Select } from "@/components/ui/input";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
@@ -28,6 +31,7 @@ type Pkg = {
   expiredDate: Date | null;
   expiredDateInput: string;
   cancelRemaining: number;
+  refund?: { cashPaid: number; saldoPaid: number; refundedAt: Date | null; refundCash: number | null; refundSaldo: number | null };
 };
 
 export default function PesertaPackageRow({
@@ -119,6 +123,7 @@ export default function PesertaPackageRow({
               {state.error}
             </p>
           )}
+          {isEditing && pkg.refund && <RefundBox packageId={pkg.id} refund={pkg.refund} />}
         </div>
 
         <div className="w-full rounded-lg bg-surface-muted px-4 py-3 sm:w-auto sm:shrink-0 sm:text-right">
@@ -137,3 +142,58 @@ export default function PesertaPackageRow({
     </div>
   );
 }
+
+// Kembalikan Dana (Hadi 10 Okt, TRD T1). Transfer uang tunai dilakukan admin di
+// dasbor Midtrans dulu; form ini mencatatnya dan mengakhiri paket.
+function RefundBox({ packageId, refund }: { packageId: string; refund: NonNullable<Pkg["refund"]> }) {
+  const [state, action, pending] = useActionState(refundPackageAction, null);
+  const [open, setOpen] = useState(false);
+  if (refund.refundedAt) {
+    return (
+      <p className="mt-3 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+        Dana dikembalikan {shortDate(refund.refundedAt)}: {formatRupiah(refund.refundCash ?? 0)} tunai, {formatRupiah(refund.refundSaldo ?? 0)} ke saldo.
+      </p>
+    );
+  }
+  if (refund.cashPaid + refund.saldoPaid === 0) return null;
+  if (state?.success) return <p className="mt-3 text-sm text-success-text">{state.success}</p>;
+  if (!open) {
+    return (
+      <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => setOpen(true)}>
+        Kembalikan Dana
+      </Button>
+    );
+  }
+  return (
+    <form action={action} className="mt-3 flex flex-col gap-3 rounded-xl border border-danger-text/30 bg-danger-bg/40 p-3">
+      <input type="hidden" name="packageId" value={packageId} />
+      <p className="text-sm text-text">
+        Transfer uang tunai dulu lewat dasbor Midtrans. Setelah disimpan, paket diakhiri, booking mendatang dibatalkan, dan sisa sesi hangus.
+      </p>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Field label={`Uang Tunai Dikembalikan (maks ${formatRupiah(refund.cashPaid)})`}>
+          <Input name="refundCash" inputMode="numeric" defaultValue={String(refund.cashPaid)} />
+        </Field>
+        <Field label={`Kembali ke Saldo Member (maks ${formatRupiah(refund.saldoPaid)})`}>
+          <Input name="refundSaldo" inputMode="numeric" defaultValue={String(refund.saldoPaid)} />
+        </Field>
+        <Field label="No. Referensi Refund Midtrans">
+          <Input name="refundReference" maxLength={100} />
+        </Field>
+      </div>
+      <Field label="Alasan">
+        <Textarea name="refundNote" rows={2} maxLength={300} required placeholder="Contoh: pembayaran ganda" />
+      </Field>
+      {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
+      <div className="flex gap-2">
+        <Button type="submit" size="sm" variant="danger" loading={pending}>
+          Simpan Pengembalian
+        </Button>
+        <Button type="button" size="sm" variant="ghost" onClick={() => setOpen(false)} disabled={pending}>
+          Batal
+        </Button>
+      </div>
+    </form>
+  );
+}
+

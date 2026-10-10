@@ -51,6 +51,9 @@ export async function markAttendance(
   if (session.user.role === "COACH" && booking.availability.coachId !== session.user.id) {
     return { error: "Sesi ini bukan sesimu." };
   }
+  if (booking.package.refundedAt) {
+    return { error: "Dana paket ini sudah dikembalikan ke member, jadi sesinya tidak bisa ditandai." };
+  }
   if (booking.availability.endTime > new Date()) {
     return { error: "Sesi ini belum selesai, jadi belum bisa ditandai." };
   }
@@ -73,7 +76,8 @@ export async function markAttendance(
       // wallet kekredit buat sesi yang udah CANCELLED (tes race lokal
       // 2026-09-17, 8 dari 8 percobaan).
       const claim = await tx.booking.updateMany({
-        where: { id: bookingId, attended: booking.attended, status: "BOOKED" },
+        // Paket yang dananya dikembalikan tidak lagi membagi uang (TRD T1).
+        where: { id: bookingId, attended: booking.attended, status: "BOOKED", package: { refundedAt: null } },
         data: {
           attended,
           attendedBy: session.user.role as "COACH" | "ADMIN",

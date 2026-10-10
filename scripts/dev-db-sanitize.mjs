@@ -31,9 +31,11 @@ export const POLICY = {
   RateLimitHit: null,
 
   User: {
-    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "partnerAgreementAcceptedAt", "partnerAgreementVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId", "memberBalance", "city"),
+    ...keep("id", "role", "isActive", "mustChangePassword", "sessionVersion", "createdAt", "termsAcceptedAt", "termsVersion", "partnerAgreementAcceptedAt", "partnerAgreementVersion", "deletionRequestedAt", "anonymizedAt", "approvedAt", "referralCodeId", "memberBalance", "city", "rejectedAt"),
     name: (r, i) => `${ROLE_LABEL[r.role] ?? "User"} ${i}`,
-    phone: (r, i) => `0899${pad(i, 8)}`,
+    // Pendaftar ditolak: nomor & email sengaja kosong di production, tetap kosong.
+    phone: (r, i) => (r.phone == null && r.rejectedAt ? null : `0899${pad(i, 8)}`),
+    rejectionReason: (r) => (r.rejectionReason == null ? null : "Alasan penolakan (disamarkan)"),
     email: (r, i) => (r.email == null ? null : `user${i}@dev.invalid`),
     passwordHash: (r, i, ctx) => ctx.devPasswordHash,
     registeredIp: () => null,
@@ -76,7 +78,7 @@ export const POLICY = {
   Testimonial: keep("id", "name", "role", "quote", "consentNote", "isPublished", "sortOrder", "createdAt"),
   CoachCertificate: keep("id", "coachProfileId", "name", "filePath", "status", "reviewedAt", "createdAt"),
   Pool: {
-    ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "pricePack4", "pricePack8", "serviceFeeBps", "pphExempt", "walletBalance", "isActive", "createdAt", "city", "dailyCapacity"),
+    ...keep("id", "name", "address", "openTime", "closeTime", "description", "facilities", "photos", "commissionPercent", "coachSharePercent", "pricePack4", "pricePack8", "serviceFeeBps", "pphExempt", "walletBalance", "isActive", "createdAt", "city", "dailyCapacity", "deactivatedReason"),
     contactPhone: (r, i) => (r.contactPhone == null ? null : `0898${pad(i, 8)}`),
     ...BANK,
   },
@@ -127,12 +129,25 @@ export const POLICY = {
   },
   WalletTransaction: keep("id", "type", "poolId", "coachProfileId", "amount", "paymentId", "bookingId", "withdrawalRequestId", "note", "createdById", "idempotencyKey", "createdAt"),
   PackageTemplate: keep("id", "poolId", "name", "totalSesi", "price", "durationDays", "jatahCancel", "isTrial", "isActive", "pendingChanges", "createdAt"),
-  Package: keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt", "coachId", "poolPrice", "coachPrice", "serviceFee", "durationDays", "saldoUsed", "noSlotSince", "freeCoachChangeAt"),
+  Package: {
+    ...keep("id", "memberId", "dependentId", "poolId", "templateId", "name", "totalSesi", "sisaSesi", "jatahCancel", "isSingleSession", "isTrial", "status", "startDate", "expiredDate", "createdAt", "coachId", "poolPrice", "coachPrice", "serviceFee", "durationDays", "saldoUsed", "noSlotSince", "freeCoachChangeAt", "refundedAt", "refundCash", "refundSaldo", "refundedById", "expiryNotice14At", "expiryNotice3At"),
+    // Kembalikan Dana (Hadi 10 Okt): nomor referensi Midtrans & alasan = teks asli.
+    refundReference: (r, i) => (r.refundReference == null ? null : `DEV-RFD-${i}`),
+    refundNote: (r) => (r.refundNote == null ? null : "Alasan pengembalian (disamarkan)"),
+  },
   CoachViolation: keep("id", "coachId", "packageId", "episodeStart", "createdAt"),
   Availability: keep("id", "coachId", "poolId", "date", "startTime", "endTime", "kapasitas", "status", "recurrenceRule", "createdAt"),
   PoolOwnership: keep("id", "poolId", "ownerId", "createdAt"),
   PoolAffiliation: keep("id", "poolId", "coachId", "createdAt"),
-  Booking: keep("id", "memberId", "availabilityId", "packageId", "status", "cancelledBy", "cancelledAt", "attended", "attendedBy", "attendedAt", "createdAt"),
+  Booking: keep("id", "memberId", "availabilityId", "packageId", "status", "cancelledBy", "cancelledAt", "attended", "attendedBy", "attendedAt", "createdAt", "reminderEveningAt", "reminderMorningAt"),
+  // Laporan member atas coach (Hadi 10-11 Okt): isi = teks bebas member, lampiran
+  // menunjuk bucket privat production; keduanya tidak ikut.
+  CoachReport: {
+    ...keep("id", "reporterId", "coachId", "bookingId", "status", "resolvedById", "resolvedAt", "createdAt"),
+    message: (r, i) => `[isi laporan disamarkan #${i}]`,
+    attachmentPath: () => null,
+    resolution: (r) => (r.resolution == null ? null : "Hasil pemeriksaan (disamarkan)"),
+  },
   // Saldo member & ganti coach (Hadi 2 Okt): angka disalin; teks bebas disamarkan.
   MemberWalletTransaction: keep("id", "memberId", "type", "amount", "packageId", "coachChangeRequestId", "note", "createdAt"),
   CoachChangeRequest: {

@@ -52,15 +52,15 @@ enum WalletTransactionType {
 // Penarikan saldo platform oleh admin (transfer manual dari akun Midtrans).
 // Saldo platform = total ledger PLATFORM_* dikurangi baris di sini.
 model PlatformWithdrawal {
-  id            String   @id @default(cuid())
-  revenueAmount Int
-  taxAmount     Int
-  note          String?
+  id                String   @id @default(cuid())
+  revenueAmount     Int
+  taxAmount         Int
+  note              String?
   // Bukti transfer (nomor referensi m-banking), wajib untuk penarikan baru
   // (keputusan Hadi 29 Sep). Kosong hanya untuk baris lama sebelum aturan ini.
   transferReference String?
-  createdById   String
-  createdAt     DateTime @default(now())
+  createdById       String
+  createdAt         DateTime @default(now())
 }
 
 enum AttendanceReportStatus {
@@ -135,28 +135,32 @@ enum MarkedBy {
 }
 
 model User {
-  id                 String   @id @default(cuid())
-  name               String
-  email              String?  @unique
-  phone              String?  @unique
-  passwordHash       String
-  role               Role     @default(MEMBER)
-  isActive           Boolean  @default(true)
-  mustChangePassword Boolean  @default(false)
+  id                         String               @id @default(cuid())
+  name                       String
+  email                      String?              @unique
+  phone                      String?              @unique
+  passwordHash               String
+  role                       Role                 @default(MEMBER)
+  isActive                   Boolean              @default(true)
+  mustChangePassword         Boolean              @default(false)
+  // Pendaftar coach/pemilik kolam yang ditolak admin (Hadi 10 Okt). Nomor HP
+  // dan email dikosongkan saat ditolak supaya bisa daftar ulang (Hadi 11 Okt).
+  rejectedAt                 DateTime?
+  rejectionReason            String?
   // Saldo member (Hadi 2 Okt): selisih ganti ke coach lebih murah. Hanya untuk
   // membeli paket / tambah bayar, tidak bisa dicairkan. Cache dari
   // MemberWalletTransaction (sumber kebenaran).
-  memberBalance      Int      @default(0)
+  memberBalance              Int                  @default(0)
   // Naik tiap password diganti/direset -- JWT yang nyimpen versi lama
   // ditolak di callback jwt (src/auth.ts), jadi sesi curian ikut mati.
-  sessionVersion     Int      @default(0)
-  createdAt          DateTime @default(now())
-  registeredReferer  String?
-  registeredIp       String?
+  sessionVersion             Int                  @default(0)
+  createdAt                  DateTime             @default(now())
+  registeredReferer          String?
+  registeredIp               String?
   // Bukti persetujuan S&K + Kebijakan Privasi saat daftar sendiri (versi =
   // tanggal dokumen, lihat src/lib/legal.ts). Null = akun dibuat admin/import.
-  termsAcceptedAt    DateTime?
-  termsVersion       String?
+  termsAcceptedAt            DateTime?
+  termsVersion               String?
   // Persetujuan perjanjian kemitraan lewat centang (coach: perjanjian coach,
   // pemilik kolam: MOU kolam). Lihat src/lib/partner-agreement.ts.
   partnerAgreementAcceptedAt DateTime?
@@ -164,51 +168,53 @@ model User {
   // 2FA (TOTP, Google Authenticator) -- wajib untuk ADMIN. totpSecret terisi
   // saat setup dimulai; baru berlaku setelah totpEnabledAt terisi.
   // totpLastStep = langkah waktu kode terakhir yang dipakai (tolak kode ulang).
-  totpSecret         String?
-  totpEnabledAt      DateTime?
-  totpLastStep       Int?
+  totpSecret                 String?
+  totpEnabledAt              DateTime?
+  totpLastStep               Int?
   // Hapus akun (keputusan Hadi 25 Sep): member mengajukan, admin menyetujui.
   // Disetujui = data identitas dianonimkan (anonymizedAt), riwayat transaksi &
   // arsip chat tetap tersimpan tanpa identitas.
-  deletionRequestedAt DateTime?
-  anonymizedAt        DateTime?
+  deletionRequestedAt        DateTime?
+  anonymizedAt               DateTime?
   // Kapan admin menyetujui akun ini (tombol Aktifkan, atau admin yang membuat
   // akunnya). Null + nonaktif + COACH/POOL_OWNER = pendaftar mandiri yang
   // MENUNGGU persetujuan -- beda dari akun yang sengaja dinonaktifkan.
-  approvedAt          DateTime?
+  approvedAt                 DateTime?
   // Kota domisili (member & coach) dari daftar tetap src/lib/cities.ts (Hadi
   // 3 Okt). Member disuguhi kolam & coach kota ini; coach memilih kolam di
   // kota ini (kota lain boleh, dengan peringatan). Null = akun lama, diminta
   // mengisi saat masuk.
-  city                String?
+  city                       String?
   // Kode afiliasi yang diisi member saat mendaftar (opsional). Komisi dibayar
   // sekali per member -- lihat AffiliateCommission.
-  referralCodeId      String?
-  referralCode        AffiliateCode? @relation(fields: [referralCodeId], references: [id], onDelete: SetNull)
-  affiliateCommission AffiliateCommission?
+  referralCodeId             String?
+  referralCode               AffiliateCode?       @relation(fields: [referralCodeId], references: [id], onDelete: SetNull)
+  affiliateCommission        AffiliateCommission?
 
-  coachProfile        CoachProfile?
-  dependents          Dependent[]
-  packages            Package[]
-  bookings            Booking[]
-  availabilities      Availability[]     @relation("CoachAvailabilities")
-  coachedPackages     Package[]          @relation("PackageCoach")
+  coachProfile             CoachProfile?
+  dependents               Dependent[]
+  packages                 Package[]
+  bookings                 Booking[]
+  availabilities           Availability[]            @relation("CoachAvailabilities")
+  coachedPackages          Package[]                 @relation("PackageCoach")
   memberWalletTransactions MemberWalletTransaction[]
-  coachChangeRequests      CoachChangeRequest[] @relation("CoachChangeMember")
-  coachChangesFrom         CoachChangeRequest[] @relation("CoachChangeFrom")
-  coachChangesTo           CoachChangeRequest[] @relation("CoachChangeTo")
+  coachChangeRequests      CoachChangeRequest[]      @relation("CoachChangeMember")
+  coachChangesFrom         CoachChangeRequest[]      @relation("CoachChangeFrom")
+  coachChangesTo           CoachChangeRequest[]      @relation("CoachChangeTo")
   coachViolations          CoachViolation[]
-  pushSubscriptions   PushSubscription[]
-  inAppNotifications  InAppNotification[]
-  poolAffiliations    PoolAffiliation[]  @relation("CoachPoolAffiliations")
-  poolOwnerships      PoolOwnership[]    @relation("PoolOwners")
-  chatThread          ChatThread?
-  cityWaitlist        CityWaitlist[]
+  pushSubscriptions        PushSubscription[]
+  inAppNotifications       InAppNotification[]
+  poolAffiliations         PoolAffiliation[]         @relation("CoachPoolAffiliations")
+  poolOwnerships           PoolOwnership[]           @relation("PoolOwners")
+  chatThread               ChatThread?
+  cityWaitlist             CityWaitlist[]
 
   milestoneItemsCreated     MilestoneItem[]            @relation("MilestoneItemCreator")
   milestoneAchievements     MilestoneAchievement[]     @relation("MilestoneAchievementCoach")
   milestoneNotes            MilestoneNote[]            @relation("MilestoneNoteCoach")
   milestoneLevelCompletions MilestoneLevelCompletion[] @relation("MilestoneCompletionCoach")
+  coachReportsFiled         CoachReport[]              @relation("CoachReportReporter")
+  coachReportsAgainst       CoachReport[]              @relation("CoachReportCoach")
 }
 
 // Chat bantuan (tombol mengambang) buat member/coach/pemilik kolam. 1 user =
@@ -257,20 +263,20 @@ enum CertificateStatus {
 }
 
 model CoachProfile {
-  id       String  @id @default(cuid())
-  userId   String  @unique
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bio      String?
-  isActive Boolean @default(true)
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio               String?
+  isActive          Boolean   @default(true)
   // Poin-poin keahlian (misal "Gaya bebas", "Anak usia dini", "Terapi
   // air") -- array pendek, ditampilin di halaman shortcut coach
   // (/pelatih/[id]) & profil. Bukan free-text panjang, biar konsisten
   // scan-able buat parent yang milih coach.
-  specialties       String[] @default([])
+  specialties       String[]  @default([])
   // Badge "plus poin" kalau coach punya sertifikasi renang resmi
   // (misal sertifikasi pelatih renang/lifeguard). certificationNote
   // opsional -- nama sertifikat/lembaga, ditampilin di sebelah badge.
-  hasCertification  Boolean  @default(false)
+  hasCertification  Boolean   @default(false)
   certificationNote String?
   // Foto profil (URL Supabase Storage). Sertifikat ada di tabel
   // CoachCertificate (kolom tunggal lama sudah dibuang 30 Sep).
@@ -286,7 +292,7 @@ model CoachProfile {
   // Saldo coach ini dari bagian per-sesi (harga coach ÷ jumlah sesi, dipotong
   // PPh 0,5%), dikredit pas booking ditandai Hadir. Lihat Pool.walletBalance buat
   // catatan yang sama soal cache-vs-ledger.
-  walletBalance     Int      @default(0)
+  walletBalance     Int       @default(0)
   bankName          String?
   bankAccountNumber String?
   bankAccountName   String?
@@ -298,16 +304,16 @@ model CoachProfile {
   pricePack8        Int?
   // Sudah menyerahkan surat pernyataan omzet < Rp500 juta/tahun: bagiannya
   // tidak dipotong PPh 0,5%. Hanya admin yang mengubah.
-  pphExempt         Boolean  @default(false)
+  pphExempt         Boolean   @default(false)
 
-  walletTransactions WalletTransaction[]
-  withdrawalRequests WithdrawalRequest[]
-  certificates       CoachCertificate[]
-  affiliateCode      AffiliateCode?
+  walletTransactions   WalletTransaction[]
+  withdrawalRequests   WithdrawalRequest[]
+  certificates         CoachCertificate[]
+  affiliateCode        AffiliateCode?
   affiliateCommissions AffiliateCommission[]
   // Gambar tanda tangan coach (path di bucket privat coach-certificates),
   // diunggah sekali, dipasang di sertifikat level milestone.
-  signaturePath      String?
+  signaturePath        String?
 }
 
 // Sertifikat coach (bisa banyak, Hadi 29 Sep). Tiap sertifikat diperiksa admin
@@ -338,36 +344,38 @@ model CoachCertificate {
 // audit ("kenapa saldo gua segini"). Setiap update walletBalance WAJIB
 // diiringi >=1 baris di sini dalam transaksi DB yang sama.
 model WalletTransaction {
-  id     String                @id @default(cuid())
-  type   WalletTransactionType
+  id                  String                @id @default(cuid())
+  type                WalletTransactionType
   // Persis 1 dari dua ini yang keisi -- baris punya Pool ATAU CoachProfile,
   // gak pernah dua-duanya (dijaga CHECK "WalletTransaction_owner_matches_type"
   // di DB, lihat migrasi money_controls + validate_money_checks).
-  poolId         String?
-  pool           Pool?          @relation(fields: [poolId], references: [id], onDelete: Cascade)
-  coachProfileId String?
-  coachProfile   CoachProfile?  @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
+  poolId              String?
+  pool                Pool?                 @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  coachProfileId      String?
+  coachProfile        CoachProfile?         @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
   // Positif = kredit (saldo nambah), negatif = debit (saldo berkurang).
-  amount         Int
+  amount              Int
   // Referensi ke sumber transaksi -- paling banyak 1 yang keisi sesuai
   // type-nya (PACKAGE_SALE -> paymentId, SESSION_PAYOUT -> bookingId,
   // WITHDRAWAL -> withdrawalRequestId).
-  paymentId          String?
-  bookingId          String?
+  paymentId           String?
+  bookingId           String?
   withdrawalRequestId String?
   // Koreksi saldo oleh admin (baris SESSION_REVENUE/SESSION_PAYOUT tanpa
   // bookingId, plus pasangannya PLATFORM_REVENUE kalau dananya dari/ke
   // platform): alasan wajib + admin yang mencatat, ditampilkan ke coach/kolam
   // di halaman Saldo. Kosong untuk baris otomatis (sesi, pencairan) dan
   // koreksi lama yang dulu dicatat langsung di database.
-  note           String?
-  createdById    String?
+  note                String?
+  createdById         String?
   // Satu kiriman formulir koreksi = satu koreksi, walau terkirim dua kali.
-  idempotencyKey String?  @unique
-  createdAt      DateTime              @default(now())
+  idempotencyKey      String?               @unique
+  createdAt           DateTime              @default(now())
 
   @@index([poolId])
   @@index([coachProfileId])
+  @@index([bookingId])
+  @@index([type, createdAt])
 }
 
 // Pengajuan pencairan saldo (kolam ATAU coach, sama pola exactly-1
@@ -376,20 +384,20 @@ model WalletTransaction {
 // Midtrans Iris (disbursement) terpasang -- sebelum itu ada, admin yang
 // proses manual dari /admin/withdrawals (lihat src/lib/disbursement.ts).
 model WithdrawalRequest {
-  id     String           @id @default(cuid())
-  poolId String?
-  pool   Pool?            @relation(fields: [poolId], references: [id], onDelete: Cascade)
-  coachProfileId String?
-  coachProfile   CoachProfile? @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
-  amount Int
-  status WithdrawalStatus @default(PENDING)
+  id                  String           @id @default(cuid())
+  poolId              String?
+  pool                Pool?            @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  coachProfileId      String?
+  coachProfile        CoachProfile?    @relation(fields: [coachProfileId], references: [id], onDelete: Cascade)
+  amount              Int
+  status              WithdrawalStatus @default(PENDING)
   // Disalin dari Pool/CoachProfile pas request dibuat -- kalau rekening
   // tujuan diedit belakangan, request yang UDAH ADA gak boleh ikut
   // berubah diam-diam (riwayat pencairan harus nunjukin kemana duitnya
   // BENERAN dikirim saat itu).
-  bankName          String
-  bankAccountNumber String
-  bankAccountName   String
+  bankName            String
+  bankAccountNumber   String
+  bankAccountName     String
   midtransReferenceId String?
   // Bukti transfer manual (nomor referensi dari m-banking), wajib saat admin
   // klik "Tandai Dibayar" -- keputusan Hadi 25 Sep.
@@ -397,8 +405,8 @@ model WithdrawalRequest {
   // Admin yang menandai dibayar / menolak (jejak audit).
   processedById       String?
   failureReason       String?
-  requestedAt DateTime  @default(now())
-  processedAt DateTime?
+  requestedAt         DateTime         @default(now())
+  processedAt         DateTime?
 
   @@index([poolId])
   @@index([coachProfileId])
@@ -410,27 +418,27 @@ model WithdrawalRequest {
 // disembunyiin dari pilihan baru, riwayat Package/Booking lama tetap
 // utuh (dibutuhin buat laporan honor coach).
 model Dependent {
-  id        String   @id @default(cuid())
-  memberId  String
-  member    User     @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  name      String
+  id             String          @id @default(cuid())
+  memberId       String
+  member         User            @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  name           String
   // Peserta bisa akun itu sendiri (dewasa yang les sendiri), bukan cuma
   // anak -- isSelf nandain entry mana yang "diri sendiri" (nama-nya
   // dicopy dari User.name pas dibuat). Paling banyak 1 entry isSelf per
   // member, dicek di action layer (bukan constraint DB).
-  isSelf    Boolean  @default(false)
+  isSelf         Boolean         @default(false)
   // Tanggal lahir peserta (anak atau dewasa), untuk level milestone per umur.
   // Wajib diisi saat menambah peserta baru; kosong untuk peserta lama.
-  birthDate DateTime?
+  birthDate      DateTime?
   // Kelompok milestone yang sedang dijalani. Diisi saat catatan milestone
   // pertama (dari umur, atau dipilih coach kalau tanggal lahir kosong). Tidak
   // ikut berganti otomatis saat umur naik di tengah level -- lihat
   // src/lib/milestone.ts (nextGroup).
   milestoneGroup MilestoneGroup?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
 
-  packages Package[]
+  packages                  Package[]
   milestoneItems            MilestoneItem[]
   milestoneAchievements     MilestoneAchievement[]
   milestoneNotes            MilestoneNote[]
@@ -443,28 +451,28 @@ model Dependent {
 // Dulu katalog paket per kolam; harga sekarang dari Pool.pricePack4/8 +
 // CoachProfile.pricePack4/8. Tabel dibiarkan untuk riwayat, drop menyusul.
 model PackageTemplate {
-  id           String   @id @default(cuid())
-  poolId       String
-  pool         Pool     @relation(fields: [poolId], references: [id], onDelete: Cascade)
-  name         String
-  totalSesi    Int
-  price        Int
+  id             String   @id @default(cuid())
+  poolId         String
+  pool           Pool     @relation(fields: [poolId], references: [id], onDelete: Cascade)
+  name           String
+  totalSesi      Int
+  price          Int
   // Masa berlaku paket dalam hari, dihitung dari startDate (aktivasi).
-  durationDays Int      @default(60)
+  durationDays   Int      @default(60)
   // Jatah pembatalan mandiri (tanpa approval admin) yang dibawa tiap
   // paket yang dibuat dari template ini -- dicopy ke Package.jatahCancel
   // pas paket dibuat, BUKAN dibaca ulang dari template tiap kali cek
   // kuota (biar paket lama gak ikut berubah kalau template diedit).
-  jatahCancel  Int      @default(2)
+  jatahCancel    Int      @default(2)
   // Paket trial (Hadi 29 Sep): 1 sesi, harga ditentukan SPH per kolam --
   // hanya admin yang membuat/mengubah. Hanya untuk peserta yang belum pernah
   // punya paket (1x per anak). Tidak ikut harga "mulai dari" & harga 1 sesi.
-  isTrial      Boolean  @default(false)
-  isActive     Boolean  @default(true)
+  isTrial        Boolean  @default(false)
+  isActive       Boolean  @default(true)
   // Usulan perubahan dari pemilik kolam yang menunggu persetujuan admin
   // (lihat src/lib/package-template.ts). Nilai di atas = yang sedang dijual.
   pendingChanges Json?
-  createdAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
 
   packages Package[]
 
@@ -472,68 +480,79 @@ model PackageTemplate {
 }
 
 model Package {
-  id          String           @id @default(cuid())
-  memberId    String
-  member      User             @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  id                  String               @id @default(cuid())
+  memberId            String
+  member              User                 @relation(fields: [memberId], references: [id], onDelete: Cascade)
   // Wajib -- 1 paket = 1 anak, gak pooled/gak bisa dipake gantian antar
   // anak. Ditulis sekali pas paket dibuat; kalau paket ini udah punya
   // >=1 Booking, dependentId GAK BOLEH diedit lagi (dicek di action
   // layer, bukan constraint DB) -- soalnya Booking gak nyimpen anak
   // sendiri, "anak"-nya booking diturunin dari sini. Edit dependentId
   // setelah ada booking = nge-rewrite riwayat anak booking lama diam-diam.
-  dependentId String
-  dependent   Dependent        @relation(fields: [dependentId], references: [id])
+  dependentId         String
+  dependent           Dependent            @relation(fields: [dependentId], references: [id])
   // Kolam tempat beli, DAN satu-satunya kolam tempat paket ini bisa
   // dibooking (revisi 2026-09-17, gantiin paket lintas-kolam 2026-09-12:
   // beli di kolam murah lalu dipake di kolam mahal bikin kolam mahal
   // dibayar pake harga kolam murah). Mau renang di kolam lain = beli
   // paket 1 sesi di kolam itu (isSingleSession), lihat src/lib/drop-in.ts.
-  poolId      String
-  pool        Pool             @relation(fields: [poolId], references: [id])
-  templateId  String?
-  template    PackageTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
-  name        String
-  totalSesi   Int
-  sisaSesi    Int
+  poolId              String
+  pool                Pool                 @relation(fields: [poolId], references: [id])
+  templateId          String?
+  template            PackageTemplate?     @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  name                String
+  totalSesi           Int
+  sisaSesi            Int
   // Dicopy dari PackageTemplate.jatahCancel pas paket dibuat (atau
   // diisi manual kalau paket custom/assign langsung). Ini yang dipakai
   // buat cek kuota self-cancel, bukan konstanta global -- tiap paket
   // bisa punya jatah beda.
-  jatahCancel Int              @default(2)
+  jatahCancel         Int                  @default(2)
   // Model harga-dari-coach (Hadi 2 Okt): paket terikat ke 1 coach. Harga
   // kolam, harga coach, dan biaya layanan SPH disalin saat dibeli -- dasar
   // pembagian uang tiap sesi (src/lib/pricing.ts), tidak ikut berubah kalau
   // harga diubah belakangan. Semua null = paket model lama (sudah dihapus dari
   // kode; tidak bisa dibooking, tandai hadir berbayar ditolak).
-  coachId      String?
-  coach        User?           @relation("PackageCoach", fields: [coachId], references: [id])
-  poolPrice    Int?
-  coachPrice   Int?
-  serviceFee   Int?
+  coachId             String?
+  coach               User?                @relation("PackageCoach", fields: [coachId], references: [id])
+  poolPrice           Int?
+  coachPrice          Int?
+  serviceFee          Int?
   // Masa berlaku (hari) sejak aktif; null = ikut template/aturan lama.
-  durationDays Int?
+  durationDays        Int?
   // Penjaga jadwal coach (Hadi 3 Okt, src/lib/coach-slot-watch.ts): sejak kapan
   // paket aktif ini punya sesi belum terjadwal tetapi coach-nya tidak membuka
   // jam yang bisa dibooking sebelum paket berakhir (null = aman). Hari ke-2
   // coach diperingatkan tiap hari; hari ke-10 member boleh ganti coach tanpa
   // biaya (freeCoachChangeAt) dan coach dapat catatan pelanggaran.
-  noSlotSince       DateTime?
-  freeCoachChangeAt DateTime?
+  noSlotSince         DateTime?
+  freeCoachChangeAt   DateTime?
+  // Kembalikan Dana oleh admin (Hadi 10 Okt, TRD T1): satu paket paling banyak
+  // satu kali; transfernya manual lewat Midtrans, di sini hanya catatannya.
+  refundedAt          DateTime?
+  refundCash          Int?
+  refundSaldo         Int?
+  refundReference     String?
+  refundNote          String?
+  refundedById        String?
+  // Pemberitahuan paket mau berakhir sudah dikirim (14 dan 3 hari sebelum).
+  expiryNotice14At    DateTime?
+  expiryNotice3At     DateTime?
   // Bagian harga yang dibayar dari saldo member (sisanya lewat Midtrans,
   // Payment.amount). Total harga paket model baru = poolPrice + coachPrice + serviceFee.
-  saldoUsed    Int              @default(0)
+  saldoUsed           Int                  @default(0)
   coachChangeRequests CoachChangeRequest[]
   coachViolations     CoachViolation[]
   // Paket eceran 1 sesi buat renang di kolam selain kolam paket utama.
   // Cuma bisa dibeli member yang masih punya paket biasa (bukan 1 sesi)
   // yang aktif -- dan paket 1 sesi sendiri gak ngitung sebagai syarat itu.
-  isSingleSession Boolean      @default(false)
+  isSingleSession     Boolean              @default(false)
   // Disalin dari PackageTemplate.isTrial saat dibeli.
-  isTrial     Boolean          @default(false)
-  status      PackageStatus    @default(PENDING_PAYMENT)
-  startDate   DateTime?
-  expiredDate DateTime?
-  createdAt   DateTime         @default(now())
+  isTrial             Boolean              @default(false)
+  status              PackageStatus        @default(PENDING_PAYMENT)
+  startDate           DateTime?
+  expiredDate         DateTime?
+  createdAt           DateTime             @default(now())
 
   payments Payment[]
   bookings Booking[]
@@ -545,20 +564,20 @@ model Package {
 }
 
 model Payment {
-  id                String        @id @default(cuid())
-  packageId         String
-  package           Package       @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  midtransOrderId   String        @unique
-  amount            Int
-  status            PaymentStatus @default(PENDING)
-  rawWebhookPayload Json?
+  id                   String              @id @default(cuid())
+  packageId            String
+  package              Package             @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  midtransOrderId      String              @unique
+  amount               Int
+  status               PaymentStatus       @default(PENDING)
+  rawWebhookPayload    Json?
   // Waktu pembayaran jadi SUCCESS (diisi webhook). Dasar laporan "uang masuk"
   // -- bukan createdAt (waktu checkout) atau updatedAt (berubah tiap
   // notifikasi duplikat dari Midtrans).
-  paidAt            DateTime?
+  paidAt               DateTime?
   // Link halaman bayar Midtrans (berlaku ~24 jam) -- tombol "Lanjut bayar"
   // untuk paket yang masih menunggu pembayaran.
-  snapRedirectUrl   String?
+  snapRedirectUrl      String?
   // Diisi kalau pembayaran ini tambahan bayar ganti coach (bukan pembelian
   // paket): webhook menyelesaikan pengajuannya, status paket tidak disentuh.
   coachChangeRequestId String?
@@ -566,9 +585,9 @@ model Payment {
   // Cookie Pixel Meta (_fbp/_fbc) + user agent saat checkout, untuk event
   // Purchase dari server saat notifikasi lunas (src/lib/meta-capi.ts). Tanpa IP.
   // Dikosongkan saat akun member dihapus (anonim).
-  metaTracking      Json?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  metaTracking         Json?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
 
   @@index([packageId])
   @@index([status, paidAt])
@@ -615,66 +634,70 @@ model Availability {
 // (walletBalance) abis komisi platform kepotong, dicairkan manual
 // lewat WithdrawalRequest.
 model Pool {
-  id                 String   @id @default(cuid())
-  name               String
-  address            String?
+  id                String   @id @default(cuid())
+  name              String
+  address           String?
   // Kota kolam dari daftar tetap src/lib/cities.ts (Hadi 3 Okt). Null = kolam
   // lama yang belum diisi (tidak tampil di saringan kota sampai diisi).
-  city               String?
+  city              String?
   // Kapasitas harian khusus pelanggan SPH yang diisi pemilik kolam (jumlah
   // sesi per hari, 1 sesi = 1 coach + 1 peserta + 1 pendamping), bisa diubah
   // kapan saja. Null = belum diisi = tanpa batas (Hadi 3 Okt).
-  dailyCapacity      Int?
-  contactPhone       String?
+  dailyCapacity     Int?
+  contactPhone      String?
   // Jam operasional harian (format "HH:mm", misal "06:00"/"21:00").
   // Satu jam buka-tutup buat semua hari -- MVP, belum per-hari (Senin
   // beda jam sama Minggu dst). Dijaga di server (src/lib/pool-hours.ts):
   // slot baru di luar jam ini ditolak, booking di luar jam ini ditolak, kolam
   // tanpa jam buka tidak bisa dibuka slot barunya (Hadi 2 Okt malam, #6/#7).
-  openTime           String?
-  closeTime          String?
+  openTime          String?
+  closeTime         String?
   // Deskripsi & fasilitas kolam (warung, mushola, toilet, dst) -- diisi
   // pemilik kolam atau admin, tampil di landing, booking, halaman coach.
-  description        String?
-  facilities         String[] @default([])
+  description       String?
+  facilities        String[] @default([])
   // Foto fasilitas kolam (URL publik Supabase Storage), diunggah pemilik
   // kolam/admin. Urutan array = urutan tampil; foto pertama jadi sampul.
-  photos             String[] @default([])
+  photos            String[] @default([])
   // TIDAK DIPAKAI LAGI: commissionPercent & coachSharePercent = model bagi
   // hasil persen lama (dihapus dari kode, Hadi 2 Okt malam #9). Kolom
   // dibiarkan sampai drop menyusul.
-  commissionPercent  Int      @default(10)
-  coachSharePercent  Int      @default(40)
+  commissionPercent Int      @default(10)
+  coachSharePercent Int      @default(40)
   // Model harga-dari-coach (Hadi 2 Okt): harga tiket kolam untuk paket 4 dan
   // 8 sesi (1 coach + 1 peserta + 1 pendamping per sesi), diubah pemilik
   // kolam/admin dan langsung berlaku. null = kolam belum memasang harga.
-  pricePack4         Int?
-  pricePack8         Int?
+  pricePack4        Int?
+  pricePack8        Int?
   // Biaya layanan SPH di atas harga kolam + coach, dalam basis poin
   // (650 = 6,5%). Dibatasi maks 690 (bahasa ke pengguna: "di bawah 7%").
-  serviceFeeBps      Int      @default(650)
+  serviceFeeBps     Int      @default(650)
   // Lihat CoachProfile.pphExempt.
-  pphExempt          Boolean  @default(false)
+  pphExempt         Boolean  @default(false)
   // Saldo kolam ini dari sesi-sesi yang diajar di kolam ini (dikredit pas
   // Booking ditandai Hadir, bukan pas Package dibeli). Cache, lihat
   // WalletTransaction buat sumber kebenaran.
-  walletBalance      Int      @default(0)
+  walletBalance     Int      @default(0)
   // Tujuan pencairan (WithdrawalRequest). Nullable -- kolam yang belum
   // isi ini gak bisa ajuin cairin (dicek di action layer).
-  bankName              String?
-  bankAccountNumber     String?
-  bankAccountName       String?
-  isActive           Boolean  @default(true)
-  createdAt          DateTime @default(now())
+  bankName          String?
+  bankAccountNumber String?
+  bankAccountName   String?
+  isActive          Boolean  @default(true)
+  // Alasan kolam nonaktif (Hadi 11 Okt, T19): OWNER_INACTIVE = semua
+  // pemiliknya dinonaktifkan (kolam menyala lagi saat pemilik diaktifkan);
+  // ADMIN = dimatikan admin (tidak ikut menyala). Kosong = kolam aktif / lama.
+  deactivatedReason String?
+  createdAt         DateTime @default(now())
 
-  affiliations       PoolAffiliation[]
-  availabilities     Availability[]
-  packageTemplates   PackageTemplate[]
-  packages           Package[]
-  walletTransactions WalletTransaction[]
-  withdrawalRequests WithdrawalRequest[]
-  ownerships         PoolOwnership[]
-  affiliateCode      AffiliateCode?
+  affiliations         PoolAffiliation[]
+  availabilities       Availability[]
+  packageTemplates     PackageTemplate[]
+  packages             Package[]
+  walletTransactions   WalletTransaction[]
+  withdrawalRequests   WithdrawalRequest[]
+  ownerships           PoolOwnership[]
+  affiliateCode        AffiliateCode?
   affiliateCommissions AffiliateCommission[]
 }
 
@@ -756,29 +779,34 @@ model InAppNotification {
 }
 
 model Booking {
-  id             String        @id @default(cuid())
-  memberId       String
-  member         User          @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  availabilityId String
-  availability   Availability  @relation(fields: [availabilityId], references: [id], onDelete: Cascade)
+  id                String            @id @default(cuid())
+  memberId          String
+  member            User              @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  availabilityId    String
+  availability      Availability      @relation(fields: [availabilityId], references: [id], onDelete: Cascade)
   // "Anak" buat booking ini diturunin transitif lewat packageId ->
   // Package.dependentId -- sengaja gak nyimpen field anak sendiri di
   // sini, biar cuma ada 1 sumber kebenaran (bukan 2 field yang bisa
   // nyimpang). Relasi Package ditambah sekalian (sebelumnya packageId
   // cuma string lepas, gak ada FK constraint di DB sama sekali).
-  packageId      String
-  package        Package       @relation(fields: [packageId], references: [id])
-  status         BookingStatus @default(BOOKED)
-  cancelledBy    CancelledBy?
-  cancelledAt    DateTime?
+  packageId         String
+  package           Package           @relation(fields: [packageId], references: [id])
+  status            BookingStatus     @default(BOOKED)
+  cancelledBy       CancelledBy?
+  cancelledAt       DateTime?
   // null = belum ditandai, true = member hadir (sesi valid buat coach),
   // false = member gak hadir (gak dihitung ke sesi valid coach walau
   // booking-nya tetep BOOKED dan sesi member tetep kepotong).
-  attended       Boolean?
-  attendedBy     MarkedBy?
-  attendedAt     DateTime?
-  attendanceReport AttendanceReport?
-  createdAt      DateTime      @default(now())
+  attended          Boolean?
+  attendedBy        MarkedBy?
+  attendedAt        DateTime?
+  attendanceReport  AttendanceReport?
+  // Pengingat sebelum sesi sudah dikirim (Hadi 9 Okt: 18.00 malam sebelumnya
+  // dan 06.00 hari-H). Diklaim bersyarat supaya tidak terkirim dua kali.
+  reminderEveningAt DateTime?
+  reminderMorningAt DateTime?
+  coachReports      CoachReport[]
+  createdAt         DateTime          @default(now())
 
   @@index([memberId])
   @@index([availabilityId])
@@ -860,21 +888,21 @@ enum MilestoneProposalStatus {
 }
 
 model MilestoneItem {
-  id          String                  @id @default(cuid())
-  group       MilestoneGroup
-  level       Int
-  sortOrder   Int                     @default(0)
-  text        String
+  id             String                  @id @default(cuid())
+  group          MilestoneGroup
+  level          Int
+  sortOrder      Int                     @default(0)
+  text           String
   // null = butir standar SPH (berlaku untuk semua peserta di kelompok itu).
   // Terisi = butir tambahan coach khusus peserta ini. Usulan yang disetujui
   // admin dijadikan standar dengan mengosongkan kolom ini.
-  dependentId String?
-  dependent   Dependent?              @relation(fields: [dependentId], references: [id], onDelete: Cascade)
-  createdById String?
-  createdBy   User?                   @relation("MilestoneItemCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  dependentId    String?
+  dependent      Dependent?              @relation(fields: [dependentId], references: [id], onDelete: Cascade)
+  createdById    String?
+  createdBy      User?                   @relation("MilestoneItemCreator", fields: [createdById], references: [id], onDelete: SetNull)
   proposalStatus MilestoneProposalStatus @default(NONE)
-  isActive    Boolean                 @default(true)
-  createdAt   DateTime                @default(now())
+  isActive       Boolean                 @default(true)
+  createdAt      DateTime                @default(now())
 
   achievements MilestoneAchievement[]
   focusNotes   MilestoneNote[]
@@ -961,8 +989,12 @@ enum AffiliateCommissionStatus {
   WAITING
   // Menunggu masa tahan (releaseAt).
   PENDING
-  // Sudah masuk saldo pemilik kode (tidak ditarik balik).
+  // Sudah masuk saldo pemilik kode.
   RELEASED
+  // Dibatalkan karena paketnya dikembalikan dananya (Hadi 11 Okt): yang
+  // sudah cair ditarik balik dari saldo pemilik kode; member itu tidak
+  // memicu komisi lagi.
+  VOID
 }
 
 model AffiliateCommission {
@@ -997,6 +1029,8 @@ enum MemberWalletType {
   PURCHASE
   // Pengembalian saldo saat pembayaran gagal/kedaluwarsa (positif).
   PURCHASE_REFUND
+  // Bagian saldo dikembalikan saat admin Kembalikan Dana (positif, Hadi 10 Okt).
+  ADMIN_REFUND
 }
 
 model MemberWalletTransaction {
@@ -1029,19 +1063,19 @@ enum CoachChangeStatus {
 }
 
 model CoachChangeRequest {
-  id          String            @id @default(cuid())
-  packageId   String
-  package     Package           @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  memberId    String
-  member      User              @relation("CoachChangeMember", fields: [memberId], references: [id], onDelete: Cascade)
-  fromCoachId String
-  fromCoach   User              @relation("CoachChangeFrom", fields: [fromCoachId], references: [id])
-  toCoachId   String
-  toCoach     User              @relation("CoachChangeTo", fields: [toCoachId], references: [id])
-  reason      String
-  status      CoachChangeStatus @default(PENDING)
-  sessions    Int?
-  amount      Int?
+  id            String            @id @default(cuid())
+  packageId     String
+  package       Package           @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  memberId      String
+  member        User              @relation("CoachChangeMember", fields: [memberId], references: [id], onDelete: Cascade)
+  fromCoachId   String
+  fromCoach     User              @relation("CoachChangeFrom", fields: [fromCoachId], references: [id])
+  toCoachId     String
+  toCoach       User              @relation("CoachChangeTo", fields: [toCoachId], references: [id])
+  reason        String
+  status        CoachChangeStatus @default(PENDING)
+  sessions      Int?
+  amount        Int?
   // Harga paket coach baru (ukuran paket ini) saat disetujui -- dipakai saat
   // menyelesaikan, supaya perubahan harga coach di tengah jalan tidak mengubah
   // tagihan yang sudah dibayar.
@@ -1056,13 +1090,13 @@ model CoachChangeRequest {
   // lama tetap dibagi dengan harga kolam lama. free = jalur tanpa biaya.
   fromPoolId    String?
   oldPoolPrice  Int?
-  free          Boolean @default(false)
+  free          Boolean           @default(false)
   // Bagian tambah bayar yang diambil dari saldo member.
-  saldoUsed   Int               @default(0)
-  adminNote   String?
-  decidedAt   DateTime?
-  completedAt DateTime?
-  createdAt   DateTime          @default(now())
+  saldoUsed     Int               @default(0)
+  adminNote     String?
+  decidedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime          @default(now())
 
   payments Payment[]
 
@@ -1109,5 +1143,34 @@ model CoachViolation {
   createdAt    DateTime @default(now())
 
   @@unique([packageId, episodeStart])
+  @@index([coachId, createdAt])
+}
+
+// Laporan member atas coach (Hadi 10-11 Okt): coach menawarkan les atau kontak
+// di luar aplikasi, dll. Bukti untuk daftar hitam (Perjanjian Coach pasal 6),
+// jadi tidak ikut terhapus saat akun dihapus (akun dianonimkan, bukan dihapus).
+enum CoachReportStatus {
+  OPEN
+  RESOLVED
+}
+
+model CoachReport {
+  id             String            @id @default(cuid())
+  reporterId     String
+  reporter       User              @relation("CoachReportReporter", fields: [reporterId], references: [id], onDelete: Restrict)
+  coachId        String
+  coach          User              @relation("CoachReportCoach", fields: [coachId], references: [id], onDelete: Restrict)
+  bookingId      String?
+  booking        Booking?          @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  message        String
+  // Tangkapan layar opsional (bucket privat, dibuka lewat tautan sementara).
+  attachmentPath String?
+  status         CoachReportStatus @default(OPEN)
+  resolution     String?
+  resolvedById   String?
+  resolvedAt     DateTime?
+  createdAt      DateTime          @default(now())
+
+  @@index([status, createdAt])
   @@index([coachId, createdAt])
 }
