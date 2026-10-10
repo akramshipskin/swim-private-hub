@@ -21,3 +21,7 @@ Butir 1: tidak menawarkan atau menerima pembayaran les langsung dari member yang
 
 ## Sampai pelanggaran bisa dibuktikan
 Aplikasi hanya bisa mencegah tulisan; bukti coach menerima uang di luar Aplikasi tidak ada di sistem. Cara SPH mengetahui pelanggaran (laporan member, pemeriksaan admin) belum ditentukan.
+
+## Keputusan Hadi 10 Okt
+- Kalimat yang dipakai: "SPH berhak memberitahukan pelanggaran ke Kolam Mitra dan mitra SPH di kota mana pun" (bukan klaim jaringan di setiap kota).
+- Cara SPH mengetahui pelanggaran: tombol lapor coach untuk member di aplikasi (akan dibuat), diperiksa admin.
