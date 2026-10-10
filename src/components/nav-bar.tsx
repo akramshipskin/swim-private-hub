@@ -61,7 +61,7 @@ export function NavBar({
         </div>
       </header>
 
-      <div className="flex w-full gap-6 px-4 lg:gap-8 lg:px-8">
+      <div className="flex w-full gap-6 lg:gap-8 lg:px-8">
         {links.length > 0 && <SidebarNav links={links} activePath={activePath} />}
         {/* pb-28 (HP dan tablet) / lg:pb-24 (desktop): ruang di bawah konten supaya bottom
             nav + tombol chat mengambang tidak menutupi baris terakhir halaman. */}
