@@ -1,6 +1,6 @@
 # Alur Aplikasi SPH: siapa melakukan apa, dalam urutan apa
 
-Status: DRAF 1.2 untuk ditinjau Hadi (draf 1 7 Okt 2026; 9 Okt jawaban Hadi; 10 Okt dicocokkan ulang ke kode, 14 koreksi). Dokumen 2 dari 6 (setelah PRD yang disetujui 7 Okt).
+Status: DISETUJUI Hadi 10 Okt 2026 (draf 1.2; draf 1 7 Okt; 9 Okt jawaban Hadi; 10 Okt dicocokkan ulang ke kode, 14 koreksi). Perubahan berikutnya dicatat di Riwayat dokumen dan docs/KEPUTUSAN.md. Dokumen 2 dari 6 (setelah PRD yang disetujui 7 Okt).
 
 Cara baca: dokumen ini menjelaskan langkah-langkah yang dilalui tiap peran dari awal sampai akhir. Isinya adalah **alur yang sudah ada di aplikasi** (dicek dari kode dan catatan keputusan, belum dijalankan ulang satu per satu), ditambah bagian bertanda **[baru]** untuk yang belum ada. Alur tidak diubah tanpa izin Hadi (AGENTS.md butir 10); tampilan boleh. Aturan angka dan uang ada di `docs/aturan-bisnis-saat-ini.md`; di sini hanya urutan dan kondisinya. Layar dan menu per peran: `src/lib/nav-links.ts`, daftar halaman `docs/cakupan-halaman.md`.
 
@@ -26,7 +26,7 @@ Salah password berulang mengunci akun 15 menit (3x dari satu jaringan untuk satu
 2. Masuk ke beranda. Ada sesi hari ini: daftar sesi hari ini. Bila tidak, satu kartu utama: jadwal berikutnya, atau sisa sesi yang belum dijadwalkan, atau "Belum ada paket aktif" / "Semua sesi paketmu sudah dipakai" dengan tombol Beli Paket. Paket yang berakhir dalam 7 hari diberi peringatan di beranda.
 
 ### 2.2 Cari dan beli paket
-1. **Cari Coach** (hanya melihat): semua coach aktif yang sudah memilih minimal 1 kolam aktif, dari semua kota, tanpa syarat jam kosong. Kartu memuat domisili, keahlian, kolam. Buka profil coach (sertifikat, kolam).
+1. **Cari Coach** (hanya melihat; Hadi 10 Okt: tetap jadi etalase semua coach, tidak disaring): semua coach aktif yang sudah memilih minimal 1 kolam aktif, dari semua kota, tanpa syarat jam kosong. Kartu memuat domisili, keahlian, kolam. Buka profil coach (sertifikat, kolam).
 1b. **Paket** (tempat membeli): disaring kota domisili member (kota lain bisa dipilih, dengan peringatan). Pasangan coach + kolam hanya tampil bila coach punya minimal 4 jam kosong yang bisa dibooking dalam 14 hari, dengan "Jadwal terdekat". Server menolak pembelian bila syarat ini tidak terpenuhi.
 2. **Kota belum ada pasangan kolam + coach:** layar "belum tersedia", tombol "Kabari saya" (daftar tunggu), saran kota terdekat. Saat pasangan muncul (kolam/coach diaktifkan, harga dipasang, jam kosong dibuka, coach memilih kolam), member dikabari sekali lewat lonceng dan notifikasi HP.
 3. **Paket:** pilih peserta, kolam, coach, 4 atau 8 sesi (atau sesi coba 7 hari, hanya untuk peserta yang belum pernah punya paket). Rincian harga tampil sebelum bayar: harga kolam + harga coach + biaya layanan.
@@ -90,13 +90,13 @@ Pekerjaan admin berupa antrean. Dasbor "Perlu Kamu Cek" mengumpulkannya; sebagia
 
 | Antrean | Pemicu | Tindakan admin | Pihak lain diberi tahu |
 |---|---|---|---|
-| Persetujuan mitra | Pendaftaran coach atau kolam | Aktifkan (menu Akun). Tidak ada tombol tolak: pendaftar yang tidak disetujui dibiarkan nonaktif | **Tidak ada** (celah B) |
+| Persetujuan mitra | Pendaftaran coach atau kolam | Aktifkan (menu Akun). **[baru, Hadi 10 Okt] tombol Tolak** dengan pesan ke pendaftar (sekarang belum ada: pendaftar dibiarkan nonaktif) | **Tidak ada** (celah B); [baru] diberi tahu saat disetujui atau ditolak |
 | Sertifikat coach | Coach mengunggah | Setujui atau tolak | Coach |
 | Ganti coach | Pengajuan member | Setujui, tolak, atau selesaikan | Member; coach lama; coach baru |
 | Penarikan saldo | Coach atau kolam mengajukan | Salin rekening, transfer manual, tandai dibayar atau tolak | Pemohon |
 | Hapus akun | Member mengajukan | Setujui (ditolak bila ada pembayaran berjalan) | - |
 | Laporan kehadiran | Member melapor "Tidak Hadir" salah | Putuskan | - |
-| Pesan dan Email | Chat bantuan (dijawab AI dulu, diteruskan ke admin bila perlu; admin tidak dapat notifikasi HP untuk chat), email masuk (admin dapat notifikasi; email otomatis tidak dihitung) | Balas | Member (balasan chat lewat notifikasi) |
+| Pesan dan Email | Chat bantuan (dijawab AI dulu, diteruskan ke admin bila perlu; admin tidak dapat notifikasi HP untuk chat; **[baru, Hadi 10 Okt] notifikasi ke admin saat chat diteruskan**), email masuk (admin dapat notifikasi; email otomatis tidak dihitung) | Balas | Member (balasan chat lewat notifikasi) |
 | Usulan keterampilan | Coach mengusulkan | Setujui atau tolak | Coach |
 | Cek pembayaran | Jumlah bayar tidak cocok, saldo member kurang | Periksa | - |
 | Coach Tanpa Jadwal, Peminat per Kota | Pemeriksa harian | Pantau; nilai 3 pelanggaran dalam 6 bulan | - |
@@ -147,3 +147,4 @@ Rekomendasi: A. Pengingat malam sebelumnya memberi waktu batal sebelum batas 2 j
 - 7 Okt 2026: draf 1 (Claude, Sonnet 5.5). Bahan: kode (proxy, authorize, booking, cron, notifikasi), nav-links, catatan keputusan, PRD. Belum dicek: pesan login untuk akun belum disetujui; isi lengkap aturan di route booking; layar admin satu per satu.
 - 9 Okt 2026 (Hadi): jawaban 9 pertanyaan: pengingat A; pemberitahuan B/C/D dikerjakan; celah E = lewat WhatsApp admin, nomor coach tidak boleh sampai ke member. Menunggu: 2 pertanyaan turunan (penyaring nomor di bio dan catatan coach; perluasan bunyi pasal 6 di Perjanjian Coach, teks hukum, butuh orang hukum). Setelah itu persetujuan Hadi untuk dokumen ini.
 - 10 Okt 2026 (Claude, Opus 5.5): dicocokkan ulang ke kode (gerbang, daftar, Cari Coach, Paket, checkout, booking, batal, kehadiran, pembagian uang, penjaga jadwal, pembayaran, kolam, antrean admin, notifikasi). 14 koreksi: Cari Coach vs Paket dipisah; sisa sesi berkurang saat booking; pesan login pendaftar; gerbang kota hanya member/coach; syarat beli; aturan booking lengkap; Tidak Hadir sesi tetap terpakai; batal oleh member/coach; ganti tanpa biaya hanya paket berbayar + kasus bukan salah coach; kedaluwarsa bayar; jam buka wajib saat daftar kolam; admin tanpa tombol tolak pendaftar; chat tanpa notifikasi admin; peringatan beranda 7 hari (celah D) dan penyaring kontak (celah E). Belum dicek: isi layar admin satu per satu, laporan kolam, dasbor kolam rinci.
+- 10 Okt 2026 (Hadi): DISETUJUI. Cari Coach dibiarkan sebagai etalase semua coach (B); tombol Tolak pendaftar + pesan ke pendaftar dibuat (A, bersama pemberitahuan mitra disetujui); notifikasi ke admin saat chat bantuan diteruskan dibuat (A).
