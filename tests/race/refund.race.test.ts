@@ -6,6 +6,7 @@ import { checkInvariants } from "./invariants";
 import { markAttendance } from "@/app/coach/riwayat-sesi/actions";
 import { releaseDueCommissions, getOrCreateAffiliateCode } from "@/lib/affiliate";
 import { refundPackage } from "@/lib/package-refund";
+import { completeCoachChange } from "@/lib/coach-change";
 
 beforeEach(reset);
 
@@ -99,6 +100,21 @@ describe("KEMBALIKAN DANA", () => {
     await mark(teacher.id, b2.id, true);
     expect((await prisma.affiliateCommission.findUniqueOrThrow({ where: { memberId: m.id } })).status).toBe("VOID");
     expect(await checkInvariants({ packages: false })).toEqual([]);
+  });
+
+  // ponytail: jendela waktunya sempit; tanpa perbaikan urutan kunci tes ini
+  // belum tentu gagal. Penjaga utamanya urutan kunci di package-refund.ts.
+  it("RF7: refund dan penyelesaian ganti coach bersamaan tetap beres", async () => {
+    const pool = await mkPool();
+    const coach = await mkUser("COACH");
+    const b = await mkUser("COACH");
+    for (let i = 0; i < 5; i++) {
+      const { m, pkg } = await mkMemberWithPackage(pool.id, coach.id, { price: 800000 });
+      const req = await prisma.coachChangeRequest.create({ data: { packageId: pkg.id, memberId: m.id, fromCoachId: coach.id, toCoachId: b.id, reason: "uji barengan", newCoachPrice: 800000, status: "AWAITING_PAYMENT" } });
+      const rs = await settle([refund(pkg.id), prisma.$transaction((tx) => completeCoachChange(tx, req.id))]);
+      for (const r of rs) if (r.status === "rejected") expect(String(r.reason)).not.toMatch(/deadlock/i);
+      expect(rs[0].status).toBe("fulfilled");
+    }
   });
 
   it("RF5: komisi yang belum cair langsung dibatalkan tanpa menyentuh saldo pengrujuk", async () => {

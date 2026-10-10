@@ -81,7 +81,7 @@ export default async function AdminPaketPage() {
   // Dasar Kembalikan Dana per paket: uang tunai lunas + saldo yang dipakai
   // (termasuk tambah bayar ganti coach).
   const [cashByPackage, changeSaldoByPackage] = await Promise.all([
-    prisma.payment.groupBy({ by: ["packageId"], where: { packageId: { in: allPackageIds }, status: "SUCCESS" }, _sum: { amount: true } }),
+    prisma.payment.groupBy({ by: ["packageId"], where: { packageId: { in: allPackageIds }, status: "SUCCESS", OR: [{ coachChangeRequestId: null }, { coachChangeRequest: { status: "COMPLETED" } }] }, _sum: { amount: true } }),
     prisma.coachChangeRequest.groupBy({ by: ["packageId"], where: { packageId: { in: allPackageIds }, status: "COMPLETED" }, _sum: { saldoUsed: true } }),
   ]).then(([cash, change]) => [
     new Map(cash.map((r) => [r.packageId, r._sum.amount ?? 0])),

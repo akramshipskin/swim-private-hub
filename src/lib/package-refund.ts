@@ -75,9 +75,10 @@ export async function refundPackage({
   await cancelUpcoming(packageId);
 
   const memberId = await prisma.$transaction(async (tx) => {
-    // Urutan kunci sama dengan booking dan ganti coach: akun member dulu, baru
-    // paket (mencegah saling tunggu). Kunci paket menahan booking baru dan
-    // membuat dua klik admin tidak menghasilkan dua refund.
+    // Urutan kunci sama dengan ganti coach (pengajuan, akun member, paket) dan
+    // booking (akun member, paket), mencegah saling tunggu. Kunci paket menahan
+    // booking baru dan membuat dua klik admin tidak menghasilkan dua refund.
+    await tx.$queryRaw`SELECT id FROM "CoachChangeRequest" WHERE "packageId" = ${packageId} AND status IN ('PENDING', 'AWAITING_PAYMENT') ORDER BY id FOR UPDATE`;
     await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${summary.memberId} FOR UPDATE`;
     const [row] = await tx.$queryRaw<{ memberId: string; refundedAt: Date | null; status: string }[]>`
       SELECT "memberId", "refundedAt", status::text AS status FROM "Package" WHERE id = ${packageId} FOR UPDATE`;
