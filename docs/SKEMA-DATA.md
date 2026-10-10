@@ -1,6 +1,6 @@
 # Skema Data SPH: apa yang disimpan, di mana, dan apa yang berubah di tahap B
 
-Status: DRAF 2 (11 Okt 2026, Claude Opus 5.5), sudah diperiksa Opus kedua berkonteks segar (hasilnya dimasukkan), menunggu keputusan dan tinjauan Hadi. Dokumen 5 dari 6. Sumber: `prisma/schema.prisma` pada commit 642e2d3 (35 tabel, 19 jenis isian tetap/enum, 44 migrasi; terakhir `20261004120000_notifikasi_lonceng`, sudah di production). Aturan teknisnya di `docs/TRD.md`.
+Status: DISETUJUI Hadi 11 Okt 2026 (draf 2, diperiksa Opus kedua). Keputusan atas pertanyaan bagian 8: komisi refund dibatalkan/ditarik (A), pendaftar ditolak boleh daftar ulang (A), kolam beberapa pemilik nonaktif bila semua pemilik nonaktif (A), laporan coach boleh tangkapan layar (B). Dokumen 5 dari 6. Sumber: `prisma/schema.prisma` pada commit 642e2d3 (35 tabel, 19 jenis isian tetap/enum, 44 migrasi; terakhir `20261004120000_notifikasi_lonceng`, sudah di production). Aturan teknisnya di `docs/TRD.md`.
 
 Cara baca: tiap tabel dijelaskan dengan bahasa biasa. Kolom yang ditulis hanya yang penting untuk aturan bisnis. Uang selalu disimpan dalam rupiah bulat (tanpa sen).
 
