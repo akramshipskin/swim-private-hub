@@ -1,6 +1,6 @@
 # TRD SPH: aturan teknis dan di mana sistem menjaganya
 
-Status: DRAF 3 (10 Okt 2026, Claude Opus 5.5), sudah diperiksa dua pemeriksa Opus berkonteks segar (hasil keduanya dimasukkan). Keputusan Hadi atas T1, T6, T8, T10, T11 sudah ada (KEPUTUSAN 10 Okt malam); menunggu keputusan atas temuan baru dan tinjauan akhir. Dokumen 4 dari 6 (PRD dan Alur Aplikasi sudah disetujui; brief desain ditunda, Hadi 10 Okt).
+Status: DISETUJUI Hadi 11 Okt 2026 (draf 3, diperiksa dua pemeriksa Opus berkonteks segar). Keputusan atas semua temuan yang butuh Hadi ada di docs/KEPUTUSAN.md (10 Okt malam dan 11 Okt); ringkasannya di bagian 12. Dokumen 4 dari 6 (PRD dan Alur Aplikasi sudah disetujui; brief desain ditunda, Hadi 10 Okt).
 
 Isi: setiap aturan penting ditulis bersama tempat kode menjaganya dan statusnya. Dicek dengan membaca kode pada commit 68b9ceb, belum dijalankan ulang satu per satu. Bukti uji yang sudah ada: sweeping sistem 3 Okt malam (445 sel hak akses 0 bocor, audit uang cocok, 4 pemeriksa Opus 0 berat) dan 6 Okt (440 sel 0 bocor, 835 tes + 200 tes balapan). Angka aturan tidak ditulis ulang di sini; sumbernya `src/lib/policy.ts` dan `src/lib/pricing.ts`, aturan bisnisnya `docs/aturan-bisnis-saat-ini.md`.
 
@@ -157,7 +157,24 @@ Dugaan yang ternyata aman (dua pemeriksa): berkas aksi ganti coach tanpa cek per
 
 Belum diperiksa siapa pun: pengaturan bucket Supabase (tidak terlihat dari kode), apakah rekening lama sudah dienkripsi ulang, HSTS di Vercel, isi `push.ts`.
 
+## 12. Keputusan Hadi atas temuan (dikerjakan di tahap B)
+
+| # | Keputusan |
+|---|---|
+| T1 | Tombol admin "Kembalikan Dana": akhiri paket, batalkan booking mendatang, catat jumlah refund, bagian saldo kembali ke saldo member; transfer manual lewat Midtrans. Ikut ditutup: komisi afiliasi paket yang direfund, status Edit Paket divalidasi. |
+| T6 | Admin wajib masuk ulang dengan 2FA setiap 14 hari. |
+| T8 | Hapus akun disetujui = paket diakhiri, sisa sesi hangus. Akun dinonaktifkan = paketnya dikecualikan dari penjaga jadwal. |
+| T10 | Coach yang dinonaktifkan admin = bukan salah coach. |
+| T11 | Sisa sesi di Edit Paket maksimal jumlah sesi dikurangi yang sudah terpakai. |
+| T13 | Ganti rekening bank wajib password + pemilik diberi tahu (tanpa penahanan 24 jam). |
+| T14 | Pemilik kolam hanya melihat jadwal kolamnya sendiri. |
+| T17 | Admin tetap boleh mencopot coach dari kolam dengan peringatan bila masih ada paket aktif. |
+| T18 | Akun coach, pemilik kolam, admin yang dibuat admin wajib ganti password saat pertama masuk. |
+| T19 | Pemilik kolam dinonaktifkan = kolamnya ikut nonaktif. |
+| Lainnya | T2, T3, T4, T9, T12, T15, T16, T20, T21: perbaikan teknis oleh Claude (T5 dicatat saja, T7 masuk sweeping sistem). |
+
 ## Riwayat dokumen
 - 10 Okt 2026: draf 1 (Claude, Opus 5.5) dari kode commit 68b9ceb, docs/aturan-bisnis-saat-ini.md, docs/HANDOFF-AGEN.md, KEPUTUSAN. Belum diperiksa Opus kedua.
 - 10 Okt 2026: draf 2 setelah pemeriksa Opus kedua berkonteks segar (65 pemeriksaan kode): T1 ditulis ulang, T3 naik tingkat, T6 jadi sedang, T7 sebagian ditutup, temuan baru T8-T12. Dua temuan terpenting (T8, T3) dicocokkan ulang sendiri oleh penulis.
 - 10 Okt 2026: draf 3 setelah pemeriksa Opus kedua (67 pemeriksaan kode): koreksi jumlah migrasi (44), tempat aturan ganti coach gratis, hak lihat milestone coach, klaim pendaftaran dan penyaring kontak; T1, T2, T3, T6, T9, T12 diperluas; T13-T21 baru. Temuan T13 (rekening) dan T14 (jadwal) dicocokkan ulang sendiri oleh penulis.
+- 11 Okt 2026: DISETUJUI Hadi setelah keputusan T13, T14, T17, T18, T19; ditambah bagian 12.
