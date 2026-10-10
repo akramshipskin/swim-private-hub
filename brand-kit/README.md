@@ -17,10 +17,12 @@ di situs (rute Next.js, `src/app/brandguideline/`) — bukan file HTML statis la
 ## Warna inti
 | Nama | Hex | Pemakaian |
 |---|---|---|
-| Charcoal | `#14140F` | Dominan (~60%): teks utama, latar gelap |
-| Cream | `#F6F6EE` | Latar terang, kartu (~30%) |
-| Lime | `#C6FF3D` | Aksen & tombol utama saja (maks ~10%) |
-| Lime Dark | `#6F8F1E` | Teks/link hijau di latar terang (kontras aman) |
+| Charcoal | `#14140F` | Dominan (~60%): teks utama, **tombol utama aplikasi**, kartu utama gelap |
+| Cream | `#F6F6EE` | Latar terang (~30%); kartu di aplikasi memakai putih |
+| Lime | `#C6FF3D` | Aksen saja (maks ~10%): kartu utama gelap, layar sukses, CTA marketing, titik logotype. **Bukan** tombol utama aplikasi (Hadi 4 Okt 2026) |
+| Lime Dark | `#6F8F1E` | Hanya titik logotype di file cetak/materi luar (lihat di bawah); bukan warna teks |
+
+Token lengkap terang/gelap ada di halaman `/brandguideline` bagian 03 (nilainya dari `src/app/globals.css`).
 
 ## Aturan pemakaian logo
 - **Tanda logo (mark) selalu: langit lime di atas, air charcoal di bawah.** Jangan

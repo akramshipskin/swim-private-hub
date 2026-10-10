@@ -10,7 +10,7 @@ import { cn } from "@/lib/cn";
 // style, lalu di-warisi turun oleh semua utility Tailwind (bg-surface,
 // text-text, dst) yang dipakai anak-anaknya -- <html> sama sekali tidak
 // disentuh, jadi toggle tema situs sendiri tidak terpengaruh.
-const THEME_VARS: Record<"light" | "dark", CSSProperties> = {
+export const THEME_VARS: Record<"light" | "dark", CSSProperties> = {
   light: {
     "--background": "#f6f6ee",
     "--foreground": "#14140f",
@@ -36,9 +36,13 @@ const THEME_VARS: Record<"light" | "dark", CSSProperties> = {
     "--color-danger-bg": "#fef2f2",
     "--color-danger-text": "#b91c1c",
     "--color-disabled-bg": "#dedbd0",
-    "--color-disabled-text": "#8e8a78",
+    "--color-disabled-text": "#6c6957",
     "--color-whatsapp": "#0f7a3c",
     "--color-whatsapp-text": "#0f7a3c",
+    "--color-hero": "#14140f",
+    "--color-hero-ink": "#f6f6ee",
+    "--color-hero-muted": "#b6b3a5",
+    "--color-hero-accent": "#c6ff3d",
     colorScheme: "light",
   } as CSSProperties,
   dark: {
@@ -66,9 +70,13 @@ const THEME_VARS: Record<"light" | "dark", CSSProperties> = {
     "--color-danger-bg": "#3f2023",
     "--color-danger-text": "#f29191",
     "--color-disabled-bg": "#3d3f39",
-    "--color-disabled-text": "#7c7e76",
+    "--color-disabled-text": "#a09d8f",
     "--color-whatsapp": "#0f7a3c",
     "--color-whatsapp-text": "#3fcf7c",
+    "--color-hero": "#c6ff3d",
+    "--color-hero-ink": "#14140f",
+    "--color-hero-muted": "#3d3b2e",
+    "--color-hero-accent": "#14140f",
     colorScheme: "dark",
   } as CSSProperties,
 };
