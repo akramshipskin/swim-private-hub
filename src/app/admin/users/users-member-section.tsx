@@ -51,7 +51,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
           {/* Desktop: tabel -- Nama & Email digabung 1 kolom (email di
               bawah nama) biar kolom gak sesek, kolom sisanya dapet napas
               lebih (padding naik dikit). */}
-          <Card className="hidden sm:block">
+          <Card className="hidden lg:block">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -101,7 +101,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
 
           {/* Mobile: card compact biasa -- semua info langsung keliatan,
               gak perlu di-tap buat expand. */}
-          <ul className="flex flex-col gap-1.5 sm:hidden">
+          <ul className="flex flex-col gap-1.5 lg:hidden">
             {filtered.map((u) => (
               <Card key={u.id}>
                 <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">

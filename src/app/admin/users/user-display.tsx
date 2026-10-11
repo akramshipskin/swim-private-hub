@@ -89,7 +89,7 @@ export function UserActions({
   pending?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-end gap-1">
+    <div className="flex flex-wrap items-center justify-end gap-1 max-sm:-ml-2 max-sm:grid max-sm:w-full max-sm:grid-cols-2 max-sm:justify-items-start">
       {user.phone && (
         <a
           href={buildContactWaLink(user.phone, user.name)}

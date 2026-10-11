@@ -27,7 +27,7 @@ export default function PackPriceForm({
   const [state, formAction, pending] = useActionState(action, null);
   const edit = useEditLock(pending, state?.error);
   return (
-    <form key={edit.formKey} action={formAction} className="flex flex-wrap items-end gap-3">
+    <form key={edit.formKey} action={formAction} className="flex flex-col gap-3">
       {Object.entries(hidden ?? {}).map(([k, v]) => (
         <input key={k} type="hidden" name={k} value={v} />
       ))}
@@ -35,14 +35,19 @@ export default function PackPriceForm({
           diubah, supaya tidak menimpa harga baru dari coach/kolam dengan angka lama. */}
       <input type="hidden" name="origPack4" value={pricePack4 ?? ""} />
       <input type="hidden" name="origPack8" value={pricePack8 ?? ""} />
-      <Field label="Paket 4 Sesi (Rp)">
-        <PriceInput name="pricePack4" defaultValue={pricePack4 ?? ""} disabled={edit.locked} className="w-full sm:w-36" />
-      </Field>
-      <Field label="Paket 8 Sesi (Rp)">
-        <PriceInput name="pricePack8" defaultValue={pricePack8 ?? ""} disabled={edit.locked} className="w-full sm:w-36" />
-      </Field>
-      {children?.(edit.locked)}
-      {edit.locked ? (
+      {/* Dua harga berdampingan, tombol di baris sendiri (brief desain 11 Okt):
+          dulu tombol Ubah menempel di samping isian kedua saja. */}
+      <div className="grid max-w-sm grid-cols-2 gap-3">
+        <Field label="Paket 4 Sesi (Rp)">
+          <PriceInput name="pricePack4" defaultValue={pricePack4 ?? ""} disabled={edit.locked} className="w-full" />
+        </Field>
+        <Field label="Paket 8 Sesi (Rp)">
+          <PriceInput name="pricePack8" defaultValue={pricePack8 ?? ""} disabled={edit.locked} className="w-full" />
+        </Field>
+      </div>
+      {children && <div className="flex flex-wrap items-end gap-3">{children(edit.locked)}</div>}
+      <div className="flex gap-2">
+        {edit.locked ? (
         <Button type="button" size="sm" variant="secondary" onClick={edit.startEdit}>
           Ubah
         </Button>
@@ -55,10 +60,11 @@ export default function PackPriceForm({
             Batal
           </Button>
         </>
-      )}
-      <p className="w-full text-xs text-text-subtle">Harga dalam kelipatan Rp 1.000.</p>
-      {state?.error && <p role="alert" className="w-full text-xs text-danger-text">{state.error}</p>}
-      {state?.ok && edit.locked && <p role="status" className="w-full text-xs text-success-text">Harga tersimpan.</p>}
+        )}
+      </div>
+      <p className="text-xs text-text-subtle">Harga dalam kelipatan Rp 1.000.</p>
+      {state?.error && <p role="alert" className="text-xs text-danger-text">{state.error}</p>}
+      {state?.ok && edit.locked && <p role="status" className="text-xs text-success-text">Harga tersimpan.</p>}
     </form>
   );
 }
