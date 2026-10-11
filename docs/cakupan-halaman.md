@@ -2,7 +2,7 @@
 
 Daftar awal untuk sweeping UI dan sweeping sistem: tiap halaman harus punya status per peran (dicek / tidak bisa dicek + alasan). Dibuat dari semua file page.tsx di src/app; buat ulang bila ada halaman baru. Hasil sweeping terakhir: docs/reviews/2026-10-11-sweeping-sistem-total.md.
 
-Total halaman: 72 (70 tayang + /lupa-password dan /reset-password yang masih di jalur kerja reset-password-email, belum tayang)
+Total halaman: 72
 
 ## Publik dan lintas peran (20)
 - `/`
