@@ -82,6 +82,12 @@ export default function KebijakanPrivasiPage() {
           notifikasi terkait pemesanan, pembayaran, dan layanan. Isi notifikasi dapat memuat nama peserta, nama coach
           atau kolam, jadwal sesi, dan nominal rupiah.
         </li>
+        <li>
+          Laporan tentang coach: bila member melaporkan coach (misalnya coach menawarkan les atau kontak di luar
+          Aplikasi), kami menyimpan akun pelapor, coach yang dilaporkan, sesi terkait, isi laporan, tangkapan layar
+          yang dilampirkan (bila ada), serta hasil pemeriksaan administrator. Laporan hanya dapat dilihat
+          administrator; coach yang dilaporkan tidak dapat melihat laporan maupun identitas pelapor melalui Aplikasi.
+        </li>
         <li>Sumber rujukan pendaftaran (misalnya tautan WhatsApp/Instagram) untuk kebutuhan internal, dan tidak dibagikan kepada pihak ketiga untuk tujuan komersial.</li>
       </ul>
 
@@ -112,6 +118,10 @@ export default function KebijakanPrivasiPage() {
           tersedia.
         </li>
         <li>Menyimpan dan menampilkan riwayat notifikasi dalam Aplikasi agar Pengguna dapat membacanya kembali.</li>
+        <li>
+          Memeriksa laporan tentang coach dan menegakkan Perjanjian Kemitraan Coach, termasuk menonaktifkan akun dan
+          memasukkan coach ke daftar hitam.
+        </li>
       </ul>
 
       <h2>4. Pembagian Data kepada Pihak Ketiga</h2>
@@ -164,6 +174,12 @@ export default function KebijakanPrivasiPage() {
           Mozilla) — meneruskan isi notifikasi ke perangkat Pengguna, bila fitur
           notifikasi diaktifkan.
         </li>
+        <li>
+          <strong>Kolam Mitra dan mitra SPH</strong> — bila coach terbukti melanggar larangan transaksi di luar
+          Aplikasi dan dimasukkan ke daftar hitam, kami dapat memberitahukan nama coach, kota, dan jenis
+          pelanggarannya kepada Kolam Mitra dan mitra SPH, sesuai Perjanjian Kemitraan Coach. Identitas member
+          pelapor dan isi laporan tidak ikut dibagikan.
+        </li>
       </ul>
       <p>Kami tidak menjual maupun menyewakan data pribadi Pengguna kepada pihak manapun.</p>
 
@@ -181,6 +197,11 @@ export default function KebijakanPrivasiPage() {
         dihapus otomatis; riwayat ini juga dihapus saat akun dihapus. Saat akun member dihapus, kota domisili dan
         catatan daftar tunggu kota tetap tersimpan tanpa nama, nomor telepon, maupun email, dan hanya dipakai untuk
         menghitung minat layanan per kota.
+      </p>
+      <p>
+        Laporan tentang coach beserta lampirannya kami simpan selama diperlukan untuk menegakkan Perjanjian Kemitraan
+        Coach, termasuk selama coach tersebut tercatat di daftar hitam, dan tidak ikut terhapus saat akun pelapor
+        dihapus.
       </p>
 
       <h2>6. Cookie dan Penyimpanan Lokal</h2>

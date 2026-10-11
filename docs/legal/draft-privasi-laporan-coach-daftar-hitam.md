@@ -1,6 +1,6 @@
 # Draf tambahan Kebijakan Privasi: laporan tentang coach dan pemberitahuan daftar hitam
 
-Status: DRAF untuk orang hukum (Hadi 11 Okt 2026 malam, 1A). BELUM dipasang. Teks aktif: `src/app/kebijakan-privasi/page.tsx` (Privasi 11 Oktober 2026). Celah ini ditemukan saat memasang Perjanjian Coach rev.4 pasal 6 dan Privasi 11 Okt.
+Status: DIPASANG 11 Okt 2026 malam (disetujui orang hukum; PRIVACY_REVISION = 2), tanpa setuju ulang. Teks aktif: `src/app/kebijakan-privasi/page.tsx` (Privasi 11 Oktober 2026). Celah ini ditemukan saat memasang Perjanjian Coach rev.4 pasal 6 dan Privasi 11 Okt.
 
 ## Fakta yang menjadi dasar (dicek dari kode 11 Okt 2026)
 

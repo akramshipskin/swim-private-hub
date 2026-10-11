@@ -20,9 +20,14 @@ export const TERMS_REVISION = 1;
 // lonceng (docs/legal/draft-privasi-rev-kota-daftar-tunggu-lonceng.md,
 // disetujui orang hukum); dipasang TANPA setuju ulang (Hadi 11 Okt, B):
 // tidak ada yang memeriksa termsVersion, jadi akun lama tidak diminta apa pun.
+// 11 Okt malam: laporan tentang coach + pemberitahuan daftar hitam ke mitra
+// (docs/legal/draft-privasi-laporan-coach-daftar-hitam.md, disetujui orang
+// hukum), tanpa setuju ulang. Hari yang sama = naikkan PRIVACY_REVISION supaya
+// catatan persetujuan membedakan kedua teks.
 export const PRIVACY_UPDATED_AT = "11 Oktober 2026";
+export const PRIVACY_REVISION = 2;
 
-export const LEGAL_CONSENT_VERSION = `S&K ${TERMS_UPDATED_AT} rev ${TERMS_REVISION}; Privasi ${PRIVACY_UPDATED_AT}`;
+export const LEGAL_CONSENT_VERSION = `S&K ${TERMS_UPDATED_AT} rev ${TERMS_REVISION}; Privasi ${PRIVACY_UPDATED_AT} rev ${PRIVACY_REVISION}`;
 
 // Data persetujuan yang disimpan saat pendaftaran mandiri. Server menolak
 // pendaftaran tanpa centang persetujuan (checkbox di browser bisa dilewati
