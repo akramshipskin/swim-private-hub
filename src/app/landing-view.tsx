@@ -70,7 +70,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Daftar & tambah peserta", body: "Satu akun untuk kamu sendiri dan/atau beberapa anak. Setiap peserta punya paket dan sisa sesi sendiri." },
       { title: "Pilih coach & kolam, lalu beli paket", body: "Harga tampil rinci sebelum bayar: tiket kolam, jasa coach, dan biaya layanan Swim Private Hub (SPH). Belum yakin? Mulai dari 1 sesi coba. Bayar online lewat Midtrans (saldo di akunmu dipakai dulu), paket langsung aktif." },
       { title: "Booking jam yang masih kosong", body: "Pilih jam dari jadwal coach pilihanmu. Jam yang sudah diambil orang lain otomatis terkunci." },
-      { title: "Datang & les", body: `Tidak bisa datang? Batalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelumnya, sesi kembali ke paket. Perkembangan peserta dicatat coach setelah sesi.` },
+      { title: "Datang & les", body: `Tidak bisa datang? Batalkan sendiri paling lambat ${CANCEL_WINDOW_HOURS} jam sebelumnya, sesi kembali ke paket. Pengingat dikirim jam 18.00 sehari sebelumnya dan jam 06.00 di hari sesi. Perkembangan peserta dicatat coach setelah sesi.` },
     ],
   },
   {
@@ -80,7 +80,7 @@ const AUDIENCES: AudienceSteps[] = [
       { title: "Daftar sebagai coach", body: "Isi profil dan keahlian. Setelah akun disetujui admin, unggah foto dan sertifikat (boleh lebih dari satu) untuk badge Bersertifikat." },
       { title: "Pasang harga & buka jadwal", body: "Tentukan harga paket 4 dan 8 sesimu sendiri, lalu buka tanggal, jam, dan kolam tempat kamu mengajar. Sistem mencegah jadwal bentrok antar kolam." },
       { title: "Tandai kehadiran", body: "Setelah sesi selesai, tandai peserta hadir atau tidak dari menu Riwayat Sesi, lalu isi catatan perkembangan (milestone) peserta." },
-      { title: "Cairkan saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa ditarik ke rekening: secepatnya, paling lambat 7 hari kerja." },
+      { title: "Tarik saldo", body: "Bagianmu masuk ke saldo setiap sesi Hadir, lalu bisa ditarik ke rekening: secepatnya, paling lambat 7 hari kerja." },
     ],
   },
   {
@@ -144,7 +144,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Kalau tidak cocok dengan coach-nya?",
-        a: "Ajukan ganti coach dari menu Paket; sisa sesi ikut pindah ke coach lain di kolam yang sama setelah disetujui admin. Kalau coach baru lebih murah, selisihnya masuk ke saldomu (dipakai untuk paket berikutnya, tidak bisa ditarik). Kalau lebih mahal, kamu menambah selisihnya.",
+        a: "Ajukan ganti coach dari menu Paket; sisa sesi ikut pindah ke coach lain di kolam yang sama setelah disetujui admin. Kalau coach baru lebih murah, selisihnya masuk ke saldomu (dipakai untuk paket berikutnya, tidak bisa ditarik). Kalau lebih mahal, kamu menambah selisihnya. Ada masalah dengan coach, misalnya diajak les di luar aplikasi? Laporkan lewat kotak Laporkan Coach di menu Riwayat Booking; laporanmu hanya dibaca admin.",
       },
       {
         q: "Apakah coach-nya bersertifikat?",
@@ -156,7 +156,7 @@ const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: "Sisa sesi hangus kalau masa berlaku habis?",
-        a: "Ya. Sisa sesi yang belum dipakai sampai masa berlaku paket berakhir hangus dan tidak dikembalikan dalam bentuk uang. Masa berlaku tertera saat pembelian.",
+        a: "Ya. Sisa sesi yang belum dipakai sampai masa berlaku paket berakhir hangus dan tidak dikembalikan dalam bentuk uang. Masa berlaku tertera saat pembelian, dan kami mengingatkan 14 hari dan 3 hari sebelum berakhir (sesi coba: 3 hari) bila masih ada sesi yang belum dibooking.",
       },
     ],
   },

@@ -83,6 +83,8 @@ const GUIDES: Guide[] = [
           { title: "Batalkan sendiri", body: `Tombol Batalkan muncul kalau masih ${CANCEL_WINDOW_HOURS} jam sebelum jadwal dan jatah batal paket itu masih ada. Sisa sesi otomatis kembali.` },
           { title: "Kalau tidak memenuhi syarat", body: "Muncul tombol WhatsApp ke admin dengan pesan yang sudah terisi otomatis." },
           { title: "Ditandai Tidak Hadir padahal hadir?", body: "Tekan Laporkan di sesi itu paling lambat 3 hari setelah sesi selesai. Admin memeriksa dan mengoreksi kalau memang salah." },
+          { title: "Ada masalah dengan coach?", body: "Misalnya diajak les atau membayar di luar aplikasi. Isi kotak Laporkan Coach di bawah Riwayat Booking (boleh dengan tangkapan layar). Laporanmu hanya dibaca admin." },
+          { title: "Pengingat sesi", body: "Notifikasi pengingat dikirim jam 18.00 sehari sebelum sesi dan jam 06.00 di hari sesi." },
         ],
       },
       {
@@ -132,7 +134,7 @@ const GUIDES: Guide[] = [
       {
         heading: "4. Saldo & profil",
         steps: [
-          { title: "Isi rekening sekali", body: "Setelah tersimpan, rekening terkunci. Klik Ubah bila ingin mengubahnya." },
+          { title: "Isi rekening sekali", body: "Setelah tersimpan, rekening terkunci. Klik Ubah bila ingin mengubahnya. Setiap menyimpan rekening kamu diminta memasukkan password, lalu mendapat pemberitahuan." },
           { title: "Ajukan penarikan", body: `Minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja. Riwayat penarikan menampilkan status, tanggal, dan rekening tujuan.` },
           { title: "Lengkapi profil", body: "Tanggal lahir, jenis kelamin, bio, keahlian, foto, dan sertifikat. Orang tua sering memilih coach dari informasi ini." },
         ],
@@ -166,7 +168,7 @@ const GUIDES: Guide[] = [
         heading: "3. Saldo & laporan",
         steps: [
           { title: "Saldo kolam", body: "Bertambah setiap sesi yang ditandai Hadir oleh coach." },
-          { title: "Ajukan penarikan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat tombol Ubah), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja.` },
+          { title: "Ajukan penarikan", body: `Isi rekening (terkunci setelah disimpan, ubah lewat tombol Ubah; setiap menyimpan diminta password), lalu ajukan minimal ${formatRupiah(MIN_WITHDRAWAL)}. Ditransfer secepatnya, paling lambat 7 hari kerja.` },
           { title: "Laporan", body: "Rincian bagian kolam (setelah PPh final 0,5%) per sesi yang benar-benar Hadir, bisa disaring per rentang tanggal." },
         ],
       },
