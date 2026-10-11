@@ -92,7 +92,7 @@ export default function RegisterPoolForm() {
   if (submitted) return <PendingApprovalScreen roleLabel="pemilik kolam" />;
 
   return (
-    <AuthShell tagline="Kolammu jadi tempat les privat yang teratur." points={["Pasang harga tiket paketmu sendiri", "Bagian kolam masuk saldo setiap sesi Hadir", "Daftar gratis, tanpa biaya bulanan"]}>
+    <AuthShell points={["Pasang harga tiket paketmu sendiri", "Bagian kolam masuk saldo setiap sesi Hadir", "Daftar gratis, tanpa biaya bulanan"]}>
 
       <Card className="w-full max-w-sm">
         <CardBody>

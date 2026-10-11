@@ -91,7 +91,7 @@ export default function RegisterCoachForm() {
   if (submitted) return <PendingApprovalScreen roleLabel="coach" />;
 
   return (
-    <AuthShell tagline="Mengajar renang di beberapa kolam mitra." points={["Tentukan harga paketmu sendiri", "Bagianmu masuk saldo setiap sesi Hadir", "Daftar gratis, tanpa biaya bulanan"]}>
+    <AuthShell points={["Tentukan harga paketmu sendiri", "Bagianmu masuk saldo setiap sesi Hadir", "Daftar gratis, tanpa biaya bulanan"]}>
 
       <Card className="w-full max-w-sm">
         <CardBody>

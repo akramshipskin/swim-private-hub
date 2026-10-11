@@ -2,16 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logotype } from "@/components/ui/logotype";
+import { BRAND_TAGLINE } from "@/lib/brand";
 
 // Kerangka halaman masuk & daftar (Hadi 2 Okt malam, #24): setara landing.
 // Desktop: panel merek gelap dengan foto perenang di kiri, formulir di kanan.
 // HP: header merek ringkas di atas formulir (tanpa foto, supaya cepat dimuat).
 export function AuthShell({
-  tagline,
   points,
   children,
 }: {
-  tagline: string;
   points: string[];
   children: ReactNode;
 }) {
@@ -25,7 +24,7 @@ export function AuthShell({
           <span className="text-lg"><Logotype /></span>
         </Link>
         <div>
-          <p className="max-w-md text-4xl font-semibold leading-tight tracking-tight text-balance">{tagline}</p>
+          <p className="max-w-md text-4xl font-semibold leading-tight tracking-tight text-balance">{BRAND_TAGLINE}</p>
           <ul className="mt-6 flex flex-col gap-2">
             {points.map((p) => (
               <li key={p} className="flex items-start gap-2 text-base text-white/85">
@@ -40,7 +39,7 @@ export function AuthShell({
         <Link href="/" className="mb-6 flex flex-col items-center text-center lg:hidden">
           <Image src="/logo.png" alt="Swim Private Hub" width={56} height={56} className="mb-3 h-14 w-14 rounded-2xl object-contain shadow-lg shadow-brand-500/20" priority />
           <span className="text-lg text-text"><Logotype /></span>
-          <span className="mt-1 max-w-xs text-sm text-text-muted">{tagline}</span>
+          <span className="mt-1 max-w-xs text-sm text-text-muted">{BRAND_TAGLINE}</span>
         </Link>
         {children}
       </div>

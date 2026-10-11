@@ -11,6 +11,9 @@ Masalah (Hadi 6 Okt): teks aplikasi terlalu kaku ("Butir", "Pengguna", "Tipe"), 
 - Teks hukum (Syarat & Ketentuan, Kebijakan, Perjanjian, MOU) TIDAK diubah.
 
 ## Tabel kata: kaku → luwes (Hadi pilih huruf A/B per baris; usulan Claude ditandai *)
+
+**Keputusan Hadi 6 Okt (yang berlaku; tanda * di tabel hanya usulan Claude saat itu, bukan keputusan):** 1 Keterampilan, 2 Akun, 3 Untuk Siapa, 4 tetap "Pengajuan", 5 Berakhir, 6/7/8/10 tetap (Saldo Mengendap, Kota Domisili, (Opsional), Menunggu Persetujuan), 9 Ulangi Password Baru, 11 **Tarik Saldo** (bukan Cairkan Saldo), 12 Rekening Penerima, 13 tetap, 14 Perlu Kamu Cek, 15 Buka Jam Kosong, 16-18 tetap. Daftar akhir: brand-kit/MESSAGING.md.
+
 | # | Sekarang (kaku) | Pilihan A | Pilihan B | Contoh sekarang → sesudah |
 |---|---|---|---|---|
 | 1 | Butir (milestone) | Keterampilan* | Kemampuan | "Butir yang tercapai hari ini" → "Keterampilan yang dikuasai hari ini" |

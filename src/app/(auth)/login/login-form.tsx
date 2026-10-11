@@ -92,7 +92,7 @@ export default function LoginForm({ resetDone = false }: { resetDone?: boolean }
   }
 
   return (
-    <AuthShell tagline="Les renang privat dengan coach pilihan, di kolam mitra Swim Private Hub." points={["Pilih coach, kolam, dan jamnya sendiri", "Perkembangan peserta dicatat coach", "Pembayaran jelas, diproses lewat Midtrans"]}>
+    <AuthShell points={["Pilih coach, kolam, dan jamnya sendiri", "Perkembangan peserta dicatat coach", "Pembayaran jelas, diproses lewat Midtrans"]}>
 
       <Card className="w-full max-w-sm">
         <CardBody>

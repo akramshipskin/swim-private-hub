@@ -97,7 +97,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
   }
 
   return (
-    <AuthShell tagline="Daftar gratis, lalu pilih coach dan kolamnya." points={["Satu akun untuk kamu dan beberapa anak", "Harga tampil rinci sebelum bayar", "Mulai dari 1 sesi coba"]}>
+    <AuthShell points={["Satu akun untuk kamu dan beberapa anak", "Harga tampil rinci sebelum bayar", "Mulai dari 1 sesi coba"]}>
 
       <Card className="w-full max-w-sm">
         <CardBody>

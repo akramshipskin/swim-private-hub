@@ -3,6 +3,8 @@
 // warna dari brand guideline (charcoal #14140f, lime #9fcc1f, latar #f6f6ee).
 // Teks polos tetap dikirim berdampingan untuk aplikasi yang tidak menampilkan HTML.
 
+import { BRAND_TAGLINE } from "@/lib/brand";
+
 const SITE = "https://www.swimprivatehub.biz.id";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -37,7 +39,7 @@ export function renderBrandEmail({ preheader, title, paragraphs, button, note }:
 <h1 style="margin:0 0 14px;font-family:'Sora',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:21px;line-height:1.3;font-weight:600;color:#14140f">${esc(title)}</h1>
 ${body}${cta}${noteHtml}
 </td></tr>
-<tr><td style="padding:18px 4px 0;${font};font-size:12px;line-height:1.5;color:#6c6957">Swim Private Hub · les renang privat dengan coach pilihan<br><a href="${SITE}" style="color:#6c6957">${SITE.replace("https://", "")}</a></td></tr>
+<tr><td style="padding:18px 4px 0;${font};font-size:12px;line-height:1.5;color:#6c6957">${BRAND_TAGLINE}<br><a href="${SITE}" style="color:#6c6957">${SITE.replace("https://", "")}</a></td></tr>
 </table></td></tr></table></body></html>`;
   const text = [title, "", ...paragraphs.flatMap((p) => [p, ""]), ...(button ? [`${button.label}: ${button.url}`, ""] : []), ...(note ? [note, ""] : []), "Swim Private Hub"].join("\n");
   return { html, text };

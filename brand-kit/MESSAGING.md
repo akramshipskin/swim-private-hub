@@ -36,7 +36,7 @@ Terakhir diperbarui: 25 September 2026 (headline & tagline baru).
 | Headline utama (landing, panduan) | 2 kalimat pendek, maksimal 12 kata total. Sebut **apa produknya** (aplikasi les renang privat) dan **apa yang bisa dilakukan** (pilih coach, kolam, jam). Tanpa superlatif ("pertama", "nomor 1", "terbaik"). Sebagai judul (`<h1>`), dipecah 3 baris: `Aplikasi les renang privat.` / `Pilih coach, pilih kolam,` / `dan pilih jamnya.` — lihat `landing-view.tsx`/`panduan-view.tsx` | "Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya." |
 | Subheadline | 1–2 kalimat: untuk siapa + siapa melakukan apa. Sebut "anak atau kamu" supaya pemula dewasa juga merasa dituju. Jelaskan cara kerjanya, bukan janji | "Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub. Perkembangan tercatat, pembayaran jelas." |
 | Judul bagian | 2–4 kata, huruf besar hanya di awal | "Kolam mitra", "Kenalan dengan coach" |
-| Judul halaman aplikasi | Kata benda, tanpa basa-basi | "Booking Coach", "Riwayat Bayar" |
+| Judul halaman aplikasi | Kata benda, tanpa basa-basi | "Booking", "Riwayat Bayar" |
 | Tombol dan label isian di dalam aplikasi | Title Case (Hadi 6 Okt); kata sambung (di, ke, dari, dan, atau, yang, untuk, dengan, pada) tetap huruf kecil; kalimat penuh tidak diubah | "Simpan Perubahan", "Tanggal Lahir", "Ya, Batalkan" |
 | Tagline (sosmed, banner, footer, halaman masuk/daftar, gambar berbagi) | **Sama persis dengan headline**, tidak dipersingkat atau diparafrase — sebagai teks satu baris (bukan judul), pakai versi kalimat, bukan versi 3 baris | "Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya." |
 | Deskripsi meta (mesin pencari, manifest PWA) | Headline + kalimat pertama subheadline | "Aplikasi les renang privat. Pilih coach, pilih kolam, dan pilih jamnya. Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub." |
@@ -84,15 +84,14 @@ nandain, dibikinin → bentuk baku: dilewati, dikelompokkan, menandai, dibuatkan
 | Ditandai Hadir | absen, check-in |
 | Tidak Hadir | gak hadir, absen, bolos |
 | Peserta yang dilatih coach / sesi bersama coach | diajar, diajarin, murid coach |
-| Membuka jadwal (coach) / jam kosong | buka slot (di teks; "slot" boleh di tombol teknis Tambah Slot) |
+| Membuka jadwal (coach) / jam kosong; tombol "Buka Jam Kosong" | buka slot, Tambah Slot (kecuali di perjanjian coach) |
 | Booking (kata benda & kerja: "booking sesi", "sudah dibooking") | pesan jadwal, reservasi (pilih satu: booking) |
 | Batalkan / dibatalkan | cancel, dicancel |
 | Pemilik kolam | owner, pengelola (kecuali di teks hukum) |
 | Biaya layanan SPH | fee, komisi (untuk member) |
 | Bagi hasil (admin) / bagianmu (coach & kolam) | revenue share, payout |
-| Pencairan / cairkan saldo | withdraw, tarik dana |
 | Kota domisili | kota asal, lokasi |
-| Daftar tunggu ("Kabari saya") | waiting list |
+| Daftar tunggu (tombol "Kabari Saya") | waiting list |
 | Ganti coach tanpa biaya | ganti gratis (boleh di judul pendek admin) |
 
 Kata santai/daerah yang TIDAK dipakai di teks pengguna (komentar kode boleh):
