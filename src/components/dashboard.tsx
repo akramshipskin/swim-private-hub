@@ -162,7 +162,7 @@ export function NextStepCard({
             <Link
               href={href}
               className={cn(
-                "inline-flex min-h-[48px] items-center justify-center rounded-2xl px-5 text-sm font-bold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full",
+                "inline-flex min-h-[48px] items-center justify-center rounded-2xl px-5 text-sm font-bold transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full",
                 dark ? "bg-hero-accent text-hero hover:opacity-90" : "bg-brand-600 text-white hover:bg-fixed-ink-deep"
               )}
             >
@@ -234,7 +234,7 @@ export function BalanceCard({
       {hint && <div className="mt-2 text-sm text-hero-muted">{hint}</div>}
       <Link
         href={href}
-        className="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-hero-accent px-5 text-sm font-bold text-hero transition-all duration-150 hover:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full md:mt-auto md:self-start"
+        className="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-hero-accent px-5 text-sm font-bold text-hero transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-150 hover:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full md:mt-auto md:self-start"
       >
         {cta}
       </Link>

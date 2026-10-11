@@ -1,3 +1,4 @@
+import { buttonClass } from "@/components/ui/button";
 import type { Metadata } from "next";
 import { AuthCard } from "../lupa-password/auth-card";
 import ResetPasswordForm from "./reset-form";
@@ -19,7 +20,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
       ) : (
         <div className="flex flex-col gap-4">
           <p role="alert" className="text-sm text-danger-text">{RESET_INVALID_ERROR}</p>
-          <a href="/lupa-password" className="text-sm font-medium text-brand-700 hover:underline">Minta Tautan Baru</a>
+          <a href="/lupa-password" className={buttonClass()}>Minta Tautan Baru</a>
         </div>
       )}
     </AuthCard>

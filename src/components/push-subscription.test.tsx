@@ -13,7 +13,7 @@ describe("PushMenuItem", () => {
 
   it("disables the button while enabling", () => {
     render(<PushMenuItem supported status="loading" enable={vi.fn()} />);
-    expect(screen.getByRole("button", { name: "Mengaktifkan..." })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Mengaktifkan…" })).toBeDisabled();
   });
 
   it("shows a status line instead of a button once subscribed", () => {

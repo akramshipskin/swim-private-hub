@@ -72,11 +72,11 @@ export default function AdjustForm({
           <legend className="mb-1 text-sm font-medium text-text">Sumber dana</legend>
           <label className="flex min-h-[44px] items-start gap-2 sm:min-h-0">
             <input type="radio" name="source" value="none" required className="mt-1" />
-            <span>Membetulkan Salah Catat <span className="text-text-subtle">— tidak ada pihak lain yang ikut berubah</span></span>
+            <span>Membetulkan Salah Catat <span className="text-text-subtle">(tidak ada pihak lain yang ikut berubah)</span></span>
           </label>
           <label className="flex min-h-[44px] items-start gap-2 sm:min-h-0">
             <input type="radio" name="source" value="platform" required className="mt-1" />
-            <span>Dari/ke Pendapatan Platform <span className="text-text-subtle">— saldo platform ikut berkurang/bertambah sebesar nominal ini</span></span>
+            <span>Dari/ke Pendapatan Platform <span className="text-text-subtle">(saldo platform ikut berkurang/bertambah sebesar nominal ini)</span></span>
           </label>
         </fieldset>
 

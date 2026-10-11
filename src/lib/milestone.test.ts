@@ -20,7 +20,7 @@ describe("groupForAge", () => {
 
 describe("levelLabel", () => {
   it("memakai judul level standar", () => {
-    expect(levelLabel("C", 2)).toBe("Level C2 — Gaya bebas dan punggung");
+    expect(levelLabel("C", 2)).toBe("Level C2: Gaya bebas dan punggung");
     expect(levelLabel("C", 9)).toBe("Level C9");
   });
 });

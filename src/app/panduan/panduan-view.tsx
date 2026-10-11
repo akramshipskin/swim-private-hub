@@ -178,7 +178,7 @@ const GUIDES: Guide[] = [
 
 const INSTALL_STEPS: { platform: string; steps: string[] }[] = [
   {
-    platform: "Android — Chrome",
+    platform: "Android, Chrome",
     steps: [
       "Buka link Swim Private Hub di Chrome.",
       'Kalau muncul tawaran "Tambahkan ke layar utama", langsung pilih itu.',
@@ -188,7 +188,7 @@ const INSTALL_STEPS: { platform: string; steps: string[] }[] = [
     ],
   },
   {
-    platform: "iPhone — Safari",
+    platform: "iPhone, Safari",
     steps: [
       "Buka link Swim Private Hub di Safari.",
       "Ketuk ikon Share (kotak dengan panah ke atas) di bar bawah.",
@@ -198,7 +198,7 @@ const INSTALL_STEPS: { platform: string; steps: string[] }[] = [
     ],
   },
   {
-    platform: "iPhone — Chrome",
+    platform: "iPhone, Chrome",
     steps: [
       "Buka link Swim Private Hub di Chrome.",
       "Ketuk ikon Share di bar bawah layar.",

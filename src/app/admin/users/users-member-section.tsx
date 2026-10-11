@@ -41,7 +41,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
       </h2>
       <Input
         type="search"
-        placeholder="Cari nama, email, Nomor HP, atau nama peserta..."
+        placeholder="Cari nama, email, Nomor HP, atau nama peserta…"
         aria-label="Cari member"
         value={search}
         onChange={(e) => {
@@ -104,7 +104,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
               <Card key={u.id}>
                 <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <Link href={`/admin/users/${u.id}`} className="min-w-0 truncate text-sm font-medium text-text underline-offset-2 hover:underline max-sm:py-3">
+                    <Link href={`/admin/users/${u.id}`} className="min-w-0 truncate text-sm font-medium text-text underline-offset-2 hover:underline max-lg:py-3">
                       {u.name}
                     </Link>
                     <Badge tone={u.isActive ? "success" : "neutral"}>

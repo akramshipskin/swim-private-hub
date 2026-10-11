@@ -206,7 +206,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
                   </Select>
                   {p.type === "self" ? (
                     <p className="flex min-h-[44px] min-w-0 flex-1 items-center truncate rounded-xl border border-border bg-surface-muted px-3 text-sm text-text-muted">
-                      {name || "(isi nama lengkap lebih dulu)"}
+                      {name || "Isi nama di atas dulu"}
                     </p>
                   ) : (
                     <Input

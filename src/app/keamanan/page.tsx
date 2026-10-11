@@ -45,7 +45,7 @@ export default async function KeamananPage() {
         <Image src="/logo.png" alt="Swim Private Hub" width={56} height={56} className="mb-3 h-14 w-14 rounded-2xl object-contain shadow-lg shadow-brand-500/20" priority />
         <p className="text-lg text-text"><Logotype /></p>
         <p className="text-sm text-text-muted">
-          {isAdmin ? "Akun admin wajib memakai verifikasi 2 langkah." : "Verifikasi 2 langkah (2FA) — tidak wajib, tapi disarankan."}
+          {isAdmin ? "Akun admin wajib memakai verifikasi 2 langkah." : "Verifikasi 2 langkah (2FA): tidak wajib, tapi disarankan."}
         </p>
       </div>
 

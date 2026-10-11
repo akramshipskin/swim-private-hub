@@ -63,9 +63,9 @@ export default async function LevelCertificatePage({
         <PrintButton />
       </div>
 
-      <article className="mx-auto flex max-w-4xl flex-col gap-6 rounded-2xl border-8 border-fixed-lime-100 bg-white p-8 text-fixed-ink shadow-sm sm:p-12 print:max-w-none print:rounded-none print:shadow-none">
-        <header className="flex items-center justify-between gap-4">
-          <Logotype className="text-2xl text-fixed-ink" />
+      <article className="mx-auto flex max-w-4xl flex-col gap-6 rounded-2xl border-8 border-fixed-lime-100 bg-white p-5 text-fixed-ink shadow-sm sm:p-12 print:max-w-none print:rounded-none print:shadow-none">
+        <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+          <Logotype className="text-xl text-fixed-ink sm:text-2xl" />
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-fixed-muted">Sertifikat Level</p>
         </header>
 

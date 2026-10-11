@@ -132,7 +132,7 @@ export function PushMenuItem({
         className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-text hover:bg-surface-muted disabled:opacity-50 max-lg:min-h-[44px]"
       >
         <BellIcon className="h-4 w-4 shrink-0 text-text-muted" />
-        {status === "loading" ? "Mengaktifkan..." : "Aktifkan Notifikasi"}
+        {status === "loading" ? "Mengaktifkan…" : "Aktifkan Notifikasi"}
       </button>
       {status === "error" && (
         <p className="px-3.5 pb-2.5 text-xs text-danger-text">

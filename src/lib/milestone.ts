@@ -32,7 +32,7 @@ export const MILESTONE_LEVEL_TITLE: Record<string, string> = {
 
 export function levelLabel(group: MilestoneGroup, level: number) {
   const title = MILESTONE_LEVEL_TITLE[`${group}${level}`];
-  return `Level ${group}${level}${title ? ` — ${title}` : ""}`;
+  return `Level ${group}${level}${title ? `: ${title}` : ""}`;
 }
 
 // Kelompok dari umur (tahun penuh). Di bawah 6 bulan tetap A (bersama orang tua).

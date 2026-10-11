@@ -79,7 +79,7 @@ export function MilestoneUpdateForm({
         <div className="flex flex-col gap-2">
           <p className="text-xs font-medium text-text-muted">
             {prior ? "Keterampilan yang sudah bisa sebelumnya" : "Keterampilan yang tercapai hari ini (opsional)"}
-            {set?.currentLevelLabel ? ` — ${set.currentLevelLabel}` : ""}
+            {set?.currentLevelLabel ? `: ${set.currentLevelLabel}` : ""}
           </p>
           {currentItems.map((it) => (
             <label key={it.id} className="flex items-start gap-2 text-sm text-text max-lg:min-h-[44px]">
@@ -111,7 +111,7 @@ export function MilestoneUpdateForm({
       {focusOptions.length > 0 && (
         <Field label="Sedang Dilatih (saran: keterampilan berikutnya)">
           <Select key={`${chosen}-${set?.suggestedItemId}`} name="focusItemId" defaultValue={set?.suggestedItemId ?? ""}>
-            <option value="">— Tidak dipilih —</option>
+            <option value="">Tidak dipilih</option>
             {focusOptions.map((it) => (
               <option key={it.id} value={it.id}>
                 {it.text}

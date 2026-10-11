@@ -63,18 +63,18 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
       <h1 className="text-2xl font-semibold tracking-tight text-text">Jadwal Kolam</h1>
       <p className="mt-1 text-sm text-text-muted">Pemakaian kolam untuk les privat per jam.</p>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, -1)}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">&larr; Sebelumnya</Link>
+      <div className="mt-4 flex items-center gap-2">
+        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, -1)}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted"><span aria-hidden="true">&larr;</span><span className="max-sm:sr-only">&nbsp;Sebelumnya</span></Link>
         {/* Di HP form-nya ambil satu baris penuh dan tanggalnya yang melar
             (flex-1), bukan dipatok w-72 -- lebar tetap bikin tombol Lihat
             kedorong keluar layar. Di layar >=sm baru dipatok 72 supaya
             popup kalendernya pas selebar tombolnya, gak nyembul nabrak
             tombol sebelahnya. */}
-        <form className="flex w-full items-center gap-2 sm:w-auto">
+        <form className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
           <DatePicker name="date" defaultValue={dateStr} className="min-w-0 flex-1 sm:w-72 sm:flex-none" />
           <button type="submit" className="min-h-[44px] shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-fixed-ink-deep">Lihat</button>
         </form>
-        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, 1)}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Berikutnya &rarr;</Link>
+        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, 1)}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className="inline-flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted"><span className="max-sm:sr-only">Berikutnya&nbsp;</span><span aria-hidden="true">&rarr;</span></Link>
       </div>
       <form className="mt-3 flex max-w-xl gap-2" role="search">
         <input type="hidden" name="date" value={dateStr} />

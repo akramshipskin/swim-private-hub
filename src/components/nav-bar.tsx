@@ -36,6 +36,10 @@ export function NavBar({
 
   return (
     <div className="min-h-screen">
+      {/* Lewati menu untuk pengguna papan ketik / pembaca layar (muncul saat difokus). */}
+      <a href="#isi" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-surface focus:px-4 focus:py-3 focus:text-sm focus:font-medium focus:text-text focus:shadow-lg">
+        Lewati ke isi
+      </a>
       <header className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
         <div className="flex w-full items-center justify-between gap-3 px-4 py-3 lg:px-8">
           {/* prefetch={false} -- "/" cuma redirect server-side ke home per-role
@@ -65,7 +69,7 @@ export function NavBar({
         {links.length > 0 && <SidebarNav links={links} activePath={activePath} />}
         {/* pb-28 (HP dan tablet) / lg:pb-24 (desktop): ruang di bawah konten supaya bottom
             nav + tombol chat mengambang tidak menutupi baris terakhir halaman. */}
-        <div className="min-w-0 flex-1 pb-28 lg:pb-24">{children}</div>
+        <div id="isi" tabIndex={-1} className="min-w-0 flex-1 pb-28 outline-none lg:pb-24">{children}</div>
       </div>
 
       {links.length > 0 && <MobileBottomNav links={links} primary={bottom.primary} moreLabel={bottom.moreLabel} activePath={activePath} />}

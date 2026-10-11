@@ -66,7 +66,7 @@ export default function AffiliateCoachForm({
             <input type="hidden" name="poolId" value={poolId} />
             <Select name="coachId" aria-label="Coach yang ditambahkan ke kolam ini" className="w-44 sm:w-52" defaultValue="">
               <option value="" disabled>
-                — pilih coach —
+                Pilih coach
               </option>
               {availableCoaches.map((c) => (
                 <option key={c.id} value={c.id}>

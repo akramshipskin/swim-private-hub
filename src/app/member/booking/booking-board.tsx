@@ -634,7 +634,7 @@ export default function BookingBoard({
                       ) : (
                         <div className="flex max-w-[220px] flex-col items-end gap-1.5 text-right">
                           <p className="text-xs font-medium text-text">
-                            Booking kamu{s.bookedForChildName && ` — untuk ${s.bookedForChildName}`}
+                            Booking kamu{s.bookedForChildName && ` untuk ${s.bookedForChildName}`}
                           </p>
                           <p className="text-xs text-text-subtle">{s.cancelReason}</p>
                           <a

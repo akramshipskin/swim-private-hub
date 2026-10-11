@@ -156,7 +156,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                             {a.status === "BOOKED" && a.bookings[0] && a.startTime <= now ? (
                               <span className="max-w-[50%] text-right text-sm text-text-subtle">
                                 {a.bookings[0].attended === null
-                                  ? "Sudah mulai — tandai di Riwayat Sesi"
+                                  ? "Sudah mulai, tandai di Riwayat Sesi"
                                   : a.bookings[0].attended
                                     ? "Sudah ditandai Hadir"
                                     : "Sudah ditandai Tidak Hadir"}

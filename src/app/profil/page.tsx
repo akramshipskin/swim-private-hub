@@ -147,7 +147,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
                   <h2 className="mb-1 text-lg font-semibold text-text">Verifikasi 2 Langkah (2FA)</h2>
                   <p className="mb-3 text-sm text-text-muted">
                     {totp.totpEnabledAt
-                      ? "Aktif — setiap masuk kamu diminta kode dari Google Authenticator."
+                      ? "Aktif: setiap masuk kamu diminta kode dari Google Authenticator."
                       : "Belum aktif. Tambahan pengaman: selain password, masuk juga butuh kode dari HP-mu."}
                   </p>
                   <a href="/keamanan" className="inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
