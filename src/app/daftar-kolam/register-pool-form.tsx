@@ -13,6 +13,7 @@ import { TimeSelect } from "@/components/ui/time-select";
 import { CitySelect } from "@/components/city-select";
 import { PriceInput } from "@/components/ui/price-input";
 import { partnerAgreementFor } from "@/lib/partner-agreement";
+import { EmailTypoHint } from "@/components/email-typo-hint";
 
 // Satu centang untuk S&K, Privasi, dan perjanjian kemitraan (bila sudah aktif).
 const agreement = partnerAgreementFor("POOL_OWNER");
@@ -213,6 +214,7 @@ export default function RegisterPoolForm() {
             <Field label="Email (Opsional)">
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
             </Field>
+            <EmailTypoHint value={email} onUse={setEmail} />
             <Field label="Password">
               <Input
                 type="password"

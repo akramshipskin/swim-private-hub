@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
+import { EmailTypoHint } from "@/components/email-typo-hint";
 
 type Role = "ADMIN" | "COACH" | "MEMBER" | "POOL_OWNER";
 type Participant = { type: "self" | "child"; name: string; birthDate: string };
@@ -15,6 +16,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
   const [role, setRole] = useState<Role>("MEMBER");
   const [participants, setParticipants] = useState<Participant[]>([{ type: "self", name: "", birthDate: "" }]);
   const [newUserName, setNewUserName] = useState("");
+  const [email, setEmail] = useState("");
   const [poolMode, setPoolMode] = useState<"existing" | "new">(pools.length > 0 ? "existing" : "new");
   // Berhasil -> kosongkan form (key baru = input tak terkontrol ikut kosong).
   const [formKey, setFormKey] = useState(0);
@@ -25,6 +27,7 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
       setRole("MEMBER");
       setParticipants([{ type: "self", name: "", birthDate: "" }]);
       setNewUserName("");
+      setEmail("");
       setFormKey((k) => k + 1);
     }
   }
@@ -51,8 +54,9 @@ export default function CreateUserForm({ pools }: { pools: { id: string; name: s
             <Input type="tel" name="phone" placeholder="0812xxxxxxx" required className="w-full" />
           </Field>
           <Field label="Email (Opsional)">
-            <Input type="email" name="email" className="w-full" />
+            <Input type="email" name="email" className="w-full" value={email} onChange={(e) => setEmail(e.target.value)} />
           </Field>
+          <EmailTypoHint value={email} onUse={setEmail} className="sm:col-span-2" />
           <Field label="Password">
             <PasswordInput name="password" required minLength={8} className="w-full" />
           </Field>

@@ -12,6 +12,7 @@ import { CitySelect } from "@/components/city-select";
 import { PriceInput } from "@/components/ui/price-input";
 import { COACH_SPECIALTIES } from "@/lib/coach-specialties";
 import { partnerAgreementFor } from "@/lib/partner-agreement";
+import { EmailTypoHint } from "@/components/email-typo-hint";
 
 // Satu centang untuk S&K, Privasi, dan perjanjian kemitraan (bila sudah aktif).
 const agreement = partnerAgreementFor("COACH");
@@ -127,6 +128,7 @@ export default function RegisterCoachForm() {
             <Field label="Email (Opsional)">
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
             </Field>
+            <EmailTypoHint value={email} onUse={setEmail} />
             <Field label="Tanggal Lahir">
               <Input
                 type="date"

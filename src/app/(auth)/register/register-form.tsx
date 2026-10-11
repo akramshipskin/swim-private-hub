@@ -9,6 +9,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
 import { isValidIndonesianPhone } from "@/lib/format";
 import { CitySelect } from "@/components/city-select";
+import { EmailTypoHint } from "@/components/email-typo-hint";
 
 type Participant = { type: "self" | "child"; name: string; birthDate: string };
 
@@ -149,6 +150,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
                 autoComplete="email"
               />
             </Field>
+            <EmailTypoHint value={email} onUse={setEmail} />
             <Field label="Password">
               <Input
                 type="password"
