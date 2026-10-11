@@ -104,7 +104,8 @@ export default async function CoachDashboardPage() {
         {overdue.length > 0 && (
           <BentoCard title="Penarikan ditahan" href="/coach/peserta" linkLabel="Update milestone" className="md:col-span-6">
             <p className="text-sm text-warning-text">
-              {overdue.map((o) => o.name).join(", ")} sudah {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir atau lebih tanpa catatan
+              {overdue.slice(0, 3).map((o) => o.name).join(", ")}
+              {overdue.length > 3 ? ` dan ${overdue.length - 3} peserta lain` : ""} sudah {MILESTONE_NOTE_EVERY_SESSIONS} sesi Hadir atau lebih tanpa catatan
               milestone darimu. Isi catatannya supaya saldo bisa ditarik lagi.
             </p>
           </BentoCard>
@@ -118,7 +119,7 @@ export default async function CoachDashboardPage() {
                 : " Semua member ini sudah bisa booking jam kosongmu."}
             </p>
             <ul className="mt-3 flex flex-col divide-y divide-border text-sm">
-              {owed.map((p) => {
+              {[...owed].sort((a, b) => Number(owedBookable.has(a.id)) - Number(owedBookable.has(b.id))).slice(0, 5).map((p) => {
                 const blocked = !owedBookable.has(p.id);
                 const daysLeft = p.expiredDate ? Math.max(0, Math.ceil((p.expiredDate.getTime() - now.getTime()) / 86_400_000)) : null;
                 return (
@@ -135,6 +136,7 @@ export default async function CoachDashboardPage() {
                   </li>
                 );
               })}
+              {owed.length > 5 && <li className="pt-3 text-xs text-text-subtle">+{owed.length - 5} paket lainnya, lihat di Jadwal</li>}
             </ul>
           </BentoCard>
         )}

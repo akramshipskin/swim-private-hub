@@ -6,12 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { getOverdueParticipants } from "@/lib/milestone-hold";
 import { formatMilestoneDate } from "@/lib/milestone";
 import { MILESTONE_NOTE_EVERY_SESSIONS } from "@/lib/policy";
+import { SearchForm, matchesQuery } from "@/components/search-form";
+import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
 
 export const metadata = { title: "Peserta | Swim Private Hub" };
 
 // Semua peserta yang pernah/sedang diajar coach ini, dengan status catatan
 // milestone. Peserta yang menahan penarikan ditaruh paling atas.
-export default async function CoachPesertaPage() {
+const PAGE = 20;
+
+export default async function CoachPesertaPage({ searchParams }: { searchParams: Promise<{ q?: string; n?: string }> }) {
+  const sp = await searchParams;
+  const q = sp.q ?? "";
+  const limit = pageSize(sp.n, PAGE);
   const session = await requireRole("COACH");
   const bookings = await prisma.booking.findMany({
     where: { status: "BOOKED", availability: { coachId: session.user.id } },
@@ -40,9 +47,11 @@ export default async function CoachPesertaPage() {
   ]);
   const overdueMap = new Map(overdue.map((o) => [o.dependentId, o.sessionsWithoutNote]));
   const lastNoteMap = new Map(lastNotes.map((n) => [n.dependentId, n._max.createdAt]));
-  const rows = [...byDependent.values()].sort(
+  const allRows = [...byDependent.values()].sort(
     (a, b) => (overdueMap.get(b.id) ?? 0) - (overdueMap.get(a.id) ?? 0) || b.lastSession.getTime() - a.lastSession.getTime(),
   );
+  const matched = allRows.filter((r) => matchesQuery(q, r.name, r.memberName));
+  const rows = matched.slice(0, limit);
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
@@ -58,8 +67,12 @@ export default async function CoachPesertaPage() {
         </p>
       )}
 
-      {rows.length === 0 ? (
+      {allRows.length > PAGE && <div className="mt-4"><SearchForm q={q} placeholder="Cari nama peserta atau akun" /></div>}
+
+      {allRows.length === 0 ? (
         <p className="mt-6 text-sm text-text-muted">Belum ada peserta yang booking sesimu.</p>
+      ) : matched.length === 0 ? (
+        <p className="mt-6 text-sm text-text-muted">Tidak ada peserta yang cocok dengan &quot;{q}&quot;.</p>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
           {rows.map((r) => {
@@ -85,6 +98,7 @@ export default async function CoachPesertaPage() {
           })}
         </div>
       )}
+      <ShowMoreLink href={listHref({ q: q || undefined, n: String(limit + PAGE) })} shown={rows.length} total={matched.length} unit="peserta" />
     </main>
   );
 }

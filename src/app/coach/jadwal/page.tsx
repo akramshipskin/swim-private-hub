@@ -1,6 +1,7 @@
 import { poolHoursLabel } from "@/lib/pool-hours";
 import { requireRole } from "@/lib/require-role";
 import { SearchForm, matchesQuery } from "@/components/search-form";
+import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
 import { prisma } from "@/lib/prisma";
 import { NOT_CLOSED } from "@/lib/availability";
 import AddSlotForm from "./add-slot-form";
@@ -12,8 +13,13 @@ import { Badge } from "@/components/ui/badge";
 
 export const metadata = { title: "Jadwal | Swim Private Hub" };
 
-export default async function CoachJadwalPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const q = (await searchParams).q ?? "";
+// Jadwal sebulan lebih: tampil 7 tanggal terdekat dulu, tombol menambah 7 tanggal.
+const PAGE_DAYS = 7;
+
+export default async function CoachJadwalPage({ searchParams }: { searchParams: Promise<{ q?: string; n?: string }> }) {
+  const sp = await searchParams;
+  const q = sp.q ?? "";
+  const limit = pageSize(sp.n, PAGE_DAYS);
   const session = await requireRole("COACH");
 
   // Jadwal coach lain di tanggal yang sama -- biar coach ini tau siapa
@@ -116,7 +122,7 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
         </Card>
       ) : (
         <div className="flex flex-col gap-8">
-          {[...byDate.entries()].map(([dateKey, dayAvailabilities]) => (
+          {[...byDate.entries()].slice(0, limit).map(([dateKey, dayAvailabilities]) => (
             <div key={dateKey}>
               <h2 className="mb-3 text-lg font-semibold text-text">{formatDateLabel(dayAvailabilities[0].date)}</h2>
               {[...new Set(dayAvailabilities.map((a) => a.pool.name))].map((poolName) => (
@@ -176,16 +182,19 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
           ))}
         </div>
       )}
+      <ShowMoreLink href={listHref({ q: q || undefined, n: String(limit + PAGE_DAYS) })} shown={Math.min(limit, byDate.size)} total={byDate.size} unit="tanggal" />
 
       {otherByDate.size > 0 && (
-        <div className="mt-10">
-          <h2 className="text-lg font-semibold text-text">Jadwal Coach Lain</h2>
+        <details className="mt-10 rounded-xl border border-border bg-surface px-4 py-3">
+          <summary className="flex min-h-[44px] cursor-pointer items-center text-lg font-semibold text-text">
+            Jadwal Coach Lain ({otherByDate.size} tanggal)
+          </summary>
           <p className="mt-1 text-sm text-text-muted">
             Jam yang sudah dibuka coach lain, supaya kamu tahu siapa saja yang bertugas di hari yang sama.
           </p>
 
           <div className="mt-4 flex flex-col gap-8">
-            {[...otherByDate.entries()].map(([dateKey, dayAvailabilities]) => (
+            {[...otherByDate.entries()].slice(0, limit).map(([dateKey, dayAvailabilities]) => (
               <div key={dateKey}>
                 <h3 className="mb-3 text-base font-semibold text-text">{formatDateLabel(dayAvailabilities[0].date)}</h3>
                 {[...new Set(dayAvailabilities.map((a) => a.pool.name))].map((poolName) => {
@@ -218,7 +227,8 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
               </div>
             ))}
           </div>
-        </div>
+          <ShowMoreLink href={listHref({ q: q || undefined, n: String(limit + PAGE_DAYS) })} shown={Math.min(limit, otherByDate.size)} total={otherByDate.size} unit="tanggal" />
+        </details>
       )}
     </main>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,18 @@ function maskAccount(n: string) {
 
 // Dipakai pemilik kolam & coach -- bentuk fiturnya sama (saldo, rekening,
 // tarik, riwayat). Server action dioper sebagai prop.
+const HISTORY_PAGE = 5;
+
+// Riwayat panjang (puluhan penarikan, komisi, koreksi): tampil 5 terbaru dulu.
+function MoreButton({ shown, total, onMore }: { shown: number; total: number; onMore: () => void }) {
+  if (total <= shown) return null;
+  return (
+    <button type="button" onClick={onMore} className="mt-2 flex min-h-[44px] w-full items-center justify-center rounded-xl border border-border bg-surface text-sm font-medium text-text hover:bg-surface-muted">
+      Tampilkan Lebih Banyak ({shown} dari {total})
+    </button>
+  );
+}
+
 export default function SaldoView({
   walletBalance,
   bankName,
@@ -85,6 +97,9 @@ export default function SaldoView({
   updateBankInfoAction: (state: SaldoActionState, formData: FormData) => Promise<SaldoActionState>;
   requestWithdrawalAction: (state: SaldoActionState, formData: FormData) => Promise<SaldoActionState>;
 }) {
+  const [shownC, setShownC] = useState(HISTORY_PAGE);
+  const [shownA, setShownA] = useState(HISTORY_PAGE);
+  const [shownW, setShownW] = useState(HISTORY_PAGE);
   const [bankState, bankAction, bankPending] = useActionState(updateBankInfoAction, null);
   const [cairState, cairAction, cairPending] = useActionState(requestWithdrawalAction, null);
 
@@ -208,7 +223,7 @@ export default function SaldoView({
         <div>
           <h2 className="mb-3 text-base font-semibold text-text">Komisi Afiliasi</h2>
           <div className="flex flex-col gap-2">
-            {commissions.map((c) => (
+            {commissions.slice(0, shownC).map((c) => (
               <Card key={c.id}>
                 <CardBody className="flex items-start justify-between gap-3 py-4">
                   <div>
@@ -226,6 +241,7 @@ export default function SaldoView({
               </Card>
             ))}
           </div>
+          <MoreButton shown={shownC} total={commissions.length} onMore={() => setShownC((n) => n + HISTORY_PAGE)} />
         </div>
       )}
 
@@ -233,7 +249,7 @@ export default function SaldoView({
         <div>
           <h2 className="mb-3 text-base font-semibold text-text">Riwayat Koreksi Saldo</h2>
           <div className="flex flex-col gap-2">
-            {adjustments.map((a) => (
+            {adjustments.slice(0, shownA).map((a) => (
               <Card key={a.id}>
                 <CardBody className="flex flex-col gap-2 py-4">
                   <div className="flex items-start justify-between gap-3">
@@ -255,6 +271,7 @@ export default function SaldoView({
               </Card>
             ))}
           </div>
+          <MoreButton shown={shownA} total={adjustments.length} onMore={() => setShownA((n) => n + HISTORY_PAGE)} />
         </div>
       )}
       <div>
@@ -265,7 +282,7 @@ export default function SaldoView({
           </Card>
         ) : (
           <div className="flex flex-col gap-2">
-            {withdrawals.map((w) => (
+            {withdrawals.slice(0, shownW).map((w) => (
               <Card key={w.id}>
                 <CardBody className="flex flex-col gap-2 py-4">
                   <div className="flex items-start justify-between gap-3">
@@ -306,6 +323,7 @@ export default function SaldoView({
             ))}
           </div>
         )}
+        <MoreButton shown={shownW} total={withdrawals.length} onMore={() => setShownW((n) => n + HISTORY_PAGE)} />
       </div>
       </div>
     </div>

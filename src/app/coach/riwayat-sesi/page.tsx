@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/require-role";
 import { SearchForm, matchesQuery } from "@/components/search-form";
+import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
 import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { Card, CardBody } from "@/components/ui/card";
@@ -9,8 +10,14 @@ import { ATTENDANCE_MARK_WINDOW_HOURS, NO_SHOW_COACH_SHARE_PERCENT, coachCanMark
 
 export const metadata = { title: "Riwayat Sesi | Swim Private Hub" };
 
-export default async function CoachRiwayatSesiPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const q = (await searchParams).q ?? "";
+// Ratusan sesi lama: tampil 7 tanggal terbaru dulu, tombol menambah 7 tanggal.
+const PAGE_DAYS = 7;
+
+export default async function CoachRiwayatSesiPage({ searchParams }: { searchParams: Promise<{ q?: string; n?: string; f?: string }> }) {
+  const sp = await searchParams;
+  const q = sp.q ?? "";
+  const onlyUnmarked = sp.f === "belum";
+  const limit = pageSize(sp.n, PAGE_DAYS);
   const session = await requireRole("COACH");
 
   const bookings = await prisma.booking.findMany({
@@ -34,23 +41,32 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
     return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
   }
   const byDate = new Map<string, typeof bookings>();
-  for (const b of bookings.filter((x) => matchesQuery(q, x.package.dependent.name, x.member.name, x.availability.pool.name))) {
+  for (const b of bookings.filter((x) => (!onlyUnmarked || x.attended === null) && matchesQuery(q, x.package.dependent.name, x.member.name, x.availability.pool.name))) {
     const key = dateKey(b.availability.date);
     if (!byDate.has(key)) byDate.set(key, []);
     byDate.get(key)!.push(b);
   }
-  const sortedDateKeys = [...byDate.keys()].sort().reverse();
+  const allDateKeys = [...byDate.keys()].sort().reverse();
+  const sortedDateKeys = allDateKeys.slice(0, limit);
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-text">Riwayat Sesi</h1>
       <SearchForm q={q} placeholder="Cari peserta, nama akun, atau kolam" />
-      <p className="mb-4 text-sm text-text-muted">Tandai kehadiran paling lambat {ATTENDANCE_MARK_WINDOW_HOURS} jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai. Hadir: kamu dan kolam mendapat bagian penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu mendapat {NO_SHOW_COACH_SHARE_PERCENT}% dari bagianmu.</p>
-      <div className="mb-6 grid grid-cols-3 gap-3">
-        <Card><CardBody className="py-3"><p className="text-sm text-text-muted">Belum Ditandai</p><p className={`text-2xl font-bold ${unmarkedCount > 0 ? "text-warning-text" : "text-text"}`}>{unmarkedCount}</p></CardBody></Card>
+      <div className="mb-4 grid grid-cols-3 gap-3">
+        <Link href={listHref({ q: q || undefined, f: onlyUnmarked ? undefined : "belum" })} aria-label={onlyUnmarked ? "Tampilkan semua sesi" : "Tampilkan hanya sesi yang belum ditandai"} className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+          <Card className={onlyUnmarked ? "border-brand-500" : undefined}><CardBody className="py-3"><p className="text-sm text-text-muted">Belum Ditandai</p><p className={`text-2xl font-bold ${unmarkedCount > 0 ? "text-warning-text" : "text-text"}`}>{unmarkedCount}</p></CardBody></Card>
+        </Link>
         <Card><CardBody className="py-3"><p className="text-sm text-text-muted">Hadir</p><p className="text-2xl font-bold text-success-text">{validSessionCount}</p></CardBody></Card>
         <Card><CardBody className="py-3"><p className="text-sm text-text-muted">Tidak Hadir</p><p className="text-2xl font-bold text-text">{absentCount}</p></CardBody></Card>
       </div>
+      <p className="mb-4 text-sm text-text-muted">Tandai kehadiran paling lambat {ATTENDANCE_MARK_WINDOW_HOURS} jam setelah sesi selesai; lewat itu hanya admin yang bisa menandai. Hadir: kamu dan kolam mendapat bagian penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu mendapat {NO_SHOW_COACH_SHARE_PERCENT}% dari bagianmu.</p>
+      {onlyUnmarked && (
+        <p className="mb-4 text-sm text-text-muted">
+          Menampilkan hanya sesi yang belum ditandai.{" "}
+          <Link href={listHref({ q: q || undefined })} className="font-medium text-brand-700 underline">Tampilkan semua</Link>
+        </p>
+      )}
 
       {bookings.length === 0 ? (
         <Card>
@@ -63,8 +79,8 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
       ) : sortedDateKeys.length === 0 ? (
         <Card>
           <CardBody className="py-10 text-center">
-            <p className="text-sm font-medium text-text">Tidak ada hasil untuk &quot;{q}&quot;</p>
-            <p className="mt-1 text-sm text-text-muted">Coba kata kunci lain: nama peserta, member, atau kolam.</p>
+            <p className="text-sm font-medium text-text">{q ? <>Tidak ada hasil untuk &quot;{q}&quot;</> : "Semua sesi sudah ditandai"}</p>
+            <p className="mt-1 text-sm text-text-muted">{q ? "Coba kata kunci lain: nama peserta, member, atau kolam." : "Tidak ada yang perlu kamu tandai sekarang."}</p>
           </CardBody>
         </Card>
       ) : (
@@ -120,6 +136,7 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
           );
         })
       )}
+      <ShowMoreLink href={listHref({ q: q || undefined, f: onlyUnmarked ? "belum" : undefined, n: String(limit + PAGE_DAYS) })} shown={sortedDateKeys.length} total={allDateKeys.length} unit="tanggal" />
     </main>
   );
 }
