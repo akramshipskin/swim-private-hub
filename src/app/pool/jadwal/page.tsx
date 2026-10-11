@@ -14,9 +14,10 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 // siapa), jam mana ada slot kosong, jam mana tidak ada les sama sekali.
 export const metadata = { title: "Jadwal Kolam | Swim Private Hub" };
 
-export default async function PoolJadwalPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
+export default async function PoolJadwalPage({ searchParams }: { searchParams: Promise<{ date?: string; q?: string }> }) {
   const session = await requireRole("POOL_OWNER");
-  const { date } = await searchParams;
+  const { date, q: rawQ } = await searchParams;
+  const q = (rawQ ?? "").trim();
   const dateStr = date && DATE.test(date) ? date : todayWibDateString();
 
   const pools = await prisma.pool.findMany({
@@ -63,7 +64,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
       <p className="mt-1 text-sm text-text-muted">Pemakaian kolam untuk les privat per jam.</p>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, -1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">&larr; Sebelumnya</Link>
+        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, -1)}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">&larr; Sebelumnya</Link>
         {/* Di HP form-nya ambil satu baris penuh dan tanggalnya yang melar
             (flex-1), bukan dipatok w-72 -- lebar tetap bikin tombol Lihat
             kedorong keluar layar. Di layar >=sm baru dipatok 72 supaya
@@ -73,8 +74,15 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
           <DatePicker name="date" defaultValue={dateStr} className="min-w-0 flex-1 sm:w-72 sm:flex-none" />
           <button type="submit" className="min-h-[44px] shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-fixed-ink-deep">Lihat</button>
         </form>
-        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, 1)}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Berikutnya &rarr;</Link>
+        <Link href={`/pool/jadwal?date=${addDaysToDateString(dateStr, 1)}${q ? `&q=${encodeURIComponent(q)}` : ""}`} className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-surface-muted max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">Berikutnya &rarr;</Link>
       </div>
+      <form className="mt-3 flex max-w-xl gap-2" role="search">
+        <input type="hidden" name="date" value={dateStr} />
+        <label htmlFor="jadwal-q" className="sr-only">Cari kode booking, peserta, atau coach</label>
+        <input id="jadwal-q" name="q" defaultValue={q} placeholder="Cari kode booking, peserta, atau coach" className="min-h-[44px] min-w-0 flex-1 rounded-lg border border-border bg-surface px-3 text-sm text-text placeholder:text-text-subtle focus:outline-none focus:ring-2 focus:ring-brand-500" />
+        <button type="submit" className="min-h-[44px] rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-fixed-ink-deep">Cari</button>
+        {q && <Link href={`/pool/jadwal?date=${dateStr}`} className="inline-flex min-h-[44px] items-center rounded-lg border border-border px-3 py-2 text-sm text-text hover:bg-surface-muted">Reset</Link>}
+      </form>
       <p className="mt-3 text-base font-semibold text-text">{formatDateLabel(dateLabel(dateStr))}</p>
 
       {pools.map((p) => {
@@ -91,7 +99,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
                   ? a.bookings[0].member.name
                   : `${a.bookings[0].package.dependent.name} (akun ${a.bookings[0].member.name})`} · kode ${a.bookings[0].id.slice(-6).toUpperCase()}`
               : undefined,
-          })),
+          })).filter((x) => !q || (x.booked && `${x.coachName} ${x.who ?? ""}`.toLowerCase().includes(q.toLowerCase()))),
           p.openTime,
           p.closeTime
         );
@@ -126,7 +134,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
                 ))}
               </ul>
               {/* Jam tanpa les diringkas satu baris (dulu satu baris per jam). */}
-              {rows.some((r) => r.booked.length === 0 && r.open.length === 0) && (
+              {!q && rows.some((r) => r.booked.length === 0 && r.open.length === 0) && (
                 <p className="mt-3 border-t border-border pt-3 text-sm text-text-subtle">
                   Tidak ada les:{" "}
                   {rows
@@ -136,7 +144,7 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
                 </p>
               )}
               {rows.every((r) => r.booked.length === 0 && r.open.length === 0) && (
-                <p className="text-sm text-text-muted">Tidak ada les di tanggal ini.</p>
+                <p className="text-sm text-text-muted">{q ? `Tidak ada sesi yang cocok dengan "${q}" di tanggal ini.` : "Tidak ada les di tanggal ini."}</p>
               )}
             </CardBody>
           </Card>

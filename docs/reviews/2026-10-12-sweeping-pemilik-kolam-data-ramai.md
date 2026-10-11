@@ -15,5 +15,7 @@ Desktop 1280: Jadwal 3.4, Coach 2.0, Saldo 3.2, Laporan 1.0, Dashboard 1.8 layar
 
 ## Belum dicek / catatan
 - Laporan dengan ratusan sesi berbayar: data seed tidak punya pembayaran sukses, jadi hanya kodenya yang dicek (potongan daftar 20; angka total tidak berubah karena dihitung sebelum dipotong). Dicek ulang bila ada data berbayar.
-- Jadwal Kolam tidak punya kolom cari kode booking (dipakai di loket); usulan, bukan perbaikan.
-- Tema gelap tiga peran: belum dicek.
+- Kolom cari kode booking di Jadwal Kolam DITAMBAH 12 Okt (cari kode, peserta, akun, atau coach; tanggal tetap terbawa). Dicek: kode FKVS3F menampilkan 1 sesi.
+
+## Tema gelap, empat peran (12 Okt)
+Alat ukur kontras otomatis (rasio teks/latar < 4.5) di 8 halaman coach, 8 member, 7 pemilik kolam, 13 admin, lebar 375, akun dummy lokal. Hasil: tidak ada teks di bawah 4.5 kecuali tombol yang sedang nonaktif (Unggah Foto, Simpan Tanda Tangan, Tambah Sertifikat, Pilih Tanggal dan Jam: 3.9, dikecualikan karena nonaktif). Dilihat juga 5 tangkapan layar: dasbor coach, jadwal dan saldo pemilik kolam. Batas pemeriksaan: alat hanya membaca teks biasa; isian formulir (placeholder), gambar, dan halaman publik tidak diukur.
