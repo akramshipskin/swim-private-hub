@@ -54,15 +54,30 @@ describe("RESET PASSWORD LEWAT EMAIL", () => {
     expect((await prisma.user.findUniqueOrThrow({ where: { id: u.id } })).mustChangePassword).toBe(true);
   });
 
-  it("PR2: email tidak terdaftar, akun admin, atau akun nonaktif: jawaban sama, tidak ada email", async () => {
-    const admin = await mkUser("ADMIN");
-    await prisma.user.update({ where: { id: admin.id }, data: { email: "admin@x.test" } });
+  it("PR2: email tidak terdaftar atau akun nonaktif: jawaban sama, tidak ada email", async () => {
     const off = await member("off@x.test");
     await prisma.user.update({ where: { id: off.id }, data: { isActive: false } });
-    for (const e of ["tidak@x.test", "admin@x.test", "off@x.test"]) expect(await ask(e, "1.1.1.2")).toEqual({ ok: RESET_SENT_MESSAGE });
+    for (const e of ["tidak@x.test", "off@x.test"]) expect(await ask(e, "1.1.1.2")).toEqual({ ok: RESET_SENT_MESSAGE });
     expect(sent).toHaveLength(0);
-    // Token buatan sendiri untuk admin pun ditolak.
-    expect(await verifyResetToken(createResetToken(await prisma.user.findUniqueOrThrow({ where: { id: admin.id } })))).toBeNull();
+  });
+
+  it("PR7: admin boleh reset (Hadi 11 Okt); 2FA tetap terpasang sesudahnya", async () => {
+    const a = await mkUser("ADMIN");
+    const admin = await prisma.user.update({ where: { id: a.id }, data: { email: "admin@x.test", totpSecret: "rahasia", totpEnabledAt: new Date() } });
+    await ask("admin@x.test", "1.1.1.3");
+    expect(sent).toHaveLength(1);
+    expect(await doReset(tokenFrom(sent[0].text), "baru-12345", "baru-12345")).toEqual({});
+    const after = await prisma.user.findUniqueOrThrow({ where: { id: admin.id } });
+    expect(after).toMatchObject({ totpSecret: "rahasia", sessionVersion: admin.sessionVersion + 1 });
+    expect(after.totpEnabledAt).not.toBeNull();
+  });
+
+  it("PR8: admin yang belum memasang 2FA tidak dikirimi tautan dan tokennya ditolak", async () => {
+    const a = await mkUser("ADMIN");
+    const admin = await prisma.user.update({ where: { id: a.id }, data: { email: "baru@x.test" } });
+    expect(await ask("baru@x.test", "1.1.1.4")).toEqual({ ok: RESET_SENT_MESSAGE });
+    expect(sent).toHaveLength(0);
+    expect(await verifyResetToken(createResetToken(admin))).toBeNull();
   });
 
   it("PR3: kedaluwarsa, tanda tangan diubah, atau password sudah diganti lewat jalan lain = ditolak", async () => {

@@ -16,8 +16,10 @@ const FROM = `Swim Private Hub <${INBOX_FROM_ADDRESS}>`;
 // Reset password lewat email (P8, Hadi 11 Okt). Tanpa tabel token: tautan
 // ditandatangani AUTH_SECRET dan terikat ke sessionVersion + sidik password
 // saat ini, jadi otomatis mati begitu password berganti (sekali pakai) atau
-// setelah RESET_TTL_MS. Admin tidak bisa reset lewat email (2FA + akses penuh;
-// reset admin tetap lewat admin lain).
+// setelah RESET_TTL_MS. Admin juga boleh (Hadi 11 Okt), HANYA bila 2FA-nya
+// sudah aktif: reset tidak menyentuh 2FA, jadi masuk tetap butuh kode. Admin
+// tanpa 2FA ditolak, karena pemegang emailnya bisa masuk lalu memasang
+// Authenticator miliknya sendiri di /keamanan.
 
 export const RESET_TTL_MS = 30 * 60_000;
 export const RESET_REQUESTS_PER_EMAIL = 3;
@@ -47,7 +49,12 @@ export function createResetToken(user: ResetUser, now = Date.now()): string {
   return `${body}.${sign(body, passwordPrint(user.passwordHash))}`;
 }
 
-const eligibleWhere = { isActive: true, anonymizedAt: null, rejectedAt: null, role: { not: "ADMIN" as const } };
+const eligibleWhere = {
+  isActive: true,
+  anonymizedAt: null,
+  rejectedAt: null,
+  OR: [{ role: { not: "ADMIN" as const } }, { totpEnabledAt: { not: null }, totpSecret: { not: null } }],
+};
 
 // Kembalikan pemilik token bila tanda tangan cocok, belum kedaluwarsa, password
 // dan sessionVersion belum berubah, dan akun masih boleh reset; selain itu null.
@@ -107,7 +114,7 @@ export async function resetPasswordWithToken(token: string, newPassword: string,
   if (!user) return { error: RESET_INVALID_ERROR };
   const passwordHash = await bcrypt.hash(newPassword, 12);
   const done = await prisma.user.updateMany({
-    where: { id: user.id, sessionVersion: user.sessionVersion, passwordHash: user.passwordHash },
+    where: { id: user.id, sessionVersion: user.sessionVersion, passwordHash: user.passwordHash, ...eligibleWhere },
     // mustChangePassword sengaja tidak diubah: akun yang masih wajib ganti
     // password sementara (buatan admin/impor) tetap melewati Ganti Password
     // dan pengisian peserta sesudah masuk.
