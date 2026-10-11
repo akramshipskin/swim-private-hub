@@ -35,10 +35,19 @@ export default async function StandardItemsPage() {
       </Card>
 
       {MILESTONE_GROUPS.map((g) => (
-        <Card key={g} className="mt-4">
-          <CardBody>
-            <h2 className="text-lg font-semibold text-text">Kelompok {g}</h2>
-            <p className="mb-3 text-sm text-text-muted">{MILESTONE_GROUP_LABEL[g]}</p>
+        // Tiap kelompok dilipat (dulu semua terbuka = 10 layar di HP); ringkasan
+        // menyebut jumlah keterampilan supaya tidak perlu dibuka untuk tahu isinya.
+        <details key={g} className="group mt-4 rounded-2xl border border-border bg-surface">
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-4">
+            <span>
+              <span className="block text-lg font-semibold text-text">Kelompok {g}</span>
+              <span className="block text-sm text-text-muted">
+                {MILESTONE_GROUP_LABEL[g]} · {items.filter((it) => it.group === g && it.isActive).length} keterampilan aktif
+              </span>
+            </span>
+            <span aria-hidden className="text-text-subtle transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="border-t border-border p-4">
             {levelsOf(items, g).length === 0 ? (
               <p className="text-sm text-text-muted">Belum ada keterampilan.</p>
             ) : (
@@ -73,8 +82,8 @@ export default async function StandardItemsPage() {
                 </div>
               ))
             )}
-          </CardBody>
-        </Card>
+          </div>
+        </details>
       ))}
     </main>
   );

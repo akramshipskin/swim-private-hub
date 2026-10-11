@@ -17,9 +17,11 @@ function dateTime(d: Date) {
 // membalik bagi hasil "tidak hadir" lalu mencatat bagi hasil normal.
 export default async function AdminLaporanKehadiranPage() {
   await requireRole("ADMIN");
+  // Semua laporan terbuka selalu tampil (terbuka diurutkan dulu) + 100 yang sudah selesai.
+  const openCount = await prisma.attendanceReport.count({ where: { status: "OPEN" } });
   const reports = await prisma.attendanceReport.findMany({
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-    take: 100,
+    take: openCount + 100,
     include: {
       booking: {
         select: {

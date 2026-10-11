@@ -34,6 +34,8 @@ type Row = {
 
 export default function PaketPerMemberList({ rows }: { rows: Row[] }) {
   const [search, setSearch] = useState("");
+  // Banyak member: tampil 20 dulu, tombol menambah 20 (pencarian tetap ke semua).
+  const [limit, setLimit] = useState(20);
 
   const filtered = search.trim()
     ? rows.filter((r) => {
@@ -49,14 +51,17 @@ export default function PaketPerMemberList({ rows }: { rows: Row[] }) {
         placeholder="Cari nama akun, peserta, atau kolam..."
         aria-label="Cari paket per member"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setLimit(20);
+        }}
         className="mb-3 max-w-sm"
       />
       {filtered.length === 0 ? (
         <p className="text-sm text-text-subtle">Tidak ada yang cocok dengan pencarian &ldquo;{search}&rdquo;.</p>
       ) : (
         <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          {filtered.map((r) => (
+          {filtered.slice(0, limit).map((r) => (
             <li key={r.memberId}>
               <MemberCard
                 memberName={r.memberName}
@@ -67,6 +72,20 @@ export default function PaketPerMemberList({ rows }: { rows: Row[] }) {
             </li>
           ))}
         </ul>
+      )}
+      {filtered.length > 0 && (
+        <p className="mt-3 text-center text-xs text-text-subtle">
+          {Math.min(limit, filtered.length)} dari {filtered.length} member
+        </p>
+      )}
+      {filtered.length > limit && (
+        <button
+          type="button"
+          onClick={() => setLimit((n) => n + 20)}
+          className="mt-2 flex min-h-[44px] w-full items-center justify-center rounded-xl border border-border bg-surface text-sm font-medium text-text hover:bg-surface-muted"
+        >
+          Tampilkan Lebih Banyak
+        </button>
       )}
     </>
   );

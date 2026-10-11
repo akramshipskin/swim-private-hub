@@ -32,18 +32,20 @@ function buildKabarinWaLink(coachName: string, dateLabel: string) {
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }
 
-type Period = "upcoming" | "unmarked" | "past" | "all";
+export type Period = "upcoming" | "unmarked" | "past" | "all";
 
 export default function BookingOverviewBoard({
   availabilities,
   coaches,
+  initialPeriod = "upcoming",
 }: {
   availabilities: Availability[];
   coaches: { id: string; name: string }[];
+  initialPeriod?: Period;
 }) {
   const [selectedCoach, setSelectedCoach] = useState("all");
   const [selectedPool, setSelectedPool] = useState("all");
-  const [period, setPeriod] = useState<Period>("upcoming");
+  const [period, setPeriod] = useState<Period>(initialPeriod);
   const [query, setQuery] = useState("");
   const now = useMemo(() => new Date(), []);
   const todayKey = dateKey(now);

@@ -128,33 +128,32 @@ export default async function AdminDashboardPage() {
           </div>
         </BentoCard>
 
-        <BentoCard title="Perlu Kamu Cek" className="md:col-span-2 md:row-span-2">
-          <div className="flex flex-col">
-            <ActionRow label="Pesan Perlu Dibalas" count={waitingChats} href="/admin/pesan" />
-            <ActionRow label="Laporan Coach dari Member" count={openCoachReports} href="/admin/laporan-coach" />
-            <ActionRow
-              label="Pengajuan Hapus Akun"
-              count={deletionRequests.length}
-              href={deletionRequests[0] ? `/admin/users/${deletionRequests[0].id}` : "/admin/users"}
-            />
-            <ActionRow
-              label="Penarikan Menunggu"
-              count={pendingWithdrawals._count}
-              href="/admin/withdrawals"
-              detail={formatRupiah(pendingWithdrawals._sum.amount ?? 0)}
-            />
-            <ActionRow
-              label="Penarikan Lewat 7 Hari Kerja"
-              count={overdueWithdrawals}
-              href="/admin/withdrawals"
-              detail="Janji transfer di perjanjian coach & MOU kolam"
-            />
-            <ActionRow label="Sertifikat Coach Menunggu" count={pendingCerts} href="/admin/users" />
-            <ActionRow label="Usulan Keterampilan Milestone" count={pendingMilestoneProposals} href="/admin/milestone" />
-            <ActionRow label="Coach/Pemilik Kolam Baru Menunggu Persetujuan" count={pendingAccounts} href="/admin/users" />
-            <ActionRow label="Kolam Belum Disetujui" count={pools.length - activePools.length} href="/admin/kolam" />
-            <ActionRow label="Sesi Lewat Belum Ditandai Hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach baru masuk setelah ditandai Hadir" />
-          </div>
+        {/* Di HP paling atas (tugas admin lebih dulu dari ringkasan angka); hanya
+            baris yang ada isinya yang tampil, supaya yang perlu dikerjakan langsung terlihat. */}
+        <BentoCard title="Perlu Kamu Cek" className="max-md:order-first md:col-span-2 md:row-span-2">
+          {(() => {
+            const rows = [
+              { label: "Pesan Perlu Dibalas", count: waitingChats, href: "/admin/pesan" },
+              { label: "Laporan Coach dari Member", count: openCoachReports, href: "/admin/laporan-coach" },
+              { label: "Pengajuan Hapus Akun", count: deletionRequests.length, href: deletionRequests[0] ? `/admin/users/${deletionRequests[0].id}` : "/admin/users" },
+              { label: "Penarikan Menunggu", count: pendingWithdrawals._count, href: "/admin/withdrawals", detail: formatRupiah(pendingWithdrawals._sum.amount ?? 0) },
+              { label: "Penarikan Lewat 7 Hari Kerja", count: overdueWithdrawals, href: "/admin/withdrawals", detail: "Janji transfer di perjanjian coach & MOU kolam" },
+              { label: "Sertifikat Coach Menunggu", count: pendingCerts, href: "/admin/users" },
+              { label: "Usulan Keterampilan Milestone", count: pendingMilestoneProposals, href: "/admin/milestone" },
+              { label: "Coach/Pemilik Kolam Baru Menunggu Persetujuan", count: pendingAccounts, href: "/admin/users?tab=menunggu" },
+              { label: "Kolam Nonaktif", count: pools.length - activePools.length, href: "/admin/kolam" },
+              { label: "Sesi Lewat Belum Ditandai Hadir", count: unmarked, href: "/admin/booking-overview?periode=belum-ditandai", detail: "Saldo kolam & coach baru masuk setelah ditandai Hadir" },
+            ].filter((r) => r.count > 0);
+            return rows.length === 0 ? (
+              <p className="py-2 text-sm text-text-muted">Tidak ada yang perlu dicek sekarang.</p>
+            ) : (
+              <div className="flex flex-col">
+                {rows.map((r) => (
+                  <ActionRow key={r.label} label={r.label} count={r.count} href={r.href} detail={r.detail} />
+                ))}
+              </div>
+            );
+          })()}
         </BentoCard>
 
         <BentoCard title="Jadwal hari ini" href="/admin/booking-overview" className="md:col-span-2">

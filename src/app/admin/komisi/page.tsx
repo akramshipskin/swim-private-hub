@@ -120,6 +120,18 @@ export default async function KomisiPage() {
   const totalPlatform = sum(allParts, "platform");
   const totalTax = sum(allParts, "tax");
 
+  // Kolam tanpa sesi dan tanpa saldo cukup disebut satu baris (dulu tiap kolam
+  // tampil lengkap berisi Rp 0, membuat halaman panjang di HP). Yang paling
+  // ramai di atas.
+  const poolSessions = (id: string) => {
+    const e = byPool.get(id);
+    return e ? e.paket.sessions + e.legacy.sessions + e.noShow.sessions : 0;
+  };
+  const activePools = pools
+    .filter((p) => poolSessions(p.id) > 0 || p.walletBalance !== 0)
+    .sort((a, b) => poolSessions(b.id) - poolSessions(a.id));
+  const idlePools = pools.filter((p) => !activePools.includes(p));
+
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Bagi Hasil</h1>
@@ -192,7 +204,7 @@ export default async function KomisiPage() {
       </Card>
 
       <div className="mt-4 grid grid-cols-1 gap-4 min-[1800px]:grid-cols-2">
-        {pools.map((pool) => {
+        {activePools.map((pool) => {
           const e = byPool.get(pool.id) ?? emptyEntry();
           const parts = [
             { label: "Paket", p: e.paket },
@@ -314,6 +326,11 @@ export default async function KomisiPage() {
           );
         })}
       </div>
+      {idlePools.length > 0 && (
+        <p className="mt-4 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text-muted">
+          Belum ada sesi dan saldo Rp 0: {idlePools.map((p) => p.name).join(", ")}.
+        </p>
+      )}
     </main>
   );
 }

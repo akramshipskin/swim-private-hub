@@ -5,6 +5,7 @@ import { assignPackageToMember } from "./actions";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import MemberPicker from "./member-picker";
 
 type Member = { id: string; name: string; email: string | null; phone: string | null };
 type Dependent = { id: string; name: string; memberId: string; isSelf: boolean };
@@ -35,21 +36,7 @@ export default function AssignPackageForm({
     <Card className="mb-8">
       <CardBody>
         <form action={formAction} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-          <Field label="Member">
-            <Select
-              name="memberId"
-              required
-              className="w-full sm:w-52"
-              value={memberId}
-              onChange={(e) => setMemberId(e.target.value)}
-            >
-              {members.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name} ({m.email ?? m.phone ?? "-"})
-                </option>
-              ))}
-            </Select>
-          </Field>
+          <MemberPicker members={members} value={memberId} onChange={setMemberId} />
           <Field label="Peserta">
             {childrenOfMember.length === 0 ? (
               <p className="text-xs text-danger-text">

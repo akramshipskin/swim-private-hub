@@ -24,18 +24,18 @@ export default async function AdminGantiCoachPage() {
   await requireRole("ADMIN");
   await releaseStalePayments();
   await expireStaleCoachChanges();
-  const requests = await prisma.coachChangeRequest.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 60,
-    include: {
-      member: { select: { name: true } },
-      fromCoach: { select: { name: true } },
-      toCoach: { select: { name: true, coachProfile: { select: { pricePack4: true, pricePack8: true } } } },
-      package: { include: { pool: { select: { name: true } }, dependent: { select: { name: true } } } },
-    },
-  });
-  const open = requests.filter((r) => r.status === "PENDING");
-  const rest = requests.filter((r) => r.status !== "PENDING");
+  const include = {
+    member: { select: { name: true } },
+    fromCoach: { select: { name: true } },
+    toCoach: { select: { name: true, coachProfile: { select: { pricePack4: true, pricePack8: true } } } },
+    package: { include: { pool: { select: { name: true } }, dependent: { select: { name: true } } } },
+  } as const;
+  // Yang menunggu keputusan SELALU tampil semua (dulu ikut batas 60 terbaru,
+  // pengajuan lama yang belum diputuskan bisa hilang dari layar); riwayat 60 terbaru.
+  const [open, rest] = await Promise.all([
+    prisma.coachChangeRequest.findMany({ where: { status: "PENDING" }, orderBy: { createdAt: "asc" }, include }),
+    prisma.coachChangeRequest.findMany({ where: { status: { not: "PENDING" } }, orderBy: { createdAt: "desc" }, take: 60, include }),
+  ]);
 
   // Perkiraan selisih untuk pengajuan yang belum diputuskan (dihitung ulang saat disetujui).
   const previews = new Map<string, { sessions: number; amount: number } | null>();

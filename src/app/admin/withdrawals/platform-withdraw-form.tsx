@@ -15,7 +15,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
   return (
     <form key={keep.key} onSubmit={keep.onSubmit} className="flex flex-col gap-3">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Field label={`Cairkan pendapatan (maks. ${formatRupiah(Math.max(0, revenue))})`}>
+        <Field label={`Tarik Pendapatan (maks. ${formatRupiah(Math.max(0, revenue))})`}>
           <PriceInput name="revenueAmount" defaultValue={Math.max(0, revenue)} required />
         </Field>
         <Field label="Nomor Referensi / Bukti Transfer">
@@ -27,7 +27,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
       </div>
       <label className="flex items-center gap-2 text-sm text-text max-lg:min-h-[44px]">
         <input type="checkbox" name="includeTax" className="h-4 w-4 rounded border-border text-brand-700 focus:ring-brand-500" />
-        Cairkan juga saldo PPN untuk disetor ke negara ({formatRupiah(Math.max(0, tax))})
+        Tarik juga saldo PPN untuk disetor ke negara ({formatRupiah(Math.max(0, tax))})
       </label>
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" loading={pending}>Catat Penarikan</Button>

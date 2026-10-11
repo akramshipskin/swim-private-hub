@@ -57,13 +57,12 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
           {/* Desktop: tabel -- Nama & Email digabung 1 kolom (email di
               bawah nama) biar kolom gak sesek, kolom sisanya dapet napas
               lebih (padding naik dikit). */}
-          <Card className="hidden lg:block">
+          <Card className="hidden xl:block">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-text-subtle">
                     <th className="px-5 py-3.5 font-medium">Nama</th>
-                    <th className="px-5 py-3.5 font-medium">Nomor HP</th>
                     <th className="w-56 px-5 py-3.5 font-medium">Paket</th>
                     <th className="px-5 py-3.5 font-medium">Status</th>
                     <th className="px-5 py-3.5"></th>
@@ -77,8 +76,8 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                           {u.name}
                         </Link>
                         {u.email && <p className="text-xs text-text-subtle">{u.email}</p>}
+                        <p className="text-xs text-text-subtle">{u.phone ?? "Nomor HP belum diisi"}</p>
                       </td>
-                      <td className="px-5 py-4 text-text-muted">{u.phone ?? "-"}</td>
                       <td className="w-56 px-5 py-4 text-xs text-text-muted">
                         <PesertaList items={u.peserta} />
                       </td>
@@ -87,16 +86,9 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                           {u.isActive ? "Aktif" : "Nonaktif"}
                         </Badge>
                       </td>
-                      <td className="px-5 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            href={`/admin/users/${u.id}`}
-                            className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-text hover:bg-surface-muted max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
-                          >
-                            Info detail
-                          </Link>
-                          <UserActions user={u} />
-                        </div>
+                      {/* Satu baris (dulu bertumpuk 3 baris); detail lewat nama member. */}
+                      <td className="px-5 py-4 text-right whitespace-nowrap [&>div]:flex-nowrap">
+                        <UserActions user={u} />
                       </td>
                     </tr>
                   ))}
@@ -107,7 +99,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
 
           {/* Mobile: card compact biasa -- semua info langsung keliatan,
               gak perlu di-tap buat expand. */}
-          <ul className="flex flex-col gap-1.5 lg:hidden">
+          <ul className="flex flex-col gap-1.5 xl:hidden">
             {shown.map((u) => (
               <Card key={u.id}>
                 <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">

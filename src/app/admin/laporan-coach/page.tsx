@@ -16,9 +16,11 @@ function dateTime(d: Date) {
 // daftar hitam (Perjanjian Coach pasal 6). Lampiran dibuka lewat tautan sementara.
 export default async function AdminLaporanCoachPage() {
   await requireRole("ADMIN");
+  // Semua laporan terbuka selalu tampil (terbuka diurutkan dulu) + 100 yang sudah selesai.
+  const openCount = await prisma.coachReport.count({ where: { status: "OPEN" } });
   const reports = await prisma.coachReport.findMany({
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-    take: 100,
+    take: openCount + 100,
     include: {
       reporter: { select: { name: true, phone: true } },
       coach: { select: { id: true, name: true } },

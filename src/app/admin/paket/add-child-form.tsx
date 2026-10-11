@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { addChildForMember } from "./actions";
 import { Field, Input, Select } from "@/components/ui/input";
+import MemberPicker from "./member-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { useKeepFormOnError } from "@/hooks/use-keep-form-on-error";
@@ -18,15 +19,7 @@ export default function AddChildForm({ members }: { members: Member[] }) {
     <Card className="mb-8">
       <CardBody>
         <form key={keep.key} onSubmit={keep.onSubmit} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-          <Field label="Member (Orang Tua)">
-            <Select name="memberId" required className="w-full sm:w-56">
-              {members.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name} ({m.email ?? m.phone ?? "-"})
-                </option>
-              ))}
-            </Select>
-          </Field>
+          <MemberPicker members={members} label="Member (Orang Tua)" />
           <Field label="Untuk Siapa">
             <Select
               name="type"

@@ -5,7 +5,8 @@ import BookingOverviewBoard from "./booking-overview-board";
 
 export const metadata = { title: "Jadwal Booking | Swim Private Hub" };
 
-export default async function AdminBookingOverviewPage() {
+export default async function AdminBookingOverviewPage({ searchParams }: { searchParams: Promise<{ periode?: string }> }) {
+  const { periode } = await searchParams;
   await requireRole("ADMIN");
 
   // Root di Availability (bukan Booking) biar slot yang UDAH dibuka coach
@@ -42,7 +43,7 @@ export default async function AdminBookingOverviewPage() {
 
   return (
     <main className="w-full px-4 py-6 sm:py-8">
-      <BookingOverviewBoard availabilities={availabilities} coaches={allCoaches} />
+      <BookingOverviewBoard availabilities={availabilities} coaches={allCoaches} initialPeriod={periode === "belum-ditandai" ? "unmarked" : "upcoming"} />
     </main>
   );
 }

@@ -70,10 +70,90 @@ export default async function AdminWithdrawalsPage({
         dibayar. Pengajuan yang ditolak otomatis mengembalikan saldo.
       </p>
 
-      <Card className="mt-4">
-        <CardBody className="flex flex-col gap-4">
+
+      <h2 className="mt-8 text-lg font-semibold text-text">Penarikan kolam &amp; coach</h2>
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {(["waiting", "paid", "failed"] as const).map((k) => {
+          const rows = total(STATUS_FILTERS[k].statuses);
+          return (
+            <Link key={k} href={link({ status: k })}>
+              <Card className={status === k ? "ring-2 ring-brand-500" : "hover:bg-surface-muted"}>
+                <CardBody className="py-3">
+                  <p className="text-sm text-text-muted">{STATUS_FILTERS[k].label}</p>
+                  <p className="text-xl font-bold text-text">{formatRupiah(rows.reduce((n, r) => n + (r._sum.amount ?? 0), 0))}</p>
+                  <p className="text-xs text-text-subtle">{rows.reduce((n, r) => n + r._count, 0)} pengajuan</p>
+                </CardBody>
+              </Card>
+            </Link>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <span className="text-sm text-text-muted">Pemilik saldo:</span>
+        <Link href={link({ who: "all" })} className={chip(who === "all")}>Semua</Link>
+        <Link href={link({ who: "pool" })} className={chip(who === "pool")}>Kolam</Link>
+        <Link href={link({ who: "coach" })} className={chip(who === "coach")}>Coach</Link>
+      </div>
+      <form action="/admin/withdrawals" className="mt-2 flex flex-wrap items-center gap-2">
+        {status && <input type="hidden" name="status" value={status} />}
+        <input type="hidden" name="who" value="pool" />
+        <label htmlFor="saring-kolam" className="text-sm text-text-muted">Kolam:</label>
+        <select id="saring-kolam" name="pool" defaultValue={params.pool ?? ""} className="min-h-[44px] rounded-xl border border-border bg-surface px-3 text-sm text-text">
+          <option value="">Semua kolam</option>
+          {pools.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
+        <button type="submit" className="min-h-[44px] rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text hover:bg-surface-muted">
+          Saring
+        </button>
+      </form>
+
+      {requests.length === 0 ? (
+        <Card className="mt-6">
+          <CardBody className="py-10 text-center text-sm text-text-muted">Tidak ada pengajuan untuk filter ini.</CardBody>
+        </Card>
+      ) : (
+        <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
+          {requests.map((w) => (
+            <WithdrawalRow
+              irisEnabled={isIrisConfigured()}
+              key={w.id}
+              w={{
+                id: w.id,
+                amount: w.amount,
+                status: w.status,
+                requestedAt: w.requestedAt.toISOString(),
+                overdue: isWithdrawalOverdue(w),
+                processedAt: w.processedAt?.toISOString() ?? null,
+                failureReason: w.failureReason,
+                referenceId: w.midtransReferenceId ?? w.transferReference,
+                bankName: w.bankName,
+                bankAccountNumber: openSecret(w.bankAccountNumber),
+                bankAccountName: w.bankAccountName,
+                holderType: w.pool ? "Kolam" : "Coach",
+                holderName: w.pool?.name ?? w.coachProfile?.user.name ?? "-",
+                holderContact: w.coachProfile?.user.phone ?? null,
+                currentBalance: w.pool?.walletBalance ?? w.coachProfile?.walletBalance ?? 0,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Penarikan pendapatan SPH jarang dilakukan: dilipat di bawah supaya antrean
+          penarikan kolam & coach (tugas harian) ada di atas. */}
+      <details className="group mt-8 rounded-2xl border border-border bg-surface">
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-4">
+          <span>
+            <span className="block text-lg font-semibold text-text">Saldo Platform (SPH)</span>
+            <span className="block text-sm text-text-muted">Bisa ditarik {formatRupiah(Math.max(0, platform.availableRevenue))} · PPN {formatRupiah(Math.max(0, platform.availableTax))}</span>
+          </span>
+          <span aria-hidden className="text-text-subtle transition-transform group-open:rotate-180">⌄</span>
+        </summary>
+        <div className="flex flex-col gap-4 border-t border-border p-4">
           <div>
-            <h2 className="text-lg font-semibold text-text">Saldo Platform</h2>
             <p className="text-sm text-text-muted">
               Komisi platform dari setiap sesi, sudah dipisah dari PPN (11% sejak 30 Sep 2026, sebelumnya 12%). Dana sesi baru bisa ditarik setelah ditahan{" "}
               {PLATFORM_HOLD_DAYS} hari (masa member melapor). Catat di sini setiap kali saldo ditarik dari akun Midtrans, lengkap
@@ -117,70 +197,8 @@ export default async function AdminWithdrawalsPage({
               </ul>
             </div>
           )}
-        </CardBody>
-      </Card>
-
-      <h2 className="mt-8 text-lg font-semibold text-text">Penarikan kolam &amp; coach</h2>
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {(["waiting", "paid", "failed"] as const).map((k) => {
-          const rows = total(STATUS_FILTERS[k].statuses);
-          return (
-            <Link key={k} href={link({ status: k })}>
-              <Card className={status === k ? "ring-2 ring-brand-500" : "hover:bg-surface-muted"}>
-                <CardBody className="py-3">
-                  <p className="text-sm text-text-muted">{STATUS_FILTERS[k].label}</p>
-                  <p className="text-xl font-bold text-text">{formatRupiah(rows.reduce((n, r) => n + (r._sum.amount ?? 0), 0))}</p>
-                  <p className="text-xs text-text-subtle">{rows.reduce((n, r) => n + r._count, 0)} pengajuan</p>
-                </CardBody>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-sm text-text-muted">Pemilik saldo:</span>
-        <Link href={link({ who: "all" })} className={chip(who === "all")}>Semua</Link>
-        <Link href={link({ who: "pool" })} className={chip(who === "pool")}>Kolam</Link>
-        <Link href={link({ who: "coach" })} className={chip(who === "coach")}>Coach</Link>
-        <span className="ml-2 text-sm text-text-muted">Kolam:</span>
-        <Link href={link({ pool: undefined })} className={chip(!params.pool)}>Semua</Link>
-        {pools.map((p) => (
-          <Link key={p.id} href={link({ pool: p.id, who: "pool" })} className={chip(params.pool === p.id)}>{p.name}</Link>
-        ))}
-      </div>
-
-      {requests.length === 0 ? (
-        <Card className="mt-6">
-          <CardBody className="py-10 text-center text-sm text-text-muted">Tidak ada pengajuan untuk filter ini.</CardBody>
-        </Card>
-      ) : (
-        <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
-          {requests.map((w) => (
-            <WithdrawalRow
-              irisEnabled={isIrisConfigured()}
-              key={w.id}
-              w={{
-                id: w.id,
-                amount: w.amount,
-                status: w.status,
-                requestedAt: w.requestedAt.toISOString(),
-                overdue: isWithdrawalOverdue(w),
-                processedAt: w.processedAt?.toISOString() ?? null,
-                failureReason: w.failureReason,
-                referenceId: w.midtransReferenceId ?? w.transferReference,
-                bankName: w.bankName,
-                bankAccountNumber: openSecret(w.bankAccountNumber),
-                bankAccountName: w.bankAccountName,
-                holderType: w.pool ? "Kolam" : "Coach",
-                holderName: w.pool?.name ?? w.coachProfile?.user.name ?? "-",
-                holderContact: w.coachProfile?.user.phone ?? null,
-                currentBalance: w.pool?.walletBalance ?? w.coachProfile?.walletBalance ?? 0,
-              }}
-            />
-          ))}
         </div>
-      )}
+      </details>
     </main>
   );
 }

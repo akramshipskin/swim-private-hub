@@ -22,20 +22,31 @@ export default async function AdminTestimonialsPage() {
         {shown === 0 ? "Sekarang: tersembunyi." : `Sekarang: ${shown} testimoni tampil.`}
       </p>
 
-      <Card className="mt-6">
-        <CardBody>
-          <h2 className="mb-3 text-lg font-semibold text-text">Tambah testimoni</h2>
+      <details className="group mt-6 rounded-2xl border border-border bg-surface">
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-semibold text-text">
+          Tambah Testimoni
+          <span aria-hidden className="text-text-subtle transition-transform group-open:rotate-180">⌄</span>
+        </summary>
+        <div className="border-t border-border p-4">
           <AddTestimonialForm />
-        </CardBody>
-      </Card>
+        </div>
+      </details>
 
       {items.map((t) => (
-        <Card key={t.id} className={`mt-4 ${t.isPublished ? "" : "opacity-70"}`}>
-          <CardBody>
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-semibold text-text">{t.name}</h2>
-              <Badge tone={t.isPublished ? "success" : "neutral"}>{t.isPublished ? "Tampil" : "Disembunyikan"}</Badge>
-            </div>
+        // Tiap testimoni dilipat: ringkasan nama, status, dan awal kutipan; formulir
+        // ubah baru tampil saat dibuka (dulu semua formulir terbuka sekaligus).
+        <details key={t.id} className={`group mt-4 rounded-2xl border border-border bg-surface ${t.isPublished ? "" : "opacity-80"}`}>
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-start justify-between gap-3 px-4 py-4">
+            <span className="min-w-0">
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="text-lg font-semibold text-text">{t.name}</span>
+                <Badge tone={t.isPublished ? "success" : "neutral"}>{t.isPublished ? "Tampil" : "Disembunyikan"}</Badge>
+              </span>
+              <span className="mt-0.5 line-clamp-1 block text-sm text-text-muted">&ldquo;{t.quote}&rdquo;</span>
+            </span>
+            <span aria-hidden className="mt-1 text-text-subtle transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="border-t border-border p-4">
             <EditTestimonialForm
               id={t.id}
               values={{ name: t.name, role: t.role, quote: t.quote, consentNote: t.consentNote, sortOrder: t.sortOrder }}
@@ -57,8 +68,8 @@ export default async function AdminTestimonialsPage() {
                 confirmLabel="Ya, Hapus"
               />
             </div>
-          </CardBody>
-        </Card>
+          </div>
+        </details>
       ))}
     </main>
   );

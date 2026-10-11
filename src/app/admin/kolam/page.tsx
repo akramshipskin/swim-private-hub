@@ -131,14 +131,26 @@ export default async function AdminKolamPage() {
       ) : (
         <div className="mt-6 flex flex-col gap-3">
           {pools.map((p) => (
-            <Card key={p.id}>
-              <CardBody className="flex flex-col gap-4 py-5">
+            // Tiap kolam dilipat (ringkasan: nama, status, saldo, jumlah coach) supaya
+            // daftar banyak kolam tidak jadi belasan layar di HP; dibuka bila
+            // hanya ada satu kolam atau ada hal yang perlu ditangani.
+            <details key={p.id} open={pools.length === 1 || (stuckByPool.get(p.id) ?? 0) > 0} className="group rounded-2xl border border-border bg-surface">
+              <summary className="flex min-h-[44px] cursor-pointer list-none items-start justify-between gap-3 px-4 py-4">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold text-text">{p.name}</h2>
+                    <Badge tone={p.isActive ? "success" : "warning"}>{p.isActive ? "Aktif" : "Nonaktif"}</Badge>
+                    {(stuckByPool.get(p.id) ?? 0) > 0 && <Badge tone="warning">Perlu dicek</Badge>}
+                  </div>
+                  <p className="mt-0.5 text-sm text-text-muted">
+                    Saldo {formatRupiah(p.walletBalance)} · {p.affiliations.length} coach
+                  </p>
+                </div>
+                <span aria-hidden className="mt-1 text-text-subtle transition-transform group-open:rotate-180">⌄</span>
+              </summary>
+              <div className="flex flex-col gap-4 border-t border-border px-4 py-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-lg font-semibold text-text">{p.name}</h2>
-                      <Badge tone={p.isActive ? "success" : "warning"}>{p.isActive ? "Aktif" : "Nonaktif"}</Badge>
-                    </div>
                     <p className="text-sm text-text-muted">{p.address ?? "Alamat belum diisi"}</p>
                     <p className="text-sm text-text-muted">
                       Pemilik: {p.ownerships.length === 0 ? "belum ada" : p.ownerships.map((o) => `${o.owner.name}${o.owner.phone ? ` (${o.owner.phone})` : ""}`).join(", ")}
@@ -217,8 +229,8 @@ export default async function AdminKolamPage() {
                     activePackages: activeByPair.get(`${p.id}:${a.coachId}`) ?? 0,
                   }))}
                 />
-              </CardBody>
-            </Card>
+              </div>
+            </details>
           ))}
         </div>
       )}

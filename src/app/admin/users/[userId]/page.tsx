@@ -126,7 +126,8 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Di HP lencana status di barisnya sendiri, tombol aksi di bawahnya. */}
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
           {user.anonymizedAt ? (
             <Badge tone="neutral">Akun dihapus</Badge>
           ) : user.rejectedAt ? (
