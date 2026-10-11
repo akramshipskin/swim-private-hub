@@ -18,6 +18,8 @@ type Row = {
 
 export default function UsersMemberSection({ rows }: { rows: Row[] }) {
   const [search, setSearch] = useState("");
+  // Ratusan member: tampil 30 dulu, tombol menambah 30 (pencarian tetap ke semua member).
+  const [limit, setLimit] = useState(30);
 
   const filtered = search.trim()
     ? rows.filter((u) => {
@@ -30,6 +32,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
         );
       })
     : rows;
+  const shown = filtered.slice(0, limit);
 
   return (
     <div className="mb-6">
@@ -41,7 +44,10 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
         placeholder="Cari nama, email, Nomor HP, atau nama peserta..."
         aria-label="Cari member"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setLimit(30);
+        }}
         className="mb-3 max-w-sm"
       />
       {filtered.length === 0 ? (
@@ -64,7 +70,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((u) => (
+                  {shown.map((u) => (
                     <tr key={u.id} className="border-b border-border last:border-0">
                       <td className="px-5 py-4">
                         <Link href={`/admin/users/${u.id}`} className="font-medium text-text hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
@@ -102,7 +108,7 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
           {/* Mobile: card compact biasa -- semua info langsung keliatan,
               gak perlu di-tap buat expand. */}
           <ul className="flex flex-col gap-1.5 lg:hidden">
-            {filtered.map((u) => (
+            {shown.map((u) => (
               <Card key={u.id}>
                 <CardBody className="flex flex-col gap-1.5 px-3 py-2.5">
                   <div className="flex items-center justify-between gap-2">
@@ -123,6 +129,18 @@ export default function UsersMemberSection({ rows }: { rows: Row[] }) {
               </Card>
             ))}
           </ul>
+          <p className="mt-3 text-center text-xs text-text-subtle">
+            {shown.length} dari {filtered.length} member{search.trim() ? " yang cocok" : ""}
+          </p>
+          {shown.length < filtered.length && (
+            <button
+              type="button"
+              onClick={() => setLimit((n) => n + 30)}
+              className="mt-2 flex min-h-[44px] w-full items-center justify-center rounded-xl border border-border bg-surface text-sm font-medium text-text hover:bg-surface-muted"
+            >
+              Tampilkan Lebih Banyak
+            </button>
+          )}
         </>
       )}
     </div>

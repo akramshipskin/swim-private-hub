@@ -17,16 +17,14 @@ import { coachBioLine } from "@/lib/coach-bio";
 import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-certificates";
 import { formatRupiah } from "@/lib/format";
 
-const roleSections: { role: "ADMIN" | "COACH" | "POOL_OWNER"; label: string }[] = [
-  { role: "ADMIN", label: "Admin" },
-  { role: "COACH", label: "Coach" },
-  { role: "POOL_OWNER", label: "Pemilik Kolam" },
-];
-
 export const metadata = { title: "Akun | Swim Private Hub" };
 
-export default async function AdminUsersPage() {
+type Tab = "menunggu" | "member" | "coach" | "kolam" | "admin";
+
+export default async function AdminUsersPage({ searchParams }: { searchParams: Promise<{ tab?: string; q?: string }> }) {
   const session = await requireRole("ADMIN");
+  const { tab: rawTab, q: rawQ } = await searchParams;
+  const q = (rawQ ?? "").trim().toLowerCase().slice(0, 100);
 
   const [users, dependents, pools] = await Promise.all([
     prisma.user.findMany({
@@ -67,13 +65,43 @@ export default async function AdminUsersPage() {
     .map((u) => ({ id: u.id, name: u.name, poolIds: u.poolAffiliations.map((a) => a.pool.id) }));
   const memberOptions = members.filter((u) => !u.anonymizedAt).map((u) => ({ id: u.id, name: u.name, email: u.email, phone: u.phone }));
 
+  // Satu kelompok akun per tampilan (tab) + pencarian, supaya admin tidak perlu
+  // menggulir puluhan layar di HP untuk menemukan satu akun.
+  const pending = users.filter((u) => (u.role === "COACH" || u.role === "POOL_OWNER") && isPendingApproval(u));
+  const byRole = (role: string) => users.filter((u) => u.role === role);
+  const tabs: { key: Tab; label: string; count: number }[] = [
+    { key: "menunggu", label: "Menunggu Persetujuan", count: pending.length },
+    { key: "member", label: "Member", count: members.length },
+    { key: "coach", label: "Coach", count: byRole("COACH").length },
+    { key: "kolam", label: "Pemilik Kolam", count: byRole("POOL_OWNER").length },
+    { key: "admin", label: "Admin", count: byRole("ADMIN").length },
+  ];
+  const tab: Tab = tabs.some((t) => t.key === rawTab) ? (rawTab as Tab) : pending.length > 0 ? "menunggu" : "member";
+  const matches = (u: (typeof users)[number]) =>
+    !q || u.name.toLowerCase().includes(q) || (u.email ?? "").toLowerCase().includes(q) || (u.phone ?? "").includes(q);
+  const cardRows =
+    tab === "menunggu"
+      ? pending.filter(matches)
+      : tab === "member"
+        ? []
+        : byRole(tab === "coach" ? "COACH" : tab === "kolam" ? "POOL_OWNER" : "ADMIN")
+            .filter(matches)
+            .sort((a, b) => Number(isPendingApproval(b)) - Number(isPendingApproval(a)));
+
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-text">Akun</h1>
 
       <PendingCertificates />
 
-      {/* Kolom kanan diisi Tambah Peserta di sebelah form Tambah User Baru (Hadi 18 Sep). */}
+      {/* Formulir jarang dipakai dibanding mencari akun: dilipat supaya daftar akun
+          langsung terlihat (dulu 3 formulir panjang ada di atas daftar). */}
+      <details className="group mb-6 rounded-2xl border border-border bg-surface">
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-semibold text-text">
+          Tambah Akun, Peserta, atau Berikan Paket
+          <span aria-hidden className="text-text-subtle transition-transform group-open:rotate-180">⌄</span>
+        </summary>
+        <div className="border-t border-border p-4">
       <div className="mb-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
         <CreateUserForm pools={pools.map(({ id, name }) => ({ id, name }))} />
         <div className="flex flex-col gap-4">
@@ -103,24 +131,52 @@ export default async function AdminUsersPage() {
         coaches={coachOptions}
       />
 
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-text">Semua Akun</h2>
+        </div>
+      </details>
 
-      {roleSections.map(({ role, label }) => {
-        // Pendaftar baru yang menunggu persetujuan tampil paling atas.
-        const rows = users
-          .filter((u) => u.role === role)
-          .sort((a, b) => Number(isPendingApproval(b)) - Number(isPendingApproval(a)));
-        if (rows.length === 0) return null;
+      <nav aria-label="Kelompok akun" className="mb-3 flex gap-2 overflow-x-auto pb-1">
+        {tabs.map((t) => (
+          <Link
+            key={t.key}
+            href={`/admin/users?tab=${t.key}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
+            className={`inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm font-medium ${
+              tab === t.key ? "border-brand-500 bg-brand-50 text-brand-700" : "border-border bg-surface text-text-muted hover:bg-surface-muted"
+            }`}
+          >
+            {t.label}
+            <span className={t.key === "menunggu" && t.count > 0 ? "rounded-full bg-warning-bg px-1.5 text-xs text-warning-text" : "text-xs text-text-subtle"}>{t.count}</span>
+          </Link>
+        ))}
+      </nav>
+      {tab !== "member" && (
+        <form action="/admin/users" className="mb-4 flex gap-2">
+          <input type="hidden" name="tab" value={tab} />
+          <input
+            name="q"
+            type="search"
+            defaultValue={q}
+            placeholder="Cari nama, email, atau Nomor HP"
+            aria-label="Cari akun"
+            className="min-h-[44px] w-full max-w-sm rounded-xl border border-border bg-surface px-3 text-sm text-text placeholder:text-text-subtle"
+          />
+          <button type="submit" className="min-h-[44px] shrink-0 rounded-xl bg-brand-600 px-4 text-sm font-medium text-white">
+            Cari
+          </button>
+        </form>
+      )}
 
+      {tab !== "member" && cardRows.length === 0 && (
+        <p className="rounded-2xl border border-border bg-surface px-4 py-8 text-center text-sm text-text-muted">
+          {q ? `Tidak ada akun yang cocok dengan "${q}".` : tab === "menunggu" ? "Tidak ada pendaftar yang menunggu persetujuan." : "Belum ada akun."}
+        </p>
+      )}
+      {tab !== "member" && cardRows.length > 0 && (() => {
+        const rows = cardRows;
         return (
-          <div key={role} className="mb-6">
-            <h2 className="mb-2 text-sm font-semibold text-text-muted">
-              {label} <span className="text-text-subtle">({rows.length})</span>
-            </h2>
-            {/* Kartu 2 kolom (Hadi 18 Sep): muat foto, kontak, ringkasan, dan
-                tombol ke halaman detail -- tabel lama terlalu sempit untuk itu. */}
             <ul className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
-              {rows.map((u) => (
+              {rows.map((u) => {
+                const role = u.role;
+                return (
                 <li key={u.id}>
                   <Card>
                     <CardBody className="flex flex-col gap-3">
@@ -187,12 +243,13 @@ export default async function AdminUsersPage() {
                     </CardBody>
                   </Card>
                 </li>
-              ))}
+                );
+              })}
             </ul>
-          </div>
         );
-      })}
+      })()}
 
+      {tab === "member" && (
       <UsersMemberSection
         rows={members.map((u) => ({
           id: u.id,
@@ -207,6 +264,7 @@ export default async function AdminUsersPage() {
           })),
         }))}
       />
+      )}
     </main>
   );
 }
