@@ -15,12 +15,15 @@ export const metadata: Metadata = {
 // 2 Okt. Rev.3 (3 Okt: coach memilih kolam sendiri, kewajiban menyediakan jadwal,
 // tanpa 5% & pasal peralihan) = docs/legal/draft-rev3-kota-coach-kolam.md, disetujui orang hukum 3 Okt. Mengubah isi halaman ini = ganti PARTNER_AGREEMENTS.COACH.version
 // (src/lib/partner-agreement.ts) supaya semua coach diminta setuju ulang.
+// Rev.4 (11 Okt: pasal 6 butir 2 diperluas, butir 4 pemberitahuan ke mitra) =
+// docs/legal/usulan-revisi-pasal-6-larangan-coach.md, disetujui orang hukum;
+// dipasang TANPA setuju ulang (Hadi 11 Okt, B): rev.3 ada di stillValid.
 const doc = PARTNER_AGREEMENTS.COACH;
 const link = "-my-3 inline-block py-3 text-brand-700 hover:underline";
 
 export default function PerjanjianCoachPage() {
   return (
-    <LegalPageLayout title={doc.title} updatedAt="3 Oktober 2026">
+    <LegalPageLayout title={doc.title} updatedAt="11 Oktober 2026">
       {doc.version && <p className="text-xs text-text-subtle">Versi: {doc.version}</p>}
       <p>Perjanjian Kemitraan Coach ini (&ldquo;Perjanjian&rdquo;) berlaku antara:</p>
       <ol>
@@ -228,7 +231,11 @@ export default function PerjanjianCoachPage() {
           Selama Perjanjian berlaku dan 12 (dua belas) bulan setelah berakhir, Coach tidak menawarkan atau menerima
           pembayaran les secara langsung dari Member yang dikenalnya melalui Aplikasi.
         </li>
-        <li>Coach tidak membagikan nomor kontak pribadinya kepada Member melalui Aplikasi untuk tujuan tersebut.</li>
+        <li>
+          Coach tidak membagikan, menulis, atau menyampaikan kontak pribadi (nomor telepon, WhatsApp, email, akun
+          media sosial, tautan chat) kepada Member dalam bentuk apa pun, termasuk di profil, catatan perkembangan, dan
+          saat Sesi, untuk menawarkan atau menerima layanan di luar Aplikasi.
+        </li>
         <li>
           Murid yang sudah menjadi murid Coach sebelum Coach bergabung dengan SPH boleh didaftarkan ke Aplikasi
           menggunakan kode afiliasi Coach, dengan komisi sesuai Pasal 10. Murid tersebut juga boleh tetap dilayani
@@ -236,7 +243,9 @@ export default function PerjanjianCoachPage() {
         </li>
         <li>
           Akibat pelanggaran: akun Coach dinonaktifkan dan Coach dimasukkan ke daftar hitam SPH sehingga tidak dapat
-          bergabung kembali. Larangan ini hanya mengikat Coach dan Kolam Mitra, tidak dibebankan kepada Member.
+          bergabung kembali. SPH berhak memberitahukan pelanggaran dan pencantuman daftar hitam kepada Kolam Mitra
+          dan mitra SPH di kota mana pun, dan menolak pendaftaran Coach tersebut kembali sebagai coach di kota mana
+          pun. Larangan ini hanya mengikat Coach dan Kolam Mitra, tidak dibebankan kepada Member.
         </li>
       </ol>
 

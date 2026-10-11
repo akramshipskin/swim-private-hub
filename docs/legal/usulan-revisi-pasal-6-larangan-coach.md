@@ -1,6 +1,6 @@
 # Usulan revisi: larangan coach membawa member keluar SPH (Perjanjian Coach pasal 6)
 
-Ditulis Claude 9 Okt 2026 dari keputusan Hadi. **Bahan untuk orang hukum, BELUM dipasang di aplikasi.** Perjanjian Coach yang tayang tetap rev.3 (3 Okt 2026) sampai disetujui orang hukum dan Hadi; saat dipasang, semua coach diminta mencentang ulang.
+Ditulis Claude 9 Okt 2026 dari keputusan Hadi. **DIPASANG 11 Okt 2026 sebagai rev.4** (disetujui orang hukum), TANPA centang ulang (Hadi 11 Okt, B): coach yang sudah menyetujui rev.3 tidak diminta apa pun; pendaftar baru menyetujui rev.4. Catatan: pasal 11 Perjanjian menyebut versi baru berlaku setelah Coach menyetujuinya, jadi untuk coach lama rev.4 belum mengikat sampai mereka mencentang.
 
 ## Keputusan Hadi (9 Okt)
 - Larangan "dilarang keras": tujuannya coach benar-benar takut membawa member keluar SPH.

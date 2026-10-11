@@ -16,7 +16,11 @@ export const TERMS_REVISION = 1;
 // (PPh); disetujui orang hukum bersama draf harga-dari-coach v3. Lalu Meta
 // Pixel + Conversions API (Hadi 2 Okt, 5B: orang hukum setuju tanpa menunggu
 // persetujuan cookie).
-export const PRIVACY_UPDATED_AT = "2 Oktober 2026";
+// 11 Okt 2026: kota, daftar tunggu kota, catatan pelanggaran coach, riwayat
+// lonceng (docs/legal/draft-privasi-rev-kota-daftar-tunggu-lonceng.md,
+// disetujui orang hukum); dipasang TANPA setuju ulang (Hadi 11 Okt, B):
+// tidak ada yang memeriksa termsVersion, jadi akun lama tidak diminta apa pun.
+export const PRIVACY_UPDATED_AT = "11 Oktober 2026";
 
 export const LEGAL_CONSENT_VERSION = `S&K ${TERMS_UPDATED_AT} rev ${TERMS_REVISION}; Privasi ${PRIVACY_UPDATED_AT}`;
 

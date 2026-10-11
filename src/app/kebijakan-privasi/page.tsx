@@ -64,6 +64,24 @@ export default function KebijakanPrivasiPage() {
         <li>Waktu dan versi persetujuan atas Syarat &amp; Ketentuan serta Kebijakan Privasi saat mendaftar.</li>
         <li>Isi percakapan pada fitur chat bantuan (lihat bagian 5).</li>
         <li>Foto kolam yang diunggah pemilik kolam.</li>
+        <li>
+          Kota domisili yang dipilih Pengguna saat mendaftar atau saat diminta melengkapi, serta kota lokasi untuk
+          kolam. Kota dipilih dari daftar kota layanan yang tersedia di Aplikasi.
+        </li>
+        <li>
+          Daftar tunggu kota: bila member memilih kota yang belum memiliki pasangan kolam dan coach yang sesuai dan
+          menekan &ldquo;Kabari Saya&rdquo;, kami menyimpan kaitan antara akun member, kota tersebut, waktu
+          pendaftaran daftar tunggu, dan waktu member dikabari.
+        </li>
+        <li>
+          Untuk coach: catatan pelanggaran kewajiban membuka jadwal (tanggal kejadian dan paket terkait), yang dilihat
+          administrator untuk menilai kelanjutan kemitraan sesuai Perjanjian Coach.
+        </li>
+        <li>
+          Riwayat notifikasi dalam Aplikasi (lonceng): judul, isi, tautan, dan status sudah/belum dibaca dari
+          notifikasi terkait pemesanan, pembayaran, dan layanan. Isi notifikasi dapat memuat nama peserta, nama coach
+          atau kolam, jadwal sesi, dan nominal rupiah.
+        </li>
         <li>Sumber rujukan pendaftaran (misalnya tautan WhatsApp/Instagram) untuk kebutuhan internal, dan tidak dibagikan kepada pihak ketiga untuk tujuan komersial.</li>
       </ul>
 
@@ -88,6 +106,12 @@ export default function KebijakanPrivasiPage() {
         <li>Mengirimkan notifikasi terkait pemesanan (apabila fitur ini diaktifkan oleh Pengguna).</li>
         <li>Melakukan analisis penggunaan Aplikasi secara agregat untuk kepentingan pengembangan layanan.</li>
         <li>Mengukur dan menyempurnakan iklan Swim Private Hub di Facebook dan Instagram (lihat Meta pada bagian 4).</li>
+        <li>
+          Menampilkan coach dan kolam yang berada di kota Pengguna, memberi peringatan bila Pengguna memilih kolam di
+          luar kota domisilinya, dan mengabari member yang menunggu di daftar tunggu kota ketika layanan di kotanya
+          tersedia.
+        </li>
+        <li>Menyimpan dan menampilkan riwayat notifikasi dalam Aplikasi agar Pengguna dapat membacanya kembali.</li>
       </ul>
 
       <h2>4. Pembagian Data kepada Pihak Ketiga</h2>
@@ -151,6 +175,12 @@ export default function KebijakanPrivasiPage() {
         keperluan penanganan keluhan dan penyelesaian masalah, dan hanya dapat
         diakses administrator. Mohon tidak mengirim kata sandi, nomor kartu, atau
         data sensitif lain melalui chat.
+      </p>
+      <p>
+        Riwayat notifikasi dalam Aplikasi (lonceng) kami simpan paling lama 90 hari sejak notifikasi dibuat, kemudian
+        dihapus otomatis; riwayat ini juga dihapus saat akun dihapus. Saat akun member dihapus, kota domisili dan
+        catatan daftar tunggu kota tetap tersimpan tanpa nama, nomor telepon, maupun email, dan hanya dipakai untuk
+        menghitung minat layanan per kota.
       </p>
 
       <h2>6. Cookie dan Penyimpanan Lokal</h2>

@@ -33,9 +33,9 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 - 9 Okt: Backup DB gagal 7 DAN 8 Okt (gpg Broken pipe di uji baca; dump sendiri jalan). Perbaikan 86e7f46: dekripsi ke berkas dulu, baru daftar isi; dijalankan ulang 9 Okt = hijau (444K, 36 tabel, terunggah). Sebab dugaan: pipa menutup dini saat backup membesar (belum 100% terbukti kenapa baru gagal 7 Okt). Uji Pulih Backup: belum pernah ada jalannya.
 
 ## Tugas Claude berikutnya
-1. Pasang usulan pasal 6 (perjanjian coach) + Kebijakan Privasi baru ke situs TANPA persetujuan ulang (Hadi 11 Okt: B; orang hukum sudah OK). Opus. Draf: docs/legal/usulan-revisi-pasal-6-larangan-coach.md, docs/legal/draft-privasi-rev-kota-daftar-tunggu-lonceng.md.
+1. SELESAI 11 Okt malam: pasal 6 (Perjanjian Coach rev.4) + Kebijakan Privasi 11 Okt dipasang tanpa persetujuan ulang (rev.3 tetap sah lewat stillValid; pemeriksa Opus kedua: tidak ada cacat). Celah ke orang hukum: Laporkan Coach + pemberitahuan daftar hitam belum disebut di Privasi; pasal 11 = rev.4 baru mengikat coach lama setelah mencentang.
 2. Sweeping peran member, coach, pemilik kolam dengan cara yang sama seperti admin 11 Okt: data ramai (ratusan) + HP 375 + desktop, logika pemakaian nyata (jalan buntu, daftar terpotong, aksi jauh dari isi).
-3. Uji HP di Simulator iOS (Safari, pasang ke layar utama, izin + notifikasi) di versi lokal dengan akun dummy, setelah Hadi selesai unduh Xcode.
+3. Simulator iOS (iPhone 17, SPH sudah di layar utama) HANYA bila Hadi menyuruh: tes notifikasi / lihat UI HP. Sweeping pakai browser bawaan ukuran HP.
 4. Satu tes kadang gagal saat laptop sibuk (lokal) dan uji alur penuh GitHub sekali gagal di langkah daftar lalu lulus saat diulang: belum diketahui penyebabnya; selidiki bila muncul lagi.
 5. Menunggu pemicu: sapu member/coach/kolam di LIVE (Hadi login sendiri); Opsi C rombak alur (tunggu data pemakaian); pantau next-auth v5 stabil (dikunci 5.0.0-beta.32). Ditunda: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB lama.
 - Data uji lokal ditambah 11 Okt malam: 300 percakapan email "Uji Ratus", 200 member "Orang Tua Ramai" (120 dengan chat). Hanya database lokal.

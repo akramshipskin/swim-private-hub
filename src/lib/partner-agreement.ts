@@ -10,9 +10,19 @@
 // setuju ulang (Hadi 4A). Versi coach dan kolam wajib berbeda (awali dengan
 // nama dokumen): kolom versinya satu, jadi pemilik kolam yang dulunya coach
 // (atau sebaliknya) tidak dianggap sudah setuju.
+//
+// stillValid = versi lama yang TIDAK perlu disetujui ulang (Hadi 11 Okt, B:
+// rev.4 pasal 6 dipasang tanpa centang ulang). Pendaftar baru tetap mencatat
+// versi terbaru; akun yang sudah menyetujui versi di stillValid tidak diarahkan
+// ke /perjanjian.
 export const PARTNER_AGREEMENTS = {
-  COACH: { version: "Perjanjian Coach 3 Oktober 2026 rev.3" as string | null, title: "Perjanjian Kemitraan Coach", href: "/perjanjian-coach" },
-  POOL_OWNER: { version: "MOU Kolam 3 Oktober 2026 rev.3" as string | null, title: "MOU Kolam Mitra", href: "/mou-kolam" },
+  COACH: {
+    version: "Perjanjian Coach 11 Oktober 2026 rev.4" as string | null,
+    stillValid: ["Perjanjian Coach 3 Oktober 2026 rev.3"] as string[],
+    title: "Perjanjian Kemitraan Coach",
+    href: "/perjanjian-coach",
+  },
+  POOL_OWNER: { version: "MOU Kolam 3 Oktober 2026 rev.3" as string | null, stillValid: [] as string[], title: "MOU Kolam Mitra", href: "/mou-kolam" },
 };
 
 type PartnerRole = keyof typeof PARTNER_AGREEMENTS;
@@ -30,7 +40,7 @@ export function partnerAgreementFor(role: string) {
 // Akun coach/pemilik kolam yang belum menyetujui versi yang berlaku.
 export function needsPartnerAgreement(role: string, acceptedVersion: string | null | undefined): boolean {
   const doc = partnerAgreementFor(role);
-  return doc !== null && acceptedVersion !== doc.version;
+  return doc !== null && acceptedVersion !== doc.version && !(acceptedVersion && doc.stillValid.includes(acceptedVersion));
 }
 
 // Data yang disimpan saat menyetujui. {} bila perjanjian untuk peran ini

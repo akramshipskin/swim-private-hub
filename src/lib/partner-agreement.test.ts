@@ -23,6 +23,15 @@ describe("perjanjian kemitraan", () => {
     expect(needsPartnerAgreement("COACH", "Perjanjian Coach v1")).toBe(false);
   });
 
+  it("versi lama di stillValid tidak diminta setuju ulang; versi lain tetap diminta (Hadi 11 Okt)", () => {
+    expect(PARTNER_AGREEMENTS.COACH.stillValid).toContain("Perjanjian Coach 3 Oktober 2026 rev.3");
+    expect(needsPartnerAgreement("COACH", "Perjanjian Coach 3 Oktober 2026 rev.3")).toBe(false);
+    expect(needsPartnerAgreement("COACH", "Perjanjian Coach 2 Oktober 2026")).toBe(true);
+    expect(needsPartnerAgreement("COACH", "")).toBe(true);
+    // Versi lama kolam tidak membuka gerbang coach (dan sebaliknya).
+    expect(needsPartnerAgreement("POOL_OWNER", "Perjanjian Coach 3 Oktober 2026 rev.3")).toBe(true);
+  });
+
   it("member dan admin tidak pernah diminta", () => {
     PARTNER_AGREEMENTS.COACH.version = "x";
     PARTNER_AGREEMENTS.POOL_OWNER.version = "y";

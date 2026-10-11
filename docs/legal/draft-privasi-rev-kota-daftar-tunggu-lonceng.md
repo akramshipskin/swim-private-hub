@@ -1,6 +1,6 @@
 # Draf tambahan Kebijakan Privasi: kota, daftar tunggu kota, riwayat lonceng
 
-Status: DRAF untuk orang hukum (Hadi 6 Okt 2026, jawaban 11A). BELUM dipasang di aplikasi. Teks aktif: `src/app/kebijakan-privasi/page.tsx` (PRIVACY_UPDATED_AT = 2 Oktober 2026). Bila disetujui, teks di bawah dimasukkan ke bagian yang disebut, tanggal pembaruan dan `LEGAL_CONSENT_VERSION` (`src/lib/legal.ts`) dinaikkan, lalu semua pengguna diminta setuju ulang seperti pada rev.3.
+Status: DIPASANG 11 Okt 2026 (disetujui orang hukum; PRIVACY_UPDATED_AT = 11 Oktober 2026) TANPA persetujuan ulang (Hadi 11 Okt, B). Celah yang belum masuk teks: laporan member tentang coach (Laporkan Coach + tangkapan layar) dan pemberitahuan daftar hitam coach ke mitra (pasal 6 rev.4). Paragraf di bawah adalah catatan saat masih draf. Teks aktif: `src/app/kebijakan-privasi/page.tsx` (PRIVACY_UPDATED_AT = 2 Oktober 2026). Bila disetujui, teks di bawah dimasukkan ke bagian yang disebut, tanggal pembaruan dan `LEGAL_CONSENT_VERSION` (`src/lib/legal.ts`) dinaikkan, lalu semua pengguna diminta setuju ulang seperti pada rev.3.
 
 Semua fakta di bawah dicek dari kode pada 6 Okt 2026 (bukan dari ingatan). Sumber tiap fakta ada di kolom kanan.
 
