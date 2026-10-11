@@ -1,61 +1,40 @@
-# Cakupan halaman SPH (dibuat otomatis dari kode, 1 Okt 2026)
+# Cakupan halaman SPH (dibuat otomatis dari kode, 11 Okt 2026)
 
-Dipakai sebagai daftar awal untuk sweeping UI dan sweeping sistem: tiap halaman harus punya status per peran (dicek / tidak bisa dicek + alasan). Dibuat dari semua file page.tsx di src/app; perbarui bila ada halaman baru.
+Daftar awal untuk sweeping UI dan sweeping sistem: tiap halaman harus punya status per peran (dicek / tidak bisa dicek + alasan). Dibuat dari semua file page.tsx di src/app; buat ulang bila ada halaman baru. Hasil sweeping terakhir: docs/reviews/2026-10-11-sweeping-sistem-total.md.
 
-Total halaman: 59
+Total halaman: 72 (70 tayang + /lupa-password dan /reset-password yang masih di jalur kerja reset-password-email, belum tayang)
 
-## publik / lintas peran (17)
+## Publik dan lintas peran (20)
 - `/`
 - `/brandguideline`
 - `/daftar-coach`
 - `/daftar-kolam`
-- `/ganti-password`
-- `/keamanan`
 - `/kebijakan-cookie`
 - `/kebijakan-pengembalian`
 - `/kebijakan-privasi`
+- `/kota`
 - `/milestone/[dependentId]`
 - `/milestone/[dependentId]/sertifikat/[completionId]`
+- `/mou-kolam`
+- `/notifikasi`
 - `/panduan`
 - `/pelatih/[coachId]`
 - `/pembayaran/gagal`
 - `/pembayaran/sukses`
+- `/perjanjian`
+- `/perjanjian-coach`
 - `/profil`
 - `/syarat-ketentuan`
 
-## auth (masuk/daftar) (2)
-- `/(auth)/login`
-- `/(auth)/register`
+## Masuk, daftar, password (6)
+- `/ganti-password`
+- `/keamanan`
+- `/login`
+- `/lupa-password`
+- `/register`
+- `/reset-password`
 
-## admin (18)
-- `/admin`
-- `/admin/afiliasi`
-- `/admin/booking-overview`
-- `/admin/email`
-- `/admin/kinerja-coach`
-- `/admin/kolam`
-- `/admin/komisi`
-- `/admin/koreksi-saldo`
-- `/admin/laporan-kehadiran`
-- `/admin/milestone`
-- `/admin/milestone/butir`
-- `/admin/paket`
-- `/admin/pembayaran`
-- `/admin/pesan`
-- `/admin/testimoni`
-- `/admin/users`
-- `/admin/users/[userId]`
-- `/admin/withdrawals`
-
-## coach (6)
-- `/coach`
-- `/coach/dashboard`
-- `/coach/jadwal`
-- `/coach/peserta`
-- `/coach/riwayat-sesi`
-- `/coach/saldo`
-
-## member (8)
+## Member (8)
 - `/member`
 - `/member/booking`
 - `/member/cari-coach`
@@ -65,7 +44,17 @@ Total halaman: 59
 - `/member/peserta`
 - `/member/riwayat`
 
-## pemilik kolam (8)
+## Coach (8)
+- `/coach`
+- `/coach/dashboard`
+- `/coach/harga`
+- `/coach/jadwal`
+- `/coach/kolam`
+- `/coach/peserta`
+- `/coach/riwayat-sesi`
+- `/coach/saldo`
+
+## Pemilik kolam (8)
 - `/pool`
 - `/pool/coach`
 - `/pool/dashboard`
@@ -74,3 +63,29 @@ Total halaman: 59
 - `/pool/laporan`
 - `/pool/paket`
 - `/pool/saldo`
+
+## Admin (22)
+- `/admin`
+- `/admin/afiliasi`
+- `/admin/booking-overview`
+- `/admin/coach-tanpa-jadwal`
+- `/admin/email`
+- `/admin/ganti-coach`
+- `/admin/kinerja-coach`
+- `/admin/kolam`
+- `/admin/komisi`
+- `/admin/koreksi-saldo`
+- `/admin/laporan-coach`
+- `/admin/laporan-kehadiran`
+- `/admin/milestone`
+- `/admin/milestone/butir`
+- `/admin/paket`
+- `/admin/pembayaran`
+- `/admin/peminat-kota`
+- `/admin/pesan`
+- `/admin/testimoni`
+- `/admin/users`
+- `/admin/users/[userId]`
+- `/admin/withdrawals`
+
+Catatan: /profil, /notifikasi, /panduan, /milestone/... dipakai beberapa peran; /perjanjian khusus coach dan pemilik kolam; /kota khusus akun yang belum memilih kota domisili; /lupa-password dan /reset-password baru 11 Okt (reset password lewat email, bukan untuk admin).

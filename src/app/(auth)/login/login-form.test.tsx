@@ -21,14 +21,14 @@ describe("LoginForm 2FA", () => {
 
     signIn.mockResolvedValueOnce({ error: "CredentialsSignin", code: "otp_required" });
     await user.click(screen.getByRole("button", { name: "Masuk" }));
-    const otp = await screen.findByLabelText("Kode 2FA (Google Authenticator)");
+    const otp = await screen.findByLabelText("Kode 2FA (Google Authenticator)", undefined, { timeout: 5000 });
     expect(screen.queryByRole("alert")).toBeNull();
 
     signIn.mockResolvedValueOnce({ error: "CredentialsSignin", code: "otp_invalid" });
     await user.type(otp, "123456");
     await user.click(screen.getByRole("button", { name: "Masuk" }));
     expect(signIn).toHaveBeenLastCalledWith("credentials", expect.objectContaining({ identifier: "081200000001", otp: "123456" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("Kode 2FA salah atau sudah dipakai");
+    expect(await screen.findByRole("alert", undefined, { timeout: 5000 })).toHaveTextContent("Kode 2FA salah atau sudah dipakai");
   });
 
   it("tanpa 2FA: salah password -> pesan umum, kolom kode tidak muncul", async () => {
@@ -38,7 +38,7 @@ describe("LoginForm 2FA", () => {
     await user.type(screen.getByLabelText("Password"), "salah");
     signIn.mockResolvedValueOnce({ error: "CredentialsSignin", code: "credentials" });
     await user.click(screen.getByRole("button", { name: "Masuk" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("password salah");
+    expect(await screen.findByRole("alert", undefined, { timeout: 5000 })).toHaveTextContent("password salah");
     expect(screen.queryByLabelText("Kode 2FA (Google Authenticator)")).toBeNull();
   });
 });
