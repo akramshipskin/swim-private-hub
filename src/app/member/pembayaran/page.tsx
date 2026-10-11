@@ -1,3 +1,4 @@
+import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
 import { PAYMENT_WINDOW_MS } from "@/lib/policy";
 import Link from "next/link";
 import { requireRole } from "@/lib/require-role";
@@ -33,7 +34,11 @@ function dateTimeLabel(d: Date) {
   });
 }
 
-export default async function MemberPembayaranPage() {
+// Puluhan transaksi lama: tampil 10 terbaru dulu, tombol menambah 10.
+const PAGE = 10;
+
+export default async function MemberPembayaranPage({ searchParams }: { searchParams: Promise<{ n?: string }> }) {
+  const limit = pageSize((await searchParams).n, PAGE);
   const session = await requireRole("MEMBER");
 
   const payments = await prisma.payment.findMany({
@@ -74,7 +79,7 @@ export default async function MemberPembayaranPage() {
         </Card>
       ) : (
         <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          {payments.map((p) => {
+          {payments.slice(0, limit).map((p) => {
             // Transaksi menunggu yang sudah lewat 24 jam dianggap kedaluwarsa,
             // walau webhook Midtrans-nya belum pernah masuk.
             const expired = p.status === "PENDING" && now.getTime() - p.createdAt.getTime() > PAYMENT_WINDOW_MS;
@@ -123,6 +128,7 @@ export default async function MemberPembayaranPage() {
           })}
         </ul>
       )}
+      <ShowMoreLink href={listHref({ n: String(limit + PAGE) })} shown={Math.min(limit, payments.length)} total={payments.length} unit="transaksi" />
     </main>
   );
 }

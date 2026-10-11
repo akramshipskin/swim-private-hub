@@ -1,3 +1,5 @@
+import { SearchForm, matchesQuery } from "@/components/search-form";
+import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
 import Link from "next/link";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
@@ -19,8 +21,15 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function CariCoachPage() {
-  await requireRole("MEMBER");
+// Puluhan coach: tampil 12 dulu (coach di kota member lebih dulu), tombol menambah 12.
+const PAGE = 12;
+
+export default async function CariCoachPage({ searchParams }: { searchParams: Promise<{ q?: string; n?: string }> }) {
+  const session = await requireRole("MEMBER");
+  const sp = await searchParams;
+  const q = sp.q ?? "";
+  const limit = pageSize(sp.n, PAGE);
+  const me = await prisma.user.findUnique({ where: { id: session.user.id }, select: { city: true } });
 
   const coaches = await prisma.user.findMany({
     // Hanya coach yang sudah memilih minimal 1 kolam aktif (Hadi 3 Okt malam,
@@ -42,19 +51,30 @@ export default async function CariCoachPage() {
     orderBy: { name: "asc" },
   });
 
+  // Coach yang domisili atau kolamnya di kota member tampil lebih dulu; sisanya urut nama.
+  const inMyCity = (c: (typeof coaches)[number]) => !!me?.city && (c.city === me.city || c.poolAffiliations.some((a) => a.pool.city === me.city));
+  const matched = coaches
+    .filter((c) => matchesQuery(q, c.name, c.city, ...c.poolAffiliations.flatMap((a) => [a.pool.name, a.pool.city]), ...(c.coachProfile?.specialties ?? [])))
+    .sort((a, b) => Number(inMyCity(b)) - Number(inMyCity(a)));
+  const shownCoaches = matched.slice(0, limit);
+
   return (
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Cari Coach</h1>
       <p className="mt-1 text-sm text-text-muted">
-        Semua coach aktif beserta kolam tempat mereka mengajar. Paket dibeli per coach dan kolam lewat menu Paket,
+        Semua coach aktif beserta kolam tempat mereka mengajar; coach di kotamu tampil lebih dulu. Paket dibeli per coach dan kolam lewat menu Paket,
         dan hanya berlaku untuk coach itu di kolam itu.
       </p>
 
+      {coaches.length > PAGE && <div className="mt-4"><SearchForm q={q} placeholder="Cari coach, kolam, atau kota" /></div>}
+
       {coaches.length === 0 ? (
         <p className="mt-6 text-sm text-text-muted">Belum ada coach aktif.</p>
+      ) : matched.length === 0 ? (
+        <p className="mt-6 text-sm text-text-muted">Tidak ada coach yang cocok dengan &quot;{q}&quot;.</p>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
-          {coaches.map((coach) => (
+          {shownCoaches.map((coach) => (
             <Card key={coach.id}>
               <CardBody className="flex gap-4">
                 <Avatar src={coach.coachProfile?.photoUrl} className="h-16 w-16" />
@@ -100,6 +120,7 @@ export default async function CariCoachPage() {
           ))}
         </div>
       )}
+      <ShowMoreLink href={listHref({ q: q || undefined, n: String(limit + PAGE) })} shown={shownCoaches.length} total={matched.length} unit="coach" />
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import { requireRole } from "@/lib/require-role";
 import { SearchForm, matchesQuery } from "@/components/search-form";
+import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
 import { prisma } from "@/lib/prisma";
 import { formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { getCancelQuotaUsage, evaluateCancelEligibility } from "@/lib/cancel-eligibility";
@@ -26,8 +27,14 @@ const statusLabel: Record<string, string> = {
 
 export const metadata = { title: "Riwayat Booking | Swim Private Hub" };
 
-export default async function MemberRiwayatPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  const q = (await searchParams).q ?? "";
+// Riwayat lama: tampil 7 tanggal terbaru dulu, tombol menambah 7 tanggal.
+// Sesi yang akan datang selalu tampil semuanya di bagian atas, terdekat dulu.
+const PAGE_DAYS = 7;
+
+export default async function MemberRiwayatPage({ searchParams }: { searchParams: Promise<{ q?: string; n?: string }> }) {
+  const sp = await searchParams;
+  const q = sp.q ?? "";
+  const limit = pageSize(sp.n, PAGE_DAYS);
   const session = await requireRole("MEMBER");
 
   const bookings = await prisma.booking.findMany({
@@ -44,13 +51,23 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
     return d.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
   }
 
-  const byDate = new Map<string, typeof bookings>();
-  for (const b of bookings.filter((x) => matchesQuery(q, x.availability.coach.name, x.availability.pool.name, x.package.dependent.name))) {
-    const key = dateKey(b.availability.date);
-    if (!byDate.has(key)) byDate.set(key, []);
-    byDate.get(key)!.push(b);
+  const now = new Date();
+  const matching = bookings.filter((x) => matchesQuery(q, x.availability.coach.name, x.availability.pool.name, x.package.dependent.name));
+  const isUpcoming = (b: (typeof bookings)[number]) => b.status === "BOOKED" && b.availability.endTime > now;
+  function group(list: typeof bookings) {
+    const byDate = new Map<string, typeof bookings>();
+    for (const b of list) {
+      const key = dateKey(b.availability.date);
+      if (!byDate.has(key)) byDate.set(key, []);
+      byDate.get(key)!.push(b);
+    }
+    return byDate;
   }
-  const sortedDateKeys = [...byDate.keys()].sort().reverse();
+  const upcomingByDate = group(matching.filter(isUpcoming));
+  const upcomingKeys = [...upcomingByDate.keys()].sort();
+  const pastByDate = group(matching.filter((b) => !isUpcoming(b)));
+  const allPastKeys = [...pastByDate.keys()].sort().reverse();
+  const pastKeys = allPastKeys.slice(0, limit);
 
   // quota/used cancel cuma bergantung ke (memberId, packageId), bukan per
   // booking -- fetch sekali per packageId unik (biasanya 1, member pake
@@ -77,37 +94,13 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
     );
   });
 
-  const now = new Date();
-
-  return (
-    <main className="w-full px-4 py-6 sm:py-8">
-      <h1 className="mb-4 text-2xl font-semibold tracking-tight text-text">Riwayat Booking</h1>
-      <SearchForm q={q} placeholder="Cari coach, kolam, atau peserta" />
-
-      {bookings.length === 0 ? (
-        <Card>
-          <CardBody className="py-10 text-center">
-            <p className="text-sm font-medium text-text">Belum ada riwayat booking</p>
-            <p className="mt-1 text-sm text-text-muted">
-              Booking pertamamu akan muncul di sini.
-            </p>
-          </CardBody>
-        </Card>
-      ) : sortedDateKeys.length === 0 ? (
-        <Card>
-          <CardBody className="py-10 text-center">
-            <p className="text-sm font-medium text-text">Tidak ada hasil untuk &quot;{q}&quot;</p>
-            <p className="mt-1 text-sm text-text-muted">Coba kata kunci lain: nama coach, kolam, atau peserta.</p>
-          </CardBody>
-        </Card>
-      ) : (
-        sortedDateKeys.map((key) => {
+  function renderDay(key: string, byDate: Map<string, typeof bookings>) {
           const rows = byDate.get(key)!;
           return (
             <div key={key} className="mb-5">
-              <h2 className="mb-3 text-lg font-semibold text-text">
+              <h3 className="mb-3 text-lg font-semibold text-text">
                 {formatDateLabel(rows[0].availability.date)}
-              </h2>
+              </h3>
               {[...new Set(rows.map((r) => r.availability.pool.name))].map((poolName) => (
               <div key={poolName} className="mb-3">
               {/* Nama kolam dibikin label kontras + 2 kolom di layar lebar
@@ -136,8 +129,8 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                             <p className="text-base font-semibold text-text tabular-nums">
                               {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}
                             </p>
-                            <p className="truncate text-sm text-text">Coach {b.availability.coach.name}</p>
-                            <p className="truncate text-sm text-text-muted">
+                            <p className="text-sm text-text">Coach {b.availability.coach.name}</p>
+                            <p className="text-sm text-text-muted">
                               Peserta: {b.package.dependent.isSelf ? "kamu sendiri" : b.package.dependent.name} · {b.package.name}
                             </p>
                             <div className="mt-1 flex flex-wrap items-center gap-1.5">
@@ -230,7 +223,45 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
               ))}
             </div>
           );
-        })
+  }
+
+  return (
+    <main className="w-full px-4 py-6 sm:py-8">
+      <h1 className="mb-4 text-2xl font-semibold tracking-tight text-text">Riwayat Booking</h1>
+      <SearchForm q={q} placeholder="Cari coach, kolam, atau peserta" />
+
+      {bookings.length === 0 ? (
+        <Card>
+          <CardBody className="py-10 text-center">
+            <p className="text-sm font-medium text-text">Belum ada riwayat booking</p>
+            <p className="mt-1 text-sm text-text-muted">
+              Booking pertamamu akan muncul di sini.
+            </p>
+          </CardBody>
+        </Card>
+      ) : upcomingKeys.length + allPastKeys.length === 0 ? (
+        <Card>
+          <CardBody className="py-10 text-center">
+            <p className="text-sm font-medium text-text">Tidak ada hasil untuk &quot;{q}&quot;</p>
+            <p className="mt-1 text-sm text-text-muted">Coba kata kunci lain: nama coach, kolam, atau peserta.</p>
+          </CardBody>
+        </Card>
+      ) : (
+        <>
+          {upcomingKeys.length > 0 && (
+            <section>
+              <h2 className="mb-3 text-xl font-semibold text-text">Akan Datang</h2>
+              {upcomingKeys.map((k) => renderDay(k, upcomingByDate))}
+            </section>
+          )}
+          {pastKeys.length > 0 && (
+            <section>
+              {upcomingKeys.length > 0 && <h2 className="mb-3 mt-2 text-xl font-semibold text-text">Riwayat</h2>}
+              {pastKeys.map((k) => renderDay(k, pastByDate))}
+            </section>
+          )}
+          <ShowMoreLink href={listHref({ q: q || undefined, n: String(limit + PAGE_DAYS) })} shown={pastKeys.length} total={allPastKeys.length} unit="tanggal" />
+        </>
       )}
       <CoachReportForm
         coaches={[...new Map(bookings.map((b) => [b.availability.coachId, { id: b.availability.coachId, name: b.availability.coach.name }])).values()]}
