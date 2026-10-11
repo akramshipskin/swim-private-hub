@@ -45,12 +45,12 @@ describe("RESET PASSWORD LEWAT EMAIL", () => {
     expect(sent.map((m) => m.to)).toEqual(["ortu@x.test", "ortu@x.test"]);
   });
 
-  it("PR6: kunci login per akun dan per akun-per-jaringan dibuka; status wajib ganti password tidak diubah", async () => {
-    const u = await member();
+  it("PR6: kunci login per akun dan per akun-per-jaringan dibuka (akun lain yang emailnya mirip tidak); status wajib ganti password tidak diubah", async () => {
+    const u = await member("ortu_x@x.test");
     await prisma.user.update({ where: { id: u.id }, data: { mustChangePassword: true } });
-    await prisma.rateLimitHit.createMany({ data: [{ key: "login:ortu@x.test" }, { key: `login-net:9.9.9.9:${u.phone}` }, { key: "login-ip:9.9.9.9" }] });
+    await prisma.rateLimitHit.createMany({ data: [{ key: "login:ortu_x@x.test" }, { key: `login-net:9.9.9.9:${u.phone}` }, { key: "login-net:9.9.9.9:ortu_x@x.test" }, { key: "login-ip:9.9.9.9" }, { key: "login-net:9.9.9.9:ortuXx@x.test" }] });
     expect(await doReset(createResetToken(u), "baru-12345", "baru-12345")).toEqual({});
-    expect((await prisma.rateLimitHit.findMany({ select: { key: true } })).map((r) => r.key)).toEqual(["login-ip:9.9.9.9"]);
+    expect((await prisma.rateLimitHit.findMany({ select: { key: true } })).map((r) => r.key).sort()).toEqual(["login-ip:9.9.9.9", "login-net:9.9.9.9:ortuXx@x.test"]);
     expect((await prisma.user.findUniqueOrThrow({ where: { id: u.id } })).mustChangePassword).toBe(true);
   });
 

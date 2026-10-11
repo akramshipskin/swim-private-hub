@@ -2,7 +2,8 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { normalizeEmail, normalizePhone } from "@/lib/format";
-import { takeAttempt } from "@/lib/rate-limit";
+import { storedKey, takeAttempt } from "@/lib/rate-limit";
+import { buildAdminWaLink } from "@/lib/whatsapp";
 import { after } from "next/server";
 import { INBOX_FROM_ADDRESS, sendPlainEmail } from "@/lib/email";
 
@@ -118,9 +119,12 @@ export async function resetPasswordWithToken(token: string, newPassword: string,
   // bentuk yang sama dengan halaman Masuk.
   const ids = [normalizeEmail(user.email), user.phone ? normalizePhone(user.phone) : null].filter((x): x is string => !!x);
   if (ids.length) {
-    await prisma.rateLimitHit.deleteMany({
-      where: { OR: ids.flatMap((id) => [{ key: `login:${id}` }, { key: { startsWith: "login-net:", endsWith: `:${id}` } }]) },
-    });
+    // Dicocokkan persis di sini (bukan endsWith Prisma: "_" dan "%" ikut jadi
+    // pola LIKE dan bisa membuka kunci akun lain yang emailnya mirip).
+    const net = await prisma.rateLimitHit.findMany({ where: { key: { startsWith: "login-net:" } }, select: { id: true, key: true } });
+    const own = new Set(ids.map((id) => storedKey(`login:${id}`)));
+    const hitIds = net.filter((h) => ids.some((id) => h.key.endsWith(`:${id}`))).map((h) => h.id);
+    await prisma.rateLimitHit.deleteMany({ where: { OR: [{ key: { in: [...own] } }, { id: { in: hitIds } }] } });
   }
   if (user.email) {
     const to = user.email;
@@ -129,7 +133,7 @@ export async function resetPasswordWithToken(token: string, newPassword: string,
         from: FROM,
         to,
         subject: "Password Swim Private Hub kamu baru diganti",
-        text: "Halo,\n\nPassword akun Swim Private Hub kamu baru saja diganti lewat tautan Lupa Password, dan semua perangkat yang masih masuk sudah dikeluarkan.\n\nKalau bukan kamu yang menggantinya, segera hubungi admin lewat WhatsApp di halaman Masuk.\n\nSwim Private Hub",
+        text: `Halo,\n\nPassword akun Swim Private Hub kamu baru saja diganti lewat tautan Lupa Password, dan semua perangkat yang masih masuk sudah dikeluarkan.\n\nKalau bukan kamu yang menggantinya, segera hubungi admin lewat WhatsApp: ${buildAdminWaLink("Halo Admin Swim Private Hub, password akun saya diganti tanpa sepengetahuan saya.")}\n\nSwim Private Hub`,
       }).catch((err) => console.error("[reset-password] kirim pemberitahuan gagal", err)),
     );
   }
