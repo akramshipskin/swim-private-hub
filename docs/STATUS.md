@@ -33,7 +33,7 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 - 9 Okt: Backup DB gagal 7 DAN 8 Okt (gpg Broken pipe di uji baca; dump sendiri jalan). Perbaikan 86e7f46: dekripsi ke berkas dulu, baru daftar isi; dijalankan ulang 9 Okt = hijau (444K, 36 tabel, terunggah). Sebab dugaan: pipa menutup dini saat backup membesar (belum 100% terbukti kenapa baru gagal 7 Okt). Uji Pulih Backup: belum pernah ada jalannya.
 
 ## Tugas Claude berikutnya
-1. SELESAI 11 Okt malam: pasal 6 (Perjanjian Coach rev.4) + Kebijakan Privasi 11 Okt dipasang tanpa persetujuan ulang (rev.3 tetap sah lewat stillValid; pemeriksa Opus kedua: tidak ada cacat). Celah ke orang hukum: Laporkan Coach + pemberitahuan daftar hitam belum disebut di Privasi; pasal 11 = rev.4 baru mengikat coach lama setelah mencentang.
+1. SELESAI 11 Okt malam: Perjanjian Coach rev.4 (pasal 6) + Privasi 11 Okt tayang; SEMUA coach wajib setuju ulang rev.4 (Hadi 2B; coach tertahan tidak bisa tandai hadir/atur jadwal sampai mencentang). Draf privasi Laporkan Coach + daftar hitam untuk orang hukum: docs/legal/draft-privasi-laporan-coach-daftar-hitam.md.
 2. Sweeping peran member, coach, pemilik kolam dengan cara yang sama seperti admin 11 Okt: data ramai (ratusan) + HP 375 + desktop, logika pemakaian nyata (jalan buntu, daftar terpotong, aksi jauh dari isi).
 3. Simulator iOS (iPhone 17, SPH sudah di layar utama) HANYA bila Hadi menyuruh: tes notifikasi / lihat UI HP. Sweeping pakai browser bawaan ukuran HP.
 4. Satu tes kadang gagal saat laptop sibuk (lokal) dan uji alur penuh GitHub sekali gagal di langkah daftar lalu lulus saat diulang: belum diketahui penyebabnya; selidiki bila muncul lagi.

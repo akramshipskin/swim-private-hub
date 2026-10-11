@@ -11,14 +11,13 @@
 // nama dokumen): kolom versinya satu, jadi pemilik kolam yang dulunya coach
 // (atau sebaliknya) tidak dianggap sudah setuju.
 //
-// stillValid = versi lama yang TIDAK perlu disetujui ulang (Hadi 11 Okt, B:
-// rev.4 pasal 6 dipasang tanpa centang ulang). Pendaftar baru tetap mencatat
-// versi terbaru; akun yang sudah menyetujui versi di stillValid tidak diarahkan
-// ke /perjanjian.
+// stillValid = versi lama yang TIDAK perlu disetujui ulang. Kosong sejak
+// 11 Okt malam: Hadi memutuskan coach lama tetap mencentang rev.4 (pasal 11:
+// versi baru baru mengikat setelah dicentang).
 export const PARTNER_AGREEMENTS = {
   COACH: {
     version: "Perjanjian Coach 11 Oktober 2026 rev.4" as string | null,
-    stillValid: ["Perjanjian Coach 3 Oktober 2026 rev.3"] as string[],
+    stillValid: [] as string[],
     title: "Perjanjian Kemitraan Coach",
     href: "/perjanjian-coach",
   },

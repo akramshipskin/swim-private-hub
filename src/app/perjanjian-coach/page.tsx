@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 // (src/lib/partner-agreement.ts) supaya semua coach diminta setuju ulang.
 // Rev.4 (11 Okt: pasal 6 butir 2 diperluas, butir 4 pemberitahuan ke mitra) =
 // docs/legal/usulan-revisi-pasal-6-larangan-coach.md, disetujui orang hukum;
-// dipasang TANPA setuju ulang (Hadi 11 Okt, B): rev.3 ada di stillValid.
+// semua coach diminta setuju ulang (Hadi 11 Okt malam, 2B).
 const doc = PARTNER_AGREEMENTS.COACH;
 const link = "-my-3 inline-block py-3 text-brand-700 hover:underline";
 

@@ -2,10 +2,11 @@ import { afterEach, describe, expect, it } from "vitest";
 import { existsSync } from "node:fs";
 import { PARTNER_AGREEMENTS, needsPartnerAgreement, partnerAgreementData, partnerAgreementFor } from "./partner-agreement";
 
-const original = { coach: PARTNER_AGREEMENTS.COACH.version, pool: PARTNER_AGREEMENTS.POOL_OWNER.version };
+const original = { coach: PARTNER_AGREEMENTS.COACH.version, pool: PARTNER_AGREEMENTS.POOL_OWNER.version, stillValid: [...PARTNER_AGREEMENTS.COACH.stillValid] };
 afterEach(() => {
   PARTNER_AGREEMENTS.COACH.version = original.coach;
   PARTNER_AGREEMENTS.POOL_OWNER.version = original.pool;
+  PARTNER_AGREEMENTS.COACH.stillValid = [...original.stillValid];
 });
 
 describe("perjanjian kemitraan", () => {
@@ -23,13 +24,13 @@ describe("perjanjian kemitraan", () => {
     expect(needsPartnerAgreement("COACH", "Perjanjian Coach v1")).toBe(false);
   });
 
-  it("versi lama di stillValid tidak diminta setuju ulang; versi lain tetap diminta (Hadi 11 Okt)", () => {
-    expect(PARTNER_AGREEMENTS.COACH.stillValid).toContain("Perjanjian Coach 3 Oktober 2026 rev.3");
-    expect(needsPartnerAgreement("COACH", "Perjanjian Coach 3 Oktober 2026 rev.3")).toBe(false);
-    expect(needsPartnerAgreement("COACH", "Perjanjian Coach 2 Oktober 2026")).toBe(true);
+  it("versi lama hanya lolos bila ada di stillValid (Hadi 11 Okt malam: rev.3 wajib setuju ulang)", () => {
+    expect(needsPartnerAgreement("COACH", "Perjanjian Coach 3 Oktober 2026 rev.3")).toBe(true);
+    PARTNER_AGREEMENTS.COACH.stillValid = ["Perjanjian Coach v0"];
+    expect(needsPartnerAgreement("COACH", "Perjanjian Coach v0")).toBe(false);
     expect(needsPartnerAgreement("COACH", "")).toBe(true);
-    // Versi lama kolam tidak membuka gerbang coach (dan sebaliknya).
-    expect(needsPartnerAgreement("POOL_OWNER", "Perjanjian Coach 3 Oktober 2026 rev.3")).toBe(true);
+    // Versi lama coach tidak membuka gerbang kolam.
+    expect(needsPartnerAgreement("POOL_OWNER", "Perjanjian Coach v0")).toBe(true);
   });
 
   it("member dan admin tidak pernah diminta", () => {
