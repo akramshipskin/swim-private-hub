@@ -52,7 +52,7 @@ export async function sendReplyEmail(params: {
   return data;
 }
 
-export async function sendPlainEmail(params: { from: string; to: string; subject: string; text: string }) {
-  const { error } = await client().emails.send({ from: params.from, to: [params.to], subject: params.subject, text: params.text });
+export async function sendPlainEmail(params: { from: string; to: string; subject: string; text: string; html?: string }) {
+  const { error } = await client().emails.send({ from: params.from, to: [params.to], subject: params.subject, text: params.text, ...(params.html ? { html: params.html } : {}) });
   if (error) throw new Error(`Resend gagal kirim email: ${error.message}`);
 }

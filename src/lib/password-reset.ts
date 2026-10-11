@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { normalizeEmail, normalizePhone } from "@/lib/format";
 import { storedKey, takeAttempt } from "@/lib/rate-limit";
 import { buildAdminWaLink } from "@/lib/whatsapp";
+import { renderBrandEmail } from "@/lib/email-template";
 import { after } from "next/server";
 import { INBOX_FROM_ADDRESS, sendPlainEmail } from "@/lib/email";
 
@@ -97,7 +98,13 @@ export async function requestPasswordReset(rawEmail: string, ip: string, defer: 
         from: FROM,
         to,
         subject: "Buat password baru Swim Private Hub",
-        text: `Halo ${user.name},\n\nAda permintaan membuat password baru untuk akunmu. Buka tautan ini dalam 30 menit:\n\n${link}\n\nKalau kamu tidak memintanya, abaikan email ini; password lamamu tetap berlaku.\n\nSwim Private Hub`,
+        ...renderBrandEmail({
+          preheader: "Tautan berlaku 30 menit dan hanya sekali pakai.",
+          title: "Buat password baru",
+          paragraphs: [`Halo ${user.name},`, "Ada permintaan membuat password baru untuk akun Swim Private Hub kamu. Tekan tombol di bawah dalam 30 menit. Tautan ini hanya bisa dipakai sekali."],
+          button: { label: "Buat Password Baru", url: link },
+          note: "Kalau kamu tidak memintanya, abaikan email ini. Password lamamu tetap berlaku.",
+        }),
       }).catch((err) => console.error("[reset-password] kirim email gagal", err)),
     );
   }
@@ -142,7 +149,13 @@ export async function resetPasswordWithToken(token: string, newPassword: string,
         from: FROM,
         to,
         subject: "Password Swim Private Hub kamu baru diganti",
-        text: `Halo,\n\nPassword akun Swim Private Hub kamu baru saja diganti lewat tautan Lupa Password, dan semua perangkat yang masih masuk sudah dikeluarkan.\n\nKalau bukan kamu yang menggantinya, segera hubungi admin lewat WhatsApp: ${buildAdminWaLink("Halo Admin Swim Private Hub, password akun saya diganti tanpa sepengetahuan saya.")}\n\nSwim Private Hub`,
+        ...renderBrandEmail({
+          preheader: "Semua perangkat yang masih masuk sudah dikeluarkan.",
+          title: "Password kamu baru diganti",
+          paragraphs: ["Password akun Swim Private Hub kamu baru saja diganti lewat tautan Lupa Password, dan semua perangkat yang masih masuk sudah dikeluarkan."],
+          button: { label: "Hubungi Admin", url: buildAdminWaLink("Halo Admin Swim Private Hub, password akun saya diganti tanpa sepengetahuan saya.") },
+          note: "Kalau kamu sendiri yang menggantinya, email ini cukup diabaikan. Kalau bukan kamu, segera hubungi admin lewat tombol di atas.",
+        }),
       }).catch((err) => console.error("[reset-password] kirim pemberitahuan gagal", err)),
     );
   }
