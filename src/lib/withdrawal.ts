@@ -136,9 +136,11 @@ export async function requestCoachWithdrawal(coachProfileId: string, amount?: nu
   // tetap benar menurut aturan (sesi yang belum tercatat Hadir belum dihitung).
   const overdue = await getOverdueParticipants(coach.userId);
   if (overdue.length > 0) {
-    throw new WithdrawalError(
-      `Penarikan ditahan: isi dulu catatan milestone untuk ${overdue.map((o) => o.name).join(", ")}.`
-    );
+    // Puluhan peserta tertinggal = pesan sangat panjang; 3 nama pertama cukup,
+    // daftar lengkapnya tampil di bagian atas halaman Saldo (tempat pesan ini muncul).
+    const names = overdue.slice(0, 3).map((o) => o.name).join(", ");
+    const more = overdue.length > 3 ? ` dan ${overdue.length - 3} peserta lain (daftar lengkap ada di bagian atas halaman Saldo)` : "";
+    throw new WithdrawalError(`Penarikan ditahan: isi dulu catatan milestone untuk ${names}${more}.`);
   }
   return createWithdrawalRequest({
     coachProfileId,

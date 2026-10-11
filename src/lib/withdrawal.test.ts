@@ -138,6 +138,15 @@ describe("requestCoachWithdrawal", () => {
     expect(withdrawalCreate).not.toHaveBeenCalled();
   });
 
+  it("pesan penahanan menyebut 3 nama pertama lalu jumlah sisanya", async () => {
+    coachFindUniqueOrThrow.mockResolvedValue({ userId: "u-coach", walletBalance: 60_000, bankName: "BCA", bankAccountNumber: "1", bankAccountName: "Ayu" });
+    getOverdueParticipants.mockResolvedValue(["A", "B", "C", "D", "E"].map((name, i) => ({ dependentId: `d${i}`, name, sessionsWithoutNote: 2 })));
+    await expect(requestCoachWithdrawal("coach-1")).rejects.toThrow(
+      "Penarikan ditahan: isi dulu catatan milestone untuk A, B, C dan 2 peserta lain (daftar lengkap ada di bagian atas halaman Saldo).",
+    );
+    expect(coachUpdateMany).not.toHaveBeenCalled();
+  });
+
   it("penarikan kolam tidak kena aturan milestone", async () => {
     poolFindUniqueOrThrow.mockResolvedValue({ walletBalance: 100_000, bankName: "BCA", bankAccountNumber: "123", bankAccountName: "Budi" });
     await requestPoolWithdrawal("pool-1");
