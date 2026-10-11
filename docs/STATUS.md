@@ -1,4 +1,4 @@
-# STATUS SPH (diperbarui 11 Okt 2026 malam: tahap B2 live, reset password email live, brief desain disetujui, sweeping admin data ramai + HP live)
+# STATUS SPH (diperbarui 12 Okt 2026 dini hari: semua tes lulus, zoom isian iPhone diperbaiki; 11 Okt malam: tahap B2 live, reset password email live, brief desain disetujui, sweeping admin data ramai + HP live)
 
 Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5, mulai dari docs/HANDOFF-AGEN.md. Maksimal 60 baris. Keputusan bertanggal ada di docs/KEPUTUSAN.md; daftar kerjaan lengkap di docs/backlog/sph-backlog-gabungan-2026-09-29.md (bagian paling bawah); daftar halaman per peran di docs/cakupan-halaman.md.
 
@@ -35,7 +35,7 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 ## Tugas Claude berikutnya
 1. SELESAI 11 Okt malam: Perjanjian Coach rev.4 (pasal 6) + Privasi 11 Okt tayang; SEMUA coach wajib setuju ulang rev.4 (Hadi 2B; coach tertahan tidak bisa tandai hadir/atur jadwal sampai mencentang). Tambahan Privasi Laporkan Coach + daftar hitam disetujui orang hukum dan tayang (Privasi rev 2).
 2. Sweeping: coach SELESAI 11 Okt malam (docs/reviews/2026-10-11-sweeping-coach-data-ramai.md; Riwayat Sesi 59 -> 3.8 layar). Member SELESAI (docs/reviews/2026-10-11-sweeping-member-data-ramai.md; Cari Coach 23 -> 5 layar). Pemilik kolam SELESAI 12 Okt (docs/reviews/2026-10-12-sweeping-pemilik-kolam-data-ramai.md). Tema gelap 4 peran dicek 12 Okt (lolos). Cari kode booking di Jadwal Kolam ditambah. Halaman publik dijalani 12 Okt (docs/reviews/2026-10-12-sweeping-halaman-publik.md; email daftar diberi alasan). Sweeping 5 peran + publik selesai. Cara lama: dengan cara yang sama seperti admin 11 Okt: data ramai (ratusan) + HP 375 + desktop, logika pemakaian nyata (jalan buntu, daftar terpotong, aksi jauh dari isi).
-3. Simulator iOS (iPhone 17, SPH sudah di layar utama) HANYA bila Hadi menyuruh: tes notifikasi / lihat UI HP. Sweeping pakai browser bawaan ukuran HP.
+3. Simulator iOS (iPhone 17) HANYA bila Hadi menyuruh. 12 Okt dini hari dipakai (Hadi: jalankan semua tes): temuan zoom-isian iPhone diperbaiki; push tidak bisa diuji di simulator. Semua tes dijalankan: docs/reviews/2026-10-12-uji-semua-mode-tidur.md (semua lulus). Ditunda: rapikan pesan 'Penarikan ditahan' (kode uang, Opus).
 4. Satu tes kadang gagal saat laptop sibuk (lokal) dan uji alur penuh GitHub sekali gagal di langkah daftar lalu lulus saat diulang: belum diketahui penyebabnya; selidiki bila muncul lagi.
 5. Menunggu pemicu: sapu member/coach/kolam di LIVE (Hadi login sendiri); Opsi C rombak alur (tunggu data pemakaian); pantau next-auth v5 stabil (dikunci 5.0.0-beta.32). Ditunda: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB lama.
 - Data uji lokal ditambah 11 Okt malam: 300 percakapan email "Uji Ratus", 200 member "Orang Tua Ramai" (120 dengan chat). Hanya database lokal.
@@ -47,7 +47,7 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 3. Tombol GitHub Actions > Uji Pulih Backup sekali.
 4. P5: isi DATABASE_CA_CERT (sertifikat Supabase) di pratinjau Vercel dulu, cek jalan, baru production.
 5. Event Meta (jendela penyamaran, Events Manager > Test Events), lalu hapus META_TEST_EVENT_CODE di Vercel.
-6. HP asli: satu pembayaran sungguhan sampai paket aktif; unggah foto/sertifikat; notifikasi HP (Claude bisa uji di Simulator iOS dengan versi lokal).
+6. HP asli: satu pembayaran sungguhan sampai paket aktif; unggah foto/sertifikat; notifikasi HP (push tidak bisa diuji di simulator; perlu iPhone/Android asli: izinkan notifikasi lalu minta Claude memicu satu notifikasi).
 7. Testimoni asli. Matikan plugin tak terpakai.
 Selesai/dibuang (Hadi 11 Okt): orang hukum OK semua dokumen; akuntan OK; nama merchant Midtrans sandbox dibiarkan (production sudah SPH); domain web.id + email Krabat dilewati.
 

@@ -1064,3 +1064,15 @@ body {
     }
   }
 }
+
+/* iPhone zoom otomatis ke kolom isian yang hurufnya di bawah 16px, lalu halaman
+   tertinggal ter-zoom dan bisa digeser ke samping (terutama di aplikasi yang
+   dipasang ke layar utama). Di perangkat sentuh, isian dibuat 16px; tanpa
+   layer sehingga menang atas kelas text-sm. Desktop tidak berubah. */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
