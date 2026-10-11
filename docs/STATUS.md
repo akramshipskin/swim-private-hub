@@ -34,22 +34,19 @@ Dimuat otomatis di awal sesi (Claude). Pengembang berikutnya: OpenCode + Fable 5
 
 ## Tugas Claude berikutnya
 1. Per 11 Okt malam SEMUA kerjaan yang diminta selesai dan tayang: tahap A-B-C, reset password email (admin boleh bila 2FA aktif; email bermerek; Hadi uji: masuk), peringatan salah ketik email, rombak sesuai brief desain (DISETUJUI), tagline resmi satu sumber di semua halaman masuk/daftar + email.
-2. Menunggu pemicu dari Hadi: sapu peran member/coach/kolam di LIVE (Hadi login sendiri); ukur menu Email live dengan inbox asli; Opsi C rombak alur total (tunggu data pemakaian); pantau next-auth v5 stabil (dikunci 5.0.0-beta.32).
+2. 11 Okt malam: menu Email live diukur (45 percakapan: halaman 0,2-0,26 dtk, 236 KB; buka percakapan 0,17-0,86 dtk) = cepat. Jadwal malam /api/cron/malam tercatat 200 di Vercel 11 Okt 18.25 WIB; jadwal harian 06.00 belum dilihat lognya. Menunggu pemicu dari Hadi: sapu peran member/coach/kolam di LIVE (Hadi login sendiri); Opsi C rombak alur total (tunggu data pemakaian); pantau next-auth v5 stabil (dikunci 5.0.0-beta.32).
 3. Ditunda sampai pemicu: rekening format lama, audit buku besar production, event Meta pendaftaran coach/kolam, drop kolom DB model lama (butuh Hadi).
 
 ## Tugas Hadi
-0. Cek Vercel > Settings > Cron Jobs: /api/cron/malam (18.00 WIB) terdaftar.
-1. Kirim docs/legal/usulan-revisi-pasal-6-larangan-coach.md ke orang hukum (sanksi: daftar hitam + info ke jaringan, diputuskan 9 Okt). Kirim draf Kebijakan Privasi (docs/legal/draft-privasi-rev-kota-daftar-tunggu-lonceng.md) ke orang hukum; sebutkan juga "pencairan" di teks hukum vs "penarikan" di aplikasi. Tandai selesai 2 email noreply lama di Email admin.
-1b. CRON_SECRET sudah dipasang + Redeploy (3 Okt malam). Cek Vercel > Logs /api/cron/harian: 200 = jalan, 401 = kunci tidak cocok. Sekalian cek Settings > Functions: Fluid Compute aktif? (belum dikonfirmasi per 5 Okt malam).
-2. **14 Okt 2026 (INGATKAN Hadi di awal sesi pada/sesudah tanggal ini):** jalankan ulang isi-jadwal-dummy --apply di production (jam kosong contoh habis sekitar 13 Okt; tanpa itu coach contoh hilang dari halaman beli paket). Pengingat cukup catatan ini (Hadi pilih A, bukan kalender).
-3. Production: akhiri-paket-lama (lihat dulu, lalu --apply); belum tercatat sudah dijalankan.
-4. Tombol GitHub Actions > Uji Pulih Backup sekali (Backup DB sudah dijalankan ulang Claude 9 Okt, hijau).
-5. P5: isi DATABASE_CA_CERT di pratinjau Vercel dulu, cek jalan, baru production.
-6. Event Meta (jendela penyamaran), lalu hapus META_TEST_EVENT_CODE di Vercel.
-7. HP asli + Safari (alur kota, Kolam Saya, notifikasi daftar tunggu); satu pembayaran sungguhan sampai paket aktif; unggah foto/sertifikat, email, notifikasi HP.
-8. Kalau mau peran lain disapu di live: login sendiri sebagai member/coach/pemilik kolam di browser aplikasi (satu peran per giliran, sesi browser satu), lalu bilang ke Claude. Claude TIDAK mengetik password ke production (batas keras).
-9. Akuntan: PPN 11%, pajak komisi afiliasi, PPN sesi tidak hadir, saldo member hangus (+ saldo dari ganti coach ke coach lebih murah). Testimoni asli. Matikan plugin tak terpakai.
-10. Claude Startups: DNS Resend + domain di Resend untuk swimprivatehub.web.id, impor situs ke Vercel + sambung domain, baca ulang kalimat situs bertanda "belum dicek", tes surat masuk, Cloudflare Email Routing Krabat (buat alamat), kirim email Krabat lewat Resend gratis (Hadi pilih 9 Okt), daftar ulang dengan email web.id. Email penolakan Claude Startups: dibiarkan.
+0. Vercel > Logs, saring /api/cron/harian, rentang besok pagi 06.00-07.00 WIB: 200 = jalan (malam sudah terbukti 200 pada 11 Okt).
+1. **14 Okt 2026 (INGATKAN Hadi di awal sesi pada/sesudah tanggal ini):** jalankan ulang isi-jadwal-dummy --apply di production (jam kosong contoh habis sekitar 13 Okt; tanpa itu coach contoh hilang dari halaman beli paket).
+2. Production: akhiri-paket-lama (lihat dulu, lalu --apply); belum tercatat sudah dijalankan.
+3. Tombol GitHub Actions > Uji Pulih Backup sekali.
+4. P5: isi DATABASE_CA_CERT (sertifikat Supabase) di pratinjau Vercel dulu, cek jalan, baru production.
+5. Event Meta (jendela penyamaran, Events Manager > Test Events), lalu hapus META_TEST_EVENT_CODE di Vercel.
+6. HP asli: satu pembayaran sungguhan sampai paket aktif; unggah foto/sertifikat; notifikasi HP (Claude bisa uji di Simulator iOS dengan versi lokal).
+7. Testimoni asli. Matikan plugin tak terpakai.
+Selesai/dibuang (Hadi 11 Okt): orang hukum OK semua dokumen; akuntan OK; nama merchant Midtrans sandbox dibiarkan (production sudah SPH); domain web.id + email Krabat dilewati.
 
 ## Belum terverifikasi
 - HP asli dan Safari; notifikasi push; unggah file ke penyimpanan asli; email; pembayaran asli sampai paket aktif; buku besar production; halaman login di production; pemeriksa harian di Vercel (belum terbukti jalan); tablet 768 sudah dilihat mata (HP terang, tablet terang, desktop gelap; 375 gelap, 768 gelap, 1280 terang hanya pemeriksa otomatis); member/coach/pemilik kolam di LIVE belum pernah disapu (hanya lokal); halaman Ganti Password belum terlihat (tidak ada akun uji dengan password sementara).
