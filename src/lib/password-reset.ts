@@ -121,6 +121,8 @@ export async function resetPasswordWithToken(token: string, newPassword: string,
   if (ids.length) {
     // Dicocokkan persis di sini (bukan endsWith Prisma: "_" dan "%" ikut jadi
     // pola LIKE dan bisa membuka kunci akun lain yang emailnya mirip).
+    // ponytail: mengambil semua kunci login-net (tabel hanya menyimpan ±1 hari);
+    // bila trafik besar, simpan id akun di kolom sendiri dan cari lewat indeks.
     const net = await prisma.rateLimitHit.findMany({ where: { key: { startsWith: "login-net:" } }, select: { id: true, key: true } });
     const own = new Set(ids.map((id) => storedKey(`login:${id}`)));
     const hitIds = net.filter((h) => ids.some((id) => h.key.endsWith(`:${id}`))).map((h) => h.id);
