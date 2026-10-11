@@ -106,13 +106,12 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
                   : `${p.availabilities.reduce((n, a) => n + a.bookings.length, 0)} dari kapasitas ${p.dailyCapacity} sesi SPH terpakai`}
               </p>
               <ul className="flex flex-col divide-y divide-border">
-                {rows.map((r) => (
+                {rows.filter((r) => r.booked.length > 0 || r.open.length > 0).map((r) => (
                   <li key={r.hour} className="flex flex-col gap-1 py-2 sm:flex-row sm:items-start sm:gap-4">
                     <span className="w-24 shrink-0 text-sm font-semibold tabular-nums text-text">
                       {String(r.hour).padStart(2, "0")}:00–{String(r.hour + 1).padStart(2, "0")}:00
                     </span>
                     <div className="flex flex-1 flex-wrap gap-2">
-                      {r.booked.length === 0 && r.open.length === 0 && <span className="text-sm text-text-subtle">Tidak ada les</span>}
                       {r.booked.map((s, i) => (
                         <Badge key={`b${i}`} tone="brand">
                           {formatTimeWib(s.startTime)} · Coach {s.coachName}
@@ -126,6 +125,19 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
                   </li>
                 ))}
               </ul>
+              {/* Jam tanpa les diringkas satu baris (dulu satu baris per jam). */}
+              {rows.some((r) => r.booked.length === 0 && r.open.length === 0) && (
+                <p className="mt-3 border-t border-border pt-3 text-sm text-text-subtle">
+                  Tidak ada les:{" "}
+                  {rows
+                    .filter((r) => r.booked.length === 0 && r.open.length === 0)
+                    .map((r) => `${String(r.hour).padStart(2, "0")}:00`)
+                    .join(", ")}
+                </p>
+              )}
+              {rows.every((r) => r.booked.length === 0 && r.open.length === 0) && (
+                <p className="text-sm text-text-muted">Tidak ada les di tanggal ini.</p>
+              )}
             </CardBody>
           </Card>
         );

@@ -1,3 +1,4 @@
+import { ShowMoreLink, pageSize } from "@/components/show-more-link";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { dateLabel, formatDateLabel, formatTimeWib, resolveDateRange } from "@/lib/datetime";
@@ -16,13 +17,17 @@ import { Button } from "@/components/ui/button";
 // dari ledger (yang benar-benar dikredit), sama seperti halaman Bagi Hasil admin.
 export const metadata = { title: "Laporan | Swim Private Hub" };
 
+// Rentang panjang = ratusan sesi: tampil 20 dulu; ringkasan di atas tetap menghitung semuanya.
+const PAGE = 20;
+
 export default async function PoolLaporanPage({
   searchParams,
 }: {
-  searchParams: Promise<{ from?: string; to?: string }>;
+  searchParams: Promise<{ from?: string; to?: string; n?: string }>;
 }) {
   const session = await requireRole("POOL_OWNER");
   const params = await searchParams;
+  const limit = pageSize(params.n, PAGE);
 
   const { from, to } = resolveDateRange(params.from, params.to, 6);
   const fromDate = dateLabel(from);
@@ -190,7 +195,7 @@ export default async function PoolLaporanPage({
                 <>
                 {/* HP: satu kartu per sesi supaya angka uangnya tidak terpotong ke kanan. */}
                 <ul className="flex flex-col gap-3 sm:hidden">
-                  {rows.map((r) => (
+                  {rows.slice(0, limit).map((r) => (
                     <li key={r.booking.id}>
                       <Card>
                         <CardBody className="py-4">
@@ -233,7 +238,7 @@ export default async function PoolLaporanPage({
                         </tr>
                       </thead>
                       <tbody>
-                        {rows.map((r) => (
+                        {rows.slice(0, limit).map((r) => (
                           <tr key={r.booking.id} className="border-b border-border last:border-0">
                             <td className="px-4 py-3">
                               <p className="text-text">{formatDateLabel(r.booking.availability.date)}</p>
@@ -257,6 +262,7 @@ export default async function PoolLaporanPage({
                     </table>
                   </div>
                 </Card>
+                <ShowMoreLink href={`?${new URLSearchParams({ from, to, n: String(limit + PAGE) }).toString()}`} shown={Math.min(limit, rows.length)} total={rows.length} unit="sesi" />
                 </>
               )}
             </div>

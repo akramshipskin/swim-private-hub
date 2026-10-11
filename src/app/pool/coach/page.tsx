@@ -1,3 +1,5 @@
+import { SearchForm, matchesQuery } from "@/components/search-form";
+import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
 import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { NOT_CLOSED } from "@/lib/availability";
@@ -10,7 +12,13 @@ import { approvedCertificatesSelect, certifiedBadgeText } from "@/lib/coach-cert
 
 export const metadata = { title: "Coach di Kolam | Swim Private Hub" };
 
-export default async function PoolCoachPage() {
+// Puluhan coach per kolam: tampil 12 dulu, tombol menambah 12.
+const PAGE = 12;
+
+export default async function PoolCoachPage({ searchParams }: { searchParams: Promise<{ q?: string; n?: string }> }) {
+  const sp = await searchParams;
+  const q = sp.q ?? "";
+  const limit = pageSize(sp.n, PAGE);
   const session = await requireRole("POOL_OWNER");
   const startMonth = wibDateTime(`${todayWibDateString().slice(0, 7)}-01`, "00:00");
   const now = new Date();
@@ -53,14 +61,19 @@ export default async function PoolCoachPage() {
     <main className="w-full px-4 py-6 sm:py-8">
       <h1 className="text-2xl font-semibold tracking-tight text-text">Coach di Kolam</h1>
       <p className="mt-1 mb-6 text-sm text-text-muted">Coach yang terdaftar mengajar di kolammu, dengan aktivitas bulan ini.</p>
-      {pools.map((p) => (
+      {pools.some((p) => p.affiliations.length > PAGE) && <SearchForm q={q} placeholder="Cari nama coach atau keahlian" />}
+      {pools.map((p) => {
+        const matched = p.affiliations.filter(({ coach }) => matchesQuery(q, coach.name, ...(coach.coachProfile?.specialties ?? [])));
+        return (
         <section key={p.id} className="mb-8">
           <h2 className="mb-3 text-lg font-semibold text-brand-700">{p.name}</h2>
           {p.affiliations.length === 0 ? (
             <p className="text-sm text-text-muted">Belum ada coach yang memilih kolam ini. Coach memilih sendiri kolam tempat mereka mengajar lewat menu Kolam Saya.</p>
+          ) : matched.length === 0 ? (
+            <p className="text-sm text-text-muted">Tidak ada coach yang cocok dengan &quot;{q}&quot;.</p>
           ) : (
             <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-              {p.affiliations.map(({ coach }) => {
+              {matched.slice(0, limit).map(({ coach }) => {
                 const here = coach.availabilities.filter((a) => a.poolId === p.id);
                 const attended = here.reduce((n, a) => n + a.bookings.length, 0);
                 const upcomingBooked = here.filter((a) => a.status === "BOOKED" && a.startTime > now).length;
@@ -92,8 +105,10 @@ export default async function PoolCoachPage() {
               })}
             </ul>
           )}
+          <ShowMoreLink href={listHref({ q: q || undefined, n: String(limit + PAGE) })} shown={Math.min(limit, matched.length)} total={matched.length} unit="coach" />
         </section>
-      ))}
+        );
+      })}
     </main>
   );
 }
