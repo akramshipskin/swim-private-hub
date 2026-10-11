@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { buildAdminWaLink } from "@/lib/whatsapp";
 import { formatCountdown, isLockedCode, lockSecondsFromCode } from "@/lib/login-lock";
 
 // Kode dari src/auth.ts (LockedError dll). Selain itu = salah HP/password
@@ -19,7 +18,7 @@ export function loginErrorMessage(code: string | undefined): string {
   return "Nomor HP/email atau password salah. Bila kamu coach atau pemilik kolam yang baru daftar, akunmu mungkin belum diaktifkan admin.";
 }
 
-export default function LoginForm() {
+export default function LoginForm({ resetDone = false }: { resetDone?: boolean }) {
   const router = useRouter();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -98,6 +97,11 @@ export default function LoginForm() {
       <Card className="w-full max-w-sm">
         <CardBody>
           <h1 className="mb-5 text-xl font-semibold text-text">Masuk ke akunmu</h1>
+          {resetDone && (
+            <p role="status" className="mb-4 rounded-xl bg-success-bg p-3 text-sm text-success-text">
+              Password baru tersimpan. Masuk memakai password barumu.
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field label="Nomor HP atau Email">
@@ -163,13 +167,8 @@ export default function LoginForm() {
 
           <p className="mt-4 text-center text-sm text-text-muted">
             Lupa password?{" "}
-            <a
-              href={buildAdminWaLink("Halo Admin Swim Private Hub, saya lupa password akun saya. Nomor HP akun saya: ")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block -my-3 py-3 font-medium text-brand-700 hover:underline"
-            >
-              Minta reset ke admin
+            <a href="/lupa-password" className="inline-block -my-3 py-3 font-medium text-brand-700 hover:underline">
+              Buat password baru
             </a>
           </p>
           <p className="mt-2 text-center text-sm text-text-muted">

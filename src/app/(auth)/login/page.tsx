@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description: "Masuk ke akunmu untuk memilih coach, kolam, dan jam les renang privat.",
 };
 
-export default function LoginPage() {
-  return <LoginForm />;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ reset?: string }> }) {
+  const { reset } = await searchParams;
+  return <LoginForm resetDone={reset === "ok"} />;
 }

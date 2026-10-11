@@ -51,3 +51,8 @@ export async function sendReplyEmail(params: {
   if (!data) throw new Error(`Resend tidak mengembalikan id pengiriman ke ${params.to}`);
   return data;
 }
+
+export async function sendPlainEmail(params: { from: string; to: string; subject: string; text: string }) {
+  const { error } = await client().emails.send({ from: params.from, to: [params.to], subject: params.subject, text: params.text });
+  if (error) throw new Error(`Resend gagal kirim email: ${error.message}`);
+}
