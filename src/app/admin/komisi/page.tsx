@@ -136,7 +136,7 @@ export default async function KomisiPage() {
             href="/admin/withdrawals"
             className="order-3 inline-flex items-center rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:opacity-90 max-lg:min-h-[44px] sm:order-none"
           >
-            Cairkan saldo →
+            Tarik Saldo →
           </Link>
           <p className="text-right text-xl font-bold text-text">
             {formatRupiah(totalPlatform)}

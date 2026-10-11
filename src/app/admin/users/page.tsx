@@ -9,6 +9,7 @@ import UsersMemberSection from "./users-member-section";
 import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserActions } from "./user-display";
+import { RejectionWaLink } from "./reject-registration-button";
 import PendingCertificates from "./pending-certificates";
 import Link from "next/link";
 import { Avatar } from "@/components/ui/avatar";
@@ -175,7 +176,10 @@ export default async function AdminUsersPage() {
                           Info detail
                         </Link>
                         {u.rejectedAt ? (
-                          <span className="text-sm text-text-muted">Ditolak: {u.rejectionReason}</span>
+                          <>
+                            <span className="text-sm text-text-muted">Ditolak: {u.rejectionReason}</span>
+                            <RejectionWaLink userId={u.id} />
+                          </>
                         ) : (
                           <UserActions user={u} isSelf={u.id === session.user.id} pending={isPendingApproval(u)} />
                         )}

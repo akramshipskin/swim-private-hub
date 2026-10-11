@@ -103,7 +103,7 @@ export default function PesertaPackageRow({
                     className="w-full sm:w-20"
                   />
                 </Field>
-                <Field label="Berlaku sampai">
+                <Field label="Berlaku Sampai">
                   <DatePicker
                     name="expiredDate"
                     defaultValue={pkg.expiredDateInput}

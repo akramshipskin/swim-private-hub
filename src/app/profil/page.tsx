@@ -94,7 +94,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
                 <h2 className="mb-3 text-lg font-semibold text-text">Nama</h2>
                 <EditNameForm
                   currentName={session.user.name ?? ""}
-                  label={session.user.role === "MEMBER" ? "Nama orang tua / pemilik akun" : "Nama Lengkap"}
+                  label={session.user.role === "MEMBER" ? "Nama Orang Tua / Pemilik Akun" : "Nama Lengkap"}
                 />
               </CardBody>
             </Card>

@@ -40,7 +40,7 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
           <CitySelect defaultValue={pool.city ?? ""} />
         </Field>
         <div className="flex flex-col gap-1.5">
-          <Field label="Kapasitas harian untuk member SPH (sesi per hari)">
+          <Field label="Kapasitas Harian untuk Member SPH (sesi per hari)">
             <Input name="dailyCapacity" type="number" inputMode="numeric" min={1} max={500} defaultValue={pool.dailyCapacity ?? ""} placeholder="Contoh: 10" />
           </Field>
           <p className="text-xs text-text-subtle">
@@ -52,7 +52,7 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
             jam yang cuma ~150px ketarik berjauhan di layar lebar
             (Hadi 18 Sep v3: "gapnya kejauhan"). */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] lg:col-span-2">
-          <Field label="No. telepon kolam">
+          <Field label="No. Telepon Kolam">
             <Input name="contactPhone" defaultValue={pool.contactPhone ?? ""} />
           </Field>
           <TimeSelect name="openTime" label="Jam Buka" defaultValue={pool.openTime ?? "06:00"} />
@@ -71,7 +71,7 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
             ))}
           </div>
         </div>
-        <Field label="Fasilitas lain (pisahkan dengan koma)">
+        <Field label="Fasilitas Lain (pisahkan dengan koma)">
           <Input name="extraFacilities" defaultValue={extra.join(", ")} placeholder="Contoh: Gazebo, Ruang laktasi" />
         </Field>
       </fieldset>

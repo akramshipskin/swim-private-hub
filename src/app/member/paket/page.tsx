@@ -422,7 +422,7 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
           <CardBody className="flex flex-col gap-3">
             <p className="text-base font-semibold text-text">Belum tersedia di {city}</p>
             <p className="text-sm text-text-muted">
-              Kami sedang mencari kolam dan coach di {city}. Tekan Kabari saya. Begitu paket pertama di {city} bisa dibeli, kami kabari lewat notifikasi HP (bila notifikasi aktif). Paketnya juga langsung muncul di halaman ini.
+              Kami sedang mencari kolam dan coach di {city}. Tekan Kabari Saya. Begitu paket pertama di {city} bisa dibeli, kami kabari lewat notifikasi HP (bila notifikasi aktif). Paketnya juga langsung muncul di halaman ini.
             </p>
             {city && isCity(city) && (waitlisted ? (
               <p role="status" className="rounded-lg bg-success-bg px-3 py-2 text-sm text-success-text">Kamu sudah masuk daftar tunggu {city}.</p>

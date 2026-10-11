@@ -129,7 +129,7 @@ export default function SaldoView({
               />
             </Field>
             <Button type="submit" disabled={!canWithdraw || cairPending} loading={cairPending}>
-              Cairkan
+              Tarik Saldo
             </Button>
           </form>
           {walletBalance < 0 && (

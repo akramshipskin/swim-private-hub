@@ -146,7 +146,7 @@ export default function RegisterPoolForm() {
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Field label="Kapasitas harian untuk member SPH (sesi per hari)">
+              <Field label="Kapasitas Harian untuk Member SPH (sesi per hari)">
                 <Input
                   type="number"
                   inputMode="numeric"

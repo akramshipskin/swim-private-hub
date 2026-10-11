@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { rejectRegistration } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
@@ -8,6 +8,44 @@ import { buildRejectionWaLink } from "@/lib/whatsapp";
 
 // Tolak pendaftar coach/pemilik kolam dengan alasan (Hadi 10 Okt); setelah
 // ditolak, admin ditawari kabar lewat WhatsApp dengan teks siap pakai.
+const waKey = (userId: string) => `reject-wa-${userId}`;
+const WA_CLASS =
+  "rounded-md px-2 py-1.5 text-sm font-medium text-whatsapp-text hover:bg-whatsapp/10 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center";
+
+// Tautan kabar penolakan di kartu "Ditolak" (nomor pendaftar sudah dihapus di
+// server, jadi tautan hanya ada di peramban admin yang menolak). Hilang begitu diklik.
+export function RejectionWaLink({ userId }: { userId: string }) {
+  const [used, setUsed] = useState(false);
+  const link = useSyncExternalStore(
+    () => () => {},
+    () => {
+      try {
+        return sessionStorage.getItem(waKey(userId));
+      } catch {
+        return null;
+      }
+    },
+    () => null,
+  );
+  if (!link || used) return null;
+  return (
+    <a
+      href={link}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => {
+        try {
+          sessionStorage.removeItem(waKey(userId));
+        } catch {}
+        setTimeout(() => setUsed(true), 0);
+      }}
+      className={WA_CLASS}
+    >
+      Kabari Penolakan Lewat WhatsApp
+    </a>
+  );
+}
+
 export default function RejectRegistrationButton({ userId, userName }: { userId: string; userName: string }) {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
@@ -22,7 +60,14 @@ export default function RejectRegistrationButton({ userId, userName }: { userId:
     setLoading(false);
     if ("error" in res) return setError(res.error);
     setOpen(false);
-    setWa(res.phone ? buildRejectionWaLink(res.phone, res.name, res.role, reason.trim().replace(/\.?$/, ".")) : "");
+    const link = res.phone ? buildRejectionWaLink(res.phone, res.name, res.role, reason.trim().replace(/\.?$/, ".")) : "";
+    // Halaman memuat ulang sesudah penolakan dan kartu ini diganti kartu
+    // "Ditolak"; tautan dititipkan ke sessionStorage supaya RejectionWaLink
+    // di kartu baru bisa menampilkannya sekali.
+    try {
+      if (link) sessionStorage.setItem(waKey(userId), link);
+    } catch {}
+    setWa(link);
   }
 
   if (wa !== null) {
@@ -31,7 +76,12 @@ export default function RejectRegistrationButton({ userId, userName }: { userId:
         href={wa}
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-md px-2 py-1.5 text-sm font-medium text-whatsapp-text hover:bg-whatsapp/10 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
+        onClick={() => {
+          try {
+            sessionStorage.removeItem(waKey(userId));
+          } catch {}
+        }}
+        className={WA_CLASS}
       >
         Kabari Penolakan Lewat WhatsApp (tautan hanya muncul sekali)
       </a>

@@ -22,7 +22,7 @@ describe("slotShortLabel", () => {
 
 describe("bookButtonState", () => {
   it("belum memilih jam: nonaktif", () => {
-    expect(bookButtonState({ sisaSesi: 3, selectedStart: null })).toEqual({ label: "Pilih tanggal dan jam", disabled: true });
+    expect(bookButtonState({ sisaSesi: 3, selectedStart: null })).toEqual({ label: "Pilih Tanggal dan Jam", disabled: true });
   });
   it("jam terpilih: label dinamis dan aktif", () => {
     expect(bookButtonState({ sisaSesi: 3, selectedStart: START })).toEqual({
@@ -31,7 +31,7 @@ describe("bookButtonState", () => {
     });
   });
   it("sesi paket habis: nonaktif walau ada pilihan", () => {
-    expect(bookButtonState({ sisaSesi: 0, selectedStart: START })).toEqual({ label: "Sesi paket habis", disabled: true });
+    expect(bookButtonState({ sisaSesi: 0, selectedStart: START })).toEqual({ label: "Sesi Paket Habis", disabled: true });
   });
   it("tidak ada paket aktif di kolam ini: nonaktif", () => {
     expect(bookButtonState({ sisaSesi: null, selectedStart: null })).toEqual({

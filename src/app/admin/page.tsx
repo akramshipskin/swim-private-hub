@@ -144,16 +144,16 @@ export default async function AdminDashboardPage() {
               detail={formatRupiah(pendingWithdrawals._sum.amount ?? 0)}
             />
             <ActionRow
-              label="Penarikan lewat 7 hari kerja"
+              label="Penarikan Lewat 7 Hari Kerja"
               count={overdueWithdrawals}
               href="/admin/withdrawals"
               detail="Janji transfer di perjanjian coach & MOU kolam"
             />
             <ActionRow label="Sertifikat Coach Menunggu" count={pendingCerts} href="/admin/users" />
             <ActionRow label="Usulan Keterampilan Milestone" count={pendingMilestoneProposals} href="/admin/milestone" />
-            <ActionRow label="Coach/pemilik kolam baru menunggu persetujuan" count={pendingAccounts} href="/admin/users" />
+            <ActionRow label="Coach/Pemilik Kolam Baru Menunggu Persetujuan" count={pendingAccounts} href="/admin/users" />
             <ActionRow label="Kolam Belum Disetujui" count={pools.length - activePools.length} href="/admin/kolam" />
-            <ActionRow label="Sesi lewat belum ditandai Hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach baru masuk setelah ditandai Hadir" />
+            <ActionRow label="Sesi Lewat Belum Ditandai Hadir" count={unmarked} href="/admin/booking-overview" detail="Saldo kolam & coach baru masuk setelah ditandai Hadir" />
           </div>
         </BentoCard>
 
@@ -164,7 +164,7 @@ export default async function AdminDashboardPage() {
           <SessionList items={tomorrowItems} empty="Belum ada sesi besok." />
         </BentoCard>
 
-        <BentoCard title="Pendapatan platform" href="/admin/withdrawals" linkLabel="Cairkan saldo" className="md:col-span-6">
+        <BentoCard title="Pendapatan platform" href="/admin/withdrawals" linkLabel="Tarik Saldo" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Pendapatan Bersih Bulan Ini" value={formatRupiah(monthSum("PLATFORM_REVENUE"))} tone="success" />
             <Stat label="PPN Bulan Ini" value={formatRupiah(monthSum("PLATFORM_TAX"))} />

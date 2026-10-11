@@ -80,7 +80,7 @@ nandain, dibikinin → bentuk baku: dilewati, dikelompokkan, menandai, dibuatkan
 | Sesi | pertemuan, jam les |
 | Jatah batal | kuota cancel |
 | Saldo | dompet, wallet |
-| Cairkan saldo | withdraw, tarik dana |
+| Tarik Saldo (penarikan) | withdraw, cairkan, tarik dana |
 | Ditandai Hadir | absen, check-in |
 | Tidak Hadir | gak hadir, absen, bolos |
 | Peserta yang dilatih coach / sesi bersama coach | diajar, diajarin, murid coach |
@@ -136,8 +136,8 @@ Tombol menu tambahan di bilah bawah HP: "Lainnya" untuk semua peran.
 
 ## 6. Tombol & pesan sistem
 
-- Tombol memakai kata kerja + objek bila perlu: "Simpan", "Tambah peserta",
-  "Cairkan saldo", "Kirim usulan". Hindari "OK" dan "Submit".
+- Tombol memakai kata kerja + objek bila perlu: "Simpan", "Tambah Peserta",
+  "Tarik Saldo", "Kirim Usulan". Hindari "OK" dan "Submit".
 - Konfirmasi tindakan berbahaya menyebut akibatnya: "Nonaktifkan Budi? Paket &
   booking peserta ini tidak bisa diakses lagi sampai diaktifkan ulang."
 - Pesan error: sebut apa yang terjadi + apa yang harus dilakukan. Jangan sebut

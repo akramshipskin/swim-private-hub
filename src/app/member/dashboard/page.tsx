@@ -135,7 +135,7 @@ export default async function MemberDashboardPage() {
               title={`${unscheduled} sesi`}
               body="Pilih tanggal dan jam dengan coach-mu sebelum paket berakhir."
               href="/member/booking"
-              cta="Booking sekarang"
+              cta="Booking Sekarang"
             >
               <SegmentBar sisa={totalSisa} total={totalAll} tone="hero" className="mt-4" />
             </NextStepCard>
@@ -144,7 +144,7 @@ export default async function MemberDashboardPage() {
               title={packages.length === 0 ? "Belum ada paket aktif" : "Semua sesi paketmu sudah dipakai"}
               body="Pilih kolam dan coach di kotamu, lalu booking jam yang masih kosong."
               href="/member/paket"
-              cta="Beli paket"
+              cta="Beli Paket"
             />
           )}
         </div>

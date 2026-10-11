@@ -48,7 +48,7 @@ export function PoolPhotosForm({
 
       <form action={uploadAction} className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <input type="hidden" name="poolId" value={poolId} />
-        <Field label="Tambah foto (JPG/PNG/WEBP, maks 3MB)" className="flex-1">
+        <Field label="Tambah Foto (JPG/PNG/WEBP, maks 3 MB)" className="flex-1">
           <Input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required disabled={!storageReady} />
         </Field>
         <Button type="submit" loading={uploading} disabled={!storageReady}>

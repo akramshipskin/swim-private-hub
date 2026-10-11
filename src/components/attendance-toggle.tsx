@@ -66,7 +66,7 @@ export default function AttendanceToggle({
         : "border-border bg-surface text-text-muted";
 
   if (lockedReason) {
-    const label = attended === true ? "Hadir" : attended === false ? "Tidak Hadir" : "Belum ditandai";
+    const label = attended === true ? "Hadir" : attended === false ? "Tidak Hadir" : "Belum Ditandai";
     return (
       <div className="flex flex-col items-end gap-1">
         <span className={`rounded-lg border px-2 py-1 text-xs font-medium ${toneClass}`}>{label}</span>
@@ -95,7 +95,7 @@ export default function AttendanceToggle({
           className={`appearance-none rounded-lg border py-1 pl-2 pr-6 text-xs font-medium max-lg:min-h-[44px] max-sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 ${toneClass}`}
         >
           <option value="" disabled>
-            Belum ditandai
+            Belum Ditandai
           </option>
           <option value="true">Hadir</option>
           <option value="false">Tidak Hadir</option>

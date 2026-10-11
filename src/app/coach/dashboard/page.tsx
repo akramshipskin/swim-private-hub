@@ -72,15 +72,15 @@ export default async function CoachDashboardPage() {
   // paling berdampak ke saldo/member.
   const nextToday = slots.find((s) => s.date.getTime() === today.getTime() && s.endTime > now);
   const step = unmarked.length > 0
-    ? { title: `${unmarked.length} sesi belum ditandai Hadir`, body: "Bagianmu masuk saldo setelah sesi ditandai. Lewat 24 jam setelah sesi selesai, hanya admin yang bisa menandai.", href: "/coach/riwayat-sesi", cta: "Tandai sekarang" }
+    ? { title: `${unmarked.length} sesi belum ditandai Hadir`, body: "Bagianmu masuk saldo setelah sesi ditandai. Lewat 24 jam setelah sesi selesai, hanya admin yang bisa menandai.", href: "/coach/riwayat-sesi", cta: "Tandai Sekarang" }
     : owedBlocked.length > 0
-      ? { title: `${owedBlocked.length} member belum bisa booking`, body: "Buka jam kosong di kolam mereka supaya sesinya tidak tertunda.", href: "/coach/jadwal", cta: "Buka jadwal" }
+      ? { title: `${owedBlocked.length} member belum bisa booking`, body: "Buka jam kosong di kolam mereka supaya sesinya tidak tertunda.", href: "/coach/jadwal", cta: "Buka Jadwal" }
       : pools.length === 0
-        ? { title: "Pilih kolam tempat kamu mengajar", body: "Member baru bisa membeli paket denganmu setelah kamu memilih kolam dan membuka jam kosong.", href: "/coach/kolam", cta: "Pilih kolam" }
+        ? { title: "Pilih kolam tempat kamu mengajar", body: "Member baru bisa membeli paket denganmu setelah kamu memilih kolam dan membuka jam kosong.", href: "/coach/kolam", cta: "Pilih Kolam" }
         : nextToday
           ? { eyebrow: "Sesi berikutnya hari ini", title: `${formatTimeWib(nextToday.startTime)}–${formatTimeWib(nextToday.endTime)} · ${nextToday.pool.name}`, body: nextToday.bookings[0]?.package.dependent.name, secondary: { href: "/coach/jadwal", label: "Lihat Jadwal" } }
           : openThisWeek < 4
-            ? { title: "Buka jam kosong minggu ini", body: "Coach dengan minimal 4 jam kosong dalam 14 hari ke depan tampil di halaman beli paket member.", href: "/coach/jadwal", cta: "Buka jadwal" }
+            ? { title: "Buka jam kosong minggu ini", body: "Coach dengan minimal 4 jam kosong dalam 14 hari ke depan tampil di halaman beli paket member.", href: "/coach/jadwal", cta: "Buka Jadwal" }
             : { title: "Semua beres", body: `${openThisWeek} jam kosong 7 hari ke depan siap dibooking member.`, secondary: { href: "/coach/jadwal", label: "Lihat Jadwal" } };
 
   return (
@@ -95,7 +95,7 @@ export default async function CoachDashboardPage() {
           amount={formatRupiah(profile?.walletBalance ?? 0)}
           hint="Bertambah setelah sesi ditandai Hadir."
           href="/coach/saldo"
-          cta="Cairkan saldo"
+          cta="Tarik Saldo"
           className="md:col-span-2"
         />
       </div>
@@ -141,7 +141,7 @@ export default async function CoachDashboardPage() {
         <BentoCard title="Ringkasan" className="md:col-span-6">
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 xl:grid-cols-4">
             <Stat label="Sesi Belum Ditandai" value={unmarked.length} tone={unmarked.length > 0 ? "warning" : undefined} hint="Saldo masuk setelah ditandai" />
-            <Stat label="Jam kosong 7 hari ke depan" value={openThisWeek} />
+            <Stat label="Jam Kosong 7 Hari ke Depan" value={openThisWeek} />
             <Stat label="Kolam Tempat Mengajar" value={pools.length} hint={pools.map((p) => p.pool.name).join(", ") || "Belum ada"} />
           </div>
         </BentoCard>

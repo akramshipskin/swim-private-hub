@@ -127,7 +127,7 @@ const GUIDES: Guide[] = [
           { title: "Isi catatan perkembangan", body: "Isi Update milestone tiap peserta minimal sekali setiap 2 sesi Hadir. Selama ada yang belum diisi, pengajuan penarikan baru ditahan." },
           { title: "Saldo masuk", body: "Hadir: bagianmu (harga paketmu ÷ jumlah sesi, dipotong PPh 0,5% kecuali bebas potongan) masuk penuh. Tidak Hadir (peserta sudah booking tapi tidak datang): kamu mendapat 50% dari bagianmu." },
         ],
-        note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum ditandai. Pastikan pilihannya benar.",
+        note: "Status yang sudah dipilih tidak bisa dikembalikan ke Belum Ditandai. Pastikan pilihannya benar.",
       },
       {
         heading: "4. Saldo & profil",

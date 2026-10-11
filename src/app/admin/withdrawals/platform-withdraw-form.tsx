@@ -18,7 +18,7 @@ export default function PlatformWithdrawForm({ revenue, tax }: { revenue: number
         <Field label={`Cairkan pendapatan (maks. ${formatRupiah(Math.max(0, revenue))})`}>
           <PriceInput name="revenueAmount" defaultValue={Math.max(0, revenue)} required />
         </Field>
-        <Field label="Nomor referensi / bukti transfer">
+        <Field label="Nomor Referensi / Bukti Transfer">
           <Input name="transferReference" required minLength={3} maxLength={100} placeholder="Nomor referensi dari m-banking" />
         </Field>
         <Field label="Catatan (Opsional)">

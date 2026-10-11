@@ -28,7 +28,7 @@ function Fields({ v }: { v?: Values }) {
       <Field label="Kutipan (Persis Kata Mereka)">
         <Textarea name="quote" defaultValue={v?.quote} maxLength={TESTIMONIAL_LIMITS.quote} rows={4} required />
       </Field>
-      <Field label="Catatan izin (siapa mengizinkan, kapan, lewat apa)">
+      <Field label="Catatan Izin (siapa mengizinkan, kapan, lewat apa)">
         <Input name="consentNote" defaultValue={v?.consentNote} maxLength={TESTIMONIAL_LIMITS.consentNote} required placeholder="Izin lewat WhatsApp, 30 Sep 2026" />
       </Field>
     </>

@@ -153,7 +153,7 @@ export default async function PoolLaporanPage({
                 </Card>
                 <Card>
                   <CardBody className="py-3">
-                    <p className="text-xs text-text-subtle">Rata-rata masuk saldo per sesi</p>
+                    <p className="text-xs text-text-subtle">Rata-rata Masuk Saldo per Sesi</p>
                     <p className="text-lg font-semibold text-text">
                       {formatRupiah(rows.length ? Math.round(totalNet / rows.length) : 0)}
                     </p>
@@ -161,7 +161,7 @@ export default async function PoolLaporanPage({
                 </Card>
                 <Card>
                   <CardBody className="py-3">
-                    <p className="text-xs text-text-subtle">Peserta berbeda</p>
+                    <p className="text-xs text-text-subtle">Peserta Berbeda</p>
                     <p className="text-lg font-semibold text-text">
                       {new Set(rows.map((r) => r.booking.package.dependent.name)).size}
                     </p>
@@ -169,7 +169,7 @@ export default async function PoolLaporanPage({
                 </Card>
                 <Card>
                   <CardBody className="py-3">
-                    <p className="text-xs text-text-subtle">Masuk saldo</p>
+                    <p className="text-xs text-text-subtle">Masuk Saldo</p>
                     <p className="text-lg font-semibold text-text">{formatRupiah(totalNet)}</p>
                     {totalPph > 0 && (
                       <p className="mt-0.5 text-xs text-text-subtle">
@@ -210,7 +210,7 @@ export default async function PoolLaporanPage({
                               <dd className="mt-0.5 font-mono text-sm text-text-muted">{r.pph > 0 ? <>&minus;{formatRupiah(r.pph)}</> : "–"}</dd>
                             </div>
                             <div>
-                              <dt className="text-text-subtle">Masuk saldo</dt>
+                              <dt className="text-text-subtle">Masuk Saldo</dt>
                               <dd className="mt-0.5 font-mono text-sm font-semibold text-text">{formatRupiah(r.netAmount)}</dd>
                             </div>
                           </dl>
@@ -266,7 +266,7 @@ export default async function PoolLaporanPage({
 
       <p className="mt-4 text-xs text-text-subtle">
         Hanya sesi yang benar-benar ditandai Hadir dan paketnya berbayar (bukan paket pemberian admin/gratis)
-        yang dihitung di sini — sama seperti dasar hitung saldo kolam. Bagian kolam dipotong PPh final 0,5% yang
+        yang dihitung di sini, sama seperti dasar hitung saldo kolam. Bagian kolam dipotong PPh final 0,5% yang
         disetor SPH atas nama kolam (kecuali kolam sudah menyerahkan surat bebas PPh); &ldquo;Masuk Saldo&rdquo; adalah angka
         yang masuk ke saldo kamu dari sesi itu (komisi afiliasi dan koreksi saldo dari admin tercatat terpisah di halaman Saldo).
       </p>

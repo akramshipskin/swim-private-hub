@@ -48,7 +48,7 @@ export function MilestoneUpdateForm({
   return (
     <form ref={form} action={action} className="flex flex-col gap-4">
       {groupOptions && (
-        <Field label="Kelompok umur (tanggal lahir peserta belum diisi)">
+        <Field label="Kelompok Umur (tanggal lahir peserta belum diisi)">
           <Select name="group" required value={chosen} onChange={(e) => setChosen(e.target.value)}>
             <option value="" disabled>
               Pilih kelompok
@@ -109,7 +109,7 @@ export function MilestoneUpdateForm({
       )}
 
       {focusOptions.length > 0 && (
-        <Field label="Sedang dilatih (saran: keterampilan berikutnya)">
+        <Field label="Sedang Dilatih (saran: keterampilan berikutnya)">
           <Select key={`${chosen}-${set?.suggestedItemId}`} name="focusItemId" defaultValue={set?.suggestedItemId ?? ""}>
             <option value="">— Tidak dipilih —</option>
             {focusOptions.map((it) => (

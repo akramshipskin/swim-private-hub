@@ -120,7 +120,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
               />
             </div>
 
-            <Field label="Nama orang tua / pemilik akun">
+            <Field label="Nama Orang Tua / Pemilik Akun">
               <Input
                 type="text"
                 placeholder="Nama kamu"

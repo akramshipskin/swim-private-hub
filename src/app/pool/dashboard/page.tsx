@@ -89,13 +89,13 @@ export default async function PoolDashboardPage() {
         const now = new Date();
         const nextLes = slots.find((x) => x.booked && x.endTime > now);
         const step = !p.openTime || !p.closeTime
-          ? { title: "Isi jam buka kolam", body: "Coach belum bisa membuka jadwal di kolammu sebelum jam buka diisi.", href: "/pool/info", cta: "Isi jam buka" }
+          ? { title: "Isi jam buka kolam", body: "Coach belum bisa membuka jadwal di kolammu sebelum jam buka diisi.", href: "/pool/info", cta: "Isi Jam Buka" }
           : p._count.affiliations === 0
-            ? { title: "Belum ada coach di kolammu", body: "Coach memilih sendiri kolam tempat mengajar. Lengkapi foto, fasilitas, dan deskripsi supaya kolammu menarik dipilih.", href: "/pool/info", cta: "Lengkapi info kolam" }
+            ? { title: "Belum ada coach di kolammu", body: "Coach memilih sendiri kolam tempat mengajar. Lengkapi foto, fasilitas, dan deskripsi supaya kolammu menarik dipilih.", href: "/pool/info", cta: "Lengkapi Info Kolam" }
             : nextLes
               ? { eyebrow: "Les berikutnya hari ini", title: `${formatTimeWib(nextLes.startTime)}–${formatTimeWib(nextLes.endTime)} · ${nextLes.who ?? "Peserta"}`, body: `Dengan ${nextLes.coachName}. Total ${bookedToday} sesi les hari ini.`, secondary: { href: "/pool/jadwal", label: "Lihat Jadwal" } }
               : !p.description || p.facilities.length === 0
-                ? { title: "Lengkapi info kolam", body: "Deskripsi dan fasilitas membantu member memilih kolammu.", href: "/pool/info", cta: "Lengkapi info" }
+                ? { title: "Lengkapi info kolam", body: "Deskripsi dan fasilitas membantu member memilih kolammu.", href: "/pool/info", cta: "Lengkapi Info" }
                 : { title: "Tidak ada les lagi hari ini", body: `Saldo bisa ditarik ${formatRupiah(p.walletBalance)}.`, secondary: { href: "/pool/saldo", label: "Lihat Saldo" } };
         return (
           <section key={p.id} className="mt-6">
@@ -107,7 +107,7 @@ export default async function PoolDashboardPage() {
                 amount={formatRupiah(p.walletBalance)}
                 hint={`Dalam proses penarikan: ${formatRupiah(pick(pendingWithdrawals, p.id)?._sum.amount ?? 0)}`}
                 href="/pool/saldo"
-                cta="Buka saldo"
+                cta="Buka Saldo"
                 className="md:col-span-2"
               />
             </div>

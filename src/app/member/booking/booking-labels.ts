@@ -27,8 +27,8 @@ export function bookButtonState({
   selectedStart: string | null;
 }): { label: string; disabled: boolean } {
   if (sisaSesi === null) return { label: "Belum ada paket di kolam ini", disabled: true };
-  if (sisaSesi <= 0) return { label: "Sesi paket habis", disabled: true };
-  if (!selectedStart) return { label: "Pilih tanggal dan jam", disabled: true };
+  if (sisaSesi <= 0) return { label: "Sesi Paket Habis", disabled: true };
+  if (!selectedStart) return { label: "Pilih Tanggal dan Jam", disabled: true };
   return { label: `Booking ${slotShortLabel(selectedStart)}`, disabled: false };
 }
 

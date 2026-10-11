@@ -8,6 +8,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { UserActions } from "../user-display";
+import { RejectionWaLink } from "../reject-registration-button";
 import { formatRupiah } from "@/lib/format";
 import { formatDateLabel, formatTimeWib, todayWibDateString, wibDateTime } from "@/lib/datetime";
 import { coachBioLine } from "@/lib/coach-bio";
@@ -129,10 +130,13 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           {user.anonymizedAt ? (
             <Badge tone="neutral">Akun dihapus</Badge>
           ) : user.rejectedAt ? (
-            <Badge tone="danger">Ditolak</Badge>
+            <>
+              <Badge tone="danger">Ditolak</Badge>
+              <RejectionWaLink userId={user.id} />
+            </>
           ) : (
             isPendingApproval(user) ? (
-              <Badge tone="warning">Menunggu persetujuan</Badge>
+              <Badge tone="warning">Menunggu Persetujuan</Badge>
             ) : (
               <Badge tone={user.isActive ? "success" : "neutral"}>{user.isActive ? "Aktif" : "Nonaktif"}</Badge>
             )

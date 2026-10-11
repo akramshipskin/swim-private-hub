@@ -50,7 +50,7 @@ export default function CoachMediaForm({
       <form action={photoAction} className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <Avatar src={photoUrl} alt="Foto profil" className="h-20 w-20" />
         <div className="flex flex-1 flex-col gap-2">
-          <Field label="Foto profil (JPG/PNG/WEBP, maks 3MB)">
+          <Field label="Foto Profil (JPG/PNG/WEBP, maks 3 MB)">
             <Input type="file" name="photo" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />
           </Field>
           <div className="flex items-center gap-3">
@@ -129,7 +129,7 @@ export default function CoachMediaForm({
                 required
               />
             </Field>
-            <Field label="File sertifikat (JPG/PNG/WEBP/PDF, maks 3MB)">
+            <Field label="File Sertifikat (JPG/PNG/WEBP/PDF, maks 3 MB)">
               <Input type="file" name="certificate" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={!storageReady} required />
             </Field>
             <div className="flex items-center gap-3">
