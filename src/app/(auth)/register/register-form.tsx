@@ -150,6 +150,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
                 autoComplete="email"
               />
             </Field>
+            <p className="-mt-2 text-xs text-text-subtle">Isi email supaya kamu bisa membuat password baru sendiri kalau lupa.</p>
             <EmailTypoHint value={email} onUse={setEmail} />
             <Field label="Password">
               <Input

@@ -214,6 +214,7 @@ export default function RegisterPoolForm() {
             <Field label="Email (Opsional)">
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
             </Field>
+            <p className="-mt-2 text-xs text-text-subtle">Isi email supaya kamu bisa membuat password baru sendiri kalau lupa.</p>
             <EmailTypoHint value={email} onUse={setEmail} />
             <Field label="Password">
               <Input
