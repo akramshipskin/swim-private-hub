@@ -114,3 +114,21 @@ berkas tsx: 224
   src/app/kebijakan-cookie/page.tsx:39  <strong>Cookie iklan Meta (Meta Pixel: _fbp, _fbc)</strong> — dipasang
   src/app/kebijakan-pengembalian/page.tsx:23  <strong>bukan</strong> merupakan pengembalian dana — sesi tetap tersedia
 ```
+
+## Penilaian ulang 12 Okt siang (setelah 0b4fb97)
+Dasar: sweeping ulang versi jadi lokal 498 kunjungan (5 peran x 375/768/1280 x terang/gelap) + 12 kunjungan ulang halaman yang dirapikan sesudahnya; cek kode ulang (transition-all 0, tanda pisah panjang di teks UI 0, isian file bawaan browser 0). Halaman laporan diperbarui (versi 2).
+
+| Kategori | Pagi | Ulang |
+|---|---|---|
+| Konsistensi brand dan warna | 8,0 | 8,5 |
+| Tema gelap | 8,0 | 8,0 |
+| Aksesibilitas | 7,5 | 8,0 |
+| Hierarki dan tata letak | 7,0 | 8,0 |
+| Pola komponen dan bentuk | 6,0 | 7,5 |
+| Landing sebagai halaman jualan | 6,5 | 7,0 |
+| Keterbacaan teks di HP | 5,5 | 7,5 |
+| **Keseluruhan** | **7,0** | **7,8** |
+
+Per peran: publik 6,5 -> 7,5; member 7,0 -> 8,0; coach 7,0 -> 7,5; pemilik kolam 6,5 -> 8,0; admin 7,0 -> 7,5.
+
+Sisa rekomendasi: (1) Peserta member: 3 paket teratas + "n paket lain"; (2) Riwayat Sesi coach: Update milestone jadi tombol terpisah; (3) teks dasar 16px di HP (keputusan brand); (4) Pesan dan Bagi Hasil admin pakai Tampilkan Lebih Banyak; (5) kartu lime penuh di tema gelap jadi charcoal + aksen lime (keputusan brand).
