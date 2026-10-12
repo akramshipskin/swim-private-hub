@@ -818,6 +818,7 @@ export default function BrandGuidelineView() {
                 ["Tanda di latar gelap", "Satu tanda untuk semua latar (Hadi 30 Sep 2026); hanya tulisan logotype yang ikut tema"],
                 ["Tombol utama", "Charcoal; lime hanya kartu utama gelap dan layar sukses (Hadi 4 Okt 2026)"],
                 ["Bentuk tombol", "Semua tombol bersudut 12 px, termasuk tombol jualan di landing; pil hanya untuk badge dan filter (Hadi 12 Okt 2026)"],
+                ["Kartu utama di tema gelap", "Charcoal dengan aksen lime dan garis lime tipis, sama dengan tema terang; tidak lagi lime penuh (Hadi 12 Okt 2026)"],
                 ["Teks di HP", "Teks standar 15 px dan teks kecil 13 px; teks samar memakai warna teks sekunder supaya terbaca (Hadi 12 Okt 2026)"],
                 ["Kata ramah dan Title Case", "Berlaku di semua teks aplikasi (Hadi 6 Okt 2026); teks hukum tidak diubah"],
                 ["Dokumen lama", "guideline.html dan brand-guideline-v2.html dihapus, digantikan halaman ini"],

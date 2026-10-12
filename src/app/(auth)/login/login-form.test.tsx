@@ -29,7 +29,7 @@ describe("LoginForm 2FA", () => {
     await user.click(screen.getByRole("button", { name: "Masuk" }));
     expect(signIn).toHaveBeenLastCalledWith("credentials", expect.objectContaining({ identifier: "081200000001", otp: "123456" }));
     expect(await screen.findByRole("alert", undefined, { timeout: 5000 })).toHaveTextContent("Kode 2FA salah atau sudah dipakai");
-  });
+  }, 20_000); // mengetik 3 isian lewat userEvent: >5 dtk saat laptop sibuk (tes ini sempat gagal acak, STATUS #4)
 
   it("tanpa 2FA: salah password -> pesan umum, kolom kode tidak muncul", async () => {
     const user = userEvent.setup();

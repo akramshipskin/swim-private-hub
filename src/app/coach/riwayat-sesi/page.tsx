@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buttonClass } from "@/components/ui/button";
 import { requireRole } from "@/lib/require-role";
 import { SearchForm, matchesQuery } from "@/components/search-form";
 import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
@@ -103,14 +104,15 @@ export default async function CoachRiwayatSesiPage({ searchParams }: { searchPar
                           {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}
                         </p>
                         <p className="text-sm text-text">
-                          Peserta: {b.package.dependent.name}{" "}
-                          <Link href={`/milestone/${b.package.dependent.id}`} className="font-medium text-brand-700 underline">
-                            Update milestone
-                          </Link>
+                          Peserta: {b.package.dependent.name}
                         </p>
                         <p className="text-sm text-text-muted">
                           Akun {b.member.name} · {b.package.name}
                         </p>
+                        {/* Tombol terpisah, bukan tautan di dalam kalimat (Hadi 12 Okt, penilaian UI/UX: sulit diketuk). */}
+                        <Link href={`/milestone/${b.package.dependent.id}`} className={buttonClass({ variant: "secondary", size: "sm", className: "mt-2" })}>
+                          Update Milestone
+                        </Link>
                         {b.attended !== null && b.attendedBy && (
                           <p className="mt-0.5 text-xs text-text-subtle">
                             ditandai {b.attendedBy === "COACH" ? "coach" : "admin"}

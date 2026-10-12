@@ -43,6 +43,7 @@ export const THEME_VARS: Record<"light" | "dark", CSSProperties> = {
     "--color-hero-ink": "#f6f6ee",
     "--color-hero-muted": "#b6b3a5",
     "--color-hero-accent": "#c6ff3d",
+    "--color-hero-ring": "transparent",
     colorScheme: "light",
   } as CSSProperties,
   dark: {
@@ -73,10 +74,11 @@ export const THEME_VARS: Record<"light" | "dark", CSSProperties> = {
     "--color-disabled-text": "#a09d8f",
     "--color-whatsapp": "#0f7a3c",
     "--color-whatsapp-text": "#3fcf7c",
-    "--color-hero": "#c6ff3d",
-    "--color-hero-ink": "#14140f",
-    "--color-hero-muted": "#3d3b2e",
-    "--color-hero-accent": "#14140f",
+    "--color-hero": "#0e0f0b",
+    "--color-hero-ink": "#f1f1e6",
+    "--color-hero-muted": "#b6b3a5",
+    "--color-hero-accent": "#c6ff3d",
+    "--color-hero-ring": "rgba(198, 255, 61, 0.35)",
     colorScheme: "dark",
   } as CSSProperties,
 };

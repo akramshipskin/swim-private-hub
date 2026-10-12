@@ -236,8 +236,10 @@ export default async function KomisiPage() {
                     Riwayat penarikan &rarr;
                   </Link>
                 </div>
+                {/* HP: hanya baris Total yang terbuka; rincian per sumber dilipat (Hadi 12 Okt,
+                    penilaian UI/UX: dulu 3-4 kartu angka per kolam berderet). Angka tidak berubah. */}
                 <ul className="flex flex-col gap-2 sm:hidden">
-                  {cards.map(({ label, total, p }) => (
+                  {cards.filter((c) => c.total).map(({ label, total, p }) => (
                     <li key={label} className={`rounded-lg border border-border px-3 py-2 ${total ? "bg-surface-muted" : ""}`}>
                       <p className={`text-sm text-text ${total ? "font-semibold" : "font-medium"}`}>
                         {label} <span className="font-normal text-text-muted">· {p.sessions} sesi · nilai {formatRupiah(p.gross)}</span>
@@ -255,6 +257,33 @@ export default async function KomisiPage() {
                     </li>
                   ))}
                 </ul>
+                {cards.length > 2 && (
+                  <details className="group sm:hidden">
+                    <summary className="flex min-h-[44px] cursor-pointer list-none items-center gap-2 text-sm font-medium text-brand-700 [&::-webkit-details-marker]:hidden">
+                      Rincian per sumber ({cards.length - 1})
+                      <span aria-hidden="true" className="transition-transform group-open:rotate-180">↓</span>
+                    </summary>
+                    <ul className="mt-2 flex flex-col gap-2">
+                      {cards.filter((c) => !c.total).map(({ label, total, p }) => (
+                        <li key={label} className={`rounded-lg border border-border px-3 py-2 ${total ? "bg-surface-muted" : ""}`}>
+                          <p className={`text-sm text-text ${total ? "font-semibold" : "font-medium"}`}>
+                            {label} <span className="font-normal text-text-muted">· {p.sessions} sesi · nilai {formatRupiah(p.gross)}</span>
+                          </p>
+                          <dl className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-sm tabular-nums">
+                            <dt className="text-text-muted">Platform bersih</dt>
+                            <dd className="text-right text-text">{formatRupiah(p.platform - p.tax)}</dd>
+                            <dt className="text-text-muted">PPN</dt>
+                            <dd className="text-right text-text">{formatRupiah(p.tax)}</dd>
+                            <dt className="text-text-muted">Kolam</dt>
+                            <dd className="text-right text-text">{formatRupiah(p.pool)}</dd>
+                            <dt className="text-text-muted">Coach</dt>
+                            <dd className="text-right text-text">{formatRupiah(p.coach)}</dd>
+                          </dl>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
                 <div className="hidden overflow-x-auto sm:block">
                   <table className="w-full min-w-[620px] text-sm">
                     <thead>

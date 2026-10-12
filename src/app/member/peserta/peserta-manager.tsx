@@ -75,8 +75,9 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                   {c.paket.length === 0 ? (
                     <p className="text-sm text-text-muted">Belum punya paket aktif.</p>
                   ) : (
+                    // Maksimal 3 paket per peserta; sisanya ke halaman Paket (Hadi 12 Okt, penilaian UI/UX).
                     <ul className="flex flex-col gap-1.5">
-                      {c.paket.map((p, i) => (
+                      {c.paket.slice(0, 3).map((p, i) => (
                         <li key={i} className="rounded-lg bg-surface-muted px-3 py-2 text-sm">
                           <span className="font-semibold text-brand-700">{p.poolName}</span>
                           <span className="text-text-muted"> · {p.packageName}</span>
@@ -86,6 +87,13 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                           </span>
                         </li>
                       ))}
+                      {c.paket.length > 3 && (
+                        <li>
+                          <Link href="/member/paket" className="text-sm font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+                            dan {c.paket.length - 3} paket lain di menu Paket
+                          </Link>
+                        </li>
+                      )}
                     </ul>
                   )}
 

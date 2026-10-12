@@ -142,7 +142,7 @@ export function NextStepCard({
       aria-label={eyebrow}
       className={cn(
         "rounded-3xl p-5 sm:p-6",
-        dark ? "bg-hero text-hero-ink" : "border border-brand-600/40 bg-brand-50 text-text",
+        dark ? "bg-hero text-hero-ink ring-1 ring-hero-ring" : "border border-brand-600/40 bg-brand-50 text-text",
         className
       )}
     >
@@ -162,7 +162,7 @@ export function NextStepCard({
             <Link
               href={href}
               className={cn(
-                "inline-flex min-h-[48px] items-center justify-center rounded-2xl px-5 text-sm font-bold transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full",
+                "inline-flex min-h-[48px] items-center justify-center rounded-xl px-5 text-sm font-bold transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full",
                 dark ? "bg-hero-accent text-hero hover:opacity-90" : "bg-brand-600 text-white hover:bg-fixed-ink-deep"
               )}
             >
@@ -226,7 +226,7 @@ export function BalanceCard({
   className?: string;
 }) {
   return (
-    <section aria-label={label} className={cn("flex flex-col rounded-3xl bg-hero p-5 text-hero-ink sm:p-6", className)}>
+    <section aria-label={label} className={cn("flex flex-col rounded-3xl bg-hero p-5 text-hero-ink ring-1 ring-hero-ring sm:p-6", className)}>
       <p className="text-xs font-semibold uppercase tracking-wide text-hero-accent">{label}</p>
       {/* Angka rupiah tidak boleh pecah di tengah: tidak dibungkus, dan mengecil di
           lebar tablet-kecil/laptop (768-1279) saat kartu berbagi baris dengan kartu lain. */}
@@ -234,7 +234,7 @@ export function BalanceCard({
       {hint && <div className="mt-2 text-sm text-hero-muted">{hint}</div>}
       <Link
         href={href}
-        className="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-hero-accent px-5 text-sm font-bold text-hero transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-150 hover:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full md:mt-auto md:self-start"
+        className="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-xl bg-hero-accent px-5 text-sm font-bold text-hero transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-150 hover:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 max-sm:w-full md:mt-auto md:self-start"
       >
         {cta}
       </Link>

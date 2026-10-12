@@ -10,7 +10,7 @@ function block(css: string, selector: string) {
   return css.slice(open + 1, css.indexOf("}", open));
 }
 function vars(body: string) {
-  return Object.fromEntries([...body.matchAll(/(--[\w-]+):\s*(#[0-9a-fA-F]{3,8})/g)].map((m) => [m[1], m[2].toLowerCase()]));
+  return Object.fromEntries([...body.matchAll(/(--[\w-]+):\s*(#[0-9a-fA-F]{3,8}|rgba\([^)]*\)|transparent)/g)].map((m) => [m[1], m[2].toLowerCase()]));
 }
 
 describe("salinan token di ThemeScope", () => {
