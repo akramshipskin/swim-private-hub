@@ -133,9 +133,11 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                       · {dayAvailabilities.filter((a) => a.pool.name === poolName).length} jam
                     </span>
                   </h3>
+                  {/* Jam terisi tetap kartu; jam kosong jadi keping ringkas 2-4 kolom
+                      (Hadi 12 Okt, penilaian UI/UX: dulu satu kartu penuh per jam di HP). */}
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {dayAvailabilities
-                      .filter((a) => a.pool.name === poolName)
+                      .filter((a) => a.pool.name === poolName && a.status === "BOOKED" && a.bookings[0])
                       .map((a) => (
                         <Card key={a.id}>
                           <CardBody className="flex items-center justify-between gap-3 py-3">
@@ -143,17 +145,11 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                               <p className="whitespace-nowrap text-base font-semibold text-text tabular-nums">
                                 {formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}
                               </p>
-                              {a.status === "BOOKED" && a.bookings[0] ? (
-                                <p className="mt-1 text-sm text-text-muted">
-                                  Peserta: <span className="font-medium text-text">{a.bookings[0].package.dependent.name}</span>
-                                </p>
-                              ) : (
-                                <div className="mt-1">
-                                  <Badge tone="neutral">Belum dibooking</Badge>
-                                </div>
-                              )}
+                              <p className="mt-1 text-sm text-text-muted">
+                                Peserta: <span className="font-medium text-text">{a.bookings[0].package.dependent.name}</span>
+                              </p>
                             </div>
-                            {a.status === "BOOKED" && a.bookings[0] && a.startTime <= now ? (
+                            {a.startTime <= now ? (
                               <span className="max-w-[50%] text-right text-sm text-text-subtle">
                                 {a.bookings[0].attended === null
                                   ? "Sudah mulai, tandai di Riwayat Sesi"
@@ -161,14 +157,9 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                                     ? "Sudah ditandai Hadir"
                                     : "Sudah ditandai Tidak Hadir"}
                               </span>
-                            ) : a.status === "BOOKED" && a.bookings[0] ? (
+                            ) : (
                               <CancelBookingButton
                                 bookingId={a.bookings[0].id}
-                                label={`${formatTimeWib(a.startTime)}–${formatTimeWib(a.endTime)}`}
-                              />
-                            ) : (
-                              <DeleteSlotButton
-                                availabilityId={a.id}
                                 label={`${formatTimeWib(a.startTime)}–${formatTimeWib(a.endTime)}`}
                               />
                             )}
@@ -176,6 +167,28 @@ export default async function CoachJadwalPage({ searchParams }: { searchParams: 
                         </Card>
                       ))}
                   </div>
+                  {dayAvailabilities.some((a) => a.pool.name === poolName && !(a.status === "BOOKED" && a.bookings[0])) && (
+                    <>
+                      <p className="mb-2 mt-3 text-sm text-text-muted">Belum dibooking</p>
+                      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
+                        {dayAvailabilities
+                          .filter((a) => a.pool.name === poolName && !(a.status === "BOOKED" && a.bookings[0]))
+                          .map((a) => (
+                            <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-dashed border-border bg-surface px-3 py-2">
+                              {/* HP: jam mulai saja (sesi selalu 1 jam) supaya jam dan tombol Hapus muat satu baris. */}
+                              <span className="whitespace-nowrap text-sm font-semibold text-text tabular-nums">
+                                <span className="sm:hidden">{formatTimeWib(a.startTime)}</span>
+                                <span className="max-sm:hidden">{formatTimeWib(a.startTime)}–{formatTimeWib(a.endTime)}</span>
+                              </span>
+                              <DeleteSlotButton
+                                availabilityId={a.id}
+                                label={`${formatTimeWib(a.startTime)}–${formatTimeWib(a.endTime)}`}
+                              />
+                            </li>
+                          ))}
+                      </ul>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

@@ -1076,3 +1076,17 @@ body {
     font-size: 16px;
   }
 }
+
+/* Teks di HP (Hadi 12 Okt, penilaian UI/UX 1A): teks standar 14 -> 15px dan
+   teks kecil 12 -> 13px, teks samar memakai warna teks sekunder yang lebih
+   gelap. Tanpa layer sehingga menang atas tema Tailwind; tablet dan desktop
+   tidak berubah. */
+@media (max-width: 767px) {
+  :root {
+    --text-sm: 0.9375rem;
+    --text-xs: 0.8125rem;
+  }
+  .text-text-subtle {
+    color: var(--color-text-muted);
+  }
+}

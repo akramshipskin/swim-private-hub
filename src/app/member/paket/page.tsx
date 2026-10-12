@@ -177,6 +177,58 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
 
   // Ganti coach tanpa biaya hari ke-10 (Hadi 3 Okt): coach di kolam sama atau
   // kolam lain sekota yang lolos syarat jadwal, harga per sesi sama/lebih murah.
+  // Paket selesai (berakhir, lewat masa berlaku, atau sesi habis tanpa jadwal
+  // tersisa) dilipat di bawah; yang masih berjalan tampil dulu (Hadi 12 Okt,
+  // penilaian UI/UX: di data ramai puluhan kartu "Berakhir" menutupi paket aktif).
+  const isDone = (p: (typeof packages)[number]) =>
+    p.status === "EXPIRED" ||
+    (p.status === "ACTIVE" && ((p.expiredDate && p.expiredDate < now) || (p.sisaSesi <= 0 && p._count.bookings === 0)));
+  const currentPkgs = packages.filter((p) => !isDone(p));
+  const donePkgs = packages.filter(isDone);
+
+  function renderPkg(p: (typeof packages)[number], showPool = false) {
+    const used = p.status === "ACTIVE" && p.sisaSesi <= 0;
+    const expired = p.status === "ACTIVE" && p.expiredDate && p.expiredDate < now;
+    return (
+      <li key={p.id} className="flex flex-wrap items-start justify-between gap-3 py-3">
+        <div className="min-w-0">
+          <p className="text-base font-semibold text-text">
+            {p.dependent.isSelf ? "Kamu sendiri" : p.dependent.name}
+          </p>
+          <p className="text-sm text-text">{p.name}{showPool && <span className="text-text-muted"> · {p.pool.name}</span>}</p>
+          <p className="text-sm text-text-muted">
+            Sisa <b className="text-text">{p.sisaSesi}</b> dari {p.totalSesi} sesi
+            {p.expiredDate && <> · berlaku s.d. {formatDateWib(p.expiredDate)}</>}
+          </p>
+          {p.status === "ACTIVE" && <SegmentBar sisa={p.sisaSesi} total={p.totalSesi} className="mt-2 w-48 max-w-full" />}
+        </div>
+        {used ? (
+          <Badge tone="neutral">{p._count.bookings > 0 ? "Semua sesi sudah dijadwalkan" : "Sesi habis"}</Badge>
+        ) : expired ? (
+          <Badge tone="neutral">Berakhir</Badge>
+        ) : p.status === "PENDING_PAYMENT" && p.payments[0]?.snapRedirectUrl ? (
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
+            <a
+              href={p.payments[0].snapRedirectUrl}
+              className="inline-flex min-h-[44px] items-center rounded-xl bg-brand-600 px-4 text-sm font-medium text-white hover:bg-fixed-ink-deep"
+            >
+              Lanjut bayar
+            </a>
+          </div>
+        ) : (
+          <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
+        )}
+        {p.status === "ACTIVE" && !expired && p.coachId && p.poolPrice != null && !p.isTrial && (
+          <div className="flex w-full flex-col gap-2">
+            {renderFreeChange(p)}
+            {renderCoachChange(p)}
+          </div>
+        )}
+      </li>
+    );
+  }
+
   function renderFreeChange(p: (typeof packages)[number]) {
     if (!p.freeCoachChangeAt || p.poolPrice == null || p.coachPrice == null || p.serviceFee == null) return null;
     // Pengajuan ganti coach biasa yang masih berjalan harus selesai/dibatalkan dulu (server menolak).
@@ -324,61 +376,39 @@ export default async function MemberPaketPage({ searchParams }: { searchParams: 
           </CardBody>
         </Card>
       ) : (
-        <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {[...new Map(packages.map((p) => [p.pool.id, p.pool])).values()].map((pool) => (
-            <Card key={pool.id}>
-              <CardBody>
-                <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Kolam</p>
-                <h2 className="text-lg font-semibold text-brand-700">{pool.name}</h2>
-                <ul className="mt-3 flex flex-col divide-y divide-border">
-                  {packages
-                    .filter((p) => p.pool.id === pool.id)
-                    .map((p) => {
-                      const used = p.status === "ACTIVE" && p.sisaSesi <= 0;
-                      const expired = p.status === "ACTIVE" && p.expiredDate && p.expiredDate < now;
-                      return (
-                        <li key={p.id} className="flex flex-wrap items-start justify-between gap-3 py-3">
-                          <div className="min-w-0">
-                            <p className="text-base font-semibold text-text">
-                              {p.dependent.isSelf ? "Kamu sendiri" : p.dependent.name}
-                            </p>
-                            <p className="text-sm text-text">{p.name}</p>
-                            <p className="text-sm text-text-muted">
-                              Sisa <b className="text-text">{p.sisaSesi}</b> dari {p.totalSesi} sesi
-                              {p.expiredDate && <> · berlaku s.d. {formatDateWib(p.expiredDate)}</>}
-                            </p>
-                            {p.status === "ACTIVE" && <SegmentBar sisa={p.sisaSesi} total={p.totalSesi} className="mt-2 w-48 max-w-full" />}
-                          </div>
-                          {used ? (
-                            <Badge tone="neutral">{p._count.bookings > 0 ? "Semua sesi sudah dijadwalkan" : "Sesi habis"}</Badge>
-                          ) : expired ? (
-                            <Badge tone="neutral">Berakhir</Badge>
-                          ) : p.status === "PENDING_PAYMENT" && p.payments[0]?.snapRedirectUrl ? (
-                            <div className="flex shrink-0 flex-col items-end gap-2">
-                              <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
-                              <a
-                                href={p.payments[0].snapRedirectUrl}
-                                className="inline-flex min-h-[44px] items-center rounded-xl bg-brand-600 px-4 text-sm font-medium text-white hover:bg-fixed-ink-deep"
-                              >
-                                Lanjut bayar
-                              </a>
-                            </div>
-                          ) : (
-                            <Badge tone={statusTone[p.status]}>{statusLabel[p.status]}</Badge>
-                          )}
-                          {p.status === "ACTIVE" && !expired && p.coachId && p.poolPrice != null && !p.isTrial && (
-                            <div className="flex w-full flex-col gap-2">
-                              {renderFreeChange(p)}
-                              {renderCoachChange(p)}
-                            </div>
-                          )}
-                        </li>
-                      );
-                    })}
-                </ul>
+        <div className="mb-10 flex flex-col gap-4">
+          {currentPkgs.length === 0 ? (
+            <Card>
+              <CardBody className="py-6 text-center">
+                <p className="text-sm text-text-muted">Tidak ada paket yang sedang berjalan. Pilih paket baru di bawah.</p>
               </CardBody>
             </Card>
-          ))}
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {[...new Map(currentPkgs.map((p) => [p.pool.id, p.pool])).values()].map((pool) => (
+                <Card key={pool.id}>
+                  <CardBody>
+                    <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Kolam</p>
+                    <h2 className="text-lg font-semibold text-brand-700">{pool.name}</h2>
+                    <ul className="mt-3 flex flex-col divide-y divide-border">
+                      {currentPkgs.filter((p) => p.pool.id === pool.id).map((p) => renderPkg(p))}
+                    </ul>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          )}
+          {donePkgs.length > 0 && (
+            <details className="group rounded-2xl border border-border bg-surface">
+              <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-text [&::-webkit-details-marker]:hidden">
+                Paket selesai ({donePkgs.length})
+                <span aria-hidden="true" className="text-text-muted transition-transform group-open:rotate-180">↓</span>
+              </summary>
+              <ul className="flex flex-col divide-y divide-border border-t border-border px-4">
+                {donePkgs.map((p) => renderPkg(p, true))}
+              </ul>
+            </details>
+          )}
         </div>
       )}
 

@@ -12,6 +12,8 @@ import { startTotpSetup } from "./actions";
 import TotpConfirmForm from "./totp-confirm-form";
 import TotpDisableForm from "./totp-disable-form";
 import { openSecret } from "@/lib/secret-box";
+import { NavBar } from "@/components/nav-bar";
+import { roleNavLinks, roleLabel } from "@/lib/nav-links";
 
 export const metadata: Metadata = {
   title: "Keamanan Akun | Swim Private Hub",
@@ -39,6 +41,103 @@ export default async function KeamananPage() {
   const setupSecret = user.totpEnabledAt || !user.totpSecret ? null : openSecret(user.totpSecret);
   const secretGroups = setupSecret?.match(/.{1,4}/g)?.join(" ");
 
+  // Di kerangka aplikasi judul halaman sudah h1 "Keamanan Akun", jadi judul kartu turun jadi h2.
+  const Title = isAdmin ? "h1" : "h2";
+  const card = (
+    <Card className={isAdmin ? "w-full max-w-sm" : "w-full max-w-lg"}>
+      <CardBody>
+        {user.totpEnabledAt ? (
+          <>
+            <Title className="mb-2 text-xl font-semibold text-text">2FA aktif</Title>
+            <p className="mb-4 text-sm text-text-muted">
+              Setiap masuk, kamu diminta kode 6 digit dari Google Authenticator di HP-mu. Aktif sejak{" "}
+              {user.totpEnabledAt.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" })}.
+            </p>
+            <h2 className="mb-2 text-base font-semibold text-text">Matikan 2FA</h2>
+            <TotpDisableForm />
+          </>
+        ) : (
+          <>
+            <Title className="mb-3 text-xl font-semibold text-text">Pasang 2FA</Title>
+            {!isAdmin && (
+              <div className="mb-4 space-y-2 text-sm text-text-muted">
+                <p>
+                  <b className="text-text">Apa itu?</b> Selain password, saat masuk kamu juga mengetik kode 6 digit dari aplikasi
+                  Google Authenticator di HP-mu. Kodenya berganti tiap 30 detik.
+                </p>
+                <p>
+                  <b className="text-text">Kenapa berguna?</b> Akunmu menyimpan saldo, paket, dan data peserta. Kalau password-mu bocor,
+                  orang lain tetap tidak bisa masuk tanpa kode dari HP-mu.
+                </p>
+              </div>
+            )}
+            <ol className="mb-4 list-decimal space-y-1.5 pl-5 text-sm text-text-muted">
+              <li>Pasang aplikasi <b className="text-text">Google Authenticator</b> di HP (gratis di Play Store / App Store).</li>
+              <li>Tekan &ldquo;Buat kunci&rdquo;, lalu tambahkan akun di aplikasi: ketuk link dari HP, atau pilih &ldquo;Masukkan kunci penyiapan&rdquo; dan ketik kuncinya.</li>
+              <li>Ketik password akunmu dan 6 digit yang muncul di aplikasi.</li>
+            </ol>
+            {!isAdmin && (
+              <p className="mb-5 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
+                <b>Penting:</b> kalau HP hilang, ganti HP, atau aplikasinya terhapus, kamu <b>tidak bisa masuk</b> sampai admin
+                mereset 2FA-mu. Hubungi admin lewat WhatsApp kalau itu terjadi.
+              </p>
+            )}
+
+            {!setupSecret ? (
+              <form action={startTotpSetup}>
+                <Button type="submit" className="w-full">Buat Kunci</Button>
+              </form>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <div className="rounded-xl border border-border bg-surface-muted px-3 py-3">
+                  <p className="text-xs text-text-subtle">Kunci penyiapan ({account})</p>
+                  <p className="mt-1 break-all font-mono text-base tracking-wider text-text">{secretGroups}</p>
+                  <a href={otpauthUrl(setupSecret, account)} className="mt-2 inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+                    Buka di aplikasi authenticator (dari HP)
+                  </a>
+                </div>
+                <TotpConfirmForm />
+                {isAdmin && (
+                  <p className="text-xs text-text-subtle">
+                    HP hilang? Kunci hanya bisa direset pemilik server lewat skrip
+                    <code className="mx-1">scripts/reset-admin-2fa.mts</code>.
+                  </p>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {!isAdmin && (
+          <Link href="/profil" className="mt-5 inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+            ← Kembali ke Profil
+          </Link>
+        )}
+      </CardBody>
+    </Card>
+  );
+
+  // Admin yang belum memasang 2FA dipaksa ke sini (tanpa menu, karena halaman
+  // admin lain belum bisa dibuka). Peran lain membuka halaman ini dari Profil,
+  // jadi tampil di kerangka aplikasi dengan menu (Hadi 12 Okt, penilaian UI/UX:
+  // dulu terasa keluar dari aplikasi).
+  if (!isAdmin) {
+    return (
+      <NavBar
+        userName={session.user.name ?? ""}
+        userRole={roleLabel[session.user.role] ?? session.user.role}
+        links={roleNavLinks[session.user.role]}
+        activePath="/profil"
+      >
+        <main className="w-full px-4 py-6 sm:py-8">
+          <h1 className="text-2xl font-semibold tracking-tight text-text">Keamanan Akun</h1>
+          <p className="mb-4 mt-1 text-sm text-text-muted">Verifikasi 2 langkah (2FA): tidak wajib, tapi disarankan.</p>
+          {card}
+        </main>
+      </NavBar>
+    );
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 py-12">
       <div className="mb-6 flex flex-col items-center text-center">
@@ -49,77 +148,7 @@ export default async function KeamananPage() {
         </p>
       </div>
 
-      <Card className="w-full max-w-sm">
-        <CardBody>
-          {user.totpEnabledAt ? (
-            <>
-              <h1 className="mb-2 text-xl font-semibold text-text">2FA aktif</h1>
-              <p className="mb-4 text-sm text-text-muted">
-                Setiap masuk, kamu diminta kode 6 digit dari Google Authenticator di HP-mu. Aktif sejak{" "}
-                {user.totpEnabledAt.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" })}.
-              </p>
-              <h2 className="mb-2 text-base font-semibold text-text">Matikan 2FA</h2>
-              <TotpDisableForm />
-            </>
-          ) : (
-            <>
-              <h1 className="mb-3 text-xl font-semibold text-text">Pasang 2FA</h1>
-              {!isAdmin && (
-                <div className="mb-4 space-y-2 text-sm text-text-muted">
-                  <p>
-                    <b className="text-text">Apa itu?</b> Selain password, saat masuk kamu juga mengetik kode 6 digit dari aplikasi
-                    Google Authenticator di HP-mu. Kodenya berganti tiap 30 detik.
-                  </p>
-                  <p>
-                    <b className="text-text">Kenapa berguna?</b> Akunmu menyimpan saldo, paket, dan data peserta. Kalau password-mu bocor,
-                    orang lain tetap tidak bisa masuk tanpa kode dari HP-mu.
-                  </p>
-                </div>
-              )}
-              <ol className="mb-4 list-decimal space-y-1.5 pl-5 text-sm text-text-muted">
-                <li>Pasang aplikasi <b className="text-text">Google Authenticator</b> di HP (gratis di Play Store / App Store).</li>
-                <li>Tekan &ldquo;Buat kunci&rdquo;, lalu tambahkan akun di aplikasi: ketuk link dari HP, atau pilih &ldquo;Masukkan kunci penyiapan&rdquo; dan ketik kuncinya.</li>
-                <li>Ketik password akunmu dan 6 digit yang muncul di aplikasi.</li>
-              </ol>
-              {!isAdmin && (
-                <p className="mb-5 rounded-lg bg-warning-bg px-3 py-2 text-sm text-warning-text">
-                  <b>Penting:</b> kalau HP hilang, ganti HP, atau aplikasinya terhapus, kamu <b>tidak bisa masuk</b> sampai admin
-                  mereset 2FA-mu. Hubungi admin lewat WhatsApp kalau itu terjadi.
-                </p>
-              )}
-
-              {!setupSecret ? (
-                <form action={startTotpSetup}>
-                  <Button type="submit" className="w-full">Buat Kunci</Button>
-                </form>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  <div className="rounded-xl border border-border bg-surface-muted px-3 py-3">
-                    <p className="text-xs text-text-subtle">Kunci penyiapan ({account})</p>
-                    <p className="mt-1 break-all font-mono text-base tracking-wider text-text">{secretGroups}</p>
-                    <a href={otpauthUrl(setupSecret, account)} className="mt-2 inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-                      Buka di aplikasi authenticator (dari HP)
-                    </a>
-                  </div>
-                  <TotpConfirmForm />
-                  {isAdmin && (
-                    <p className="text-xs text-text-subtle">
-                      HP hilang? Kunci hanya bisa direset pemilik server lewat skrip
-                      <code className="mx-1">scripts/reset-admin-2fa.mts</code>.
-                    </p>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-
-          {!isAdmin && (
-            <Link href="/profil" className="mt-5 inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-              ← Kembali ke Profil
-            </Link>
-          )}
-        </CardBody>
-      </Card>
+      {card}
     </main>
   );
 }

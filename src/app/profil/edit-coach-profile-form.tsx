@@ -32,6 +32,12 @@ export default function EditCoachProfileForm({
 
   return (
     <form key={edit.formKey} action={formAction} className="flex flex-col gap-4">
+      {/* Tombol Ubah di atas isian (Hadi 12 Okt, penilaian UI/UX), bukan di bawah formulir panjang. */}
+      {edit.locked && (
+        <Button type="button" variant="secondary" onClick={edit.startEdit} className="self-start max-sm:w-full">
+          Ubah Profil Coach
+        </Button>
+      )}
       <fieldset disabled={edit.locked} className="flex flex-col gap-4 disabled:opacity-90">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Tanggal Lahir">
@@ -82,11 +88,7 @@ export default function EditCoachProfileForm({
       </fieldset>
 
       <div className="flex flex-wrap items-center gap-3">
-        {edit.locked ? (
-          <Button type="button" variant="secondary" onClick={edit.startEdit} className="w-full sm:w-auto">
-            Ubah Profil Coach
-          </Button>
-        ) : (
+        {!edit.locked && (
           <>
             <Button type="submit" loading={pending} disabled={edit.saveDisabled}>
               Simpan

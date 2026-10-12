@@ -17,14 +17,21 @@ const STEPS = {
   ],
 } as const;
 
-export function PartnerSteps({ kind }: { kind: keyof typeof STEPS }) {
+// Desktop: di panel gelap kiri (tone "dark"). HP: di atas formulir (Hadi 12 Okt,
+// penilaian UI/UX: dulu di bawah formulir sehingga jarang terbaca).
+export function PartnerSteps({ kind, tone = "light", className = "" }: { kind: keyof typeof STEPS; tone?: "light" | "dark"; className?: string }) {
+  const dark = tone === "dark";
   return (
-    <section aria-label="Langkah jadi mitra" className="mt-6 w-full max-w-sm">
-      <h2 className="text-sm font-semibold text-text">5 langkah jadi mitra</h2>
+    <section aria-label="Langkah jadi mitra" className={`w-full ${className}`}>
+      <h2 className={`text-sm font-semibold ${dark ? "text-white" : "text-text"}`}>5 langkah jadi mitra</h2>
       <ol className="mt-3 flex flex-col gap-2">
         {STEPS[kind].map((step, i) => (
-          <li key={step} className="flex gap-3 text-sm text-text-muted">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
+          <li key={step} className={`flex gap-3 text-sm ${dark ? "text-white/85" : "text-text-muted"}`}>
+            <span
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                dark ? "bg-fixed-lime text-fixed-ink" : "bg-brand-600 text-white"
+              }`}
+            >
               {i + 1}
             </span>
             <span className="pt-0.5">{step}</span>

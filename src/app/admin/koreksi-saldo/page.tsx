@@ -3,10 +3,12 @@ import { requireRole } from "@/lib/require-role";
 import { prisma } from "@/lib/prisma";
 import { formatRupiah } from "@/lib/format";
 import { Card, CardBody } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Field, Select } from "@/components/ui/input";
 import AdjustForm from "./adjust-form";
+import { ShowMoreLink, listHref, pageSize } from "@/components/show-more-link";
+
+const STEP = 15;
 
 export const metadata = { title: "Koreksi Saldo | Swim Private Hub" };
 
@@ -20,9 +22,11 @@ function dateTime(d: Date) {
 
 // Koreksi saldo coach/kolam + riwayat semua koreksi (jejak audit di satu
 // tempat). Koreksi = baris ledger tanpa bookingId, lihat wallet-adjustment.ts.
-export default async function AdminKoreksiSaldoPage({ searchParams }: { searchParams: Promise<{ target?: string }> }) {
+export default async function AdminKoreksiSaldoPage({ searchParams }: { searchParams: Promise<{ target?: string; n?: string }> }) {
   await requireRole("ADMIN");
-  const raw = (await searchParams).target ?? "";
+  const sp = await searchParams;
+  const raw = sp.target ?? "";
+  const n = pageSize(sp.n, STEP);
   const [kind, id] = raw.split(":");
 
   const [coaches, pools] = await Promise.all([
@@ -41,19 +45,23 @@ export default async function AdminKoreksiSaldoPage({ searchParams }: { searchPa
       ? { type: "pool" as const, id: pool.id, name: pool.name, balance: pool.walletBalance }
       : null;
 
-  const rows = await prisma.walletTransaction.findMany({
-    where: {
-      bookingId: null,
-      ...(selected?.type === "coach"
-        ? { type: "SESSION_PAYOUT", coachProfileId: selected.id }
-        : selected?.type === "pool"
-          ? { type: "SESSION_REVENUE", poolId: selected.id }
-          : { type: { in: ["SESSION_PAYOUT", "SESSION_REVENUE"] } }),
-    },
-    orderBy: { createdAt: "desc" },
-    take: 100,
-    include: { pool: { select: { name: true } }, coachProfile: { select: { user: { select: { name: true } } } } },
-  });
+  const where = {
+    bookingId: null,
+    ...(selected?.type === "coach"
+      ? { type: "SESSION_PAYOUT" as const, coachProfileId: selected.id }
+      : selected?.type === "pool"
+        ? { type: "SESSION_REVENUE" as const, poolId: selected.id }
+        : { type: { in: ["SESSION_PAYOUT" as const, "SESSION_REVENUE" as const] } }),
+  };
+  const [rows, rowCount] = await Promise.all([
+    prisma.walletTransaction.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: n,
+      include: { pool: { select: { name: true } }, coachProfile: { select: { user: { select: { name: true } } } } },
+    }),
+    prisma.walletTransaction.count({ where }),
+  ]);
 
   // Pasangan di pendapatan platform (sumber dana "dari/ke platform"): dicatat
   // dalam transaksi yang sama, jadi cocokkan lewat alasan + admin + waktu.
@@ -142,31 +150,33 @@ export default async function AdminKoreksiSaldoPage({ searchParams }: { searchPa
               <CardBody className="py-8 text-center text-sm text-text-muted">Belum ada koreksi saldo.</CardBody>
             </Card>
           ) : (
-            <div className="flex flex-col gap-2">
-              {rows.map((r) => (
-                <Card key={r.id}>
-                  <CardBody className="flex flex-col gap-2 py-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <p className={`text-lg font-semibold ${r.amount < 0 ? "text-danger-text" : "text-success-text"}`}>{signed(r.amount)}</p>
-                      <Badge tone="neutral">{r.coachProfile ? "Coach" : "Kolam"}</Badge>
-                    </div>
-                    <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-                      <dt className="text-text-subtle">Penerima</dt>
-                      <dd className="text-text">{r.coachProfile?.user.name ?? r.pool?.name ?? "-"}</dd>
-                      <dt className="text-text-subtle">Alasan</dt>
-                      <dd className="text-text">{r.note ?? "Koreksi lama (dicatat langsung di database, tanpa alasan)"}</dd>
-                      <dt className="text-text-subtle">Sumber dana</dt>
-                      <dd className="text-text">{r.note === null ? "-" : fromPlatform(r) ? "Dari/ke pendapatan platform" : "Membetulkan salah catat"}</dd>
-                      <dt className="text-text-subtle">Waktu</dt>
-                      <dd className="text-text">{dateTime(r.createdAt)}</dd>
-                      <dt className="text-text-subtle">Oleh</dt>
-                      <dd className="text-text">{r.createdById ? (admins.get(r.createdById) ?? "Admin") : "-"}</dd>
-                    </dl>
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
+            // Satu baris ringkas per koreksi (Hadi 12 Okt, penilaian UI/UX: dulu kartu
+            // tinggi 5 baris per koreksi, 100 koreksi = gulir sangat panjang).
+            <Card>
+              <CardBody className="py-1">
+                <ul className="flex flex-col divide-y divide-border">
+                  {rows.map((r) => (
+                    <li key={r.id} className="flex flex-col gap-1 py-3">
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                        <p className="text-sm font-semibold text-text">
+                          {r.coachProfile?.user.name ?? r.pool?.name ?? "-"}{" "}
+                          <span className="font-normal text-text-subtle">· {r.coachProfile ? "Coach" : "Kolam"}</span>
+                        </p>
+                        <p className={`whitespace-nowrap text-base font-semibold tabular-nums ${r.amount < 0 ? "text-danger-text" : "text-success-text"}`}>{signed(r.amount)}</p>
+                      </div>
+                      <p className="text-sm text-text">{r.note ?? "Koreksi lama (dicatat langsung di database, tanpa alasan)"}</p>
+                      <p className="text-xs text-text-subtle">
+                        {dateTime(r.createdAt)}
+                        {r.createdById && <> · oleh {admins.get(r.createdById) ?? "Admin"}</>}
+                        {r.note !== null && <> · {fromPlatform(r) ? "dari/ke pendapatan platform" : "membetulkan salah catat"}</>}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </CardBody>
+            </Card>
           )}
+          <ShowMoreLink href={listHref({ target: raw || undefined, n: String(n + STEP) })} shown={rows.length} total={rowCount} unit="koreksi" />
         </div>
       </div>
     </main>

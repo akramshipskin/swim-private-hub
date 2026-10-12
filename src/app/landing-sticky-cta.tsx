@@ -29,7 +29,7 @@ export function StickyCta() {
         <Link
           href="/register"
           tabIndex={show ? undefined : -1}
-          className="flex min-h-[48px] w-full items-center justify-center rounded-full bg-fixed-lime text-base font-semibold text-fixed-ink active:scale-[0.98]"
+          className="flex min-h-[48px] w-full items-center justify-center rounded-xl bg-fixed-lime text-base font-semibold text-fixed-ink active:scale-[0.98]"
         >
           Daftar gratis
         </Link>

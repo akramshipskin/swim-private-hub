@@ -246,10 +246,10 @@ export default function PanduanView() {
             <Logotype className="text-sm sm:text-xl" />
           </Link>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-semibold hover:bg-surface-muted sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+            <Link href="/login" className="rounded-xl px-2.5 py-2 text-sm font-semibold hover:bg-surface-muted sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               Masuk
             </Link>
-            <Link href="/register" className="rounded-full bg-text px-2.5 py-2 text-sm font-semibold text-background hover:opacity-90 sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+            <Link href="/register" className="rounded-xl bg-text px-2.5 py-2 text-sm font-semibold text-background hover:opacity-90 sm:px-4 max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
               Daftar
             </Link>
           </div>
@@ -289,12 +289,12 @@ export default function PanduanView() {
               Anak atau kamu belajar berenang dengan coach pilihan sendiri, di kolam mitra Swim Private Hub. Perkembangan tercatat, pembayaran jelas.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/register" className="rounded-full bg-fixed-lime-500 px-6 py-3 text-base font-semibold text-fixed-ink hover:bg-fixed-lime-100">
+              <Link href="/register" className="rounded-xl bg-fixed-lime-500 px-6 py-3 text-base font-semibold text-fixed-ink hover:bg-fixed-lime-100">
                 Daftar gratis
               </Link>
               <Link
                 href="/daftar-kolam"
-                className="rounded-full border border-border px-6 py-3 text-base font-semibold hover:bg-surface-muted"
+                className="rounded-xl border border-border px-6 py-3 text-base font-semibold hover:bg-surface-muted"
               >
                 Punya kolam renang? Daftarkan kolam
               </Link>

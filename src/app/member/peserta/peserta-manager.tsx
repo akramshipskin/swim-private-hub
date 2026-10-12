@@ -89,13 +89,16 @@ export default function PesertaManager({ items }: { items: PesertaItem[] }) {
                     </ul>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={() => setConfirming(c)}
-                    className="mt-auto self-start text-sm font-medium text-danger-text hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
-                  >
-                    Nonaktifkan Peserta
-                  </button>
+                  {/* Aksi berbahaya dipisah garis dari daftar paket (Hadi 12 Okt, penilaian UI/UX). */}
+                  <div className="mt-auto border-t border-border pt-3">
+                    <button
+                      type="button"
+                      onClick={() => setConfirming(c)}
+                      className="text-sm font-medium text-danger-text hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center"
+                    >
+                      Nonaktifkan Peserta
+                    </button>
+                  </div>
                 </CardBody>
               </Card>
             </li>

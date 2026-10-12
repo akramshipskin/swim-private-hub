@@ -3,19 +3,24 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logotype } from "@/components/ui/logotype";
 import { BRAND_TAGLINE } from "@/lib/brand";
+import { PartnerSteps } from "@/components/partner-steps";
 
 // Kerangka halaman masuk & daftar (Hadi 2 Okt malam, #24): setara landing.
 // Desktop: panel merek gelap dengan foto perenang di kiri, formulir di kanan.
 // HP: header merek ringkas di atas formulir (tanpa foto, supaya cepat dimuat).
+// partner: halaman daftar mitra; 5 langkah tampil di panel kiri (desktop) dan
+// di atas formulir (HP) menggantikan tiga poin umum.
 export function AuthShell({
   points,
+  partner,
   children,
 }: {
   points: string[];
+  partner?: "coach" | "kolam";
   children: ReactNode;
 }) {
   return (
-    <main className="grid min-h-screen grid-cols-[minmax(0,1fr)] bg-background lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+    <main id="daftar" className="grid min-h-screen grid-cols-[minmax(0,1fr)] bg-background lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <aside className="relative isolate hidden overflow-hidden bg-fixed-night text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
         <Image src="/images/landing/hero-swim.jpg" alt="" fill sizes="45vw" className="-z-10 object-cover object-[60%_30%] opacity-60" priority />
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-fixed-night via-fixed-night/70 to-fixed-night/30" />
@@ -33,6 +38,7 @@ export function AuthShell({
               </li>
             ))}
           </ul>
+          {partner && <PartnerSteps kind={partner} tone="dark" className="mt-8 max-w-md border-t border-white/20 pt-6" />}
         </div>
       </aside>
       <div className="flex flex-col items-center justify-center bg-[radial-gradient(circle_at_top,_var(--color-brand-100)_0%,_var(--background)_55%)] px-4 py-12 lg:bg-none">
@@ -41,6 +47,7 @@ export function AuthShell({
           <span className="text-lg text-text"><Logotype /></span>
           <span className="mt-1 max-w-xs text-sm text-text-muted">{BRAND_TAGLINE}</span>
         </Link>
+        {partner && <PartnerSteps kind={partner} className="mb-6 max-w-sm lg:hidden" />}
         {children}
       </div>
     </main>

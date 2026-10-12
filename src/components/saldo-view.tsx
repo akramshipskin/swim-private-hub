@@ -171,7 +171,15 @@ export default function SaldoView({
         <CardBody>
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="text-base font-semibold text-text">Rekening Penerima</h2>
-            {hasBankInfo && <Badge tone={bankLocked ? "success" : "warning"}>{bankLocked ? "Tersimpan" : "Sedang diubah"}</Badge>}
+            <div className="flex items-center gap-2">
+              {hasBankInfo && <Badge tone={bankLocked ? "success" : "warning"}>{bankLocked ? "Tersimpan" : "Sedang diubah"}</Badge>}
+              {/* Tombol Ubah di kepala kartu (Hadi 12 Okt, penilaian UI/UX), bukan di bawah isian. */}
+              {bankLocked && (
+                <Button type="button" variant="secondary" size="sm" onClick={edit.startEdit}>
+                  Ubah
+                </Button>
+              )}
+            </div>
           </div>
           <form key={edit.formKey} action={bankAction} className="flex flex-col gap-3">
             <Field label="Nama Bank">
@@ -196,11 +204,7 @@ export default function SaldoView({
                 <Input name="password" type="password" autoComplete="current-password" required />
               </Field>
             )}
-            {bankLocked ? (
-              <Button type="button" variant="secondary" onClick={edit.startEdit} className="w-full">
-                Ubah Rekening
-              </Button>
-            ) : (
+            {!bankLocked && (
               <div className="flex gap-2">
                 <Button type="submit" loading={bankPending} disabled={edit.saveDisabled} className="flex-1">
                   Simpan Rekening

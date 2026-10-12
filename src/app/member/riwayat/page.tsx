@@ -108,7 +108,10 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
               <p className="mb-2 inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold tracking-wide text-brand-700 uppercase">
                 {poolName}
               </p>
-              <ul className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+              {/* Satu kartu per kolam berisi baris ringkas; di desktop tiap baris memakai
+                  lebar penuh (Hadi 12 Okt, penilaian UI/UX: dulu kartu selebar 1/3 layar). */}
+              <Card>
+              <ul className="flex flex-col divide-y divide-border">
                 {rows.filter((r) => r.availability.pool.name === poolName).map((b) => {
                   const eligibility = eligibilityByBooking.get(b.id);
                   const remaining = eligibility ? Math.max(0, eligibility.quota - eligibility.used) : 0;
@@ -121,19 +124,20 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                   const reportDeadline = new Date(b.availability.endTime.getTime() + ATTENDANCE_REPORT_WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
                   return (
-                    <Card key={b.id}>
-                      <CardBody className="flex items-start justify-between gap-3 py-3">
-                        <div className="flex min-w-0 items-center gap-3">
+                    <li key={b.id} className="flex items-start justify-between gap-3 px-4 py-3 sm:px-5">
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
                           <Avatar src={b.availability.coach.coachProfile?.photoUrl} className="h-10 w-10" />
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1 lg:grid lg:grid-cols-[7.5rem_minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-x-6">
                             <p className="text-base font-semibold text-text tabular-nums">
                               {formatTimeWib(b.availability.startTime)}–{formatTimeWib(b.availability.endTime)}
                             </p>
-                            <p className="text-sm text-text">Coach {b.availability.coach.name}</p>
-                            <p className="text-sm text-text-muted">
-                              Peserta: {b.package.dependent.isSelf ? "kamu sendiri" : b.package.dependent.name} · {b.package.name}
-                            </p>
-                            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                            <div className="min-w-0">
+                              <p className="text-sm text-text">Coach {b.availability.coach.name}</p>
+                              <p className="text-sm text-text-muted">
+                                Peserta: {b.package.dependent.isSelf ? "kamu sendiri" : b.package.dependent.name} · {b.package.name}
+                              </p>
+                            </div>
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5 lg:mt-0">
                               {/* Status COMPLETED gak pernah di-set di mana pun -- booking
                                   yang sesinya udah lewat tetep BOOKED selamanya, jadi dulu
                                   kebaca "Terjadwal" buat sesi minggu lalu. Label diturunin
@@ -167,7 +171,7 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                               )}
                             </div>
                             {b.attendanceReport?.status === "RESOLVED" && (
-                              <p className="mt-1 text-xs text-text-muted">
+                              <p className="mt-1 text-xs text-text-muted lg:col-span-3">
                                 Laporan selesai diperiksa{b.attendanceReport.resolution ? `: ${b.attendanceReport.resolution}` : "."}
                               </p>
                             )}
@@ -205,7 +209,7 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                                   })}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 rounded-md bg-whatsapp px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 max-lg:min-h-[44px]"
+                                  className="inline-flex items-center gap-1.5 rounded-xl bg-whatsapp px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 max-lg:min-h-[44px]"
                                 >
                                   Hubungi Admin
                                 </a>
@@ -214,11 +218,11 @@ export default async function MemberRiwayatPage({ searchParams }: { searchParams
                             )}
                           </div>
                         )}
-                      </CardBody>
-                    </Card>
+                    </li>
                   );
                 })}
               </ul>
+              </Card>
               </div>
               ))}
             </div>

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { PARTNER_CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { PendingApprovalScreen } from "@/components/pending-approval-screen";
 import { AuthShell } from "@/components/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
-import { PartnerSteps } from "@/components/partner-steps";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { isValidIndonesianPhone } from "@/lib/format";
 import { CitySelect } from "@/components/city-select";
@@ -42,6 +42,12 @@ export default function RegisterCoachForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    // Tombol Daftar selalu aktif; belum centang = pesan jelas (dulu tombol abu tanpa penjelasan).
+    if (!agreed) {
+      setError(PARTNER_CONSENT_REQUIRED_ERROR.COACH + ".");
+      return;
+    }
 
     if (!isValidIndonesianPhone(phone)) {
       setError("Format Nomor HP tidak valid (contoh: 0812xxxxxxx)");
@@ -91,7 +97,7 @@ export default function RegisterCoachForm() {
   if (submitted) return <PendingApprovalScreen roleLabel="coach" />;
 
   return (
-    <AuthShell points={["Tentukan harga paketmu sendiri", "Bagianmu masuk saldo setiap sesi Hadir", "Daftar gratis, tanpa biaya bulanan"]}>
+    <AuthShell partner="coach" points={["Tentukan harga paketmu sendiri", "Bagianmu masuk saldo setiap sesi Hadir", "Daftar gratis, tanpa biaya bulanan"]}>
 
       <Card className="w-full max-w-sm">
         <CardBody>
@@ -112,6 +118,7 @@ export default function RegisterCoachForm() {
               />
             </div>
 
+            <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Data diri</p>
             <Field label="Nama Lengkap">
               <Input value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" />
             </Field>
@@ -140,22 +147,13 @@ export default function RegisterCoachForm() {
                 autoComplete="bday"
               />
             </Field>
-            <Field label="Password">
-              <Input
-                type="password"
-                placeholder="Minimal 8 karakter"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                autoComplete="new-password"
-              />
-            </Field>
             <Field label="Kota Domisili">
               <CitySelect value={city} onChange={(e) => setCity(e.target.value)} />
             </Field>
+            <hr className="border-border" />
+            <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Harga jasa</p>
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium text-text">Harga jasa kamu</p>
+              <p className="sr-only">Harga jasa kamu</p>
               <p className="text-xs text-text-subtle">
                 Satu harga untuk semua kolam. Isi minimal satu, kelipatan Rp 1.000. Member membayar harga ini ditambah harga kolam dan biaya layanan SPH. Bisa diubah nanti.
               </p>
@@ -168,6 +166,8 @@ export default function RegisterCoachForm() {
                 </Field>
               </div>
             </div>
+            <hr className="border-border" />
+            <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Keahlian dan sertifikat</p>
             <Field label="Bio Singkat (Opsional)">
               <Textarea
                 value={bio}
@@ -226,12 +226,25 @@ export default function RegisterCoachForm() {
               </Field>
             )}
 
+            <hr className="border-border" />
+            <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Akun (untuk masuk)</p>
+            <Field label="Password">
+              <Input
+                type="password"
+                placeholder="Minimal 8 karakter"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={8}
+                autoComplete="new-password"
+              />
+            </Field>
             <label className="flex items-start gap-2 text-xs text-text-muted max-lg:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
+                name="agree"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                required
                 className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-700 focus:ring-brand-500 max-sm:h-5 max-sm:w-5"
               />
               <span>
@@ -261,7 +274,7 @@ export default function RegisterCoachForm() {
               </p>
             )}
 
-            <Button type="submit" loading={loading} disabled={!agreed} className="mt-1 w-full">
+            <Button type="submit" loading={loading} className="mt-1 w-full">
               Daftar
             </Button>
           </form>
@@ -274,7 +287,10 @@ export default function RegisterCoachForm() {
           </p>
         </CardBody>
       </Card>
-      <PartnerSteps kind="coach" />
+      <a href="#untuk-coach" className="mt-5 inline-flex min-h-[44px] items-center gap-1 text-sm font-semibold text-brand-700 underline underline-offset-4">
+        Kenapa jadi coach mitra? Baca keuntungannya
+        <span aria-hidden="true">↓</span>
+      </a>
     </AuthShell>
   );
 }

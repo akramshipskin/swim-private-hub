@@ -231,7 +231,7 @@ export default function BrandGuidelineView() {
           aplikasi.
         </p>
         <dl className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-text-subtle">
-          <div><dt className="inline font-medium text-text">Versi: </dt><dd className="inline">2.1 (10 Oktober 2026)</dd></div>
+          <div><dt className="inline font-medium text-text">Versi: </dt><dd className="inline">2.2 (12 Oktober 2026)</dd></div>
           <div><dt className="inline font-medium text-text">Palet: </dt><dd className="inline">Charcoal · Cream · Lime</dd></div>
           <div><dt className="inline font-medium text-text">Logotype: </dt><dd className="inline font-mono">swim.privatehub</dd></div>
         </dl>
@@ -437,8 +437,8 @@ export default function BrandGuidelineView() {
                 { cls: "text-2xl font-semibold", sample: "Riwayat Bayar", meta: "24 px · judul halaman" },
                 { cls: "text-xl font-semibold", sample: "Masuk ke akunmu", meta: "20 px · judul kartu masuk/daftar" },
                 { cls: "text-lg font-semibold", sample: "Paket Aktif", meta: "18 px · judul bagian" },
-                { cls: "text-sm font-normal font-sans", sample: "Teks standar: tombol, isian, paragraf kartu", meta: "14 px · ukuran dasar" },
-                { cls: "text-xs font-medium font-sans", sample: "Label, badge, keterangan kecil", meta: "12 px · paling kecil" },
+                { cls: "text-sm font-normal font-sans", sample: "Teks standar: tombol, isian, paragraf kartu", meta: "14 px, 15 px di HP · ukuran dasar" },
+                { cls: "text-xs font-medium font-sans", sample: "Label, badge, keterangan kecil", meta: "12 px, 13 px di HP · paling kecil" },
               ].map((row) => (
                 <div key={row.meta} className="flex flex-col gap-1 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <span className={`${row.cls} text-text`}>{row.sample}</span>
@@ -460,11 +460,11 @@ export default function BrandGuidelineView() {
             head={["Unsur", "Nilai", "Dipakai di"]}
             mono={[1]}
             rows={[
-              ["Sudut kecil", "8 px", "Chip, tombol kecil"],
-              ["Sudut standar", "12 px", "Tombol, isian, dialog"],
+              ["Sudut kecil", "8 px", "Keping kecil, gambar mini"],
+              ["Sudut standar", "12 px", "Semua tombol (aplikasi, landing, panduan), isian, dialog"],
               ["Sudut kartu", "16 px", "Kartu, panel"],
               ["Sudut besar", "24 px", "Kartu dasbor (bento), kartu utama, kartu landing"],
-              ["Pil", "penuh", "Badge, filter, CTA marketing"],
+              ["Pil", "penuh", "Badge, filter, keping pilihan (bukan tombol)"],
               ["Isi kartu", "16 px (HP) / 20 px", "Jarak dalam kartu"],
               ["Tepi halaman", "16 px (HP) / 32 px (desktop)", "Kiri-kanan konten"],
               ["Area sentuh di HP", "minimal 44 × 44 px", "Tombol, tautan mandiri, isian"],
@@ -817,6 +817,8 @@ export default function BrandGuidelineView() {
                 ["Nama di layar utama HP", "\"SPH Booking\" (nama pendek ikon); tempat lain \"Swim Private Hub\""],
                 ["Tanda di latar gelap", "Satu tanda untuk semua latar (Hadi 30 Sep 2026); hanya tulisan logotype yang ikut tema"],
                 ["Tombol utama", "Charcoal; lime hanya kartu utama gelap dan layar sukses (Hadi 4 Okt 2026)"],
+                ["Bentuk tombol", "Semua tombol bersudut 12 px, termasuk tombol jualan di landing; pil hanya untuk badge dan filter (Hadi 12 Okt 2026)"],
+                ["Teks di HP", "Teks standar 15 px dan teks kecil 13 px; teks samar memakai warna teks sekunder supaya terbaca (Hadi 12 Okt 2026)"],
                 ["Kata ramah dan Title Case", "Berlaku di semua teks aplikasi (Hadi 6 Okt 2026); teks hukum tidak diubah"],
                 ["Dokumen lama", "guideline.html dan brand-guideline-v2.html dihapus, digantikan halaman ini"],
                 ["Aset resolusi tinggi", "Tanda 4096 px, lockup 8320 × 1920, aset sosial 4× (selesai)"],
@@ -832,7 +834,7 @@ export default function BrandGuidelineView() {
 
       <footer className="border-t border-border py-8">
         <div className="mx-auto max-w-5xl px-4 text-xs text-text-subtle">
-          Brand Guideline 2.1 · Swim Private Hub · Contoh di halaman ini memakai komponen aplikasi yang sama.
+          Brand Guideline 2.2 · Swim Private Hub · Contoh di halaman ini memakai komponen aplikasi yang sama.
         </div>
       </footer>
     </main>

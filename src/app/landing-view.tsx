@@ -15,7 +15,7 @@ import { HeroVideo } from "./hero-video";
 import { HeroFx, Magnetic } from "./landing-fx";
 import { PAYMENT_METHODS } from "./landing-payments";
 import { TestimonialsSection, type Testimonial } from "./landing-testimonials";
-import { BeforeAfter, CoachSection, CoverageSection, ParentSection, PoolSection, RolePicker } from "./landing-sections";
+import { BeforeAfter, CoverageSection, ParentSection, RolePicker } from "./landing-sections";
 
 // Struktur mengikuti referensi Stride (hero foto penuh, badan krem, kartu
 // kolam selang-seling, kartu coach, FAQ, CTA gelap). Semua angka & data
@@ -312,11 +312,11 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
             </p>
             <div className="hero-rise mt-8 flex flex-wrap gap-3" style={heroDelay(480)}>
               <Magnetic>
-                <Link href="/register" className="inline-flex items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
+                <Link href="/register" className="inline-flex items-center rounded-xl bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
                   Daftar gratis
                 </Link>
               </Magnetic>
-              <a href="#kolam" className="inline-flex items-center rounded-full border border-white/40 px-7 py-3.5 text-base font-semibold transition-colors hover:bg-white/10">
+              <a href="#kolam" className="inline-flex items-center rounded-xl border border-white/40 px-7 py-3.5 text-base font-semibold transition-colors hover:bg-white/10">
                 Lihat kolam
               </a>
             </div>
@@ -487,7 +487,8 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
         )}
       </section>
 
-      <CoachSection />
+      {/* Bagian mitra coach dan kolam pindah ke halaman Daftar Coach dan Daftar Kolam
+          (Hadi 12 Okt, penilaian UI/UX 3A): landing iklan fokus ke orang tua. */}
 
       {/* Coach: maksimal 5 coach gaya referensi Stride "meet the leaders" --
           kartu polaroid agak miring, nyebar kiri-kanan, muncul satu per satu
@@ -508,8 +509,6 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           )}
         </div>
       </section>
-
-      <PoolSection waLink={OWNER_WA_LINK} />
 
       {/* Cara kerja */}
       <section id="cara-kerja" className="mx-auto w-full max-w-6xl scroll-mt-20 px-4 py-14 sm:py-20">
@@ -557,7 +556,7 @@ export default function LandingView({ stats, pools, coaches, testimonials }: { s
           <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-6xl">Siap mulai les renang?</h2>
             <Magnetic>
-              <Link href="/register" className="fx-pulse inline-flex shrink-0 items-center rounded-full bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
+              <Link href="/register" className="fx-pulse inline-flex shrink-0 items-center rounded-xl bg-fixed-lime px-7 py-3.5 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
                 Daftar gratis
               </Link>
             </Magnetic>

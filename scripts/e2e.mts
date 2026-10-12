@@ -175,7 +175,7 @@ try {
   await fill('input[placeholder="Minimal 8 karakter"]', PASSWORD);
   await fill('input[aria-label="Peserta 1: tanggal lahir"]', "1990-05-05");
   await fill('select[name="city"]', "Jakarta");
-  await fill('input[type="checkbox"][required]', "on");
+  await fill('input[type="checkbox"][name="agree"]', "on");
   await sleep(3500); // formulir yang dikirim terlalu cepat ditolak (penangkal bot)
   await clickText("Daftar");
   await waitFor("dialihkan ke Paket", `location.pathname === "/member/paket"`, 30_000);

@@ -1,11 +1,22 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 
 // Foto profil coach. Belum upload foto = siluet default (seperti medsos),
-// bukan inisial, supaya semua kartu coach tampil seragam.
+// bukan inisial, supaya semua kartu coach tampil seragam. Foto gagal dimuat
+// (file hilang, tautan kedaluwarsa) juga jatuh ke siluet, bukan teks alt.
 export function Avatar({ src, alt = "", className }: { src?: string | null; alt?: string; className?: string }) {
-  if (src) {
+  const [failed, setFailed] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+  // Gambar yang sudah gagal sebelum React aktif tidak memicu onError lagi: cek sekali saat dipasang.
+  useEffect(() => {
+    const img = ref.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
+  if (src && !failed) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} className={cn("shrink-0 rounded-full object-cover", className)} />;
+    return <img ref={ref} src={src} alt={alt} onError={() => setFailed(true)} className={cn("shrink-0 rounded-full object-cover", className)} />;
   }
   return (
     <svg

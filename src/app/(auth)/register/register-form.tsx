@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { AuthShell } from "@/components/auth-shell";
@@ -37,6 +38,12 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    // Tombol Daftar selalu aktif; belum centang = pesan jelas (dulu tombol abu tanpa penjelasan).
+    if (!agreed) {
+      setError(CONSENT_REQUIRED_ERROR + ".");
+      return;
+    }
 
     if (!isValidIndonesianPhone(phone)) {
       setError("Format Nomor HP tidak valid (contoh: 0812xxxxxxx)");
@@ -242,9 +249,9 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
             <label className="flex items-start gap-2 text-xs text-text-muted max-lg:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
+                name="agree"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                required
                 className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-700 focus:ring-brand-500 max-sm:h-5 max-sm:w-5"
               />
               <span>
@@ -266,7 +273,7 @@ export default function RegisterForm({ initialReferralCode = "" }: { initialRefe
               </p>
             )}
 
-            <Button type="submit" loading={loading} disabled={!agreed} className="mt-1 w-full">
+            <Button type="submit" loading={loading} className="mt-1 w-full">
               Daftar
             </Button>
           </form>

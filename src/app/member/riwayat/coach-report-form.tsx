@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { FileInput } from "@/components/ui/file-input";
 import { reportCoach } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Field, Select, Textarea } from "@/components/ui/input";
@@ -41,7 +42,7 @@ export default function CoachReportForm({ coaches }: { coaches: { id: string; na
               <Textarea name="message" rows={4} required minLength={10} maxLength={1000} placeholder="Ceritakan apa yang terjadi dan kapan." />
             </Field>
             <Field label="Tangkapan Layar (Opsional)">
-              <input name="attachment" type="file" accept="image/jpeg,image/png,image/webp" className="text-sm text-text-muted" />
+              <FileInput name="attachment" accept="image/jpeg,image/png,image/webp" />
             </Field>
             {state?.error && <p role="alert" className="text-sm text-danger-text">{state.error}</p>}
             <div className="flex gap-2">

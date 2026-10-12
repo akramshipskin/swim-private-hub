@@ -3,7 +3,8 @@
 import { useActionState } from "react";
 import { deletePoolPhoto, uploadPoolPhoto } from "@/lib/pool-info-actions";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/input";
+import { Field } from "@/components/ui/input";
+import { FileInput } from "@/components/ui/file-input";
 
 // Foto fasilitas kolam. Terpisah dari form info kolam supaya upload tidak
 // ikut pola "Edit dulu baru Simpan" (upload sekali klik, langsung tampil).
@@ -49,7 +50,7 @@ export function PoolPhotosForm({
       <form action={uploadAction} className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <input type="hidden" name="poolId" value={poolId} />
         <Field label="Tambah Foto (JPG/PNG/WEBP, maks 3 MB)" className="flex-1">
-          <Input type="file" name="photo" accept="image/jpeg,image/png,image/webp" required disabled={!storageReady} />
+          <FileInput name="photo" accept="image/jpeg,image/png,image/webp" required disabled={!storageReady} />
         </Field>
         <Button type="submit" loading={uploading} disabled={!storageReady}>
           Unggah Foto

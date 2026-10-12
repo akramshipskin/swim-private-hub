@@ -5,7 +5,6 @@ import { NOT_CLOSED } from "@/lib/availability";
 import { todayWibDateString, dateLabel, addDaysToDateString, formatDateLabel, formatTimeWib } from "@/lib/datetime";
 import { groupByHour } from "@/lib/pool-occupancy";
 import { Card, CardBody } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { DatePicker } from "@/components/ui/date-picker";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -86,23 +85,43 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
       <p className="mt-3 text-base font-semibold text-text">{formatDateLabel(dateLabel(dateStr))}</p>
 
       {pools.map((p) => {
-        const rows = groupByHour(
-          p.availabilities.map((a) => ({
-            startTime: a.startTime,
-            endTime: a.endTime,
-            booked: a.status === "BOOKED",
-            coachName: a.coach.name,
-            // Kode booking sama dengan yang tampil di kartu "Booking hari ini" HP
-            // member, untuk dicocokkan di loket (Hadi 2 Okt malam, #18b).
-            who: a.bookings[0]
-              ? `${a.bookings[0].package.dependent.isSelf
-                  ? a.bookings[0].member.name
-                  : `${a.bookings[0].package.dependent.name} (akun ${a.bookings[0].member.name})`} · kode ${a.bookings[0].id.slice(-6).toUpperCase()}`
-              : undefined,
-          })).filter((x) => !q || (x.booked && `${x.coachName} ${x.who ?? ""}`.toLowerCase().includes(q.toLowerCase()))),
+        // Tampilan loket (Hadi 12 Okt, penilaian UI/UX): satu baris per sesi
+        // berisi jam, peserta, coach, dan kode booking tebal supaya petugas bisa
+        // mencocokkan kode di HP member dalam hitungan detik. Jam kosong coach
+        // diringkas jadi jumlah (rinciannya bisa dibuka).
+        const needle = q.toLowerCase();
+        const sessions = p.availabilities
+          .filter((a) => a.status === "BOOKED" && a.bookings[0])
+          .map((a) => {
+            const b = a.bookings[0];
+            const dep = b.package.dependent;
+            return {
+              key: b.id,
+              start: a.startTime,
+              end: a.endTime,
+              coach: a.coach.name,
+              participant: dep.isSelf ? b.member.name : dep.name,
+              account: dep.isSelf ? null : b.member.name,
+              // Kode booking sama dengan yang tampil di kartu "Booking hari ini" HP
+              // member, untuk dicocokkan di loket (Hadi 2 Okt malam, #18b).
+              code: b.id.slice(-6).toUpperCase(),
+            };
+          })
+          .filter((x) => !q || `${x.coach} ${x.participant} ${x.account ?? ""} ${x.code}`.toLowerCase().includes(needle));
+        const openByCoach = new Map<string, Date[]>();
+        if (!q) {
+          for (const a of p.availabilities) {
+            if (a.status === "BOOKED") continue;
+            openByCoach.set(a.coach.name, [...(openByCoach.get(a.coach.name) ?? []), a.startTime]);
+          }
+        }
+        const openCount = [...openByCoach.values()].reduce((n, t) => n + t.length, 0);
+        const quietHours = groupByHour(
+          p.availabilities.map((a) => ({ startTime: a.startTime, endTime: a.endTime, booked: a.status === "BOOKED", coachName: a.coach.name })),
           p.openTime,
           p.closeTime
-        );
+        ).filter((r) => r.booked.length === 0 && r.open.length === 0);
+        const bookedTotal = p.availabilities.reduce((n, a) => n + a.bookings.length, 0);
         return (
           <Card key={p.id} className="mt-4 w-full">
             <CardBody>
@@ -110,41 +129,67 @@ export default async function PoolJadwalPage({ searchParams }: { searchParams: P
               {/* Kapasitas harian pelanggan SPH (Hadi 3 Okt): booking baru ditolak bila penuh. */}
               <p className="mb-3 text-sm text-text-muted">
                 {p.dailyCapacity == null
-                  ? `${p.availabilities.reduce((n, a) => n + a.bookings.length, 0)} sesi SPH dibooking di tanggal ini · kapasitas harian belum diisi (tidak dibatasi)`
-                  : `${p.availabilities.reduce((n, a) => n + a.bookings.length, 0)} dari kapasitas ${p.dailyCapacity} sesi SPH terpakai`}
+                  ? `${bookedTotal} sesi SPH dibooking di tanggal ini · kapasitas harian belum diisi (tidak dibatasi)`
+                  : `${bookedTotal} dari kapasitas ${p.dailyCapacity} sesi SPH terpakai`}
               </p>
-              <ul className="flex flex-col divide-y divide-border">
-                {rows.filter((r) => r.booked.length > 0 || r.open.length > 0).map((r) => (
-                  <li key={r.hour} className="flex flex-col gap-1 py-2 sm:flex-row sm:items-start sm:gap-4">
-                    <span className="w-24 shrink-0 text-sm font-semibold tabular-nums text-text">
-                      {String(r.hour).padStart(2, "0")}:00–{String(r.hour + 1).padStart(2, "0")}:00
-                    </span>
-                    <div className="flex flex-1 flex-wrap gap-2">
-                      {r.booked.map((s, i) => (
-                        <Badge key={`b${i}`} tone="brand">
-                          {formatTimeWib(s.startTime)} · Coach {s.coachName}
-                          {s.who ? ` · peserta ${s.who}` : ""}
-                        </Badge>
-                      ))}
-                      {r.open.map((s, i) => (
-                        <Badge key={`o${i}`} tone="neutral">Jam kosong: {s.coachName}</Badge>
-                      ))}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              {/* Jam tanpa les diringkas satu baris (dulu satu baris per jam). */}
-              {!q && rows.some((r) => r.booked.length === 0 && r.open.length === 0) && (
-                <p className="mt-3 border-t border-border pt-3 text-sm text-text-subtle">
-                  Tidak ada les:{" "}
-                  {rows
-                    .filter((r) => r.booked.length === 0 && r.open.length === 0)
-                    .map((r) => `${String(r.hour).padStart(2, "0")}:00`)
-                    .join(", ")}
+
+              {sessions.length === 0 ? (
+                <p className="text-sm text-text-muted">
+                  {q ? `Tidak ada sesi yang cocok dengan "${q}" di tanggal ini.` : "Belum ada sesi les yang dibooking di tanggal ini."}
                 </p>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="max-sm:sr-only">
+                    <tr className="border-b border-border text-left text-xs font-medium text-text-subtle">
+                      <th scope="col" className="py-2 pr-3 font-medium">Jam</th>
+                      <th scope="col" className="py-2 pr-3 font-medium">Peserta</th>
+                      <th scope="col" className="py-2 pr-3 font-medium">Coach</th>
+                      <th scope="col" className="py-2 text-right font-medium">Kode</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {sessions.map((x) => (
+                      <tr key={x.key} className="max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto] max-sm:gap-x-3 max-sm:py-2.5">
+                        <td className="whitespace-nowrap py-2.5 pr-3 align-top font-semibold tabular-nums text-text max-sm:py-0">
+                          {/* HP: jam mulai saja (sesi selalu 1 jam) supaya kolom peserta tidak terjepit. */}
+                          <span className="sm:hidden">{formatTimeWib(x.start)}</span>
+                          <span className="max-sm:hidden">{formatTimeWib(x.start)}–{formatTimeWib(x.end)}</span>
+                        </td>
+                        <td className="py-2.5 pr-3 align-top text-text max-sm:col-start-2 max-sm:row-start-1 max-sm:py-0">
+                          <span className="font-medium">{x.participant}</span>
+                          {x.account && <span className="block text-xs text-text-subtle">akun {x.account}</span>}
+                          <span className="block text-xs text-text-subtle sm:hidden">Coach {x.coach}</span>
+                        </td>
+                        <td className="py-2.5 pr-3 align-top text-text-muted max-sm:hidden">{x.coach}</td>
+                        <td className="py-2.5 text-right align-top max-sm:col-start-3 max-sm:row-start-1 max-sm:py-0">
+                          <span className="font-mono text-base font-bold tracking-wider text-text">{x.code}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               )}
-              {rows.every((r) => r.booked.length === 0 && r.open.length === 0) && (
-                <p className="text-sm text-text-muted">{q ? `Tidak ada sesi yang cocok dengan "${q}" di tanggal ini.` : "Tidak ada les di tanggal ini."}</p>
+
+              {openCount > 0 && (
+                <details className="group mt-3 border-t border-border pt-3">
+                  <summary className="flex min-h-[44px] cursor-pointer list-none items-center gap-2 text-sm text-text-muted lg:min-h-0 [&::-webkit-details-marker]:hidden">
+                    <span className="font-medium text-text">{openCount} jam kosong coach</span> belum dibooking
+                    <span aria-hidden="true" className="transition-transform group-open:rotate-180">↓</span>
+                  </summary>
+                  <ul className="mt-2 flex flex-col gap-1.5">
+                    {[...openByCoach.entries()].map(([coach, times]) => (
+                      <li key={coach} className="text-sm text-text-muted">
+                        <span className="font-medium text-text">{coach}</span>: {times.map((t) => formatTimeWib(t)).join(", ")}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+              {/* Jam tanpa les diringkas satu baris (dulu satu baris per jam). */}
+              {!q && quietHours.length > 0 && (
+                <p className="mt-3 border-t border-border pt-3 text-sm text-text-subtle">
+                  Tidak ada les: {quietHours.map((r) => `${String(r.hour).padStart(2, "0")}:00`).join(", ")}
+                </p>
               )}
             </CardBody>
           </Card>

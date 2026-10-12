@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { PARTNER_CONSENT_REQUIRED_ERROR } from "@/lib/legal";
 import { PendingApprovalScreen } from "@/components/pending-approval-screen";
 import { AuthShell } from "@/components/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
-import { PartnerSteps } from "@/components/partner-steps";
 import { Field, Input, Textarea } from "@/components/ui/input";
 import { POOL_FACILITIES } from "@/lib/pool-facilities";
 import { isValidIndonesianPhone } from "@/lib/format";
@@ -41,6 +41,12 @@ export default function RegisterPoolForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    // Tombol Daftar selalu aktif; belum centang = pesan jelas (dulu tombol abu tanpa penjelasan).
+    if (!agreed) {
+      setError(PARTNER_CONSENT_REQUIRED_ERROR.POOL_OWNER + ".");
+      return;
+    }
 
     if (!isValidIndonesianPhone(phone)) {
       setError("Format Nomor HP tidak valid (contoh: 0812xxxxxxx)");
@@ -92,7 +98,7 @@ export default function RegisterPoolForm() {
   if (submitted) return <PendingApprovalScreen roleLabel="pemilik kolam" />;
 
   return (
-    <AuthShell points={["Pasang harga tiket paketmu sendiri", "Bagian kolam masuk saldo setiap sesi Hadir", "Daftar gratis, tanpa biaya bulanan"]}>
+    <AuthShell partner="kolam" points={["Pasang harga tiket paketmu sendiri", "Bagian kolam masuk saldo setiap sesi Hadir", "Daftar gratis, tanpa biaya bulanan"]}>
 
       <Card className="w-full max-w-sm">
         <CardBody>
@@ -113,6 +119,7 @@ export default function RegisterPoolForm() {
               />
             </div>
 
+            <p className="text-xs font-medium uppercase tracking-wide text-text-subtle">Data kolam</p>
             <Field label="Nama Kolam">
               <Input value={poolName} onChange={(e) => setPoolName(e.target.value)} required />
             </Field>
@@ -231,9 +238,9 @@ export default function RegisterPoolForm() {
             <label className="flex items-start gap-2 text-xs text-text-muted max-lg:min-h-[44px] max-sm:py-1">
               <input
                 type="checkbox"
+                name="agree"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                required
                 className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-brand-700 focus:ring-brand-500 max-sm:h-5 max-sm:w-5"
               />
               <span>
@@ -263,7 +270,7 @@ export default function RegisterPoolForm() {
               </p>
             )}
 
-            <Button type="submit" loading={loading} disabled={!agreed} className="mt-1 w-full">
+            <Button type="submit" loading={loading} className="mt-1 w-full">
               Daftar
             </Button>
           </form>
@@ -276,7 +283,10 @@ export default function RegisterPoolForm() {
           </p>
         </CardBody>
       </Card>
-      <PartnerSteps kind="kolam" />
+      <a href="#untuk-kolam" className="mt-5 inline-flex min-h-[44px] items-center gap-1 text-sm font-semibold text-brand-700 underline underline-offset-4">
+        Kenapa jadi kolam mitra? Baca keuntungannya
+        <span aria-hidden="true">↓</span>
+      </a>
     </AuthShell>
   );
 }

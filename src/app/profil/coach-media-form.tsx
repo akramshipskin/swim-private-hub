@@ -5,6 +5,7 @@ import { uploadCoachPhoto, uploadCoachCertificate, deleteCoachCertificate, uploa
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Field, Input } from "@/components/ui/input";
+import { FileInput } from "@/components/ui/file-input";
 import { Avatar } from "@/components/ui/avatar";
 import { ConfirmSubmit } from "@/components/ui/confirm-submit";
 import { certificateStatusBadge, MAX_CERTIFICATES_PER_COACH } from "@/lib/coach-certificates";
@@ -51,7 +52,7 @@ export default function CoachMediaForm({
         <Avatar src={photoUrl} alt="Foto profil" className="h-20 w-20" />
         <div className="flex flex-1 flex-col gap-2">
           <Field label="Foto Profil (JPG/PNG/WEBP, maks 3 MB)">
-            <Input type="file" name="photo" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />
+            <FileInput name="photo" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />
           </Field>
           <div className="flex items-center gap-3">
             <Button type="submit" size="sm" loading={photoPending} disabled={!storageReady}>Unggah Foto</Button>
@@ -72,7 +73,7 @@ export default function CoachMediaForm({
           <img src={signatureUrl} alt="Tanda tangan tersimpan" className="h-16 w-auto self-start rounded border border-border bg-white p-1" />
         )}
         <Field label="File Tanda Tangan">
-          <Input type="file" name="signature" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />
+          <FileInput name="signature" accept="image/jpeg,image/png,image/webp" disabled={!storageReady} required />
         </Field>
         <div className="flex items-center gap-3">
           <Button type="submit" size="sm" loading={sigPending} disabled={!storageReady}>Simpan Tanda Tangan</Button>
@@ -130,7 +131,7 @@ export default function CoachMediaForm({
               />
             </Field>
             <Field label="File Sertifikat (JPG/PNG/WEBP/PDF, maks 3 MB)">
-              <Input type="file" name="certificate" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={!storageReady} required />
+              <FileInput name="certificate" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={!storageReady} required />
             </Field>
             <div className="flex items-center gap-3">
               <Button type="submit" size="sm" loading={certPending} disabled={!storageReady}>Tambah Sertifikat</Button>

@@ -74,6 +74,35 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
       : null;
   const { error } = await searchParams;
 
+  // Kartu keamanan: coach di kolom kiri (kanan sudah berisi Profil Coach); peran lain
+  // di kolom kanan supaya dua kolom seimbang (Hadi 12 Okt, penilaian UI/UX).
+  const securityCards = (
+    <>
+      <Card>
+        <CardBody>
+          <h2 className="mb-3 text-lg font-semibold text-text">Ganti Password</h2>
+          <EditPasswordForm />
+        </CardBody>
+      </Card>
+
+      {totp && (
+        <Card>
+          <CardBody>
+            <h2 className="mb-1 text-lg font-semibold text-text">Verifikasi 2 Langkah (2FA)</h2>
+            <p className="mb-3 text-sm text-text-muted">
+              {totp.totpEnabledAt
+                ? "Aktif: setiap masuk kamu diminta kode dari Google Authenticator."
+                : "Belum aktif. Tambahan pengaman: selain password, masuk juga butuh kode dari HP-mu."}
+            </p>
+            <a href="/keamanan" className="inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+              {totp.totpEnabledAt ? "Kelola 2FA →" : "Pasang 2FA →"}
+            </a>
+          </CardBody>
+        </Card>
+      )}
+    </>
+  );
+
   return (
     <NavBar
       userName={session.user.name ?? ""}
@@ -134,31 +163,11 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
               </Card>
             )}
 
-            <Card>
-              <CardBody>
-                <h2 className="mb-3 text-lg font-semibold text-text">Ganti Password</h2>
-                <EditPasswordForm />
-              </CardBody>
-            </Card>
-
-            {totp && (
-              <Card>
-                <CardBody>
-                  <h2 className="mb-1 text-lg font-semibold text-text">Verifikasi 2 Langkah (2FA)</h2>
-                  <p className="mb-3 text-sm text-text-muted">
-                    {totp.totpEnabledAt
-                      ? "Aktif: setiap masuk kamu diminta kode dari Google Authenticator."
-                      : "Belum aktif. Tambahan pengaman: selain password, masuk juga butuh kode dari HP-mu."}
-                  </p>
-                  <a href="/keamanan" className="inline-block text-sm font-medium text-brand-700 hover:underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-                    {totp.totpEnabledAt ? "Kelola 2FA →" : "Pasang 2FA →"}
-                  </a>
-                </CardBody>
-              </Card>
-            )}
+            {coachProfile && securityCards}
           </div>
 
           <div className="flex flex-col gap-4">
+            {!coachProfile && securityCards}
             {coachProfile && (
               <Card>
                 <CardBody>
@@ -182,13 +191,6 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
               </Card>
             )}
 
-            {deletionAccount && (
-              <DeleteAccountCard
-                requestedAt={deletionAccount.deletionRequestedAt?.toISOString() ?? null}
-                memberBalance={deletionAccount.memberBalance}
-              />
-            )}
-
             {session.user.role === "MEMBER" && (
               <p className="text-sm text-text-muted">
                 Tambah atau ubah peserta les ada di menu{" "}
@@ -200,6 +202,17 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
             )}
           </div>
         </div>
+
+        {/* Aksi berbahaya paling bawah, terpisah dari isian biasa (Hadi 12 Okt,
+            penilaian UI/UX: dulu kartu Hapus Akun sejajar kartu Nama di desktop). */}
+        {deletionAccount && (
+          <div className="mt-10 border-t border-border pt-6 lg:max-w-[calc(50%-0.5rem)]">
+            <DeleteAccountCard
+              requestedAt={deletionAccount.deletionRequestedAt?.toISOString() ?? null}
+              memberBalance={deletionAccount.memberBalance}
+            />
+          </div>
+        )}
       </main>
     </NavBar>
   );

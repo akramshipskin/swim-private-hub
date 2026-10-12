@@ -29,6 +29,10 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
   return (
     <form key={edit.formKey} action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="poolId" value={pool.id} />
+      {/* Tombol Ubah di atas isian (Hadi 12 Okt, penilaian UI/UX): dulu di bawah formulir panjang, jadi harus gulir ke bawah untuk membuka lalu ke atas untuk mengisi. */}
+      {edit.locked && (
+        <Button type="button" variant="secondary" onClick={edit.startEdit} className="self-start max-sm:w-full">Ubah Info Kolam</Button>
+      )}
       <fieldset disabled={edit.locked} className="grid gap-4 disabled:opacity-90 lg:grid-cols-2">
         <Field label="Deskripsi Kolam">
           <Textarea name="description" rows={3} maxLength={1000} defaultValue={pool.description ?? ""} placeholder="Ukuran kolam, kedalaman, suasana, dll." />
@@ -76,9 +80,7 @@ export default function PoolInfoForm({ pool }: { pool: PoolInfo }) {
         </Field>
       </fieldset>
       <div className="flex flex-wrap items-center gap-2">
-        {edit.locked ? (
-          <Button type="button" variant="secondary" onClick={edit.startEdit}>Ubah Info Kolam</Button>
-        ) : (
+        {!edit.locked && (
           <>
             <Button type="submit" loading={pending} disabled={edit.saveDisabled}>Simpan</Button>
             <Button type="button" variant="ghost" onClick={edit.cancel} disabled={pending}>Batal</Button>

@@ -29,13 +29,13 @@ const ROLES = [
     cta: "Lihat untuk orang tua",
   },
   {
-    href: "#untuk-coach",
+    href: "/daftar-coach#untuk-coach",
     label: "Coach",
     line: "Jadwal, kehadiran, dan saldo diurus sistem. Kamu fokus mengajar.",
     cta: "Lihat untuk coach",
   },
   {
-    href: "#untuk-kolam",
+    href: "/daftar-kolam#untuk-kolam",
     label: "Pemilik kolam",
     line: "Ubah jam sepi kolam jadi les privat yang terjadwal, dengan bagi hasil yang jelas.",
     cta: "Lihat untuk pemilik kolam",
@@ -108,7 +108,7 @@ export function BeforeAfter() {
             Les renang tanpa drama chat.
           </h2>
           <p className="mt-4 max-w-md text-base text-fixed-muted">Empat hal yang dulu diurus lewat chat, sekarang diurus aplikasi.</p>
-          <Link href="/register" className="mt-7 inline-flex items-center rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
+          <Link href="/register" className="mt-7 inline-flex items-center rounded-xl bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
             Daftar gratis
           </Link>
         </Reveal>
@@ -133,18 +133,27 @@ export function BeforeAfter() {
   );
 }
 
+// Landing dipendekkan (Hadi 12 Okt, penilaian UI/UX 3A): 3 alasan utama tampil,
+// 3 sisanya dilipat supaya halaman iklan tidak terlalu panjang di HP.
 const PARENT_POINTS: Point[] = [
   {
     title: "Harga paket sudah termasuk tiket masuk kolam",
     body: "Peserta tidak membayar tiket lagi di loket. Tiket per sesi sudah mencakup 1 peserta, 1 pendamping, dan coach-nya.",
   },
   {
-    title: "Benar-benar privat: 1 coach, 1 peserta",
-    body: "Setiap sesi berlangsung 60 menit dan dijadwalkan khusus untuk pesertanya. Bukan kelas gabungan.",
-  },
-  {
     title: "Kamu yang memilih coach",
     body: "Lihat keahlian, umur, harga, dan kolam tempat mengajar. Badge Bersertifikat berarti sertifikat yang diunggah coach sudah diperiksa dan disetujui admin. Tidak cocok? Ajukan ganti coach, sisa sesi ikut pindah.",
+  },
+  {
+    title: "Boleh coba dulu",
+    body: "Belum yakin? Peserta yang belum pernah punya paket bisa beli 1 sesi coba dengan coach pilihanmu (satu kali per peserta, berlaku 7 hari).",
+  },
+];
+
+const PARENT_MORE: Point[] = [
+  {
+    title: "Benar-benar privat: 1 coach, 1 peserta",
+    body: "Setiap sesi berlangsung 60 menit dan dijadwalkan khusus untuk pesertanya. Bukan kelas gabungan.",
   },
   {
     title: "Perkembangan anak tercatat",
@@ -153,10 +162,6 @@ const PARENT_POINTS: Point[] = [
   {
     title: "Keselamatan kolam jelas penanggung jawabnya",
     body: "Kolam mitra bertanggung jawab atas petugas penyelamat selama jam operasional, perlengkapan P3K, rambu kedalaman, dan kebersihan air.",
-  },
-  {
-    title: "Boleh coba dulu",
-    body: "Belum yakin? Peserta yang belum pernah punya paket bisa beli 1 sesi coba dengan coach pilihanmu (satu kali per peserta, berlaku 7 hari).",
   },
 ];
 
@@ -177,15 +182,29 @@ export function ParentSection() {
             Anak belajar dengan tenang. Kamu tahu persis apa yang dibayar.
           </h2>
           <p className="mt-4 max-w-xl text-base text-fixed-muted">Tanpa biaya tersembunyi, tanpa kejutan di kolam.</p>
-          <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2">
+          <ul className="mt-10 grid gap-x-10 gap-y-8">
             {PARENT_POINTS.map((p) => (
               <li key={p.title} className="fx-point border-t border-fixed-ink/20 pt-5">
                 <h3 className="text-lg font-semibold leading-snug">{p.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-fixed-ink-soft">{p.body}</p>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-fixed-ink-soft">{p.body}</p>
               </li>
             ))}
           </ul>
-          <Link href="/register" className="mt-10 inline-flex items-center rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
+          <details className="group mt-6 border-t border-fixed-ink/20">
+            <summary className="flex min-h-[44px] cursor-pointer list-none items-center gap-2 pt-4 text-sm font-semibold underline decoration-fixed-ink/30 underline-offset-4 [&::-webkit-details-marker]:hidden">
+              Lihat 3 alasan lain
+              <span aria-hidden="true" className="transition-transform group-open:rotate-180">↓</span>
+            </summary>
+            <ul className="mt-4 grid gap-y-6">
+              {PARENT_MORE.map((p) => (
+                <li key={p.title}>
+                  <h3 className="text-base font-semibold leading-snug">{p.title}</h3>
+                  <p className="mt-1 max-w-xl text-sm leading-relaxed text-fixed-ink-soft">{p.body}</p>
+                </li>
+              ))}
+            </ul>
+          </details>
+          <Link href="/register" className="mt-10 inline-flex items-center rounded-xl bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
             Daftar gratis
           </Link>
         </Reveal>
@@ -301,7 +320,7 @@ const COACH_CELLS: { title: string; body: string }[] = [
 // Enam sel persis untuk enam poin: satu sel lime besar (poin yang paling
 // menentukan bagi coach), satu sel foto, satu sel gelap berbingkai, tiga sel
 // gelap biasa. Bukan enam kartu kembar.
-export function CoachSection() {
+export function CoachSection({ ctaHref = "/daftar-coach" }: { ctaHref?: string }) {
   const [lead, schedule, free, ...rest] = COACH_CELLS;
   return (
     <section id="untuk-coach" className="scroll-mt-20 bg-fixed-ink py-14 text-white sm:py-20">
@@ -377,7 +396,7 @@ export function CoachSection() {
           </div>
         </Reveal>
         </div>
-        <Link href="/daftar-coach" className="mt-6 inline-flex items-center rounded-full bg-fixed-lime px-6 py-3 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
+        <Link href={ctaHref} className="mt-6 inline-flex items-center rounded-xl bg-fixed-lime px-6 py-3 text-base font-semibold text-fixed-ink transition-transform hover:bg-fixed-lime-100 active:scale-[0.98]">
           Daftar sebagai coach
         </Link>
       </div>
@@ -429,7 +448,7 @@ const POOL_GROUPS: { heading: string; items: Point[] }[] = [
   },
 ];
 
-export function PoolSection({ waLink }: { waLink: string }) {
+export function PoolSection({ waLink, ctaHref = "/daftar-kolam" }: { waLink: string; ctaHref?: string }) {
   return (
     <section id="untuk-kolam" className="scroll-mt-20 mx-auto w-full max-w-6xl px-4 py-14 sm:py-20">
       <Reveal>
@@ -459,10 +478,10 @@ export function PoolSection({ waLink }: { waLink: string }) {
       </div>
 
       <Reveal className="mt-12 flex flex-wrap gap-3">
-        <Link href="/daftar-kolam" className="inline-flex items-center rounded-full bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
+        <Link href={ctaHref} className="inline-flex items-center rounded-xl bg-fixed-ink px-6 py-3 text-base font-semibold text-white transition-transform hover:bg-fixed-ink-deep active:scale-[0.98]">
           Daftarkan kolam
         </Link>
-        <a href={waLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-full border border-fixed-ink/25 px-6 py-3 text-base font-semibold transition-colors hover:bg-white">
+        <a href={waLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-xl border border-fixed-ink/25 px-6 py-3 text-base font-semibold transition-colors hover:bg-white">
           Tanya lewat WhatsApp
         </a>
       </Reveal>

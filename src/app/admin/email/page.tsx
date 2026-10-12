@@ -224,7 +224,7 @@ export default async function AdminEmailPage({ searchParams }: { searchParams: P
                     </div>
                     <a
                       href="#balas"
-                      className="inline-flex min-h-[44px] items-center rounded-full border border-border bg-surface px-4 text-sm font-medium text-text hover:bg-surface-muted lg:min-h-0 lg:py-1.5"
+                      className="inline-flex min-h-[44px] items-center rounded-xl border border-border bg-surface px-4 text-sm font-medium text-text hover:bg-surface-muted lg:min-h-0 lg:py-1.5"
                     >
                       ↩ Balas
                     </a>

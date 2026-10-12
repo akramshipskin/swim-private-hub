@@ -81,100 +81,125 @@ export default async function CoachShortcutPage({
     // pindah dari Cari Coach). Anonim: tengah, sejajar header publik.
     <main className={session ? "w-full px-4 py-6 sm:py-8" : "mx-auto w-full max-w-6xl px-4 py-8"}>
       <BackButton fallbackHref={session?.user.role === "MEMBER" ? "/member/cari-coach" : "/"} />
-      <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
-        <Avatar src={profile?.photoUrl} alt={`Foto ${coach.name}`} className="h-24 w-24 sm:h-28 sm:w-28" />
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-text">{coach.name}</h1>
-          <p className="text-sm text-text-muted">{coachBioLine(profile) ?? "Coach renang privat"}</p>
-          {profile?.bio && <p className="mt-2 text-base text-text">{profile.bio}</p>}
+      {/* Rombak 12 Okt (penilaian UI/UX): desktop dua kolom, profil di kiri; kolam
+          dan ajakan daftar di kanan, menempel saat digulir. HP satu kolom. */}
+      <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-10">
+        <section aria-label="Profil coach" className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <Avatar src={profile?.photoUrl} alt={`Foto ${coach.name}`} className="h-28 w-28 sm:h-32 sm:w-32" />
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl font-semibold tracking-tight text-text sm:text-3xl">{coach.name}</h1>
+              <p className="mt-1 text-sm text-text-muted">{coachBioLine(profile) ?? "Coach renang privat"}</p>
+              {certifiedLabel && (
+                <div className="mt-2">
+                  <Badge tone="success">{certifiedLabel}</Badge>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {profile?.bio && <p className="max-w-prose text-base leading-relaxed text-text">{profile.bio}</p>}
+
           {profile && profile.specialties.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {profile.specialties.map((sp) => (
-                <Badge key={sp} tone="brand">
-                  {sp}
-                </Badge>
-              ))}
+            <div>
+              <h2 className="text-sm font-semibold text-text">Keahlian</h2>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {profile.specialties.map((sp) => (
+                  <Badge key={sp} tone="brand">
+                    {sp}
+                  </Badge>
+                ))}
+              </div>
             </div>
           )}
-        </div>
-      </div>
 
-      {certifiedLabel && (
-        <div className="mt-4 flex flex-col gap-2">
-          <div>
-            <Badge tone="success">{certifiedLabel}</Badge>
-          </div>
-          <ul className="flex flex-col gap-1">
-            {certificates.map((c) => (
-              <li key={c.id} className="flex flex-wrap items-center gap-2 text-sm text-text">
-                <span>{c.name}</span>
-                {session ? (
-                  c.viewUrl && (
-                    <a href={c.viewUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-700 underline">
-                      Lihat sertifikat
-                    </a>
-                  )
-                ) : (
-                  c.filePath && (
-                    <Link href="/register" className="font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
-                      Lihat sertifikat (daftar dulu)
-                    </Link>
-                  )
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <h2 className="mt-6 text-base font-semibold text-text">Mengajar di kolam</h2>
-      {coach.poolAffiliations.length === 0 ? (
-        <p className="mt-2 text-sm text-text-muted">Belum terdaftar di kolam mana pun.</p>
-      ) : (
-        <ul className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
-          {coach.poolAffiliations.map(({ pool }) => (
-            <li key={pool.id}>
-              <Card>
-                <CardBody className="flex gap-3 py-3">
-                  {pool.photos.length > 0 && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={pool.photos[0]} alt={`Foto ${pool.name}`} className="h-20 w-24 shrink-0 rounded-lg object-cover" />
-                  )}
-                  <div className="min-w-0">
-                    <p className="text-base font-semibold text-text">{pool.name}</p>
-                    {pool.address && <p className="text-sm text-text-muted">{pool.address}</p>}
-                    {session && (
-                      <>
-                        {pool.openTime && pool.closeTime && (
-                          <p className="mt-1 text-sm text-text-muted">
-                            Buka {pool.openTime}–{pool.closeTime}
-                          </p>
-                        )}
-                        {pool.facilities.length > 0 && (
-                          <p className="mt-1 line-clamp-2 text-sm text-text-muted">Fasilitas: {pool.facilities.join(", ")}</p>
-                        )}
-                      </>
+          {certifiedLabel && (
+            <div>
+              <h2 className="text-sm font-semibold text-text">Sertifikat</h2>
+              <ul className="mt-2 flex flex-col divide-y divide-border border-y border-border">
+                {certificates.map((c) => (
+                  <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm text-text">
+                    <span>{c.name}</span>
+                    {session ? (
+                      c.viewUrl && (
+                        <a href={c.viewUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+                          Lihat sertifikat
+                        </a>
+                      )
+                    ) : (
+                      c.filePath && (
+                        <Link href="/register" className="font-medium text-brand-700 underline max-lg:inline-flex max-lg:min-h-[44px] max-lg:items-center">
+                          Lihat sertifikat (daftar dulu)
+                        </Link>
+                      )
                     )}
-                  </div>
-                </CardBody>
-              </Card>
-            </li>
-          ))}
-        </ul>
-      )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
 
-      <p className="mt-6 text-sm text-text-muted">
-        {session?.user.role === "MEMBER"
-          ? "Mau les dengan coach ini? Beli paketnya di menu Paket (pilih kolam lalu coach ini), lalu booking jadwalnya di menu Booking."
-          : session
-            ? "Booking coach dilakukan member lewat menu Booking."
-            : "Mau les dengan coach ini? Daftar sebagai member untuk melihat jadwal, fasilitas kolam, dan sertifikat lengkap."}
-      </p>
-      {!session && (
-        <Link href="/register" className={buttonClass({ className: "mt-3" })}>
-          Daftar gratis
-        </Link>
-      )}
+        <aside aria-label="Kolam dan pendaftaran" className="flex flex-col gap-4 lg:sticky lg:top-24">
+          <div>
+            <h2 className="text-base font-semibold text-text">Mengajar di kolam</h2>
+            {coach.poolAffiliations.length === 0 ? (
+              <p className="mt-2 text-sm text-text-muted">Belum terdaftar di kolam mana pun.</p>
+            ) : (
+              <ul className="mt-2 flex flex-col gap-3">
+                {coach.poolAffiliations.map(({ pool }) => (
+                  <li key={pool.id}>
+                    <Card>
+                      <CardBody className="flex gap-3 py-3">
+                        {pool.photos.length > 0 && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={pool.photos[0]} alt={`Foto ${pool.name}`} className="h-20 w-24 shrink-0 rounded-lg object-cover" />
+                        )}
+                        <div className="min-w-0">
+                          <p className="text-base font-semibold text-text">{pool.name}</p>
+                          {pool.address && <p className="text-sm text-text-muted">{pool.address}</p>}
+                          {session && (
+                            <>
+                              {pool.openTime && pool.closeTime && (
+                                <p className="mt-1 text-sm text-text-muted">
+                                  Buka {pool.openTime}–{pool.closeTime}
+                                </p>
+                              )}
+                              {pool.facilities.length > 0 && (
+                                <p className="mt-1 line-clamp-2 text-sm text-text-muted">Fasilitas: {pool.facilities.join(", ")}</p>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </CardBody>
+                    </Card>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface-muted p-4 sm:p-5">
+            <p className="text-sm text-text">
+              {session?.user.role === "MEMBER"
+                ? "Mau les dengan coach ini? Beli paketnya di menu Paket (pilih kolam lalu coach ini), lalu booking jadwalnya di menu Booking."
+                : session
+                  ? "Booking coach dilakukan member lewat menu Booking."
+                  : "Mau les dengan coach ini? Daftar sebagai member untuk melihat jadwal, fasilitas kolam, dan sertifikat lengkap."}
+            </p>
+            {!session && (
+              <Link href="/register" className={buttonClass({ className: "mt-3 w-full" })}>
+                Daftar gratis
+              </Link>
+            )}
+            {session?.user.role === "MEMBER" && (
+              <Link href="/member/paket" className={buttonClass({ className: "mt-3 w-full" })}>
+                Ke menu Paket
+              </Link>
+            )}
+          </div>
+        </aside>
+      </div>
     </main>
   );
 

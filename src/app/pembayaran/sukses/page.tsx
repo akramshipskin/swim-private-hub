@@ -64,8 +64,13 @@ export default async function PembayaranSuksesPage({
                   : "bg-brand-500 text-fixed-ink"
             }`}
           >
-            {isUnknown ? (
-              <span className="text-3xl font-bold" aria-hidden="true">?</span>
+            {/* Status menunggu/belum diketahui: ikon jam (sedang diproses), bukan tanda
+                tanya (Hadi 12 Okt, penilaian UI/UX: tanda tanya terasa tidak meyakinkan). */}
+            {isUnknown || isPending ? (
+              <svg viewBox="0 0 24 24" fill="none" className="h-9 w-9" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" />
+                <path d="M12 7v5l3 2" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             ) : isFailed ? (
               <svg viewBox="0 0 24 24" fill="none" className="h-9 w-9" aria-hidden="true">
                 <path
